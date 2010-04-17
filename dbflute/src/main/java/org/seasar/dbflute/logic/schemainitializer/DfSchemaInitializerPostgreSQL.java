@@ -28,6 +28,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -44,20 +45,26 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                       =============
     @Override
     protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        final String schema = _schema != null && _schema.trim().length() > 0 ? _schema : "public";
+        final String catalog = _unifiedSchema.existsPureCatalog() ? _unifiedSchema.getPureCatalog() : null;
+        final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
         final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");
-        sb.append(" where sequence_schema = '").append(schema).append("'");
+        sb.append(" where ");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalog)) {
+            sb.append("sequence_catalog = '").append(catalog).append("'").append(" and ");
+        }
+        sb.append("sequence_schema = '").append(schema).append("'");
         final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(), Arrays
                 .asList(sequenceColumnName));
         for (Map<String, String> recordMap : resultList) {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }
         for (String sequenceName : sequenceNameList) {
-            final String dropSequenceSql = "drop sequence " + schema + "." + sequenceName;
+            final String sequenceSqlName = _unifiedSchema.buildSqlElement(sequenceName);
+            final String dropSequenceSql = "drop sequence " + sequenceSqlName;
             _log.info(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }

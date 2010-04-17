@@ -10,10 +10,14 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.seasar.dbflute.logic.factory.DfUrlAnalyzerFactory;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -217,11 +221,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
                 url = getDatabaseProperties().getDatabaseUrl();
             }
         }
+        final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), url);
+        final DfUrlAnalyzer analyzer = factory.createAnalyzer();
+        final String catalog = analyzer.extractCatalog();
         final String schema = propertyMap.get("schema");
+        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema,
+                getDatabaseProperties());
         final String user = propertyMap.get("user");
         final String password = propertyMap.get("password");
         _log.info("...Creating a connection for additional user");
-        return createConnection(driver, url, schema, user, password);
+        return createConnection(driver, url, unifiedSchema, user, password);
     }
 
     // ===================================================================================
@@ -275,7 +284,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return prop;
     }
 
-    public String getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
+    public UnifiedSchema getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
+        final String url = getAdditionalDropUrl(additionalDropMap);
+        final String catalog;
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(url)) {
+            final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), url);
+            final DfUrlAnalyzer analyzer = factory.createAnalyzer();
+            catalog = analyzer.extractCatalog();
+        } else {
+            catalog = getDatabaseProperties().getDatabaseCatalog();
+        }
         final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
             getBasicProperties().isDatabasePostgreSQL();
@@ -286,7 +304,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             }
             return null;
         }
-        return castToString(obj, "additionalDropMapList.schema");
+        final String schema = castToString(obj, "additionalDropMapList.schema");
+        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema,
+                getDatabaseProperties());
+        return unifiedSchema;
     }
 
     protected boolean isSchemaCanBeOmittedDBMS() {
@@ -349,9 +370,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         info.putAll(prop);
         info.put("user", user);
         info.put("password", password);
-        final String schema = getAdditionalDropSchema(additionalDropMap);
         _log.info("...Creating a connection for additional drop");
-        return createConnection(driver, url, schema, info);
+        return createConnection(driver, url, getAdditionalDropSchema(additionalDropMap), info);
     }
 
     // ===================================================================================

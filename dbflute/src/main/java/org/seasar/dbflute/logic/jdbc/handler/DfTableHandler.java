@@ -21,14 +21,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -48,25 +50,26 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
     /**
      * Get all the table names in the current database that are not system tables. <br />
      * This does not contain additional schema. only specified schema is considered.
-     * @param dbMeta JDBC database meta data. (NotNull)
-     * @param uniqueSchema The unique name of schema that can contain catalog name and no-name mark. (Nullable)
+     * @param metaData JDBC database meta data. (NotNull)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
-    public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String uniqueSchema) throws SQLException {
-        return doGetTableList(dbMeta, uniqueSchema);
+    public List<DfTableMetaInfo> getTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
+            throws SQLException {
+        return doGetTableList(metaData, unifiedSchema);
     }
 
-    protected List<DfTableMetaInfo> doGetTableList(DatabaseMetaData dbMeta, String uniqueSchema) throws SQLException {
-        uniqueSchema = filterSchemaName(uniqueSchema);
-        final String[] objectTypes = getRealObjectTypeTargetArray(uniqueSchema);
+    protected List<DfTableMetaInfo> doGetTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
+            throws SQLException {
+        final String[] objectTypes = getRealObjectTypeTargetArray(unifiedSchema);
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
-            _log.info("...Getting tables: schema=" + uniqueSchema + " objectTypes=" + Arrays.asList(objectTypes));
-            final String catalogName = extractCatalogName(uniqueSchema);
-            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
-            resultSet = dbMeta.getTables(catalogName, pureSchemaName, "%", objectTypes);
+            _log.info("...Getting tables: schema=" + unifiedSchema + " objectTypes=" + Arrays.asList(objectTypes));
+            final String catalogName = unifiedSchema.getPureCatalog();
+            final String schemaName = unifiedSchema.getPureSchema();
+            resultSet = metaData.getTables(catalogName, schemaName, "%", objectTypes);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString("TABLE_NAME");
                 final String tableType = resultSet.getString("TABLE_TYPE");
@@ -89,22 +92,10 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
 
-                final String tableUniqueSchema;
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(tableCatalog)) {
-                    // basically for additionalSchema
-                    final String schemaPart;
-                    if (Srl.is_NotNull_and_NotTrimmedEmpty(tableSchema)) {
-                        schemaPart = tableSchema;
-                    } else {
-                        // basically MySQL
-                        schemaPart = DfDatabaseProperties.NO_NAME_SCHEMA;
-                    }
-                    tableUniqueSchema = tableCatalog + "." + schemaPart;
-                } else {
-                    tableUniqueSchema = tableSchema;
-                }
+                // create new original unified schema for this table
+                final UnifiedSchema tableUnifiedSchema = createAsDynamicSchema(tableCatalog, tableSchema);
 
-                if (isTableExcept(tableUniqueSchema, tableName)) {
+                if (isTableExcept(tableUnifiedSchema, tableName)) {
                     _log.info(tableName + " is excepted!");
                     continue;
                 }
@@ -116,7 +107,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
                 tableMetaInfo.setTableName(tableName);
                 tableMetaInfo.setTableType(tableType);
-                tableMetaInfo.setUniqueSchema(tableUniqueSchema);
+                tableMetaInfo.setUnifiedSchema(tableUnifiedSchema);
                 tableMetaInfo.setTableComment(tableComment);
                 tableList.add(tableMetaInfo);
             }
@@ -147,7 +138,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         return false;
     }
 
-    protected String[] getRealObjectTypeTargetArray(String uniqueSchema) {
+    protected String[] getRealObjectTypeTargetArray(UnifiedSchema uniqueSchema) {
         if (uniqueSchema != null) {
             final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(uniqueSchema);
             if (schemaInfo != null) {
@@ -161,11 +152,21 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
     }
 
-    protected void assertObjectTypeTargetListNotEmpty(String uniqueSchema, List<String> objectTypeTargetList) {
+    protected void assertObjectTypeTargetListNotEmpty(UnifiedSchema uniqueSchema, List<String> objectTypeTargetList) {
         if (objectTypeTargetList == null || objectTypeTargetList.isEmpty()) {
             String msg = "The property 'objectTypeTargetList' should be required:";
             msg = msg + " uniqueSchema=" + uniqueSchema;
             throw new IllegalStateException(msg);
         }
+    }
+
+    public Map<String, DfTableMetaInfo> getTableMap(DatabaseMetaData metaData, UnifiedSchema uniqueSchema)
+            throws SQLException {
+        final List<DfTableMetaInfo> tableList = getTableList(metaData, uniqueSchema);
+        final Map<String, DfTableMetaInfo> map = DfCollectionUtil.newLinkedHashMap();
+        for (DfTableMetaInfo tableInfo : tableList) {
+            map.put(tableInfo.getTableName(), tableInfo);
+        }
+        return map;
     }
 }

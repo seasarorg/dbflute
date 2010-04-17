@@ -17,6 +17,8 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.List;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
+
 /**
  * @author jflute
  * @since 0.9.6.2 (2009/12/08 Tuesday)
@@ -32,7 +34,7 @@ public class DfProcedureSynonymMetaInfo {
     // ===================================================================================
     //                                                                              Switch
     //                                                                              ======
-    public DfProcedureMetaInfo createMergedProcedure(String mainSchemaName) {
+    public DfProcedureMetaInfo createMergedProcedure() {
         if (_procedureMetaInfo == null) {
             String msg = "The procedureMetaInfo should not be null!";
             throw new IllegalStateException(msg);
@@ -42,21 +44,16 @@ public class DfProcedureSynonymMetaInfo {
             throw new IllegalStateException(msg);
         }
         final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();
-        final String synonymOwner = _synonymMetaInfo.getSynonymOwner();
+        final UnifiedSchema synonymOwner = _synonymMetaInfo.getSynonymOwner();
         final String synonymName = _synonymMetaInfo.getSynonymName();
-        final String synonymFullName = synonymOwner + "." + synonymName;
-        final String synonymSqlName;
-        if (mainSchemaName != null && mainSchemaName.equalsIgnoreCase(synonymOwner)) {
-            synonymSqlName = synonymName;
-        } else {
-            synonymSqlName = synonymOwner + "." + synonymName;
-        }
+        final String synonymSqlName = _synonymMetaInfo.buildCatalogSchemaSynonym();
         final String synonymUniqueName = synonymName;
-        metaInfo.setProcedureCatalog(null);
         metaInfo.setProcedureSchema(synonymOwner);
         metaInfo.setProcedureName(synonymName);
-        metaInfo.setProcedureFullName(synonymFullName);
         metaInfo.setProcedureSqlName(synonymSqlName);
+        metaInfo.setProcedureDisplayName(synonymSqlName);
+        metaInfo.setCatalogSchemaProcedureName(_synonymMetaInfo.buildCatalogSchemaSynonym());
+        metaInfo.setSchemaProcedureName(_synonymMetaInfo.buildPureSchemaSynonym());
         metaInfo.setProcedureUniqueName(synonymUniqueName);
         metaInfo.setProcedureSynonym(_procedureMetaInfo.isProcedureSynonym());
         metaInfo.setProcedureType(_procedureMetaInfo.getProcedureType());

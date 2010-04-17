@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
@@ -27,8 +28,8 @@ public class DfDtsSqlServerSqlTableWriter extends DfDtsSqlTableWriter {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDtsSqlServerSqlTableWriter(final DataSource dataSource, String schemaName) {
-        super(dataSource, schemaName);
+    public DfDtsSqlServerSqlTableWriter(final DataSource dataSource, UnifiedSchema unifiedSchema) {
+        super(dataSource, unifiedSchema);
     }
 
     // ===================================================================================

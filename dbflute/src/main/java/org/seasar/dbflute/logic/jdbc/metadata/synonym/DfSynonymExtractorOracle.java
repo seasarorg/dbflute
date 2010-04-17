@@ -33,6 +33,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
@@ -48,6 +49,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -64,7 +66,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected List<String> _allSchemaList;
+    protected List<UnifiedSchema> _unifiedSchemaList;
     protected Set<String> _refTableCheckSet;
 
     // -----------------------------------------------------
@@ -75,7 +77,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
     protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler() {
         @Override
-        public boolean isTableExcept(String schemaName, String tableName) {
+        public boolean isTableExcept(UnifiedSchema unifiedSchema, String tableName) {
             // All foreign tables are target if the foreign table is except.
             // Because the filtering is executed when translating foreign keys.
             return false;
@@ -98,9 +100,9 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             _log.info(sql);
             rs = statement.executeQuery(sql);
             while (rs.next()) {
-                final String synonymOwner = rs.getString("OWNER");
+                final UnifiedSchema synonymOwner = createAsDynamicSchema(null, rs.getString("OWNER"));
                 final String synonymName = rs.getString("SYNONYM_NAME");
-                final String tableOwner = rs.getString("TABLE_OWNER");
+                final UnifiedSchema tableOwner = createAsDynamicSchema(null, rs.getString("TABLE_OWNER"));
                 final String tableName = rs.getString("TABLE_NAME");
                 final String dbLinkName = rs.getString("DB_LINK");
 
@@ -133,7 +135,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                     }
                     continue;
                 }
-                if (tableOwner == null || tableOwner.trim().length() == 0) {
+                if (!tableOwner.hasSchema()) {
                     continue; // basically no way because it may be for DB Link Synonym
                 }
 
@@ -180,26 +182,25 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected String buildSynonymSelect() {
         final StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (String schema : _allSchemaList) {
+        for (UnifiedSchema unifiedSchema : _unifiedSchemaList) {
             if (count > 0) {
                 sb.append(", ");
             }
-            sb.append("'").append(schema).append("'");
+            sb.append("'").append(unifiedSchema.getPureSchema()).append("'");
             ++count;
         }
         final String sql = "select * from ALL_SYNONYMS where OWNER in (" + sb.toString() + ")";
         return sql;
     }
 
-    protected String buildSynonymMapKey(String synonymOwner, String synonymName) {
-        return synonymOwner + "." + synonymName;
+    protected String buildSynonymMapKey(UnifiedSchema synonymOwner, String synonymName) {
+        return synonymOwner.buildPureSchemaElement(synonymName);
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final String synonymOwner = info.getSynonymOwner();
-        final String synonymName = info.getSynonymName();
-        final String sql = "select * from " + synonymOwner + "." + synonymName + " where 0=1";
+        final String synonymSqlName = info.buildPureSchemaSynonym();
+        final String sql = "select * from " + synonymSqlName + " where 0 = 1";
         try {
             final List<String> columnList = new ArrayList<String>();
             columnList.add("dummy");
@@ -210,8 +211,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected void setupBasicConstraintInfo(DfSynonymMetaInfo info, String tableOwner, String tableName, Connection conn)
-            throws SQLException {
+    protected void setupBasicConstraintInfo(DfSynonymMetaInfo info, UnifiedSchema tableOwner, String tableName,
+            Connection conn) throws SQLException {
         final DatabaseMetaData md = conn.getMetaData();
         final DfPrimaryKeyMetaInfo pkInfo = getPKList(md, tableOwner, tableName);
         info.setPrimaryKeyMetaInfo(pkInfo);
@@ -241,7 +242,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     }
 
     protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, DfSynonymMetaInfo info) throws SQLException {
-        final String synonymOwner = info.getSynonymOwner();
+        final UnifiedSchema synonymOwner = info.getSynonymOwner();
         final String synonymName = info.getSynonymName();
         final String tableName = info.getTableName();
         final String dbLinkName = info.getDbLinkName();
@@ -267,41 +268,43 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                                    For Normal Synonym
     //                                    ------------------
-    protected DfPrimaryKeyMetaInfo getPKList(DatabaseMetaData metaData, String tableOwner, String tableName) {
+    protected DfPrimaryKeyMetaInfo getPKList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) {
         try {
-            return _uniqueKeyHandler.getPrimaryKey(metaData, tableOwner, tableName);
+            return _uniqueKeyHandler.getPrimaryKey(metaData, unifiedSchema, tableName);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    protected Map<String, Map<Integer, String>> getUQMap(DatabaseMetaData metaData, String tableOwner,
+    protected Map<String, Map<Integer, String>> getUQMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, List<String> primaryKeyNameList) {
         try {
-            return _uniqueKeyHandler.getUniqueKeyMap(metaData, tableOwner, tableName, primaryKeyNameList);
+            return _uniqueKeyHandler.getUniqueKeyMap(metaData, unifiedSchema, tableName, primaryKeyNameList);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    protected Map<String, DfForeignKeyMetaInfo> getFKMap(DatabaseMetaData metaData, String tableOwner, String tableName) {
+    protected Map<String, DfForeignKeyMetaInfo> getFKMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName) {
         try {
-            return _foreignKeyHandler.getForeignKeyMetaInfo(metaData, tableOwner, tableName);
+            return _foreignKeyHandler.getForeignKeyMetaInfo(metaData, unifiedSchema, tableName);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, String tableOwner,
+    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) {
         try {
-            return _indexHandler.getIndexMap(metaData, tableOwner, tableName, uniqueKeyMap);
+            return _indexHandler.getIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    protected boolean isAutoIncrement(Connection conn, String tableOwner, String tableName, String primaryKeyColumnName) {
+    protected boolean isAutoIncrement(Connection conn, UnifiedSchema tableOwner, String tableName,
+            String primaryKeyColumnName) {
         return false; // because Oracle does not support identity
         //try {
         //    final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
@@ -335,7 +338,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 continue;
             }
             final Set<String> fkNameSet = fkMap.keySet();
-            final Map<String, DfForeignKeyMetaInfo> additionalFKMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
+            final Map<String, DfForeignKeyMetaInfo> additionalFKMap = DfCollectionUtil.newLinkedHashMap();
             final Map<String, String> removedFKKeyMap = new LinkedHashMap<String, String>();
             for (String fkName : fkNameSet) {
                 final DfForeignKeyMetaInfo fk = fkMap.get(fkName);
@@ -398,12 +401,13 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
      */
     protected void setupTableColumnComment(Map<String, DfSynonymMetaInfo> synonymMap) {
         final Map<String, Set<String>> ownerTabSetMap = createOwnerTableSetMap(synonymMap);
-        final Map<String, Map<String, UserTabComments>> ownerTabCommentMap = new LinkedHashMap<String, Map<String, UserTabComments>>();
-        final Map<String, Map<String, Map<String, UserColComments>>> ownerTabColCommentMap = new LinkedHashMap<String, Map<String, Map<String, UserColComments>>>();
+        final Map<String, Map<String, UserTabComments>> ownerTabCommentMap = DfCollectionUtil.newLinkedHashMap();
+        final Map<String, Map<String, Map<String, UserColComments>>> ownerTabColCommentMap = DfCollectionUtil
+                .newLinkedHashMap();
         final Set<String> ownerSet = ownerTabSetMap.keySet();
         for (String owner : ownerSet) {
             final Set<String> tableSet = ownerTabSetMap.get(owner);
-            final DfDbCommentExtractorOracle extractor = createDbCommentExtractor(owner);
+            final DfDbCommentExtractorOracle extractor = createDbCommentExtractor(createAsDynamicSchema(null, owner));
             final Map<String, UserTabComments> tabCommentMap = extractor.extractTableComment(tableSet);
             final Map<String, Map<String, UserColComments>> tabColCommentMap = extractor.extractColumnComment(tableSet);
             ownerTabCommentMap.put(owner, tabCommentMap);
@@ -411,7 +415,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
 
         for (DfSynonymMetaInfo synonym : synonymMap.values()) {
-            final String owner = synonym.getTableOwner();
+            final UnifiedSchema owner = synonym.getTableOwner();
             final String tableName = synonym.getTableName();
             final Map<String, UserTabComments> tableCommentMap = ownerTabCommentMap.get(owner);
             if (tableCommentMap != null) {
@@ -430,24 +434,24 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected DfDbCommentExtractorOracle createDbCommentExtractor(String schema) {
+    protected DfDbCommentExtractorOracle createDbCommentExtractor(UnifiedSchema schema) {
         final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
         extractor.setDataSource(_dataSource);
-        extractor.setSchema(schema);
+        extractor.setUnifiedSchema(schema);
         return extractor;
     }
 
     protected Map<String, Set<String>> createOwnerTableSetMap(Map<String, DfSynonymMetaInfo> synonymMap) {
         final Map<String, Set<String>> ownerTabSetMap = new LinkedHashMap<String, Set<String>>();
         for (DfSynonymMetaInfo synonym : synonymMap.values()) {
-            final String owner = synonym.getTableOwner();
+            final UnifiedSchema owner = synonym.getTableOwner();
             if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
                 continue;
             }
             Set<String> tableSet = ownerTabSetMap.get(owner);
             if (tableSet == null) {
                 tableSet = new LinkedHashSet<String>();
-                ownerTabSetMap.put(owner, tableSet);
+                ownerTabSetMap.put(owner.getPureSchema(), tableSet);
             }
             tableSet.add(synonym.getTableName());
         }
@@ -457,8 +461,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                                   For DB Link Synonym
     //                                   -------------------
-    protected List<DfColumnMetaInfo> getDBLinkSynonymColumns(Connection conn, String synonymOwner, String synonymName)
-            throws SQLException {
+    protected List<DfColumnMetaInfo> getDBLinkSynonymColumns(Connection conn, UnifiedSchema synonymOwner,
+            String synonymName) throws SQLException {
         final List<DfColumnMetaInfo> columnList = new ArrayList<DfColumnMetaInfo>();
         Statement statement = null;
         ResultSet rs = null;
@@ -590,8 +594,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         _dataSource = dataSource;
     }
 
-    public void setAllSchemaList(List<String> allSchemaList) {
-        this._allSchemaList = allSchemaList;
+    public void setTargetSchemaList(List<UnifiedSchema> unifiedSchemaList) {
+        this._unifiedSchemaList = unifiedSchemaList;
     }
 
     public void setRefTableCheckSet(Set<String> refTableCheckSet) {

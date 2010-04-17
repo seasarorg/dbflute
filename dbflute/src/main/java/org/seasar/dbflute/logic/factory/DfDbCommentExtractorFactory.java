@@ -2,7 +2,7 @@ package org.seasar.dbflute.logic.factory;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.jdbc.urlanalyzer.DfUrlAnalyzerMySql;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorMySql;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
@@ -20,8 +20,7 @@ public class DfDbCommentExtractorFactory {
     //                                                                           =========
     protected DfBasicProperties _basicProperties;
     protected DataSource _dataSource;
-    protected String _url;
-    protected String _schema;
+    protected UnifiedSchema _unifiedSchema;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -29,15 +28,13 @@ public class DfDbCommentExtractorFactory {
     /**
      * @param basicProperties The basic properties. (NotNull)
      * @param dataSource The data source. (NotNull)
-     * @param url The url to extract at a database that does not have schema. (Nullable)
-     * @param schema The schema to extract mainly. (Nullable)
+     * @param unifiedSchema The unified schema to extract. (Nullable)
      */
-    public DfDbCommentExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource, String url,
-            String schema) {
+    public DfDbCommentExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource,
+            UnifiedSchema unifiedSchema) {
         _basicProperties = basicProperties;
         _dataSource = dataSource;
-        _url = url;
-        _schema = schema;
+        _unifiedSchema = unifiedSchema;
     }
 
     // ===================================================================================
@@ -50,34 +47,19 @@ public class DfDbCommentExtractorFactory {
         if (_basicProperties.isDatabaseMySQL()) {
             final DfDbCommentExtractorMySql extractor = new DfDbCommentExtractorMySql();
             extractor.setDataSource(_dataSource);
-            if (_schema != null && _schema.trim().length() > 0) {
-                extractor.setSchema(_schema);
-            } else {
-                // because a schema is not required at MySQL
-                final String schema = extractSchemaFromMySqlUrl();
-                if (schema == null || schema.trim().length() == 0) {
-                    return null;
-                }
-                extractor.setSchema(schema);
-            }
+            extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
         } else if (_basicProperties.isDatabaseOracle()) {
             final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
             extractor.setDataSource(_dataSource);
-            extractor.setSchema(_schema);
+            extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
         } else if (_basicProperties.isDatabaseSQLServer()) {
             final DfDbCommentExtractorSqlServer extractor = new DfDbCommentExtractorSqlServer();
             extractor.setDataSource(_dataSource);
-            extractor.setSchema(_schema);
+            extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
         }
         return null;
-    }
-
-    protected String extractSchemaFromMySqlUrl() {
-        final DfUrlAnalyzerMySql analyzer = new DfUrlAnalyzerMySql();
-        analyzer.setUrl(_url);
-        return analyzer.extractSchema();
     }
 }

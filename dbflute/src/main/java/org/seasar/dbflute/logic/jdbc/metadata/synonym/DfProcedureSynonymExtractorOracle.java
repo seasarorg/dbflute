@@ -29,6 +29,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
@@ -54,7 +55,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected List<String> _allSchemaList;
+    protected List<UnifiedSchema> _targetSchemaList;
 
     // ===================================================================================
     //                                                                             Extract
@@ -71,20 +72,20 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
             final Map<String, DfProcedureMetaInfo> procedureFullNameKeyMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
             final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>();
             final DfProcedureHandler procedureHandler = new DfProcedureHandler();
-            for (String schemaName : _allSchemaList) {
-                procedureList.addAll(procedureHandler.getPlainProcedureList(metaData, schemaName));
+            for (UnifiedSchema unifiedSchema : _targetSchemaList) {
+                procedureList.addAll(procedureHandler.getPlainProcedureList(metaData, unifiedSchema));
             }
             for (DfProcedureMetaInfo metaInfo : procedureList) {
-                final String procedureFullName = metaInfo.getProcedureFullName();
-                procedureFullNameKeyMap.put(procedureFullName, metaInfo);
+                final String procedureKeyName = metaInfo.getSchemaProcedureName();
+                procedureFullNameKeyMap.put(procedureKeyName, metaInfo);
             }
             statement = conn.createStatement();
             _log.info(sql);
             rs = statement.executeQuery(sql);
             while (rs.next()) {
-                final String synonymOwner = rs.getString("OWNER");
+                final UnifiedSchema synonymOwner = createAsDynamicSchema(null, rs.getString("OWNER"));
                 final String synonymName = rs.getString("SYNONYM_NAME");
-                final String tableOwner = rs.getString("TABLE_OWNER");
+                final UnifiedSchema tableOwner = createAsDynamicSchema(null, rs.getString("TABLE_OWNER"));
                 final String tableName = rs.getString("TABLE_NAME");
                 final String dbLinkName = rs.getString("DB_LINK");
 
@@ -106,11 +107,11 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
                     continue; // It's a DB Link Synonym!
                 }
-                if (tableOwner == null || tableOwner.trim().length() == 0) {
+                if (!tableOwner.hasSchema()) {
                     continue; // basically no way because it may be for DB Link Synonym
                 }
 
-                final String procedureKey = tableOwner + "." + tableName; // as procedure full name
+                final String procedureKey = tableOwner.buildPureSchemaElement(tableName);
                 final DfProcedureMetaInfo procedureMetaInfo = procedureFullNameKeyMap.get(procedureKey);
                 if (procedureMetaInfo == null) {
                     // Synonym for Package Procedure has several problems.
@@ -161,26 +162,25 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     protected String buildSynonymSelect() {
         final StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (String schema : _allSchemaList) {
+        for (UnifiedSchema unifiedSchema : _targetSchemaList) {
             if (count > 0) {
                 sb.append(", ");
             }
-            sb.append("'").append(schema).append("'");
+            sb.append("'").append(unifiedSchema.getPureSchema()).append("'");
             ++count;
         }
         final String sql = "select * from ALL_SYNONYMS where OWNER in (" + sb.toString() + ")";
         return sql;
     }
 
-    protected String buildSynonymMapKey(String synonymOwner, String synonymName) {
-        return synonymOwner + "." + synonymName;
+    protected String buildSynonymMapKey(UnifiedSchema synonymOwner, String synonymName) {
+        return synonymOwner.buildPureSchemaElement(synonymName);
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final String synonymOwner = info.getSynonymOwner();
-        final String synonymName = info.getSynonymName();
-        final String sql = "select * from " + synonymOwner + "." + synonymName + " where 0=1";
+        final String synonymSqlName = info.buildPureSchemaSynonym();
+        final String sql = "select * from " + synonymSqlName + " where 0 = 1";
         try {
             final List<String> columnList = new ArrayList<String>();
             columnList.add("dummy");
@@ -198,7 +198,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         _dataSource = dataSource;
     }
 
-    public void setAllSchemaList(List<String> allSchemaList) {
-        this._allSchemaList = allSchemaList;
+    public void setTargetSchemaList(List<UnifiedSchema> targetSchemaList) {
+        this._targetSchemaList = targetSchemaList;
     }
 }

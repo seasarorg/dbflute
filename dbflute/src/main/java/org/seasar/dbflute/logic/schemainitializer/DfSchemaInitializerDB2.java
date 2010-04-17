@@ -64,10 +64,10 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
     //                                                                       =============
     @Override
     protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        if (_schema == null || _schema.trim().length() == 0) {
+        if (!_unifiedSchema.hasSchema()) {
             return;
         }
-        final String schema = _schema;
+        final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
         final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
         final String sequenceColumnName = "sequence_name";

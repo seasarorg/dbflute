@@ -68,9 +68,11 @@ public class DfProcedureExecutionMetaExtractor {
             throws SQLException {
         final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
         for (DfProcedureMetaInfo procedure : procedureList) {
+            final String catalogSchemaProcedureName = procedure.getCatalogSchemaProcedureName();
+            final String schemaProcedureName = procedure.getSchemaProcedureName();
             final String procedureName = procedure.getProcedureName();
-            final String procedureFullName = procedure.getProcedureFullName();
-            if (prop.isExecutionMetaProcedureName(procedureFullName)
+            if (prop.isExecutionMetaProcedureName(catalogSchemaProcedureName)
+                    || prop.isExecutionMetaProcedureName(schemaProcedureName)
                     || prop.isExecutionMetaProcedureName(procedureName)) {
                 doExtractExecutionMetaData(dataSource, procedure);
             }
@@ -80,7 +82,7 @@ public class DfProcedureExecutionMetaExtractor {
     protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
         final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnList();
         if (!needsToCall(columnList)) {
-            final String name = procedure.getProcedureFullName();
+            final String name = procedure.getProcedureDisplayName();
             _log.info("*not needed to call: " + name + " params=" + buildParameterTypeView(columnList));
             return;
         }

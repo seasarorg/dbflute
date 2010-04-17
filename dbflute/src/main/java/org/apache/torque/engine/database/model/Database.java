@@ -971,13 +971,13 @@ public class Database {
         return getProperties().getDatabaseProperties();
     }
 
-    public String getDatabaseSchema() {
+    public UnifiedSchema getDatabaseSchema() {
         return getDatabaseProperties().getDatabaseSchema();
     }
 
     public boolean hasDatabaseSchema() {
-        String databaseSchema = getDatabaseSchema();
-        return databaseSchema != null && databaseSchema.trim().length() > 0;
+        UnifiedSchema databaseSchema = getDatabaseSchema();
+        return databaseSchema.hasSchema();
     }
 
     public boolean hasAdditionalSchema() {
@@ -1955,7 +1955,7 @@ public class Database {
         _log.info("...Setting up procedures for documents");
         final DfProcedureHandler handler = new DfProcedureHandler();
         handler.includeProcedureSynonym(getDataSource());
-        final String schemaName = getDatabaseSchema();
+        final UnifiedSchema unifiedSchema = getDatabaseSchema();
         final DataSource dataSource = getDataSource();
         try {
             final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(dataSource);
@@ -1963,7 +1963,7 @@ public class Database {
             return _procedureMetaInfoList;
         } catch (SQLException e) {
             String msg = "Failed to get the list of available procedures:";
-            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " unifiedSchema=" + unifiedSchema;
             throw new IllegalStateException(msg);
         }
     }

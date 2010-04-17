@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
@@ -31,14 +32,14 @@ public class DfCurrentSchemaConnector {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _schema;
+    protected UnifiedSchema _unifiedSchema;
     protected DfBasicProperties _basicProperties;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCurrentSchemaConnector(String schema, DfBasicProperties basicProperties) {
-        _schema = schema;
+    public DfCurrentSchemaConnector(UnifiedSchema unifiedSchema, DfBasicProperties basicProperties) {
+        _unifiedSchema = unifiedSchema;
         _basicProperties = basicProperties;
     }
 
@@ -61,11 +62,11 @@ public class DfCurrentSchemaConnector {
     }
 
     public void connectSchema(Connection conn) throws SQLException {
-        if (_basicProperties.isDatabaseDB2() && _schema != null) {
-            final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
+        if (_basicProperties.isDatabaseDB2() && _unifiedSchema.existsPureSchema()) {
+            final String sql = "SET CURRENT SCHEMA = " + _unifiedSchema.getPureSchema();
             executeCurrentSchemaSql(conn, sql);
-        } else if (_basicProperties.isDatabaseOracle() && _schema != null) {
-            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _schema.trim();
+        } else if (_basicProperties.isDatabaseOracle() && _unifiedSchema.existsPureSchema()) {
+            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _unifiedSchema.getPureSchema();
             executeCurrentSchemaSql(conn, sql);
         }
     }
@@ -73,7 +74,7 @@ public class DfCurrentSchemaConnector {
     protected void executeCurrentSchemaSql(Connection conn, String sql) throws SQLException {
         final Statement st = conn.createStatement();
         try {
-            _log.info("...Connecting the schema: " + _schema + ln() + sql);
+            _log.info("...Connecting the schema: " + _unifiedSchema + ln() + sql);
             st.execute(sql);
         } catch (SQLException continued) { // continue because it's supplementary SQL
             String msg = "Failed to execute the SQL:" + ln() + sql + ln() + continued.getMessage();

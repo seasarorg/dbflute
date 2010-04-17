@@ -106,7 +106,7 @@ public class Table {
     private List<IdMethodParameter> _idMethodParameters;
     private String _name;
     private String _type;
-    private String _plainSchema;
+    private UnifiedSchema _unifiedSchema;
     private String _plainComment;
     private String _description;
     private String _javaName;
@@ -168,7 +168,8 @@ public class Table {
     public void loadFromXML(Attributes attrib) {
         _name = attrib.getValue("name");
         _type = attrib.getValue("type");
-        _plainSchema = attrib.getValue("schema");
+        final String plainSchema = attrib.getValue("schema");
+        _unifiedSchema = UnifiedSchema.createAsDynamicSchema(plainSchema, getDatabaseProperties());
         _plainComment = attrib.getValue("comment");
         _javaName = attrib.getValue("javaName");
 
@@ -348,51 +349,21 @@ public class Table {
     // -----------------------------------------------------
     //                                          Table Schema
     //                                          ------------
-    protected String getPlainSchema() {
-        return _plainSchema;
-    }
-
     public String getDisplaySchema() {
-        if (isCatalogAdditionalSchema()) {
-            return getCatalogSchema();
-        } else {
-            if (hasSchema()) {
-                return getPureSchema();
-            } else {
-                return "";
-            }
-        }
+        final String catalogSchema = getCatalogSchema();
+        return catalogSchema != null ? catalogSchema : "";
     }
 
     protected String getCatalogSchema() { // contains catalog name
-        if (!hasSchema()) {
-            return _plainSchema;
-        }
-        if (!_plainSchema.contains(".")) {
-            return _plainSchema;
-        }
-        final int dotIndex = _plainSchema.indexOf(".");
-        if (dotIndex < 0) {
-            return _plainSchema;
-        }
-        final String catalogName = Srl.substringFirstFront(_plainSchema, ".");
-        final String schemaName = Srl.substringFirstRear(_plainSchema, ".");
-        if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(schemaName)) {
-            return catalogName;
-        } else {
-            return catalogName + "." + schemaName;
-        }
+        return _unifiedSchema != null ? _unifiedSchema.getCatalogSchema() : null;
     }
 
     protected String getPureSchema() { // NOT contain catalog name
-        if (!hasSchema()) {
-            return _plainSchema;
-        }
-        return Srl.substringFirstRear(getCatalogSchema(), ".");
+        return _unifiedSchema != null ? _unifiedSchema.getPureSchema() : null;
     }
 
     public boolean hasSchema() {
-        return Srl.is_NotNull_and_NotTrimmedEmpty(_plainSchema);
+        return _unifiedSchema != null ? _unifiedSchema.hasSchema() : false;
     }
 
     public boolean isMainSchema() {
@@ -400,17 +371,11 @@ public class Table {
     }
 
     public boolean isAdditionalSchema() {
-        if (hasSchema()) {
-            return getDatabaseProperties().isAdditionalSchema(getPlainSchema());
-        }
-        return false;
+        return hasSchema() && getDatabaseProperties().isAdditionalSchema(_unifiedSchema);
     }
 
     public boolean isCatalogAdditionalSchema() {
-        if (hasSchema()) {
-            return getDatabaseProperties().isCatalogAdditionalSchema(getPlainSchema());
-        }
-        return false;
+        return hasSchema() && getDatabaseProperties().isCatalogAdditionalSchema(_unifiedSchema);
     }
 
     // -----------------------------------------------------
@@ -2479,8 +2444,7 @@ public class Table {
         }
         if (isAdditionalSchema()) {
             final DfDatabaseProperties prop = getDatabaseProperties();
-            final String schema = getPlainSchema();
-            final DfAdditionalSchemaInfo schemaInfo = prop.getAdditionalSchemaInfo(schema);
+            final DfAdditionalSchemaInfo schemaInfo = prop.getAdditionalSchemaInfo(_unifiedSchema);
             if (schemaInfo.isSuppressCommonColumn()) {
                 return false;
             }

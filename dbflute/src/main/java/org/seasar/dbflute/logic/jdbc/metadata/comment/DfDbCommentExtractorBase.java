@@ -29,6 +29,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfCommentExtractingFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
@@ -48,7 +49,7 @@ public abstract class DfDbCommentExtractorBase extends DfAbstractMetaDataExtract
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected String _schema;
+    protected UnifiedSchema _unifiedSchema;
 
     // ===================================================================================
     //                                                                                Main
@@ -64,7 +65,7 @@ public abstract class DfDbCommentExtractorBase extends DfAbstractMetaDataExtract
             }
             return resultMap;
         } catch (SQLException e) {
-            String msg = "Failed to extract comment data: schema=" + _schema;
+            String msg = "Failed to extract comment data: unifiedSchema=" + _unifiedSchema;
             throw new DfCommentExtractingFailureException(msg, e);
         } finally {
             if (conn != null) {
@@ -97,7 +98,7 @@ public abstract class DfDbCommentExtractorBase extends DfAbstractMetaDataExtract
             }
             return resultMap;
         } catch (SQLException e) {
-            String msg = "Failed to extract comment data: schema=" + _schema;
+            String msg = "Failed to extract comment data: schema=" + _unifiedSchema;
             throw new DfCommentExtractingFailureException(msg, e);
         } finally {
             if (conn != null) {
@@ -213,11 +214,11 @@ public abstract class DfDbCommentExtractorBase extends DfAbstractMetaDataExtract
         _dataSource = dataSource;
     }
 
-    public String getSchema() {
-        return _schema;
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema;
     }
 
-    public void setSchema(String schema) {
-        this._schema = schema;
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        this._unifiedSchema = unifiedSchema;
     }
 }

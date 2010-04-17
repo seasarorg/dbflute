@@ -154,7 +154,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             }
             xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
             xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-            xlsDataHandler.setSchemaName(_schema); // for getting database meta data
+            xlsDataHandler.setUnifiedSchema(_mainSchema); // for getting database meta data
             xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
             xlsDataHandlerImpl = xlsDataHandler;
         }

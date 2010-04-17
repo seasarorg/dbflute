@@ -39,6 +39,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -73,7 +74,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     protected boolean _loggingInsertSql;
 
     /** The name of schema. (Nullable) */
-    protected String _schemaName;
+    protected UnifiedSchema _unifiedSchema;
 
     /** The pattern of skip sheet. (Nullable) */
     protected Pattern _skipSheetPattern;
@@ -323,7 +324,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         try {
             conn = dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(metaData, _schemaName, tableName);
+            final List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableName);
             for (DfColumnMetaInfo columnMetaInfo : columnList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
             }
@@ -569,12 +570,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         this._suppressBatchUpdate = suppressBatchUpdate;
     }
 
-    public String getSchemaName() {
-        return _schemaName;
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema;
     }
 
-    public void setSchemaName(String schemaName) {
-        _schemaName = schemaName;
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        _unifiedSchema = unifiedSchema;
     }
 
     public void setSkipSheet(String skipSheet) {

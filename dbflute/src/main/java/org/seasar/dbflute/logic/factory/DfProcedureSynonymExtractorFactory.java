@@ -1,10 +1,10 @@
 package org.seasar.dbflute.logic.factory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractorOracle;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -39,19 +39,13 @@ public class DfProcedureSynonymExtractorFactory {
         if (_basicProperties.isDatabaseOracle()) {
             final DfProcedureSynonymExtractorOracle extractor = new DfProcedureSynonymExtractorOracle();
             extractor.setDataSource(_dataSource);
-            extractor.setAllSchemaList(createAllSchemaList());
+            extractor.setTargetSchemaList(createTargetSchemaList());
             return extractor;
         }
         return null;
     }
 
-    protected List<String> createAllSchemaList() { // not only main schema but also additional schemas
-        final List<String> schemaList = new ArrayList<String>();
-        final String mainSchema = _databaseProperties.getDatabaseSchema();
-        if (mainSchema != null && mainSchema.trim().length() > 0) {
-            schemaList.add(_databaseProperties.getDatabaseSchema());
-        }
-        schemaList.addAll(_databaseProperties.getAdditionalSchemaNameList());
-        return schemaList;
+    protected List<UnifiedSchema> createTargetSchemaList() { // not only main schema but also additional schemas
+        return _databaseProperties.getTargetSchemaList();
     }
 }

@@ -20,24 +20,24 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
-import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
-import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -53,8 +53,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerPostgreSQL(DataSource dataSource, String schema, List<String> allSchemaList) {
-        super(dataSource, schema, allSchemaList);
+    public DfSequenceHandlerPostgreSQL(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+        super(dataSource, unifiedSchemaList);
     }
 
     // ===================================================================================
@@ -74,48 +74,33 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     protected void handleSerialTypeSequence(Map<String, String> tableSequenceMap) throws SQLException {
         final StringSet doneSequenceSet = StringSet.createAsFlexibleOrdered();
         doneSequenceSet.addAll(tableSequenceMap.values());
-        final DfTableHandler tableHandler = new DfTableHandler() {
-            @Override
-            protected List<String> getRealTableExceptList(String schemaName) {
-                return DfCollectionUtil.emptyList(); // all tables are target!
-            }
-
-            @Override
-            protected List<String> getRealTableTargetList(String schemaName) {
-                return DfCollectionUtil.emptyList(); // all tables are target!
-            }
-        };
         Connection conn = null;
         Statement st = null;
         try {
             conn = _dataSource.getConnection();
             st = conn.createStatement();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfTableMetaInfo> tableList = tableHandler.getTableList(metaData, _schema);
-            final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
-            final DfColumnHandler columnHandler = new DfColumnHandler() {
-                @Override
-                protected Map<String, List<String>> getRealColumnExceptMap(String schemaName) {
-                    return new HashMap<String, List<String>>(); // all column target
-                }
-            };
+            final DfColumnHandler columnHandler = new DfColumnHandler();
             final DfAutoIncrementHandler autoIncrementHandler = new DfAutoIncrementHandler();
             _log.info("...Incrementing serial type sequence");
-            for (DfTableMetaInfo tableMetaInfo : tableList) {
-                final String tableName = tableMetaInfo.getTableName();
-                final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, tableMetaInfo);
+            final Set<Entry<String, DfTableMetaInfo>> entrySet = _tableMap.entrySet();
+            for (Entry<String, DfTableMetaInfo> entry : entrySet) {
+                final DfTableMetaInfo tableInfo = entry.getValue();
+                final DfPrimaryKeyMetaInfo pkInfo = _uniqueKeyHandler.getPrimaryKey(metaData, tableInfo);
                 final List<String> pkList = pkInfo.getPrimaryKeyList();
                 if (pkList.size() != 1) {
                     continue;
                 }
                 final String primaryKeyColumnName = pkList.get(0);
-                if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName)) {
+                if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnName)) {
                     continue;
                 }
-                final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMap(metaData, _schema,
-                        tableName);
-                final DfColumnMetaInfo columnMetaInfo = columnMetaMap.get(primaryKeyColumnName);
-                final String defaultValue = columnMetaInfo.getDefaultValue();
+                final Map<String, DfColumnMetaInfo> columnMap = columnHandler.getColumnMap(metaData, tableInfo);
+                final DfColumnMetaInfo columnInfo = columnMap.get(primaryKeyColumnName);
+                if (columnInfo == null) {
+                    continue;
+                }
+                final String defaultValue = columnInfo.getDefaultValue();
                 if (defaultValue == null) {
                     continue;
                 }
@@ -132,18 +117,20 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 if (doneSequenceSet.contains(sequenceName)) {
                     continue; // already done
                 }
-
-                final Integer count = selectCount(st, tableName);
+                final String tableSqlName = tableInfo.buildCatalogSchemaTable();
+                final Integer count = selectCount(st, tableSqlName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                final Integer actualValue = selectDataMax(st, tableName, primaryKeyColumnName);
+                final Integer actualValue = selectDataMax(st, tableInfo, primaryKeyColumnName);
                 if (actualValue == null) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                callSequenceLoop(st, sequenceName, actualValue);
+                final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
+                final String sequenceSqlName = Srl.connectPrefix(sequenceName, unifiedSchema.getCatalogSchema(), ".");
+                callSequenceLoop(st, sequenceSqlName, actualValue);
             }
         } finally {
             if (st != null) {

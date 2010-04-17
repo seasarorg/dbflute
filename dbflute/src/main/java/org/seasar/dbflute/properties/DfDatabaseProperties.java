@@ -12,9 +12,12 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.factory.DfUrlAnalyzerFactory;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -55,8 +58,30 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return _databaseInfo.getDatabaseUrl();
     }
 
-    public String getDatabaseSchema() {
-        return _databaseInfo.getDatabaseSchema();
+    public String getDatabaseCatalog() { // as main catalog
+        final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), getDatabaseUrl());
+        final DfUrlAnalyzer analyzer = factory.createAnalyzer();
+        final String catalog = analyzer != null ? analyzer.extractCatalog() : null;
+        return Srl.is_NotNull_and_NotTrimmedEmpty(catalog) ? catalog : "";
+    }
+
+    public UnifiedSchema getDatabaseSchema() { // as main schema
+        String schema = _databaseInfo.getDatabaseSchema();
+        if (getBasicProperties().isDatabasePostgreSQL()) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(schema)) {
+                schema = "public";
+            }
+        } else if (getBasicProperties().isDatabaseOracle()) {
+            schema = schema.toUpperCase();
+        } else if (getBasicProperties().isDatabaseDB2()) {
+            schema = schema.toUpperCase();
+        } else if (getBasicProperties().isDatabaseH2()) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(schema)) {
+                schema = "PUBLIC";
+            }
+        }
+        final String catalog = getDatabaseCatalog();
+        return UnifiedSchema.createAsMainSchema(catalog, schema);
     }
 
     public String getDatabaseUser() {
@@ -69,8 +94,16 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
     public boolean isDifferentUserSchema() {
         final String databaseUser = getDatabaseUser();
-        final String databaseSchema = getDatabaseSchema();
-        return !databaseUser.equalsIgnoreCase(databaseSchema);
+        final UnifiedSchema databaseSchema = getDatabaseSchema();
+        return !databaseUser.equalsIgnoreCase(databaseSchema.getPureSchema());
+    }
+
+    public List<UnifiedSchema> getTargetSchemaList() {
+        final List<UnifiedSchema> targetSchemaList = new ArrayList<UnifiedSchema>();
+        final UnifiedSchema mainSchema = getDatabaseSchema();
+        targetSchemaList.add(mainSchema);
+        targetSchemaList.addAll(getAdditionalSchemaList());
+        return targetSchemaList;
     }
 
     // ===================================================================================
@@ -206,11 +239,11 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
         final Set<Entry<String, Object>> entrySet = additionalSchemaMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
-            final String uniqueSchema = entry.getKey();
+            final String identifiedSchema = entry.getKey();
             final Object obj = entry.getValue();
             if (obj == null) {
                 String msg = "The value of schema in the property 'additionalSchemaMap' should be required:";
-                msg = msg + " uniqueSchema=" + uniqueSchema;
+                msg = msg + " uniqueSchema=" + identifiedSchema;
                 msg = msg + " additionalSchemaMap=" + additionalSchemaMap;
                 throw new DfRequiredPropertyNotFoundException(msg);
             }
@@ -223,14 +256,26 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final Map<String, Object> elementMap = (Map<String, Object>) obj;
 
             final DfAdditionalSchemaInfo info = new DfAdditionalSchemaInfo();
-            info.setSchemaName(uniqueSchema);
+            boolean catalogSpecified;
+            final String catalog;
+            if (identifiedSchema.contains(".")) {
+                catalog = Srl.substringFirstFront(identifiedSchema, ".");
+                catalogSpecified = true;
+            } else {
+                catalog = getDatabaseCatalog(); // as main catalog
+                catalogSpecified = false;
+            }
+            final String schema = Srl.substringFirstRear(identifiedSchema, ".");
+            final UnifiedSchema unifiedSchema = UnifiedSchema.createAsAdditionalSchema(catalog, schema,
+                    catalogSpecified);
+            info.setUnifiedSchema(unifiedSchema);
             setupAdditionalSchemaObjectTypeTargetList(info, elementMap);
             setupAdditionalSchemaTableExceptList(info, elementMap);
             setupAdditionalSchemaTableTargetList(info, elementMap);
             info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
             setupAdditionalSchemaSupplementaryConnectionMap(info, elementMap);
 
-            _additionalSchemaMap.put(uniqueSchema, info);
+            _additionalSchemaMap.put(identifiedSchema, info);
         }
         return _additionalSchemaMap;
     }
@@ -314,6 +359,18 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return new ArrayList<String>(getAdditionalSchemaMap().keySet());
     }
 
+    public List<UnifiedSchema> getAdditionalSchemaList() {
+        final Map<String, DfAdditionalSchemaInfo> schemaMap = getAdditionalSchemaMap();
+        final Set<Entry<String, DfAdditionalSchemaInfo>> entrySet = schemaMap.entrySet();
+        final List<UnifiedSchema> schemaList = new ArrayList<UnifiedSchema>();
+        for (Entry<String, DfAdditionalSchemaInfo> entry : entrySet) {
+            final DfAdditionalSchemaInfo info = entry.getValue();
+            final UnifiedSchema unifiedSchema = info.getUnifiedSchema();
+            schemaList.add(unifiedSchema);
+        }
+        return schemaList;
+    }
+
     public boolean hasAdditionalSchema() {
         return !getAdditionalSchemaMap().isEmpty();
     }
@@ -328,40 +385,30 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    public DfAdditionalSchemaInfo getAdditionalSchemaInfo(String uniqueSchema) {
-        if (uniqueSchema == null) {
+    public DfAdditionalSchemaInfo getAdditionalSchemaInfo(UnifiedSchema unifiedSchema) {
+        if (unifiedSchema == null) {
             return null;
         }
         final Map<String, DfAdditionalSchemaInfo> map = getAdditionalSchemaMap();
-        final DfAdditionalSchemaInfo value = map.get(uniqueSchema);
+        final String identifiedSchema = unifiedSchema.getIdentifiedSchema();
+        final DfAdditionalSchemaInfo value = map.get(identifiedSchema);
         if (value != null) {
             return value;
         }
-        if (!uniqueSchema.contains(".")) {
-            return null;
-        }
-        final String catalog = Srl.substringFirstFront(uniqueSchema, ".");
-        final String pureSchema = Srl.substringFirstRear(uniqueSchema, ".");
-        final String newKey;
-        if (NO_NAME_SCHEMA.equals(pureSchema)) { // basically for MySQL
-            newKey = catalog;
-        } else {
-            newKey = pureSchema;
-        }
-        return map.get(newKey);
+        final String pureSchema = unifiedSchema.getPureSchema();
+        return map.get(pureSchema);
     }
 
-    public boolean isAdditionalSchema(String uniqueSchema) {
-        return getAdditionalSchemaInfo(uniqueSchema) != null;
+    public boolean isAdditionalSchema(UnifiedSchema unifiedSchema) {
+        return getAdditionalSchemaInfo(unifiedSchema) != null;
     }
 
-    public boolean isCatalogAdditionalSchema(String uniqueSchema) {
-        if (!isAdditionalSchema(uniqueSchema)) {
+    public boolean isCatalogAdditionalSchema(UnifiedSchema unifiedSchema) {
+        if (!isAdditionalSchema(unifiedSchema)) {
             return false;
         }
-        final DfAdditionalSchemaInfo info = getAdditionalSchemaInfo(uniqueSchema);
-        final String schemaName = info.getSchemaName();
-        return schemaName.contains(".");
+        final DfAdditionalSchemaInfo info = getAdditionalSchemaInfo(unifiedSchema);
+        return info.getUnifiedSchema().existsPureCatalog();
     }
 
     // ===================================================================================
@@ -588,7 +635,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     public Connection createMainSchemaConnection() {
         final String driver = getDatabaseDriver();
         final String url = getDatabaseUrl();
-        final String schema = getDatabaseSchema();
+        final UnifiedSchema schema = getDatabaseSchema();
         final String user = getDatabaseUser();
         final String password = getDatabasePassword();
         _log.info("...Creating a connection to main schema");

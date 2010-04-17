@@ -3,9 +3,8 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
@@ -15,10 +14,12 @@ import org.seasar.dbflute.util.Srl;
 public class DfProcedureMetaInfo {
 
     protected String procedureCatalog;
-    protected String procedureSchema;
+    protected UnifiedSchema procedureSchema;
     protected String procedureName;
-    protected String procedureFullName;
     protected String procedureSqlName;
+    protected String procedureDisplayName;
+    protected String catalogSchemaProcedureName;
+    protected String schemaProcedureName;
     protected DfProcedureType procedureType;
     protected String procedureUniqueName;
     protected String procedureComment;
@@ -29,24 +30,7 @@ public class DfProcedureMetaInfo {
 
     public String getProcedureDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
-        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
-        final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
-        if (basicProp.isDatabaseOracle()) {
-            if (databaseProp.hasAdditionalSchema() && Srl.is_NotNull_and_NotTrimmedEmpty(procedureSchema)) {
-                sb.append(procedureSchema).append(".");
-            }
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureCatalog)) {
-                sb.append(procedureCatalog).append(".");
-            }
-        } else {
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureCatalog)) {
-                sb.append(procedureCatalog).append(".");
-            }
-            if (databaseProp.hasAdditionalSchema() && Srl.is_NotNull_and_NotTrimmedEmpty(procedureSchema)) {
-                sb.append(procedureSchema).append(".");
-            }
-        }
-        sb.append(procedureName);
+        sb.append(procedureSqlName);
         final String typeDisp = procedureType.alias() + (procedureSynonym ? ", Synonym" : "");
         sb.append(" <span class=\"type\">(").append(typeDisp).append(")</span>");
         return sb.toString();
@@ -65,7 +49,7 @@ public class DfProcedureMetaInfo {
 
     @Override
     public String toString() {
-        return "{" + procedureFullName + ", " + procedureType + ", " + procedureComment + ", " + procedureColumnList
+        return "{" + procedureSqlName + ", " + procedureType + ", " + procedureComment + ", " + procedureColumnList
                 + ", notParamResult=" + notParamResultList.size() + "}";
     }
 
@@ -90,11 +74,11 @@ public class DfProcedureMetaInfo {
         this.procedureCatalog = procedureCatalog;
     }
 
-    public String getProcedureSchema() {
+    public UnifiedSchema getProcedureSchema() {
         return procedureSchema;
     }
 
-    public void setProcedureSchema(String procedureSchema) {
+    public void setProcedureSchema(UnifiedSchema procedureSchema) {
         this.procedureSchema = procedureSchema;
     }
 
@@ -106,20 +90,36 @@ public class DfProcedureMetaInfo {
         this.procedureName = procedureName;
     }
 
-    public String getProcedureFullName() {
-        return procedureFullName;
-    }
-
-    public void setProcedureFullName(String procedureFullName) {
-        this.procedureFullName = procedureFullName;
-    }
-
     public String getProcedureSqlName() {
         return procedureSqlName;
     }
 
     public void setProcedureSqlName(String procedureSqlName) {
         this.procedureSqlName = procedureSqlName;
+    }
+
+    public String getProcedureDisplayName() {
+        return procedureDisplayName;
+    }
+
+    public void setProcedureDisplayName(String procedureDisplayName) {
+        this.procedureDisplayName = procedureDisplayName;
+    }
+
+    public String getCatalogSchemaProcedureName() {
+        return catalogSchemaProcedureName;
+    }
+
+    public void setCatalogSchemaProcedureName(String catalogSchemaProcedureName) {
+        this.catalogSchemaProcedureName = catalogSchemaProcedureName;
+    }
+
+    public String getSchemaProcedureName() {
+        return schemaProcedureName;
+    }
+
+    public void setSchemaProcedureName(String schemaProcedureName) {
+        this.schemaProcedureName = schemaProcedureName;
     }
 
     public String getProcedureUniqueName() {

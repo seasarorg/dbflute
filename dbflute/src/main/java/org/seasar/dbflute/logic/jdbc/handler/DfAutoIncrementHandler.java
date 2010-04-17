@@ -43,13 +43,13 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
     /**
      * Is auto-increment column?
      * @param conn Connection.
-     * @param tableMetaInfo The meta information of table from which to retrieve PK information.
+     * @param tableInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
      * @return Auto-increment column name. (Nullable)
      */
-    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName)
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
             throws SQLException {
-        final String tableName = tableMetaInfo.getTableName();
+        final String tableName = tableInfo.getTableName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableName);
         Statement st = null;
         ResultSet rs = null;
@@ -65,12 +65,12 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // Basically it does not come here.
                 // But if it's schema requirement or reservation word, it comes here. 
                 try {
-                    final String schemaPrefix = extractPureSchemaName(tableMetaInfo.getUniqueSchema());
+                    final String schemaPrefix = tableInfo.buildPureSchemaTable();
                     recoverySql1 = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
                     rs = st.executeQuery(recoverySql1);
                 } catch (SQLException recovery1ex) {
                     try {
-                        final String schemaPrefix = extractCatalogSchema(tableMetaInfo.getUniqueSchema());
+                        final String schemaPrefix = tableInfo.buildCatalogSchemaTable();
                         recoverySql2 = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
                         rs = st.executeQuery(recoverySql2);
                     } catch (SQLException recovery2ex) {

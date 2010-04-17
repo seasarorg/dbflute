@@ -2,6 +2,7 @@ package org.seasar.dbflute.helper.dataset.writers;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 
 /**
@@ -15,14 +16,14 @@ public class DfDtsSqlWriter {
     //                                                                           Attribute
     //                                                                           =========
     private DataSource dataSource;
-    protected String _schemaName;
+    protected UnifiedSchema _unifiedSchema;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDtsSqlWriter(DataSource dataSource, String schemaName) {
+    public DfDtsSqlWriter(DataSource dataSource, UnifiedSchema unifiedSchema) {
         this.dataSource = dataSource;
-        _schemaName = schemaName;
+        this._unifiedSchema = unifiedSchema;
     }
 
     public DataSource getDataSource() {
@@ -30,7 +31,7 @@ public class DfDtsSqlWriter {
     }
 
     public void write(DfDataSet dataSet) {
-        DfDtsTableWriter writer = new DfDtsSqlTableWriter(getDataSource(), _schemaName);
+        DfDtsTableWriter writer = new DfDtsSqlTableWriter(getDataSource(), _unifiedSchema);
         for (int i = 0; i < dataSet.getTableSize(); ++i) {
             writer.write(dataSet.getTable(i));
         }

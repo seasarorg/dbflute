@@ -30,7 +30,7 @@ public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
         final StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_TAB_COMMENTS");
-        sb.append(" where OWNER = '").append(_schema).append("'");
+        sb.append(" where OWNER = '").append(_unifiedSchema).append("'");
         sb.append(" order by TABLE_NAME asc");
         final String sql = sb.toString();
         return doSelectUserTabComments(sql, conn, tableSet);
@@ -39,7 +39,7 @@ public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
         final StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_COL_COMMENTS");
-        sb.append(" where OWNER = '").append(_schema).append("'");
+        sb.append(" where OWNER = '").append(_unifiedSchema).append("'");
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
         final String sql = sb.toString();
         return doSelectUserColComments(sql, conn, tableSet);

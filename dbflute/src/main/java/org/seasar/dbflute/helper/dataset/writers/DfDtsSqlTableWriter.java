@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
@@ -19,11 +20,11 @@ import org.seasar.dbflute.helper.dataset.states.DfDtsRowState;
 public class DfDtsSqlTableWriter implements DfDtsTableWriter {
 
     private DataSource dataSource;
-    protected String _schemaName;
+    protected UnifiedSchema _unifiedSchema;
 
-    public DfDtsSqlTableWriter(DataSource dataSource, String schemaName) {
+    public DfDtsSqlTableWriter(DataSource dataSource, UnifiedSchema unifiedSchema) {
         this.dataSource = dataSource;
-        _schemaName = schemaName;
+        _unifiedSchema = unifiedSchema;
     }
 
     public DataSource getDataSource() {
@@ -53,7 +54,7 @@ public class DfDtsSqlTableWriter implements DfDtsTableWriter {
     private void setupMetaData(DfDataTable table) throws SQLException {
         Connection con = getConnection(dataSource);
         try {
-            table.setupMetaData(getMetaData(con), _schemaName);
+            table.setupMetaData(getMetaData(con), _unifiedSchema);
         } finally {
             close(con);
         }

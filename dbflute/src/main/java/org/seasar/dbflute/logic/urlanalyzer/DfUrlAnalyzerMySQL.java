@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.jdbc.urlanalyzer;
+package org.seasar.dbflute.logic.urlanalyzer;
 
 import org.seasar.dbflute.util.Srl;
 
@@ -7,11 +7,11 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.6 (2009/10/31 Saturday)
  */
-public class DfUrlAnalyzerPostgreSql implements DfUrlAnalyzer {
+public class DfUrlAnalyzerMySQL implements DfUrlAnalyzer {
 
     protected String _url;
 
-    public DfUrlAnalyzerPostgreSql(String url) {
+    public DfUrlAnalyzerMySQL(String url) {
         this._url = url;
     }
 

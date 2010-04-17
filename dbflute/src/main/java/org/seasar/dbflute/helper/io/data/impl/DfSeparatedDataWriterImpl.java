@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
@@ -54,7 +55,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                           =========
     protected DataSource _dataSource;
 
-    protected String _schemaName;
+    protected UnifiedSchema _unifiedSchema;
 
     protected boolean _loggingInsertSql;
 
@@ -332,7 +333,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexible();
         try {
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-            final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumnList(metaData, _schemaName,
+            final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumnList(metaData, _unifiedSchema,
                     tableName);
             for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
@@ -646,12 +647,12 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getSchemaName() {
-        return _schemaName;
+    public UnifiedSchema getSchemaName() {
+        return _unifiedSchema;
     }
 
-    public void setSchemaName(String schemaName) {
-        this._schemaName = schemaName;
+    public void setSchemaName(UnifiedSchema unifiedSchema) {
+        this._unifiedSchema = unifiedSchema;
     }
 
     public boolean isLoggingInsertSql() {

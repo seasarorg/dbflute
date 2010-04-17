@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -535,11 +536,11 @@ public abstract class DfAbstractHelperProperties {
         return DfEnvironmentType.getInstance().getEnvironmentType();
     }
 
-    protected Connection createConnection(String driver, String url, String schema, Properties info) {
+    protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, Properties info) {
         setupConnectionDriver(driver);
         try {
             final Connection conn = DriverManager.getConnection(url, info);
-            setupConnectionVariousSetting(schema, conn);
+            setupConnectionVariousSetting(unifiedSchema, conn);
             return conn;
         } catch (SQLException e) {
             String msg = "Failed to connect: url=" + url + " info=" + info;
@@ -547,11 +548,11 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
-    protected Connection createConnection(String driver, String url, String schema, String user, String password) {
+    protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, String user, String password) {
         setupConnectionDriver(driver);
         try {
             final Connection conn = DriverManager.getConnection(url, user, password);
-            setupConnectionVariousSetting(schema, conn);
+            setupConnectionVariousSetting(unifiedSchema, conn);
             return conn;
         } catch (SQLException e) {
             String msg = "Failed to connect: url=" + url + " user=" + user;
@@ -567,10 +568,10 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
-    private void setupConnectionVariousSetting(String schema, Connection conn) throws SQLException {
+    private void setupConnectionVariousSetting(UnifiedSchema unifiedSchema, Connection conn) throws SQLException {
         conn.setAutoCommit(true);
-        if (schema != null && schema.trim().length() > 0) {
-            final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(schema, getBasicProperties());
+        if (unifiedSchema.existsPureSchema()) {
+            final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(unifiedSchema, getBasicProperties());
             connector.connectSchema(conn);
         }
     }

@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
@@ -51,7 +52,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected String _schema;
+    protected UnifiedSchema _unifiedSchema;
     protected boolean _tableNameWithSchema;
     protected List<String> _dropObjectTypeList;
     protected List<String> _dropTableTargetList;
@@ -81,21 +82,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final DatabaseMetaData dbMetaData = conn.getMetaData();
                 final DfTableHandler tableNameHandler = new DfTableHandler() {
                     @Override
-                    protected String[] getRealObjectTypeTargetArray(String schemaName) {
+                    protected String[] getRealObjectTypeTargetArray(UnifiedSchema unifiedSchema) {
                         if (_dropObjectTypeList != null) {
                             return _dropObjectTypeList.toArray(new String[] {});
                         } else {
-                            return super.getRealObjectTypeTargetArray(schemaName);
+                            return super.getRealObjectTypeTargetArray(unifiedSchema);
                         }
                     }
 
                     @Override
-                    protected List<String> getRealTableExceptList(String schemaName) {
+                    protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) {
                         if (_dropTableExceptList != null) {
                             return _dropTableExceptList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getRealTableExceptList(schemaName);
+                                return super.getRealTableExceptList(unifiedSchema);
                             } else {
                                 return new ArrayList<String>();
                             }
@@ -103,25 +104,25 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     }
 
                     @Override
-                    protected List<String> getRealTableTargetList(String schemaName) {
+                    protected List<String> getRealTableTargetList(UnifiedSchema unifiedSchema) {
                         if (_dropTableTargetList != null) {
                             return _dropTableTargetList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getRealTableTargetList(schemaName);
+                                return super.getRealTableTargetList(unifiedSchema);
                             } else {
                                 return new ArrayList<String>();
                             }
                         }
                     }
                 };
-                tableMetaInfoList = tableNameHandler.getTableList(dbMetaData, _schema);
+                tableMetaInfoList = tableNameHandler.getTableList(dbMetaData, _unifiedSchema);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
             executeObject(conn, tableMetaInfoList);
         } catch (SQLException e) {
-            String msg = "Failed to the initialize schema: " + _schema;
+            String msg = "Failed to the initialize schema: " + _unifiedSchema;
             throw new SQLFailureException(msg, e);
         } finally {
             if (conn != null) {
@@ -240,12 +241,12 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final DfForeignKeyHandler handler = new DfForeignKeyHandler() {
 
                     @Override
-                    protected List<String> getRealTableExceptList(String schemaName) {
+                    protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) {
                         if (_dropTableExceptList != null) {
                             return _dropTableExceptList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getRealTableExceptList(schemaName);
+                                return super.getRealTableExceptList(unifiedSchema);
                             } else {
                                 return new ArrayList<String>();
                             }
@@ -253,12 +254,12 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     }
 
                     @Override
-                    protected List<String> getRealTableTargetList(String schemaName) {
+                    protected List<String> getRealTableTargetList(UnifiedSchema unifiedSchema) {
                         if (_dropTableTargetList != null) {
                             return _dropTableTargetList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getRealTableTargetList(schemaName);
+                                return super.getRealTableTargetList(unifiedSchema);
                             } else {
                                 return new ArrayList<String>();
                             }
@@ -410,10 +411,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(_dataSource);
                 procedureList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
             } else {
-                procedureList = handler.getPlainProcedureList(metaData, _schema);
+                procedureList = handler.getPlainProcedureList(metaData, _unifiedSchema);
             }
         } catch (SQLException e) {
-            String msg = "Failed to get procedure meta data: " + _schema;
+            String msg = "Failed to get procedure meta data: " + _unifiedSchema;
             throw new IllegalStateException(msg, e);
         }
         callbackDropProcedureByJdbc(conn, procedureList, createDropProcedureByJdbcCallback());
@@ -494,8 +495,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                       Assist Helper
     //                                                                       =============
     protected String filterTableName(String tableName) {
-        if (_tableNameWithSchema && _schema != null && _schema.trim().length() > 0) {
-            tableName = _schema + "." + tableName;
+        if (_tableNameWithSchema && _unifiedSchema.hasSchema()) {
+            tableName = _unifiedSchema.buildCatalogSchemaElement(tableName);
+            ;
         }
         return tableName;
     }
@@ -514,8 +516,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _dataSource = dataSource;
     }
 
-    public void setSchema(String schema) {
-        _schema = schema;
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        _unifiedSchema = unifiedSchema;
     }
 
     public boolean isTableNameWithSchema() {

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.jdbc.urlanalyzer;
+package org.seasar.dbflute.logic.urlanalyzer;
 
 /**
  * @author jflute

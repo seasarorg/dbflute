@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
@@ -49,41 +50,40 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     //                                                                         ===========
     /**
      * Retrieves a list of foreign key columns for a given table.
-     * @param dbMeta JDBC meta data. (NotNull)
-     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param metaData JDBC meta data. (NotNull)
+     * @param tableInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta,
-            DfTableMetaInfo tableMetaInfo) throws SQLException {
-        final String uniqueSchema = tableMetaInfo.getUniqueSchema();
-        final String tableName = tableMetaInfo.getTableName();
-        return getForeignKeyMetaInfo(dbMeta, uniqueSchema, tableName);
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
+            throws SQLException {
+        final UnifiedSchema uniqueSchema = tableInfo.getUnifiedSchema();
+        final String tableName = tableInfo.getTableName();
+        return getForeignKeyMetaInfo(metaData, uniqueSchema, tableName);
     }
 
     /**
      * Retrieves a list of foreign key columns for a given table.
-     * @param dbMeta JDBC meta data. (NotNull)
-     * @param uniqueSchema The unique name of schema that can contain catalog name. (Nullable)
+     * @param metaData JDBC meta data. (NotNull)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String uniqueSchema,
-            String tableName) throws SQLException {
-        uniqueSchema = filterSchemaName(uniqueSchema);
-        Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(dbMeta, uniqueSchema, tableName);
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData metaData,
+            UnifiedSchema unifiedSchema, String tableName) throws SQLException {
+        Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName);
         if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetForeignKeyMetaInfo(dbMeta, uniqueSchema, tableName.toLowerCase());
+            resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName.toLowerCase());
         }
         if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetForeignKeyMetaInfo(dbMeta, uniqueSchema, tableName.toUpperCase());
+            resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName.toUpperCase());
         }
         return resultMap;
     }
 
-    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMetaInfo(DatabaseMetaData dbMeta, String uniqueSchema,
-            String tableName) throws SQLException {
+    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMetaInfo(DatabaseMetaData dbMeta,
+            UnifiedSchema unifiedSchema, String tableName) throws SQLException {
         final Map<String, DfForeignKeyMetaInfo> fkMap = newLinkedHashMap();
         if (!isForeignKeyExtractingSupported()) {
             return fkMap;
@@ -91,10 +91,11 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         final Map<String, String> exceptedFKKeyMap = newLinkedHashMap();
         ResultSet foreignKeys = null;
         try {
-            final String catalogName = extractCatalogName(uniqueSchema);
-            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
-            foreignKeys = dbMeta.getImportedKeys(catalogName, pureSchemaName, tableName);
+            final String catalogName = unifiedSchema.getPureCatalog();
+            final String schemaName = unifiedSchema.getPureSchema();
+            foreignKeys = dbMeta.getImportedKeys(catalogName, schemaName, tableName);
             while (foreignKeys.next()) {
+                final String foreignCatalogName = foreignKeys.getString(1);
                 final String foreignSchemaName = foreignKeys.getString(2);
                 final String foreignTableName = foreignKeys.getString(3);
                 String fkName = foreignKeys.getString(12);
@@ -111,8 +112,9 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 // check except columns
                 final String localColumnName = foreignKeys.getString(8);
                 final String foreignColumnName = foreignKeys.getString(4);
-                assertFKColumnNotExcepted(uniqueSchema, tableName, localColumnName);
-                assertPKColumnNotExcepted(foreignSchemaName, foreignTableName, foreignColumnName);
+                assertFKColumnNotExcepted(unifiedSchema, tableName, localColumnName);
+                final UnifiedSchema foreignSchema = createAsDynamicSchema(foreignCatalogName, foreignSchemaName);
+                assertPKColumnNotExcepted(foreignSchema, foreignTableName, foreignColumnName);
 
                 DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
                 if (metaInfo == null) {
@@ -143,20 +145,20 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         return filterSameForeignKeyMetaInfo(fkMap);
     }
 
-    protected void assertFKColumnNotExcepted(String uniqueSchema, String tableName, String columnName) {
-        if (isColumnExcept(uniqueSchema, tableName, columnName)) {
+    protected void assertFKColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {
+        if (isColumnExcept(unifiedSchema, tableName, columnName)) {
             String msg = "FK columns are unsupported on 'columnExcept' property:";
-            msg = msg + " uniqueSchema=" + uniqueSchema;
+            msg = msg + " unifiedSchema=" + unifiedSchema;
             msg = msg + " tableName=" + tableName;
             msg = msg + " columnName=" + columnName;
             throw new DfIllegalPropertySettingException(msg);
         }
     }
 
-    protected void assertPKColumnNotExcepted(String uniqueSchema, String tableName, String columnName) {
-        if (isColumnExcept(uniqueSchema, tableName, columnName)) {
+    protected void assertPKColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {
+        if (isColumnExcept(unifiedSchema, tableName, columnName)) {
             String msg = "PK columns are unsupported on 'columnExcept' property:";
-            msg = msg + " uniqueSchema=" + uniqueSchema;
+            msg = msg + " unifiedSchema=" + unifiedSchema;
             msg = msg + " tableName=" + tableName;
             msg = msg + " columnName=" + columnName;
             throw new DfIllegalPropertySettingException(msg);

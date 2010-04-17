@@ -3,13 +3,15 @@ package org.seasar.dbflute.properties.assistant;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
+
 /**
  * @author jflute
  * @since 0.9.5.5 (2009/10/04 Sunday)
  */
 public class DfAdditionalSchemaInfo {
 
-    protected String _schemaName;
+    protected UnifiedSchema _unifiedSchema;
     protected List<String> _objectTypeTargetList;
     protected List<String> _tableExceptList;
     protected List<String> _tableTargetList;
@@ -34,12 +36,12 @@ public class DfAdditionalSchemaInfo {
         return _supplementaryConnectionMap.get("password");
     }
 
-    public String getSchemaName() {
-        return _schemaName;
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema;
     }
 
-    public void setSchemaName(String schemaName) {
-        this._schemaName = schemaName;
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        this._unifiedSchema = unifiedSchema;
     }
 
     public List<String> getObjectTypeTargetList() {

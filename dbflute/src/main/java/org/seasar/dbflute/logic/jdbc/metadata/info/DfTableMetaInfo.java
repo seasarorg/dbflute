@@ -17,9 +17,9 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
 import org.seasar.dbflute.util.DfSystemUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -30,10 +30,10 @@ public class DfTableMetaInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _tableName;
-    protected String _tableType;
+    protected String _tableName; // NotNull
+    protected String _tableType; // NotNull
     protected String _tableComment;
-    protected String _uniqueSchema;
+    protected UnifiedSchema _unifiedSchema; // NotNull
     protected boolean _existSameNameTable;
     protected boolean _outOfGenerateTarget;
 
@@ -65,14 +65,26 @@ public class DfTableMetaInfo {
     }
 
     // ===================================================================================
-    //                                                                        Name Builder
-    //                                                                        ============
+    //                                                                       Name Building
+    //                                                                       =============
     public String buildTableDisplayName() {
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(_uniqueSchema)) {
-            return _uniqueSchema + "." + _tableName;
-        } else {
-            return _tableName;
-        }
+        return buildCatalogSchemaTable();
+    }
+
+    public String buildTableSqlName() {
+        return _unifiedSchema.buildSqlElement(_tableName);
+    }
+
+    public String buildCatalogSchemaTable() {
+        return _unifiedSchema.buildCatalogSchemaElement(_tableName);
+    }
+
+    public String buildIdentifiedSchemaTable() {
+        return _unifiedSchema.buildIdentifiedSchemaElement(_tableName);
+    }
+
+    public String buildPureSchemaTable() {
+        return _unifiedSchema.buildPureSchemaElement(_tableName);
     }
 
     // ===================================================================================
@@ -116,13 +128,8 @@ public class DfTableMetaInfo {
                 comment = _tableComment;
             }
         }
-        if (_uniqueSchema != null && _uniqueSchema.trim().length() != 0) {
-            return _uniqueSchema + "." + _tableName + "(" + _tableType + ")"
-                    + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
-        } else {
-            return _tableName + "(" + _tableType + ")"
-                    + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
-        }
+        return _unifiedSchema.buildCatalogSchemaElement(_tableName) + "(" + _tableType + ")"
+                + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
     }
 
     // ===================================================================================
@@ -152,12 +159,12 @@ public class DfTableMetaInfo {
         this._tableComment = tableComment;
     }
 
-    public String getUniqueSchema() {
-        return _uniqueSchema;
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema;
     }
 
-    public void setUniqueSchema(String uniqueSchema) {
-        this._uniqueSchema = uniqueSchema;
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        this._unifiedSchema = unifiedSchema;
     }
 
     public boolean isOutOfGenerateTarget() {

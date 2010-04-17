@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.states.DfDtsRowStates;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
@@ -134,9 +135,9 @@ public class DfDataTable {
         return _hasMetaData;
     }
 
-    public void setupMetaData(DatabaseMetaData metaData, String schemaName) throws SQLException {
-        final Map<String, DfColumnMetaInfo> metaMap = extractColumnMetaMap(metaData, schemaName);
-        final Set<String> primaryKeySet = getPrimaryKeySet(metaData, schemaName);
+    public void setupMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
+        final Map<String, DfColumnMetaInfo> metaMap = extractColumnMetaMap(metaData, unifiedSchema);
+        final Set<String> primaryKeySet = getPrimaryKeySet(metaData, unifiedSchema);
         for (int i = 0; i < getColumnSize(); ++i) {
             final DfDataColumn column = getColumn(i);
             if (primaryKeySet.contains(column.getColumnName())) {
@@ -159,9 +160,10 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, String schemaName)
+    protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
-        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumnList(metaData, schemaName, _tableName);
+        final List<DfColumnMetaInfo> metaList = new DfColumnHandler()
+                .getColumnList(metaData, unifiedSchema, _tableName);
         final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : metaList) {
             metaMap.put(metaInfo.getColumnName(), metaInfo);
@@ -169,14 +171,14 @@ public class DfDataTable {
         return metaMap;
     }
 
-    protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, String schemaName) {
+    protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) {
         try {
-            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyHandler()
-                    .getPrimaryKey(metaData, schemaName, _tableName);
+            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyHandler().getPrimaryKey(metaData, unifiedSchema,
+                    _tableName);
             final List<String> list = pkInfo.getPrimaryKeyList();
             return new HashSet<String>(list);
         } catch (SQLException e) {
-            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + _tableName;
+            String msg = "SQLException occured: unifiedSchema=" + unifiedSchema + " tableName=" + _tableName;
             throw new IllegalStateException(msg);
         }
     }

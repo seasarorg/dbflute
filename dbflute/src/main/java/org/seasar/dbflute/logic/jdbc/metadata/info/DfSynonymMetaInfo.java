@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -31,36 +32,71 @@ public class DfSynonymMetaInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String synonymOwner;
-    protected String synonymName;
-    protected String tableOwner;
-    protected String tableName;
-    protected DfPrimaryKeyMetaInfo primaryKeyMetaInfo;
-    protected boolean autoIncrement;
-    protected Map<String, Map<Integer, String>> uniqueKeyMap;
-    protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
-    protected Map<String, Map<Integer, String>> indexMap;
-    protected String dbLinkName;
-    protected List<DfColumnMetaInfo> columnMetaInfoList4DBLink;
-    protected boolean selectable;
-    protected boolean procedureSynonym;
-    protected boolean sequenceSynonym;
-    protected String tableComment;
-    protected Map<String, UserColComments> columnCommentMap;
+    protected UnifiedSchema _synonymOwner;
+    protected String _synonymName;
+    protected UnifiedSchema _tableOwner;
+    protected String _tableName;
+    protected DfPrimaryKeyMetaInfo _primaryKeyMetaInfo;
+    protected boolean _autoIncrement;
+    protected Map<String, Map<Integer, String>> _uniqueKeyMap;
+    protected Map<String, DfForeignKeyMetaInfo> _foreignKeyMetaInfoMap;
+    protected Map<String, Map<Integer, String>> _indexMap;
+    protected String _dbLinkName;
+    protected List<DfColumnMetaInfo> _columnMetaInfoList4DBLink;
+    protected boolean _selectable;
+    protected boolean _procedureSynonym;
+    protected boolean _sequenceSynonym;
+    protected String _tableComment;
+    protected Map<String, UserColComments> _columnCommentMap;
 
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean isDBLink() {
-        return dbLinkName != null;
+        return _dbLinkName != null;
     }
 
     public boolean hasTableComment() {
-        return tableComment != null && tableComment.trim().length() > 0;
+        return _tableComment != null && _tableComment.trim().length() > 0;
     }
 
     public boolean hasColumnCommentMap() {
-        return columnCommentMap != null && !columnCommentMap.isEmpty();
+        return _columnCommentMap != null && !_columnCommentMap.isEmpty();
+    }
+
+    // ===================================================================================
+    //                                                                       Name Building
+    //                                                                       =============
+    public String buildSynonymDisplayName() {
+        return buildCatalogSchemaSynonym();
+    }
+
+    public String buildCatalogSchemaSynonym() {
+        return _synonymOwner.buildCatalogSchemaElement(_synonymName);
+    }
+
+    public String buildIdentifiedSchemaSynonym() {
+        return _synonymOwner.buildIdentifiedSchemaElement(_synonymName);
+    }
+
+    public String buildPureSchemaSynonym() {
+        return _synonymOwner.buildPureSchemaElement(_synonymName);
+    }
+
+    public String buildTableDisplayName() {
+        return buildCatalogSchemaTable();
+    }
+
+    public String buildCatalogSchemaTable() {
+        return _tableOwner.buildCatalogSchemaElement(_tableName);
+    }
+
+    public String buildIdentifiedSchemaTable() {
+        return _tableOwner.buildIdentifiedSchemaElement(_tableName);
+    }
+
+    public String buildPureSchemaTable() {
+        return _tableOwner.buildPureSchemaElement(_tableName);
     }
 
     // ===================================================================================
@@ -69,139 +105,139 @@ public class DfSynonymMetaInfo {
     @Override
     public String toString() {
         String comment = "";
-        if (tableComment != null) {
+        if (_tableComment != null) {
             final String ln = DfSystemUtil.getLineSeparator();
-            final int indexOf = tableComment.indexOf(ln);
+            final int indexOf = _tableComment.indexOf(ln);
             if (indexOf > 0) { // not contain 0 because ignore first line separator
-                comment = tableComment.substring(0, indexOf) + "...";
+                comment = _tableComment.substring(0, indexOf) + "...";
             } else {
-                comment = tableComment;
+                comment = _tableComment;
             }
         }
         String columns = "";
-        if (columnMetaInfoList4DBLink != null) {
-            columns = "(" + columnMetaInfoList4DBLink.size() + " columns for DB link)";
+        if (_columnMetaInfoList4DBLink != null) {
+            columns = "(" + _columnMetaInfoList4DBLink.size() + " columns for DB link)";
         }
-        return synonymOwner + "." + synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "."
-                + tableName + columns + ", PK=" + primaryKeyMetaInfo + (autoIncrement ? ", ID" : "") + ", "
-                + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", "
-                + (selectable ? "selectable" : "unselectable") + "}"
+        return _synonymOwner + "." + _synonymName + ":{" + (_dbLinkName != null ? _dbLinkName : _tableOwner) + "."
+                + _tableName + columns + ", PK=" + _primaryKeyMetaInfo + (_autoIncrement ? ", ID" : "") + ", "
+                + (_uniqueKeyMap != null ? "UQ=" + _uniqueKeyMap.size() : null) + ", "
+                + (_foreignKeyMetaInfoMap != null ? "FK=" + _foreignKeyMetaInfoMap.size() : null) + ", "
+                + (_selectable ? "selectable" : "unselectable") + "}"
                 + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getSynonymOwner() {
-        return synonymOwner;
+    public UnifiedSchema getSynonymOwner() {
+        return _synonymOwner;
     }
 
-    public void setSynonymOwner(String synonymOwner) {
-        this.synonymOwner = synonymOwner;
+    public void setSynonymOwner(UnifiedSchema synonymOwner) {
+        this._synonymOwner = synonymOwner;
     }
 
     public String getSynonymName() {
-        return synonymName;
+        return _synonymName;
     }
 
     public void setSynonymName(String synonymName) {
-        this.synonymName = synonymName;
+        this._synonymName = synonymName;
     }
 
-    public String getTableOwner() {
-        return tableOwner;
+    public UnifiedSchema getTableOwner() {
+        return _tableOwner;
     }
 
-    public void setTableOwner(String tableOwner) {
-        this.tableOwner = tableOwner;
+    public void setTableOwner(UnifiedSchema tableOwner) {
+        this._tableOwner = tableOwner;
     }
 
     public String getTableName() {
-        return tableName;
+        return _tableName;
     }
 
     public void setTableName(String tableName) {
-        this.tableName = tableName;
+        this._tableName = tableName;
     }
 
     public DfPrimaryKeyMetaInfo getPrimaryKeyMetaInfo() {
-        return primaryKeyMetaInfo;
+        return _primaryKeyMetaInfo;
     }
 
     public void setPrimaryKeyMetaInfo(DfPrimaryKeyMetaInfo primaryKeyMetaInfo) {
-        this.primaryKeyMetaInfo = primaryKeyMetaInfo;
+        this._primaryKeyMetaInfo = primaryKeyMetaInfo;
     }
 
     public boolean isAutoIncrement() {
-        return autoIncrement;
+        return _autoIncrement;
     }
 
     public void setAutoIncrement(boolean autoIncrement) {
-        this.autoIncrement = autoIncrement;
+        this._autoIncrement = autoIncrement;
     }
 
     public Map<String, Map<Integer, String>> getUniqueKeyMap() {
-        return uniqueKeyMap != null ? uniqueKeyMap : new HashMap<String, Map<Integer, String>>();
+        return _uniqueKeyMap != null ? _uniqueKeyMap : new HashMap<String, Map<Integer, String>>();
     }
 
     public void setUniqueKeyMap(Map<String, Map<Integer, String>> uniqueKeyMap) {
-        this.uniqueKeyMap = uniqueKeyMap;
+        this._uniqueKeyMap = uniqueKeyMap;
     }
 
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfoMap() {
-        return foreignKeyMetaInfoMap != null ? foreignKeyMetaInfoMap : new HashMap<String, DfForeignKeyMetaInfo>();
+        return _foreignKeyMetaInfoMap != null ? _foreignKeyMetaInfoMap : new HashMap<String, DfForeignKeyMetaInfo>();
     }
 
     public void setForeignKeyMetaInfoMap(Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap) {
-        this.foreignKeyMetaInfoMap = foreignKeyMetaInfoMap;
+        this._foreignKeyMetaInfoMap = foreignKeyMetaInfoMap;
     }
 
     public Map<String, Map<Integer, String>> getIndexMap() {
-        return indexMap != null ? indexMap : new HashMap<String, Map<Integer, String>>();
+        return _indexMap != null ? _indexMap : new HashMap<String, Map<Integer, String>>();
     }
 
     public void setIndexMap(Map<String, Map<Integer, String>> indexMap) {
-        this.indexMap = indexMap;
+        this._indexMap = indexMap;
     }
 
     public String getDbLinkName() {
-        return dbLinkName;
+        return _dbLinkName;
     }
 
     public void setDbLinkName(String dbLinkName) {
-        this.dbLinkName = dbLinkName;
+        this._dbLinkName = dbLinkName;
     }
 
     public List<DfColumnMetaInfo> getColumnMetaInfoList4DBLink() {
-        return columnMetaInfoList4DBLink != null ? columnMetaInfoList4DBLink : new ArrayList<DfColumnMetaInfo>();
+        return _columnMetaInfoList4DBLink != null ? _columnMetaInfoList4DBLink : new ArrayList<DfColumnMetaInfo>();
     }
 
     public void setColumnMetaInfoList4DBLink(List<DfColumnMetaInfo> columnMetaInfoList4DBLink) {
-        this.columnMetaInfoList4DBLink = columnMetaInfoList4DBLink;
+        this._columnMetaInfoList4DBLink = columnMetaInfoList4DBLink;
     }
 
     public boolean isSelectable() {
-        return selectable;
+        return _selectable;
     }
 
     public void setSelectable(boolean selectable) {
-        this.selectable = selectable;
+        this._selectable = selectable;
     }
 
     public String getTableComment() {
-        return tableComment;
+        return _tableComment;
     }
 
     public void setTableComment(String tableComment) {
-        this.tableComment = tableComment;
+        this._tableComment = tableComment;
     }
 
     public Map<String, UserColComments> getColumnCommentMap() {
-        return columnCommentMap;
+        return _columnCommentMap;
     }
 
     public void setColumnCommentMap(Map<String, UserColComments> columnCommentMap) {
-        this.columnCommentMap = columnCommentMap;
+        this._columnCommentMap = columnCommentMap;
     }
 }

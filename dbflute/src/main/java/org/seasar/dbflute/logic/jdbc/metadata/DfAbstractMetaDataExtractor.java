@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.jdbc.metadata;
 
 import java.util.LinkedHashMap;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
@@ -32,50 +33,16 @@ public abstract class DfAbstractMetaDataExtractor {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String filterSchemaName(String uniqueSchema) {
+    protected String filterSchemaName(String schemaName) {
         // The driver throws the exception if the value is empty string.
-        if (Srl.isTrimmedEmpty(uniqueSchema) && !isSchemaNameEmptyAllowed()) {
+        if (Srl.isTrimmedEmpty(schemaName) && !isSchemaNameEmptyAllowed()) {
             return null;
         }
-        return uniqueSchema;
+        return schemaName;
     }
 
-    protected String extractCatalogSchema(String uniqueSchema) { // basically for MySQL
-        if (Srl.is_Null_or_TrimmedEmpty(uniqueSchema)) {
-            return uniqueSchema;
-        }
-        if (!uniqueSchema.endsWith("." + DfDatabaseProperties.NO_NAME_SCHEMA)) {
-            return uniqueSchema;
-        }
-        return filterSchemaName(Srl.substringLastFront(uniqueSchema, "."));
-    }
-
-    protected String extractCatalogName(String uniqueSchema) { // for DBMS that supports both schema and catalog
-        if (Srl.is_Null_or_Empty(uniqueSchema)) {
-            return null;
-        }
-        int dotIndex = uniqueSchema.indexOf(".");
-        if (dotIndex < 0) {
-            return null;
-        }
-        // basically additionalSchema with Database only
-        return Srl.substringFirstFront(uniqueSchema, ".");
-    }
-
-    protected String extractPureSchemaName(String uniqueSchema) { // for DBMS that supports both schema and catalog
-        if (Srl.is_Null_or_Empty(uniqueSchema)) {
-            return filterSchemaName(uniqueSchema);
-        }
-        int dotIndex = uniqueSchema.indexOf(".");
-        if (dotIndex < 0) {
-            return filterSchemaName(uniqueSchema);
-        }
-        // basically additionalSchema with Database only
-        final String pureSchemaName = Srl.substringFirstRear(uniqueSchema, ".");
-        if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(pureSchemaName)) {
-            return null;
-        }
-        return filterSchemaName(pureSchemaName);
+    protected UnifiedSchema createAsDynamicSchema(String catalog, String schema) {
+        return UnifiedSchema.createAsDynamicSchema(catalog, schema, getDatabaseProperties());
     }
 
     // ===================================================================================

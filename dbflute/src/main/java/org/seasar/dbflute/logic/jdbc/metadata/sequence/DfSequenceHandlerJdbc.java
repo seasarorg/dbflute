@@ -20,7 +20,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,9 +29,16 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -49,54 +55,66 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected String _schema;
-    protected List<String> _uniqueSchemaList;
+    protected List<UnifiedSchema> _unifiedSchemaList;
+    protected final DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
+    protected Map<String, DfTableMetaInfo> _tableMap;
+
+    protected void initializeTableInfo(Connection conn) throws SQLException {
+        if (_tableMap != null) {
+            return;
+        }
+        _tableMap = StringKeyMap.createAsFlexible();
+        final DfTableHandler tableHandler = new DfTableHandler();
+        final DatabaseMetaData metaData = conn.getMetaData();
+        final List<UnifiedSchema> uniqueSchemaList = _unifiedSchemaList;
+        for (UnifiedSchema unifiedSchema : uniqueSchemaList) {
+            // same-name tables between different schemas are unsupported
+            // so put all directly here
+            _tableMap.putAll(tableHandler.getTableMap(metaData, unifiedSchema));
+        }
+    }
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerJdbc(DataSource dataSource, String schema, List<String> uniqueSchemaList) {
+    public DfSequenceHandlerJdbc(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
         _dataSource = dataSource;
-        _schema = schema;
-        _uniqueSchemaList = uniqueSchemaList;
+        _unifiedSchemaList = unifiedSchemaList;
     }
 
     // ===================================================================================
     //                                                                  Increment Sequence
     //                                                                  ==================
     public void incrementSequenceToDataMax(Map<String, String> tableSequenceMap) {
-        final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
-        final Map<String, List<String>> skippedMap = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<String>> skippedMap = DfCollectionUtil.newLinkedHashMap();
         _log.info("...Incrementing sequences to max value of table data");
         Connection conn = null;
         Statement st = null;
         String sequenceName = null;
         try {
+            initializeTableInfo(conn);
             conn = _dataSource.getConnection();
             st = conn.createStatement();
             final Set<Entry<String, String>> entrySet = tableSequenceMap.entrySet();
             for (Entry<String, String> entry : entrySet) {
                 final String tableName = entry.getKey();
                 sequenceName = entry.getValue();
-                if (sequenceName == null || sequenceName.trim().length() == 0) {
-                    String msg = "Not found the sequence name of the table:";
-                    msg = msg + " tableName=" + tableName;
-                    throw new IllegalStateException(msg); // basically unreachable
-                }
-                final DatabaseMetaData metaData = conn.getMetaData();
-                final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, _schema, tableName);
+                assertValidSequence(sequenceName, tableName);
+                final DfTableMetaInfo tableInfo = findTableInfo(conn, tableName);
+                final DfPrimaryKeyMetaInfo pkInfo = findPrimaryKeyInfo(conn, tableInfo);
                 final List<String> pkList = pkInfo.getPrimaryKeyList();
                 if (pkList.size() != 1) {
                     skippedMap.put(tableName, pkList);
                     continue;
                 }
                 final String primaryKeyColumnName = pkList.get(0);
-                final Integer count = selectCount(st, tableName);
+                final String tableSqlName = tableInfo.buildCatalogSchemaTable();
+                final Integer count = selectCount(st, tableSqlName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                final Integer actualValue = selectDataMax(st, tableName, primaryKeyColumnName);
+                final Integer actualValue = selectDataMax(st, tableInfo, primaryKeyColumnName);
                 if (actualValue == null) {
                     // It is not necessary to increment because the table has no data.
                     continue;
@@ -145,6 +163,29 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
     }
 
+    protected void assertValidSequence(String sequenceName, String tableName) {
+        if (Srl.is_Null_or_TrimmedEmpty(sequenceName)) {
+            String msg = "Not found the sequence name of the table:";
+            msg = msg + " tableName=" + tableName;
+            throw new IllegalStateException(msg); // basically unreachable
+        }
+    }
+
+    protected DfTableMetaInfo findTableInfo(Connection conn, String tableName) throws SQLException {
+        final DfTableMetaInfo table = _tableMap.get(tableName);
+        if (table == null) {
+            String msg = "Failed to find the table in generated target tables:";
+            msg = msg + " table=" + tableName + " target=" + _tableMap.keySet();
+            throw new DfTableNotFoundException(msg);
+        }
+        return table;
+    }
+
+    protected DfPrimaryKeyMetaInfo findPrimaryKeyInfo(Connection conn, DfTableMetaInfo tableInfo) throws SQLException {
+        final DatabaseMetaData metaData = conn.getMetaData();
+        return _uniqueKeyHandler.getPrimaryKey(metaData, tableInfo);
+    }
+
     protected void callSequenceLoop(Statement st, String sequenceName, Integer actualValue) throws SQLException {
         Integer sequenceValue = selectNextVal(st, sequenceName); // first next value
         final Integer startPoint = sequenceValue; // save start point
@@ -185,9 +226,11 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
     }
 
-    protected Integer selectDataMax(Statement statement, String tableName, String primaryKeyColumnName)
+    protected Integer selectDataMax(Statement statement, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
             throws SQLException {
-        final String sql = "select max(" + primaryKeyColumnName + ") as MAX_VALUE from " + tableName;
+        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
+        final String tableSqlName = unifiedSchema.buildCatalogSchemaElement(tableInfo.getTableName());
+        final String sql = "select max(" + primaryKeyColumnName + ") as MAX_VALUE from " + tableSqlName;
         ResultSet rs = null;
         try {
             rs = statement.executeQuery(sql);
@@ -203,7 +246,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 actualValue = Integer.valueOf(value);
             } catch (NumberFormatException e) {
                 String msg = "The type of primary key related to sequece should be Number:";
-                msg = msg + " table=" + tableName + " primaryKey=" + primaryKeyColumnName;
+                msg = msg + " table=" + tableSqlName + " primaryKey=" + primaryKeyColumnName;
                 msg = msg + " value=" + value;
                 throw new IllegalStateException(msg);
             }

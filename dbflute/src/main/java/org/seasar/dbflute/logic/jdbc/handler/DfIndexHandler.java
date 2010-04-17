@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -39,38 +40,37 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo,
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMetaInfo tableInfo,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
-        final String uniqueSchema = tableMetaInfo.getUniqueSchema();
-        final String tableName = tableMetaInfo.getTableName();
-        if (tableMetaInfo.isTableTypeView()) {
+        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
+        final String tableName = tableInfo.getTableName();
+        if (tableInfo.isTableTypeView()) {
             return newLinkedHashMap();
         }
-        return getIndexMap(dbMeta, uniqueSchema, tableName, uniqueKeyMap);
+        return getIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
     }
 
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String uniqueSchema,
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
-        uniqueSchema = filterSchemaName(uniqueSchema);
-        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(dbMeta, uniqueSchema, tableName, uniqueKeyMap);
+        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
         if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetIndexMap(dbMeta, uniqueSchema, tableName.toLowerCase(), uniqueKeyMap);
+            resultMap = doGetIndexMap(metaData, unifiedSchema, tableName.toLowerCase(), uniqueKeyMap);
         }
         if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetIndexMap(dbMeta, uniqueSchema, tableName.toUpperCase(), uniqueKeyMap);
+            resultMap = doGetIndexMap(metaData, unifiedSchema, tableName.toUpperCase(), uniqueKeyMap);
         }
         return resultMap;
     }
 
-    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, String uniqueSchema,
+    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = false;
-            final String catalogName = extractCatalogName(uniqueSchema);
-            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
-            parts = dbMeta.getIndexInfo(catalogName, pureSchemaName, tableName, uniqueKeyOnly, true);
+            final String catalogName = unifiedSchema.getPureCatalog();
+            final String schemaName = unifiedSchema.getPureSchema();
+            parts = dbMeta.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final String indexName = parts.getString(6);
                 final boolean isNonUnique;
@@ -96,7 +96,7 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 if (columnName == null || columnName.trim().length() == 0) {
                     continue;
                 }
-                if (isColumnExcept(uniqueSchema, tableName, columnName)) {
+                if (isColumnExcept(unifiedSchema, tableName, columnName)) {
                     continue;
                 }
                 final Integer ordinalPosition;

@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 
 /**
  * @author jflute
@@ -39,8 +40,8 @@ public class DfSequenceHandlerH2 extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerH2(DataSource dataSource, String schema, List<String> allSchemaList) {
-        super(dataSource, schema, allSchemaList);
+    public DfSequenceHandlerH2(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+        super(dataSource, unifiedSchemaList);
     }
 
     // ===================================================================================

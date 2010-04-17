@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
@@ -43,8 +43,8 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceExtractorPostgreSQL(DataSource dataSource, List<String> allSchemaList) {
-        super(dataSource, allSchemaList);
+    public DfSequenceExtractorPostgreSQL(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+        super(dataSource, unifiedSchemaList);
     }
 
     // ===================================================================================
@@ -75,23 +75,23 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
             final String sequenceName = recordMap.get("sequence_name");
             info.setSequenceName(sequenceName);
 
-            final String catalogSchema = sequenceCatalog + "." + sequenceSchema;
+            final UnifiedSchema unifiedSchema = createAsDynamicSchema(sequenceCatalog, sequenceSchema);
 
             String minValue = recordMap.get("minimum_value");
             if (minValue == null || minValue.trim().length() == 0) {
-                minValue = selectMinimumValue(facade, catalogSchema, sequenceName);
+                minValue = selectMinimumValue(facade, unifiedSchema, sequenceName);
             }
             info.setMinimumValue(minValue != null ? new BigDecimal(minValue) : null);
 
             String maxValue = recordMap.get("maximum_value");
             if (maxValue == null || maxValue.trim().length() == 0) {
-                maxValue = selectMaximumValue(facade, catalogSchema, sequenceName);
+                maxValue = selectMaximumValue(facade, unifiedSchema, sequenceName);
             }
             info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
 
             String incrementSize = recordMap.get("increment");
             if (incrementSize == null || incrementSize.trim().length() == 0) {
-                incrementSize = selectIncrementSize(facade, catalogSchema, sequenceName);
+                incrementSize = selectIncrementSize(facade, unifiedSchema, sequenceName);
             }
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
 
@@ -105,14 +105,13 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
 
     protected String buildMetaSelectSql() {
         final String schemaCondition;
-        if (!_allSchemaList.isEmpty()) {
+        if (!_unifiedSchemaList.isEmpty()) {
             final StringBuilder sb = new StringBuilder();
-            for (String schema : _allSchemaList) {
+            for (UnifiedSchema unifiedSchema : _unifiedSchemaList) {
                 if (sb.length() > 0) {
                     sb.append(",");
                 }
-                final String realSchemaName = extractPureSchemaName(schema);
-                sb.append("'").append(realSchemaName).append("'");
+                sb.append("'").append(unifiedSchema.getPureSchema()).append("'");
             }
             schemaCondition = sb.toString();
         } else {
@@ -122,31 +121,24 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
         return "select * from information_schema.sequences where sequence_schema in (" + schemaCondition + ")";
     }
 
-    protected String selectMinimumValue(DfJdbcFacade facade, String catalogSchema, String sequenceName) {
-        return selectElementValue(facade, catalogSchema, sequenceName, "min_value");
+    protected String selectMinimumValue(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName) {
+        return selectElementValue(facade, unifiedSchema, sequenceName, "min_value");
     }
 
-    protected String selectMaximumValue(DfJdbcFacade facade, String catalogSchema, String sequenceName) {
-        return selectElementValue(facade, catalogSchema, sequenceName, "max_value");
+    protected String selectMaximumValue(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName) {
+        return selectElementValue(facade, unifiedSchema, sequenceName, "max_value");
     }
 
-    protected String selectIncrementSize(DfJdbcFacade facade, String catalogSchema, String sequenceName) {
-        return selectElementValue(facade, catalogSchema, sequenceName, "increment_by");
+    protected String selectIncrementSize(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName) {
+        return selectElementValue(facade, unifiedSchema, sequenceName, "increment_by");
     }
 
-    protected String selectElementValue(DfJdbcFacade facade, String catalogSchema, String sequenceName,
+    protected String selectElementValue(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName,
             String elementName) {
-        String sql = buildElementValueSql(catalogSchema + "." + sequenceName, elementName);
+        String sql = buildElementValueSql(unifiedSchema.buildCatalogSchemaElement(sequenceName), elementName);
         final List<String> columnList = new ArrayList<String>();
         columnList.add(elementName);
-        List<Map<String, String>> resultList;
-        try {
-            resultList = facade.selectStringList(sql, columnList);
-        } catch (SQLFailureException ignored) {
-            final String pureSchemaName = extractPureSchemaName(catalogSchema);
-            sql = buildElementValueSql(pureSchemaName + "." + sequenceName, elementName);
-            resultList = facade.selectStringList(sql, columnList);
-        }
+        final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
         if (!resultList.isEmpty()) {
             return resultList.get(0).get(elementName); // only one record exists
         }

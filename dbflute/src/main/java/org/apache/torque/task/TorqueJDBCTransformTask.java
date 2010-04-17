@@ -71,6 +71,7 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.apache.xerces.dom.DocumentImpl;
 import org.apache.xerces.dom.DocumentTypeImpl;
@@ -170,7 +171,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("  driver : " + _driver);
         _log.info("  URL    : " + _url);
         _log.info("  user   : " + _userId);
-        _log.info("  schema : " + _schema);
+        _log.info("  schema : " + _mainSchema);
         _log.info("  props  : " + _connectionProperties);
 
         final DocumentTypeImpl docType = new DocumentTypeImpl(null, "database", null, DTDResolver.WEB_SITE_DTD);
@@ -255,7 +256,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         // Create database node. (The beginning of schema XML!)
         _databaseNode = _doc.createElement("database");
-        _databaseNode.setAttribute("name", _schema); // as main schema
+        _databaseNode.setAttribute("name", _mainSchema.getPureSchema()); // as main schema
 
         // * * * * * *
         // Table Loop
@@ -272,9 +273,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             final Element tableElement = _doc.createElement("table");
             tableElement.setAttribute("name", tableMataInfo.getTableName());
             tableElement.setAttribute("type", tableMataInfo.getTableType());
-            final String catalogSchema = tableMataInfo.getUniqueSchema();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogSchema)) {
-                tableElement.setAttribute("schema", catalogSchema);
+            final UnifiedSchema unifiedSchema = tableMataInfo.getUnifiedSchema();
+            if (unifiedSchema.hasSchema()) {
+                tableElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
             }
             final String tableComment = tableMataInfo.getTableComment();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(tableComment)) {
@@ -453,7 +454,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         msg = msg + "[Connection Settings]" + ln();
         msg = msg + " driver = " + _driver + ln();
         msg = msg + " url    = " + _url + ln();
-        msg = msg + " schema = " + _schema + ln();
+        msg = msg + " schema = " + _mainSchema + ln();
         msg = msg + " user   = " + _userId + ln();
         msg = msg + "* * * * * * * * * */";
         throw new DfTableNotFoundException(msg);
@@ -505,8 +506,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        final List<DfTableMetaInfo> tableList = _tableHandler.getTableList(dbMeta, _schema);
-        helpTableComments(tableList, _url, _schema);
+        final List<DfTableMetaInfo> tableList = _tableHandler.getTableList(dbMeta, _mainSchema);
+        helpTableComments(tableList, _mainSchema);
         resolveAdditionalSchema(dbMeta, tableList);
         assertDuplicateTable(tableList);
         return tableList;
@@ -540,23 +541,16 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMetaInfo> tableList)
             throws SQLException {
-        final List<String> schemaList = getDatabaseProperties().getAdditionalSchemaNameList();
-        for (String catalogSchema : schemaList) {
-            final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, catalogSchema);
-            for (DfTableMetaInfo metaInfo : additionalTableList) {
-                final String metaDataSchema = metaInfo.getUniqueSchema();
-                if (metaDataSchema == null || metaDataSchema.trim().length() == 0) {
-                    metaInfo.setUniqueSchema(catalogSchema);
-                }
-            }
-            // URL is null because of for additional schema here
-            helpTableComments(additionalTableList, null, catalogSchema);
+        final List<UnifiedSchema> schemaList = getDatabaseProperties().getAdditionalSchemaList();
+        for (UnifiedSchema additionalSchema : schemaList) {
+            final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
+            helpTableComments(additionalTableList, additionalSchema);
             tableList.addAll(additionalTableList);
         }
     }
 
-    protected void helpTableComments(List<DfTableMetaInfo> tableList, String url, String schema) {
-        final DfDbCommentExtractor extractor = createDbCommentExtractor(url, schema);
+    protected void helpTableComments(List<DfTableMetaInfo> tableList, UnifiedSchema unifiedSchema) {
+        final DfDbCommentExtractor extractor = createDbCommentExtractor(unifiedSchema);
         if (extractor != null) {
             final Set<String> tableSet = new HashSet<String>();
             for (DfTableMetaInfo table : tableList) {
@@ -832,14 +826,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             String msg = "The table meta information should be for synonym: " + table;
             throw new IllegalStateException(msg);
         }
-        final String catalogSchema = table.getUniqueSchema();
-        final String tableName = table.getTableName();
-        DfSynonymMetaInfo info = _supplementarySynonymInfoMap.get(catalogSchema + "." + tableName);
+        String key = table.buildCatalogSchemaTable();
+        DfSynonymMetaInfo info = _supplementarySynonymInfoMap.get(key);
         if (info != null) {
             return info;
         }
-        final String pureSchemaName = Srl.substringFirstRear(catalogSchema, ".");
-        info = _supplementarySynonymInfoMap.get(pureSchemaName + "." + tableName);
+        key = table.buildPureSchemaTable();
+        info = _supplementarySynonymInfoMap.get(key);
         if (info != null) {
             return info;
         }
@@ -906,13 +899,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                           Extractor
     //                                                                           =========
-    protected DfDbCommentExtractor createDbCommentExtractor(String url, String schema) {
-        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory(url, schema);
+    protected DfDbCommentExtractor createDbCommentExtractor(UnifiedSchema unifiedSchema) {
+        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory(unifiedSchema);
         return factory.createDbCommentExtractor();
     }
 
-    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory(String url, String schema) {
-        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource(), url, schema);
+    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory(UnifiedSchema unifiedSchema) {
+        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource(), unifiedSchema);
     }
 
     protected DfIdentityExtractor createIdentityExtractor() {

@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
@@ -55,8 +56,8 @@ public abstract class DfAbstractTask extends Task {
     /** DB URL. */
     protected String _url;
 
-    /** Schema name. */
-    protected String _schema;
+    /** Main schema. */
+    protected UnifiedSchema _mainSchema;
 
     /** User name. */
     protected String _userId;
@@ -127,7 +128,7 @@ public abstract class DfAbstractTask extends Task {
                 sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
                 sb.append(ln).append("    driver = " + _driver);
                 sb.append(ln).append("    url    = " + _url);
-                sb.append(ln).append("    schema = " + _schema);
+                sb.append(ln).append("    schema = " + _mainSchema);
                 sb.append(ln).append("    user   = " + _userId);
                 sb.append(ln).append("    props  = " + _connectionProperties);
                 String finalInformation = getFinalInformation();
@@ -178,7 +179,7 @@ public abstract class DfAbstractTask extends Task {
         _driver = getDatabaseProperties().getDatabaseDriver();
         _url = getDatabaseProperties().getDatabaseUrl();
         _userId = getDatabaseProperties().getDatabaseUser();
-        _schema = getDatabaseProperties().getDatabaseSchema();
+        _mainSchema = getDatabaseProperties().getDatabaseSchema();
         _password = getDatabaseProperties().getDatabasePassword();
         _connectionProperties = getDatabaseProperties().getDatabaseConnectionProperties();
     }
@@ -256,7 +257,7 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void connectSchema() throws SQLException {
-        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_schema, getBasicProperties());
+        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_mainSchema, getBasicProperties());
         connector.connectSchema(getDataSource());
     }
 

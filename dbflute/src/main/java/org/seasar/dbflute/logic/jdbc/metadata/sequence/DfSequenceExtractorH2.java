@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
@@ -41,8 +42,8 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceExtractorH2(DataSource dataSource, List<String> allSchemaList) {
-        super(dataSource, allSchemaList);
+    public DfSequenceExtractorH2(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+        super(dataSource, unifiedSchemaList);
     }
 
     // ===================================================================================
@@ -89,14 +90,13 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
 
     protected String buildMetaSelectSql() {
         final String schemaCondition;
-        if (!_allSchemaList.isEmpty()) {
+        if (!_unifiedSchemaList.isEmpty()) {
             final StringBuilder sb = new StringBuilder();
-            for (String schema : _allSchemaList) {
+            for (UnifiedSchema unifiedSchema : _unifiedSchemaList) {
                 if (sb.length() > 0) {
                     sb.append(",");
                 }
-                final String realSchemaName = extractPureSchemaName(schema);
-                sb.append("'").append(realSchemaName).append("'");
+                sb.append("'").append(unifiedSchema.getPureSchema()).append("'");
             }
             schemaCondition = sb.toString();
         } else {

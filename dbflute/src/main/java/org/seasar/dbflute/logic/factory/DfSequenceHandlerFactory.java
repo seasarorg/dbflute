@@ -1,10 +1,10 @@
 package org.seasar.dbflute.logic.factory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerDB2;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerH2;
@@ -30,27 +30,20 @@ public class DfSequenceHandlerFactory {
     }
 
     public DfSequenceHandler createSequenceHandler() {
-        final String mainSchema = _databaseProperties.getDatabaseSchema();
-        final List<String> allSchemaList = createUniqueSchemaList();
+        final List<UnifiedSchema> targetSchemaList = createTargetSchemaList();
         if (_basicProperties.isDatabasePostgreSQL()) {
-            return new DfSequenceHandlerPostgreSQL(_dataSource, mainSchema, allSchemaList);
+            return new DfSequenceHandlerPostgreSQL(_dataSource, targetSchemaList);
         } else if (_basicProperties.isDatabaseOracle()) {
-            return new DfSequenceHandlerOracle(_dataSource, mainSchema, allSchemaList);
+            return new DfSequenceHandlerOracle(_dataSource, targetSchemaList);
         } else if (_basicProperties.isDatabaseDB2()) {
-            return new DfSequenceHandlerDB2(_dataSource, mainSchema, allSchemaList);
+            return new DfSequenceHandlerDB2(_dataSource, targetSchemaList);
         } else if (_basicProperties.isDatabaseH2()) {
-            return new DfSequenceHandlerH2(_dataSource, mainSchema, allSchemaList);
+            return new DfSequenceHandlerH2(_dataSource, targetSchemaList);
         }
         return null;
     }
 
-    protected List<String> createUniqueSchemaList() { // not only main schema but also additional schemas
-        final List<String> schemaList = new ArrayList<String>();
-        final String mainSchema = _databaseProperties.getDatabaseSchema();
-        if (mainSchema != null && mainSchema.trim().length() > 0) {
-            schemaList.add(_databaseProperties.getDatabaseSchema());
-        }
-        schemaList.addAll(_databaseProperties.getAdditionalSchemaNameList());
-        return schemaList;
+    protected List<UnifiedSchema> createTargetSchemaList() { // not only main schema but also additional schemas
+        return _databaseProperties.getTargetSchemaList();
     }
 }

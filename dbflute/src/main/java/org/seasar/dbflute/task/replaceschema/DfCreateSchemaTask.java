@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
@@ -136,11 +137,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             return;
         }
         for (Map<String, Object> additionalDropMap : additionalDropMapList) {
-            final String dropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
+            final UnifiedSchema dropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
             final String dropUrl = getMyProperties().getAdditionalDropUrl(additionalDropMap);
             final StringBuilder logSb = new StringBuilder();
-            if (dropSchema != null && dropSchema.trim().length() > 0) {
-                logSb.append("[").append(dropSchema).append("]");
+            if (dropSchema.hasSchema()) {
+                logSb.append("[").append(dropSchema.getCatalogSchema()).append("]");
                 if (dropUrl != null && dropUrl.trim().length() > 0) {
                     logSb.append(": ").append(dropUrl);
                 }

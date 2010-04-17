@@ -20,6 +20,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 
@@ -33,14 +34,14 @@ public abstract class DfSequenceExtractorBase extends DfAbstractMetaDataExtracto
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected List<String> _allSchemaList;
+    protected List<UnifiedSchema> _unifiedSchemaList;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceExtractorBase(DataSource dataSource, List<String> allSchemaList) {
+    public DfSequenceExtractorBase(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
         _dataSource = dataSource;
-        _allSchemaList = allSchemaList;
+        _unifiedSchemaList = unifiedSchemaList;
     }
 
     // ===================================================================================

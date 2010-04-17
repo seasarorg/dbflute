@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerDB2;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerH2;
@@ -122,7 +123,7 @@ public class DfSchemaInitializerFactory {
 
         if (_initializeType.equals(InitializeType.MAIN)) {
             initializer.setDataSource(_dataSource);
-            initializer.setSchema(_databaseProperties.getDatabaseSchema());
+            initializer.setUnifiedSchema(_databaseProperties.getDatabaseSchema());
             initializer.setDropGenerateTableOnly(_replaceSchemaProperties.isDropGenerateTableOnly());
             initializer.setDropGenerateProcedureOnly(_replaceSchemaProperties.isDropGenerateProcedureOnly());
             return;
@@ -135,8 +136,8 @@ public class DfSchemaInitializerFactory {
                 throw new IllegalStateException(msg);
             }
             initializer.setDataSource(getAdditionalDataSource());
-            final String schemaName = getAdditionalDropSchema(_additionalDropMap);
-            initializer.setSchema(schemaName);
+            final UnifiedSchema unifiedSchema = getAdditionalDropSchema(_additionalDropMap);
+            initializer.setUnifiedSchema(unifiedSchema);
             initializer.setTableNameWithSchema(true); // because it may be other schema!
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
             initializer.setDropTableTargetList(getAdditionalDropTableTargetList(_additionalDropMap));
@@ -187,7 +188,7 @@ public class DfSchemaInitializerFactory {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    protected String getAdditionalDropSchema(Map<String, Object> map) {
+    protected UnifiedSchema getAdditionalDropSchema(Map<String, Object> map) {
         return _replaceSchemaProperties.getAdditionalDropSchema(map);
     }
 
