@@ -23,7 +23,7 @@ import java.util.Set;
  * @author jflute
  * @since 0.9.6 (2009/10/31 Saturday)
  */
-public class DfDbCommentExtractorMySql extends DfDbCommentExtractorBase {
+public class CopyOfDfDbCommentExtractorMySql extends DfDbCommentExtractorBase {
 
     // ===================================================================================
     //                                                                    Select Meta Data
