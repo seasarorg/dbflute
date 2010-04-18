@@ -153,10 +153,6 @@ public class DfProcedureMetaInfo {
         this._procedureSchemaQualifiedName = procedureSchemaQualifiedName;
     }
 
-    public String getProcedureSqlName() {
-        return _procedureSqlName;
-    }
-
     protected void setProcedureSqlName(String procedureSqlName) { // basically for procedure synonym
         this._procedureSqlName = procedureSqlName;
     }

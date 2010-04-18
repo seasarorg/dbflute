@@ -1,11 +1,11 @@
 package org.seasar.dbflute.properties;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -57,7 +57,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         }
         _targetProcedureCatalogList = getOutsideSqlPropertyAsList("targetProcedureCatalogList");
         if (_targetProcedureCatalogList == null) {
-            _targetProcedureCatalogList = new ArrayList<String>();
+            _targetProcedureCatalogList = DfCollectionUtil.emptyList();
         }
         return _targetProcedureCatalogList;
     }
@@ -90,7 +90,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         }
         _targetProcedureSchemaList = getOutsideSqlPropertyAsList("targetProcedureSchemaList");
         if (_targetProcedureSchemaList == null) {
-            _targetProcedureSchemaList = new ArrayList<String>();
+            _targetProcedureSchemaList = DfCollectionUtil.emptyList();
         }
         return _targetProcedureSchemaList;
     }
@@ -123,7 +123,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         }
         _targetProcedureNameList = getOutsideSqlPropertyAsList("targetProcedureNameList");
         if (_targetProcedureNameList == null) {
-            _targetProcedureNameList = new ArrayList<String>();
+            _targetProcedureNameList = DfCollectionUtil.emptyList();
         }
         return _targetProcedureNameList;
     }
@@ -149,7 +149,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         }
         _executionMetaProcedureNameList = getOutsideSqlPropertyAsList("executionMetaProcedureNameList");
         if (_executionMetaProcedureNameList == null) {
-            _executionMetaProcedureNameList = new ArrayList<String>();
+            _executionMetaProcedureNameList = DfCollectionUtil.emptyList();
         }
         return _executionMetaProcedureNameList;
     }

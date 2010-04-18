@@ -71,7 +71,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
      * Get the map of available meta information. <br />
      * The map key is procedure unique name.
      * @param dataSource The data source for getting meta data. (NotNull)
-     * @return The map of available procedure meta informations. (NotNull)
+     * @return The map of available procedure meta informations. The key is full-qualified name. (NotNull)
      * @throws SQLException
      */
     public Map<String, DfProcedureMetaInfo> getAvailableProcedureMap(DataSource dataSource) throws SQLException {

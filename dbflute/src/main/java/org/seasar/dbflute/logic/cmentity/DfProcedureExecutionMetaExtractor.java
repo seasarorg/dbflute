@@ -89,7 +89,7 @@ public class DfProcedureExecutionMetaExtractor {
         final List<Object> testValueList = new ArrayList<Object>();
         final boolean existsReturn = existsReturnValue(columnList);
         setupTestValueList(columnList, testValueList);
-        final String sql = createSql(procedure.getProcedureSqlName(), columnList.size(), existsReturn);
+        final String sql = createSql(procedure.buildProcedureSqlName(), columnList.size(), existsReturn);
         Connection conn = null;
         CallableStatement cs = null;
         try {
