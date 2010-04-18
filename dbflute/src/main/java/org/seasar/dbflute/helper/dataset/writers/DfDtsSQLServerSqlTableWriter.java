@@ -17,18 +17,18 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class XDfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
+public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(XDfDtsSQLServerSqlTableWriter.class);
+    private static final Log _log = LogFactory.getLog(DfDtsSQLServerSqlTableWriter.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public XDfDtsSQLServerSqlTableWriter(final DataSource dataSource, UnifiedSchema unifiedSchema) {
+    public DfDtsSQLServerSqlTableWriter(final DataSource dataSource, UnifiedSchema unifiedSchema) {
         super(dataSource, unifiedSchema);
     }
 

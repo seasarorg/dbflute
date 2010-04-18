@@ -10,14 +10,14 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class XDfDtsSQLServerSqlWriter extends DfDtsSqlWriter {
+public class DfDtsSQLServerSqlWriter extends DfDtsSqlWriter {
 
-    public XDfDtsSQLServerSqlWriter(final DataSource dataSource, UnifiedSchema unifiedSchema) {
+    public DfDtsSQLServerSqlWriter(final DataSource dataSource, UnifiedSchema unifiedSchema) {
         super(dataSource, unifiedSchema);
     }
 
     public void write(final DfDataSet dataSet) {
-        final DfDtsTableWriter writer = new XDfDtsSQLServerSqlTableWriter(getDataSource(), _unifiedSchema);
+        final DfDtsTableWriter writer = new DfDtsSQLServerSqlTableWriter(getDataSource(), _unifiedSchema);
         for (int i = 0; i < dataSet.getTableSize(); ++i) {
             writer.write(dataSet.getTable(i));
         }
