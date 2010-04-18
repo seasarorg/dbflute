@@ -77,6 +77,10 @@ public class DfProcedureMetaInfo {
         return _procedureSqlName;
     }
 
+    public String buildProcedurePureName() {
+        return Srl.substringLastRear(_procedureName, ".");
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

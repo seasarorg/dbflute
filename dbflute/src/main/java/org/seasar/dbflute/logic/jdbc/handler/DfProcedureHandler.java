@@ -310,21 +310,12 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         String procedureName = null;
         ResultSet columnResultSet = null;
         try {
-            final String catalogName = unifiedSchema.getPureCatalog();
-            final String schemaName = unifiedSchema.getPureSchema();
-            final ResultSet procedureRs = metaData.getProcedures(catalogName, schemaName, null);
+            final ResultSet procedureRs = doGetProcedures(metaData, unifiedSchema);
             setupProcedureMetaInfo(metaInfoList, procedureRs, unifiedSchema);
-            for (DfProcedureMetaInfo procedureMetaInfo : metaInfoList) {
-                procedureName = procedureMetaInfo.getProcedureName();
-                final String specifiedName;
-                if (isDatabaseMySQL() && Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
-                    // getProcedureColumns() of MySQL requires qualified procedure name when other catalog
-                    specifiedName = Srl.connectPrefix(procedureName, catalogName, ".");
-                } else {
-                    specifiedName = procedureName;
-                }
-                final ResultSet columnRs = metaData.getProcedureColumns(catalogName, schemaName, specifiedName, null);
-                setupProcedureColumnMetaInfo(procedureMetaInfo, columnRs);
+            for (DfProcedureMetaInfo metaInfo : metaInfoList) {
+                procedureName = metaInfo.getProcedureName();
+                final ResultSet columnRs = doGetProcedureColumns(metaData, metaInfo);
+                setupProcedureColumnMetaInfo(metaInfo, columnRs);
             }
         } catch (SQLException e) {
             throwProcedureListGettingFailureException(unifiedSchema, procedureName, e);
@@ -338,6 +329,33 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
         }
         return metaInfoList;
+    }
+
+    protected ResultSet doGetProcedures(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
+        final String catalogName = unifiedSchema.getPureCatalog();
+        final String schemaName = unifiedSchema.getPureSchema();
+        return metaData.getProcedures(catalogName, schemaName, null);
+    }
+
+    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMetaInfo metaInfo)
+            throws SQLException {
+        final String catalogName = metaInfo.getProcedureCatalog();
+        final String schemaName = metaInfo.getProcedureSchema().getPureSchema();
+        final String procedurePureName = metaInfo.buildProcedurePureName();
+        final String catalogArgName;
+        final String procedureArgName;
+        if (isDatabaseMySQL() && Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
+            // getProcedureColumns() of MySQL requires qualified procedure name when other catalog
+            catalogArgName = catalogName;
+            procedureArgName = Srl.connectPrefix(procedurePureName, catalogName, ".");
+        } else if (isDatabaseOracle() && metaInfo.isPackageProcdure()) {
+            catalogArgName = metaInfo.getProcedurePackage();
+            procedureArgName = procedurePureName; // needs to use pure name
+        } else {
+            catalogArgName = catalogName;
+            procedureArgName = procedurePureName;
+        }
+        return metaData.getProcedureColumns(catalogArgName, schemaName, procedureArgName, null);
     }
 
     protected void throwProcedureListGettingFailureException(UnifiedSchema unifiedSchema, String procedureName,

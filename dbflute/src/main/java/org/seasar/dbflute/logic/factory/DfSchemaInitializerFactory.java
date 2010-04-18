@@ -16,7 +16,7 @@ import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerJdbc;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerMySQL;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerPostgreSQL;
-import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerSqlServer;
+import org.seasar.dbflute.logic.schemainitializer.XDfSchemaInitializerSQLServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -107,7 +107,7 @@ public class DfSchemaInitializerFactory {
     }
 
     protected DfSchemaInitializer createSchemaInitializerSqlServer() {
-        final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
+        final XDfSchemaInitializerSQLServer initializer = new XDfSchemaInitializerSQLServer();
         setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }
