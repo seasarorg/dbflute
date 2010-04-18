@@ -55,6 +55,7 @@ public class DfOldClassHandler {
     //                                                                     Old Table Class
     //                                                                     ===============
     public void deleteOldTableClass() {
+        info("");
         info("// /- - - - - - - - - - - - -");
         info("// Delete old table classes!");
         info("// - - - - - - - - - -/");
@@ -284,7 +285,7 @@ public class DfOldClassHandler {
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
-                _log.info("deleteOldTableClass('" + extendedClassName + "');");
+                info("deleteOldTableClass('" + extendedClassName + "');");
             }
         }
     }
@@ -307,7 +308,7 @@ public class DfOldClassHandler {
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
-                _log.info("deleteOldTableClass('" + extendedClassName + "');");
+                info("deleteOldTableClass('" + extendedClassName + "');");
             }
         }
     }
@@ -318,7 +319,7 @@ public class DfOldClassHandler {
 
     protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
         for (String className : deletedClassNameList) {
-            _log.info("deleteOldTableClass('" + className + "');");
+            info("deleteOldTableClass('" + className + "');");
         }
     }
 

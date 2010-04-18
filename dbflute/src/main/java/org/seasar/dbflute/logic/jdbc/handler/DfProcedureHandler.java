@@ -265,12 +265,18 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     // -----------------------------------------------------
     //                                   Duplicate Procedure
     //                                   -------------------
+    /**
+     * @param second The second procedure being processed current loop. (NotNull)
+     * @param procedureHandlingMap The handling map of procedure. (NotNull)
+     * @param mainSchema The unified schema for main. (NotNull)
+     * @return Does it skip to register the second procedure?
+     */
     protected boolean handleDuplicateProcedure(DfProcedureMetaInfo second,
             Map<String, DfProcedureMetaInfo> procedureHandlingMap, UnifiedSchema mainSchema) {
         final String procedureKeyName = second.buildProcedureKeyName();
         final DfProcedureMetaInfo first = procedureHandlingMap.get(procedureKeyName);
         if (first == null) {
-            return false;
+            return false; // not duplicate
         }
         final UnifiedSchema firstSchema = first.getProcedureSchema();
         final UnifiedSchema secondSchema = second.getProcedureSchema();
@@ -278,10 +284,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         if (!firstSchema.equals(secondSchema)) {
             if (firstSchema.isMainSchema()) {
                 showDuplicateProcedure(first, second, true, "main schema");
-                return true;
+                return true; // use first so skip
             } else if (secondSchema.isMainSchema()) {
                 procedureHandlingMap.remove(procedureKeyName);
                 showDuplicateProcedure(first, second, false, "main schema");
+                return false; // use second so NOT skip (override)
             }
         }
         // if both are additional schema or main schema, it selects first. 
