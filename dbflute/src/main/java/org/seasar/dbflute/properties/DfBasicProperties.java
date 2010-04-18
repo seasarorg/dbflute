@@ -132,8 +132,34 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseType().equalsIgnoreCase("msaccess");
     }
 
-    public boolean isDatabaseSchemaCanBeOmitted() {
+    public boolean isDatabase_Supported() {
+        if (isDatabaseAsMainSupported() || isDatabaseAsSubSupported()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isDatabaseAsMainSupported() {
+        if (isDatabaseMySQL() || isDatabasePostgreSQL() || isDatabaseOracle() || isDatabaseDB2()
+                || isDatabaseSQLServer() || isDatabaseH2() || isDatabaseDerby()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isDatabaseAsSubSupported() {
+        if (isDatabaseSQLite() || isDatabaseMSAccess()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isDatabaseAsSchemaCanBeOmitted() {
         return isDatabaseMySQL() || isDatabaseSQLite();
+    }
+
+    public boolean isDatabaseAsUnifiedSchemaUnsupported() {
+        return !isDatabase_Supported() || isDatabaseSQLite() || isDatabaseMSAccess();
     }
 
     // ===================================================================================

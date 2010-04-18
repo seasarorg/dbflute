@@ -307,7 +307,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected boolean isDatabaseSchemaCanBeOmitted() {
-        return getBasicProperties().isDatabaseSchemaCanBeOmitted();
+        return getBasicProperties().isDatabaseAsSchemaCanBeOmitted();
     }
 
     public List<String> getAdditionalDropObjectTypeList(Map<String, Object> additionalDropMap) {

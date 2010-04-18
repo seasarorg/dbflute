@@ -31,11 +31,21 @@ public class UnifiedSchema {
     //                                                                         Constructor
     //                                                                         ===========
     protected UnifiedSchema(String catalog, String schema) {
+        if (isCompletelyUnsupportedDBMS()) {
+            _catalog = null;
+            _schema = null;
+            return;
+        }
         _catalog = filterAttribute(catalog);
         _schema = filterAttribute(schema);
     }
 
     protected UnifiedSchema(String schemaExpression) {
+        if (isCompletelyUnsupportedDBMS()) {
+            _catalog = null;
+            _schema = null;
+            return;
+        }
         if (schemaExpression != null) {
             if (schemaExpression.contains(".")) {
                 _catalog = filterAttribute(Srl.substringFirstFront(schemaExpression, "."));
@@ -52,6 +62,10 @@ public class UnifiedSchema {
 
     protected String filterAttribute(String element) {
         return Srl.is_NotNull_and_NotTrimmedEmpty(element) ? element.trim() : null;
+    }
+
+    protected boolean isCompletelyUnsupportedDBMS() {
+        return DfBuildProperties.getInstance().getBasicProperties().isDatabaseAsUnifiedSchemaUnsupported();
     }
 
     // -----------------------------------------------------

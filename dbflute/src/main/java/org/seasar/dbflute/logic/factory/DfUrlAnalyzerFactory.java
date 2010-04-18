@@ -3,7 +3,6 @@ package org.seasar.dbflute.logic.factory;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerDerby;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerH2;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerMSAccess;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerMySQL;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerPostgreSQL;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerSQLServer;
@@ -57,7 +56,9 @@ public class DfUrlAnalyzerFactory {
         } else if (_basicProperties.isDatabaseSQLite()) {
             return new DfUrlAnalyzerSQLite(_url);
         } else if (_basicProperties.isDatabaseMSAccess()) {
-            return new DfUrlAnalyzerMSAccess(_url);
+            // MS Access (JDBC driver) does not support catalog
+            //return new DfUrlAnalyzerMSAccess(_url);
+            return createNullAnalyzer();
         }
         return createNullAnalyzer();
     }
