@@ -268,7 +268,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
                 // The main schema has priority
                 {
                     final boolean mainSchema1 = table1.isMainSchema();
-                    final boolean mainSchema2 = table1.isMainSchema();
+                    final boolean mainSchema2 = table2.isMainSchema();
                     if (mainSchema1 != mainSchema2) {
                         if (mainSchema1) {
                             return -1;
@@ -276,7 +276,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
                         if (mainSchema2) {
                             return 1;
                         }
-                        // unreachable!
+                        // unreachable
                     }
                     final String schema1 = table1.getDisplaySchema();
                     final String schema2 = table2.getDisplaySchema();
