@@ -30,7 +30,7 @@ public class DfDbCommentExtractorSQLServer extends DfDbCommentExtractorBase {
     //                                                                    Select Meta Data
     //                                                                    ================
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
-        if (_unifiedSchema.existsPureSchema()) {
+        if (!_unifiedSchema.existsPureSchema()) {
             String msg = "Extracting comments from SQLServer requires pure schema in unified schema:";
             msg = msg + " unifiedSchema=" + _unifiedSchema;
             throw new IllegalStateException(msg);
@@ -62,7 +62,7 @@ public class DfDbCommentExtractorSQLServer extends DfDbCommentExtractorBase {
     }
 
     protected String buildUserColCommentsSql(String tableName) {
-        if (_unifiedSchema.existsPureSchema()) {
+        if (!_unifiedSchema.existsPureSchema()) {
             String msg = "Extracting comments from SQLServer requires pure schema in unified schema:";
             msg = msg + " unifiedSchema=" + _unifiedSchema;
             throw new IllegalStateException(msg);

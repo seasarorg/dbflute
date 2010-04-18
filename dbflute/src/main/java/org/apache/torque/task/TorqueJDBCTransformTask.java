@@ -167,12 +167,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void doExecute() {
         _log.info("");
         _log.info("...Starting to process JDBC to SchemaXML");
-        _log.info("Your DB settings are:");
-        _log.info("  driver : " + _driver);
-        _log.info("  URL    : " + _url);
-        _log.info("  user   : " + _userId);
-        _log.info("  schema : " + _mainSchema);
-        _log.info("  props  : " + _connectionProperties);
 
         final DocumentTypeImpl docType = new DocumentTypeImpl(null, "database", null, DTDResolver.WEB_SITE_DTD);
         _doc = new DocumentImpl(docType);
