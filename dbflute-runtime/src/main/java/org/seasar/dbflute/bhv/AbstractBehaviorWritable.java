@@ -379,6 +379,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
             return;
         }
+        // basically property(column) type is same as next value type
+        // so there is NOT type conversion cost when writing to the entity
         dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
     }
 

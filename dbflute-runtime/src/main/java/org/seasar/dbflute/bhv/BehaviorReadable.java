@@ -118,7 +118,7 @@ public interface BehaviorReadable {
      * Read next value of sequence.
      * @return The next value of sequence. (NotNull)
      */
-    java.math.BigDecimal readNextVal();
+    Number readNextVal();
 
     // ===================================================================================
     //                                                                             Warm Up

@@ -254,16 +254,17 @@ public class DfReflectionUtil {
     //                                                                              ======
     public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
         return findMethod(clazz, methodName, argTypes, false);
     }
 
     public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
         return findMethod(clazz, methodName, argTypes, true);
     }
 
     protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes, boolean publicOnly) {
-        assertObjectNotNull("clazz", clazz);
         for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
             final Method[] methods = target.getDeclaredMethods();
             for (int i = 0; i < methods.length; ++i) {
@@ -279,6 +280,12 @@ public class DfReflectionUtil {
                 }
                 if (methodName.equals(current.getName())) {
                     final Class<?>[] types = current.getParameterTypes();
+                    if (argTypes == null) {
+                        if (types.length == 0) {
+                            return current;
+                        }
+                        continue;
+                    }
                     if (types.length != argTypes.length) {
                         continue;
                     }
@@ -464,6 +471,20 @@ public class DfReflectionUtil {
         }
         if (value == null) {
             String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the entity is not null and not trimmed empty.
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     */
+    public static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull("value", value);
+        if (value.trim().length() == 0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
     }

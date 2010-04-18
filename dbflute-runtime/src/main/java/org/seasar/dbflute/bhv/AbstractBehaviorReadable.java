@@ -16,7 +16,6 @@
 package org.seasar.dbflute.bhv;
 
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -460,25 +459,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * {@inheritDoc}
      */
-    public BigDecimal readNextVal() {
-        try {
-            final Method method = getClass().getMethod("selectNextVal", new Class[] {});
-            final Object sequenceObject = method.invoke(this, new Object[] {});
-            if (sequenceObject instanceof BigDecimal) {
-                return (BigDecimal) sequenceObject;
-            }
-            return helpConvertingSequenceObject(sequenceObject, BigDecimal.class);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("The table does not have sequence: " + getTableDbName(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("The selectNextVal() of the table threw the exception: " + getTableDbName(), e);
-        }
+    public Number readNextVal() {
+        return doReadNextVal();
     }
 
-    @SuppressWarnings("unchecked")
-    protected <RESULT> RESULT helpConvertingSequenceObject(Object sequenceObject, Class<?> resultClass) {
-        return (RESULT) DfTypeUtil.toNumber(sequenceObject, resultClass);
-    }
+    protected abstract Number doReadNextVal();
 
     // ===================================================================================
     //                                                                       Load Referrer
@@ -953,7 +938,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         } catch (ClassCastException e) {
             String msg = "The entity should be " + DfTypeUtil.toClassTitle(clazz);
             msg = msg + " but it was: " + entity.getClass();
-            throw new RuntimeException(msg, e);
+            throw new IllegalStateException(msg, e);
         }
     }
 
@@ -966,7 +951,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         } catch (ClassCastException e) {
             String msg = "The condition-bean should be " + DfTypeUtil.toClassTitle(clazz);
             msg = msg + " but it was: " + cb.getClass();
-            throw new RuntimeException(msg, e);
+            throw new IllegalStateException(msg, e);
         }
     }
 

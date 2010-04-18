@@ -16,6 +16,29 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class DfReflectionUtilTest extends PlainTestCase {
 
+    public void test_getPublicMethod_basic() throws Exception {
+        // ## Arrange ##
+        String methodName = "fooNoArg";
+
+        // ## Act ##
+        Method method = DfReflectionUtil.getPublicMethod(FooTarget.class, methodName, null);
+
+        // ## Assert ##
+        assertEquals(methodName, method.getName());
+    }
+
+    public void test_invoke_basic() throws Exception {
+        // ## Arrange ##
+        String methodName = "fooNoArg";
+        Method method = DfReflectionUtil.getPublicMethod(FooTarget.class, methodName, null);
+
+        // ## Act ##
+        Object result = DfReflectionUtil.invoke(method, new FooTarget(), null);
+
+        // ## Assert ##
+        assertEquals("foo", result);
+    }
+
     public void test_getElementType_List() throws Exception {
         // ## Arrange ##
         Type genericType = getListMethod().getGenericReturnType();
@@ -98,6 +121,12 @@ public class DfReflectionUtilTest extends PlainTestCase {
         }
 
         public String fooNonGeneric() {
+            return "foo";
+        }
+    }
+
+    public static class FooTarget {
+        public String fooNoArg() {
             return "foo";
         }
     }
