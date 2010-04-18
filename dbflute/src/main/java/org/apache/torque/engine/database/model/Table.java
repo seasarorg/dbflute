@@ -2022,7 +2022,9 @@ public class Table {
                 String msg = "The sequence for serial type should exist when isUseSequence() is true!";
                 throw new IllegalStateException(msg);
             }
-            return hasSchema() ? getUnifiedSchema().buildSqlName(serialSequenceName) : serialSequenceName;
+            // the schema prefix of sequence for serial type has already been resolved here
+            // (the name in default value has schema prefix)
+            return serialSequenceName;
         }
         return sequenceName;
     }
