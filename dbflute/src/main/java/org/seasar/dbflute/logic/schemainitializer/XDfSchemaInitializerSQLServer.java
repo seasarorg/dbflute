@@ -21,7 +21,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
  * The schema initializer for SqlServer.
  * @author jflute
  */
-public class DfSchemaInitializerSqlServer extends DfSchemaInitializerJdbc {
+public class XDfSchemaInitializerSQLServer extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
     //                                                                      Drop Procedure
