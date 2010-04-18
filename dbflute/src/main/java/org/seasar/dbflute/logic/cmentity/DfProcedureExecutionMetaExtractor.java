@@ -89,14 +89,26 @@ public class DfProcedureExecutionMetaExtractor {
         final List<Object> testValueList = new ArrayList<Object>();
         final boolean existsReturn = existsReturnValue(columnList);
         setupTestValueList(columnList, testValueList);
-        final String sql = createSql(procedure.buildProcedureSqlName(), columnList.size(), existsReturn);
+        final String procedureSqlName = procedure.buildProcedureSqlName();
+        final String sql = createSql(procedureSqlName, columnList.size(), existsReturn, true);
         Connection conn = null;
         CallableStatement cs = null;
         try {
             _log.info("...Calling: " + sql);
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            cs = dataSource.getConnection().prepareCall(sql);
+            try {
+                cs = conn.prepareCall(sql);
+            } catch (SQLException e) { // retry without escape because Oracle sometimes hates escape
+                final String retrySql = createSql(procedureSqlName, columnList.size(), existsReturn, false);
+                try {
+                    cs = conn.prepareCall(retrySql);
+                    _log.info("  (o) retry: " + retrySql);
+                } catch (SQLException ignored) {
+                    _log.info("  (x) retry: " + retrySql);
+                    throw e;
+                }
+            }
             final List<DfProcedureColumnMetaInfo> boundColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
             setupBindParameter(cs, columnList, testValueList, boundColumnList);
             ResultSet rs = null;
@@ -245,9 +257,11 @@ public class DfProcedureExecutionMetaExtractor {
         return false;
     }
 
-    public String createSql(String procedureName, int bindSize, boolean existsReturn) {
+    public String createSql(String procedureName, int bindSize, boolean existsReturn, boolean escape) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        if (escape) {
+            sb.append("{");
+        }
         final int argSize;
         {
             if (existsReturn) {
@@ -264,7 +278,10 @@ public class DfProcedureExecutionMetaExtractor {
         if (argSize > 0) {
             sb.setLength(sb.length() - 2);
         }
-        sb.append(")}");
+        sb.append(")");
+        if (escape) {
+            sb.append("}");
+        }
         return sb.toString();
     }
 
