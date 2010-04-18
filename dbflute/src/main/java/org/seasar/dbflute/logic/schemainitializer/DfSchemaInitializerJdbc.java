@@ -433,7 +433,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
-        return metaInfo.getProcedureSqlName();
+        // same reason as table, see filterTableName()
+        return metaInfo.getProcedureName();
     }
 
     public static interface DfDropProcedureByJdbcCallback {
@@ -494,11 +495,12 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String filterTableName(String tableName) {
-        // not use SQL name because of additional drop
-        if (_useFullQualifiedTableName && _unifiedSchema.hasSchema()) {
-            tableName = _unifiedSchema.buildFullQualifiedName(tableName);
-        }
+    protected String filterTableName(String tableName) { // not used when procedure
+        // because additional drop uses an own connection
+        // so it does not need to qualify names
+        //if (_useFullQualifiedTableName && _unifiedSchema.hasSchema()) {
+        //    tableName = _unifiedSchema.buildFullQualifiedName(tableName);
+        //}
         return tableName;
     }
 
@@ -518,14 +520,6 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
         _unifiedSchema = unifiedSchema;
-    }
-
-    public boolean isUseFullQualifiedTableName() {
-        return _useFullQualifiedTableName;
-    }
-
-    public void setUseFullQualifiedTableName(boolean useFullQualifiedTableName) {
-        this._useFullQualifiedTableName = useFullQualifiedTableName;
     }
 
     public void setDropObjectTypeList(List<String> dropObjectTypeList) {

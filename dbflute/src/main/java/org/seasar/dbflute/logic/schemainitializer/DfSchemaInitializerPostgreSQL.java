@@ -76,7 +76,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     @Override
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
         final String expression = "(" + buildProcedureArgExpression(metaInfo) + ")";
-        return metaInfo.getProcedureSqlName() + expression;
+        return super.buildProcedureSqlName(metaInfo) + expression;
     }
 
     protected String buildProcedureArgExpression(DfProcedureMetaInfo metaInfo) {

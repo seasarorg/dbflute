@@ -189,8 +189,20 @@ public class UnifiedSchema {
                 return getPureSchema();
             }
         }
-        // for example, when additional drop of ReplaceSchema
-        return getCatalogSchema(); // as unknown
+        // additional drop or ReplaceSchema does not use this
+        // (it uses an own connection so it does not need to qualify names)
+        throwUnknownSchemaCannotUseSQLPrefixException();
+        return null; // unreachable
+    }
+
+    protected void throwUnknownSchemaCannotUseSQLPrefixException() {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Unknown schema is NOT supported to use SQL prefix!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Unified Schema]" + ln() + toString() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================

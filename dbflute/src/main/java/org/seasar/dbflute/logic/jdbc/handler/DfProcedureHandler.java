@@ -178,9 +178,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
 
             // merge synonym to procedure (create copied instance)
-            final String beforeName = metaInfo.getProcedureMetaInfo().getProcedureDisplayName();
+            final String beforeName = metaInfo.getProcedureMetaInfo().buildProcedureLoggingName();
             final DfProcedureMetaInfo mergedProcedure = metaInfo.createMergedProcedure();
-            final String afterName = mergedProcedure.getProcedureDisplayName();
+            final String afterName = mergedProcedure.buildProcedureLoggingName();
             _log.info("  " + beforeName + " to " + afterName);
 
             procedureSynonymList.add(mergedProcedure);
@@ -221,16 +221,16 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         _log.info("...Filtering procedures by the property: before=" + procedureList.size());
         int passedCount = 0;
         for (DfProcedureMetaInfo metaInfo : procedureList) {
-            final String procedureDisplayName = metaInfo.getProcedureDisplayName();
+            final String procedureLoggingName = metaInfo.buildProcedureLoggingName();
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
-                _log.info("  passed: non-target catalog - " + procedureDisplayName);
+                _log.info("  passed: non-target catalog - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
             final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
-                _log.info("  passed: non-target schema - " + procedureDisplayName);
+                _log.info("  passed: non-target schema - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
@@ -240,7 +240,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (!outsideSqlProperties.isTargetProcedureName(procedureFullQualifiedName)
                     && !outsideSqlProperties.isTargetProcedureName(procedureSchemaQualifiedName)
                     && !outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                _log.info("  passed: non-target name - " + procedureDisplayName);
+                _log.info("  passed: non-target name - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
@@ -281,8 +281,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     protected void showDuplicateProcedure(DfProcedureMetaInfo first, DfProcedureMetaInfo second, boolean electFirst,
             String reason) {
-        final String firstName = first.getProcedureDisplayName();
-        final String secondName = second.getProcedureDisplayName();
+        final String firstName = first.buildProcedureLoggingName();
+        final String secondName = second.buildProcedureLoggingName();
         final String firstType = first.isProcedureSynonym() ? "(synonym)" : "";
         final String secondType = second.isProcedureSynonym() ? "(synonym)" : "";
         String msg = "*Found the same-name procedure, so elects " + reason + ":";
@@ -377,8 +377,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             metaInfo.setProcedureComment(procedureComment);
             metaInfo.setProcedureFullQualifiedName(buildProcedureFullQualifiedName(metaInfo));
             metaInfo.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(metaInfo));
-            metaInfo.setProcedureSqlName(buildProcedureSqlName(metaInfo));
-            metaInfo.setProcedureDisplayName(metaInfo.getProcedureSqlName());
             procedureMetaInfoList.add(metaInfo);
         }
     }
@@ -452,16 +450,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         adjustProcedureColumnList(procedureMetaInfo);
     }
 
-    protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
-        final String sqlName = metaInfo.getProcedureSchema().buildSqlName(metaInfo.getProcedureName());
-        // DB2 needs schema prefix for calling procedures. (actually tried)
-        if (isDatabaseDB2() && !sqlName.contains(".")) {
-            return Srl.connectPrefix(sqlName, metaInfo.getProcedureSchema().getPureSchema(), ".");
-        } else {
-            return sqlName;
-        }
-    }
-
     protected String buildProcedureFullQualifiedName(DfProcedureMetaInfo metaInfo) {
         return metaInfo.getProcedureSchema().buildFullQualifiedName(metaInfo.getProcedureName());
     }
@@ -504,7 +492,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         if (existsResultSetParameter && existsResultSetReturn) {
             // It is a precondition that PostgreSQL does not allow functions to have a result set return
             // when it also has result set parameters (as an out parameter).
-            String name = procedureMetaInfo.getProcedureDisplayName() + "." + resultSetReturnName;
+            String name = procedureMetaInfo.buildProcedureLoggingName() + "." + resultSetReturnName;
             _log.info("...Removing the result set return which is unnecessary: " + name);
             columnMetaInfoList.remove(resultSetReturnIndex);
         }

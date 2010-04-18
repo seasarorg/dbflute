@@ -660,7 +660,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             final String pmbName = convertProcedureNameToPmbName(procedure.getProcedureName());
             {
-                final String procDisp = procedure.getProcedureDisplayName();
+                final String procDisp = procedure.buildProcedureLoggingName();
                 final DfProcedureType procType = procedure.getProcedureType();
                 _log.info("[" + pmbName + "]: " + procDisp + " // " + procType);
                 if (procedureColumnList.isEmpty() && notParamResultList.isEmpty()) {
@@ -717,7 +717,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
             parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
             parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
-            parameterBeanMetaData.setProcedureName(procedure.getProcedureSqlName());
+            parameterBeanMetaData.setProcedureName(procedure.buildProcedureSqlName());
             parameterBeanMetaData.setRefCustomizeEntity(existsCustomizeEntity);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
             procdureHandlingMap.put(pmbName, procedure); // for duplicate check

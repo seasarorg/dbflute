@@ -54,7 +54,6 @@ public class DfProcedureSynonymMetaInfo {
         metaInfo.setProcedureFullQualifiedName(synonymFullQualifiedName);
         metaInfo.setProcedureSchemaQualifiedName(synonymSchemaQualifiedName);
         metaInfo.setProcedureSqlName(synonymSqlName);
-        metaInfo.setProcedureDisplayName(synonymSqlName);
         metaInfo.setProcedureSynonym(_procedureMetaInfo.isProcedureSynonym());
         metaInfo.setProcedureType(_procedureMetaInfo.getProcedureType());
         metaInfo.setProcedureComment(_procedureMetaInfo.getProcedureComment());

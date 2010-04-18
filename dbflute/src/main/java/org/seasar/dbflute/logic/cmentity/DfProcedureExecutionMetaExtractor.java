@@ -82,7 +82,7 @@ public class DfProcedureExecutionMetaExtractor {
     protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
         final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnList();
         if (!needsToCall(columnList)) {
-            final String name = procedure.getProcedureDisplayName();
+            final String name = procedure.buildProcedureLoggingName();
             _log.info("*not needed to call: " + name + " params=" + buildParameterTypeView(columnList));
             return;
         }

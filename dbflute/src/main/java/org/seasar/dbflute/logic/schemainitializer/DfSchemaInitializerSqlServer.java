@@ -28,7 +28,7 @@ public class DfSchemaInitializerSqlServer extends DfSchemaInitializerJdbc {
     //                                                                      ==============
     @Override
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
-        return removeSemicolonSuffixIfExists(metaInfo.getProcedureSqlName());
+        return removeSemicolonSuffixIfExists(super.buildProcedureSqlName(metaInfo));
     }
 
     protected String removeSemicolonSuffixIfExists(String procedureSqlName) {
