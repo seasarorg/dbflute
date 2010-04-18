@@ -19,7 +19,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -87,10 +86,10 @@ public class DfProcedureExecutionMetaExtractor {
             _log.info("*not needed to call: " + name + " params=" + buildParameterTypeView(columnList));
             return;
         }
-        final List<Object> testValueList = new ArrayList<Object>();
-        final boolean existsReturn = existsReturnValue(columnList);
+        final List<Object> testValueList = DfCollectionUtil.newArrayList();
         setupTestValueList(columnList, testValueList);
         final String procedureSqlName = procedure.buildProcedureSqlName();
+        final boolean existsReturn = existsReturnValue(columnList);
         final String sql = createSql(procedureSqlName, columnList.size(), existsReturn, true);
         Connection conn = null;
         CallableStatement cs = null;
@@ -299,6 +298,7 @@ public class DfProcedureExecutionMetaExtractor {
             List<Object> testValueList, List<DfProcedureColumnMetaInfo> boundColumnList) throws SQLException {
         boundColumnList.clear();
         int index = 0;
+        int testValueIndex = 0;
         for (DfProcedureColumnMetaInfo column : columnList) {
             final int paramIndex = (index + 1);
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
@@ -306,7 +306,8 @@ public class DfProcedureExecutionMetaExtractor {
                 cs.registerOutParameter(paramIndex, column.getJdbcType());
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                cs.setObject(paramIndex, testValueList.remove(0));
+                cs.setObject(paramIndex, testValueList.get(testValueIndex));
+                ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
                 if (isPostgreSQLCursor(column)) {
@@ -319,7 +320,8 @@ public class DfProcedureExecutionMetaExtractor {
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
                 cs.registerOutParameter(paramIndex, column.getJdbcType());
-                cs.setObject(paramIndex, testValueList.remove(0));
+                cs.setObject(paramIndex, testValueList.get(testValueIndex));
+                ++testValueIndex;
                 boundColumnList.add(column);
             }
             ++index;
