@@ -130,9 +130,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         if (_suppressAdditionalSchema) {
             return;
         }
-        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
-        final List<UnifiedSchema> additionalSchemaList = databaseProperties.getAdditionalSchemaList();
+        final DfDatabaseProperties databaseProp = getProperties().getDatabaseProperties();
+        final List<UnifiedSchema> additionalSchemaList = databaseProp.getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            final DfAdditionalSchemaInfo schemaInfo = databaseProp.getAdditionalSchemaInfo(additionalSchema);
+            if (schemaInfo.isSuppressProcedure()) {
+                continue;
+            }
             final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(metaData, additionalSchema);
             procedureList.addAll(additionalProcedureList);
         }
@@ -251,28 +255,28 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     // -----------------------------------------------------
     //                                   Duplicate Procedure
     //                                   -------------------
-    protected boolean handleDuplicateProcedure(DfProcedureMetaInfo metaInfo,
-            Map<String, DfProcedureMetaInfo> procdureMap, UnifiedSchema schemaName) {
-        final String procedureUniqueName = metaInfo.getProcedureFullQualifiedName();
-        final DfProcedureMetaInfo first = procdureMap.get(procedureUniqueName);
+    protected boolean handleDuplicateProcedure(DfProcedureMetaInfo second,
+            Map<String, DfProcedureMetaInfo> procedureHandlingMap, UnifiedSchema mainSchema) {
+        final String procedureFullQualifiedName = second.getProcedureFullQualifiedName();
+        final DfProcedureMetaInfo first = procedureHandlingMap.get(procedureFullQualifiedName);
         if (first == null) {
             return false;
         }
         final UnifiedSchema firstSchema = first.getProcedureSchema();
-        final UnifiedSchema secondSchema = metaInfo.getProcedureSchema();
-        // Basically select the one of main schema.
-        // If both are additional schema, it selects first. 
-        if (!firstSchema.equals(secondSchema) && firstSchema.equals(schemaName)) {
-            showDuplicateProcedure(first, metaInfo, true, "main schema");
-            return true;
-        } else if (!secondSchema.equals(firstSchema) && secondSchema.equals(schemaName)) {
-            procdureMap.remove(procedureUniqueName);
-            showDuplicateProcedure(first, metaInfo, false, "main schema");
-            return false;
-        } else {
-            showDuplicateProcedure(first, metaInfo, true, "first one");
-            return true;
+        final UnifiedSchema secondSchema = second.getProcedureSchema();
+        // basically select the one of main schema.
+        if (!firstSchema.equals(secondSchema)) {
+            if (firstSchema.isMainSchema()) {
+                showDuplicateProcedure(first, second, true, "main schema");
+                return true;
+            } else if (secondSchema.isMainSchema()) {
+                procedureHandlingMap.remove(procedureFullQualifiedName);
+                showDuplicateProcedure(first, second, false, "main schema");
+            }
         }
+        // if both are additional schema or main schema, it selects first. 
+        showDuplicateProcedure(first, second, true, "first one");
+        return true;
     }
 
     protected void showDuplicateProcedure(DfProcedureMetaInfo first, DfProcedureMetaInfo second, boolean electFirst,
@@ -339,8 +343,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 final String plainCatalog = procedureRs.getString("PROCEDURE_CAT");
                 String packagePrefix = "";
                 if (isDatabaseOracle()) {
-                    packagePrefix = plainCatalog + ".";
-                    procedureCatalog = null; // because Oracle treats catalog as package
+                    // because Oracle treats catalog as package
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(plainCatalog)) {
+                        packagePrefix = plainCatalog + ".";
+                    }
+                    procedureCatalog = null;
                 } else {
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(plainCatalog)) {
                         procedureCatalog = plainCatalog;
@@ -351,7 +358,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 final String plainName = procedureRs.getString("PROCEDURE_NAME");
                 procedureName = packagePrefix + plainName;
             }
-            final Integer procedureType = new Integer(procedureRs.getString("PROCEDURE_TYPE"));
+            final Integer procedureType = Integer.valueOf(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
 
             final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();

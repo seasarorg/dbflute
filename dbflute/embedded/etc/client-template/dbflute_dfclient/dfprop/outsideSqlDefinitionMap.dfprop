@@ -53,7 +53,7 @@ map:{
     #  You can specify target catalog of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #
-    #; targetProcedureCatalogList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
+    #; targetProcedureCatalogList = list:{FOO_CATALOG ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,7 +62,7 @@ map:{
     #  This property is valid only when generateProcedureParameterBean is valid.
     #  ex) list:{PROCEDUREDB}
     #
-    #; targetProcedureSchemaList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
+    #; targetProcedureSchemaList = list:{FOO_SCHEMA ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -71,7 +71,7 @@ map:{
     #  This property is valid only when isGenerateProcedureParameterBean is valid.
     #  ex) list:{prefix:SP_}
     #
-    #; targetProcedureNameList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
+    #; targetProcedureNameList = list:{FOO_PROCEDURE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,7 +80,7 @@ map:{
     #  This property is valid only when isGenerateProcedureCustomizeEntity is valid.
     #  ex) list:{prefix:SP_}
     #
-    #; executionMetaProcedureNameList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
+    #; executionMetaProcedureNameList = list:{FOO_PROCEDURE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

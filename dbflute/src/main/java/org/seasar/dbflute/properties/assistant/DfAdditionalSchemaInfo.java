@@ -15,7 +15,9 @@ public class DfAdditionalSchemaInfo {
     protected List<String> _objectTypeTargetList;
     protected List<String> _tableExceptList;
     protected List<String> _tableTargetList;
+    protected Map<String, List<String>> _columnExceptMap;
     protected boolean _suppressCommonColumn;
+    protected boolean _suppressProcedure;
     protected Map<String, String> _supplementaryConnectionMap;
 
     public boolean hasObjectTypeSynonym() {
@@ -68,12 +70,28 @@ public class DfAdditionalSchemaInfo {
         this._tableTargetList = tableTargetList;
     }
 
+    public Map<String, List<String>> getColumnExceptMap() {
+        return _columnExceptMap;
+    }
+
+    public void setColumnExceptMap(Map<String, List<String>> columnExceptMap) {
+        this._columnExceptMap = columnExceptMap;
+    }
+
     public boolean isSuppressCommonColumn() {
         return _suppressCommonColumn;
     }
 
     public void setSuppressCommonColumn(boolean suppressCommonColumn) {
         this._suppressCommonColumn = suppressCommonColumn;
+    }
+
+    public boolean isSuppressProcedure() {
+        return _suppressProcedure;
+    }
+
+    public void setSuppressProcedure(boolean suppressProcedure) {
+        this._suppressProcedure = suppressProcedure;
     }
 
     public Map<String, String> getSupplementaryConnectionMap() {

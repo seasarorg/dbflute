@@ -37,13 +37,13 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The list for except table. (Lazy) */
+    /** The list for except table on main schema. (Lazy) */
     private List<String> _tableExceptList;
 
-    /** The list for target table. (Lazy) */
+    /** The list for target table on main schema. (Lazy) */
     private List<String> _tableTargetList;
 
-    /** The map for except column. (Lazy) */
+    /** The map for except column on main schema. (Lazy) */
     private Map<String, List<String>> _columnExceptMap;
 
     protected final List<String> getTableExceptList() { // for main schema
@@ -130,7 +130,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
     protected Map<String, List<String>> getRealColumnExceptMap(UnifiedSchema unifiedSchema) { // extension point
         final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(unifiedSchema);
         if (schemaInfo != null) {
-            return DfCollectionUtil.emptyMap(); // unsupported at additional schema
+            return schemaInfo.getColumnExceptMap();
         }
         return getColumnExceptMap();
     }

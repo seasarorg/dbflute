@@ -20,6 +20,7 @@ import org.seasar.dbflute.logic.factory.DfUrlAnalyzerFactory;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -327,9 +328,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             setupAdditionalSchemaObjectTypeTargetList(info, elementMap);
             setupAdditionalSchemaTableExceptList(info, elementMap);
             setupAdditionalSchemaTableTargetList(info, elementMap);
+            setupAdditionalSchemaColumnExceptList(info, elementMap);
             info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
-            setupAdditionalSchemaSupplementaryConnectionMap(info, elementMap);
-
+            info.setSuppressCommonColumn(isProperty("isSuppressProcedure", false, elementMap));
             _additionalSchemaMap.put(unifiedSchema.getIdentifiedSchema(), info);
         }
         return _additionalSchemaMap;
@@ -362,8 +363,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     protected void setupAdditionalSchemaTableExceptList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
         final Object obj = elementMap.get("tableExceptList");
         if (obj == null) {
-            @SuppressWarnings("unchecked")
-            final List<String> tableExceptList = Collections.EMPTY_LIST;
+            final List<String> tableExceptList = DfCollectionUtil.emptyList();
             info.setTableExceptList(tableExceptList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of tableExceptList in the property 'additionalSchemaMap' should be List:";
@@ -379,8 +379,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     protected void setupAdditionalSchemaTableTargetList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
         final Object obj = elementMap.get("tableTargetList");
         if (obj == null) {
-            @SuppressWarnings("unchecked")
-            final List<String> tableTargetList = Collections.EMPTY_LIST;
+            final List<String> tableTargetList = DfCollectionUtil.emptyList();
             info.setTableTargetList(tableTargetList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of tableTargetList in the property 'additionalSchemaMap' should be List:";
@@ -393,21 +392,19 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected void setupAdditionalSchemaSupplementaryConnectionMap(DfAdditionalSchemaInfo info,
-            Map<String, Object> elementMap) {
-        final Object obj = elementMap.get("supplementaryConnectionMap"); // It's closet!
+    protected void setupAdditionalSchemaColumnExceptList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
+        final Object obj = elementMap.get("columnExceptMap");
         if (obj == null) {
-            @SuppressWarnings("unchecked")
-            final Map<String, String> supplementaryConnectionMap = Collections.EMPTY_MAP;
-            info.setSupplementaryConnectionMap(supplementaryConnectionMap);
+            final Map<String, List<String>> columnExceptMap = DfCollectionUtil.emptyMap();
+            info.setColumnExceptMap(columnExceptMap);
         } else if (!(obj instanceof Map<?, ?>)) {
-            String msg = "The type of supplementaryConnectionMap in the property 'additionalSchemaMap' should be Map:";
+            String msg = "The type of columnExceptMap in the property 'additionalSchemaMap' should be Map:";
             msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")
-            final Map<String, String> supplementaryConnectionMap = (Map<String, String>) obj;
-            info.setSupplementaryConnectionMap(supplementaryConnectionMap);
+            final Map<String, List<String>> columnExceptMap = (Map<String, List<String>>) obj;
+            info.setColumnExceptMap(columnExceptMap);
         }
     }
 

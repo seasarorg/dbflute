@@ -373,7 +373,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 if (entityName == null) {
                     return false;
                 }
-                if ("df:x".equalsIgnoreCase(entityName)) {// Non Target Making SQL!
+                if ("df:x".equalsIgnoreCase(entityName)) { // non target making SQL!
                     return false;
                 }
                 return true;
