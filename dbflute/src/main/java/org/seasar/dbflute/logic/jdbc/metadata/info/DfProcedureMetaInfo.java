@@ -193,7 +193,7 @@ public class DfProcedureMetaInfo {
         return _procedureColumnList;
     }
 
-    public void addProcedureColumnMetaInfo(DfProcedureColumnMetaInfo procedureColumn) {
+    public void addProcedureColumn(DfProcedureColumnMetaInfo procedureColumn) {
         _procedureColumnList.add(procedureColumn);
     }
 

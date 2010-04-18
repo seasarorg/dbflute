@@ -59,7 +59,7 @@ public class DfProcedureSynonymMetaInfo {
         metaInfo.setProcedureComment(_procedureMetaInfo.getProcedureComment());
         final List<DfProcedureColumnMetaInfo> columnMetaInfoList = _procedureMetaInfo.getProcedureColumnList();
         for (DfProcedureColumnMetaInfo columnMetaInfo : columnMetaInfoList) {
-            metaInfo.addProcedureColumnMetaInfo(columnMetaInfo);
+            metaInfo.addProcedureColumn(columnMetaInfo);
         }
         return metaInfo;
     }

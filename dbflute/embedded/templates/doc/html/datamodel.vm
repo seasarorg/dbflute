@@ -326,10 +326,10 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 		<pre>${procedure.procedureCommentForSchemaHtml}</pre>
 	</dd>
 #end
-#if ($procedure.procedureColumnMetaInfoList.isEmpty())
+#if ($procedure.procedureColumnList.isEmpty())
 	<dd class="column">*no arguments</dd>
 #else
-#foreach ($column in $procedure.procedureColumnMetaInfoList)
+#foreach ($column in $procedure.procedureColumnList)
 	<dd class="column">
 		${column.columnDisplayNameForSchemaHtml}
 #if ($column.hasColumnComment())

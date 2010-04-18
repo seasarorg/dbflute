@@ -504,7 +504,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureColumnMetaInfo.setColumnSize(columnSize);
             procedureColumnMetaInfo.setDecimalDigits(decimalDigits);
             procedureColumnMetaInfo.setColumnComment(columnComment);
-            procedureMetaInfo.addProcedureColumnMetaInfo(procedureColumnMetaInfo);
+            procedureMetaInfo.addProcedureColumn(procedureColumnMetaInfo);
         }
         adjustProcedureColumnList(procedureMetaInfo);
     }
