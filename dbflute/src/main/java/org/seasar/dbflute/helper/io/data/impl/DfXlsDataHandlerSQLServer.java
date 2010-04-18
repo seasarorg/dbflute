@@ -31,7 +31,7 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
 /**
  * @author jflute
  */
-public class XDfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
+public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
 
     // ===================================================================================
     //                                                                          Definition
