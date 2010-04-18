@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
@@ -59,6 +60,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected List<String> _dropTableExceptList;
     protected boolean _dropGenerateTableOnly;
     protected boolean _dropGenerateProcedureOnly;
+    protected StringSet _droppedPackageSet = StringSet.createAsCaseInsensitive();
 
     // /= = = = = = = = = = = = =
     // Detail execution handling!
@@ -429,6 +431,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
                 return "drop function " + buildProcedureSqlName(metaInfo);
             }
+
+            public String buildDropPackageSql(DfProcedureMetaInfo metaInfo) {
+                return "drop package " + metaInfo.getProcedurePackage();
+            }
         };
     }
 
@@ -441,6 +447,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         String buildDropProcedureSql(DfProcedureMetaInfo metaInfo);
 
         String buildDropFunctionSql(DfProcedureMetaInfo metaInfo);
+
+        String buildDropPackageSql(DfProcedureMetaInfo metaInfo);
     }
 
     protected void callbackDropProcedureByJdbc(Connection conn, List<DfProcedureMetaInfo> procedureMetaInfoList,
@@ -450,6 +458,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         try {
             st = conn.createStatement();
             for (DfProcedureMetaInfo metaInfo : procedureMetaInfoList) {
+                if (metaInfo.isPackageProcdure()) {
+                    currentSql = callback.buildDropPackageSql(metaInfo);
+                    handlePackageProcedure(metaInfo, st, currentSql);
+                    continue;
+                }
                 final String dropProcedureSql = callback.buildDropProcedureSql(metaInfo);
                 currentSql = dropProcedureSql;
                 _log.info(dropProcedureSql);
@@ -462,7 +475,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         _log.info("  (o) retry: " + dropFunctionSql);
                     } catch (SQLException ignored) {
                         _log.info("  (x) retry: " + dropFunctionSql);
-                        handlePackageProcedure(metaInfo, st, e);
+                        throw e;
                     }
                 }
             }
@@ -480,9 +493,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected void handlePackageProcedure(DfProcedureMetaInfo metaInfo, Statement st, SQLException e)
-            throws SQLException {
-        throw e; // override if it needs
+    protected void handlePackageProcedure(DfProcedureMetaInfo metaInfo, Statement st, String sql) throws SQLException {
+        final String procedurePackage = metaInfo.getProcedurePackage();
+        if (_droppedPackageSet.contains(procedurePackage)) {
+            return;
+        }
+        _log.info(sql);
+        st.execute(sql);
     }
 
     // ===================================================================================

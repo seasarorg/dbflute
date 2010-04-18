@@ -337,18 +337,21 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             UnifiedSchema unifiedSchema) throws SQLException {
         while (procedureRs.next()) {
             final String procedureSchema = procedureRs.getString("PROCEDURE_SCHEM");
+            final String procedurePackage;
             final String procedureCatalog;
             final String procedureName;
             {
                 final String plainCatalog = procedureRs.getString("PROCEDURE_CAT");
-                String packagePrefix = "";
                 if (isDatabaseOracle()) {
                     // because Oracle treats catalog as package
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(plainCatalog)) {
-                        packagePrefix = plainCatalog + ".";
+                        procedurePackage = plainCatalog;
+                    } else {
+                        procedurePackage = null;
                     }
                     procedureCatalog = null;
                 } else {
+                    procedurePackage = null;
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(plainCatalog)) {
                         procedureCatalog = plainCatalog;
                     } else {
@@ -356,7 +359,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                     }
                 }
                 final String plainName = procedureRs.getString("PROCEDURE_NAME");
-                procedureName = packagePrefix + plainName;
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(procedurePackage)) {
+                    procedureName = procedurePackage + "." + plainName;
+                } else {
+                    procedureName = plainName;
+                }
             }
             final Integer procedureType = Integer.valueOf(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
@@ -372,9 +379,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             } else if (procedureType == DatabaseMetaData.procedureReturnsResult) {
                 metaInfo.setProcedureType(DfProcedureType.procedureReturnsResult);
             } else {
-                throw new IllegalStateException("Unknown procedureType: " + procedureType);
+                String msg = "Unknown procedureType: type=" + procedureType + " procedure=" + procedureName;
+                throw new IllegalStateException(msg);
             }
             metaInfo.setProcedureComment(procedureComment);
+            metaInfo.setProcedurePackage(procedurePackage);
             metaInfo.setProcedureFullQualifiedName(buildProcedureFullQualifiedName(metaInfo));
             metaInfo.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(metaInfo));
             procedureMetaInfoList.add(metaInfo);

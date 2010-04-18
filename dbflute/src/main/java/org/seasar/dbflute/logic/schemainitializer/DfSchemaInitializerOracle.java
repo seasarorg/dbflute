@@ -24,8 +24,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -39,11 +37,6 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfSchemaInitializerOracle.class);
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected StringSet _droppedPackageSet = StringSet.createAsCaseInsensitive();
 
     // ===================================================================================
     //                                                                    Drop Foreign Key
@@ -138,31 +131,6 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                     _log.info("rs.close() threw the exception!", ignored);
                 }
             }
-        }
-    }
-
-    // ===================================================================================
-    //                                                                      Drop Procedure
-    //                                                                      ==============
-    @Override
-    protected void handlePackageProcedure(DfProcedureMetaInfo metaInfo, Statement st, SQLException e)
-            throws SQLException {
-        final String catalog = metaInfo.getProcedureCatalog();
-        if (catalog == null || catalog.trim().length() == 0) {
-            throw e; // not package so pure exception
-        }
-        if (_droppedPackageSet.contains(catalog)) {
-            _log.info("  (o) already dropped: " + catalog);
-            return; // already dropped
-        }
-        final String sql = "drop package " + catalog; // a catalog is package if Oracle
-        try {
-            st.execute(sql);
-            _log.info("  (o) retry: " + sql);
-            _droppedPackageSet.add(catalog);
-        } catch (SQLException ignored) {
-            _log.info("  (x) retry: " + sql);
-            throw e;
         }
     }
 

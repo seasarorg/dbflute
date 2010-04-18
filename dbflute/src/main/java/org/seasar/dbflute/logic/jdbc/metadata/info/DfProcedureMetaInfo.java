@@ -19,13 +19,15 @@ public class DfProcedureMetaInfo {
     //                                                                           =========
     protected String _procedureCatalog;
     protected UnifiedSchema _procedureSchema;
-    protected String _procedureName;
+    protected String _procedureName; // contains package prefix
     protected DfProcedureType _procedureType;
     protected String _procedureFullQualifiedName;
     protected String _procedureSchemaQualifiedName;
     protected String _procedureSqlName; // basically for procedure synonym
     protected String _procedureComment;
+    protected String _procedurePackage; // basically for dropping procedure
     protected boolean _procedureSynonym;
+    protected boolean _packageProcedure;
 
     protected List<DfProcedureColumnMetaInfo> _procedureColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
     protected List<DfProcedureNotParamResultMetaInfo> _notParamResultList = new ArrayList<DfProcedureNotParamResultMetaInfo>();
@@ -52,6 +54,10 @@ public class DfProcedureMetaInfo {
         return comment;
     }
 
+    public boolean isPackageProcdure() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_procedurePackage);
+    }
+
     public String buildProcedureLoggingName() {
         return _procedureFullQualifiedName;
     }
@@ -61,16 +67,10 @@ public class DfProcedureMetaInfo {
             return _procedureSqlName;
         }
         final DfBasicProperties prop = DfBuildProperties.getInstance().getBasicProperties();
-        final String procedureName = getProcedureName();
-        if (prop.isDatabaseOracle() && procedureName.contains(".")) { // package procedure
-            // returns plain name because it cannot add schema prefix to package procedure 
-            _procedureSqlName = procedureName;
-            return _procedureSqlName;
-        }
-        final String sqlName = getProcedureSchema().buildSqlName(procedureName);
+        final String sqlName = getProcedureSchema().buildSqlName(getProcedureName());
         // DB2 needs schema prefix for calling procedures. (actually tried)
         if (prop.isDatabaseDB2() && !sqlName.contains(".")) {
-            _procedureSqlName = Srl.connectPrefix(sqlName, getProcedureSchema().getPureSchema(), ".");
+            _procedureSqlName = getProcedureSchema().buildSchemaQualifiedName(sqlName);
         } else {
             _procedureSqlName = sqlName;
         }
@@ -167,6 +167,14 @@ public class DfProcedureMetaInfo {
 
     public void setProcedureComment(String procedureComment) {
         this._procedureComment = procedureComment;
+    }
+
+    public String getProcedurePackage() {
+        return _procedurePackage;
+    }
+
+    public void setProcedurePackage(String procedurePackage) {
+        this._procedurePackage = procedurePackage;
     }
 
     public boolean isProcedureSynonym() {
