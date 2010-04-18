@@ -68,8 +68,18 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                 Available Procedure
     //                                                                 ===================
     /**
+     * Get the list of available meta information.
+     * @param dataSource The data source for getting meta data. (NotNull)
+     * @return The list of available procedure meta informations. (NotNull)
+     * @throws SQLException
+     */
+    public List<DfProcedureMetaInfo> getAvailableProcedureList(DataSource dataSource) throws SQLException {
+        return new ArrayList<DfProcedureMetaInfo>(getAvailableProcedureMap(dataSource).values());
+    }
+
+    /**
      * Get the map of available meta information. <br />
-     * The map key is procedure unique name.
+     * The map key is procedure name that contains package prefix).
      * @param dataSource The data source for getting meta data. (NotNull)
      * @return The map of available procedure meta informations. The key is full-qualified name. (NotNull)
      * @throws SQLException
@@ -102,7 +112,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (handleDuplicateProcedure(metaInfo, procedureHandlingMap, mainSchema)) {
                 continue;
             }
-            procedureHandlingMap.put(metaInfo.getProcedureFullQualifiedName(), metaInfo);
+            procedureHandlingMap.put(metaInfo.buildProcedureKeyName(), metaInfo);
         }
 
         // arrange order (additional schema after main schema)
@@ -257,8 +267,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                   -------------------
     protected boolean handleDuplicateProcedure(DfProcedureMetaInfo second,
             Map<String, DfProcedureMetaInfo> procedureHandlingMap, UnifiedSchema mainSchema) {
-        final String procedureFullQualifiedName = second.getProcedureFullQualifiedName();
-        final DfProcedureMetaInfo first = procedureHandlingMap.get(procedureFullQualifiedName);
+        final String procedureKeyName = second.buildProcedureKeyName();
+        final DfProcedureMetaInfo first = procedureHandlingMap.get(procedureKeyName);
         if (first == null) {
             return false;
         }
@@ -270,7 +280,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 showDuplicateProcedure(first, second, true, "main schema");
                 return true;
             } else if (secondSchema.isMainSchema()) {
-                procedureHandlingMap.remove(procedureFullQualifiedName);
+                procedureHandlingMap.remove(procedureKeyName);
                 showDuplicateProcedure(first, second, false, "main schema");
             }
         }

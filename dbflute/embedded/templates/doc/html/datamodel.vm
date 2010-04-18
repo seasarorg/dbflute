@@ -191,7 +191,7 @@
 <body>
 <h1>Project Schema for ${database.projectName} (${database.databaseName})</h1>
 #if ($database.hasDatabaseSchema())
-<p class="mainschema">generated from <strong>${database.databaseSchema.displaySchema}</strong></p>
+<p class="mainschema">generated from <strong>${database.databaseSchema.catalogSchema}</strong></p>
 #end
 <p class="updatedate">${database.timestampExpression}</p>
 #if ($database.hasClassificationDefinitionMap())
@@ -223,7 +223,7 @@
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
 #if ($database.hasAdditionalSchema())
-		<td class="schemacell">#if ($table.hasSchema()) ${table.displaySchema}#else &nbsp;#end</td>
+		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
 #end
 #if ($database.isAliasDelimiterInDbCommentValid())
 		<td class="aliascell">${table.alias}</td>

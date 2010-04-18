@@ -1955,8 +1955,7 @@ public class Database {
         final DfProcedureHandler handler = new DfProcedureHandler();
         handler.includeProcedureSynonym(getDataSource());
         final DataSource dataSource = getDataSource();
-        final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(dataSource);
-        _procedureMetaInfoList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
+        _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource);
         return _procedureMetaInfoList;
     }
 

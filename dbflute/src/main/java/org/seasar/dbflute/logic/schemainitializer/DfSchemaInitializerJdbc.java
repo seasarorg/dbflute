@@ -410,8 +410,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final List<DfProcedureMetaInfo> procedureList;
         try {
             if (_dropGenerateProcedureOnly) {
-                final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(_dataSource);
-                procedureList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
+                procedureList = handler.getAvailableProcedureList(_dataSource);
             } else {
                 procedureList = handler.getPlainProcedureList(metaData, _unifiedSchema);
             }

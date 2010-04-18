@@ -123,11 +123,7 @@ public class UnifiedSchema {
     // ===================================================================================
     //                                                                   Schema Expression
     //                                                                   =================
-    public String getDisplaySchema() {
-        return getCatalogSchema();
-    }
-
-    protected String getCatalogSchema() {
+    public String getCatalogSchema() {
         final StringBuilder sb = new StringBuilder();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_catalog)) {
             sb.append(_catalog);
@@ -157,6 +153,10 @@ public class UnifiedSchema {
             sb.append(NO_NAME_SCHEMA);
         }
         return sb.length() > 0 ? sb.toString() : null;
+    }
+
+    public String getLoggingSchema() {
+        return getCatalogSchema();
     }
 
     public String getPureCatalog() {

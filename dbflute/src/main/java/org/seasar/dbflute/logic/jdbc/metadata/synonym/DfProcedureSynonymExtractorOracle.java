@@ -96,7 +96,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 synonymMetaInfo.setSynonymName(synonymName);
                 synonymMetaInfo.setTableOwner(tableOwner);
                 synonymMetaInfo.setTableName(tableName);
-                synonymMetaInfo.setDbLinkName(dbLinkName);
+                synonymMetaInfo.setDBLinkName(dbLinkName);
 
                 // Select-able?
                 judgeSynonymSelectable(synonymMetaInfo);

@@ -19,12 +19,10 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -653,13 +651,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         _log.info(" ");
         _log.info("...Setting up procedures for generating parameter-beans");
-        final Map<String, DfProcedureMetaInfo> procedureMap = getAvailableProcedureMap();
-        final Set<Entry<String, DfProcedureMetaInfo>> entrySet = procedureMap.entrySet();
+        final List<DfProcedureMetaInfo> procedureList = getAvailableProcedureList();
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
-        final Map<String, DfProcedureMetaInfo> procdureHandlingMap = new HashMap<String, DfProcedureMetaInfo>();
-        for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
-            final DfProcedureMetaInfo procedure = entry.getValue();
-
+        for (DfProcedureMetaInfo procedure : procedureList) {
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
@@ -729,7 +723,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             parameterBeanMetaData.setProcedureName(procedure.buildProcedureSqlName());
             parameterBeanMetaData.setRefCustomizeEntity(existsCustomizeEntity);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
-            procdureHandlingMap.put(pmbName, procedure); // for duplicate check
         }
         _log.info("= = = = = = = = = =/");
         _log.info(" ");
@@ -738,16 +731,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // -----------------------------------------------------
     //                                   Procedure Meta Info
     //                                   -------------------
-    protected Map<String, DfProcedureMetaInfo> getAvailableProcedureMap() throws SQLException {
+    protected List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
         _procedureHandler.includeProcedureSynonym(getDataSource());
-        final Map<String, DfProcedureMetaInfo> procedureMap = _procedureHandler
-                .getAvailableProcedureMap(getDataSource());
+        final List<DfProcedureMetaInfo> procedureList = _procedureHandler.getAvailableProcedureList(getDataSource());
         if (getProperties().getOutsideSqlProperties().isGenerateProcedureCustomizeEntity()) {
             final DfProcedureExecutionMetaExtractor executionMetaHandler = new DfProcedureExecutionMetaExtractor();
-            final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
             executionMetaHandler.extractExecutionMetaData(getDataSource(), procedureList);
         }
-        return procedureMap;
+        return procedureList;
     }
 
     // -----------------------------------------------------

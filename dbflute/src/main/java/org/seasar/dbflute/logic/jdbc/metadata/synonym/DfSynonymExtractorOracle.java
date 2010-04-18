@@ -118,7 +118,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 info.setSynonymName(synonymName);
                 info.setTableOwner(tableOwner);
                 info.setTableName(tableName);
-                info.setDbLinkName(dbLinkName);
+                info.setDBLinkName(dbLinkName);
 
                 // Select-able?
                 judgeSynonymSelectable(info);
@@ -245,7 +245,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         final UnifiedSchema synonymOwner = info.getSynonymOwner();
         final String synonymName = info.getSynonymName();
         final String tableName = info.getTableName();
-        final String dbLinkName = info.getDbLinkName();
+        final String dbLinkName = info.getDBLinkName();
         final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymOwner, synonymName);
         info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
         final DfPrimaryKeyMetaInfo pkInfo = getDBLinkSynonymPKInfo(conn, tableName, dbLinkName);

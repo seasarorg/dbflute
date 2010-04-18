@@ -58,6 +58,10 @@ public class DfProcedureMetaInfo {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_procedurePackage);
     }
 
+    public String buildProcedureKeyName() {
+        return _procedureName;
+    }
+
     public String buildProcedureLoggingName() {
         return _procedureFullQualifiedName;
     }

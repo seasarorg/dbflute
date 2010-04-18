@@ -183,11 +183,11 @@ public class DfSynonymMetaInfo {
         this._indexMap = indexMap;
     }
 
-    public String getDbLinkName() {
+    public String getDBLinkName() {
         return _dbLinkName;
     }
 
-    public void setDbLinkName(String dbLinkName) {
+    public void setDBLinkName(String dbLinkName) {
         this._dbLinkName = dbLinkName;
     }
 

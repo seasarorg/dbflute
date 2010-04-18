@@ -1,7 +1,7 @@
 <h2 id="${table.name}"${table.titleForSchemaHtml}>
 ${table.aliasExpression}${table.name}
 #if ($database.hasAdditionalSchema() && $table.hasSchema())
-&nbsp;<span class="tableschema">on ${table.displaySchema}</span>
+&nbsp;<span class="tableschema">on ${table.documentSchema}</span>
 #end
 #if ($database.isSchemaHtmlOutsideSqlValid() && $table.hasBehaviorQueryPath())
 &nbsp;<span class="bqpcount"><a href="${database.sharp}${table.javaName}Sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>

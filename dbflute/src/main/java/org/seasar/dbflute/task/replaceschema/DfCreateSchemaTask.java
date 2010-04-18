@@ -141,7 +141,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             final String dropUrl = getMyProperties().getAdditionalDropUrl(additionalDropMap);
             final StringBuilder logSb = new StringBuilder();
             if (dropSchema.hasSchema()) {
-                logSb.append("[").append(dropSchema.getDisplaySchema()).append("]");
+                logSb.append("[").append(dropSchema.getLoggingSchema()).append("]");
                 if (dropUrl != null && dropUrl.trim().length() > 0) {
                     logSb.append(": ").append(dropUrl);
                 }

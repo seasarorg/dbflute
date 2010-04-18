@@ -353,8 +353,15 @@ public class Table {
         return _unifiedSchema != null ? _unifiedSchema : null;
     }
 
-    public String getDisplaySchema() {
-        return _unifiedSchema != null ? _unifiedSchema.getDisplaySchema() : "";
+    public String getDocumentSchema() {
+        if (_unifiedSchema == null) {
+            return "";
+        }
+        if (getDatabase().hasCatalogAdditionalSchema()) {
+            return _unifiedSchema.getCatalogSchema();
+        } else {
+            return _unifiedSchema.getPureSchema();
+        }
     }
 
     protected String getPureCatalog() { // NOT contain catalog name
@@ -439,7 +446,7 @@ public class Table {
         final StringBuilder sb = new StringBuilder();
         sb.append("type=").append(_type);
         if (isAdditionalSchema()) {
-            sb.append(", schema=").append(getDisplaySchema());
+            sb.append(", schema=").append(getDocumentSchema());
         }
         sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
         sb.append(", nameLength=").append(getName().length());
