@@ -326,10 +326,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return new SLFunction<CB, RESULT>(cb, resultType);
     }
 
-#if ($table.isUseSequence())
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
+#if ($table.isUseSequence())
     /**
      * Select the next value as sequence.
      * @return The next value. (NotNull)
@@ -343,6 +343,16 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
 #end
+    @Override
+    protected Number doReadNextVal() {
+#if ($table.isUseSequence())
+        return selectNextVal();
+#else
+        String msg = "This table is NOT related to sequence: " + getTableDbName();
+        throw new UnsupportedOperationException(msg);
+#end
+    }
+
 #if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
     // ===================================================================================
     //                                                                       Load Referrer
