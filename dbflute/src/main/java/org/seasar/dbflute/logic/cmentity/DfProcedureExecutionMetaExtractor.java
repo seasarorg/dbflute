@@ -39,6 +39,7 @@ import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -97,22 +98,31 @@ public class DfProcedureExecutionMetaExtractor {
             _log.info("...Calling: " + sql);
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
+            cs = conn.prepareCall(sql);
+            final List<DfProcedureColumnMetaInfo> boundColumnList = DfCollectionUtil.newArrayList();
+            setupBindParameter(cs, columnList, testValueList, boundColumnList);
+            ResultSet rs = null;
+
+            boolean executed;
             try {
-                cs = conn.prepareCall(sql);
+                executed = cs.execute();
             } catch (SQLException e) { // retry without escape because Oracle sometimes hates escape
                 final String retrySql = createSql(procedureSqlName, columnList.size(), existsReturn, false);
                 try {
+                    try {
+                        cs.close();
+                    } catch (SQLException ignored) {
+                    }
                     cs = conn.prepareCall(retrySql);
+                    setupBindParameter(cs, columnList, testValueList, boundColumnList);
+                    executed = cs.execute();
                     _log.info("  (o) retry: " + retrySql);
                 } catch (SQLException ignored) {
                     _log.info("  (x) retry: " + retrySql);
                     throw e;
                 }
             }
-            final List<DfProcedureColumnMetaInfo> boundColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
-            setupBindParameter(cs, columnList, testValueList, boundColumnList);
-            ResultSet rs = null;
-            if (cs.execute()) {
+            if (executed) {
                 int closetIndex = 0;
                 do {
                     rs = cs.getResultSet();
@@ -287,6 +297,7 @@ public class DfProcedureExecutionMetaExtractor {
 
     protected void setupBindParameter(CallableStatement cs, List<DfProcedureColumnMetaInfo> columnList,
             List<Object> testValueList, List<DfProcedureColumnMetaInfo> boundColumnList) throws SQLException {
+        boundColumnList.clear();
         int index = 0;
         for (DfProcedureColumnMetaInfo column : columnList) {
             final int paramIndex = (index + 1);

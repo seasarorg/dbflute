@@ -351,6 +351,7 @@ public class DfOldClassHandler {
     //                                                                 Old Customize Class
     //                                                                 ===================
     public void deleteOldCustomizeClass() {
+        info("");
         info("// /- - - - - - - - - - - - - - -");
         info("// Delete old customize classes!");
         info("// - - - - - - - - - -/");
