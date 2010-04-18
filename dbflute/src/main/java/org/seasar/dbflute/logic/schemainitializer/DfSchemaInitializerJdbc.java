@@ -500,6 +500,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
         _log.info(sql);
         st.execute(sql);
+        _droppedPackageSet.add(procedurePackage);
     }
 
     // ===================================================================================
