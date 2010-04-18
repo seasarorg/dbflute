@@ -330,7 +330,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             setupAdditionalSchemaTableTargetList(info, elementMap);
             setupAdditionalSchemaColumnExceptList(info, elementMap);
             info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
-            info.setSuppressCommonColumn(isProperty("isSuppressProcedure", false, elementMap));
+            info.setSuppressProcedure(isProperty("isSuppressProcedure", false, elementMap));
             _additionalSchemaMap.put(unifiedSchema.getIdentifiedSchema(), info);
         }
         return _additionalSchemaMap;
@@ -404,7 +404,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         } else {
             @SuppressWarnings("unchecked")
             final Map<String, List<String>> columnExceptMap = (Map<String, List<String>>) obj;
-            info.setColumnExceptMap(columnExceptMap);
+            final Map<String, List<String>> flexibleMap = StringKeyMap.createAsFlexible();
+            flexibleMap.putAll(columnExceptMap);
+            info.setColumnExceptMap(flexibleMap);
         }
     }
 

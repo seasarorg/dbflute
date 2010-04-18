@@ -432,7 +432,7 @@ public class Table {
     //                                        --------------
     public String getBasicInfoDispString() {
         final String type = getType();
-        return getAliasExpression() + getName() + (type != null ? " that is " + getType() : "");
+        return getAliasExpression() + getName() + (type != null ? " for " + getType() : "");
     }
 
     public String getTitleForSchemaHtml() {

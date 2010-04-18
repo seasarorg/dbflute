@@ -1946,7 +1946,7 @@ public class Database {
     //                                                                  ==================
     protected List<DfProcedureMetaInfo> _procedureMetaInfoList;
 
-    public List<DfProcedureMetaInfo> getAvailableProcedureList() {
+    public List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
         if (_procedureMetaInfoList != null) {
             return _procedureMetaInfoList;
         }
@@ -1954,17 +1954,10 @@ public class Database {
         _log.info("...Setting up procedures for documents");
         final DfProcedureHandler handler = new DfProcedureHandler();
         handler.includeProcedureSynonym(getDataSource());
-        final UnifiedSchema unifiedSchema = getDatabaseSchema();
         final DataSource dataSource = getDataSource();
-        try {
-            final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(dataSource);
-            _procedureMetaInfoList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
-            return _procedureMetaInfoList;
-        } catch (SQLException e) {
-            String msg = "Failed to get the list of available procedures:";
-            msg = msg + " unifiedSchema=" + unifiedSchema;
-            throw new IllegalStateException(msg);
-        }
+        final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(dataSource);
+        _procedureMetaInfoList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
+        return _procedureMetaInfoList;
     }
 
     // ===================================================================================

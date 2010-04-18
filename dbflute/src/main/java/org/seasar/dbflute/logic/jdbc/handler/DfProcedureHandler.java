@@ -307,6 +307,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
+        String procedureName = null;
         ResultSet columnResultSet = null;
         try {
             final String catalogName = unifiedSchema.getPureCatalog();
@@ -314,14 +315,20 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final ResultSet procedureRs = metaData.getProcedures(catalogName, schemaName, null);
             setupProcedureMetaInfo(metaInfoList, procedureRs, unifiedSchema);
             for (DfProcedureMetaInfo procedureMetaInfo : metaInfoList) {
-                String procedureName = procedureMetaInfo.getProcedureName();
-                final ResultSet columnRs = metaData.getProcedureColumns(catalogName, schemaName, procedureName, null);
+                procedureName = procedureMetaInfo.getProcedureName();
+                final String specifiedName;
+                if (isDatabaseMySQL() && Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
+                    // getProcedureColumns() of MySQL requires qualified procedure name when other catalog
+                    specifiedName = Srl.connectPrefix(procedureName, catalogName, ".");
+                } else {
+                    specifiedName = procedureName;
+                }
+                final ResultSet columnRs = metaData.getProcedureColumns(catalogName, schemaName, specifiedName, null);
                 setupProcedureColumnMetaInfo(procedureMetaInfo, columnRs);
             }
         } catch (SQLException e) {
-            String msg = "Failed to get a list of procedures:";
-            msg = msg + " unifiedSchema=" + unifiedSchema;
-            throw new DfJDBCException(msg, e);
+            throwProcedureListGettingFailureException(unifiedSchema, procedureName, e);
+            return null; // unreachable
         } finally {
             if (columnResultSet != null) {
                 try {
@@ -331,6 +338,21 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
         }
         return metaInfoList;
+    }
+
+    protected void throwProcedureListGettingFailureException(UnifiedSchema unifiedSchema, String procedureName,
+            SQLException e) throws SQLException {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to get a list of procedures!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Unified Schema]" + ln() + unifiedSchema + ln();
+        msg = msg + ln();
+        msg = msg + "[Current Procedure]" + ln() + procedureName + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL Exception]" + ln() + e.getClass() + ln() + e.getMessage() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfJDBCException(msg);
     }
 
     protected void setupProcedureMetaInfo(List<DfProcedureMetaInfo> procedureMetaInfoList, ResultSet procedureRs,

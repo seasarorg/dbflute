@@ -40,6 +40,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
+import org.seasar.dbflute.exception.DfProcedureSetupFailureException;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -630,11 +631,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected void setupProcedure() {
         try {
             doSetupProcedure();
-        } catch (SQLException ignored) {
-            _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.info(ignored.getMessage());
-            _log.info("* * * * * * * * * */");
+        } catch (SQLException e) {
+            throwProcedureSetupFailureException(e);
         }
+    }
+
+    protected void throwProcedureSetupFailureException(SQLException e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to set up procedures!" + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL Exception]" + ln() + e.getClass() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfProcedureSetupFailureException(msg, e);
     }
 
     protected void doSetupProcedure() throws SQLException {
