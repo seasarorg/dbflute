@@ -468,7 +468,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
-            rs = statement.executeQuery("select * from " + synonymOwner + "." + synonymName + " where 0=1");
+            final String synonymSqlName = synonymOwner.buildSchemaQualifiedName(synonymName);
+            rs = statement.executeQuery("select * from " + synonymSqlName + " where 0=1");
             final ResultSetMetaData metaData = rs.getMetaData();
             int count = metaData.getColumnCount();
             for (int i = 0; i < count; i++) {

@@ -111,7 +111,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                     continue; // basically no way because it may be for DB Link Synonym
                 }
 
-                final String procedureKey = tableOwner.buildFullQualifiedName(tableName);
+                final String procedureKey = tableOwner.buildSchemaQualifiedName(tableName);
                 final DfProcedureMetaInfo procedureMetaInfo = procedureMap.get(procedureKey);
                 if (procedureMetaInfo == null) {
                     // Synonym for Package Procedure has several problems.
@@ -174,7 +174,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     }
 
     protected String buildSynonymMapKey(UnifiedSchema synonymOwner, String synonymName) {
-        return synonymOwner.buildFullQualifiedName(synonymName);
+        return synonymOwner.buildSchemaQualifiedName(synonymName);
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
