@@ -98,8 +98,8 @@ public class DfSynonymMetaInfo {
         if (_columnMetaInfoList4DBLink != null) {
             columns = "(" + _columnMetaInfoList4DBLink.size() + " columns for DB link)";
         }
-        final String synonymSchema = _synonymOwner != null ? _synonymOwner.getPureCatalog() : "";
-        final String tableSchema = _tableOwner != null ? _tableOwner.getPureCatalog() : "";
+        final String synonymSchema = _synonymOwner != null ? _synonymOwner.getPureSchema() : "";
+        final String tableSchema = _tableOwner != null ? _tableOwner.getPureSchema() : "";
         return synonymSchema + "." + _synonymName + ":{" + (_dbLinkName != null ? _dbLinkName : tableSchema) + "."
                 + _tableName + columns + ", PK=" + _primaryKeyMetaInfo + (_autoIncrement ? ", ID" : "") + ", "
                 + (_uniqueKeyMap != null ? "UQ=" + _uniqueKeyMap.size() : null) + ", "
