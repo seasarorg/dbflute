@@ -426,7 +426,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     protected void throwSequenceDefinitionMapNotFoundTableException(List<String> notFoundTableNameList) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The table name was Not Found in the map of sequence definition!" + ln();
+        msg = msg + "The table name on the sequence definition was NOT FOUND!" + ln();
         msg = msg + ln();
         msg = msg + "[Not Found Table]" + ln();
         for (String tableName : notFoundTableNameList) {

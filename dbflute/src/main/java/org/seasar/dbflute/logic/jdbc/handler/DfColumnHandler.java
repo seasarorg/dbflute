@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.exception.DfColumnNotFoundException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
@@ -91,12 +90,13 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 upperSpare = metaData.getColumns(catalogName, schemaName, tableName.toUpperCase(), null);
                 setupColumnMetaInfo(columns, upperSpare, unifiedSchema, tableName);
             }
-            if (columns.isEmpty()) {
-                String msg = "Failed to get columns:";
-                msg = msg + " catalogName=" + catalogName + " schemaName=" + schemaName;
-                msg = msg + " tableName=" + tableName;
-                throw new DfColumnNotFoundException(msg);
-            }
+            // *because it exists supplementary process for getting columns after here
+            //if (columns.isEmpty()) {
+            //    String msg = "Failed to get columns:";
+            //    msg = msg + " catalogName=" + catalogName + " schemaName=" + schemaName;
+            //    msg = msg + " tableName=" + tableName;
+            //    throw new DfColumnNotFoundException(msg);
+            //}
         } finally {
             if (columnResultSet != null) {
                 try {
