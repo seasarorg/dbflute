@@ -35,15 +35,14 @@ public class DfDbCommentExtractorSQLServer extends DfDbCommentExtractorBase {
             msg = msg + " unifiedSchema=" + _unifiedSchema;
             throw new IllegalStateException(msg);
         }
+        // catalog is unsupported at this function
+        // so comment for catalog additional schema is invalid
         final StringBuilder sb = new StringBuilder();
         sb.append("select cast(objtype as nvarchar(500)) as OBJECT_TYPE");
         sb.append(", cast(objname as nvarchar(500)) as TABLE_NAME");
         sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
         sb.append("('MS_Description'");
-        if (_unifiedSchema.existsPureCatalog()) {
-            sb.append(", 'database', '").append(_unifiedSchema.getPureCatalog()).append("'");
-        }
         sb.append(", 'schema', '").append(_unifiedSchema.getPureSchema()).append("'");
         sb.append(", 'table', default, default, default)");
         sb.append(" order by TABLE_NAME asc");
@@ -67,15 +66,14 @@ public class DfDbCommentExtractorSQLServer extends DfDbCommentExtractorBase {
             msg = msg + " unifiedSchema=" + _unifiedSchema;
             throw new IllegalStateException(msg);
         }
+        // catalog is unsupported at this function
+        // so comment for catalog additional schema is invalid
         final StringBuilder sb = new StringBuilder();
         sb.append("select '").append(tableName).append("' as TABLE_NAME");
         sb.append(", cast(objname as nvarchar(500)) as COLUMN_NAME");
         sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
         sb.append("('MS_Description'");
-        if (_unifiedSchema.existsPureCatalog()) {
-            sb.append(", 'database', '").append(_unifiedSchema.getPureCatalog()).append("'");
-        }
         sb.append(", 'schema', '").append(_unifiedSchema.getPureSchema()).append("'");
         sb.append(", 'table', '").append(tableName).append("', 'column', default)");
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
