@@ -11,7 +11,7 @@ import org.seasar.dbflute.helper.io.data.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerImpl;
-import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerSqlServer;
+import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerSQLServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
@@ -149,7 +149,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         if (xlsDataHandlerImpl == null) {
             final DfXlsDataHandlerImpl xlsDataHandler;
             if (basicProperties.isDatabaseSQLServer()) {
-                xlsDataHandler = new DfXlsDataHandlerSqlServer();
+                xlsDataHandler = new DfXlsDataHandlerSQLServer();
             } else {
                 xlsDataHandler = new DfXlsDataHandlerImpl();
             }

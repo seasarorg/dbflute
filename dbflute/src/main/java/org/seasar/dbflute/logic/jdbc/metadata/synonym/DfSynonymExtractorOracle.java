@@ -464,12 +464,13 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected List<DfColumnMetaInfo> getDBLinkSynonymColumns(Connection conn, UnifiedSchema synonymOwner,
             String synonymName) throws SQLException {
         final List<DfColumnMetaInfo> columnList = new ArrayList<DfColumnMetaInfo>();
-        Statement statement = null;
+        Statement st = null;
         ResultSet rs = null;
         try {
-            statement = conn.createStatement();
+            st = conn.createStatement();
             final String synonymSqlName = synonymOwner.buildSchemaQualifiedName(synonymName);
-            rs = statement.executeQuery("select * from " + synonymSqlName + " where 0=1");
+            final String sql = "select * from " + synonymSqlName + " where 0=1";
+            rs = st.executeQuery(sql);
             final ResultSetMetaData metaData = rs.getMetaData();
             int count = metaData.getColumnCount();
             for (int i = 0; i < count; i++) {
@@ -491,9 +492,9 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             }
             return columnList;
         } finally {
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {
                 }
             }
