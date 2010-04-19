@@ -104,6 +104,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 }
 
                 // handling except tables if the set for check is set
+                // (basically if the foreign table is non-generate target, it is excepted)
                 if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
                     exceptedFKKeyMap.put(fkName, foreignTableName);
                     continue;
@@ -119,11 +120,23 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
                 if (metaInfo == null) {
                     metaInfo = new DfForeignKeyMetaInfo();
-                    metaInfo.setForeignKeyName(fkName);
-                    metaInfo.setLocalTableName(tableName);
-                    metaInfo.setForeignTableName(foreignTableName);
                     fkMap.put(fkName, metaInfo);
+                } else {
+                    // basically no way!
+                    // but DB2 returns to-ALIAS foreign key as same-name FK
+                    // it overrides here (use later)
+                    String firstLocal = metaInfo.getLocalTableName();
+                    String firstForeign = metaInfo.getForeignTableName();
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append("...Handling same-name FK (use later one):");
+                    sb.append(ln()).append("[Duplicate Foreign Key]: ").append(fkName);
+                    sb.append(ln()).append(" first = ").append(firstLocal).append(" to ").append(firstForeign);
+                    sb.append(ln()).append(" later = ").append(tableName).append(" to ").append(foreignTableName);
+                    _log.info(sb.toString());
                 }
+                metaInfo.setForeignKeyName(fkName);
+                metaInfo.setLocalTableName(tableName);
+                metaInfo.setForeignTableName(foreignTableName);
                 metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
             }
         } finally {
@@ -133,12 +146,13 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         }
         if (!exceptedFKKeyMap.isEmpty()) {
             final StringBuilder sb = new StringBuilder();
-            sb.append("...Excepting foreign keys from the table:").append(ln()).append("[Excepted Foreign Key]");
+            sb.append("...Excepting foreign keys from the table:");
+            sb.append(ln()).append("[Excepted Foreign Key]");
             final Set<String> exceptedFKKeySet = exceptedFKKeyMap.keySet();
             for (String exceptedKey : exceptedFKKeySet) {
+                final String exceptedFKTable = exceptedFKKeyMap.get(exceptedKey);
                 sb.append(ln()).append(" ").append(exceptedKey);
-                sb.append(" (").append(tableName).append(" to ");
-                sb.append(exceptedFKKeyMap.get(exceptedKey)).append(")");
+                sb.append(" (").append(tableName).append(" to ").append(exceptedFKTable).append(")");
             }
             _log.info(sb.toString());
         }
