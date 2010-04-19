@@ -28,6 +28,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
@@ -98,11 +99,20 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 final String foreignCatalogName = rs.getString(1);
                 final String foreignSchemaName = rs.getString(2);
                 final String foreignTableName = rs.getString(3);
-                String fkName = rs.getString(12);
-                if (fkName == null) {
-                    // basically no way
-                    // make it up (use table name instead)
-                    fkName = "FK_" + tableName + "_" + foreignTableName;
+                final String foreignColumnName = rs.getString(4);
+                final String localColumnName = rs.getString(8);
+                final String fkName;
+                {
+                    final String fkPlainName = rs.getString(12);
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(fkPlainName)) {
+                        fkName = fkPlainName;
+                    } else {
+                        // basically no way
+                        // but make it up automatically just in case
+                        // (use local column name)
+                        fkName = "FK_" + tableName + "_" + localColumnName;
+                        _log.info("...Making FK name automatically (cannot get from meta data): " + fkName);
+                    }
                 }
 
                 // handling except tables if the set for check is set
@@ -113,8 +123,6 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 }
 
                 // check except columns
-                final String localColumnName = rs.getString(8);
-                final String foreignColumnName = rs.getString(4);
                 assertFKColumnNotExcepted(unifiedSchema, tableName, localColumnName);
                 final UnifiedSchema foreignSchema = createAsDynamicSchema(foreignCatalogName, foreignSchemaName);
                 assertPKColumnNotExcepted(foreignSchema, foreignTableName, foreignColumnName);
