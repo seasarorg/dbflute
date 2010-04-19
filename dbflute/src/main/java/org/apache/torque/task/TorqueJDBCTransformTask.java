@@ -589,7 +589,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void judgeOutOfTargetSynonym(List<DfTableMetaInfo> tableList) {
         for (DfTableMetaInfo table : tableList) {
             if (canHandleSynonym(table)) {
-                DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
+                final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
                 if (synonym != null && !synonym.isSelectable()) {
                     table.setOutOfGenerateTarget(true);
                 }
@@ -600,7 +600,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void helpSynonymTableComments(List<DfTableMetaInfo> tableList) {
         for (DfTableMetaInfo table : tableList) {
             if (canHandleSynonym(table) && !table.hasTableComment()) {
-                DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
+                final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
                 if (synonym != null && synonym.hasTableComment()) {
                     table.setTableComment(synonym.getTableComment());
                 }

@@ -2,7 +2,6 @@ package org.seasar.dbflute.properties;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -47,22 +47,23 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     protected Map<String, String> _sequenceDefinitionMap;
 
     protected Map<String, String> getSequenceDefinitionMap() {
-        if (_sequenceDefinitionMap == null) {
-            final Map<String, String> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
-            final Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
-            final Set<Entry<String, Object>> entrySet = originalMap.entrySet();
-            for (Entry<String, Object> entry : entrySet) {
-                String tableName = entry.getKey();
-                Object sequenceValue = entry.getValue();
-                if (!(sequenceValue instanceof String)) {
-                    String msg = "The value of sequence map should be string:";
-                    msg = msg + " sequenceValue=" + sequenceValue + " map=" + originalMap;
-                    throw new DfIllegalPropertyTypeException(msg);
-                }
-                flexibleMap.put(tableName, (String) sequenceValue);
-            }
-            _sequenceDefinitionMap = flexibleMap;
+        if (_sequenceDefinitionMap != null) {
+            return _sequenceDefinitionMap;
         }
+        final Map<String, String> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
+        final Set<Entry<String, Object>> entrySet = originalMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            String tableName = entry.getKey();
+            Object sequenceName = entry.getValue();
+            if (!(sequenceName instanceof String)) {
+                String msg = "The value of sequence map should be string:";
+                msg = msg + " sequenceName=" + sequenceName + " map=" + originalMap;
+                throw new DfIllegalPropertyTypeException(msg);
+            }
+            flexibleMap.put(tableName, (String) sequenceName);
+        }
+        _sequenceDefinitionMap = flexibleMap;
         return _sequenceDefinitionMap;
     }
 
@@ -102,28 +103,88 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     // -----------------------------------------------------
-    //                                          Sequence Map
-    //                                          ------------
-    protected Map<String, DfSequenceMetaInfo> _sequenceMetaInfoMap;
+    //                                      Check Definition
+    //                                      ----------------
+    /**
+     * @param checker The checker for call-back. (NotNull)
+     */
+    public void checkSequenceDefinitionMap(SequenceDefinitionMapChecker checker) {
+        final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
+        final Set<String> keySet = sequenceDefinitionMap.keySet();
+        final List<String> notFoundTableNameList = new ArrayList<String>();
+        for (String tableName : keySet) {
+            if (!checker.hasTable(tableName)) {
+                notFoundTableNameList.add(tableName);
+            }
+        }
+        if (!notFoundTableNameList.isEmpty()) {
+            throwSequenceDefinitionMapNotFoundTableException(notFoundTableNameList);
+        }
+    }
+
+    protected void throwSequenceDefinitionMapNotFoundTableException(List<String> notFoundTableNameList) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The table name on the sequence definition was NOT FOUND!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Not Found Table]" + ln();
+        for (String tableName : notFoundTableNameList) {
+            msg = msg + tableName + ln();
+        }
+        msg = msg + ln();
+        msg = msg + "[Sequence Definition]" + ln() + _sequenceDefinitionMap + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new SequenceDefinitionMapTableNotFoundException(msg);
+    }
+
+    public static interface SequenceDefinitionMapChecker {
+        public boolean hasTable(String tableName);
+    }
+
+    public static class SequenceDefinitionMapTableNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public SequenceDefinitionMapTableNotFoundException(String msg) {
+            super(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                Sequence Return Type
+    //                                                                ====================
+    public String getSequenceReturnType() { // It's not property!
+        return getBasicProperties().getLanguageDependencyInfo().getDefaultSequenceType();
+    }
+
+    // ===================================================================================
+    //                                                            Sequence (Meta Info) Map
+    //                                                            ========================
+    protected Map<String, DfSequenceMetaInfo> _sequenceMap;
 
     protected Map<String, DfSequenceMetaInfo> getSequenceMap(DataSource dataSource) {
-        if (_sequenceMetaInfoMap != null) {
-            return _sequenceMetaInfoMap;
+        if (_sequenceMap != null) {
+            return _sequenceMap;
         }
-        final DfSequenceExtractorFactory factory = new DfSequenceExtractorFactory(dataSource, getBasicProperties(),
-                getDatabaseProperties());
+        final DfSequenceExtractorFactory factory = createSequenceExtractorFactory(dataSource);
         final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
+        Map<String, DfSequenceMetaInfo> sequenceMap = null;
         if (sequenceExtractor != null) {
             try {
-                _sequenceMetaInfoMap = sequenceExtractor.getSequenceMap();
+                sequenceMap = sequenceExtractor.getSequenceMap();
             } catch (RuntimeException continued) { // because of supplement
-                _log.info("Failed to get sequence map: " + continued.getMessage());
-                _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
+                _log.info("*Failed to get sequence map: " + continued.getMessage());
             }
-        } else {
-            _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
         }
-        return _sequenceMetaInfoMap;
+        if (sequenceMap != null) {
+            _sequenceMap = sequenceMap;
+        } else {
+            _sequenceMap = DfCollectionUtil.emptyMap();
+        }
+        return _sequenceMap;
+    }
+
+    protected DfSequenceExtractorFactory createSequenceExtractorFactory(DataSource dataSource) {
+        return new DfSequenceExtractorFactory(dataSource, getBasicProperties(), getDatabaseProperties());
     }
 
     protected DfSequenceMetaInfo getSequenceElement(UnifiedSchema unifiedSchema, String sequenceName,
@@ -401,64 +462,6 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             msg = msg + "- - - - - - - - - -/";
             throw new DfIllegalPropertySettingException(msg);
         }
-    }
-
-    // -----------------------------------------------------
-    //                                      Check Definition
-    //                                      ----------------
-    /**
-     * @param checker The checker for call-back. (NotNull)
-     */
-    public void checkSequenceDefinitionMap(SequenceDefinitionMapChecker checker) {
-        final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
-        final Set<String> keySet = sequenceDefinitionMap.keySet();
-        final List<String> notFoundTableNameList = new ArrayList<String>();
-        for (String tableName : keySet) {
-            if (!checker.hasTable(tableName)) {
-                notFoundTableNameList.add(tableName);
-            }
-        }
-        if (!notFoundTableNameList.isEmpty()) {
-            throwSequenceDefinitionMapNotFoundTableException(notFoundTableNameList);
-        }
-    }
-
-    protected void throwSequenceDefinitionMapNotFoundTableException(List<String> notFoundTableNameList) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The table name on the sequence definition was NOT FOUND!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Not Found Table]" + ln();
-        for (String tableName : notFoundTableNameList) {
-            msg = msg + tableName + ln();
-        }
-        msg = msg + ln();
-        msg = msg + "[Sequence Definition]" + ln() + _sequenceDefinitionMap + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new SequenceDefinitionMapTableNotFoundException(msg);
-    }
-
-    public static interface SequenceDefinitionMapChecker {
-        public boolean hasTable(String tableName);
-    }
-
-    public static class SequenceDefinitionMapTableNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public SequenceDefinitionMapTableNotFoundException(String msg) {
-            super(msg);
-        }
-    }
-
-    protected String ln() {
-        return System.getProperty("line.separator");
-    }
-
-    // ===================================================================================
-    //                                                                Sequence Return Type
-    //                                                                ====================
-    public String getSequenceReturnType() { // It's not property!
-        return getBasicProperties().getLanguageDependencyInfo().getDefaultSequenceType();
     }
 
     // ===================================================================================
