@@ -36,10 +36,10 @@ public class DfSynonymMetaInfo {
     protected String _synonymName;
     protected UnifiedSchema _tableOwner;
     protected String _tableName;
-    protected DfPrimaryKeyMetaInfo _primaryKeyMetaInfo;
+    protected DfPrimaryKeyMetaInfo _primaryKey;
     protected boolean _autoIncrement;
     protected Map<String, Map<Integer, String>> _uniqueKeyMap;
-    protected Map<String, DfForeignKeyMetaInfo> _foreignKeyMetaInfoMap;
+    protected Map<String, DfForeignKeyMetaInfo> _foreignKeyMap;
     protected Map<String, Map<Integer, String>> _indexMap;
     protected String _dbLinkName;
     protected List<DfColumnMetaInfo> _columnMetaInfoList4DBLink;
@@ -101,9 +101,9 @@ public class DfSynonymMetaInfo {
         final String synonymSchema = _synonymOwner != null ? _synonymOwner.getPureSchema() : "";
         final String tableSchema = _tableOwner != null ? _tableOwner.getPureSchema() : "";
         return synonymSchema + "." + _synonymName + ":{" + (_dbLinkName != null ? _dbLinkName : tableSchema) + "."
-                + _tableName + columns + ", PK=" + _primaryKeyMetaInfo + (_autoIncrement ? ", ID" : "") + ", "
+                + _tableName + columns + ", PK=" + _primaryKey + (_autoIncrement ? ", ID" : "") + ", "
                 + (_uniqueKeyMap != null ? "UQ=" + _uniqueKeyMap.size() : null) + ", "
-                + (_foreignKeyMetaInfoMap != null ? "FK=" + _foreignKeyMetaInfoMap.size() : null) + ", "
+                + (_foreignKeyMap != null ? "FK=" + _foreignKeyMap.size() : null) + ", "
                 + (_selectable ? "selectable" : "unselectable") + "}"
                 + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
     }
@@ -143,12 +143,12 @@ public class DfSynonymMetaInfo {
         this._tableName = tableName;
     }
 
-    public DfPrimaryKeyMetaInfo getPrimaryKeyMetaInfo() {
-        return _primaryKeyMetaInfo;
+    public DfPrimaryKeyMetaInfo getPrimaryKey() {
+        return _primaryKey;
     }
 
-    public void setPrimaryKeyMetaInfo(DfPrimaryKeyMetaInfo primaryKeyMetaInfo) {
-        this._primaryKeyMetaInfo = primaryKeyMetaInfo;
+    public void setPrimaryKey(DfPrimaryKeyMetaInfo primaryKey) {
+        this._primaryKey = primaryKey;
     }
 
     public boolean isAutoIncrement() {
@@ -167,12 +167,12 @@ public class DfSynonymMetaInfo {
         this._uniqueKeyMap = uniqueKeyMap;
     }
 
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfoMap() {
-        return _foreignKeyMetaInfoMap != null ? _foreignKeyMetaInfoMap : new HashMap<String, DfForeignKeyMetaInfo>();
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMap() {
+        return _foreignKeyMap != null ? _foreignKeyMap : new HashMap<String, DfForeignKeyMetaInfo>();
     }
 
-    public void setForeignKeyMetaInfoMap(Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap) {
-        this._foreignKeyMetaInfoMap = foreignKeyMetaInfoMap;
+    public void setForeignKeyMap(Map<String, DfForeignKeyMetaInfo> foreignKeyMap) {
+        this._foreignKeyMap = foreignKeyMap;
     }
 
     public Map<String, Map<Integer, String>> getIndexMap() {

@@ -215,7 +215,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             Connection conn) throws SQLException {
         final DatabaseMetaData md = conn.getMetaData();
         final DfPrimaryKeyMetaInfo pkInfo = getPKList(md, tableOwner, tableName);
-        info.setPrimaryKeyMetaInfo(pkInfo);
+        info.setPrimaryKey(pkInfo);
         final List<String> pkList = pkInfo.getPrimaryKeyList();
         if (info.isSelectable()) { // because it needs a select statement
             for (String primaryKeyName : pkList) {
@@ -232,7 +232,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
         {
             final Map<String, DfForeignKeyMetaInfo> fkMap = getFKMap(md, tableOwner, tableName);
-            info.setForeignKeyMetaInfoMap(fkMap); // It's tentative information at this timing!
+            info.setForeignKeyMap(fkMap); // It's tentative information at this timing!
         }
         {
             final Map<String, Map<Integer, String>> uqMap = info.getUniqueKeyMap();
@@ -249,12 +249,12 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymOwner, synonymName);
         info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
         final DfPrimaryKeyMetaInfo pkInfo = getDBLinkSynonymPKInfo(conn, tableName, dbLinkName);
-        info.setPrimaryKeyMetaInfo(pkInfo);
+        info.setPrimaryKey(pkInfo);
         final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, tableName, dbLinkName);
         info.setUniqueKeyMap(uniqueKeyMap);
 
         // It does not support Foreign Key of DBLink.
-        info.setForeignKeyMetaInfoMap(new LinkedHashMap<String, DfForeignKeyMetaInfo>());
+        info.setForeignKeyMap(new LinkedHashMap<String, DfForeignKeyMetaInfo>());
 
         // It does not support Index of DBLink.
         info.setIndexMap(new LinkedHashMap<String, Map<Integer, String>>());
@@ -288,7 +288,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected Map<String, DfForeignKeyMetaInfo> getFKMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName) {
         try {
-            return _foreignKeyHandler.getForeignKeyMetaInfo(metaData, unifiedSchema, tableName);
+            return _foreignKeyHandler.getForeignKeyMap(metaData, unifiedSchema, tableName);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -333,7 +333,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             }
         }
         for (DfSynonymMetaInfo synonym : synonymList) {
-            final Map<String, DfForeignKeyMetaInfo> fkMap = synonym.getForeignKeyMetaInfoMap();
+            final Map<String, DfForeignKeyMetaInfo> fkMap = synonym.getForeignKeyMap();
             if (fkMap == null || fkMap.isEmpty()) {
                 continue;
             }

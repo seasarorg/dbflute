@@ -49,29 +49,29 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     //                                                                         Foreign Key
     //                                                                         ===========
     /**
-     * Retrieves a list of foreign key columns for a given table.
+     * Retrieves a map of foreign key columns for a given table. (the key is FK name)
      * @param metaData JDBC meta data. (NotNull)
      * @param tableInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMap(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
             throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
-        return getForeignKeyMetaInfo(metaData, unifiedSchema, tableName);
+        return getForeignKeyMap(metaData, unifiedSchema, tableName);
     }
 
     /**
-     * Retrieves a list of foreign key columns for a given table.
+     * Retrieves a map of foreign key columns for a given table. (the key is FK name)
      * @param metaData JDBC meta data. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData metaData,
-            UnifiedSchema unifiedSchema, String tableName) throws SQLException {
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName) throws SQLException {
         Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName);
         if (resultMap.isEmpty()) { // for lower case
             resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName.toLowerCase());

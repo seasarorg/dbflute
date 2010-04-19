@@ -332,10 +332,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             // * * * * * * * * * * * * * * *
             // Foreign keys for this table.
             // * * * * * * * * * * * * * * *
-            final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = getForeignKeys(dbMetaData, tableMataInfo);
-            final Set<String> foreignKeyMetaInfoKeySet = foreignKeyMetaInfoMap.keySet();
-            for (String foreignKeyName : foreignKeyMetaInfoKeySet) {
-                final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
+            final Map<String, DfForeignKeyMetaInfo> foreignKeyMap = getForeignKeys(dbMetaData, tableMataInfo);
+            final Set<String> foreignKeyKeySet = foreignKeyMap.keySet();
+            for (String foreignKeyName : foreignKeyKeySet) {
+                final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMap.get(foreignKeyName);
                 final Element foreignKeyElement = _doc.createElement("foreign-key");
                 foreignKeyElement.setAttribute("foreignTable", foreignKeyMetaInfo.getForeignTableName());
                 foreignKeyElement.setAttribute("name", foreignKeyMetaInfo.getForeignKeyName());
@@ -677,7 +677,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
         final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
         if (synonym != null) {
-            return synonym.getPrimaryKeyMetaInfo();
+            return synonym.getPrimaryKey();
         } else {
             return pkInfo;
         }
@@ -758,13 +758,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo table)
             throws SQLException {
-        final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfo = _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta,
-                table);
-        if (!canHandleSynonym(table) || !foreignKeyMetaInfo.isEmpty()) {
-            return foreignKeyMetaInfo;
+        final Map<String, DfForeignKeyMetaInfo> foreignKeyMap = _foreignKeyHandler.getForeignKeyMap(dbMeta, table);
+        if (!canHandleSynonym(table) || !foreignKeyMap.isEmpty()) {
+            return foreignKeyMap;
         }
         final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
-        return synonym != null ? synonym.getForeignKeyMetaInfoMap() : foreignKeyMetaInfo;
+        return synonym != null ? synonym.getForeignKeyMap() : foreignKeyMap;
     }
 
     // -----------------------------------------------------
