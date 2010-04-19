@@ -15,8 +15,9 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -32,7 +33,7 @@ public class DfForeignKeyMetaInfo {
 
     protected String _foreignTableName;
 
-    protected Map<String, String> _columnNameMap = new LinkedHashMap<String, String>();
+    protected Map<String, String> _columnNameMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                      Basic Override

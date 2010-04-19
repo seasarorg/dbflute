@@ -49,6 +49,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -67,7 +68,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     //                                                                           =========
     protected DataSource _dataSource;
     protected List<UnifiedSchema> _unifiedSchemaList;
-    protected Set<String> _refTableCheckSet;
+    protected Map<String, DfTableMetaInfo> _generatedTableMap;
 
     // -----------------------------------------------------
     //                                     Meta Data Handler
@@ -339,7 +340,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             }
             final Set<String> fkNameSet = fkMap.keySet();
             final Map<String, DfForeignKeyMetaInfo> additionalFKMap = DfCollectionUtil.newLinkedHashMap();
-            final Map<String, String> removedFKKeyMap = new LinkedHashMap<String, String>();
+            final Map<String, String> removedFKMap = DfCollectionUtil.newLinkedHashMap();
             for (String fkName : fkNameSet) {
                 final DfForeignKeyMetaInfo fk = fkMap.get(fkName);
 
@@ -350,9 +351,9 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 final List<String> foreignSynonymList = tableForeignSynonymListMap.get(orignalForeignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
                     if (_tableHandler.isTableExcept(synonym.getTableOwner(), orignalForeignTableName)) {
-                        removedFKKeyMap.put(fkName, orignalForeignTableName);
-                    } else if (_refTableCheckSet != null && !_refTableCheckSet.contains(orignalForeignTableName)) {
-                        removedFKKeyMap.put(fkName, orignalForeignTableName);
+                        removedFKMap.put(fkName, orignalForeignTableName);
+                    } else if (!isForeignTableGenerated(orignalForeignTableName)) {
+                        removedFKMap.put(fkName, orignalForeignTableName);
                     }
                     continue;
                 }
@@ -379,19 +380,34 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 }
             }
             fkMap.putAll(additionalFKMap);
-            if (!removedFKKeyMap.isEmpty()) {
+            if (!removedFKMap.isEmpty()) {
                 final StringBuilder sb = new StringBuilder();
                 sb.append("...Excepting foreign keys from the synonym:").append(ln()).append("[Excepted Foreign Key]");
-                final Set<String> removedFKKeySet = removedFKKeyMap.keySet();
+                final Set<String> removedFKKeySet = removedFKMap.keySet();
                 for (String removedKey : removedFKKeySet) {
                     sb.append(ln()).append(" ").append(removedKey);
                     sb.append(" (").append(synonym.getSynonymName()).append(" to ");
-                    sb.append(removedFKKeyMap.get(removedKey)).append(")");
+                    sb.append(removedFKMap.get(removedKey)).append(")");
                     fkMap.remove(removedKey);
                 }
                 _log.info(sb.toString());
             }
         }
+    }
+
+    protected boolean isForeignTableGenerated(String foreignTableName) {
+        if (_generatedTableMap == null || _generatedTableMap.isEmpty()) {
+            // means no check of generation
+            return true;
+        }
+        final DfTableMetaInfo info = _generatedTableMap.get(foreignTableName);
+        if (info == null) {
+            return false;
+        }
+        if (info.isOutOfGenerateTarget()) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -600,7 +616,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         this._unifiedSchemaList = unifiedSchemaList;
     }
 
-    public void setRefTableCheckSet(Set<String> refTableCheckSet) {
-        this._refTableCheckSet = refTableCheckSet;
+    public void setGeneratedTableMap(Map<String, DfTableMetaInfo> generatedTableMap) {
+        this._generatedTableMap = generatedTableMap;
     }
 }

@@ -18,9 +18,9 @@ package org.seasar.dbflute.logic.jdbc.handler;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +43,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Set<String> _refTableCheckSet;
+    protected Map<String, DfTableMetaInfo> _generatedTableMap;
 
     // ===================================================================================
     //                                                                         Foreign Key
@@ -88,75 +88,80 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         if (!isForeignKeyExtractingSupported()) {
             return fkMap;
         }
-        final Map<String, String> exceptedFKKeyMap = newLinkedHashMap();
-        ResultSet foreignKeys = null;
+        final Map<String, String> exceptedFKMap = newLinkedHashMap();
+        ResultSet rs = null;
         try {
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
-            foreignKeys = dbMeta.getImportedKeys(catalogName, schemaName, tableName);
-            while (foreignKeys.next()) {
-                final String foreignCatalogName = foreignKeys.getString(1);
-                final String foreignSchemaName = foreignKeys.getString(2);
-                final String foreignTableName = foreignKeys.getString(3);
-                String fkName = foreignKeys.getString(12);
-                if (fkName == null) { // if FK has no name - make it up (use table name instead)
-                    fkName = foreignTableName;
+            rs = dbMeta.getImportedKeys(catalogName, schemaName, tableName);
+            while (rs.next()) {
+                final String foreignCatalogName = rs.getString(1);
+                final String foreignSchemaName = rs.getString(2);
+                final String foreignTableName = rs.getString(3);
+                String fkName = rs.getString(12);
+                if (fkName == null) {
+                    // basically no way
+                    // make it up (use table name instead)
+                    fkName = "FK_" + tableName + "_" + foreignTableName;
                 }
 
                 // handling except tables if the set for check is set
                 // (basically if the foreign table is non-generate target, it is excepted)
-                if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
-                    exceptedFKKeyMap.put(fkName, foreignTableName);
+                if (!isForeignTableGenerated(foreignTableName)) {
+                    exceptedFKMap.put(fkName, foreignTableName);
                     continue;
                 }
 
                 // check except columns
-                final String localColumnName = foreignKeys.getString(8);
-                final String foreignColumnName = foreignKeys.getString(4);
+                final String localColumnName = rs.getString(8);
+                final String foreignColumnName = rs.getString(4);
                 assertFKColumnNotExcepted(unifiedSchema, tableName, localColumnName);
                 final UnifiedSchema foreignSchema = createAsDynamicSchema(foreignCatalogName, foreignSchemaName);
                 assertPKColumnNotExcepted(foreignSchema, foreignTableName, foreignColumnName);
 
                 DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
-                if (metaInfo == null) {
+                if (metaInfo == null) { // basically here
                     metaInfo = new DfForeignKeyMetaInfo();
                     fkMap.put(fkName, metaInfo);
                 } else {
-                    // basically no way!
-                    // but DB2 returns to-ALIAS foreign key as same-name FK
-                    // it overrides here (use later)
-                    String firstLocal = metaInfo.getLocalTableName();
-                    String firstForeign = metaInfo.getForeignTableName();
-                    final StringBuilder sb = new StringBuilder();
-                    sb.append("...Handling same-name FK (use later one):");
-                    sb.append(ln()).append("[Duplicate Foreign Key]: ").append(fkName);
-                    sb.append(ln()).append(" first = ").append(firstLocal).append(" to ").append(firstForeign);
-                    sb.append(ln()).append(" later = ").append(tableName).append(" to ").append(foreignTableName);
-                    _log.info(sb.toString());
+                    // /- - - - - - - - - - - -
+                    // same-name FK was found!
+                    // - - - - - - - - - -/
+                    final String firstName = metaInfo.getForeignTableName();
+                    final String secondName = foreignTableName;
+                    if (firstName.equalsIgnoreCase(secondName)) { // multiple FK
+                        metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
+                        continue; // putting columns only
+                    } else {
+                        // here: same-name FK and same different foreign table.
+                        // Basically no way!
+                        // But DB2 returns to-ALIAS foreign key as same-name FK.
+                        // Same type as local's type is prior
+                        // and if types are different, use first.
+                        final String msgBase = "...Handling same-name FK (use first one): " + fkName + " to ";
+                        if (judgeSameNameForeignKey(tableName, firstName, secondName)) {
+                            // use first (skip current)
+                            _log.info(msgBase + firstName);
+                            continue;
+                        } else {
+                            // use second (override)
+                            _log.info(msgBase + secondName);
+                        }
+                    }
                 }
+                // first or override
                 metaInfo.setForeignKeyName(fkName);
                 metaInfo.setLocalTableName(tableName);
                 metaInfo.setForeignTableName(foreignTableName);
                 metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
             }
         } finally {
-            if (foreignKeys != null) {
-                foreignKeys.close();
+            if (rs != null) {
+                rs.close();
             }
         }
-        if (!exceptedFKKeyMap.isEmpty()) {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("...Excepting foreign keys from the table:");
-            sb.append(ln()).append("[Excepted Foreign Key]");
-            final Set<String> exceptedFKKeySet = exceptedFKKeyMap.keySet();
-            for (String exceptedKey : exceptedFKKeySet) {
-                final String exceptedFKTable = exceptedFKKeyMap.get(exceptedKey);
-                sb.append(ln()).append(" ").append(exceptedKey);
-                sb.append(" (").append(tableName).append(" to ").append(exceptedFKTable).append(")");
-            }
-            _log.info(sb.toString());
-        }
-        return filterSameForeignKeyMetaInfo(fkMap);
+        handleExceptedForeignKey(exceptedFKMap, tableName);
+        return filterSameStructureForeignKey(fkMap);
     }
 
     protected void assertFKColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {
@@ -179,37 +184,89 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         }
     }
 
-    protected Map<String, DfForeignKeyMetaInfo> filterSameForeignKeyMetaInfo(Map<String, DfForeignKeyMetaInfo> fks) {
-        final Map<String, DfForeignKeyMetaInfo> filteredForeignKeyMetaInfoMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
-        final Map<Map<String, Object>, Object> checkMap = new LinkedHashMap<Map<String, Object>, Object>();
-        final Set<String> foreignKeyNameSet = fks.keySet();
-        for (String foreinKeyName : foreignKeyNameSet) {
-            final DfForeignKeyMetaInfo metaInfo = fks.get(foreinKeyName);
-
-            final Map<String, Object> checkKeyMap = new LinkedHashMap<String, Object>();
-            checkKeyMap.put(metaInfo.getForeignTableName(), new Object());
-            checkKeyMap.put("columnNameMap:" + metaInfo.getColumnNameMap(), new Object());
-            if (checkMap.containsKey(checkKeyMap)) {
-                String msg = "A structural one of the same row already exists.";
-                msg = msg + "The skipped foreign-key name is " + foreinKeyName + ".";
-                msg = msg + " The columns are " + checkKeyMap + ".";
-                _log.warn(msg);
-            } else {
-                checkMap.put(checkKeyMap, new Object());
-                filteredForeignKeyMetaInfoMap.put(foreinKeyName, metaInfo);
+    protected boolean judgeSameNameForeignKey(String localName, String firstName, String secondName) {
+        final DfTableMetaInfo localInfo = getTableInfo(localName);
+        final DfTableMetaInfo firstInfo = getTableInfo(firstName);
+        final DfTableMetaInfo secondInfo = getTableInfo(secondName);
+        if (localInfo != null && firstInfo != null && secondInfo != null) {
+            final String localType = localInfo.getTableType();
+            if (localType.equals(firstInfo.getTableType())) {
+                // use first
+                return false;
+            } else if (localType.equals(secondInfo.getTableType())) {
+                // use second
+                return true;
             }
         }
-        return filteredForeignKeyMetaInfoMap;
+        return true; // use first
+    }
+
+    protected void handleExceptedForeignKey(Map<String, String> exceptedFKMap, String localTableName) {
+        if (exceptedFKMap.isEmpty()) {
+            return;
+        }
+        final StringBuilder sb = new StringBuilder();
+        sb.append("...Excepting foreign keys (refers to non-generated table):");
+        sb.append(ln()).append("[Excepted Foreign Key]");
+        final Set<Entry<String, String>> entrySet = exceptedFKMap.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            final String fkName = entry.getKey();
+            final String foreignTableName = entry.getValue();
+            sb.append(ln()).append(" ").append(fkName);
+            sb.append(" (").append(localTableName).append(" to ").append(foreignTableName).append(")");
+        }
+        _log.info(sb.toString());
+    }
+
+    protected Map<String, DfForeignKeyMetaInfo> filterSameStructureForeignKey(Map<String, DfForeignKeyMetaInfo> fkMap) {
+        final Map<String, DfForeignKeyMetaInfo> filteredFKMap = newLinkedHashMap();
+        final Map<Map<String, Object>, Object> checkMap = newLinkedHashMap();
+        final Object dummyObj = new Object();
+        final Set<Entry<String, DfForeignKeyMetaInfo>> entrySet = fkMap.entrySet();
+        for (Entry<String, DfForeignKeyMetaInfo> entry : entrySet) {
+            final String foreinKeyName = entry.getKey();
+            final DfForeignKeyMetaInfo metaInfo = entry.getValue();
+            final Map<String, Object> checkKey = newLinkedHashMap();
+            checkKey.put(metaInfo.getForeignTableName(), dummyObj);
+            checkKey.put("columnNameMap:" + metaInfo.getColumnNameMap(), dummyObj);
+            if (checkMap.containsKey(checkKey)) { // basically no way
+                String msg = "*The same-structural foreign key was found:";
+                msg = msg + " skipped = " + foreinKeyName + " - " + checkKey;
+                _log.warn(msg);
+            } else {
+                checkMap.put(checkKey, dummyObj);
+                filteredFKMap.put(foreinKeyName, metaInfo);
+            }
+        }
+        return filteredFKMap;
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public Set<String> getRefTableCheckSet() {
-        return _refTableCheckSet;
+    //                                                                              Option
+    //                                                                              ======
+    public void exceptForeignTableNotGenerated(Map<String, DfTableMetaInfo> generatedTableMap) {
+        _generatedTableMap = generatedTableMap;
     }
 
-    public void setRefTableCheckSet(Set<String> refTableCheckSet) {
-        this._refTableCheckSet = refTableCheckSet;
+    protected boolean isForeignTableGenerated(String foreignTableName) {
+        if (_generatedTableMap == null || _generatedTableMap.isEmpty()) {
+            // means no check of generation
+            return true;
+        }
+        final DfTableMetaInfo info = _generatedTableMap.get(foreignTableName);
+        if (info == null) {
+            return false;
+        }
+        if (info.isOutOfGenerateTarget()) {
+            return false;
+        }
+        return true;
+    }
+
+    protected DfTableMetaInfo getTableInfo(String tableName) {
+        if (_generatedTableMap == null) {
+            return null;
+        }
+        return _generatedTableMap.get(tableName);
     }
 }
