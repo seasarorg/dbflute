@@ -28,18 +28,28 @@ public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
     //                                                                    Select Meta Data
     //                                                                    ================
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
+        if (!_unifiedSchema.existsPureSchema()) {
+            String msg = "Extracting comments from Oracle requires pure schema in unified schema:";
+            msg = msg + " unifiedSchema=" + _unifiedSchema;
+            throw new IllegalStateException(msg);
+        }
         final StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_TAB_COMMENTS");
-        sb.append(" where OWNER = '").append(_unifiedSchema).append("'");
+        sb.append(" where OWNER = '").append(_unifiedSchema.getPureSchema()).append("'");
         sb.append(" order by TABLE_NAME asc");
         final String sql = sb.toString();
         return doSelectUserTabComments(sql, conn, tableSet);
     }
 
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
+        if (!_unifiedSchema.existsPureSchema()) {
+            String msg = "Extracting comments from Oracle requires pure schema in unified schema:";
+            msg = msg + " unifiedSchema=" + _unifiedSchema;
+            throw new IllegalStateException(msg);
+        }
         final StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_COL_COMMENTS");
-        sb.append(" where OWNER = '").append(_unifiedSchema).append("'");
+        sb.append(" where OWNER = '").append(_unifiedSchema.getPureSchema()).append("'");
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
         final String sql = sb.toString();
         return doSelectUserColComments(sql, conn, tableSet);
