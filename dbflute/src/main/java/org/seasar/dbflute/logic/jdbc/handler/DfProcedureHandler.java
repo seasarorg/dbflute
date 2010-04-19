@@ -354,42 +354,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         return metaData.getProcedures(catalogName, schemaName, null);
     }
 
-    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMetaInfo metaInfo)
-            throws SQLException {
-        final String catalogName = metaInfo.getProcedureCatalog();
-        final String schemaName = metaInfo.getProcedureSchema().getPureSchema();
-        final String procedurePureName = metaInfo.buildProcedurePureName();
-        final String catalogArgName;
-        final String procedureArgName;
-        if (isDatabaseMySQL() && Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
-            // getProcedureColumns() of MySQL requires qualified procedure name when other catalog
-            catalogArgName = catalogName;
-            procedureArgName = Srl.connectPrefix(procedurePureName, catalogName, ".");
-        } else if (isDatabaseOracle() && metaInfo.isPackageProcdure()) {
-            catalogArgName = metaInfo.getProcedurePackage();
-            procedureArgName = procedurePureName; // needs to use pure name
-        } else {
-            catalogArgName = catalogName;
-            procedureArgName = procedurePureName;
-        }
-        return metaData.getProcedureColumns(catalogArgName, schemaName, procedureArgName, null);
-    }
-
-    protected void throwProcedureListGettingFailureException(UnifiedSchema unifiedSchema, String procedureName,
-            SQLException e) throws SQLException {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to get a list of procedures!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Unified Schema]" + ln() + unifiedSchema + ln();
-        msg = msg + ln();
-        msg = msg + "[Current Procedure]" + ln() + procedureName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL Exception]" + ln() + e.getClass() + ln() + e.getMessage() + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfJDBCException(msg);
-    }
-
     protected void setupProcedureMetaInfo(List<DfProcedureMetaInfo> procedureMetaInfoList, ResultSet procedureRs,
             UnifiedSchema unifiedSchema) throws SQLException {
         while (procedureRs.next()) {
@@ -445,6 +409,27 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             metaInfo.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(metaInfo));
             procedureMetaInfoList.add(metaInfo);
         }
+    }
+
+    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMetaInfo metaInfo)
+            throws SQLException {
+        final String catalogName = metaInfo.getProcedureCatalog();
+        final String schemaName = metaInfo.getProcedureSchema().getPureSchema();
+        final String procedurePureName = metaInfo.buildProcedurePureName();
+        final String catalogArgName;
+        final String procedureArgName;
+        if (isDatabaseMySQL() && Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
+            // getProcedureColumns() of MySQL requires qualified procedure name when other catalog
+            catalogArgName = catalogName;
+            procedureArgName = Srl.connectPrefix(procedurePureName, catalogName, ".");
+        } else if (isDatabaseOracle() && metaInfo.isPackageProcdure()) {
+            catalogArgName = metaInfo.getProcedurePackage();
+            procedureArgName = procedurePureName; // needs to use pure name
+        } else {
+            catalogArgName = catalogName;
+            procedureArgName = procedurePureName;
+        }
+        return metaData.getProcedureColumns(catalogArgName, schemaName, procedureArgName, null);
     }
 
     protected void setupProcedureColumnMetaInfo(DfProcedureMetaInfo procedureMetaInfo, ResultSet columnRs)
@@ -562,6 +547,21 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             _log.info("...Removing the result set return which is unnecessary: " + name);
             columnMetaInfoList.remove(resultSetReturnIndex);
         }
+    }
+
+    protected void throwProcedureListGettingFailureException(UnifiedSchema unifiedSchema, String procedureName,
+            SQLException e) throws SQLException {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to get a list of procedures!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Unified Schema]" + ln() + unifiedSchema + ln();
+        msg = msg + ln();
+        msg = msg + "[Current Procedure]" + ln() + procedureName + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL Exception]" + ln() + e.getClass() + ln() + e.getMessage() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfJDBCException(msg);
     }
 
     // ===================================================================================

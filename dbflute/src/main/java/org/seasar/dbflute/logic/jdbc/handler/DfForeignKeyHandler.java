@@ -107,11 +107,11 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(fkPlainName)) {
                         fkName = fkPlainName;
                     } else {
-                        // basically no way
-                        // but make it up automatically just in case
-                        // (use local column name)
-                        fkName = "FK_" + tableName + "_" + localColumnName;
-                        _log.info("...Making FK name automatically (cannot get from meta data): " + fkName);
+                        // basically no way but SQLite comes here
+                        // make it up automatically just in case
+                        // (use local column name and foreign table name)
+                        fkName = "FK_" + tableName + "_" + localColumnName + "_" + foreignTableName;
+                        _log.info("...Making FK name (because of no name): " + fkName);
                     }
                 }
 
@@ -200,10 +200,10 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
             final String localType = localInfo.getTableType();
             if (localType.equals(firstInfo.getTableType())) {
                 // use first
-                return false;
+                return true;
             } else if (localType.equals(secondInfo.getTableType())) {
                 // use second
-                return true;
+                return false;
             }
         }
         return true; // use first
