@@ -161,7 +161,7 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
         final StringBuilder sb = new StringBuilder();
         sb.append("select OWNER as SYNONYM_OWNER, SYNONYM_NAME, SEQUENCE_OWNER");
         sb.append(", SEQUENCE_NAME, MIN_VALUE, MAX_VALUE, INCREMENT_BY");
-        sb.append(" from ALL_SYNONYMS syn left outer join ALL_SEQUENCES seq");
+        sb.append(" from ALL_SYNONYMS syn inner join ALL_SEQUENCES seq");
         sb.append(" on syn.TABLE_OWNER = seq.SEQUENCE_OWNER and syn.TABLE_NAME = seq.SEQUENCE_NAME");
         sb.append(" where syn.OWNER in (" + schemaCondition + ")");
         return sb.toString();
