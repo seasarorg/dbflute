@@ -146,14 +146,14 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                         // But DB2 returns to-ALIAS foreign key as same-name FK.
                         // Same type as local's type is prior
                         // and if types are different, use first.
-                        final String msgBase = "...Handling same-name FK (use first one): " + fkName + " to ";
+                        final String msgBase = "...Handling same-name FK ";
                         if (judgeSameNameForeignKey(tableName, firstName, secondName)) {
                             // use first (skip current)
-                            _log.info(msgBase + firstName);
+                            _log.info(msgBase + "(use first one): " + fkName + " to " + firstName);
                             continue;
                         } else {
                             // use second (override)
-                            _log.info(msgBase + secondName);
+                            _log.info(msgBase + "(use second one): " + fkName + " to " + secondName);
                         }
                     }
                 }
