@@ -149,6 +149,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
 #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
 #set ($existTop = true)
+#end
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
@@ -178,7 +179,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
     }
 
-#end
 #end
 #end
     // ===================================================================================
