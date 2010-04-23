@@ -373,7 +373,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * Set up 'exists-referrer' (sub-query). {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
      */
     public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -400,7 +400,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'not exists' sub-query. {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * Set up 'not exists-referrer' (sub-query). {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
     public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -723,7 +723,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * Set up 'exists-referrer' (sub-query). {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
      */
     public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -750,7 +750,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'not exists' sub-query. {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * Set up 'not exists-referrer' (sub-query). {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
     public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -957,8 +957,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($table.hasOnlyOnePrimaryKey())
 
     // ===================================================================================
-    //                                                                     Scalar SubQuery
-    //                                                                     ===============
+    //                                                                    Scalar Condition
+    //                                                                    ================
     public HpSSQFunction<${myConditionBeanClassName}> scalar_Equal() {
         return xcreateSSQFunction("=");
     }
@@ -974,11 +974,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public HpSSQFunction<${myConditionBeanClassName}> scalar_LessEqual() {
         return xcreateSSQFunction("<=");
     }
-    
+
     public HpSSQFunction<${myConditionBeanClassName}> scalar_LessThan() {
         return xcreateSSQFunction("<");
     }
-    
+
     protected HpSSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
         return new HpSSQFunction<${myConditionBeanClassName}>(new HpSSQSetupper<${myConditionBeanClassName}>() {
             public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery) {
@@ -996,10 +996,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
 
     // ===================================================================================
-    //                                                             MySelf InScope SubQuery
-    //                                                             =======================
+    //                                                                      Myself InScope
+    //                                                                      ==============
     /**
-     * Myself InScope SubQuery. {mainly for CLOB and Union}
+     * Myself InScope (SubQuery). {mainly for CLOB and Union}
      * @param subQuery The implementation of sub query. (NotNull)
      */
     public void myselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
