@@ -480,8 +480,8 @@ namespace ${glPackageBaseCQ} {
 #if ($table.hasOnlyOnePrimaryKey())
 
         // ===================================================================================
-        //                                                                     Scalar SubQuery
-        //                                                                     ===============
+        //                                                                    Scalar Condition
+        //                                                                    ================
         public SSQFunction<${myConditionBeanClassName}> Scalar_Equal() {
             return xcreateSSQFunction("=");
         }
@@ -517,8 +517,8 @@ namespace ${glPackageBaseCQ} {
         public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
 
         // ===============================================================================
-        //                                                         MySelf InScope SubQuery
-        //                                                         =======================
+        //                                                                  MySelf InScope
+        //                                                                  ==============
         public void MyselfInScope(${glSubQuery}<${myConditionBeanClassName}> subQuery) {
             assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); subQuery.Invoke(cb);
