@@ -5,7 +5,7 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.7.0"/>
+	<property name="version" value="0.9.6.9"/>
 	<property name="build.version" value="${version}-SNAPSHOT"/>
 	<property name="pre.version" value="0.9.6.8"/>
 	<property name="runtime.version" value="0.9.6.8"/>
