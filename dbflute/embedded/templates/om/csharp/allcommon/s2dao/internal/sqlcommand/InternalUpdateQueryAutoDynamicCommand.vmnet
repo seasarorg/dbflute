@@ -96,65 +96,33 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
             return null;
         }
         String currentPropertyName = null;
-        try {
-            foreach (String propertyName in modifiedPropertyNames.Keys) {
-                currentPropertyName = propertyName;
-                ${glColumnInfo} columnInfo = dbmeta.FindColumnInfo(propertyName);
-                String columnName = columnInfo.ColumnDbName;
-                PropertyInfo getter = columnInfo.FindProperty();
-                Object value = getter.GetValue(entity, null);
-                if (value != null) {
-                    columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
-                } else {
-                    columnParameterMap.put(columnName, "null");
-                }
+        foreach (String propertyName in modifiedPropertyNames.Keys) {
+            currentPropertyName = propertyName;
+            ${glColumnInfo} columnInfo = dbmeta.FindColumnInfo(propertyName);
+            String columnName = columnInfo.ColumnDbName;
+            PropertyInfo getter = columnInfo.FindProperty();
+            Object value = getter.GetValue(entity, null);
+            if (value != null) {
+                columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
+            } else {
+                columnParameterMap.put(columnName, "null");
             }
-            if (dbmeta.HasVersionNo) {
-                ${glColumnInfo} columnInfo = dbmeta.VersionNoColumnInfo;
-                String columnName = columnInfo.ColumnDbName;
-                columnParameterMap.put(columnName, columnName + " + 1");
-            }
-            if (dbmeta.HasUpdateDate) {
-                ${glColumnInfo} columnInfo = dbmeta.UpdateDateColumnInfo;
-                PropertyInfo setter = columnInfo.FindProperty();
-                setter.SetValue(entity, DateTime.Now, null);
-                String columnName = columnInfo.ColumnDbName;
-                columnParameterMap.put(columnName, "/*entity." + columnInfo.PropertyName + "*/null");
-            }
-        } catch (Exception e) {
-            throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
+        }
+        if (dbmeta.HasVersionNo) {
+            ${glColumnInfo} columnInfo = dbmeta.VersionNoColumnInfo;
+            String columnName = columnInfo.ColumnDbName;
+            columnParameterMap.put(columnName, columnName + " + 1");
+        }
+        if (dbmeta.HasUpdateDate) {
+            ${glColumnInfo} columnInfo = dbmeta.UpdateDateColumnInfo;
+            PropertyInfo setter = columnInfo.FindProperty();
+            setter.SetValue(entity, DateTime.Now, null);
+            String columnName = columnInfo.ColumnDbName;
+            columnParameterMap.put(columnName, "/*entity." + columnInfo.PropertyName + "*/null");
         }
         return cb.SqlClause.getClauseQueryUpdate(columnParameterMap);
     }
-    
-    protected void throwQueryUpdateFailureException(${glConditionBean} cb, ${glEntity} entity, String propertyName, Exception e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "queryUpdate() failed to execute!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the parameter comment logic." + getLineSeparator();
-        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x) -- /*IF pmb.XxxId != null*/XXX_ID = /*pmb.XxxId*/3" + getLineSeparator();
-        msg = msg + "    after  (o) -- /*IF pmb.XxxId != null*/XXX_ID = /*pmb.XxxId*/3/*END*/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Doubtful Property Name]" + getLineSeparator() + propertyName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[ConditionBean]" + getLineSeparator() + cb + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Entity]" + getLineSeparator() + entity + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Exception Message]" + getLineSeparator() + e.Message + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new QueryUpdateFailureException(msg, e);
-    }
-	
-    public class QueryUpdateFailureException : RuntimeException {
-        public QueryUpdateFailureException(String msg, Exception e) : base(msg, e) {
-        }
-    }
-    
+
     protected ICommandContext createCommandContext(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
         ICommandContext context;
         {

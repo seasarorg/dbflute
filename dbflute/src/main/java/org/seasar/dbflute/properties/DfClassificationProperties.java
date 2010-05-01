@@ -27,6 +27,7 @@ import org.seasar.dbflute.properties.assistant.classification.DfClassificationIl
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The properties for classification.
@@ -341,7 +342,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
                 final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
                 selectedTmpMap.put(DfClassificationElement.KEY_CODE, tmpCodeValue);
-                selectedTmpMap.put("name", tmpNameValue);
+                selectedTmpMap.put("name", filterTableClassificationName(tmpNameValue));
                 selectedTmpMap.put("alias", tmpAliasValue);
                 if (tmpCommentValue != null) {
                     selectedTmpMap.put("comment", tmpCommentValue);
@@ -362,6 +363,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             name = name.substring(name.lastIndexOf(".") + 1);
         }
         return name;
+    }
+
+    protected String filterTableClassificationName(String name) {
+        if (Srl.is_Null_or_TrimmedEmpty(name)) {
+            return name;
+        }
+        return Srl.camelize(name, " ", "_", "-"); // for method name
     }
 
     protected void setupClassificationMetaFromLiteralIfNeeds(String classificationName, Map<?, ?> elementMap) {

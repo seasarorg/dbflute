@@ -49,7 +49,7 @@ public class DfClassificationElement {
         name = (name != null ? name : code);
         this._name = name;
 
-        // alias
+        // alias (same as name if null)
         String alias = (String) elementMap.get(aliasKey);
         alias = (alias != null ? alias : name);
         this._alias = alias;

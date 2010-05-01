@@ -9,6 +9,9 @@ import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -38,18 +41,20 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
-    //                                          DI component
+    //                                          DI Component
     //                                          ------------
     protected BehaviorCommandInvoker _behaviorCommandInvoker;
     protected DataSource _dataSource;
 
     // -----------------------------------------------------
-    //                                        Lazy component
+    //                                        Lazy Component
     //                                        --------------
     protected volatile DBMetaProvider _dbmetaProvider;
     protected volatile SqlClauseCreator _sqlClauseCreator;
     protected volatile StatementFactory _statementFactory;
     protected volatile TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected volatile SqlAnalyzerFactory _sqlAnalyzerFactory;
+    protected volatile SQLExceptionHandlerFactory _sqlExceptionHandlerFactory;
     protected volatile SequenceCacheHandler _sequenceCacheHandler;
 
     // -----------------------------------------------------
@@ -81,7 +86,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                       DBMeta Provider
     //                                       ---------------
-    public DBMetaProvider assistDBMetaProvider() { // Lazy component
+    public DBMetaProvider assistDBMetaProvider() { // lazy component
         if (_dbmetaProvider != null) {
             return _dbmetaProvider;
         }
@@ -101,7 +106,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                    SQL Clause Creator
     //                                    ------------------
-    public SqlClauseCreator assistSqlClauseCreator() { // Lazy component
+    public SqlClauseCreator assistSqlClauseCreator() { // lazy component
         if (_sqlClauseCreator != null) {
             return _sqlClauseCreator;
         }
@@ -121,7 +126,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                     Statement Factory
     //                                     -----------------
-    public StatementFactory assistStatementFactory() { // Lazy component
+    public StatementFactory assistStatementFactory() { // lazy component
         if (_statementFactory != null) {
             return _statementFactory;
         }
@@ -144,7 +149,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                Bean Meta Data Factory
     //                                ----------------------
-    public TnBeanMetaDataFactory assistBeanMetaDataFactory() { // Lazy component
+    public TnBeanMetaDataFactory assistBeanMetaDataFactory() { // lazy component
         if (_beanMetaDataFactory != null) {
             return _beanMetaDataFactory;
         }
@@ -167,48 +172,67 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                  SQL Analyzer Factory
     //                                  --------------------
     /**
-     * Assist the factory of SQL analyzer. <br />
-     * This factory is also used on ConditionBean.toDisplaySql().
-     * So this method should not depend on the state of this class. 
-     * @return The factory of SQL analyzer. (NotNull)
+     * {@inheritDoc}
      */
-    public SqlAnalyzerFactory assistSqlAnalyzerFactory() {
-        return new SqlAnalyzerFactory() {
-            public SqlAnalyzer create(String sql, boolean blockNullParameter) {
-                return new SqlAnalyzer(sql, blockNullParameter);
+    public SqlAnalyzerFactory assistSqlAnalyzerFactory() { // lazy component
+        if (_sqlAnalyzerFactory != null) {
+            return _sqlAnalyzerFactory;
+        }
+        synchronized (this) {
+            if (_sqlAnalyzerFactory != null) {
+                return _sqlAnalyzerFactory;
             }
-        };
+            _sqlAnalyzerFactory = createSqlAnalyzerFactory();
+        }
+        return _sqlAnalyzerFactory;
+    }
+
+    protected SqlAnalyzerFactory createSqlAnalyzerFactory() {
+        return new DefaultSqlAnalyzerFactory();
+    }
+
+    public static class DefaultSqlAnalyzerFactory implements SqlAnalyzerFactory {
+        public SqlAnalyzer create(String sql, boolean blockNullParameter) {
+            return new SqlAnalyzer(sql, blockNullParameter);
+        }
     }
 
     // -----------------------------------------------------
-    //                                    Resource Parameter
-    //                                    ------------------
-    public ResourceParameter assistResourceParameter() {
-        ResourceParameter resourceParameter = new ResourceParameter();
-        resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
-        resourceParameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
-        resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
-        return resourceParameter;
+    //                          SQLException Handler Factory
+    //                          ----------------------------
+    /**
+     * {@inheritDoc}
+     */
+    public SQLExceptionHandlerFactory assistSQLExceptionHandlerFactory() { // lazy component
+        if (_sqlExceptionHandlerFactory != null) {
+            return _sqlExceptionHandlerFactory;
+        }
+        synchronized (this) {
+            if (_sqlExceptionHandlerFactory != null) {
+                return _sqlExceptionHandlerFactory;
+            }
+            _sqlExceptionHandlerFactory = createSQLExceptionHandlerFactory();
+        }
+        return _sqlExceptionHandlerFactory;
+    }
+
+    protected SQLExceptionHandlerFactory createSQLExceptionHandlerFactory() {
+        return new DefaultSQLExceptionHandlerFactory();
+    }
+
+    public static class DefaultSQLExceptionHandlerFactory implements SQLExceptionHandlerFactory {
+        public SQLExceptionHandler create() {
+            return new SQLExceptionHandler();
+        }
     }
 
     // -----------------------------------------------------
-    //                                     SQL File Encoding
-    //                                     -----------------
-    public String assistSqlFileEncoding() {
-        return "${database.sqlFileEncoding}";
-    }
-
-    // -----------------------------------------------------
-    //                               Statement Configuration
-    //                               -----------------------
-    public StatementConfig assistDefaultStatementConfig() {
-        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
-    }
-
-    // -----------------------------------------------------
-    //                                        Sequence Cache
-    //                                        --------------
-    public SequenceCacheHandler assistSequenceCacheHandler() {
+    //                                Sequence Cache Handler
+    //                                ----------------------
+    /**
+     * {@inheritDoc}
+     */
+    public SequenceCacheHandler assistSequenceCacheHandler() { // lazy component
         if (_sequenceCacheHandler != null) {
             return _sequenceCacheHandler;
         }
@@ -228,6 +252,38 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
             handler.setSequenceCacheKeyGenerator(generator);
         }
         return handler;
+    }
+
+    // -----------------------------------------------------
+    //                                     SQL File Encoding
+    //                                     -----------------
+    public String assistSqlFileEncoding() {
+        return "${database.sqlFileEncoding}";
+    }
+
+    // -----------------------------------------------------
+    //                               Statement Configuration
+    //                               -----------------------
+    public StatementConfig assistDefaultStatementConfig() {
+        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+    }
+
+    // -----------------------------------------------------
+    //                            Behavior Exception Thrower
+    //                            --------------------------
+    public BehaviorExceptionThrower assistBehaviorExceptionThrower() {
+        return new BehaviorExceptionThrower();
+    }
+
+    // -----------------------------------------------------
+    //                                    Resource Parameter
+    //                                    ------------------
+    public ResourceParameter assistResourceParameter() {
+        ResourceParameter resourceParameter = new ResourceParameter();
+        resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
+        resourceParameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
+        resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
+        return resourceParameter;
     }
 
     // ===================================================================================
