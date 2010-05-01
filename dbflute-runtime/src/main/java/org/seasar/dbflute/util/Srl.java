@@ -17,7 +17,6 @@ package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * String Utility for Internal Programming of DBFlute.
@@ -434,14 +433,28 @@ public class Srl {
     //                                                                       Name Handling
     //                                                                       =============
     public static String camelize(String decamelName) {
-        assertObjectNotNull("decamelName", decamelName);
+        assertDecamelNameNotNull(decamelName);
+        return doCamelize(decamelName, "_");
+    }
+
+    public static String camelize(String decamelName, String... delimiters) {
+        assertDecamelNameNotNull(decamelName);
+        String name = decamelName;
+        for (String delimiter : delimiters) {
+            name = doCamelize(name, delimiter);
+        }
+        return name;
+    }
+
+    protected static String doCamelize(String decamelName, String delimiter) {
+        assertDecamelNameNotNull(decamelName);
+        assertDelimiterNotNull(delimiter);
         if (is_Null_or_TrimmedEmpty(decamelName)) {
             return decamelName;
         }
         final StringBuilder sb = new StringBuilder();
-        final StringTokenizer tok = new StringTokenizer(decamelName, "_");
-        while (tok.hasMoreTokens()) {
-            String part = ((String) tok.nextElement());
+        final List<String> splitList = splitListTrimmed(decamelName, delimiter);
+        for (String part : splitList) {
             boolean allUpperCase = true;
             for (int i = 1; i < part.length(); ++i) {
                 if (isLowerCase(part.charAt(i))) {
@@ -457,26 +470,37 @@ public class Srl {
     }
 
     public static String decamelize(String camelName) {
-        assertObjectNotNull("camelName", camelName);
+        assertCamelNameNotNull(camelName);
+        return doDecamelize(camelName, "_");
+    }
+
+    public static String decamelize(String camelName, String delimiter) {
+        assertCamelNameNotNull(camelName);
+        assertDelimiterNotNull(delimiter);
+        return doDecamelize(camelName, delimiter);
+    }
+
+    protected static String doDecamelize(String camelName, String delimiter) {
+        assertCamelNameNotNull(camelName);
         if (is_Null_or_TrimmedEmpty(camelName)) {
             return camelName;
         }
         if (camelName.length() == 1) {
             return camelName.toUpperCase();
         }
-        StringBuilder sb = new StringBuilder(40);
+        final StringBuilder sb = new StringBuilder();
         int pos = 0;
         for (int i = 1; i < camelName.length(); ++i) {
             if (isUpperCase(camelName.charAt(i))) {
                 if (sb.length() != 0) {
-                    sb.append('_');
+                    sb.append(delimiter);
                 }
                 sb.append(camelName.substring(pos, i).toUpperCase());
                 pos = i;
             }
         }
         if (sb.length() != 0) {
-            sb.append('_');
+            sb.append(delimiter);
         }
         sb.append(camelName.substring(pos, camelName.length()).toUpperCase());
         return sb.toString();
@@ -584,6 +608,14 @@ public class Srl {
 
     protected static void assertListStringNotNull(List<String> strList) {
         assertObjectNotNull("strList", strList);
+    }
+
+    protected static void assertDecamelNameNotNull(String decamelName) {
+        assertObjectNotNull("decamelName", decamelName);
+    }
+
+    protected static void assertCamelNameNotNull(String camelName) {
+        assertObjectNotNull("camelName", camelName);
     }
 
     /**

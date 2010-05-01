@@ -170,6 +170,22 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("Foo", DfStringUtil.camelize("FOO"));
         assertEquals("FooName", DfStringUtil.camelize("FooName"));
         assertEquals("FName", DfStringUtil.camelize("FName"));
+        assertEquals("FooName", DfStringUtil.camelize("foo__name"));
+        assertEquals("FooName", DfStringUtil.camelize("FOO _ NAME"));
+        assertEquals("FooNa me", DfStringUtil.camelize("FOO _ NA ME"));
+    }
+
+    public void test_camelize_delimiters() {
+        assertEquals("FooName", DfStringUtil.camelize("FOO_NAME", "_"));
+        assertEquals("FooNaMe", DfStringUtil.camelize("foo_na-me", "_", "-"));
+        assertEquals("FooNaMeBarId", DfStringUtil.camelize("foo_na-me_bar@id", "_", "-", "@"));
+        assertEquals("FooNaMeBId", DfStringUtil.camelize("foo_na-me_b@id", "_", "-", "@"));
+        assertEquals("FooNaMeBarId", DfStringUtil.camelize("FOO_NA-ME_BAR@ID", "_", "-", "@"));
+        assertEquals("FooName", DfStringUtil.camelize("foo--name", "-"));
+        assertEquals("FooName", DfStringUtil.camelize("foo-_@name", "-", "_", "@"));
+        assertEquals("FooNaMe", DfStringUtil.camelize("FOO _ NA - ME", "_", "-"));
+        assertEquals("FooNa - me", DfStringUtil.camelize("FOO _ NA - ME", "_"));
+        assertEquals("FooNameBarId", DfStringUtil.camelize("FOO NAME BAR ID", " "));
     }
 
     public void test_decamelize_basic() {
@@ -180,6 +196,13 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("FOO__NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
         assertEquals("F_O_O__N_A_M_E", DfStringUtil.decamelize("FOO_NAME"));
         assertEquals("FOO_NAME", DfStringUtil.decamelize("foo_name"));
+    }
+
+    public void test_decamelize_delimiter() {
+        assertEquals("FOO-NAME", DfStringUtil.decamelize("FooName", "-"));
+        assertEquals("FOO@NAME", decamelize("fooName", "@"));
+        assertEquals("F", DfStringUtil.decamelize("f", "_"));
+        assertEquals("F*O*O_*NAME*BAR", DfStringUtil.decamelize("FOO_NameBar", "*"));
     }
 
     // ===================================================================================

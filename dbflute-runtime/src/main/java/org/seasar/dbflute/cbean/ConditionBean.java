@@ -56,8 +56,8 @@ public interface ConditionBean extends PagingBean {
     SqlClause getSqlClause();
 
     // ===================================================================================
-    //                                                                      PrimaryKey Map
-    //                                                                      ==============
+    //                                                                 PrimaryKey Handling
+    //                                                                 ===================
     /**
      * Accept primary-key map-string.
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
@@ -70,9 +70,6 @@ public interface ConditionBean extends PagingBean {
      */
     void acceptPrimaryKeyMapString(String primaryKeyMapString);
 
-    // ===================================================================================
-    //                                                                     OrderBy Setting
-    //                                                                     ===============
     /**
      * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
      * @return this. (NotNull)
