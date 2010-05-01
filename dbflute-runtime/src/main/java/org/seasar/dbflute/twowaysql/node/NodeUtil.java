@@ -51,9 +51,9 @@ public class NodeUtil {
         msg = msg + "Is it within the scope of your assumption?" + ln();
         msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + ln();
         msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) - XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "    (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "For example:" + ln();
+        msg = msg + "  (x) - XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "  (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
         msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
@@ -78,12 +78,12 @@ public class NodeUtil {
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your comment." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) - /*" + emmark + "pmb,memberId*/" + ln();
-        msg = msg + "    (x) - /*" + emmark + "p mb.memberId*/" + ln();
-        msg = msg + "    (x) - /*" + emmark + "pmb:memberId*/" + ln();
-        msg = msg + "    (x) - /*" + emmark + "pnb.memberId*/" + ln();
-        msg = msg + "    (o) - /*" + emmark + "pmb.memberId*/" + ln();
+        msg = msg + "For example:" + ln();
+        msg = msg + "  (x) - /*" + emmark + "pmb,memberId*/" + ln();
+        msg = msg + "  (x) - /*" + emmark + "p mb.memberId*/" + ln();
+        msg = msg + "  (x) - /*" + emmark + "pmb:memberId*/" + ln();
+        msg = msg + "  (x) - /*" + emmark + "pnb.memberId*/" + ln();
+        msg = msg + "  (o) - /*" + emmark + "pmb.memberId*/" + ln();
         msg = msg + ln();
         msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
@@ -106,21 +106,21 @@ public class NodeUtil {
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
-        msg = msg + "      xxxIdList.add(3);" + ln();
-        msg = msg + "      xxxIdList.add(7);" + ln();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + "For example:" + ln();
+        msg = msg + "  (x):" + ln();
+        msg = msg + "    List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "    cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + "  (o):" + ln();
+        msg = msg + "    List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "    xxxIdList.add(3);" + ln();
+        msg = msg + "    xxxIdList.add(7);" + ln();
+        msg = msg + "    cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
         msg = msg + ln();
         msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IllegalArgumentException(msg);
+        throw new IllegalStateException(msg);
     }
 
     public static void throwBindOrEmbeddedCommentParameterNullOnlyListException(String expression, String specifiedSql,
@@ -131,23 +131,23 @@ public class NodeUtil {
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
-        msg = msg + "      xxxIdList.add(null);" + ln();
-        msg = msg + "      xxxIdList.add(null);" + ln();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
-        msg = msg + "      xxxIdList.add(3);" + ln();
-        msg = msg + "      xxxIdList.add(7);" + ln();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + "For example:" + ln();
+        msg = msg + "  (x):" + ln();
+        msg = msg + "    List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "    xxxIdList.add(null);" + ln();
+        msg = msg + "    xxxIdList.add(null);" + ln();
+        msg = msg + "    cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + "  (o):" + ln();
+        msg = msg + "    List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "    xxxIdList.add(3);" + ln();
+        msg = msg + "    xxxIdList.add(7);" + ln();
+        msg = msg + "    cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
         msg = msg + ln();
         msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IllegalArgumentException(msg);
+        throw new IllegalStateException(msg);
     }
 
     protected static String ln() {
