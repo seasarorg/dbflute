@@ -62,6 +62,14 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                 PrimaryKey Handling
     //                                                                 ===================
+#if ($table.hasPrimaryKey())
+    public void acceptPrimaryKey(${table.primaryKeyArgsString}) {
+        ${table.primaryKeyArgsAssertString}
+        ${myClassName} cb = this;
+        ${table.primaryKeyArgsConditionSetupString}
+    }
+
+#end
     public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
 #if ($table.hasPrimaryKey())
         assertPrimaryKeyMap(primaryKeyMap);
@@ -96,14 +104,6 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
     }
 
-#if ($table.hasPrimaryKey())
-    public void acceptPrimaryKeyValue(${table.primaryKeyArgsString}) {
-        ${table.primaryKeyArgsAssertString}
-        ${myClassName} cb = this;
-        ${table.primaryKeyArgsConditionSetupString}
-    }
-
-#end
     public ConditionBean addOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)
