@@ -32,6 +32,8 @@ import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
@@ -87,12 +89,9 @@ public class ResourceContext {
      * @return The behavior command. (NotNull)
      */
     public static BehaviorCommand<?> behaviorCommand() {
-        if (!isExistResourceContextOnThread()) {
-            String msg = "The resource context should exist!";
-            throw new IllegalStateException(msg);
-        }
-        ResourceContext context = getResourceContextOnThread();
-        BehaviorCommand<?> behaviorCommand = context.getBehaviorCommand();
+        assertResourceContextExists();
+        final ResourceContext context = getResourceContextOnThread();
+        final BehaviorCommand<?> behaviorCommand = context.getBehaviorCommand();
         if (behaviorCommand == null) {
             String msg = "The behavior command should exist: context=" + context;
             throw new IllegalStateException(msg);
@@ -107,7 +106,7 @@ public class ResourceContext {
         if (!isExistResourceContextOnThread()) {
             return DBDef.Unknown;
         }
-        DBDef currentDBDef = getResourceContextOnThread().getCurrentDBDef();
+        final DBDef currentDBDef = getResourceContextOnThread().getCurrentDBDef();
         if (currentDBDef == null) {
             return DBDef.Unknown;
         }
@@ -122,12 +121,9 @@ public class ResourceContext {
      * @return The provider of DB meta. (NotNull)
      */
     public static DBMetaProvider dbmetaProvider() {
-        if (!isExistResourceContextOnThread()) {
-            String msg = "The resource context should exist!";
-            throw new IllegalStateException(msg);
-        }
-        ResourceContext context = getResourceContextOnThread();
-        DBMetaProvider provider = context.getDBMetaProvider();
+        assertResourceContextExists();
+        final ResourceContext context = getResourceContextOnThread();
+        final DBMetaProvider provider = context.getDBMetaProvider();
         if (provider == null) {
             String msg = "The provider of DB meta should exist: context=" + context;
             throw new IllegalStateException(msg);
@@ -143,7 +139,7 @@ public class ResourceContext {
         if (!isExistResourceContextOnThread()) {
             return null;
         }
-        DBMetaProvider provider = getResourceContextOnThread().getDBMetaProvider();
+        final DBMetaProvider provider = getResourceContextOnThread().getDBMetaProvider();
         if (provider == null) {
             return null;
         }
@@ -155,12 +151,9 @@ public class ResourceContext {
      * @return The instance of DB meta. (NotNull)
      */
     public static DBMeta provideDBMetaChecked(String tableFlexibleName) {
-        if (!isExistResourceContextOnThread()) {
-            String msg = "The resource context should exist: " + tableFlexibleName;
-            throw new IllegalStateException(msg);
-        }
-        ResourceContext context = getResourceContextOnThread();
-        DBMetaProvider provider = context.getDBMetaProvider();
+        assertResourceContextExists();
+        final ResourceContext context = getResourceContextOnThread();
+        final DBMetaProvider provider = context.getDBMetaProvider();
         if (provider == null) {
             String msg = "The provider of DB meta should exist:";
             msg = msg + " tableFlexibleName=" + tableFlexibleName + " context=" + context;
@@ -170,17 +163,25 @@ public class ResourceContext {
     }
 
     public static SqlAnalyzer createSqlAnalyzer(String sql, boolean blockNullParameter) {
-        if (!isExistResourceContextOnThread()) {
-            String msg = "The resource context should exist!";
-            throw new IllegalStateException(msg);
-        }
-        ResourceContext context = getResourceContextOnThread();
-        SqlAnalyzerFactory factory = context.getSqlAnalyzerFactory();
+        assertResourceContextExists();
+        final ResourceContext context = getResourceContextOnThread();
+        final SqlAnalyzerFactory factory = context.getSqlAnalyzerFactory();
         if (factory == null) {
             String msg = "The provider of SQL analyzer should exist: context=" + context;
             throw new IllegalStateException(msg);
         }
         return factory.create(sql, blockNullParameter);
+    }
+
+    public static SQLExceptionHandler createSQLExceptionHandler() {
+        assertResourceContextExists();
+        final ResourceContext context = getResourceContextOnThread();
+        final SQLExceptionHandlerFactory factory = context.getSQLExceptionHandlerFactory();
+        if (factory != null) {
+            return factory.create();
+        } else {
+            return new SQLExceptionHandler();
+        }
     }
 
     /**
@@ -233,6 +234,13 @@ public class ResourceContext {
             return null;
         }
         return resourceParameter;
+    }
+
+    protected static void assertResourceContextExists() {
+        if (!isExistResourceContextOnThread()) {
+            String msg = "The resource context should exist!";
+            throw new IllegalStateException(msg);
+        }
     }
 
     // -----------------------------------------------------
@@ -322,6 +330,7 @@ public class ResourceContext {
     protected SqlClauseCreator _sqlClauseCreator;
     protected ResourceParameter _resourceParameter;
     protected SqlAnalyzerFactory _sqlAnalyzerFactory;
+    protected SQLExceptionHandlerFactory _sqlExceptionHandlerFactory;
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -381,5 +390,13 @@ public class ResourceContext {
 
     public void setSqlAnalyzerFactory(SqlAnalyzerFactory sqlAnalyzerFactory) {
         _sqlAnalyzerFactory = sqlAnalyzerFactory;
+    }
+
+    public SQLExceptionHandlerFactory getSQLExceptionHandlerFactory() {
+        return _sqlExceptionHandlerFactory;
+    }
+
+    public void setSQLExceptionHandlerFactory(SQLExceptionHandlerFactory sqlExceptionHandlerFactory) {
+        _sqlExceptionHandlerFactory = sqlExceptionHandlerFactory;
     }
 }

@@ -23,9 +23,9 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.jdbc.PlainResultSetWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.resource.SQLExceptionHandler;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -289,7 +289,11 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     }
 
     protected void handleSQLException(SQLException e, Statement statement) {
-        new SQLExceptionHandler().handleSQLException(e, statement);
+        createSQLExceptionHandler().handleSQLException(e, statement);
+    }
+
+    protected SQLExceptionHandler createSQLExceptionHandler() {
+        return ResourceContext.createSQLExceptionHandler();
     }
 
     // ===================================================================================

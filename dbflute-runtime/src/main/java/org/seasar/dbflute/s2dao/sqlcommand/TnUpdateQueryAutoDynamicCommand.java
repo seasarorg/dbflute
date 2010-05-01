@@ -15,8 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,7 +28,6 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
-import org.seasar.dbflute.exception.QueryUpdateFailureException;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -132,72 +129,37 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         if (modifiedPropertyNames.isEmpty()) {
             return null;
         }
-        String currentPropertyName = null;
-        try {
-            for (String propertyName : modifiedPropertyNames) {
-                currentPropertyName = propertyName;
-                final ColumnInfo columnInfo = dbmeta.findColumnInfo(propertyName);
-                final String columnName = columnInfo.getColumnDbName();
-                final Method reader = columnInfo.reader();
-                final Object value = reader.invoke(entity, (Object[]) null);
-                if (value != null) {
-                    columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
-
-                    // Add property type
-                    TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
-                    propertyTypeList.add(propertyType);
-                } else {
-                    columnParameterMap.put(columnName, "null");
-                }
-            }
-            if (dbmeta.hasVersionNo()) {
-                final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
-                final String columnName = columnInfo.getColumnDbName();
-                columnParameterMap.put(columnName, columnName + " + 1");
-            }
-            if (dbmeta.hasUpdateDate()) {
-                ColumnInfo columnInfo = dbmeta.getUpdateDateColumnInfo();
-                final Method writer = columnInfo.writer();
-                writer.invoke(entity, ResourceContext.getAccessTimestamp());
-                final String columnName = columnInfo.getColumnDbName();
-                final String propertyName = columnInfo.getPropertyName();
+        for (String propertyName : modifiedPropertyNames) {
+            final ColumnInfo columnInfo = dbmeta.findColumnInfo(propertyName);
+            final String columnName = columnInfo.getColumnDbName();
+            final Object value = columnInfo.read(entity);
+            if (value != null) {
                 columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
 
-                // add property type
-                final TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
+                // Add property type
+                TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
                 propertyTypeList.add(propertyType);
+            } else {
+                columnParameterMap.put(columnName, "null");
             }
-        } catch (RuntimeException e) {
-            throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
-        } catch (IllegalAccessException e) {
-            throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
-        } catch (InvocationTargetException e) {
-            throwQueryUpdateFailureException(cb, entity, currentPropertyName, e.getCause());
+        }
+        if (dbmeta.hasVersionNo()) {
+            final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
+            final String columnName = columnInfo.getColumnDbName();
+            columnParameterMap.put(columnName, columnName + " + 1");
+        }
+        if (dbmeta.hasUpdateDate()) {
+            ColumnInfo columnInfo = dbmeta.getUpdateDateColumnInfo();
+            columnInfo.write(entity, ResourceContext.getAccessTimestamp());
+            final String columnName = columnInfo.getColumnDbName();
+            final String propertyName = columnInfo.getPropertyName();
+            columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
+
+            // add property type
+            final TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
+            propertyTypeList.add(propertyType);
         }
         return cb.getSqlClause().getClauseQueryUpdate(columnParameterMap);
-    }
-
-    protected void throwQueryUpdateFailureException(ConditionBean cb, Entity entity, String propertyName, Throwable e) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to execute query-update!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the parameter comment logic." + ln();
-        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
-        msg = msg + ln();
-        msg = msg + "[Doubtful Property Name]" + ln() + propertyName + ln();
-        msg = msg + ln();
-        msg = msg + "[ConditionBean]" + ln() + cb + ln();
-        msg = msg + ln();
-        msg = msg + "[Entity]" + ln() + entity + ln();
-        msg = msg + ln();
-        msg = msg + "[Exception Message]" + ln() + e.getMessage() + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new QueryUpdateFailureException(msg, e);
     }
 
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,

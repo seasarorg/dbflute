@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the classification code is illegal.
+ * The exception of when the column specification of scalar select is invalid.
  * @author jflute
  */
-public class IllegalClassificationCodeException extends RuntimeException {
+public class ScalarSelectInvalidColumnSpecificationException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IllegalClassificationCodeException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IllegalClassificationCodeException(String msg) {
+    public ScalarSelectInvalidColumnSpecificationException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IllegalClassificationCodeException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IllegalClassificationCodeException(String msg, Throwable cause) {
+    public ScalarSelectInvalidColumnSpecificationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

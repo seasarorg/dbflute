@@ -25,10 +25,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
-import org.seasar.dbflute.resource.SQLExceptionHandler;
+import org.seasar.dbflute.resource.ResourceContext;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -142,7 +143,11 @@ public class TnStatementFactoryImpl implements StatementFactory {
     }
 
     protected void handleSQLException(SQLException e, Statement statement) {
-        new SQLExceptionHandler().handleSQLException(e, statement);
+        createSQLExceptionHandler().handleSQLException(e, statement);
+    }
+
+    protected SQLExceptionHandler createSQLExceptionHandler() {
+        return ResourceContext.createSQLExceptionHandler();
     }
 
     // ===================================================================================

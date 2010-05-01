@@ -23,10 +23,11 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
-import org.seasar.dbflute.resource.SQLExceptionHandler;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
@@ -82,7 +83,11 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     }
 
     protected void handleSQLException(SQLException e) {
-        new SQLExceptionHandler().handleSQLException(e);
+        createSQLExceptionHandler().handleSQLException(e);
+    }
+
+    protected SQLExceptionHandler createSQLExceptionHandler() {
+        return ResourceContext.createSQLExceptionHandler();
     }
 
     public TnBeanMetaData createBeanMetaData(final DatabaseMetaData dbMetaData, final Class<?> beanClass,

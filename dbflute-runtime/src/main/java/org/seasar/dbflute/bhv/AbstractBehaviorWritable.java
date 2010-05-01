@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.bhv;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +41,12 @@ import org.seasar.dbflute.bhv.core.command.UpdateEntityCommand;
 import org.seasar.dbflute.bhv.core.command.UpdateNonstrictEntityCommand;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
+import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
+import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.exception.IllegalBehaviorStateException;
+import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
+import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
 import org.seasar.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
 import org.seasar.dbflute.helper.token.file.FileToken;
@@ -177,13 +184,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         assertEntityHasUpdateDateValue(entity);
         final int updatedCount = callback.callbackDelegateUpdate(entity);
         if (updatedCount == 0) {
-            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
+            throwUpdateEntityAlreadyDeletedException(entity);
         } else if (updatedCount > 1) {
-            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount="
-                    + updatedCount;
-            msg = msg + ": entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
+            throwUpdateEntityDuplicatedException(entity, updatedCount);
         }
     }
 
@@ -196,18 +199,34 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         assertEntityNotNull(entity);
         final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
         if (updatedCount == 0) {
-            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
+            throwUpdateEntityAlreadyDeletedException(entity);
         } else if (updatedCount > 1) {
-            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount="
-                    + updatedCount;
-            msg = msg + ": entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
+            throwUpdateEntityDuplicatedException(entity, updatedCount);
         }
     }
 
     protected static interface InternalUpdateNonstrictCallback<ENTITY extends Entity> {
         public int callbackDelegateUpdateNonstrict(ENTITY entity);
+    }
+
+    protected <ENTITY extends Entity> void throwUpdateEntityAlreadyDeletedException(ENTITY entity) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The entity was not found! it has already been deleted.");
+        br.addItem("Entity");
+        br.addElement(entity.toString());
+        final String msg = br.buildExceptionMessage();
+        throw new EntityAlreadyDeletedException(msg);
+    }
+
+    protected <ENTITY extends Entity> void throwUpdateEntityDuplicatedException(ENTITY entity, int count) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The entity was duplicated. It should be the only one!");
+        br.addItem("Count");
+        br.addElement(count);
+        br.addItem("Entity");
+        br.addElement(entity.toString());
+        final String msg = br.buildExceptionMessage();
+        throw new EntityDuplicatedException(msg);
     }
 
     // -----------------------------------------------------
@@ -261,9 +280,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         } else {
             try {
                 callback.callbackUpdateNonstrict(entity);
-            } catch (org.seasar.dbflute.exception.EntityAlreadyUpdatedException e) {
+            } catch (EntityAlreadyUpdatedException e) {
                 callback.callbackInsert(entity);
-            } catch (org.seasar.dbflute.exception.EntityAlreadyDeletedException e) {
+            } catch (EntityAlreadyDeletedException e) {
                 callback.callbackInsert(entity);
             }
         }
@@ -284,13 +303,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         assertEntityHasUpdateDateValue(entity);
         final int deletedCount = callback.callbackDelegateDelete(entity);
         if (deletedCount == 0) {
-            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
+            throwUpdateEntityAlreadyDeletedException(entity);
         } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount="
-                    + deletedCount;
-            msg = msg + ": entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
+            throwUpdateEntityDuplicatedException(entity, deletedCount);
         }
     }
 
@@ -303,13 +318,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
-            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
+            throwUpdateEntityAlreadyDeletedException(entity);
         } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount="
-                    + deletedCount;
-            msg = msg + ": entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
+            throwUpdateEntityDuplicatedException(entity, deletedCount);
         }
     }
 
@@ -324,10 +335,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (deletedCount == 0) {
             return;
         } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount="
-                    + deletedCount;
-            msg = msg + ": entity=" + entity;
-            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
+            throwUpdateEntityDuplicatedException(entity, deletedCount);
         }
     }
 
@@ -410,8 +418,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
          * @throws java.io.IOException The IO exception occurred.
          */
         public TokenFileReflectionResult reflectTokenFile(String filename,
-                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException,
-                java.io.IOException {
+                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException, IOException {
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
             assertFileTokenReflectionOption(tokenFileReflectionOption);
 
@@ -434,8 +441,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
          * @throws java.io.IOException The IO exception occurred.
          */
         public TokenFileReflectionResult reflectTokenFile(java.io.InputStream inputStream,
-                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException,
-                java.io.IOException {
+                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException, IOException {
             assertObjectNotNull("inputStream", inputStream);
             assertFileTokenReflectionOption(tokenFileReflectionOption);
 
@@ -607,22 +613,21 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     private void assertCommonColumnAutoSetupperNotNull() {
-        if (_commonColumnAutoSetupper == null) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "Not found the auto set-upper of common column as behavior's attribute!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + "Please confirm the definition of the set-upper at your component configuration of DBFlute."
-                    + ln();
-            msg = msg + ln();
-            msg = msg + "[Your Behavior's Attributes]" + ln();
-            msg = msg + "  _behaviorCommandInvoker   : " + _behaviorCommandInvoker + ln();
-            msg = msg + "  _behaviorSelector         : " + _behaviorSelector + ln();
-            msg = msg + "  _commonColumnAutoSetupper : " + _commonColumnAutoSetupper + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg);
+        if (_commonColumnAutoSetupper != null) {
+            return;
         }
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Not found the auto set-upper of common column in the behavior!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the definition of the set-upper at your component configuration of DBFlute.");
+        br.addItem("Behavior");
+        br.addElement("Behavior for " + getTableDbName());
+        br.addItem("Attribute");
+        br.addElement("behaviorCommandInvoker   : " + _behaviorCommandInvoker);
+        br.addElement("behaviorSelector         : " + _behaviorSelector);
+        br.addElement("commonColumnAutoSetupper : " + _commonColumnAutoSetupper);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalBehaviorStateException(msg);
     }
 
     /**
@@ -791,19 +796,16 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (hasVersionNoValue(entity)) {
             return;
         }
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The value of 'version no' on the entity was Not Found!" + ln() + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the existence of the value of 'version no' on the entity." + ln();
-        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + ln();
-        msg = msg + "So 'version no' is required on the entity. " + ln();
-        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary."
-                + ln() + ln();
-        msg = msg + "[Entity]" + ln();
-        msg = msg + "entity to string = " + entity + ln();
-        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Not found the value of 'version no' on the entity!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the existence of the value of 'version no' on the entity.");
+        br.addElement("You called the method in which the check for optimistic lock is indispensable.");
+        br.addElement("So 'version no' is required on the entity. In addition, please confirm");
+        br.addElement("the necessity of optimistic lock. It might possibly be unnecessary.");
+        br.addItem("Entity");
+        br.addElement(entity.toString());
+        final String msg = br.buildExceptionMessage();
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
@@ -814,28 +816,17 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (hasUpdateDateValue(entity)) {
             return;
         }
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The value of 'update date' on the entity was Not Found!" + ln() + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the existence of the value of 'update date' on the entity." + ln();
-        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + ln();
-        msg = msg + "So 'update date' is required on the entity. " + ln();
-        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary."
-                + ln() + ln();
-        msg = msg + "[Entity]" + ln();
-        msg = msg + "entity to string = " + entity + ln();
-        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Not found the value of 'update date' on the entity!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the existence of the value of 'update date' on the entity.");
+        br.addElement("You called the method in which the check for optimistic lock is indispensable.");
+        br.addElement("So 'update date' is required on the entity. In addition, please confirm");
+        br.addElement("the necessity of optimistic lock. It might possibly be unnecessary.");
+        br.addItem("Entity");
+        br.addElement(entity.toString());
+        final String msg = br.buildExceptionMessage();
         throw new OptimisticLockColumnValueNullException(msg);
-    }
-
-    public static class OptimisticLockColumnValueNullException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public OptimisticLockColumnValueNullException(String msg) {
-            super(msg);
-        }
     }
 
     // ===================================================================================

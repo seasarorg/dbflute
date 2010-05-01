@@ -47,6 +47,8 @@ import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.IllegalBehaviorStateException;
+import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingSimpleFacade;
@@ -117,7 +119,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         try {
             ls = callback.callbackSelectList(cb);
         } catch (DangerousResultSizeException e) {
-            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
+            throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
             return null; // unreachable
         } finally {
             xrestoreSafetyResult(cb, preSafetyMaxResultSize);
@@ -217,7 +219,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected void assertEntityNotDeleted(Entity entity, Object searchKey4Log) {
         if (entity == null) {
-            throwEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(searchKey4Log);
         }
     }
 
@@ -229,7 +231,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected void assertEntityNotDeleted(List<? extends Entity> ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            throwEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(searchKey4Log);
         }
     }
 
@@ -242,18 +244,18 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected void assertEntitySelectedAsOne(List<? extends Entity> ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            throwEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(searchKey4Log);
         }
         if (ls.size() > 1) {
-            throwEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
+            throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
     }
 
-    private void throwEntityAlreadyDeletedException(Object searchKey4Log) {
+    protected void throwSelectEntityAlreadyDeletedException(Object searchKey4Log) {
         ConditionBeanContext.throwEntityAlreadyDeletedException(searchKey4Log);
     }
 
-    private void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
+    protected void throwSelectEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
         ConditionBeanContext.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
     }
 
@@ -365,55 +367,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
 
         protected void throwScalarSelectInvalidColumnSpecificationException() {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "The specified column for scalar select was Invalid!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
-            msg = msg + "  For example:" + ln();
-            msg = msg + "    " + ln();
-            msg = msg + "    [Wrong]" + ln();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + ln();
-            msg = msg + "        public void query(MemberCB cb) {" + ln();
-            msg = msg + "            // *No! It's empty!" + ln();
-            msg = msg + "        }" + ln();
-            msg = msg + "    });" + ln();
-            msg = msg + "    - - - - - - - - - -/" + ln();
-            msg = msg + "    " + ln();
-            msg = msg + "    [Wrong]" + ln();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + ln();
-            msg = msg + "        public void query(MemberCB cb) {" + ln();
-            msg = msg + "            cb.specify().columnMemberBirthday();" + ln();
-            msg = msg + "            cb.specify().columnRegisterDatetime(); // *No! It's duplicated!" + ln();
-            msg = msg + "        }" + ln();
-            msg = msg + "    });" + ln();
-            msg = msg + "    - - - - - - - - - -/" + ln();
-            msg = msg + "    " + ln();
-            msg = msg + "    [Good!]" + ln();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + ln();
-            msg = msg + "        public void query(MemberCB cb) {" + ln();
-            msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + ln();
-            msg = msg + "        }" + ln();
-            msg = msg + "    });" + ln();
-            msg = msg + "    - - - - - - - - - -/" + ln();
-            msg = msg + ln();
-            msg = msg + "[ConditionBean Type]" + ln() + _conditionBean.getClass().getName() + ln();
-            msg = msg + ln();
-            msg = msg + "[Result Type]" + ln() + _resultType.getName() + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new ScalarSelectInvalidColumnSpecificationException(msg);
-        }
-    }
-
-    public static class ScalarSelectInvalidColumnSpecificationException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public ScalarSelectInvalidColumnSpecificationException(String msg) {
-            super(msg);
+            ConditionBeanContext.throwScalarSelectInvalidColumnSpecificationException(_conditionBean, _resultType);
         }
     }
 
@@ -656,22 +610,21 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     private void assertBehaviorSelectorNotNull(String methodName) {
-        if (_behaviorSelector == null) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "Not found the selector of behavior as behavior's attribute!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + "Please confirm the definition of the selector at your component configuration of DBFlute."
-                    + ln();
-            msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + ln();
-            msg = msg + ln();
-            msg = msg + "[Your Behavior's Attributes]" + ln();
-            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + ln();
-            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg);
+        if (_behaviorSelector != null) {
+            return;
         }
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Not found the selector of behavior in the behavior!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the definition of the selector at your component configuration of DBFlute.");
+        br.addElement("It is precondition that '" + methodName + "()' needs the selector instance.");
+        br.addItem("Behavior");
+        br.addElement("Behavior for " + getTableDbName());
+        br.addItem("Attribute");
+        br.addElement("behaviorCommandInvoker   : " + _behaviorCommandInvoker);
+        br.addElement("behaviorSelector         : " + _behaviorSelector);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalBehaviorStateException(msg);
     }
 
     protected <ELEMENT> List<ELEMENT> xnewLRLs(ELEMENT element) { // newLoadReferrerList() as Internal
@@ -869,21 +822,21 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected void assertBehaviorCommandInvoker(String methodName) {
-        if (_behaviorCommandInvoker == null) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "Not found the invoker of behavior command as behavior's attributed!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + "Please confirm the definition of the invoker at your 'dbflute.dicon'." + ln();
-            msg = msg + "It is precondition that '" + methodName + "()' needs the invoker instance." + ln();
-            msg = msg + ln();
-            msg = msg + "[Your Behavior's Attributes]" + ln();
-            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + ln();
-            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg);
+        if (_behaviorCommandInvoker != null) {
+            return;
         }
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Not found the invoker of behavior command in the behavior!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the definition of the set-upper at your component configuration of DBFlute.");
+        br.addElement("It is precondition that '" + methodName + "()' needs the invoker instance.");
+        br.addItem("Behavior");
+        br.addElement("Behavior for " + getTableDbName());
+        br.addItem("Attribute");
+        br.addElement("behaviorCommandInvoker   : " + _behaviorCommandInvoker);
+        br.addElement("behaviorSelector         : " + _behaviorSelector);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalBehaviorStateException(msg);
     }
 
     // ===================================================================================
@@ -953,6 +906,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             msg = msg + " but it was: " + cb.getClass();
             throw new IllegalStateException(msg, e);
         }
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ExceptionMessageBuilder createExceptionMessageBuilder() {
+        return new ExceptionMessageBuilder();
     }
 
     // ===================================================================================

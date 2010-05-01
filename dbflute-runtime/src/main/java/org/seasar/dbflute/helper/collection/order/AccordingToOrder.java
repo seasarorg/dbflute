@@ -24,7 +24,6 @@ public interface AccordingToOrder {
 
     /**
      * Order the unordered list.
-     * 
      * @param option The option of according-to-order. (NotNull)
      * @param unorderedList The unordered list. (NotNull)
      * @param <ELEMENT_TYPE> The type of element.

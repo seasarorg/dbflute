@@ -16,10 +16,11 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the classification code is illegal.
+ * The exception when the optimistic lock value on the entity is null.
+ * This class is old.
  * @author jflute
  */
-public class IllegalClassificationCodeException extends RuntimeException {
+public class OptimisticLockColumnValueNullException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +29,7 @@ public class IllegalClassificationCodeException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IllegalClassificationCodeException(String msg) {
+    public OptimisticLockColumnValueNullException(String msg) {
         super(msg);
     }
 
@@ -37,7 +38,7 @@ public class IllegalClassificationCodeException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IllegalClassificationCodeException(String msg, Throwable cause) {
+    public OptimisticLockColumnValueNullException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

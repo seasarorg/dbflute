@@ -13,31 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.exception.factory;
+
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 
 /**
- * The exception of when executing query-update is failed.
  * @author jflute
  */
-public class QueryUpdateFailureException extends RuntimeException {
+public interface SQLExceptionHandlerFactory {
 
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     */
-    public QueryUpdateFailureException(String msg) {
-        super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public QueryUpdateFailureException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+    SQLExceptionHandler create();
 }

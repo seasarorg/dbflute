@@ -22,8 +22,10 @@ import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationExcepti
 import org.seasar.dbflute.exception.DerivedReferrerInvalidForeignSpecificationException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeException;
+import org.seasar.dbflute.exception.ScalarSelectInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidForeignSpecificationException;
 import org.seasar.dbflute.exception.ScalarSubQueryInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.ScalarSubQueryInvalidForeignSpecificationException;
@@ -35,6 +37,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerEntityPropertyNotFound
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
+import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -247,34 +250,50 @@ public class ConditionBeanContext {
     // -----------------------------------------------------
     //                                         Set up Select
     //                                         -------------
-    public static void throwSetupSelectAfterUnionException(String className, String foreignPropertyName,
-            String displaySql) {
+    public static void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
         String methodName = "setupSelect_" + initCap(foreignPropertyName) + "()";
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("You should NOT call " + methodName + " after calling union()!");
+        br.addItem("Advice");
+        br.addElement(methodName + " should be called before calling union().");
+        br.addElement("For example:");
+        br.addElement("  /- - - - - - - - - - - - - - - - - - - - ");
+        br.addElement("  " + className + " cb = new " + className + "();");
+        br.addElement("  cb." + methodName + "; // You should call here!");
+        br.addElement("  cb.query().setXxx...;");
+        br.addElement("  cb.union(new UnionQuery<" + className + ">() {");
+        br.addElement("      public void query(" + className + " unionCB) {");
+        br.addElement("          unionCB.query().setXxx...;");
+        br.addElement("      }");
+        br.addElement("  });");
+        br.addElement("  - - - - - - - - - -/");
+        final String msg = br.buildExceptionMessage();
+        throw new SetupSelectAfterUnionException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                                Paging
+    //                                                ------
+    public static void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "You should NOT call " + methodName + " after calling union()!" + ln();
+        msg = msg + "Page size for paging should not be minus or zero!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + methodName + " should be called before calling union()." + ln();
+        msg = msg + "Confirm the value of your parameter 'pageSize'." + ln();
+        msg = msg + "The first parameter of paging() should be a plus value!" + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    " + className + " cb = new " + className + "();" + ln();
-        msg = msg + "    cb." + methodName + "; // You should call here!" + ln();
-        msg = msg + "    cb.query().setXxx...;" + ln();
-        msg = msg + "    cb.union(new UnionQuery<" + className + ">() {" + ln();
-        msg = msg + "        public void query(" + className + " unionCB) {" + ln();
-        msg = msg + "            unionCB.query().setXxx...;" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    });" + ln();
-        msg = msg + "    // You should not call setupSelect after calling union()!" + ln();
-        msg = msg + "    // cb." + methodName + ";" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + "    (x) - cb.paging(0, 1);" + ln();
+        msg = msg + "    (x) - cb.paging(-3, 2);" + ln();
+        msg = msg + "    (o) - cb.paging(4, 3);" + ln();
         msg = msg + ln();
-        msg = msg + "[SetupSelect Method]" + ln() + methodName + ln();
+        msg = msg + "[Page Size]" + ln();
+        msg = msg + pageSize + ln();
         msg = msg + ln();
-        msg = msg + "[ConditionBean SQL]" + ln() + displaySql + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
-        throw new SetupSelectAfterUnionException(msg);
+        msg = msg + "[Page Number]" + ln();
+        msg = msg + pageNumber + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new PagingPageSizeNotPlusException(msg);
     }
 
     // -----------------------------------------------------
@@ -303,6 +322,7 @@ public class ConditionBeanContext {
         msg = msg + "    cb.specify().specifyMemberStatus().columnMemberStatusName();" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
         msg = msg + ln();
+        // don't use displaySql because of illegal CB's state
         msg = msg + "[ConditionBean]" + ln() + baseCB.getClass().getName() + ln();
         msg = msg + ln();
         msg = msg + "[Specified Column]" + ln() + tableDbName + "." + columnName + ln();
@@ -313,6 +333,48 @@ public class ConditionBeanContext {
     // -----------------------------------------------------
     //                                         Scalar Select
     //                                         -------------
+    public static void throwScalarSelectInvalidColumnSpecificationException(ConditionBean cb, Class<?> resultType) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The specified column for scalar select was invalid");
+        br.addItem("Advice");
+        br.addElement("You should call specify().column[TargetColumn]() only once.");
+        br.addElement("For example:");
+        br.addElement("");
+        br.addElement("  [Wrong]");
+        br.addElement("  /- - - - - - - - - - - - - - - - - - - - ");
+        br.addElement("  memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
+        br.addElement("      public void query(MemberCB cb) {");
+        br.addElement("          // *No! It's empty!");
+        br.addElement("      }");
+        br.addElement("  });");
+        br.addElement("  - - - - - - - - - -/");
+        br.addElement("");
+        br.addElement("  [Wrong]");
+        br.addElement("  /- - - - - - - - - - - - - - - - - - - - ");
+        br.addElement("  memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
+        br.addElement("      public void query(MemberCB cb) {");
+        br.addElement("          cb.specify().columnMemberBirthday();");
+        br.addElement("          cb.specify().columnRegisterDatetime(); // *No! It's duplicated!");
+        br.addElement("      }");
+        br.addElement("  });");
+        br.addElement("  - - - - - - - - - -/");
+        br.addElement("");
+        br.addElement("  [Good]");
+        br.addElement("  /- - - - - - - - - - - - - - - - - - - - ");
+        br.addElement("  memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
+        br.addElement("      public void query(MemberCB cb) {");
+        br.addElement("          cb.specify().columnMemberBirthday(); // *point");
+        br.addElement("      }");
+        br.addElement("  });");
+        br.addElement("  - - - - - - - - - -/");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
+        br.addElement(cb.getClass().getName());
+        br.addItem("Result Type");
+        br.addElement(resultType.getName());
+        final String msg = br.buildExceptionMessage();
+        throw new ScalarSelectInvalidColumnSpecificationException(msg);
+    }
+
     public static void throwScalarSelectInvalidForeignSpecificationException(String foreignPropertyName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -820,5 +882,12 @@ public class ConditionBeanContext {
 
     protected static String initUncap(String str) {
         return Srl.initUncap(str);
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected static ExceptionMessageBuilder createExceptionMessageBuilder() {
+        return new ExceptionMessageBuilder();
     }
 }

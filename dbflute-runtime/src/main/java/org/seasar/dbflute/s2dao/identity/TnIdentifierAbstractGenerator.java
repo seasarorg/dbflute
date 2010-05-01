@@ -24,10 +24,11 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.resource.SQLExceptionHandler;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
@@ -121,8 +122,12 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
             }
         }
 
-        protected void handleSQLException(SQLException e, Statement statement) {
-            new SQLExceptionHandler().handleSQLException(e, statement);
+        protected void handleSQLException(SQLException e, Statement st) {
+            createSQLExceptionHandler().handleSQLException(e, st);
+        }
+
+        protected SQLExceptionHandler createSQLExceptionHandler() {
+            return ResourceContext.createSQLExceptionHandler();
         }
     }
 

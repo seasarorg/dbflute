@@ -33,7 +33,6 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
-import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -291,25 +290,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Page size for paging should not be minus or zero!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Confirm the value of your parameter 'pageSize'." + ln();
-        msg = msg + "The first parameter of paging() should be a plus value!" + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) - cb.paging(0, 1);" + ln();
-        msg = msg + "    (x) - cb.paging(-3, 2);" + ln();
-        msg = msg + "    (o) - cb.paging(4, 3);" + ln();
-        msg = msg + ln();
-        msg = msg + "[Page Size]" + ln();
-        msg = msg + pageSize + ln();
-        msg = msg + ln();
-        msg = msg + "[Page Number]" + ln();
-        msg = msg + pageNumber + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new PagingPageSizeNotPlusException(msg);
+        ConditionBeanContext.throwPagingPageSizeNotPlusException(pageSize, pageNumber);
     }
 
     /**
@@ -900,7 +881,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
-        ConditionBeanContext.throwSetupSelectAfterUnionException(className, foreignPropertyName, toDisplaySql());
+        ConditionBeanContext.throwSetupSelectAfterUnionException(className, foreignPropertyName);
     }
 
     // ===================================================================================

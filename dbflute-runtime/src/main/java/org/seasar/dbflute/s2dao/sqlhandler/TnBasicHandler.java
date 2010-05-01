@@ -26,13 +26,13 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.QLog;
+import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.resource.SQLExceptionHandler;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
@@ -234,7 +234,11 @@ public class TnBasicHandler {
 
     protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
         String completeSql = buildExceptionMessageSql();
-        new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, completeSql);
+        createSQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, completeSql);
+    }
+
+    protected SQLExceptionHandler createSQLExceptionHandler() {
+        return ResourceContext.createSQLExceptionHandler();
     }
 
     protected String buildExceptionMessageSql() {
