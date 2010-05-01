@@ -36,6 +36,7 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
+import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
@@ -799,7 +800,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwSpecifyDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
-        ConditionBeanContext.throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
+        createCBExThrower().throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
     }
 
     protected void assertSpecifyDerivedReferrerColumnType(String function, ConditionQuery subQuery,
@@ -818,7 +819,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
             Class<?> deriveColumnType) {
-        ConditionBeanContext.throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
+        createCBExThrower().throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
                 deriveColumnType);
     }
 
@@ -902,7 +903,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwQueryDerivedReferrerInvalidColumnSpecificationException(String function) {
-        ConditionBeanContext.throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
+        createCBExThrower().throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
     }
 
     protected void assertQueryDerivedReferrerColumnType(String function, ConditionQuery subQuery,
@@ -943,7 +944,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
             Class<?> deriveColumnType, Object value) {
-        ConditionBeanContext.throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
+        createCBExThrower().throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
                 deriveColumnType, value);
     }
 
@@ -1016,7 +1017,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
-        ConditionBeanContext.throwScalarSubQueryInvalidColumnSpecificationException(function);
+        createCBExThrower().throwScalarSubQueryInvalidColumnSpecificationException(function);
     }
 
     protected void assertScalarSubQueryColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
@@ -1031,7 +1032,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName,
             Class<?> deriveColumnType) {
-        ConditionBeanContext.throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName,
+        createCBExThrower().throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName,
                 deriveColumnType);
     }
 
@@ -1263,7 +1264,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
-        ConditionBeanContext.throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
+        createCBExThrower().throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
     }
 
     protected void registerOrderBy(String columnName, boolean ascOrDesc) {
@@ -1673,6 +1674,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new IllegalStateException(msg);
         }
         return ParameterUtil.handleShortChar(columnName, value, size, mode);
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ConditionBeanExceptionThrower createCBExThrower() {
+        return new ConditionBeanExceptionThrower();
     }
 
     // ===================================================================================

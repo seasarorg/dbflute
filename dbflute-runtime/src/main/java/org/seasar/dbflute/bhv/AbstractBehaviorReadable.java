@@ -38,7 +38,6 @@ import org.seasar.dbflute.bhv.core.command.SelectNextValCommand;
 import org.seasar.dbflute.bhv.core.command.SelectScalarCBCommand;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingResultBean;
@@ -48,6 +47,8 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
+import org.seasar.dbflute.exception.handler.BehaviorExceptionThrower;
+import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
@@ -190,9 +191,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
                 }
             }
             if (!exists) {
-                ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
+                throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
             }
         }
+    }
+
+    protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String alias, Class<?> entityType) {
+        createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
     }
 
     // ===================================================================================
@@ -214,49 +219,49 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * Assert that the entity is not deleted.
      * @param entity Selected entity. (Nullable)
-     * @param searchKey4Log Search-key for Logging.
+     * @param searchKey Search-key for logging.
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
-    protected void assertEntityNotDeleted(Entity entity, Object searchKey4Log) {
+    protected void assertEntityNotDeleted(Entity entity, Object searchKey) {
         if (entity == null) {
-            throwSelectEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(searchKey);
         }
     }
 
     /**
      * Assert that the entity is not deleted.
      * @param ls Selected list. (Nullable)
-     * @param searchKey4Log Search-key for Logging. (NotNull)
+     * @param searchKey Search-key for logging. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException
      */
-    protected void assertEntityNotDeleted(List<? extends Entity> ls, Object searchKey4Log) {
+    protected void assertEntityNotDeleted(List<? extends Entity> ls, Object searchKey) {
         if (ls == null || ls.isEmpty()) {
-            throwSelectEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(searchKey);
         }
     }
 
     /**
      * Assert that the entity is selected as one.
      * @param ls Selected list. (NotNull)
-     * @param searchKey4Log Search-key for Logging. (NotNull)
+     * @param searchKey Search-key for logging. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException
      */
-    protected void assertEntitySelectedAsOne(List<? extends Entity> ls, Object searchKey4Log) {
+    protected void assertEntitySelectedAsOne(List<? extends Entity> ls, Object searchKey) {
         if (ls == null || ls.isEmpty()) {
-            throwSelectEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(searchKey);
         }
         if (ls.size() > 1) {
-            throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
+            throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey, null);
         }
     }
 
-    protected void throwSelectEntityAlreadyDeletedException(Object searchKey4Log) {
-        ConditionBeanContext.throwEntityAlreadyDeletedException(searchKey4Log);
+    protected void throwSelectEntityAlreadyDeletedException(Object searchKey) {
+        createBhvExThrower().throwSelectEntityAlreadyDeletedException(searchKey);
     }
 
-    protected void throwSelectEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        ConditionBeanContext.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+    protected void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
+        createBhvExThrower().throwSelectEntityDuplicatedException(resultCountExp, searchKey, cause);
     }
 
     // ===================================================================================
@@ -367,7 +372,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
 
         protected void throwScalarSelectInvalidColumnSpecificationException() {
-            ConditionBeanContext.throwScalarSelectInvalidColumnSpecificationException(_conditionBean, _resultType);
+            createCBExThrower().throwScalarSelectInvalidColumnSpecificationException(_conditionBean, _resultType);
         }
     }
 
@@ -825,6 +830,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         if (_behaviorCommandInvoker != null) {
             return;
         }
+        // don't use exception thrower because the thrower is created by BehaviorCommandInvoker
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Not found the invoker of behavior command in the behavior!");
         br.addItem("Advice");
@@ -855,29 +861,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @return Determination.
      */
     protected abstract boolean hasUpdateDateValue(Entity entity);
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    /**
-     * To lower case if the type is String.
-     * @param obj Object. (Nullable)
-     * @return Lower object. (Nullable)
-     */
-    protected Object toLowerCaseIfString(Object obj) {
-        if (obj != null && obj instanceof String) {
-            return ((String) obj).toLowerCase();
-        }
-        return obj;
-    }
-
-    /**
-     * Get the value of line separator.
-     * @return The value of line separator. (NotNull)
-     */
-    protected String ln() {
-        return DfSystemUtil.getLineSeparator();
-    }
 
     // ===================================================================================
     //                                                                     Downcast Helper
@@ -911,6 +894,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                    Exception Helper
     //                                                                    ================
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        assertBehaviorCommandInvoker("createBhvExThrower");
+        return _behaviorCommandInvoker.createBehaviorExceptionThrower();
+    }
+
+    protected ConditionBeanExceptionThrower createCBExThrower() {
+        return new ConditionBeanExceptionThrower();
+    }
+
     protected ExceptionMessageBuilder createExceptionMessageBuilder() {
         return new ExceptionMessageBuilder();
     }
@@ -1028,6 +1020,29 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             String msg = "The list should contain only one object: ls=" + ls.toString();
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    /**
+     * To lower case if the type is String.
+     * @param obj Object. (Nullable)
+     * @return Lower object. (Nullable)
+     */
+    protected Object toLowerCaseIfString(Object obj) {
+        if (obj != null && obj instanceof String) {
+            return ((String) obj).toLowerCase();
+        }
+        return obj;
+    }
+
+    /**
+     * Get the value of line separator.
+     * @return The value of line separator. (NotNull)
+     */
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

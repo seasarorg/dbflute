@@ -1,9 +1,9 @@
 package org.seasar.dbflute.cbean.chelper;
 
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -96,25 +96,35 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected abstract String getTableDbName();
 
     // ===================================================================================
-    //                                                                  Exception Handling
+    //                                                                  Exception Throwing
     //                                                                  ==================
     protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
-        ConditionBeanContext.throwSpecifyColumnNotSetupSelectColumnException(_baseCB, getTableDbName(), columnName);
+        createCBExThrower().throwSpecifyColumnNotSetupSelectColumnException(_baseCB, getTableDbName(), columnName);
     }
 
     protected void throwDerivedReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
-        ConditionBeanContext.throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
+        createCBExThrower().throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
     }
 
     protected void throwScalarSelectInvalidForeignSpecificationException(String foreignPropertyName) {
-        ConditionBeanContext.throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
+        createCBExThrower().throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
     }
 
     protected void throwScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
-        ConditionBeanContext.throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
+        createCBExThrower().throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
     }
 
-    protected String getLineSeparator() {
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ConditionBeanExceptionThrower createCBExThrower() {
+        return new ConditionBeanExceptionThrower();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 }

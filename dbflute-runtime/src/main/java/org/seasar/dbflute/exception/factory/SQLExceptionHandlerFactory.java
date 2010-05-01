@@ -22,5 +22,8 @@ import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
  */
 public interface SQLExceptionHandlerFactory {
 
+    /**
+     * @return The handler of SQLException. (NotNull)
+     */
     SQLExceptionHandler create();
 }

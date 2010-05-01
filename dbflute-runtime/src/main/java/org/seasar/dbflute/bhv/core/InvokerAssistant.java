@@ -21,6 +21,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
@@ -63,9 +64,17 @@ public interface InvokerAssistant {
     TnBeanMetaDataFactory assistBeanMetaDataFactory();
 
     /**
+     * Assist the factory of SQL analyzer. <br />
+     * This factory is also used on ConditionBean.toDisplaySql().
+     * So this method should be state-less.
      * @return The factory of SQL analyzer. (NotNull)
      */
     SqlAnalyzerFactory assistSqlAnalyzerFactory();
+
+    /**
+     * @return The factory of SQLException handler. (NotNull)
+     */
+    SQLExceptionHandlerFactory assistSQLExceptionHandlerFactory();
 
     /**
      * @return The parameter of resource. (NotNull)

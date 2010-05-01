@@ -141,7 +141,7 @@ public class SQLExceptionHandler {
 
     protected void setupConditionBeanElement(ExceptionMessageBuilder br) {
         if (hasConditionBean()) {
-            br.addItem("ConditionBean"); // don't use displaySql because of already existing displaySql
+            br.addItem("ConditionBean"); // only class name because of already existing displaySql
             br.addElement(getConditionBean().getClass().getName());
         }
     }
@@ -150,10 +150,16 @@ public class SQLExceptionHandler {
         if (hasOutsideSqlContext()) {
             br.addItem("OutsideSql");
             br.addElement(getOutsideSqlContext().getOutsideSqlPath());
-            br.addItem("ParameterBean");
-            br.addElement(getOutsideSqlContext().getParameterBean());
         }
     }
+
+    // *because of existing displaySql instead
+    //protected void setupParameterBeanElement(ExceptionMessageBuilder br) {
+    //    if (hasOutsideSqlContext()) {
+    //        br.addItem("ParameterBean");
+    //        br.addElement(getOutsideSqlContext().getParameterBean());
+    //    }
+    //}
 
     protected void setupStatementElement(ExceptionMessageBuilder br, Statement st) {
         if (st != null) {

@@ -9,12 +9,22 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.util.DfSystemUtil;
 
+/**
+ * @author jflute
+ * @since 0.9.6.9 (2010/05/01 Saturday)
+ */
 public class ExceptionMessageBuilder {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final List<String> _noticeList = new ArrayList<String>();
     protected final Map<String, List<Object>> _elementMap = new LinkedHashMap<String, List<Object>>();
     protected List<Object> _currentList;
 
+    // ===================================================================================
+    //                                                                                 Add
+    //                                                                                 ===
     public void addNotice(String notice) {
         _noticeList.add(notice);
     }
@@ -33,6 +43,9 @@ public class ExceptionMessageBuilder {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                               Build
+    //                                                                               =====
     public String buildExceptionMessage() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Look! Read the message below.").append(ln());
@@ -58,6 +71,9 @@ public class ExceptionMessageBuilder {
         return sb.toString();
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }

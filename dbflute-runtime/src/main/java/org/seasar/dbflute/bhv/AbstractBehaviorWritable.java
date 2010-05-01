@@ -43,7 +43,6 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
-import org.seasar.dbflute.exception.EntityDuplicatedException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
@@ -210,23 +209,11 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     protected <ENTITY extends Entity> void throwUpdateEntityAlreadyDeletedException(ENTITY entity) {
-        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The entity was not found! it has already been deleted.");
-        br.addItem("Entity");
-        br.addElement(entity.toString());
-        final String msg = br.buildExceptionMessage();
-        throw new EntityAlreadyDeletedException(msg);
+        createBhvExThrower().throwUpdateEntityAlreadyDeletedException(entity);
     }
 
     protected <ENTITY extends Entity> void throwUpdateEntityDuplicatedException(ENTITY entity, int count) {
-        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The entity was duplicated. It should be the only one!");
-        br.addItem("Count");
-        br.addElement(count);
-        br.addItem("Entity");
-        br.addElement(entity.toString());
-        final String msg = br.buildExceptionMessage();
-        throw new EntityDuplicatedException(msg);
+        createBhvExThrower().throwUpdateEntityDuplicatedException(entity, count);
     }
 
     // -----------------------------------------------------
@@ -796,17 +783,11 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (hasVersionNoValue(entity)) {
             return;
         }
-        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("Not found the value of 'version no' on the entity!");
-        br.addItem("Advice");
-        br.addElement("Please confirm the existence of the value of 'version no' on the entity.");
-        br.addElement("You called the method in which the check for optimistic lock is indispensable.");
-        br.addElement("So 'version no' is required on the entity. In addition, please confirm");
-        br.addElement("the necessity of optimistic lock. It might possibly be unnecessary.");
-        br.addItem("Entity");
-        br.addElement(entity.toString());
-        final String msg = br.buildExceptionMessage();
-        throw new OptimisticLockColumnValueNullException(msg);
+        throwVersionNoValueNullException(entity);
+    }
+
+    protected void throwVersionNoValueNullException(Entity entity) {
+        createBhvExThrower().throwVersionNoValueNullException(entity);
     }
 
     protected void assertEntityHasUpdateDateValue(Entity entity) {
@@ -816,17 +797,11 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (hasUpdateDateValue(entity)) {
             return;
         }
-        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("Not found the value of 'update date' on the entity!");
-        br.addItem("Advice");
-        br.addElement("Please confirm the existence of the value of 'update date' on the entity.");
-        br.addElement("You called the method in which the check for optimistic lock is indispensable.");
-        br.addElement("So 'update date' is required on the entity. In addition, please confirm");
-        br.addElement("the necessity of optimistic lock. It might possibly be unnecessary.");
-        br.addItem("Entity");
-        br.addElement(entity.toString());
-        final String msg = br.buildExceptionMessage();
-        throw new OptimisticLockColumnValueNullException(msg);
+        throwUpdateDateValueNullException(entity);
+    }
+
+    protected void throwUpdateDateValueNullException(Entity entity) {
+        createBhvExThrower().throwUpdateDateValueNullException(entity);
     }
 
     // ===================================================================================

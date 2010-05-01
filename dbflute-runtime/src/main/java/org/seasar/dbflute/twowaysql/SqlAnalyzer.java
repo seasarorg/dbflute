@@ -373,7 +373,7 @@ public class SqlAnalyzer {
             Class<?>[] argTypes, Object[] args, String logDateFormat, String logTimestampFormat) {
         final CommandContext context;
         {
-            final SqlAnalyzer parser = factory.create(twoWaySql, false);
+            final SqlAnalyzer parser = createSqlAnalyzer4DisplaySql(factory, twoWaySql);
             final Node node = parser.analyze();
             final CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
@@ -382,5 +382,20 @@ public class SqlAnalyzer {
         final String preparedSql = context.getSql();
         return DisplaySqlBuilder.buildDisplaySql(preparedSql, context.getBindVariables(), logDateFormat,
                 logTimestampFormat);
+    }
+
+    protected static SqlAnalyzer createSqlAnalyzer4DisplaySql(SqlAnalyzerFactory factory, String twoWaySql) {
+        if (factory == null) {
+            String msg = "The factory of SQL analyzer should exist.";
+            throw new IllegalStateException(msg);
+        }
+        final boolean blockNullParameter = false;
+        final SqlAnalyzer created = factory.create(twoWaySql, blockNullParameter);
+        if (created != null) {
+            return created;
+        }
+        String msg = "The factory should not return null:";
+        msg = msg + " sql=" + twoWaySql + " factory=" + factory;
+        throw new IllegalStateException(msg);
     }
 }

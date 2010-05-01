@@ -29,6 +29,7 @@ import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.exception.handler.BehaviorExceptionThrower;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
@@ -51,6 +52,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  *   o getExecutionCacheSize();
  *   o injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand);
  *   o createOutsideSqlBasicExecutor(String tableDbName);
+ *   o createBehaviorExceptionThrower();
  *   o invoke(BehaviorCommand behaviorCommand);
  *   o getSequenceCacheHandler();
  * </pre>
@@ -124,6 +126,16 @@ public class BehaviorCommandInvoker {
         final DBDef dbDef = _invokerAssistant.assistCurrentDBDef();
         final StatementConfig statementConfig = _invokerAssistant.assistDefaultStatementConfig();
         return new OutsideSqlBasicExecutor(this, tableDbName, dbDef, statementConfig);
+    }
+
+    // ===================================================================================
+    //                                                                   Exception Thrower
+    //                                                                   =================
+    /**
+     * @return The thrower of behavior exception. (NotNull)
+     */
+    public BehaviorExceptionThrower createBehaviorExceptionThrower() {
+        return new BehaviorExceptionThrower();
     }
 
     // ===================================================================================
@@ -214,6 +226,7 @@ public class BehaviorCommandInvoker {
         resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
         resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
         resourceContext.setSqlAnalyzerFactory(_invokerAssistant.assistSqlAnalyzerFactory());
+        resourceContext.setSQLExceptionHandlerFactory(_invokerAssistant.assistSQLExceptionHandlerFactory());
         resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
         ResourceContext.setResourceContextOnThread(resourceContext);
     }

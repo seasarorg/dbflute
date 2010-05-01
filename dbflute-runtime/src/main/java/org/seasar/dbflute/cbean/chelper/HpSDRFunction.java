@@ -1,10 +1,10 @@
 package org.seasar.dbflute.cbean.chelper;
 
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
 
 /**
  * The function of specify derived-referrer.
@@ -172,14 +172,21 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {
-        ConditionBeanContext.throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
+        createCBExThrower().throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
     }
 
     //protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
-    //    ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, entityType);
+    //    createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, entityType);
     //}
 
     //protected String replaceString(String text, String fromText, String toText) {
     //    return Srl.replace(text, fromText, toText);
     //}
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ConditionBeanExceptionThrower createCBExThrower() {
+        return new ConditionBeanExceptionThrower();
+    }
 }

@@ -33,6 +33,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
+import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -290,7 +291,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
-        ConditionBeanContext.throwPagingPageSizeNotPlusException(pageSize, pageNumber);
+        createCBExThrower().throwPagingPageSizeNotPlusException(pageSize, pageNumber);
     }
 
     /**
@@ -597,14 +598,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
         leftSp.specify(cb);
         String leftColumn = cb.getSqlClause().removeSpecifiedColumnRealNameAsOne();
         if (leftColumn == null) {
-            ConditionBeanContext.throwColumnQueryInvalidColumnSpecificationException();
+            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
         // Specify right column
         cb.getSqlClause().clearSpecifiedSelectColumn(); // recycle
         rightSp.specify(cb);
         String rightColumn = cb.getSqlClause().removeSpecifiedColumnRealNameAsOne();
         if (rightColumn == null) {
-            ConditionBeanContext.throwColumnQueryInvalidColumnSpecificationException();
+            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
 
         // Register where clause
@@ -881,7 +882,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
-        ConditionBeanContext.throwSetupSelectAfterUnionException(className, foreignPropertyName);
+        createCBExThrower().throwSetupSelectAfterUnionException(className, foreignPropertyName);
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ConditionBeanExceptionThrower createCBExThrower() {
+        return new ConditionBeanExceptionThrower();
     }
 
     // ===================================================================================

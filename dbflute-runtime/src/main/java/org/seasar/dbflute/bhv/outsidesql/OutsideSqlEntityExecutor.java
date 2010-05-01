@@ -21,9 +21,9 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.handler.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -82,7 +82,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
             ls = invoke(createSelectListCommand(path, pmb, entityType));
         } catch (DangerousResultSizeException e) {
             String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
-            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
+            throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
         } finally {
             xrestoreSafetyResultIfNeed(pmb, preSafetyMaxResultSize);
@@ -92,7 +92,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         }
         if (ls.size() > 1) {
             String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
-            throwEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
+            throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
         return ls.get(0);
     }
@@ -112,7 +112,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         final ENTITY entity = selectEntity(path, pmb, entityType);
         if (entity == null) {
             String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
-            throwEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(searchKey4Log);
         }
         return entity;
     }
@@ -141,15 +141,12 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         }
     }
 
-    // -----------------------------------------------------
-    //                                                Helper
-    //                                                ------
-    protected void throwEntityAlreadyDeletedException(Object searchKey4Log) {
-        ConditionBeanContext.throwEntityAlreadyDeletedException(searchKey4Log);
+    protected void throwSelectEntityAlreadyDeletedException(Object searchKey) {
+        createBhvExThrower().throwSelectEntityAlreadyDeletedException(searchKey);
     }
 
-    protected void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        ConditionBeanContext.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+    protected void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
+        createBhvExThrower().throwSelectEntityDuplicatedException(resultCountExp, searchKey, cause);
     }
 
     // ===================================================================================
@@ -201,8 +198,15 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     }
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        return _behaviorCommandInvoker.createBehaviorExceptionThrower();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     /**
      * Get the value of line separator.
      * @return The value of line separator. (NotNull)

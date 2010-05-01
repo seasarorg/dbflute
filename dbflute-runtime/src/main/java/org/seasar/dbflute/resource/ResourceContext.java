@@ -167,21 +167,33 @@ public class ResourceContext {
         final ResourceContext context = getResourceContextOnThread();
         final SqlAnalyzerFactory factory = context.getSqlAnalyzerFactory();
         if (factory == null) {
-            String msg = "The provider of SQL analyzer should exist: context=" + context;
+            String msg = "The factory of SQL analyzer should exist:";
+            msg = msg + " sql=" + sql + " blockNullParameter=" + blockNullParameter;
             throw new IllegalStateException(msg);
         }
-        return factory.create(sql, blockNullParameter);
+        final SqlAnalyzer created = factory.create(sql, blockNullParameter);
+        if (created != null) {
+            return created;
+        }
+        String msg = "The factory should not return null:";
+        msg = msg + " sql=" + sql + " factory=" + factory;
+        throw new IllegalStateException(msg);
     }
 
     public static SQLExceptionHandler createSQLExceptionHandler() {
         assertResourceContextExists();
         final ResourceContext context = getResourceContextOnThread();
         final SQLExceptionHandlerFactory factory = context.getSQLExceptionHandlerFactory();
-        if (factory != null) {
-            return factory.create();
-        } else {
-            return new SQLExceptionHandler();
+        if (factory == null) {
+            String msg = "The factory of SQLException handler should exist.";
+            throw new IllegalStateException(msg);
         }
+        final SQLExceptionHandler created = factory.create();
+        if (created != null) {
+            return created;
+        }
+        String msg = "The factory should not return null: factory=" + factory;
+        throw new IllegalStateException(msg);
     }
 
     /**
