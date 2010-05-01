@@ -60,8 +60,8 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     // ===================================================================================
-    //                                                                      PrimaryKey Map
-    //                                                                      ==============
+    //                                                                 PrimaryKey Handling
+    //                                                                 ===================
     public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
 #if ($table.hasPrimaryKey())
         assertPrimaryKeyMap(primaryKeyMap);
@@ -91,13 +91,19 @@ public class ${myClassName} extends AbstractConditionBean {
         }
 #end
 #else
-        throw new UnsupportedOperationException("This table has no primary-key: " + getTableDbName());
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new UnsupportedOperationException(msg);
 #end
     }
 
-    // ===================================================================================
-    //                                                                     OrderBy Setting
-    //                                                                     ===============
+#if ($table.hasPrimaryKey())
+    public void acceptPrimaryKeyValue(${table.primaryKeyArgsString}) {
+        ${table.primaryKeyArgsAssertString}
+        ${myClassName} cb = this;
+        ${table.primaryKeyArgsConditionSetupString}
+    }
+
+#end
     public ConditionBean addOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)
@@ -106,7 +112,7 @@ public class ${myClassName} extends AbstractConditionBean {
         return this;
 #else
         String msg = "This table has no primary-keys: " + getTableDbName();
-        throw new IllegalStateException(msg);
+        throw new UnsupportedOperationException(msg);
 #end
     }
 
@@ -118,7 +124,7 @@ public class ${myClassName} extends AbstractConditionBean {
         return this;
 #else
         String msg = "This table has no primary-keys: " + getTableDbName();
-        throw new IllegalStateException(msg);
+        throw new UnsupportedOperationException(msg);
 #end
     }
 

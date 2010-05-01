@@ -26,8 +26,8 @@ namespace ${glPackageBaseCommonCBean} {
         String GetClause();
 
         // ===============================================================================
-        //                                                                 OrderBy Setting
-        //                                                                 ===============
+        //                                                             PrimaryKey Handling
+        //                                                             ===================
         ${glConditionBean} AddOrderBy_PK_Asc();
         ${glConditionBean} AddOrderBy_PK_Desc();
 		

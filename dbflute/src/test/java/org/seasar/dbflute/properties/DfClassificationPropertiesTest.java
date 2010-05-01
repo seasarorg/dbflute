@@ -129,19 +129,19 @@ public class DfClassificationPropertiesTest {
         final Map<String, String> elementMap = new HashMap<String, String>();
 
         // ## Act & Assert ##
-        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        assertFalse(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_DATA_TYPE, "foo");
-        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        assertFalse(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, "bar");
-        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        assertTrue(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_DATA_TYPE, null);
-        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        assertTrue(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, null);
-        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        assertFalse(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationElement.KEY_CODE, "foo");
-        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        assertFalse(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, "foo");
-        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        assertTrue(prop.isElementMapClassificationTop(elementMap));
     }
 
     @Test

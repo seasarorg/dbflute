@@ -28,8 +28,16 @@ namespace ${glPackageBaseCB} {
         public override String TableDbName { get { return "${table.name}"; } }
 
         // ===============================================================================
-        //                                                                  Add OrderBy PK
-        //                                                                  ==============
+        //                                                             PrimaryKey Handling
+        //                                                             ===================
+#if ($table.hasPrimaryKey())
+        public void AcceptPrimaryKeyValue(${table.primaryKeyArgsString}) {
+            ${table.primaryKeyArgsAssertStringCSharp}
+            ${myClassName} cb = this;
+            ${table.primaryKeyArgsConditionSetupStringCSharp}
+        }
+
+#end
         public override ${glConditionBean} AddOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)

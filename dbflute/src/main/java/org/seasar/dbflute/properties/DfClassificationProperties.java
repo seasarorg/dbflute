@@ -169,8 +169,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 // - - - - - - -
                 // from Literal
                 // - - - - - - -
-                if (isElementMapClassificationMeta(elementMap)) {
-                    setupClassificationMetaFromLiteralIfNeeds(classificationName, elementMap);
+                if (isElementMapClassificationTop(elementMap)) {
+                    setupClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
                 } else {
                     literalArranger.arrange(classificationName, elementMap, elementList);
                 }
@@ -181,7 +181,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _classificationDefinitionMap;
     }
 
-    protected boolean isElementMapClassificationMeta(Map<?, ?> elementMap) {
+    protected boolean isElementMapClassificationTop(Map<?, ?> elementMap) {
         // The topComment is main mark.
         final String classificationTopComment = (String) elementMap.get(DfClassificationTop.KEY_TOP_COMMENT);
         return classificationTopComment != null;
@@ -372,7 +372,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return Srl.camelize(name, " ", "_", "-"); // for method name
     }
 
-    protected void setupClassificationMetaFromLiteralIfNeeds(String classificationName, Map<?, ?> elementMap) {
+    protected void setupClassificationTopFromLiteralIfNeeds(String classificationName, Map<?, ?> elementMap) {
         if (_classificationTopDefinitionMap.containsKey(classificationName)) {
             return;
         }
