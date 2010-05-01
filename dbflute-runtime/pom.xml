@@ -101,15 +101,9 @@
 					<links>
 						<link>http://java.sun.com/javaee/5/docs/api/</link>
 						<link>http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/</link>
-						<link>http://aopalliance.sourceforge.net/doc/</link>
 						<link>http://jakarta.apache.org/commons/logging/apidocs/</link>
-						<link>http://www.csg.is.titech.ac.jp/~chiba/javassist/html/</link>
-						<link>http://www.ognl.org/2.6.9/Documentation/javadoc/</link>
 						<link>http://www.junit.org/junit/javadoc/4.3/</link>
 						<link>http://www.junit.org/junit/javadoc/3.8.1/</link>
-						<link>http://s2container.seasar.org/2.4/s2-framework/ja/apidocs/</link>
-						<link>http://s2container.seasar.org/2.4/s2-extension/ja/apidocs/</link>
-						<link>http://s2container.seasar.org/2.4/s2-tiger/ja/apidocs/</link>
 					</links>
 				</configuration>
 				<executions>

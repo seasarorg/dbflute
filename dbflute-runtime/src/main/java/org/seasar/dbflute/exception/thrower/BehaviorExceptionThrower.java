@@ -13,14 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception.handler;
+package org.seasar.dbflute.exception.thrower;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
-import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 

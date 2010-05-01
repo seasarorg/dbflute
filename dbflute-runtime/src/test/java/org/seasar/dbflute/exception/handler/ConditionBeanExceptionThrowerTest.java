@@ -1,6 +1,7 @@
 package org.seasar.dbflute.exception.handler;
 
 import org.seasar.dbflute.exception.SetupSelectAfterUnionException;
+import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.Srl;
 

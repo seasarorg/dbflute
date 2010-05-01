@@ -29,7 +29,7 @@ import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.exception.handler.BehaviorExceptionThrower;
+import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
@@ -51,9 +51,9 @@ import org.seasar.dbflute.util.DfTypeUtil;
  *   o isExecutionCacheEmpty();
  *   o getExecutionCacheSize();
  *   o injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand);
+ *   o invoke(BehaviorCommand behaviorCommand);
  *   o createOutsideSqlBasicExecutor(String tableDbName);
  *   o createBehaviorExceptionThrower();
- *   o invoke(BehaviorCommand behaviorCommand);
  *   o getSequenceCacheHandler();
  * </pre>
  * @author jflute
@@ -113,29 +113,6 @@ public class BehaviorCommandInvoker {
     protected String getSqlFileEncoding() {
         assertInvokerAssistant();
         return _invokerAssistant.assistSqlFileEncoding();
-    }
-
-    // ===================================================================================
-    //                                                                          OutsideSql
-    //                                                                          ==========
-    /**
-     * @param tableDbName The DB name of table. (NotNull)
-     * @return The basic executor of outside SQL. (NotNull) 
-     */
-    public OutsideSqlBasicExecutor createOutsideSqlBasicExecutor(String tableDbName) {
-        final DBDef dbDef = _invokerAssistant.assistCurrentDBDef();
-        final StatementConfig statementConfig = _invokerAssistant.assistDefaultStatementConfig();
-        return new OutsideSqlBasicExecutor(this, tableDbName, dbDef, statementConfig);
-    }
-
-    // ===================================================================================
-    //                                                                   Exception Thrower
-    //                                                                   =================
-    /**
-     * @return The thrower of behavior exception. (NotNull)
-     */
-    public BehaviorExceptionThrower createBehaviorExceptionThrower() {
-        return new BehaviorExceptionThrower();
     }
 
     // ===================================================================================
@@ -835,6 +812,29 @@ public class BehaviorCommandInvoker {
     }
 
     // ===================================================================================
+    //                                                                          OutsideSql
+    //                                                                          ==========
+    /**
+     * @param tableDbName The DB name of table. (NotNull)
+     * @return The basic executor of outside SQL. (NotNull) 
+     */
+    public OutsideSqlBasicExecutor createOutsideSqlBasicExecutor(String tableDbName) {
+        final DBDef dbDef = _invokerAssistant.assistCurrentDBDef();
+        final StatementConfig statementConfig = _invokerAssistant.assistDefaultStatementConfig();
+        return new OutsideSqlBasicExecutor(this, tableDbName, dbDef, statementConfig);
+    }
+
+    // ===================================================================================
+    //                                                                   Exception Thrower
+    //                                                                   =================
+    /**
+     * @return The thrower of behavior exception. (NotNull)
+     */
+    public BehaviorExceptionThrower createBehaviorExceptionThrower() {
+        return _invokerAssistant.assistBehaviorExceptionThrower();
+    }
+
+    // ===================================================================================
     //                                                                      Sequence Cache
     //                                                                      ==============
     /**
@@ -843,13 +843,6 @@ public class BehaviorCommandInvoker {
      */
     public SequenceCacheHandler getSequenceCacheHandler() {
         return _invokerAssistant.assistSequenceCacheHandler();
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
@@ -887,6 +880,13 @@ public class BehaviorCommandInvoker {
             String msg = "The attribute 'invokerAssistant' should not be null!";
             throw new IllegalStateException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

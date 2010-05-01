@@ -1,4 +1,4 @@
-package org.seasar.dbflute.exception.msgbuilder;
+package org.seasar.dbflute.exception.factory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

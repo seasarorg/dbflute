@@ -33,7 +33,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
-import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;

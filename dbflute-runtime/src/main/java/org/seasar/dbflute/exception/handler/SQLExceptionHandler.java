@@ -22,7 +22,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.exception.EntityAlreadyExistsException;
 import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;

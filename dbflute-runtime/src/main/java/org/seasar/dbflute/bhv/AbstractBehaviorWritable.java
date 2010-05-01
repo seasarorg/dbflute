@@ -45,7 +45,7 @@ import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
-import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
 import org.seasar.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
 import org.seasar.dbflute.helper.token.file.FileToken;

@@ -4,7 +4,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 
 /**
  * The function of specify derived-referrer.

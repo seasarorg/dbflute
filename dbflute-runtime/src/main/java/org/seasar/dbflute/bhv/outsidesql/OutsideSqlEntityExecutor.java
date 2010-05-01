@@ -23,7 +23,7 @@ import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
 import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
-import org.seasar.dbflute.exception.handler.BehaviorExceptionThrower;
+import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.util.DfSystemUtil;

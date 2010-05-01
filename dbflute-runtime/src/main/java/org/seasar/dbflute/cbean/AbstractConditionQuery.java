@@ -36,7 +36,7 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
-import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;

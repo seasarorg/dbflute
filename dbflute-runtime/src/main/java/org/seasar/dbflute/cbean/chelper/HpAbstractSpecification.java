@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.chelper;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.exception.handler.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**

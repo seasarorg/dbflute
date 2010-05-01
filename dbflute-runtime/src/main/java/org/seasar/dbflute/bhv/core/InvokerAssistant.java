@@ -22,6 +22,7 @@ import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
+import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
@@ -72,17 +73,19 @@ public interface InvokerAssistant {
     SqlAnalyzerFactory assistSqlAnalyzerFactory();
 
     /**
+     * Assist the factory of SQLException handler.
      * @return The factory of SQLException handler. (NotNull)
      */
     SQLExceptionHandlerFactory assistSQLExceptionHandlerFactory();
 
     /**
-     * @return The parameter of resource. (NotNull)
+     * Assist the handler of sequence cache.
+     * @return The handler of sequence cache. (NotNull)
      */
-    ResourceParameter assistResourceParameter();
+    SequenceCacheHandler assistSequenceCacheHandler();
 
     /**
-     * @return The encoding of SQL files. (NotNull)
+     * @return The encoding of SQL file. (NotNull)
      */
     String assistSqlFileEncoding();
 
@@ -92,9 +95,14 @@ public interface InvokerAssistant {
     StatementConfig assistDefaultStatementConfig();
 
     /**
-     * @return The handler of sequence cache. (NotNull)
+     * @return The thrower of behavior exception. (NotNull)
      */
-    SequenceCacheHandler assistSequenceCacheHandler();
+    BehaviorExceptionThrower assistBehaviorExceptionThrower();
+
+    /**
+     * @return The parameter of resource. (NotNull)
+     */
+    ResourceParameter assistResourceParameter();
 
     /**
      * To be disposable.

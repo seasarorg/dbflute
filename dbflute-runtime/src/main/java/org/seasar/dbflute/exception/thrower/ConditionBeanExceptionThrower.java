@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception.handler;
+package org.seasar.dbflute.exception.thrower;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
@@ -34,7 +34,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerEntityPropertyNotFound
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
-import org.seasar.dbflute.exception.msgbuilder.ExceptionMessageBuilder;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 

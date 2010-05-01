@@ -2,6 +2,7 @@ package org.seasar.dbflute.exception.handler;
 
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
