@@ -20,6 +20,7 @@ import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
 import org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The option of like search.
@@ -252,6 +253,8 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit = " + _asOrSplit;
+        final String title = DfTypeUtil.toClassTitle(this);
+        return title + ":{like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit = "
+                + _asOrSplit + "}";
     }
 }
