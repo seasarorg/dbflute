@@ -24,10 +24,12 @@ import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException
 import org.seasar.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
+import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -36,6 +38,11 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class ValueAndTypeSetupper {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String LIKE_SEARCH_OPTION_SUFFIX = "InternalLikeSearchOption";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -133,17 +140,17 @@ public class ValueAndTypeSetupper {
 
     // for OutsideSql
     protected boolean hasLikeSearchOption(DfBeanDesc beanDesc, String currentName) {
-        return beanDesc.hasPropertyDesc(currentName + "InternalLikeSearchOption");
+        return beanDesc.hasPropertyDesc(currentName + LIKE_SEARCH_OPTION_SUFFIX);
     }
 
     // for OutsideSql
     protected LikeSearchOption getLikeSearchOption(DfBeanDesc beanDesc, String currentName, Object pmb) {
-        final DfPropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
+        final DfPropertyDesc pb = beanDesc.getPropertyDesc(currentName + LIKE_SEARCH_OPTION_SUFFIX);
         final LikeSearchOption option = (LikeSearchOption) pb.getValue(pmb);
-        if (option == null) {
+        if (option == null) { // basically no way because of check in parameter-bean
             throwLikeSearchOptionNotFoundException(pmb, currentName);
         }
-        if (option.isSplit()) {
+        if (option.isSplit()) { // basically no way because of check in parameter-bean
             throwOutsideSqlLikeSearchOptionSplitUnavailableException(option, pmb, currentName);
         }
         return option;
@@ -160,8 +167,10 @@ public class ValueAndTypeSetupper {
         final String beanName = DfTypeUtil.toClassTitle(pmb);
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
         msg = msg + "    " + beanName + "." + methodName + ln();
-        msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + pmb + ln();
+        // *because basically it does not come here by checking in parameter-bean
+        //  (and for security to application data)
+        //msg = msg + ln();
+        //msg = msg + "[ParameterBean]" + ln() + pmb + ln();
         msg = msg + "* * * * * * * * * */";
         throw new RequiredOptionNotFoundException(msg);
     }
@@ -189,81 +198,48 @@ public class ValueAndTypeSetupper {
         msg = msg + "    pmb." + methodName + ln();
         msg = msg + ln();
         msg = msg + "[LikeSearchOption]" + ln() + option + ln();
-        msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + pmb + ln();
+        // *because basically it does not come here by checking in parameter-bean
+        //  (and for security to application data)
+        //msg = msg + ln();
+        //msg = msg + "[ParameterBean]" + ln() + pmb + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
     protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, DfPropertyDesc pd) {
-        try {
-            return pd.getValue(beanValue);
-        } catch (RuntimeException e) {
-            throwPropertyHandlingFailureException(beanType, beanValue, currentName, _expression, _specifiedSql, _bind,
-                    e);
-            return null; // unreachable
-        }
-    }
-
-    protected void throwPropertyHandlingFailureException(Class<?> beanType, Object beanValue, String currentName,
-            String expression, String specifiedSql, boolean bind, Exception e) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The handlig of the property was failed!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "This is the Framework Exception!" + ln();
-        msg = msg + ln();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
-                + ln();
-        msg = msg + ln();
-        msg = msg + "[Bean Type]" + ln() + beanType + ln();
-        msg = msg + ln();
-        msg = msg + "[Bean Value]" + ln() + beanValue + ln();
-        msg = msg + ln();
-        msg = msg + "[Property Name]" + ln() + currentName + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new IllegalStateException(msg, e);
+        return pd.getValue(beanValue);
     }
 
     protected Object invokeGetter(Method method, Object target) {
-        try {
-            return method.invoke(target, (Object[]) null);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        return DfReflectionUtil.invoke(method, target, null);
     }
 
     protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class<?> targetType,
             String notFoundProperty, String specifiedSql, boolean bind) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!"
-                + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the existence of your property on your arguments." + ln();
-        msg = msg + "Abd has the property had misspelling?" + ln();
-        msg = msg + ln();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
-                + ln();
-        msg = msg + ln();
-        msg = msg + "[NotFound Property]" + ln() + (targetType != null ? targetType.getName() + "#" : "")
-                + notFoundProperty + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the existence of your property on your arguments.");
+        br.addElement("And has the property had misspelling?");
+        br.addItem((bind ? "Bind Variable" : "Embedded Value") + " Comment");
+        br.addElement(expression);
+        br.addItem("NotFound Property");
+        br.addElement((targetType != null ? targetType.getName() + "#" : "") + notFoundProperty);
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
         if (bind) {
             throw new BindVariableCommentNotFoundPropertyException(msg);
         } else {
             throw new EmbeddedValueCommentNotFoundPropertyException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ExceptionMessageBuilder createExceptionMessageBuilder() {
+        return new ExceptionMessageBuilder();
     }
 
     // ===================================================================================

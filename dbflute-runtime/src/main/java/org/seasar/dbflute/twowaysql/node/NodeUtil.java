@@ -87,8 +87,10 @@ public class NodeUtil {
         msg = msg + ln();
         msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + pmb + ln();
-        msg = msg + ln();
+        // *debug to this exception does not need contents of the parameter-bean
+        //  (and for security to application data)
+        //msg = msg + "[ParameterBean]" + ln() + pmb + ln();
+        //msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         if (bind) {

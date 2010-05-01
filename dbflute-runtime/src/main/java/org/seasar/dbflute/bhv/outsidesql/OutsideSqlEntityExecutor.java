@@ -118,11 +118,11 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     }
 
     protected <ENTITY> String buildSearchKey4Log(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        String tmp = "Table  = " + _outsideSqlOption.getTableDbName() + ln();
-        tmp = tmp + "Path   = " + path + ln();
-        tmp = tmp + "Pmb    = " + DfTypeUtil.toClassTitle(pmb) + ":" + pmb + ln();
-        tmp = tmp + "Entity = " + DfTypeUtil.toClassTitle(entityType) + ln();
-        tmp = tmp + "Option = " + _outsideSqlOption;
+        String tmp = "table  = " + _outsideSqlOption.getTableDbName() + ln();
+        tmp = tmp + "path   = " + path + ln();
+        tmp = tmp + "pmbean = " + DfTypeUtil.toClassTitle(pmb) + ":" + pmb + ln();
+        tmp = tmp + "entity = " + DfTypeUtil.toClassTitle(entityType) + ln();
+        tmp = tmp + "option = " + _outsideSqlOption;
         return tmp;
     }
 
