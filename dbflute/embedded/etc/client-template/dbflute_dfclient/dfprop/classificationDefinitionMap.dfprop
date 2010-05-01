@@ -6,7 +6,7 @@
 # Specification:
 # map: {
 #     [classification-name] = list:{
-#         ; map:{topComment=[comment]; dataType=[String(default) or Number]}
+#         ; map:{topComment=[comment]; codeType=[String(default) or Number]}
 #         ; map:{code=[code]; name=[name]; alias=[alias]; comment=[comment]}
 #         ; map:{
 #             ; table=[table-name]
@@ -24,7 +24,7 @@
 map:{
     # example for implicit classification
     #; Flg = list:{
-    #    ; map:{topComment=general boolean classification: for every flg-column; dataType=Number}
+    #    ; map:{topComment=general boolean classification: for every flg-column; codeType=Number}
     #    ; map:{code=1; name=True ; alias=Yes ; comment=means valid}
     #    ; map:{code=0; name=False; alias=No  ; comment=means invalid}
     #}

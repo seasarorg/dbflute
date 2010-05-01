@@ -237,15 +237,23 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             elementList.add(elementMap);
 
             final String topComment = map.get(DfClassificationTop.KEY_TOP_COMMENT);
-            final String dataType = map.get(DfClassificationTop.KEY_DATA_TYPE);
+            final String codeType;
+            {
+                String tmpType = map.get(DfClassificationTop.KEY_CODE_TYPE);
+                if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
+                    // for compatible
+                    tmpType = map.get(DfClassificationTop.KEY_DATA_TYPE);
+                }
+                codeType = tmpType;
+            }
             if (!_classificationTopDefinitionMap.containsKey(classificationName)) {
                 final Map<String, String> topElementMap = new LinkedHashMap<String, String>();
                 topElementMap.put("classificationName", classificationName);
                 if (topComment != null) {
                     topElementMap.put(DfClassificationTop.KEY_TOP_COMMENT, topComment);
                 }
-                if (dataType != null) {
-                    topElementMap.put(DfClassificationTop.KEY_DATA_TYPE, dataType);
+                if (codeType != null) {
+                    topElementMap.put(DfClassificationTop.KEY_CODE_TYPE, codeType);
                 }
                 if (topComment != null) { // The topComment is main mark.
                     _classificationTopDefinitionMap.put(classificationName, topElementMap);
@@ -381,8 +389,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (classificationTop.getTopComment() != null) {
             topElementMap.put(DfClassificationTop.KEY_TOP_COMMENT, classificationTop.getTopComment());
         }
-        if (classificationTop.getDataType() != null) {
-            topElementMap.put(DfClassificationTop.KEY_DATA_TYPE, classificationTop.getDataType());
+        if (classificationTop.getCodeType() != null) {
+            topElementMap.put(DfClassificationTop.KEY_CODE_TYPE, classificationTop.getCodeType());
         }
         if (classificationTop.getTopComment() != null) { // The topComment is main mark.
             _classificationTopDefinitionMap.put(classificationName, topElementMap);

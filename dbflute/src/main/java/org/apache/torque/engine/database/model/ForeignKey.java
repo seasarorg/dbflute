@@ -974,8 +974,8 @@ public class ForeignKey {
         final Map<String, Map<String, String>> topMap = getClassificationProperties()
                 .getClassificationTopDefinitionMap();
         final Map<String, String> map = topMap.get(classificationName);
-        final String dataType = map.get(DfClassificationTop.KEY_DATA_TYPE);
-        if (dataType == null || !dataType.equalsIgnoreCase(DfClassificationTop.DATA_TYPE_NUMBER)) {
+        final String codeType = map.get(DfClassificationTop.KEY_CODE_TYPE);
+        if (codeType == null || !codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_NUMBER)) {
             code = "'" + code + "'";
         }
         return code;

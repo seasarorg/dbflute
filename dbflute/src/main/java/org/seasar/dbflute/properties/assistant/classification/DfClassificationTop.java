@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * Temporary DTO when classification initializing.
  * @author jflute
@@ -15,17 +17,18 @@ public class DfClassificationTop {
     //                                                                          Definition
     //                                                                          ==========
     public static final String KEY_TOP_COMMENT = "topComment";
-    public static final String KEY_DATA_TYPE = "dataType";
+    public static final String KEY_CODE_TYPE = "codeType";
+    public static final String KEY_DATA_TYPE = "dataType"; // old style
 
-    public static final String DATA_TYPE_STRING = "String";
-    public static final String DATA_TYPE_NUMBER = "Number";
+    public static final String CODE_TYPE_STRING = "String";
+    public static final String CODE_TYPE_NUMBER = "Number";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String _classificationName;
     protected String _topComment;
-    protected String _dataType;
+    protected String _codeType;
     protected String _relatedColumnName;
     protected List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
 
@@ -33,10 +36,10 @@ public class DfClassificationTop {
     //                                                                              Accept
     //                                                                              ======
     public void acceptClassificationTopElementMap(Map<?, ?> elementMap) {
-        acceptTopMap(elementMap, KEY_TOP_COMMENT, KEY_DATA_TYPE);
+        acceptTopMap(elementMap, KEY_TOP_COMMENT, KEY_CODE_TYPE, KEY_DATA_TYPE);
     }
 
-    protected void acceptTopMap(Map<?, ?> elementMap, String commentKey, String dataTypeKey) {
+    protected void acceptTopMap(Map<?, ?> elementMap, String commentKey, String codeTypeKey, String dataTypeKey) {
         // topComment
         final String topComment = (String) elementMap.get(commentKey);
         if (topComment == null) {
@@ -45,9 +48,17 @@ public class DfClassificationTop {
         }
         this._topComment = topComment;
 
-        // dataType
-        final String dataType = (String) elementMap.get(dataTypeKey);
-        this._dataType = dataType;
+        // codeType
+        final String codeType;
+        {
+            String tmpType = (String) elementMap.get(codeTypeKey);
+            if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
+                // for compatible
+                tmpType = (String) elementMap.get(dataTypeKey);
+            }
+            codeType = tmpType;
+        }
+        this._codeType = codeType;
     }
 
     // ===================================================================================
@@ -55,7 +66,7 @@ public class DfClassificationTop {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _classificationName + ", " + _topComment + ", " + _dataType + ", " + _relatedColumnName + ", "
+        return "{" + _classificationName + ", " + _topComment + ", " + _codeType + ", " + _relatedColumnName + ", "
                 + _elementList + "}";
     }
 
@@ -78,12 +89,12 @@ public class DfClassificationTop {
         this._topComment = topComment;
     }
 
-    public String getDataType() {
-        return _dataType;
+    public String getCodeType() {
+        return _codeType;
     }
 
-    public void setDataType(String dataType) {
-        _dataType = dataType;
+    public void setCodeType(String codeType) {
+        _codeType = codeType;
     }
 
     public String getRelatedColumnName() {

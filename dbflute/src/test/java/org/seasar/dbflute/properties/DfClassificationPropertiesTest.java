@@ -130,11 +130,11 @@ public class DfClassificationPropertiesTest {
 
         // ## Act & Assert ##
         assertFalse(prop.isElementMapClassificationTop(elementMap));
-        elementMap.put(DfClassificationTop.KEY_DATA_TYPE, "foo");
+        elementMap.put(DfClassificationTop.KEY_CODE_TYPE, "foo");
         assertFalse(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, "bar");
         assertTrue(prop.isElementMapClassificationTop(elementMap));
-        elementMap.put(DfClassificationTop.KEY_DATA_TYPE, null);
+        elementMap.put(DfClassificationTop.KEY_CODE_TYPE, null);
         assertTrue(prop.isElementMapClassificationTop(elementMap));
         elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, null);
         assertFalse(prop.isElementMapClassificationTop(elementMap));
