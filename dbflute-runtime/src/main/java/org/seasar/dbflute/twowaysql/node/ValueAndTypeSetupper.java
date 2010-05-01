@@ -137,38 +137,38 @@ public class ValueAndTypeSetupper {
     }
 
     // for OutsideSql
-    protected LikeSearchOption getLikeSearchOption(DfBeanDesc beanDesc, String currentName, Object resourceBean) {
+    protected LikeSearchOption getLikeSearchOption(DfBeanDesc beanDesc, String currentName, Object pmb) {
         final DfPropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
-        final LikeSearchOption option = (LikeSearchOption) pb.getValue(resourceBean);
+        final LikeSearchOption option = (LikeSearchOption) pb.getValue(pmb);
         if (option == null) {
-            throwLikeSearchOptionNotFoundException(resourceBean, currentName);
+            throwLikeSearchOptionNotFoundException(pmb, currentName);
         }
         if (option.isSplit()) {
-            throwOutsideSqlLikeSearchOptionSplitUnavailableException(option, resourceBean, currentName);
+            throwOutsideSqlLikeSearchOptionSplitUnavailableException(option, pmb, currentName);
         }
         return option;
     }
 
     // for OutsideSql
-    protected void throwLikeSearchOptionNotFoundException(Object resourceBean, String currentName) {
+    protected void throwLikeSearchOptionNotFoundException(Object pmb, String currentName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + ln();
+        msg = msg + "The likeSearchOption was not found! (Should not be null!)" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your method call:" + ln();
-        final String beanName = DfTypeUtil.toClassTitle(resourceBean);
+        final String beanName = DfTypeUtil.toClassTitle(pmb);
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
         msg = msg + "    " + beanName + "." + methodName + ln();
         msg = msg + ln();
-        msg = msg + "[Target ParameterBean]" + ln() + resourceBean + ln();
+        msg = msg + "[ParameterBean]" + ln() + pmb + ln();
         msg = msg + "* * * * * * * * * */";
         throw new RequiredOptionNotFoundException(msg);
     }
 
     // for OutsideSql
-    protected void throwOutsideSqlLikeSearchOptionSplitUnavailableException(LikeSearchOption option,
-            Object resourceBean, String currentName) {
+    protected void throwOutsideSqlLikeSearchOptionSplitUnavailableException(LikeSearchOption option, Object pmb,
+            String currentName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The splitByXxx() of LikeSearchOption is unavailable at OutsideSql!" + ln();
@@ -177,7 +177,7 @@ public class ValueAndTypeSetupper {
         msg = msg + "Please confirm your method call:" + ln();
         msg = msg + "For example:" + ln();
         msg = msg + "  (x):" + ln();
-        final String beanName = DfTypeUtil.toClassTitle(resourceBean.getClass().getName());
+        final String beanName = DfTypeUtil.toClassTitle(pmb.getClass().getName());
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
         msg = msg + "    " + beanName + " pmb = new " + beanName + "();" + ln();
         msg = msg + "    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();" + ln();
@@ -188,9 +188,9 @@ public class ValueAndTypeSetupper {
         msg = msg + "    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();" + ln();
         msg = msg + "    pmb." + methodName + ln();
         msg = msg + ln();
-        msg = msg + "[Target LikeSearchOption]" + ln() + option + ln();
+        msg = msg + "[LikeSearchOption]" + ln() + option + ln();
         msg = msg + ln();
-        msg = msg + "[Target ParameterBean]" + ln() + resourceBean + ln();
+        msg = msg + "[ParameterBean]" + ln() + pmb + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalOutsideSqlOperationException(msg);
     }
