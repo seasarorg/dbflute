@@ -22,5 +22,5 @@ package org.seasar.dbflute.jdbc;
  */
 public enum ClassificationCodeType {
 
-    String, Number;
+    String, Number, Boolean;
 }

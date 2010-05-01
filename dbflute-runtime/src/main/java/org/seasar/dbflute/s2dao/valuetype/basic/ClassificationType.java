@@ -70,6 +70,8 @@ public class ClassificationType extends TnAbstractValueType {
                 ps.setString(index, cls.code());
             } else if (ClassificationCodeType.Number.equals(cls.meta().codeType())) {
                 ps.setInt(index, DfTypeUtil.toInteger(cls.code()));
+            } else if (ClassificationCodeType.Boolean.equals(cls.meta().codeType())) {
+                ps.setBoolean(index, DfTypeUtil.toBoolean(cls.code()));
             } else {
                 ps.setObject(index, cls.code());
             }
