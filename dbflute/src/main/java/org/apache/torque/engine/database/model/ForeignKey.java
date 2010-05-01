@@ -910,7 +910,7 @@ public class ForeignKey {
             String parameterType = peace.substring(typeStartIndex + "(".length(), typeEndIndex);
             if (peace.startsWith("$cls")) {
                 // Not Dynamic (Embedded)
-                final String code = extractFixedConditionEmbeddedCommentClasification(peace, parameterType);
+                final String code = extractFixedConditionEmbeddedCommentClassification(peace, parameterType);
                 final String expression = "/*" + peace + "*/";
 
                 // Remove test value because of hard code.
@@ -940,7 +940,7 @@ public class ForeignKey {
         }
     }
 
-    protected String extractFixedConditionEmbeddedCommentClasification(String peace, String parameterType) {
+    protected String extractFixedConditionEmbeddedCommentClassification(String peace, String parameterType) {
         if (!parameterType.contains(".")) {
             String msg = "The classification expression should be 'classificationName.elementName':";
             msg = msg + " expression=" + parameterType + " embeddedComment=" + peace;
@@ -975,7 +975,7 @@ public class ForeignKey {
                 .getClassificationTopDefinitionMap();
         final Map<String, String> map = topMap.get(classificationName);
         final String codeType = map.get(DfClassificationTop.KEY_CODE_TYPE);
-        if (codeType == null || !codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_NUMBER)) {
+        if (codeType == null || !codeType.equals(DfClassificationTop.CODE_TYPE_NUMBER)) {
             code = "'" + code + "'";
         }
         return code;

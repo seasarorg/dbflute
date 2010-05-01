@@ -45,8 +45,8 @@ public interface ${glCDef} extends Classification {
 #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
 #set ($existTop = true)
 #end
-#if ($existTop && $classificationTopMap.containsKey('dataType'))
-            if ("${classificationName}".equals(name())) { return ClassificationCodeType.${classificationTopMap.get('dataType')}; }
+#if ($existTop && $classificationTopMap.containsKey('codeType'))
+            if ("${classificationName}".equals(name())) { return ClassificationCodeType.${classificationTopMap.get('codeType')}; }
 #end
 #end
             return ClassificationCodeType.String; // as default

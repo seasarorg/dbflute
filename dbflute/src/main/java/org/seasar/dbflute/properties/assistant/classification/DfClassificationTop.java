@@ -22,6 +22,7 @@ public class DfClassificationTop {
 
     public static final String CODE_TYPE_STRING = "String";
     public static final String CODE_TYPE_NUMBER = "Number";
+    public static final String CODE_TYPE_BOOLEAN = "Boolean";
 
     // ===================================================================================
     //                                                                           Attribute

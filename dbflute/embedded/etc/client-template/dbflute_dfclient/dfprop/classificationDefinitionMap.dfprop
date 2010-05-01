@@ -30,7 +30,7 @@ map:{
     #}
     # example for table classification
     #; MemberStatus = list:{
-    #    ; map:{topComment=status of member from entry to withdrawal}
+    #    ; map:{topComment=status of member from entry to withdrawal; codeType=String}
     #    ; map:{
     #        ; table=MEMBER_STATUS
     #        ; code=MEMBER_STATUS_CODE; name=MEMBER_STATUS_NAME
