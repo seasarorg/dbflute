@@ -51,7 +51,7 @@ public abstract class AbstractNode implements Node {
         children.add(node);
     }
 
-    protected boolean isBeginChildContextAndValidCoondition(CommandContext ctx, String sql) {
+    protected boolean isBeginChildContextAndValidCondition(CommandContext ctx, String sql) {
         return ctx.isBeginChildContext() && sql != null && sql.trim().length() > 0;
     }
 }

@@ -163,9 +163,9 @@ public class SqlTokenizer {
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm the SQL comment writing." + ln();
         msg = msg + "It may exist the comment that DOESN'T have a comment end." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    before (x) -- /*pmb.xxxId3" + ln();
-        msg = msg + "    after  (o) -- /*pmb.xxxId*/3" + ln();
+        msg = msg + "For example:" + ln();
+        msg = msg + "  (x) -- /*pmb.xxxId3" + ln();
+        msg = msg + "  (o) -- /*pmb.xxxId*/3" + ln();
         msg = msg + ln();
         msg = msg + "[Comment End Expected Place]" + ln() + expression + ln();
         msg = msg + ln();

@@ -54,7 +54,7 @@ public class SqlNode extends AbstractNode {
     public void accept(CommandContext ctx) {
         ctx.addSql(sql);
 
-        if (ifelseChildNode && isBeginChildContextAndValidCoondition(ctx, sql)) {
+        if (ifelseChildNode && isBeginChildContextAndValidCondition(ctx, sql)) {
             // It does not skipped actually but it has not already needed to skip.
             ctx.setAlreadySkippedPrefix(true);
         }

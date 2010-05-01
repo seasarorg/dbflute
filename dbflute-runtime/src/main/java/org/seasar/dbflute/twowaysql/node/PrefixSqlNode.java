@@ -43,7 +43,7 @@ public class PrefixSqlNode extends AbstractNode {
     public void accept(CommandContext ctx) {
         if (ctx.isEnabled() || ctx.isAlreadySkippedPrefix()) {
             ctx.addSql(prefix);
-        } else if (isBeginChildContextAndValidCoondition(ctx, sql)) {
+        } else if (isBeginChildContextAndValidCondition(ctx, sql)) {
             // To skip prefix should be done only once
             // so it marks that a prefix already skipped.
             ctx.setAlreadySkippedPrefix(true);
