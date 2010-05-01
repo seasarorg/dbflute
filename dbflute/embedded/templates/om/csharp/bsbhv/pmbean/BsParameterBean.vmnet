@@ -72,8 +72,8 @@ namespace ${glPackageExtendedParameterBean} {
 
 #end
         // ===============================================================================
-        //                                                                          Helper
-        //                                                                          ======
+        //                                                                   Assist Helper
+        //                                                                   =============
         protected String ConvertEmptyToNullIfString(String value) {
             return FilterRemoveEmptyString(value);
         }
@@ -86,6 +86,20 @@ namespace ${glPackageExtendedParameterBean} {
             return "byte[" + (bytes != null ? bytes.Length.ToString() : "null") + "]";
         }
 
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
+        protected void AssertLikeSearchOptionValid(String name, ${glLikeSearchOption} option) {
+            if (option == null) {
+                String msg = "The argument '" + name + "' should not be null!";
+                throw new SystemException(msg);
+            }
+            if (option.isSplit()) {
+                String msg = "The split of like-search is NOT available on parameter-bean.";
+                msg = msg + " Don't use SplitByXxx(): " + option;
+                throw new SystemException(msg);
+            }
+        }
+
+#end
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============
@@ -131,9 +145,10 @@ namespace ${glPackageExtendedParameterBean} {
         }
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}(${propertyType} ${argumentName}, ${glLikeSearchOption} ${propertyName}Option) {
+        public void Set${database.initCap($propertyName)}(${propertyType} ${argumentName}, ${glLikeSearchOption} ${argumentName}Option) {
+            AssertLikeSearchOptionValid("${argumentName}Option", ${argumentName}Option);
             ${variableName} = ${argumentName};
-            ${variableName}InternalLikeSearchOption = ${propertyName}Option;
+            ${variableName}InternalLikeSearchOption = ${argumentName}Option;
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))

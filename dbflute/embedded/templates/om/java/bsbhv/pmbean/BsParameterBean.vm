@@ -13,6 +13,8 @@ import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
+import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 import org.seasar.dbflute.cbean.coption.FromToOption;
@@ -159,6 +161,20 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
     }
 
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
+    protected void assertLikeSearchOptionValid(String name, LikeSearchOption option) {
+        if (option == null) {
+            String msg = "The like-search option is required!";
+            throw new RequiredOptionNotFoundException(msg);
+        }
+        if (option.isSplit()) {
+            String msg = "The split of like-search is NOT available on parameter-bean.";
+            msg = msg + " Don't use splitByXxx(): " + option;
+            throw new IllegalOutsideSqlOperationException(msg);
+        }
+    }
+
+#end
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -234,9 +250,10 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     /**
      * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${argumentName} The value of ${propertyName}. (Nullable)
-     * @param ${argumentName}Option The option of likeSearch for ${propertyName}. (Nullable)
+     * @param ${argumentName}Option The option of likeSearch for ${propertyName} which is NOT split mode. (NotNull)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${argumentName}, LikeSearchOption ${argumentName}Option) {
+        assertLikeSearchOptionValid("${argumentName}Option", ${argumentName}Option);
         ${variableName} = ${argumentName};
         ${variableName}InternalLikeSearchOption = ${argumentName}Option;
     }
