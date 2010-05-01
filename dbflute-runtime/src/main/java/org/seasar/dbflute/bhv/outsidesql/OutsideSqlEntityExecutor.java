@@ -81,7 +81,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         try {
             ls = invoke(createSelectListCommand(path, pmb, entityType));
         } catch (DangerousResultSizeException e) {
-            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            final String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
         } finally {
@@ -91,7 +91,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
             return null;
         }
         if (ls.size() > 1) {
-            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            final String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
             throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
         return ls.get(0);

@@ -71,7 +71,7 @@ public class ValueAndTypeSetupper {
                 break;
             }
             final String currentName = _nameList.get(pos);
-            if (pos == 1) {// at the First Loop
+            if (pos == 1) { // at the First Loop
                 final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
                 if (hasLikeSearchOption(beanDesc, currentName)) {
                     likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
@@ -201,7 +201,7 @@ public class ValueAndTypeSetupper {
         } catch (RuntimeException e) {
             throwPropertyHandlingFailureException(beanType, beanValue, currentName, _expression, _specifiedSql, _bind,
                     e);
-            return null;// unreachable
+            return null; // unreachable
         }
     }
 

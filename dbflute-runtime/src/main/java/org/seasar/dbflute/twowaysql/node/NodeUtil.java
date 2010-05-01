@@ -87,7 +87,7 @@ public class NodeUtil {
         msg = msg + ln();
         msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + pmb + ln();
+        msg = msg + "[ParameterBean]" + ln() + pmb + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
