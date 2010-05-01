@@ -140,18 +140,18 @@ public class DfAdditionalForeignKeyInitializer {
                 foreignColumn.addReferrer(fk);
             }
         } else {
-            String msg = "    *Cannot add referrer!";
+            String msg = "  *Cannot add referrer!";
             _log.info(msg);
         }
     }
 
     protected void showResult(String foreignTableName, List<String> foreignColumnNameList, String fixedCondition,
             Table table, List<String> localColumnNameList) {
-        String msg = "    Add foreign key " + table.getName() + "." + localColumnNameList;
+        String msg = "  Add foreign key " + table.getName() + "." + localColumnNameList;
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             msg = msg + " to " + foreignTableName + "." + foreignColumnNameList;
             _log.info(msg);
-            String withFixedCondition = "    with " + fixedCondition;
+            String withFixedCondition = "  with " + fixedCondition;
             _log.info(withFixedCondition);
         } else {
             msg = msg + " to " + foreignTableName + "." + foreignColumnNameList;

@@ -85,11 +85,11 @@ public class DfAdditionalPrimaryKeyInitializer {
     }
 
     protected void showResult(String primaryKeyName, Table table, List<String> columnNameList) {
-        _log.info("    " + primaryKeyName);
+        _log.info("  " + primaryKeyName);
         if (columnNameList.size() == 1) {
-            _log.info("       Add primary key " + table.getName() + "." + columnNameList.get(0));
+            _log.info("    Add primary key " + table.getName() + "." + columnNameList.get(0));
         } else {
-            _log.info("       Add primary key " + table.getName() + "." + columnNameList);
+            _log.info("    Add primary key " + table.getName() + "." + columnNameList);
         }
     }
 

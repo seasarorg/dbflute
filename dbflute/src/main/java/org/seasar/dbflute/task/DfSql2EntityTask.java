@@ -850,33 +850,31 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         final Set<String> entityNameSet = _entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
-            final Map<String, DfColumnMetaInfo> columnMetaInfoMap = _entityInfoMap.get(entityName);
+            final Map<String, DfColumnMetaInfo> metaMap = _entityInfoMap.get(entityName);
 
             final Table tbl = new Table();
             tbl.setName(entityName);
             tbl.setupNeedsJavaNameConvertFalse();
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);
-            _log.info(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "
-                    + tbl.getUncapitalisedJavaName());
+            _log.info(entityName);
 
-            final boolean allCommonColumn = hasAllCommonColumn(columnMetaInfoMap);
-            final Set<String> columnNameSet = columnMetaInfoMap.keySet();
+            final boolean allCommonColumn = hasAllCommonColumn(metaMap);
+            final Set<String> columnNameSet = metaMap.keySet();
             for (String columnName : columnNameSet) {
                 final Column column = new Column();
                 setupColumnName(columnName, column);
                 setupPrimaryKey(entityName, columnName, column);
-                setupTorqueType(columnMetaInfoMap, columnName, column, allCommonColumn);
-                setupDbType(columnMetaInfoMap, columnName, column);
-                setupColumnSizeContainsDigit(columnMetaInfoMap, columnName, column);
-                setupColumnComment(columnMetaInfoMap, columnName, column);
-                setupSql2EntityRelatedTableName(columnMetaInfoMap, columnName, column);
-                setupSql2EntityRelatedColumnName(columnMetaInfoMap, columnName, column);
-                setupSql2EntityForcedJavaNative(columnMetaInfoMap, columnName, column);
+                setupTorqueType(metaMap, columnName, column, allCommonColumn);
+                setupDbType(metaMap, columnName, column);
+                setupColumnSizeContainsDigit(metaMap, columnName, column);
+                setupColumnComment(metaMap, columnName, column);
+                final String relatedTableName = setupSql2EntityRelatedTableName(metaMap, columnName, column);
+                final String relatedColumnName = setupSql2EntityRelatedColumnName(metaMap, columnName, column);
+                final String forcedJavaNative = setupSql2EntityForcedJavaNative(metaMap, columnName, column);
 
                 tbl.addColumn(column);
-                _log.info("   " + (column.isPrimaryKey() ? "*" : " ") + columnName + " --> " + column.getName() + " : "
-                        + column.getJavaName() + " : " + column.getUncapitalisedJavaName());
+                showColumnInfo(columnName, column, relatedTableName, relatedColumnName, forcedJavaNative);
             }
             _log.info("");
         }
@@ -918,7 +916,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected void setupTorqueType(Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, Column column,
+    protected void setupTorqueType(Map<String, DfColumnMetaInfo> metaMap, String columnName, Column column,
             boolean allCommonColumn) {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // If the select columns have common columns, 
@@ -931,13 +929,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 return;
             }
         }
-        final DfColumnMetaInfo columnMetaInfo = columnJdbcTypeMap.get(columnName);
+        final DfColumnMetaInfo columnMetaInfo = metaMap.get(columnName);
         final String columnTorqueType = getColumnTorqueType(columnMetaInfo);
         column.setJdbcType(columnTorqueType);
     }
 
-    protected void setupDbType(Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, Column column) {
-        final DfColumnMetaInfo columnMetaInfo = columnJdbcTypeMap.get(columnName);
+    protected void setupDbType(Map<String, DfColumnMetaInfo> metaMap, String columnName, Column column) {
+        final DfColumnMetaInfo columnMetaInfo = metaMap.get(columnName);
         column.setDbType(columnMetaInfo.getDbTypeName());
     }
 
@@ -954,17 +952,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return _columnHandler.getColumnJdbcType(columnMetaInfo);
     }
 
-    protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
-            String columnName, final Column column) {
-        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+    protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> metaMap, String columnName,
+            final Column column) {
+        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final int columnSize = metaInfo.getColumnSize();
         final int decimalDigits = metaInfo.getDecimalDigits();
         column.setupColumnSize(columnSize, decimalDigits);
     }
 
-    protected void setupColumnComment(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName,
+    protected void setupColumnComment(final Map<String, DfColumnMetaInfo> metaMap, String columnName,
             final Column column) {
-        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
         final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
         if (relatedTable == null) {
@@ -979,31 +977,33 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         column.setPlainComment(plainComment);
     }
 
-    protected void setupSql2EntityRelatedTableName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
-            String columnName, final Column column) {
-        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+    protected String setupSql2EntityRelatedTableName(final Map<String, DfColumnMetaInfo> metaMap, String columnName,
+            final Column column) {
+        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
         final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
         if (relatedTable == null) {
-            return;
+            return null;
         }
         column.setSql2EntityRelatedTableName(sql2EntityRelatedTableName);
+        return sql2EntityRelatedTableName;
     }
 
-    protected void setupSql2EntityRelatedColumnName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
-            String columnName, final Column column) {
-        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+    protected String setupSql2EntityRelatedColumnName(final Map<String, DfColumnMetaInfo> metaMap, String columnName,
+            final Column column) {
+        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
         final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
         if (relatedTable == null) {
-            return;
+            return null;
         }
         final String sql2EntityRelatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
         final Column relatedColumn = relatedTable.getColumn(sql2EntityRelatedColumnName);
         if (relatedColumn == null) {
-            return;
+            return null;
         }
         column.setSql2EntityRelatedColumnName(sql2EntityRelatedColumnName);
+        return sql2EntityRelatedColumnName;
     }
 
     protected Table getRelatedTable(String sql2EntityRelatedTableName) {
@@ -1020,11 +1020,32 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return relatedTable;
     }
 
-    protected void setupSql2EntityForcedJavaNative(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
-            String columnName, final Column column) {
-        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+    protected String setupSql2EntityForcedJavaNative(final Map<String, DfColumnMetaInfo> metaMap, String columnName,
+            final Column column) {
+        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final String sql2EntityForcedJavaNative = metaInfo.getSql2EntityForcedJavaNative();
         column.setSql2EntityForcedJavaNative(sql2EntityForcedJavaNative);
+        return sql2EntityForcedJavaNative;
+    }
+
+    protected void showColumnInfo(String columnName, Column column, String relatedTableName, String relatedColumnName,
+            String forcedJavaNatice) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(" ").append(column.isPrimaryKey() ? "*" : " ");
+        sb.append(columnName);
+        sb.append(" ");
+        sb.append(column.getDbTypeExpression());
+        final String columnSize = column.getColumnSize();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(columnSize)) {
+            sb.append("(").append(columnSize).append(")");
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(relatedColumnName)) {
+            sb.append(" related:").append(relatedTableName).append(".").append(relatedColumnName);
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(forcedJavaNatice)) {
+            sb.append(" forced:").append(forcedJavaNatice);
+        }
+        _log.info(sb.toString());
     }
 
     protected VelocityContext createVelocityContext(final AppData appData) {

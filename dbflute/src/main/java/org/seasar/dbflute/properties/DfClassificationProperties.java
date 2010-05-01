@@ -155,9 +155,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     classificationInfo.acceptClassificationBasicElementMap(elementMap);
                     final String where = (String) elementMap.get("where");
                     final String orderBy = (String) elementMap.get("orderBy");
-                    final String sql = buildSql(classificationInfo, table, where, orderBy);
+                    final String sql = buildTableClassificationSql(classificationInfo, table, where, orderBy);
                     final List<?> exceptCodeList = extractExceptCodeList(elementMap);
-                    setupTableClassification(elementList, sql, classificationInfo, exceptCodeList);
+                    setupTableClassification(classificationName, elementList, sql, classificationInfo, exceptCodeList);
 
                     // Save for auto deployment if it is NOT suppressAutoDeploy.
                     if (!isTableClassificationSuppressAutoDeploy(elementMap)) {
@@ -204,8 +204,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     // -----------------------------------------------------
-    //                                     Definition Helper
-    //                                     -----------------
+    //                       All-in-One Table Classification
+    //                       -------------------------------
     protected void setupAllInOneTableClassification(String sql) {
         final DfClassificationAllInOneSqlExecutor executor = new DfClassificationAllInOneSqlExecutor();
         final Connection conn = getDatabaseProperties().createMainSchemaConnection();
@@ -254,6 +254,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
     }
 
+    // -----------------------------------------------------
+    //                                        exceptCodeList
+    //                                        --------------
     protected List<?> extractExceptCodeList(final Map<?, ?> elementMap) {
         List<?> exceptCodeList = new ArrayList<Object>(); // Default Empty
         {
@@ -270,87 +273,82 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return exceptCodeList;
     }
 
-    protected String buildSql(DfClassificationElement element, String table, String where, String orderBy) {
+    // -----------------------------------------------------
+    //                                  Table Classification
+    //                                  --------------------
+    protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
+            String orderBy) {
         final String code = element.getCode();
         final String name = element.getName();
         final String alias = element.getAlias();
         final String comment = element.getComment();
-        return buildSql(code, name, alias, comment, table, where, orderBy);
+        return buildTableClassificationSql(code, name, alias, comment, table, where, orderBy);
     }
 
-    protected String buildSql(String code, String name, String alias, String comment, String table, String where,
-            String orderBy) {
+    protected String buildTableClassificationSql(String code, String name, String alias, String comment, String table,
+            String where, String orderBy) {
         final StringBuffer sb = new StringBuffer();
-        sb.append("select ").append(code).append(", ").append(name).append(", ").append(alias);
-        if (comment != null && comment.trim().length() != 0) {
-            sb.append(", ").append(comment);
+        sb.append("select ").append(code).append(" as code");
+        sb.append(", ").append(name).append(" as name");
+        sb.append(", ").append(alias).append(" as alias");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+            sb.append(", ").append(comment).append(" as comment");
+        } else {
+            sb.append(", null as comment");
         }
-        sb.append(" from ").append(table);
-        if (where != null && where.trim().length() != 0) {
+        sb.append(ln()); // only here
+        sb.append("  from ").append(table);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(where)) {
             sb.append(" where ").append(where);
         }
-        if (orderBy != null && orderBy.trim().length() != 0) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(orderBy)) {
             sb.append(" order by ").append(orderBy);
         }
         return sb.toString();
     }
 
-    protected void setupTableClassification(List<Map<String, String>> elementList, String sql,
-            DfClassificationElement element, List<?> exceptCodeList) {
-        final String code = element.getCode();
-        final String name = element.getName();
-        final String alias = element.getAlias();
-        final String comment = element.getComment();
-        doSetupTableClassification(elementList, sql, code, name, alias, comment, exceptCodeList);
+    protected void setupTableClassification(String classificationName, List<Map<String, String>> elementList,
+            String sql, DfClassificationElement element, List<?> exceptCodeList) {
+        doSetupTableClassification(classificationName, elementList, sql, exceptCodeList);
     }
 
-    protected void doSetupTableClassification(List<Map<String, String>> elementList, String sql, String code,
-            String name, String alias, String comment, List<?> exceptCodeList) {
-        code = removeAliasPrefixIfNeeds(code);
-        name = removeAliasPrefixIfNeeds(name);
-        alias = removeAliasPrefixIfNeeds(alias);
-        comment = removeAliasPrefixIfNeeds(comment);
-
+    protected void doSetupTableClassification(String classificationName, List<Map<String, String>> elementList,
+            String sql, List<?> exceptCodeList) {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         try {
             conn = getDatabaseProperties().createMainSchemaConnection();
             stmt = conn.createStatement();
-            _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.debug("The classification sql: " + sql);
+            _log.info("...Selecting for " + classificationName + " classification" + ln() + sql);
             rs = stmt.executeQuery(sql);
             final Set<String> codeDuplicateCheckSet = new HashSet<String>();
             while (rs.next()) {
-                final String tmpCodeValue = rs.getString(code);
-                final String tmpNameValue = rs.getString(name);
-                final String tmpAliasValue = rs.getString(alias);
-                String tmpCommentValue = null;
-                if (comment != null && comment.trim().length() != 0) {
-                    tmpCommentValue = rs.getString(comment);
-                }
+                final String tmpCodeValue = rs.getString("code");
+                final String tmpNameValue = rs.getString("name");
+                final String tmpAliasValue = rs.getString("alias");
+                final String tmpCommentValue = rs.getString("comment");
 
                 if (exceptCodeList.contains(tmpCodeValue)) {
-                    _log.debug("    exceptCode: " + tmpCodeValue);
+                    _log.info("  except code: " + tmpCodeValue);
                     continue;
                 }
 
                 if (codeDuplicateCheckSet.contains(tmpCodeValue)) {
-                    _log.debug("    duplicate: " + tmpCodeValue);
+                    _log.info("  duplicate: " + tmpCodeValue);
                     continue;
                 }
 
                 final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
                 selectedTmpMap.put(DfClassificationElement.KEY_CODE, tmpCodeValue);
                 selectedTmpMap.put("name", filterTableClassificationName(tmpNameValue));
-                selectedTmpMap.put("alias", tmpAliasValue);
-                if (tmpCommentValue != null) {
+                selectedTmpMap.put("alias", tmpAliasValue); // already adjusted at SQL
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(tmpCommentValue)) {
                     selectedTmpMap.put("comment", tmpCommentValue);
                 }
                 elementList.add(selectedTmpMap);
                 codeDuplicateCheckSet.add(tmpCodeValue);
             }
-            _log.debug("- - - - - - - - /");
         } catch (SQLException e) {
             throw new RuntimeException("The sql is " + sql, e);
         } finally {

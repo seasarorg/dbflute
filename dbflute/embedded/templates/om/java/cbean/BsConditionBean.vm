@@ -14,6 +14,9 @@ import org.seasar.dbflute.cbean.chelper.*;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+#if ($table.hasPrimaryKeyForcedClassificationSetting())
+import ${glPackageBaseCommon}.${glCDef};
+#end
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
 import ${glPackageBaseCommon}.${glImplementedInvokerAssistant};

@@ -81,11 +81,11 @@ public class DfAdditionalUniqueKeyInitializer {
     }
 
     protected void showResult(String uniqueKeyName, Table table, List<String> columnNameList) {
-        _log.info("    " + uniqueKeyName);
+        _log.info("  " + uniqueKeyName);
         if (columnNameList.size() == 1) {
-            _log.info("       Add unique key " + table.getName() + "." + columnNameList.get(0));
+            _log.info("    Add unique key " + table.getName() + "." + columnNameList.get(0));
         } else {
-            _log.info("       Add unique key " + table.getName() + "." + columnNameList);
+            _log.info("    Add unique key " + table.getName() + "." + columnNameList);
         }
     }
 
