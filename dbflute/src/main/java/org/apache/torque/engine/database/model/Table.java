@@ -1966,6 +1966,26 @@ public class Table {
         return false;
     }
 
+    public boolean hasTableClassification() {
+        final Column[] columns = getColumns();
+        for (Column column : columns) {
+            if (column.isTableClassification()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasImplicitClassification() {
+        final Column[] columns = getColumns();
+        for (Column column : columns) {
+            if (!column.isTableClassification()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasPrimaryKeyForcedClassificationSetting() {
         final List<Column> columns = getPrimaryKey();
         for (Column column : columns) {

@@ -238,6 +238,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 #end
 #end
+#if ($table.hasImplicitClassification())
     // ===================================================================================
     //                                                           Classification Name/Alias
     //                                                           =========================
@@ -265,6 +266,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return cdef != null ? cdef.alias() : null;
     }
 
+#end
 #end
 #end
 #end

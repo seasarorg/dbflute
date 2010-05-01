@@ -22,20 +22,20 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
+    # example for implicit classification
     #; Flg = list:{
-    #    ; map:{topComment=フラグを示す; dataType=Number}
-    #    ; map:{code=1; name=True ; alias=はい  ; comment=有効を示す}
-    #    ; map:{code=0; name=False; alias=いいえ; comment=無効を示す}
+    #    ; map:{topComment=general boolean classification: for every flg-column; dataType=Number}
+    #    ; map:{code=1; name=True ; alias=Yes ; comment=means valid}
+    #    ; map:{code=0; name=False; alias=No  ; comment=means invalid}
     #}
+    # example for table classification
     #; MemberStatus = list:{
-    #    ; map:{topComment=会員の状態を示す; dataType=String}
-    #    ; map:{topComment=入会から退会までの会員のステータスを示す}
-    #    ; map:{code=PRV; name=Provisional; alias=仮会員  ; comment=入会直後のステータスで一部のサイトサービスが利用可能}
-    #    ; map:{code=FML; name=Formalized ; alias=正式会員; comment=正式な会員としてサイトサービスが利用可能}
-    #    ; map:{code=WDL; name=Withdrawal ; alias=退会会員; comment=退会が確定した会員でサイトサービスはダメ}
-    #
-    #    # If you use table classification, specify like this:
-    #    #; map:{table=MEMBER_STATUS; code=MEMBER_STATUS_CODE; name=MEMBER_STATUS_NAME; orderBy=DISPLAY_ORDER}
+    #    ; map:{topComment=status of member: from entry to withdrawal}
+    #    ; map:{
+    #        ; table=MEMBER_STATUS
+    #        ; code=MEMBER_STATUS_CODE; name=MEMBER_STATUS_NAME
+    #        ; comment=DESCRIPTION; orderBy=DISPLAY_ORDER
+    #    }
     #}
 }
 # ----------------/

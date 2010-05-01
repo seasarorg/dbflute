@@ -196,6 +196,7 @@ namespace ${myExtendedEntityPackageName} {
 #end
         #endregion
 
+#if ($table.hasImplicitClassification())
         // ===============================================================================
         //                                                       Classification Name/Alias
         //                                                       =========================
@@ -225,6 +226,7 @@ namespace ${myExtendedEntityPackageName} {
 #end
         #endregion
 
+#end
 #end
         // ===============================================================================
         //                                                                Foreign Property
