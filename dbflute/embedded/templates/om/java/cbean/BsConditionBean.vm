@@ -150,9 +150,6 @@ public class ${myClassName} extends AbstractConditionBean {
         return new ${myConditionQueryClassName}(childQuery, sqlClause, aliasName, nestLevel);
     }
 
-    /**
-     * ${database.implementComment}
-     */
     public ConditionQuery localCQ() {
         return getConditionQuery();
     }
