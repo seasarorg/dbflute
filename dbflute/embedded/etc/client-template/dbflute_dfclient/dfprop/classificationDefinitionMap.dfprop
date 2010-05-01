@@ -6,7 +6,7 @@
 # Specification:
 # map: {
 #     [classification-name] = list:{
-#         ; map:{topComment=[comment]; codeType=[String(default) or Number]}
+#         ; map:{topComment=[comment]; codeType=[String(default) or Number or Boolean]}
 #         ; map:{code=[code]; name=[name]; alias=[alias]; comment=[comment]}
 #         ; map:{
 #             ; table=[table-name]
@@ -24,13 +24,13 @@
 map:{
     # example for implicit classification
     #; Flg = list:{
-    #    ; map:{topComment=general boolean classification: for every flg-column; codeType=Number}
-    #    ; map:{code=1; name=True ; alias=Yes ; comment=means valid}
-    #    ; map:{code=0; name=False; alias=No  ; comment=means invalid}
+    #    ; map:{topComment=general boolean classification for every flg-column; codeType=Number}
+    #    ; map:{code=1; name=True ; alias=Yes; comment=means valid}
+    #    ; map:{code=0; name=False; alias=No ; comment=means invalid}
     #}
     # example for table classification
     #; MemberStatus = list:{
-    #    ; map:{topComment=status of member: from entry to withdrawal}
+    #    ; map:{topComment=status of member from entry to withdrawal}
     #    ; map:{
     #        ; table=MEMBER_STATUS
     #        ; code=MEMBER_STATUS_CODE; name=MEMBER_STATUS_NAME
