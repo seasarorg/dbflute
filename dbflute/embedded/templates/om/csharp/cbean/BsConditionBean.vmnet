@@ -31,8 +31,9 @@ namespace ${glPackageBaseCB} {
         //                                                             PrimaryKey Handling
         //                                                             ===================
 #if ($table.hasPrimaryKey())
+## assert method same as Java
         public void AcceptPrimaryKey(${table.primaryKeyArgsString}) {
-            ${table.primaryKeyArgsAssertString}## assert method same as Java
+            ${table.primaryKeyArgsAssertString}
             ${myClassName} cb = this;
             ${table.primaryKeyArgsConditionSetupStringCSharp}
         }
