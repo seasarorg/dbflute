@@ -108,6 +108,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         String fixedCondition = componentMap.get(KEY_FIXED_CONDITION);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
+            // adjust a little about camel case
             fixedCondition = DfStringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
             fixedCondition = DfStringUtil.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
             fixedCondition = DfStringUtil.replace(fixedCondition, "$$LocalAlias$$", "$$localAlias$$");
