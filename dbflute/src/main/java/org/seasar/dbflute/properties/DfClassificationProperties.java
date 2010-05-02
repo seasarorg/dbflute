@@ -256,19 +256,19 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                  --------------------
     protected void processTableClassification(String classificationName, Map<?, ?> elementMap, String table,
             List<Map<String, String>> elementList) {
-        final DfClassificationElement classificationInfo = new DfClassificationElement();
-        classificationInfo.setClassificationName(classificationName);
-        classificationInfo.setTable(table);
-        classificationInfo.acceptClassificationBasicElementMap(elementMap);
+        final DfClassificationElement element = new DfClassificationElement();
+        element.setClassificationName(classificationName);
+        element.setTable(table);
+        element.acceptClassificationBasicElementMap(elementMap);
         final String where = (String) elementMap.get("where");
         final String orderBy = (String) elementMap.get("orderBy");
-        final String sql = buildTableClassificationSql(classificationInfo, table, where, orderBy);
+        final String sql = buildTableClassificationSql(element, table, where, orderBy);
         final Set<String> exceptCodeSet = extractExceptCodeSet(elementMap);
-        setupTableClassification(classificationName, elementList, sql, classificationInfo, exceptCodeSet);
+        setupTableClassification(classificationName, elementList, sql, element, exceptCodeSet);
 
         // save for auto deployment if it is NOT suppressAutoDeploy.
         if (!isTableClassificationSuppressAutoDeploy(elementMap)) {
-            _tableClassificationMap.put(classificationName, classificationInfo);
+            _tableClassificationMap.put(classificationName, element);
         }
     }
 
@@ -281,18 +281,18 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final StringBuffer sb = new StringBuffer();
         sb.append("select ").append(code).append(" as cls_code");
         sb.append(", ").append(name).append(" as cls_name");
-        sb.append(", ").append(alias).append(" as cls_alias");
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
-            sb.append(", ").append(comment).append(" as cls_comment");
-        } else {
-            sb.append(", null as comment");
-        }
-        sb.append(ln()); // only here
+        sb.append(ln());
+        sb.append("     , ").append(alias).append(" as cls_alias");
+        final String commentColumn = Srl.is_NotNull_and_NotTrimmedEmpty(comment) ? comment : "null";
+        sb.append(", ").append(commentColumn).append(" as cls_comment");
+        sb.append(ln());
         sb.append("  from ").append(table);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(where)) {
+            sb.append(ln());
             sb.append(" where ").append(where);
         }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(orderBy)) {
+            sb.append(ln());
             sb.append(" order by ").append(orderBy);
         }
         return sb.toString();
@@ -351,7 +351,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 selectedMap.put(DfClassificationElement.KEY_CODE, currentCode);
                 selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(currentName));
                 selectedMap.put(DfClassificationElement.KEY_ALIAS, currentAlias); // already adjusted at SQL
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) {
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) { // because of not required
                     selectedMap.put(DfClassificationElement.KEY_COMMENT, currentComment);
                 }
                 elementList.add(selectedMap);
