@@ -389,11 +389,11 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertObjectNotNull(String variableName, Object arg) {
             if (variableName == null) {
                 String msg = "Argument[variableName] should not be null.";
-                throw new ArgumentNullException(msg);
+                throw new SystemException(msg);
             }
             if (arg == null) {
                 String msg = "Argument[" + variableName + "] should not be null.";
-                throw new ArgumentNullException(msg);
+                throw new SystemException(msg);
             }
         }
 
@@ -409,7 +409,7 @@ namespace ${glPackageBaseCommonBhv} {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 String msg = "The entity should have primary-key: entity=" + entity;
-                throw new ArgumentOutOfRangeException(msg + entity);
+                throw new SystemException(msg + entity);
             }
         }
 
@@ -419,15 +419,15 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             if (variableName == null) {
                 String msg = "Variable[variableName] should not be null.";
-                throw new ArgumentNullException(msg);
+                throw new SystemException(msg);
             }
             if (value == null) {
                 String msg = "Variable[" + variableName + "] should not be null.";
-                throw new ArgumentNullException(msg);
+                throw new SystemException(msg);
             }
             if (value.Trim().Length == 0) {
                 String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
-                throw new ArgumentOutOfRangeException(msg);
+                throw new SystemException(msg);
             }
         }
 
@@ -438,7 +438,7 @@ namespace ${glPackageBaseCommonBhv} {
             AssertObjectNotNull(variableName, ls);
             if (!(ls.Count == 0)) {
                 String msg = "The list[" + variableName + "] should be empty: ls=" + ls.ToString();
-                throw new ArgumentOutOfRangeException(msg);
+                throw new SystemException(msg);
             }
         }
 
@@ -446,7 +446,7 @@ namespace ${glPackageBaseCommonBhv} {
             AssertObjectNotNull(variableName, ls);
             if (ls.Count == 0) {
                 String msg = "The list[" + variableName + "] should not be empty: ls=" + ls.ToString();
-                throw new ArgumentOutOfRangeException(msg);
+                throw new SystemException(msg);
             }
         }
 
@@ -454,7 +454,7 @@ namespace ${glPackageBaseCommonBhv} {
             AssertObjectNotNull(variableName, ls);
             if (ls.Count != 1) {
                 String msg = "The list[" + variableName + "] should contain only one object: ls=" + ls.ToString();
-                throw new ArgumentOutOfRangeException(msg);
+                throw new SystemException(msg);
             }
         }
         #endregion

@@ -326,6 +326,17 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                   Assert Helper
         //                                                                   =============
+        protected void assertObjectNotNull(String variableName, Object arg) {
+            if (variableName == null) {
+                String msg = "Argument[variableName] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            if (arg == null) {
+                String msg = "Argument[" + variableName + "] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+
         protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
             if (HasUnionQueryOrUnionAllQuery()) {
                 throwSetupSelectAfterUnionException(this.GetType().Name, foreignPropertyName);
