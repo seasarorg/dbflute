@@ -228,13 +228,14 @@ public class TnBasicHandler {
     // ===================================================================================
     //                                                                   Exception Handler
     //                                                                   =================
-    protected void handleSQLException(SQLException e, Statement statement) {
-        handleSQLException(e, statement, false);
+    protected void handleSQLException(SQLException e, Statement st) {
+        handleSQLException(e, st, false);
     }
 
-    protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
-        String completeSql = buildExceptionMessageSql();
-        createSQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, completeSql);
+    protected void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid) {
+        final String executedSql = sql;
+        final String displaySql = buildExceptionMessageSql();
+        createSQLExceptionHandler().handleSQLException(e, st, uniqueConstraintValid, executedSql, displaySql);
     }
 
     protected SQLExceptionHandler createSQLExceptionHandler() {
@@ -242,14 +243,14 @@ public class TnBasicHandler {
     }
 
     protected String buildExceptionMessageSql() {
-        String completeSql = null;
+        String displaySql = null;
         if (sql != null && exceptionMessageSqlArgs != null) {
             try {
-                completeSql = getDisplaySql(exceptionMessageSqlArgs);
+                displaySql = getDisplaySql(exceptionMessageSqlArgs);
             } catch (RuntimeException ignored) {
             }
         }
-        return completeSql;
+        return displaySql;
     }
 
     // ===================================================================================

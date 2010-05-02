@@ -51,15 +51,28 @@ public class SQLExceptionHandler {
         handleSQLException(e, st, false);
     }
 
+    /**
+     * @param e The instance of SQLException. (NotNull)
+     * @param st The instance of statement. (Nullable)
+     * @param uniqueConstraintValid Is unique constraint handling valid?
+     */
     public void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid) {
-        handleSQLException(e, st, uniqueConstraintValid, null);
+        handleSQLException(e, st, uniqueConstraintValid, null, null);
     }
 
-    public void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid, String completeSql) {
+    /**
+     * @param e The instance of SQLException. (NotNull)
+     * @param st The instance of statement. (Nullable)
+     * @param uniqueConstraintValid Is unique constraint handling valid?
+     * @param executedSql The executed SQL which does not have bind values. (Nullable)
+     * @param displaySql The SQL for display which has bind values (embedded on SQL). (Nullable)
+     */
+    public void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid, String executedSql,
+            String displaySql) {
         if (uniqueConstraintValid && isUniqueConstraintException(e)) {
-            throwEntityAlreadyExistsException(e, st, completeSql);
+            throwEntityAlreadyExistsException(e, st, executedSql, displaySql);
         }
-        throwSQLFailureException(e, st, completeSql);
+        throwSQLFailureException(e, st, executedSql, displaySql);
     }
 
     protected boolean isUniqueConstraintException(SQLException e) {
@@ -72,23 +85,23 @@ public class SQLExceptionHandler {
     // ===================================================================================
     //                                                                               Throw
     //                                                                               =====
-    protected void throwEntityAlreadyExistsException(SQLException e, Statement st, String displaySql) {
+    protected void throwEntityAlreadyExistsException(SQLException e, Statement st, String executedSql, String displaySql) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The entity already exists on the database!");
         br.addItem("Advice");
         br.addElement("Please confirm the primary key whether it already exists on the database.");
         br.addElement("And confirm the unique constraint for other columns.");
-        setupCommonElement(br, e, st, displaySql);
+        setupCommonElement(br, e, st, executedSql, displaySql);
         final String msg = br.buildExceptionMessage();
         throw new EntityAlreadyExistsException(msg, e);
     }
 
-    protected void throwSQLFailureException(SQLException e, Statement statement, String displaySql) {
+    protected void throwSQLFailureException(SQLException e, Statement st, String executedSql, String displaySql) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The SQL failed to execute!");
         br.addItem("Advice");
         br.addElement("Please confirm the SQLException message.");
-        setupCommonElement(br, e, statement, displaySql);
+        setupCommonElement(br, e, st, executedSql, displaySql);
         final String msg = br.buildExceptionMessage();
         throw new SQLFailureException(msg, e);
     }
@@ -100,7 +113,8 @@ public class SQLExceptionHandler {
     // ===================================================================================
     //                                                                             Element
     //                                                                             =======
-    protected void setupCommonElement(ExceptionMessageBuilder br, SQLException e, Statement st, String displaySql) {
+    protected void setupCommonElement(ExceptionMessageBuilder br, SQLException e, Statement st, String executedSql,
+            String displaySql) {
         br.addItem("SQLState");
         br.addElement(extractSQLState(e));
         br.addItem("ErrorCode");
@@ -110,7 +124,7 @@ public class SQLExceptionHandler {
         setupConditionBeanElement(br);
         setupOutsideSqlElement(br);
         setupStatementElement(br, st);
-        setupDisplaySqlElement(br, displaySql);
+        setupTargetSqlElement(br, executedSql, displaySql);
     }
 
     protected void setupSQLExceptionElement(ExceptionMessageBuilder br, SQLException e) {
@@ -153,7 +167,8 @@ public class SQLExceptionHandler {
         }
     }
 
-    // *because of existing displaySql instead
+    // *because displaySql exists instead
+    //  (and for security to application data)
     //protected void setupParameterBeanElement(ExceptionMessageBuilder br) {
     //    if (hasOutsideSqlContext()) {
     //        br.addItem("ParameterBean");
@@ -168,11 +183,20 @@ public class SQLExceptionHandler {
         }
     }
 
-    protected void setupDisplaySqlElement(ExceptionMessageBuilder br, String displaySql) {
+    // if you want to completely remove application data from exception message,
+    // you should override and use executedSql instead of displaySql or set up nothing
+    // (if you use embedded variables in the SQL, executedSql may also have application data)
+    protected void setupTargetSqlElement(ExceptionMessageBuilder br, String executedSql, String displaySql) {
         if (displaySql != null) {
+            // uses displaySql as default
             br.addItem("Display SQL");
             br.addElement(displaySql);
         }
+        //if (executedSql != null) {
+        //    br.addItem("Executed SQL");
+        //    br.addElement(executedSql);
+        //    br.addElement("*NOT use displaySql for security");
+        //}
     }
 
     // ===================================================================================
