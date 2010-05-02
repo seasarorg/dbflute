@@ -167,7 +167,7 @@ public class SQLExceptionHandler {
         }
     }
 
-    // *because displaySql exists instead
+    // *because displaySql exists instead which is enough to debug the exception
     //  (and for security to application data)
     //protected void setupParameterBeanElement(ExceptionMessageBuilder br) {
     //    if (hasOutsideSqlContext()) {
@@ -183,12 +183,30 @@ public class SQLExceptionHandler {
         }
     }
 
-    // if you want to completely remove application data from exception message,
-    // you should override and use executedSql instead of displaySql or set up nothing
-    // (if you use embedded variables in the SQL, executedSql may also have application data)
+    /**
+     * Set up the element of target SQL. <br />
+     * It uses displaySql as default.
+     * <p>
+     * If you want to hide application data on exception message,
+     * you should override and use executedSql instead of displaySql or set up nothing.
+     * But you should consider the following things:
+     * </p>
+     * <ul>
+     *     <li>Debug process becomes more difficult.</li>
+     *     <li>If you use embedded variables in the SQL, executedSql may also have application data.</li>
+     *     <li>JDBC driver's message may also have application data about exception's cause.</li>
+     * </ul>
+     * <p>
+     * So if you want to COMPLETELY hide application data on exception message,
+     * you should cipher your application logs (files).
+     * (If you hide JDBC driver's message too, you'll be at a loss when you debug)
+     * </p>
+     * @param br The builder of exception message. (NotNull)
+     * @param executedSql The executed SQL which does not have bind values. (Nullable)
+     * @param displaySql The SQL for display which has bind values (embedded on SQL). (Nullable)
+     */
     protected void setupTargetSqlElement(ExceptionMessageBuilder br, String executedSql, String displaySql) {
         if (displaySql != null) {
-            // uses displaySql as default
             br.addItem("Display SQL");
             br.addElement(displaySql);
         }
