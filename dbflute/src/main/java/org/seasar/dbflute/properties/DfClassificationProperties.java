@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +18,10 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationAllInOneSqlExecutor;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
@@ -28,6 +29,7 @@ import org.seasar.dbflute.properties.assistant.classification.DfClassificationIl
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -119,7 +121,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             // - - - - - - - - - - - - -
             if (classificationName.equalsIgnoreCase("$$SQL$$")) {
                 final String topSql = (String) plainClassificationDefinitionMap.get(classificationName);
-                setupAllInOneTableClassification(topSql);
+                processAllInOneTableClassification(topSql);
                 continue;
             }
 
@@ -148,22 +150,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 // from Table
                 // - - - - - -
                 final String table = (String) elementMap.get(DfClassificationElement.KEY_TABLE);
-                if (table != null) {
-                    // Classification
-                    final DfClassificationElement classificationInfo = new DfClassificationElement();
-                    classificationInfo.setClassificationName(classificationName);
-                    classificationInfo.setTable(table);
-                    classificationInfo.acceptClassificationBasicElementMap(elementMap);
-                    final String where = (String) elementMap.get("where");
-                    final String orderBy = (String) elementMap.get("orderBy");
-                    final String sql = buildTableClassificationSql(classificationInfo, table, where, orderBy);
-                    final List<?> exceptCodeList = extractExceptCodeList(elementMap);
-                    setupTableClassification(classificationName, elementList, sql, classificationInfo, exceptCodeList);
-
-                    // Save for auto deployment if it is NOT suppressAutoDeploy.
-                    if (!isTableClassificationSuppressAutoDeploy(elementMap)) {
-                        _tableClassificationMap.put(classificationName, classificationInfo);
-                    }
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(table)) {
+                    processTableClassification(classificationName, elementMap, table, elementList);
                     continue;
                 }
 
@@ -171,7 +159,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 // from Literal
                 // - - - - - - -
                 if (isElementMapClassificationTop(elementMap)) {
-                    setupClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
+                    processClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
                 } else {
                     literalArranger.arrange(classificationName, elementMap, elementList);
                 }
@@ -207,7 +195,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // -----------------------------------------------------
     //                       All-in-One Table Classification
     //                       -------------------------------
-    protected void setupAllInOneTableClassification(String sql) {
+    protected void processAllInOneTableClassification(String sql) {
         final DfClassificationAllInOneSqlExecutor executor = new DfClassificationAllInOneSqlExecutor();
         final Connection conn = getDatabaseProperties().createMainSchemaConnection();
         final List<Map<String, String>> resultList = executor.executeAllInOneSql(conn, sql);
@@ -266,6 +254,24 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // -----------------------------------------------------
     //                                  Table Classification
     //                                  --------------------
+    protected void processTableClassification(String classificationName, Map<?, ?> elementMap, String table,
+            List<Map<String, String>> elementList) {
+        final DfClassificationElement classificationInfo = new DfClassificationElement();
+        classificationInfo.setClassificationName(classificationName);
+        classificationInfo.setTable(table);
+        classificationInfo.acceptClassificationBasicElementMap(elementMap);
+        final String where = (String) elementMap.get("where");
+        final String orderBy = (String) elementMap.get("orderBy");
+        final String sql = buildTableClassificationSql(classificationInfo, table, where, orderBy);
+        final Set<String> exceptCodeSet = extractExceptCodeSet(elementMap);
+        setupTableClassification(classificationName, elementList, sql, classificationInfo, exceptCodeSet);
+
+        // save for auto deployment if it is NOT suppressAutoDeploy.
+        if (!isTableClassificationSuppressAutoDeploy(elementMap)) {
+            _tableClassificationMap.put(classificationName, classificationInfo);
+        }
+    }
+
     protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
             String orderBy) {
         final String code = element.getCode();
@@ -292,24 +298,28 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return sb.toString();
     }
 
-    protected List<?> extractExceptCodeList(final Map<?, ?> elementMap) {
-        List<?> exceptCodeList = new ArrayList<Object>(); // default empty
-        {
-            final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
-            if (exceptCodeObj != null) {
-                if (!(exceptCodeObj instanceof List<?>)) {
-                    String msg = "'exceptCodeList' should be java.util.List! But: " + exceptCodeObj.getClass();
-                    msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
-                    throw new IllegalStateException(msg);
-                }
-                exceptCodeList = (List<?>) exceptCodeObj;
+    protected Set<String> extractExceptCodeSet(final Map<?, ?> elementMap) {
+        final Set<String> exceptCodeSet;
+        final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
+        if (exceptCodeObj != null) {
+            if (!(exceptCodeObj instanceof List<?>)) {
+                String msg = "'exceptCodeList' should be java.util.List! But: " + exceptCodeObj.getClass();
+                msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
+                throw new DfIllegalPropertyTypeException(msg);
             }
+            final List<?> exceptCodeList = (List<?>) exceptCodeObj;
+            exceptCodeSet = StringSet.createAsCaseInsensitive();
+            for (Object exceptCode : exceptCodeList) {
+                exceptCodeSet.add((String) exceptCode);
+            }
+        } else {
+            exceptCodeSet = DfCollectionUtil.emptySet(); // default empty
         }
-        return exceptCodeList;
+        return exceptCodeSet;
     }
 
     protected void setupTableClassification(String classificationName, List<Map<String, String>> elementList,
-            String sql, DfClassificationElement element, List<?> exceptCodeList) {
+            String sql, DfClassificationElement element, Set<String> exceptCodeSet) {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
@@ -318,32 +328,33 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             stmt = conn.createStatement();
             _log.info("...Selecting for " + classificationName + " classification" + ln() + sql);
             rs = stmt.executeQuery(sql);
-            final Set<String> codeDuplicateCheckSet = new HashSet<String>();
+            final Set<String> duplicateCheckSet = StringSet.createAsCaseInsensitive();
             while (rs.next()) {
                 final String currentCode = rs.getString("cls_code");
                 final String currentName = rs.getString("cls_name");
                 final String currentAlias = rs.getString("cls_alias");
                 final String currentComment = rs.getString("cls_comment");
 
-                if (exceptCodeList.contains(currentCode)) {
-                    _log.info("  except code: " + currentCode);
+                if (exceptCodeSet.contains(currentCode)) {
+                    _log.info("  exceptd: " + currentCode);
                     continue;
                 }
 
-                if (codeDuplicateCheckSet.contains(currentCode)) {
+                if (duplicateCheckSet.contains(currentCode)) {
                     _log.info("  duplicate: " + currentCode);
                     continue;
+                } else {
+                    duplicateCheckSet.add(currentCode);
                 }
 
-                final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
-                selectedTmpMap.put(DfClassificationElement.KEY_CODE, currentCode);
-                selectedTmpMap.put("name", filterTableClassificationName(currentName));
-                selectedTmpMap.put("alias", currentAlias); // already adjusted at SQL
+                final Map<String, String> selectedMap = newLinkedHashMap();
+                selectedMap.put(DfClassificationElement.KEY_CODE, currentCode);
+                selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(currentName));
+                selectedMap.put(DfClassificationElement.KEY_ALIAS, currentAlias); // already adjusted at SQL
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) {
-                    selectedTmpMap.put("comment", currentComment);
+                    selectedMap.put(DfClassificationElement.KEY_COMMENT, currentComment);
                 }
-                elementList.add(selectedTmpMap);
-                codeDuplicateCheckSet.add(currentCode);
+                elementList.add(selectedMap);
             }
         } catch (SQLException e) {
             throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
@@ -359,7 +370,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return Srl.camelize(name, " ", "_", "-"); // for method name
     }
 
-    protected void setupClassificationTopFromLiteralIfNeeds(String classificationName, Map<?, ?> elementMap) {
+    protected void processClassificationTopFromLiteralIfNeeds(String classificationName, Map<?, ?> elementMap) {
         if (_classificationTopDefinitionMap.containsKey(classificationName)) {
             return;
         }

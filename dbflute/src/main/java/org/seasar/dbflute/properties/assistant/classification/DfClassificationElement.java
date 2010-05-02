@@ -12,21 +12,21 @@ public class DfClassificationElement {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    public static final String KEY_TABLE = "table";
     public static final String KEY_CODE = "code";
     public static final String KEY_NAME = "name";
     public static final String KEY_ALIAS = "alias";
     public static final String KEY_COMMENT = "comment";
-    public static final String KEY_TABLE = "table";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String classificationName;
+    protected String _classificationName;
+    protected String _table;
     protected String _code;
     protected String _name;
     protected String _alias;
     protected String _comment;
-    protected String _table;
 
     // ===================================================================================
     //                                                                              Accept
@@ -64,18 +64,27 @@ public class DfClassificationElement {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _code + ", " + _name + ", " + _alias + ", " + _comment + "}";
+        return _classificationName + ":{" + _table + ", " + _code + ", " + _name + ", " + _alias + ", " + _comment
+                + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getClassificationName() {
-        return classificationName;
+        return _classificationName;
     }
 
     public void setClassificationName(String classificationName) {
-        this.classificationName = classificationName;
+        this._classificationName = classificationName;
+    }
+
+    public String getTable() {
+        return _table;
+    }
+
+    public void setTable(String table) {
+        this._table = table;
     }
 
     public String getCode() {
@@ -108,13 +117,5 @@ public class DfClassificationElement {
 
     public void setComment(String comment) {
         this._comment = comment;
-    }
-
-    public String getTable() {
-        return _table;
-    }
-
-    public void setTable(String table) {
-        this._table = table;
     }
 }
