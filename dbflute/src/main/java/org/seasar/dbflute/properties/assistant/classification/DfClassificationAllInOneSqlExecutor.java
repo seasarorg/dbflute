@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -69,10 +71,14 @@ public class DfClassificationAllInOneSqlExecutor {
             }
             _log.debug("- - - - - - - - /");
         } catch (SQLException e) {
-            throw new RuntimeException("The sql is " + sql, e);
+            throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
         } finally {
             new DfClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
         }
         return elementList;
+    }
+
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }

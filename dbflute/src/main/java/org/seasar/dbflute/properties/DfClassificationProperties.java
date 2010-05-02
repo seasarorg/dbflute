@@ -19,6 +19,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationAllInOneSqlExecutor;
@@ -263,25 +264,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     // -----------------------------------------------------
-    //                                        exceptCodeList
-    //                                        --------------
-    protected List<?> extractExceptCodeList(final Map<?, ?> elementMap) {
-        List<?> exceptCodeList = new ArrayList<Object>(); // Default Empty
-        {
-            final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
-            if (exceptCodeObj != null) {
-                if (!(exceptCodeObj instanceof List<?>)) {
-                    String msg = "'exceptCodeList' should be java.util.List! But: " + exceptCodeObj.getClass();
-                    msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
-                    throw new IllegalStateException(msg);
-                }
-                exceptCodeList = (List<?>) exceptCodeObj;
-            }
-        }
-        return exceptCodeList;
-    }
-
-    // -----------------------------------------------------
     //                                  Table Classification
     //                                  --------------------
     protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
@@ -290,17 +272,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String name = element.getName();
         final String alias = element.getAlias();
         final String comment = element.getComment();
-        return buildTableClassificationSql(code, name, alias, comment, table, where, orderBy);
-    }
-
-    protected String buildTableClassificationSql(String code, String name, String alias, String comment, String table,
-            String where, String orderBy) {
         final StringBuffer sb = new StringBuffer();
-        sb.append("select ").append(code).append(" as code");
-        sb.append(", ").append(name).append(" as name");
-        sb.append(", ").append(alias).append(" as alias");
+        sb.append("select ").append(code).append(" as cls_code");
+        sb.append(", ").append(name).append(" as cls_name");
+        sb.append(", ").append(alias).append(" as cls_alias");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
-            sb.append(", ").append(comment).append(" as comment");
+            sb.append(", ").append(comment).append(" as cls_comment");
         } else {
             sb.append(", null as comment");
         }
@@ -315,13 +292,24 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return sb.toString();
     }
 
-    protected void setupTableClassification(String classificationName, List<Map<String, String>> elementList,
-            String sql, DfClassificationElement element, List<?> exceptCodeList) {
-        doSetupTableClassification(classificationName, elementList, sql, exceptCodeList);
+    protected List<?> extractExceptCodeList(final Map<?, ?> elementMap) {
+        List<?> exceptCodeList = new ArrayList<Object>(); // default empty
+        {
+            final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
+            if (exceptCodeObj != null) {
+                if (!(exceptCodeObj instanceof List<?>)) {
+                    String msg = "'exceptCodeList' should be java.util.List! But: " + exceptCodeObj.getClass();
+                    msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
+                    throw new IllegalStateException(msg);
+                }
+                exceptCodeList = (List<?>) exceptCodeObj;
+            }
+        }
+        return exceptCodeList;
     }
 
-    protected void doSetupTableClassification(String classificationName, List<Map<String, String>> elementList,
-            String sql, List<?> exceptCodeList) {
+    protected void setupTableClassification(String classificationName, List<Map<String, String>> elementList,
+            String sql, DfClassificationElement element, List<?> exceptCodeList) {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
@@ -332,43 +320,36 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             rs = stmt.executeQuery(sql);
             final Set<String> codeDuplicateCheckSet = new HashSet<String>();
             while (rs.next()) {
-                final String tmpCodeValue = rs.getString("code");
-                final String tmpNameValue = rs.getString("name");
-                final String tmpAliasValue = rs.getString("alias");
-                final String tmpCommentValue = rs.getString("comment");
+                final String currentCode = rs.getString("cls_code");
+                final String currentName = rs.getString("cls_name");
+                final String currentAlias = rs.getString("cls_alias");
+                final String currentComment = rs.getString("cls_comment");
 
-                if (exceptCodeList.contains(tmpCodeValue)) {
-                    _log.info("  except code: " + tmpCodeValue);
+                if (exceptCodeList.contains(currentCode)) {
+                    _log.info("  except code: " + currentCode);
                     continue;
                 }
 
-                if (codeDuplicateCheckSet.contains(tmpCodeValue)) {
-                    _log.info("  duplicate: " + tmpCodeValue);
+                if (codeDuplicateCheckSet.contains(currentCode)) {
+                    _log.info("  duplicate: " + currentCode);
                     continue;
                 }
 
                 final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
-                selectedTmpMap.put(DfClassificationElement.KEY_CODE, tmpCodeValue);
-                selectedTmpMap.put("name", filterTableClassificationName(tmpNameValue));
-                selectedTmpMap.put("alias", tmpAliasValue); // already adjusted at SQL
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(tmpCommentValue)) {
-                    selectedTmpMap.put("comment", tmpCommentValue);
+                selectedTmpMap.put(DfClassificationElement.KEY_CODE, currentCode);
+                selectedTmpMap.put("name", filterTableClassificationName(currentName));
+                selectedTmpMap.put("alias", currentAlias); // already adjusted at SQL
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) {
+                    selectedTmpMap.put("comment", currentComment);
                 }
                 elementList.add(selectedTmpMap);
-                codeDuplicateCheckSet.add(tmpCodeValue);
+                codeDuplicateCheckSet.add(currentCode);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("The sql is " + sql, e);
+            throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
         } finally {
             new DfClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
         }
-    }
-
-    protected String removeAliasPrefixIfNeeds(String name) {
-        if (name != null && name.lastIndexOf(".") >= 0) {
-            name = name.substring(name.lastIndexOf(".") + 1);
-        }
-        return name;
     }
 
     protected String filterTableClassificationName(String name) {
