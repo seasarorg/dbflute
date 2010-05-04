@@ -37,6 +37,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     /** SQL clause instance. */
     protected final SqlClause _sqlClause;
     {
+        // use only paging methods and order-by methods
         _sqlClause = new SqlClauseDefault("dummy");
     }
 
@@ -287,6 +288,8 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     // ===================================================================================
     //                                                       Implementation of OrderByBean
     //                                                       =============================
+    // basically unused because this class does not have order-by registration I/F
+    // (you can use these methods if you implements the I/F methods at sub-class of this class)
     /**
      * {@inheritDoc}
      */

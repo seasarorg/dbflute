@@ -42,8 +42,8 @@ public class PageRangeBean implements java.io.Serializable {
     protected PageRangeOption _pageRangeOption;
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                    Page Number List
+    //                                                                    ================
     /**
      * Build the list of page number link.
      * @param <LINK> The type of link.
@@ -111,6 +111,9 @@ public class PageRangeBean implements java.io.Serializable {
         return convertListToIntArray(createPageNumberList());
     }
 
+    // ===================================================================================
+    //                                                                     Range Existence
+    //                                                                     ===============
     /**
      * Is existing previous page range?
      * @return Determination.

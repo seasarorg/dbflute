@@ -40,7 +40,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     // -----------------------------------------------------
     //                                       Page Basic Info
     //                                       ---------------
-    /** The value of current page number. */
+    /** The value of page size that means record count in one page. */
     protected int _pageSize;
 
     /** The value of current page number. */
@@ -74,30 +74,24 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                 Calculated Property
-    //                                                                 ===================
+    //                                                                      Page Existence
+    //                                                                      ==============
     /**
-     * Get the value of allPageCount that is calculated.
-     * @return The value of allPageCount.
+     * Is existing previous page?
+     * Using values are currentPageNumber.
+     * @return Determination.
      */
-    public int getAllPageCount() {
-        return calculateAllPageCount(_allRecordCount, _pageSize);
+    public boolean isExistPrePage() {
+        return (_allRecordCount > 0 && _currentPageNumber > 1);
     }
 
     /**
-     * Get the value of currentStartRecordNumber that is calculated.
-     * @return The value of currentStartRecordNumber.
+     * Is existing next page?
+     * Using values are currentPageNumber and allPageCount.
+     * @return Determination.
      */
-    public int getCurrentStartRecordNumber() {
-        return calculateCurrentStartRecordNumber(_currentPageNumber, _pageSize);
-    }
-
-    /**
-     * Get the value of currentEndRecordNumber that is calculated.
-     * @return The value of currentEndRecordNumber.
-     */
-    public int getCurrentEndRecordNumber() {
-        return calculateCurrentEndRecordNumber(_currentPageNumber, _pageSize);
+    public boolean isExistNextPage() {
+        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
     }
 
     // ===================================================================================
@@ -221,44 +215,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
-    /**
-     * Is existing previous page?
-     * Using values are currentPageNumber.
-     * @return Determination.
-     */
-    public boolean isExistPrePage() {
-        return (_allRecordCount > 0 && _currentPageNumber > 1);
-    }
-
-    /**
-     * Is existing next page?
-     * Using values are currentPageNumber and allPageCount.
-     * @return Determination.
-     */
-    public boolean isExistNextPage() {
-        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
-    }
-
-    // ===================================================================================
-    //                                                                             Mapping
-    //                                                                             =======
-    public <DTO> PagingResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityDtoMapper) {
-        final ListResultBean<DTO> ls = super.mappingList(entityDtoMapper);
-        final PagingResultBean<DTO> mappingList = new PagingResultBean<DTO>();
-        mappingList.setSelectedList(ls.getSelectedList());
-        mappingList.setTableDbName(getTableDbName());
-        mappingList.setAllRecordCount(getAllRecordCount());
-        mappingList.setOrderByClause(getOrderByClause());
-        mappingList.setPageSize(getPageSize());
-        mappingList.setCurrentPageNumber(getCurrentPageNumber());
-        mappingList.setPageRangeOption(_pageRangeOption);
-        mappingList.setPageGroupOption(_pageGroupOption);
-        return mappingList;
-    }
-
-    // ===================================================================================
     //                                                                 Calculate(Internal)
     //                                                                 ===================
     /**
@@ -284,6 +240,24 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 
     protected int calculateCurrentEndRecordNumber(int currentPageNumber, int pageSize) {
         return calculateCurrentStartRecordNumber(currentPageNumber, pageSize) + _selectedList.size() - 1;
+    }
+
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
+    @Override
+    public <DTO> PagingResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityDtoMapper) {
+        final ListResultBean<DTO> ls = super.mappingList(entityDtoMapper);
+        final PagingResultBean<DTO> mappingList = new PagingResultBean<DTO>();
+        mappingList.setSelectedList(ls.getSelectedList());
+        mappingList.setTableDbName(getTableDbName());
+        mappingList.setAllRecordCount(getAllRecordCount());
+        mappingList.setOrderByClause(getOrderByClause());
+        mappingList.setPageSize(getPageSize());
+        mappingList.setCurrentPageNumber(getCurrentPageNumber());
+        mappingList.setPageRangeOption(_pageRangeOption);
+        mappingList.setPageGroupOption(_pageGroupOption);
+        return mappingList;
     }
 
     // ===================================================================================
@@ -381,5 +355,32 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      */
     public void setCurrentPageNumber(int currentPageNumber) {
         _currentPageNumber = currentPageNumber;
+    }
+
+    // -----------------------------------------------------
+    //                                   Calculated Property
+    //                                   -------------------
+    /**
+     * Get the value of allPageCount that is calculated.
+     * @return The value of allPageCount.
+     */
+    public int getAllPageCount() {
+        return calculateAllPageCount(_allRecordCount, _pageSize);
+    }
+
+    /**
+     * Get the value of currentStartRecordNumber that is calculated.
+     * @return The value of currentStartRecordNumber.
+     */
+    public int getCurrentStartRecordNumber() {
+        return calculateCurrentStartRecordNumber(_currentPageNumber, _pageSize);
+    }
+
+    /**
+     * Get the value of currentEndRecordNumber that is calculated.
+     * @return The value of currentEndRecordNumber.
+     */
+    public int getCurrentEndRecordNumber() {
+        return calculateCurrentEndRecordNumber(_currentPageNumber, _pageSize);
     }
 }
