@@ -120,8 +120,8 @@ public class PageGroupBean implements java.io.Serializable {
     }
 
     // ===================================================================================
-    //                                                                     Group Existence
-    //                                                                     ===============
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Is existing previous page-group?
      * Using values are currentPageNumber and pageGroupSize.
@@ -164,7 +164,7 @@ public class PageGroupBean implements java.io.Serializable {
 
     protected void assertPageGroupValid() {
         if (_pageGroupOption == null) {
-            String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+            String msg = "The pageGroupOption should not be null. Please call setPageGroupOption().";
             throw new IllegalStateException(msg);
         }
         if (_pageGroupOption.getPageGroupSize() == 0) {
@@ -215,13 +215,13 @@ public class PageGroupBean implements java.io.Serializable {
     //                                   Calculated Property
     //                                   -------------------
     /**
-     * Get the value of preGroupNearPageNumber that is calculated. <br />
+     * Get the value of preGroupNearestPageNumber that is calculated. <br />
      * You should use this.isExistPrePageGroup() before calling this. (call only when true)
-     * @return The value of preGroupNearPageNumber.
+     * @return The value of preGroupNearestPageNumber.
      */
-    public int getPreGroupNearPageNumber() {
+    public int getPreGroupNearestPageNumber() {
         if (!isExistPrePageGroup()) {
-            String msg = "The previous page range should exist when you use preGroupNearPageNumber:";
+            String msg = "The previous page range should exist when you use preGroupNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageGroupOption=" + _pageGroupOption;
             throw new IllegalStateException(msg);
@@ -230,13 +230,13 @@ public class PageGroupBean implements java.io.Serializable {
     }
 
     /**
-     * Get the value of nextGroupNearPageNumber that is calculated. <br />
+     * Get the value of nextGroupNearestPageNumber that is calculated. <br />
      * You should use this.isExistNextPageGroup() before calling this. (call only when true)
-     * @return The value of nextGroupNearPageNumber.
+     * @return The value of nextGroupNearestPageNumber.
      */
-    public int getNextGroupNearPageNumber() {
+    public int getNextGroupNearestPageNumber() {
         if (!isExistNextPageGroup()) {
-            String msg = "The next page range should exist when you use nextGroupNearPageNumber:";
+            String msg = "The next page range should exist when you use nextGroupNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageGroupOption=" + _pageGroupOption;
             throw new IllegalStateException(msg);

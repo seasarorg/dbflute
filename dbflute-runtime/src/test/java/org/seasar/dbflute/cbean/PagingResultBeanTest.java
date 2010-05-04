@@ -1,9 +1,13 @@
 package org.seasar.dbflute.cbean;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.cbean.pagenavi.group.PageGroupBean;
+import org.seasar.dbflute.cbean.pagenavi.range.PageRangeBean;
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
  * @author jflute
@@ -88,8 +92,8 @@ public class PagingResultBeanTest extends PlainTestCase {
     }
 
     // ===================================================================================
-    //                                                                      Page Existence
-    //                                                                      ==============
+    //                                                                       Determination
+    //                                                                       =============
     public void test_isExistPrePage_basic() {
         assertTrue(createTarget(4, 5, 20).isExistPrePage());
         assertTrue(createTarget(4, 4, 20).isExistPrePage());
@@ -140,26 +144,64 @@ public class PagingResultBeanTest extends PlainTestCase {
         assertEquals(2, page.pageGroup().createPageNumberList().size()); // once more call
     }
 
-    public void test_pageGroup_getPreGroupNearPageNumber_lastGroup() {
+    public void test_pageGroup_createPageNumberList_dynamic() {
+        // ## Arrange ##
+        String fieldName = "_cachedPageNumberList";
+        Field cachedField = DfReflectionUtil.getAccessibleField(PageGroupBean.class, fieldName);
+        cachedField.setAccessible(true);
+        PagingResultBean<String> page = createTarget(4, 3, 20);
+        page.setPageGroupSize(3);
+        assertNull(DfReflectionUtil.getValue(cachedField, page.pageGroup()));
+
+        // ## Act ##
+        List<Integer> ls = page.pageGroup().createPageNumberList();
+
+        // ## Assert ##
+        assertEquals(3, ls.size());
+        assertEquals(1, ls.get(0).intValue());
+        assertEquals(2, ls.get(1).intValue());
+        assertEquals(3, ls.get(2).intValue());
+        assertEquals(3, page.pageGroup().createPageNumberList().size()); // once more call
+        assertNotNull(DfReflectionUtil.getValue(cachedField, page.pageGroup()));
+
+        // ## Act ##
+        page.setPageGroupSize(2);
+        ls = page.pageGroup().createPageNumberList();
+
+        // ## Assert ##
+        assertEquals(2, ls.size());
+        assertEquals(3, ls.get(0).intValue());
+        assertEquals(4, ls.get(1).intValue());
+
+        // ## Act ##
+        page.setCurrentPageNumber(5);
+        ls = page.pageGroup().createPageNumberList();
+
+        // ## Assert ##
+        assertEquals(1, ls.size());
+        assertEquals(5, ls.get(0).intValue());
+    }
+
+    public void test_pageGroup_getPreGroupNearestPageNumber_lastGroup() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 4, 20);
         page.setPageGroupSize(3);
 
         // ## Act ##
-        int pageNumber = page.pageGroup().getPreGroupNearPageNumber();
+        int pageNumber = page.pageGroup().getPreGroupNearestPageNumber();
 
         // ## Assert ##
         assertEquals(3, pageNumber);
     }
 
-    public void test_pageGroup_getPreGroupNearPageNumber_noExist() {
+    public void test_pageGroup_getPreGroupNearestPageNumber_noExist() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 3, 20);
         page.setPageGroupSize(3);
 
         // ## Act ##
         try {
-            int pageNumber = page.pageGroup().getPreGroupNearPageNumber();
+            int pageNumber = page.pageGroup().getPreGroupNearestPageNumber();
 
             // ## Assert ##
             fail("pageNumber=" + pageNumber);
@@ -169,26 +211,26 @@ public class PagingResultBeanTest extends PlainTestCase {
         }
     }
 
-    public void test_pageGroup_getNextGroupNearPageNumber_firstGroup() {
+    public void test_pageGroup_getNextGroupNearestPageNumber_firstGroup() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 3, 20);
         page.setPageGroupSize(3);
 
         // ## Act ##
-        int pageNumber = page.pageGroup().getNextGroupNearPageNumber();
+        int pageNumber = page.pageGroup().getNextGroupNearestPageNumber();
 
         // ## Assert ##
         assertEquals(4, pageNumber);
     }
 
-    public void test_pageGroup_getNextGroupNearPageNumber_noExist() {
+    public void test_pageGroup_getNextGroupNearestPageNumber_noExist() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 4, 20);
         page.setPageGroupSize(3);
 
         // ## Act ##
         try {
-            int pageNumber = page.pageGroup().getNextGroupNearPageNumber();
+            int pageNumber = page.pageGroup().getNextGroupNearestPageNumber();
 
             // ## Assert ##
             fail("pageNumber=" + pageNumber);
@@ -239,26 +281,74 @@ public class PagingResultBeanTest extends PlainTestCase {
         assertEquals(6, page.pageRange().createPageNumberList().size()); // once more call
     }
 
-    public void test_pageRange_getPreRangeNearPageNumber_nearLastRange() {
+    public void test_pageRange_createPageNumberList_dynamic() {
+        // ## Arrange ##
+        String fieldName = "_cachedPageNumberList";
+        Field cachedField = DfReflectionUtil.getAccessibleField(PageRangeBean.class, fieldName);
+        cachedField.setAccessible(true);
+        PagingResultBean<String> page = createTarget(4, 3, 40);
+        page.setPageRangeSize(3);
+        assertNull(DfReflectionUtil.getValue(cachedField, page.pageRange()));
+
+        // ## Act ##
+        List<Integer> ls = page.pageRange().createPageNumberList();
+
+        // ## Assert ##
+        assertEquals(6, ls.size());
+        assertEquals(1, ls.get(0).intValue());
+        assertEquals(2, ls.get(1).intValue());
+        assertEquals(3, ls.get(2).intValue());
+        assertEquals(4, ls.get(3).intValue());
+        assertEquals(5, ls.get(4).intValue());
+        assertEquals(6, ls.get(5).intValue());
+        assertEquals(6, page.pageRange().createPageNumberList().size()); // once more call
+        assertNotNull(DfReflectionUtil.getValue(cachedField, page.pageRange()));
+
+        // ## Act ##
+        page.setPageRangeSize(2);
+        ls = page.pageRange().createPageNumberList();
+
+        // ## Assert ##
+        assertEquals(5, ls.size());
+        assertEquals(1, ls.get(0).intValue());
+        assertEquals(2, ls.get(1).intValue());
+        assertEquals(3, ls.get(2).intValue());
+        assertEquals(4, ls.get(3).intValue());
+        assertEquals(5, ls.get(4).intValue());
+
+        // ## Act ##
+        page.setCurrentPageNumber(8);
+        ls = page.pageRange().createPageNumberList();
+
+        // ## Assert ##
+        assertEquals(5, ls.size());
+        assertEquals(6, ls.get(0).intValue());
+        assertEquals(7, ls.get(1).intValue());
+        assertEquals(8, ls.get(2).intValue());
+        assertEquals(9, ls.get(3).intValue());
+        assertEquals(10, ls.get(4).intValue());
+    }
+
+    public void test_pageRange_getPreRangeNearestPageNumber_nearLastRange() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 8, 40);
         page.setPageRangeSize(3);
 
         // ## Act ##
-        int pageNumber = page.pageRange().getPreRangeNearPageNumber();
+        int pageNumber = page.pageRange().getPreRangeNearestPageNumber();
 
         // ## Assert ##
         assertEquals(4, pageNumber);
     }
 
-    public void test_pageRange_getPreRangeNearPageNumber_noExist() {
+    public void test_pageRange_getPreRangeNearestPageNumber_noExist() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 3, 40);
         page.setPageRangeSize(3);
 
         // ## Act ##
         try {
-            int pageNumber = page.pageRange().getPreRangeNearPageNumber();
+            int pageNumber = page.pageRange().getPreRangeNearestPageNumber();
 
             // ## Assert ##
             fail("pageNumber=" + pageNumber);
@@ -268,26 +358,26 @@ public class PagingResultBeanTest extends PlainTestCase {
         }
     }
 
-    public void test_pageRange_getNextRangeNearPageNumber_nearFirstRange() {
+    public void test_pageRange_getNextRangeNearestPageNumber_nearFirstRange() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 3, 40);
         page.setPageRangeSize(3);
 
         // ## Act ##
-        int pageNumber = page.pageRange().getNextRangeNearPageNumber();
+        int pageNumber = page.pageRange().getNextRangeNearestPageNumber();
 
         // ## Assert ##
         assertEquals(7, pageNumber);
     }
 
-    public void test_pageRange_getNextRangeNearPageNumber_noExist() {
+    public void test_pageRange_getNextRangeNearestPageNumber_noExist() {
         // ## Arrange ##
         PagingResultBean<String> page = createTarget(4, 8, 40);
         page.setPageRangeSize(3);
 
         // ## Act ##
         try {
-            int pageNumber = page.pageRange().getNextRangeNearPageNumber();
+            int pageNumber = page.pageRange().getNextRangeNearestPageNumber();
 
             // ## Assert ##
             fail("pageNumber=" + pageNumber);

@@ -74,8 +74,8 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                      Page Existence
-    //                                                                      ==============
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Is existing previous page?
      * Using values are currentPageNumber.
@@ -97,9 +97,18 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     // ===================================================================================
     //                                                                    Page Group/Range
     //                                                                    ================
+    protected void initializeCachedBeans() {
+        initializePageGroup();
+        initializePageRange();
+    }
+
     // -----------------------------------------------------
     //                                            Page Group
     //                                            ----------
+    protected void initializePageGroup() {
+        _pageGroupBean = null;
+    }
+
     /**
      * Get the value of pageGroupSize.
      * @return The value of pageGroupSize.
@@ -123,6 +132,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param pageGroupOption The value of pageGroupOption. (Nullable)
      */
     public void setPageGroupOption(PageGroupOption pageGroupOption) {
+        initializePageGroup();
         _pageGroupOption = pageGroupOption;
     }
 
@@ -134,10 +144,10 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         assertPageGroupValid();
         if (_pageGroupBean == null) {
             _pageGroupBean = new PageGroupBean();
+            _pageGroupBean.setPageGroupOption(_pageGroupOption);
+            _pageGroupBean.setCurrentPageNumber(getCurrentPageNumber());
+            _pageGroupBean.setAllPageCount(getAllPageCount());
         }
-        _pageGroupBean.setPageGroupOption(_pageGroupOption);
-        _pageGroupBean.setCurrentPageNumber(getCurrentPageNumber());
-        _pageGroupBean.setAllPageCount(getAllPageCount());
         return _pageGroupBean;
     }
 
@@ -161,6 +171,10 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     // -----------------------------------------------------
     //                                            Page Range
     //                                            ----------
+    protected void initializePageRange() {
+        _pageRangeBean = null;
+    }
+
     /**
      * Get the value of pageRangeSize.
      * @return The value of pageRangeSize.
@@ -174,7 +188,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param pageRangeSize The value of pageRangeSize.
      */
     public void setPageRangeSize(int pageRangeSize) {
-        _pageRangeBean = null; // initialize
         final PageRangeOption option = new PageRangeOption();
         option.setPageRangeSize(pageRangeSize);
         setPageRangeOption(option);
@@ -185,8 +198,8 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param pageRangeOption The value of pageRangeOption. (Nullable)
      */
     public void setPageRangeOption(PageRangeOption pageRangeOption) {
-        _pageRangeBean = null; // initialize
-        this._pageRangeOption = pageRangeOption;
+        initializePageRange();
+        _pageRangeOption = pageRangeOption;
     }
 
     /**
@@ -328,6 +341,16 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     //                                                                            Accessor
     //                                                                            ========
     /**
+     * Set the value of allRecordCount with initializing cached beans.
+     * @param allRecordCount The value of allRecordCount.
+     */
+    @Override
+    public void setAllRecordCount(int allRecordCount) {
+        initializeCachedBeans();
+        super.setAllRecordCount(allRecordCount);
+    }
+
+    /**
      * Get the value of pageSize.
      * @return The value of pageSize.
      */
@@ -336,10 +359,11 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     /**
-     * Set the value of pageSize.
+     * Set the value of pageSize with initializing cached beans.
      * @param pageSize The value of pageSize.
      */
     public void setPageSize(int pageSize) {
+        initializeCachedBeans();
         _pageSize = pageSize;
     }
 
@@ -352,10 +376,11 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     /**
-     * Set the value of currentPageNumber.
+     * Set the value of currentPageNumber with initializing cached beans.
      * @param currentPageNumber The value of currentPageNumber.
      */
     public void setCurrentPageNumber(int currentPageNumber) {
+        initializeCachedBeans();
         _currentPageNumber = currentPageNumber;
     }
 

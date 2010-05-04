@@ -116,8 +116,8 @@ public class PageRangeBean implements java.io.Serializable {
     }
 
     // ===================================================================================
-    //                                                                     Range Existence
-    //                                                                     ===============
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Is existing previous page range?
      * @return Determination.
@@ -159,7 +159,7 @@ public class PageRangeBean implements java.io.Serializable {
 
     protected void assertPageRangeValid() {
         if (_pageRangeOption == null) {
-            String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
+            String msg = "The pageRangeOption should not be null. Please call setPageRangeOption().";
             throw new IllegalStateException(msg);
         }
         final int pageRangeSize = _pageRangeOption.getPageRangeSize();
@@ -205,13 +205,13 @@ public class PageRangeBean implements java.io.Serializable {
     //                                   Calculated Property
     //                                   -------------------
     /**
-     * Get the value of preRangeNearPageNumber that is calculated. <br />
+     * Get the value of preRangeNearestPageNumber that is calculated. <br />
      * You should use this.isExistPrePageRange() before calling this. (call only when true)
-     * @return The value of preRangeNearPageNumber.
+     * @return The value of preRangeNearestPageNumber.
      */
-    public int getPreRangeNearPageNumber() {
+    public int getPreRangeNearestPageNumber() {
         if (!isExistPrePageRange()) {
-            String msg = "The previous page range should exist when you use preRangeNearPageNumber:";
+            String msg = "The previous page range should exist when you use preRangeNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageRangeOption=" + _pageRangeOption;
             throw new IllegalStateException(msg);
@@ -220,13 +220,13 @@ public class PageRangeBean implements java.io.Serializable {
     }
 
     /**
-     * Get the value of nextRangeNearPageNumber that is calculated. <br />
+     * Get the value of nextRangeNearestPageNumber that is calculated. <br />
      * You should use this.isExistNextPageRange() before calling this. (call only when true)
-     * @return The value of nextRangeNearPageNumber.
+     * @return The value of nextRangeNearestPageNumber.
      */
-    public int getNextRangeNearPageNumber() {
+    public int getNextRangeNearestPageNumber() {
         if (!isExistNextPageRange()) {
-            String msg = "The next page range should exist when you use nextRangeNearPageNumber:";
+            String msg = "The next page range should exist when you use nextRangeNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageRangeOption=" + _pageRangeOption;
             throw new IllegalStateException(msg);
