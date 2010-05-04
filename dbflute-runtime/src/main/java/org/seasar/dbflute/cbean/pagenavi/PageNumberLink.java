@@ -59,11 +59,11 @@ public class PageNumberLink implements java.io.Serializable {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer();
-
-        sb.append(" pageNumberElement=").append(_pageNumberElement);
-        sb.append(" pageNumberLinkHref=").append(_pageNumberLinkHref);
-        sb.append(" current=").append(_current);
-
+        sb.append("{");
+        sb.append("pageNumberElement=").append(_pageNumberElement);
+        sb.append(", pageNumberLinkHref=").append(_pageNumberLinkHref);
+        sb.append(", current=").append(_current);
+        sb.append("}");
         return sb.toString();
     }
 

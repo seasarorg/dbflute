@@ -16,7 +16,6 @@
 package org.seasar.dbflute.cbean.pagenavi.range;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.pagenavi.PageNumberLink;
@@ -40,6 +39,7 @@ public class PageRangeBean implements java.io.Serializable {
     protected int _currentPageNumber;
     protected int _allPageCount;
     protected PageRangeOption _pageRangeOption;
+    protected List<Integer> _cachedPageNumberList;
 
     // ===================================================================================
     //                                                                    Page Number List
@@ -66,6 +66,9 @@ public class PageRangeBean implements java.io.Serializable {
      */
     public List<Integer> createPageNumberList() {
         assertPageRangeValid();
+        if (_cachedPageNumberList != null) {
+            return _cachedPageNumberList;
+        }
         final int pageRangeSize = _pageRangeOption.getPageRangeSize();
         final int allPageCount = _allPageCount;
         final int currentPageNumber = _currentPageNumber;
@@ -99,7 +102,8 @@ public class PageRangeBean implements java.io.Serializable {
                 resultList.add(Integer.valueOf(i));
             }
         }
-        return resultList;
+        _cachedPageNumberList = resultList;
+        return _cachedPageNumberList;
     }
 
     /**
@@ -120,11 +124,11 @@ public class PageRangeBean implements java.io.Serializable {
      */
     public boolean isExistPrePageRange() {
         assertPageRangeValid();
-        final int[] array = createPageNumberArray();
-        if (array.length == 0) {
+        final List<Integer> ls = createPageNumberList();
+        if (ls.isEmpty()) {
             return false;
         }
-        return array[0] > 1;
+        return ls.get(0) > 1;
     }
 
     /**
@@ -133,11 +137,11 @@ public class PageRangeBean implements java.io.Serializable {
      */
     public boolean isExistNextPageRange() {
         assertPageRangeValid();
-        final int[] array = createPageNumberArray();
-        if (array.length == 0) {
+        final List<Integer> ls = createPageNumberList();
+        if (ls.isEmpty()) {
             return false;
         }
-        return array[array.length - 1] < _allPageCount;
+        return ls.get(ls.size() - 1) < _allPageCount;
     }
 
     // ===================================================================================
@@ -146,9 +150,8 @@ public class PageRangeBean implements java.io.Serializable {
     protected int[] convertListToIntArray(List<Integer> ls) {
         final int[] resultArray = new int[ls.size()];
         int arrayIndex = 0;
-        for (Iterator<Integer> ite = ls.iterator(); ite.hasNext();) {
-            final Integer tmpPageNumber = (Integer) ite.next();
-            resultArray[arrayIndex] = tmpPageNumber.intValue();
+        for (int pageNumber : resultArray) {
+            resultArray[arrayIndex] = pageNumber;
             arrayIndex++;
         }
         return resultArray;
@@ -175,11 +178,11 @@ public class PageRangeBean implements java.io.Serializable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-
-        sb.append(" currentPageNumber=").append(_currentPageNumber);
-        sb.append(" allPageCount=").append(_allPageCount);
-        sb.append(" pageRangeOption=").append(_pageRangeOption);
-
+        sb.append("{");
+        sb.append("currentPageNumber=").append(_currentPageNumber);
+        sb.append(", allPageCount=").append(_allPageCount);
+        sb.append(", pageRangeOption=").append(_pageRangeOption);
+        sb.append("}");
         return sb.toString();
     }
 
@@ -196,5 +199,39 @@ public class PageRangeBean implements java.io.Serializable {
 
     public void setPageRangeOption(PageRangeOption pageRangeOption) {
         this._pageRangeOption = pageRangeOption;
+    }
+
+    // -----------------------------------------------------
+    //                                   Calculated Property
+    //                                   -------------------
+    /**
+     * Get the value of preRangeNearPageNumber that is calculated. <br />
+     * You should use this.isExistPrePageRange() before calling this. (call only when true)
+     * @return The value of preRangeNearPageNumber.
+     */
+    public int getPreRangeNearPageNumber() {
+        if (!isExistPrePageRange()) {
+            String msg = "The previous page range should exist when you use preRangeNearPageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
+            msg = msg + " pageRangeOption=" + _pageRangeOption;
+            throw new IllegalStateException(msg);
+        }
+        return createPageNumberList().get(0) - 1;
+    }
+
+    /**
+     * Get the value of nextRangeNearPageNumber that is calculated. <br />
+     * You should use this.isExistNextPageRange() before calling this. (call only when true)
+     * @return The value of nextRangeNearPageNumber.
+     */
+    public int getNextRangeNearPageNumber() {
+        if (!isExistNextPageRange()) {
+            String msg = "The next page range should exist when you use nextRangeNearPageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
+            msg = msg + " pageRangeOption=" + _pageRangeOption;
+            throw new IllegalStateException(msg);
+        }
+        final List<Integer> ls = createPageNumberList();
+        return ls.get(ls.size() - 1) + 1;
     }
 }

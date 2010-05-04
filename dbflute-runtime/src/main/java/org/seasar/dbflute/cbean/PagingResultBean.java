@@ -143,7 +143,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 
     protected void assertPageGroupValid() {
         if (_pageGroupOption == null) {
-            String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+            String msg = "The pageGroupOption should not be null. Please call setPageGroupOption().";
             throw new IllegalStateException(msg);
         }
         if (_pageGroupOption.getPageGroupSize() == 0) {
@@ -174,6 +174,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param pageRangeSize The value of pageRangeSize.
      */
     public void setPageRangeSize(int pageRangeSize) {
+        _pageRangeBean = null; // initialize
         final PageRangeOption option = new PageRangeOption();
         option.setPageRangeSize(pageRangeSize);
         setPageRangeOption(option);
@@ -184,6 +185,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param pageRangeOption The value of pageRangeOption. (Nullable)
      */
     public void setPageRangeOption(PageRangeOption pageRangeOption) {
+        _pageRangeBean = null; // initialize
         this._pageRangeOption = pageRangeOption;
     }
 
@@ -195,16 +197,16 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         assertPageRangeValid();
         if (_pageRangeBean == null) {
             _pageRangeBean = new PageRangeBean();
+            _pageRangeBean.setPageRangeOption(_pageRangeOption);
+            _pageRangeBean.setCurrentPageNumber(getCurrentPageNumber());
+            _pageRangeBean.setAllPageCount(getAllPageCount());
         }
-        _pageRangeBean.setPageRangeOption(_pageRangeOption);
-        _pageRangeBean.setCurrentPageNumber(getCurrentPageNumber());
-        _pageRangeBean.setAllPageCount(getAllPageCount());
         return _pageRangeBean;
     }
 
     protected void assertPageRangeValid() {
         if (_pageRangeOption == null) {
-            String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
+            String msg = "The pageRangeOption should not be null. Please call setPageRangeOption().";
             throw new IllegalStateException(msg);
         }
         final int pageRangeSize = _pageRangeOption.getPageRangeSize();
@@ -366,6 +368,34 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      */
     public int getAllPageCount() {
         return calculateAllPageCount(_allRecordCount, _pageSize);
+    }
+
+    /**
+     * Get the value of prePageNumber that is calculated. <br />
+     * You should use this.isExistPrePage() before calling this. (call only when true)
+     * @return The value of prePageNumber.
+     */
+    public int getPrePageNumber() {
+        if (!isExistPrePage()) {
+            String msg = "The previous page should exist when you use prePageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        return _currentPageNumber - 1;
+    }
+
+    /**
+     * Get the value of nextPageNumber that is calculated. <br />
+     * You should use this.isExistNextPage() before calling this. (call only when true)
+     * @return The value of nextPageNumber.
+     */
+    public int getNextPageNumber() {
+        if (!isExistNextPage()) {
+            String msg = "The next page should exist when you use nextPageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        return _currentPageNumber + 1;
     }
 
     /**

@@ -42,10 +42,10 @@ public class PageRangeOption implements java.io.Serializable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-
-        sb.append(" pageRangeSize=").append(_pageRangeSize);
-        sb.append(" fillLimit=").append(_fillLimit);
-
+        sb.append("{");
+        sb.append("pageRangeSize=").append(_pageRangeSize);
+        sb.append(", fillLimit=").append(_fillLimit);
+        sb.append("}");
         return sb.toString();
     }
 
