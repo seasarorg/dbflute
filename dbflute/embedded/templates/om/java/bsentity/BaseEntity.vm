@@ -469,7 +469,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
         return true;
     }
-    private boolean xSV(Object value1, Object value2) { // isSameValue()
+    protected boolean xSV(Object value1, Object value2) { // isSameValue()
         return InternalUtil.isSameValue(value1, value2);
     }
 
@@ -484,7 +484,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
         return result;
     }
-    private int xCH(int result, Object value) { // calculateHashcode()
+    protected int xCH(int result, Object value) { // calculateHashcode()
         return InternalUtil.calculateHashcode(result, value);
     }
 
@@ -526,7 +526,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
 #if ($table.hasRelation())
-    private String xbRDS(Entity e, String name) { // buildRelationDisplayString()
+    protected String xbRDS(Entity e, String name) { // buildRelationDisplayString()
         return e.buildDisplayString(name, true, true);
     }
 #end
@@ -540,12 +540,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public String buildDisplayString(String name, boolean column, boolean relation) {
         StringBuilder sb = new StringBuilder();
         if (name != null) { sb.append(name).append(column || relation ? ":" : ""); }
-        if (column) { sb.append(xbuildColumnString()); }
-        if (relation) { sb.append(xbuildRelationString()); }
+        if (column) { sb.append(buildColumnString()); }
+        if (relation) { sb.append(buildRelationString()); }
         sb.append("@").append(Integer.toHexString(hashCode()));
         return sb.toString();
     }
-    private String xbuildColumnString() {
+    protected String buildColumnString() {
         String c = ", ";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
@@ -562,7 +562,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
 #if ($table.hasUtilDateColumn())
-    private String xfUD(Date date) { // formatUtilDate()
+    protected String xfUD(Date date) { // formatUtilDate()
 #if ($database.isDatabaseOracle())
         String pattern = "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
 #else
@@ -572,11 +572,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #end
 #if ($table.hasByteArrayColumn())
-    private String xfBA(byte[] bytes) { // formatByteArray()
+    protected String xfBA(byte[] bytes) { // formatByteArray()
         return InternalUtil.toString(bytes);
     }
 #end
-    private String xbuildRelationString() {
+    protected String buildRelationString() {
 #if ($table.hasRelation())
         StringBuilder sb = new StringBuilder();
         String c = ",";

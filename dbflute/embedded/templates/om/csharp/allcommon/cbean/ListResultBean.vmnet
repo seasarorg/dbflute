@@ -259,22 +259,22 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                        Accessor
         //                                                                        ========
         #region Accessor
-        public String TableDbName {
+        public virtual String TableDbName {
             get { return _tableDbName; }
             set { _tableDbName = value; }
         }
 
-        public int AllRecordCount {
+        public virtual int AllRecordCount {
             get { return _allRecordCount; }
             set { _allRecordCount = value; }
         }
 
-        public System.Collections.Generic.IList<ENTITY> SelectedList {
+        public virtual System.Collections.Generic.IList<ENTITY> SelectedList {
             get { return _selectedList; }
             set { if (value == null) { return; } _selectedList = value; }
         }
 
-        public ${glOrderByClause} OrderByClause {
+        public virtual ${glOrderByClause} OrderByClause {
             get { return _orderByClause; }
             set { if (value == null) { return; } _orderByClause = value; }
         }

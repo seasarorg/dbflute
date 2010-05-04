@@ -19,9 +19,9 @@ public class ${myClassName} {
     //                                                                      ==============
     public override String ToString() {
         StringBuilder sb = new StringBuilder();
-
-        sb.append(" pageGroupSize=").append(PageGroupSize);
-
+        sb.append("{");
+        sb.append("pageGroupSize=").append(PageGroupSize);
+        sb.append("}");
         return sb.toString();
     }
 }

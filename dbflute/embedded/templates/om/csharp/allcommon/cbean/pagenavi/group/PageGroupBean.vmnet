@@ -14,15 +14,13 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
     protected int _currentPageNumner;
-    public int CurrentPageNumber { get { return _currentPageNumner; } set { _currentPageNumner = value; } }
     protected int _allPageCount;
-    public int AllPageCount { get { return _allPageCount; } set { _allPageCount = value; } }
     protected ${glPageGroupOption} _pageGroupOption;
-    public ${glPageGroupOption} PageGroupOption { get { return _pageGroupOption; } set { _pageGroupOption = value; } }
+    protected System.Collections.Generic.IList<int> _cachedPageNumberList;
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                    Page Number List
+    //                                                                    ================
     public System.Collections.Generic.IList<LINK> BuildPageNumberLinkList<LINK>(${glPageNumberLinkSetupper}<LINK> pageNumberLinkSetupper) where LINK : ${glPageNumberLink} {
         System.Collections.Generic.IList<int> pageNumberList = CreatePageNumberList();
         System.Collections.Generic.IList<LINK> pageNumberLinkList = new System.Collections.Generic.List<LINK>();
@@ -32,7 +30,30 @@ public class ${myClassName} {
         return pageNumberLinkList;
     }
 
-    public int CalculateStartPageNumber() {
+    public System.Collections.Generic.IList<int> CreatePageNumberList() {
+        AssertPageGroupValid();
+        if (_cachedPageNumberList != null) {
+            return _cachedPageNumberList;
+        }
+        int pageGroupSize = PageGroupOption.PageGroupSize;
+        int allPageCount = AllPageCount;
+        int currentPageGroupStartPageNumber = CalculateStartPageNumber();
+        if (!(currentPageGroupStartPageNumber > 0)) {
+            String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
+            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + pageGroupSize;
+
+        System.Collections.Generic.IList<int> resultList = new System.Collections.Generic.List<int>();
+        for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
+            resultList.Add(i);
+        }
+        _cachedPageNumberList = resultList;
+        return _cachedPageNumberList;
+    }
+
+    protected int CalculateStartPageNumber() {
         AssertPageGroupValid();
         int pageGroupSize = PageGroupOption.PageGroupSize;
         int currentPageNumber = CurrentPageNumber;
@@ -52,30 +73,14 @@ public class ${myClassName} {
         return currentPageGroupStartPageNumber;
     }
 
-    public System.Collections.Generic.IList<int> CreatePageNumberList() {
-        AssertPageGroupValid();
-        int pageGroupSize = PageGroupOption.PageGroupSize;
-        int allPageCount = AllPageCount;
-        int currentPageGroupStartPageNumber = CalculateStartPageNumber();
-        if (!(currentPageGroupStartPageNumber > 0)) {
-            String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
-            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
-            throw new IllegalStateException(msg);
-        }
-        int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + pageGroupSize;
-
-        System.Collections.Generic.IList<int> resultList = new System.Collections.Generic.List<int>();
-        for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
-            resultList.Add(i);
-        }
-        return resultList;
-    }
-
     public int[] CreatePageNumberArray() {
         AssertPageGroupValid();
         return ConvertListToIntArray(CreatePageNumberList());
     }
 
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     public bool IsExistPrePageGroup() {
         AssertPageGroupValid();
         return (CurrentPageNumber > PageGroupOption.PageGroupSize);
@@ -108,7 +113,7 @@ public class ${myClassName} {
 
     protected void AssertPageGroupValid() {
         if (PageGroupOption == null) {
-            String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+            String msg = "The pageGroupOption should not be null. Please call setPageGroupOption().";
             throw new IllegalStateException(msg);
         }
         if (PageGroupOption.PageGroupSize == 0) {
@@ -128,13 +133,45 @@ public class ${myClassName} {
     //                                                                      ==============
     public override String ToString() {
         StringBuilder sb = new StringBuilder();
-
-        sb.append(" currentPageNumber=").append(CurrentPageNumber);
-        sb.append(" allPageCount=").append(AllPageCount);
-        sb.append(" pageGroupOption=").append(PageGroupOption);
-
+        sb.append("{");
+        sb.append("currentPageNumber=").append(CurrentPageNumber);
+        sb.append(", allPageCount=").append(AllPageCount);
+        sb.append(", pageGroupOption=").append(PageGroupOption);
+        sb.append("}");
         return sb.toString();
     }
+
+    // ===================================================================================
+    //                                                                            Property
+    //                                                                            ========
+    public int CurrentPageNumber { get { return _currentPageNumner; } set { _currentPageNumner = value; } }
+    public int AllPageCount { get { return _allPageCount; } set { _allPageCount = value; } }
+    public ${glPageGroupOption} PageGroupOption { get { return _pageGroupOption; } set { _pageGroupOption = value; } }
+
+
+    // -----------------------------------------------------
+    //                                   Calculated Property
+    //                                   -------------------
+    public int PreGroupNearestPageNumber { get {
+        if (!IsExistPrePageGroup()) {
+            String msg = "The previous page range should exist when you use preGroupNearestPageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
+            msg = msg + " pageGroupOption=" + _pageGroupOption;
+            throw new IllegalStateException(msg);
+        }
+        return CreatePageNumberList()[0] - 1;
+    }}
+
+    public int NextGroupNearestPageNumber { get {
+        if (!IsExistNextPageGroup()) {
+            String msg = "The next page range should exist when you use nextGroupNearestPageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
+            msg = msg + " pageGroupOption=" + _pageGroupOption;
+            throw new IllegalStateException(msg);
+        }
+        System.Collections.Generic.IList<int> ls = CreatePageNumberList();
+        return ls[ls.Count - 1] + 1;
+    }}
 }
 
 }

@@ -14,15 +14,13 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
     protected int _currentPageNumner;
-    public int CurrentPageNumber { get { return _currentPageNumner; } set { _currentPageNumner = value; } }
     protected int _allPageCount;
-    public int AllPageCount { get { return _allPageCount; } set { _allPageCount = value; } }
     protected ${glPageRangeOption} _pageRangeOption;
-    public ${glPageRangeOption} PageRangeOption { get { return _pageRangeOption; } set { _pageRangeOption = value; } }
+    protected System.Collections.Generic.IList<int> _cachedPageNumberList;
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                    Page Number List
+    //                                                                    ================
     public System.Collections.Generic.IList<LINK> BuildPageNumberLinkList<LINK>(${glPageNumberLinkSetupper}<LINK> pageNumberLinkSetupper) where LINK : ${glPageNumberLink} {
         System.Collections.Generic.IList<int> pageNumberList = CreatePageNumberList();
         System.Collections.Generic.IList<LINK> pageNumberLinkList = new System.Collections.Generic.List<LINK>();
@@ -34,6 +32,9 @@ public class ${myClassName} {
 
     public System.Collections.Generic.IList<int> CreatePageNumberList() {
         AssertPageRangeValid();
+        if (_cachedPageNumberList != null) {
+            return _cachedPageNumberList;
+        }
         int pageRangeSize = PageRangeOption.PageRangeSize;
         int allPageCount = AllPageCount;
         int currentPageNumber = CurrentPageNumber;
@@ -67,7 +68,8 @@ public class ${myClassName} {
                 resultList.Add(i);
             }
         }
-        return resultList;
+        _cachedPageNumberList = resultList;
+        return _cachedPageNumberList;
     }
 
     public int[] CreatePageNumberArray() {
@@ -75,6 +77,9 @@ public class ${myClassName} {
         return ConvertListToIntArray(CreatePageNumberList());
     }
 
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     public bool IsExistPrePageRange() {
         AssertPageRangeValid();
         int[] array = CreatePageNumberArray();
@@ -108,7 +113,7 @@ public class ${myClassName} {
 
     protected void AssertPageRangeValid() {
         if (PageRangeOption == null) {
-            String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
+            String msg = "The pageRangeOption should not be null. Please call setPageRangeOption().";
             throw new IllegalStateException(msg);
         }
         int pageRangeSize = PageRangeOption.PageRangeSize;
@@ -123,13 +128,44 @@ public class ${myClassName} {
     //                                                                      ==============
     public override String ToString() {
         StringBuilder sb = new StringBuilder();
-
-        sb.append(" currentPageNumber=").append(CurrentPageNumber);
-        sb.append(" allPageCount=").append(AllPageCount);
-        sb.append(" pageRangeOption=").append(PageRangeOption);
-
+        sb.append("{");
+        sb.append("currentPageNumber=").append(CurrentPageNumber);
+        sb.append(", allPageCount=").append(AllPageCount);
+        sb.append(", pageRangeOption=").append(PageRangeOption);
+        sb.append("}");
         return sb.toString();
     }
+
+    // ===================================================================================
+    //                                                                            Property
+    //                                                                            ========
+    public int CurrentPageNumber { get { return _currentPageNumner; } set { _currentPageNumner = value; } }
+    public int AllPageCount { get { return _allPageCount; } set { _allPageCount = value; } }
+    public ${glPageRangeOption} PageRangeOption { get { return _pageRangeOption; } set { _pageRangeOption = value; } }
+
+    // -----------------------------------------------------
+    //                                   Calculated Property
+    //                                   -------------------
+    public int PreRangeNearestPageNumber { get {
+        if (!IsExistPrePageRange()) {
+            String msg = "The previous page range should exist when you use preRangeNearestPageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
+            msg = msg + " pageRangeOption=" + _pageRangeOption;
+            throw new IllegalStateException(msg);
+        }
+        return CreatePageNumberList()[0] - 1;
+    }}
+
+    public int NextRangeNearestPageNumber { get {
+        if (!IsExistNextPageRange()) {
+            String msg = "The next page range should exist when you use nextRangeNearestPageNumber:";
+            msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
+            msg = msg + " pageRangeOption=" + _pageRangeOption;
+            throw new IllegalStateException(msg);
+        }
+        System.Collections.Generic.IList<int> ls = CreatePageNumberList();
+        return ls[ls.Count - 1] + 1;
+    }}
 }
 
 }

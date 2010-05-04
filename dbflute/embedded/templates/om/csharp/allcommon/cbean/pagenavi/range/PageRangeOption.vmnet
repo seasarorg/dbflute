@@ -21,10 +21,10 @@ public class ${myClassName} {
     //                                                                      ==============
     public override String ToString() {
         StringBuilder sb = new StringBuilder();
-
-        sb.append(" pageRangeSize=").append(PageRangeSize);
-        sb.append(" fillLimit=").append(IsFillLimit);
-
+        sb.append("{");
+        sb.append("pageRangeSize=").append(PageRangeSize);
+        sb.append(", fillLimit=").append(IsFillLimit);
+        sb.append("}");
         return sb.toString();
     }
 }

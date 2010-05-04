@@ -303,7 +303,7 @@ namespace ${myExtendedEntityPackageName} {
         // ===============================================================================
         //                                                                   Determination
         //                                                                   =============
-        public bool HasPrimaryKeyValue {
+        public virtual bool HasPrimaryKeyValue {
             get {
 #foreach ($col in $table.primaryKey)
                 if (_${col.uncapitalisedJavaName} == null) { return false; }
@@ -352,7 +352,7 @@ namespace ${myExtendedEntityPackageName} {
 #end
             return true;
         }
-        private bool xSV(Object value1, Object value2) { // isSameValue()
+        protected bool xSV(Object value1, Object value2) { // isSameValue()
             if (value1 == null && value2 == null) { return true; }
             if (value1 == null || value2 == null) { return false; }
 #if ($table.hasByteArrayColumnInEqualsHashcode())
@@ -361,7 +361,7 @@ namespace ${myExtendedEntityPackageName} {
             return value1.Equals(value2);
         }
 #if ($table.hasByteArrayColumnInEqualsHashcode())
-        private bool xSVBA(byte[] byte1, byte[] byte2) { // isSameValueByteArray()
+        protected bool xSVBA(byte[] byte1, byte[] byte2) { // isSameValueByteArray()
             if (byte1 == null && byte2 == null) { return true; }
             if (byte1 == null || byte2 == null) { return false; }
             if (byte1.Length != byte2.Length) { return false; }
@@ -379,16 +379,16 @@ namespace ${myExtendedEntityPackageName} {
 #end
             return result;
         }
-        private int xCH(int result, Object value) { // calculateHashcode()
+        protected int xCH(int result, Object value) { // calculateHashcode()
             if (value == null) { return result; }
             return (31*result) + (value is byte[] ? ((byte[])value).Length : value.GetHashCode());
         }
 
         public override String ToString() {
-            return "${myClassName}:" + xbuildColumnString() + xbuildRelationString();
+            return "${myClassName}:" + buildColumnString() + buildRelationString();
         }
 
-        public String ToStringWithRelation() {
+        public virtual String ToStringWithRelation() {
             StringBuilder sb = new StringBuilder();
             sb.Append(ToString());
 #if ($table.hasRelation())
@@ -416,19 +416,19 @@ namespace ${myExtendedEntityPackageName} {
             return sb.ToString();
         }
 #if ($table.hasRelation())
-        private String xbRDS(${glEntity} e, String name) { // buildRelationDisplayString()
+        protected String xbRDS(${glEntity} e, String name) { // buildRelationDisplayString()
             return e.BuildDisplayString(name, true, true);
         }
 #end
 
-        public String BuildDisplayString(String name, bool column, bool relation) {
+        public virtual String BuildDisplayString(String name, bool column, bool relation) {
             StringBuilder sb = new StringBuilder();
             if (name != null) { sb.Append(name).Append(column || relation ? ":" : ""); }
-            if (column) { sb.Append(xbuildColumnString()); }
-            if (relation) { sb.Append(xbuildRelationString()); }
+            if (column) { sb.Append(BuildColumnString()); }
+            if (relation) { sb.Append(BuildRelationString()); }
             return sb.ToString();
         }
-        private String xbuildColumnString() {
+        protected virtual String BuildColumnString() {
             String c = ", ";
             StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
@@ -443,11 +443,11 @@ namespace ${myExtendedEntityPackageName} {
             return sb.ToString();
         }
 #if ($table.hasByteArrayColumn())
-        private String xfBA(byte[] byteArray) { // formatByteArray()
+        protected String xfBA(byte[] byteArray) { // formatByteArray()
             return "byte[" + (byteArray != null ? byteArray.Length.ToString() : "null") + "]";
         }
 #end
-        private String xbuildRelationString() {
+        protected virtual String BuildRelationString() {
 #if ($table.hasRelation())
             StringBuilder sb = new StringBuilder();
             String c = ",";
