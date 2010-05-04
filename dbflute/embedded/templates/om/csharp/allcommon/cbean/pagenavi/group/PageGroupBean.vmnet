@@ -13,7 +13,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected int _currentPageNumner;
+    protected int _currentPageNumber;
     protected int _allPageCount;
     protected ${glPageGroupOption} _pageGroupOption;
     protected System.Collections.Generic.IList<int> _cachedPageNumberList;
@@ -144,10 +144,9 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Property
     //                                                                            ========
-    public int CurrentPageNumber { get { return _currentPageNumner; } set { _currentPageNumner = value; } }
+    public int CurrentPageNumber { get { return _currentPageNumber; } set { _currentPageNumber = value; } }
     public int AllPageCount { get { return _allPageCount; } set { _allPageCount = value; } }
     public ${glPageGroupOption} PageGroupOption { get { return _pageGroupOption; } set { _pageGroupOption = value; } }
-
 
     // -----------------------------------------------------
     //                                   Calculated Property
