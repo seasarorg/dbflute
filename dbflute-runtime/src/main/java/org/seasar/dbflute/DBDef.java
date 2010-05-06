@@ -40,11 +40,17 @@ public enum DBDef {
     // ===================================================================================
     //                                                                                ENUM
     //                                                                                ====
-    MySQL("mysql", null, new WayOfMySQL()), PostgreSQL("postgresql", "postgre", new WayOfPostgreSQL()), Oracle(
-            "oracle", null, new WayOfOracle()), DB2("db2", null, new WayOfDB2()), SQLServer("sqlserver", "mssql",
-            new WayOfSQLServer()), FireBird("firebird", null, new WayOfFirebird()), H2("h2", null, new WayOfH2()), Derby(
-            "derby", null, new WayOfDerby()), SQLite("sqlite", null, new WayOfSQLite()), MSAccess("msaccess", null,
-            new WayOfMSAccess()), Unknown("unknown", null, new WayOfUnknown());
+    MySQL("mysql", null, new WayOfMySQL()) // supported
+    , PostgreSQL("postgresql", "postgre", new WayOfPostgreSQL()) // supported
+    , Oracle("oracle", null, new WayOfOracle()) // supported
+    , DB2("db2", null, new WayOfDB2()) // supported
+    , SQLServer("sqlserver", "mssql", new WayOfSQLServer()) // supported
+    , FireBird("firebird", null, new WayOfFirebird()) // unsupported
+    , H2("h2", null, new WayOfH2()) // supported
+    , Derby("derby", null, new WayOfDerby()) // supported
+    , SQLite("sqlite", null, new WayOfSQLite()) // semi-supported
+    , MSAccess("msaccess", null, new WayOfMSAccess()) // semi-supported
+    , Unknown("unknown", null, new WayOfUnknown());
 
     // ===================================================================================
     //                                                                    Static Reference
