@@ -269,7 +269,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 		<td>
 			<table class="child">
 			<tr>
-				<th><a name="${classificationName}Cls"/>Code</th>
+				<th id="${classificationName}Cls">Code</th>
 				<th>Name</th>
 				<th>Alias</th>
 				<th>Comment</th>
