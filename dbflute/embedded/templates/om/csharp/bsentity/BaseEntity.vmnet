@@ -493,12 +493,7 @@ namespace ${myExtendedEntityPackageName} {
         [Seasar.Dao.Attrs.Column("${col.Name}")]
         public ${col.JavaNative} ${col.javaName} {
 #if ($col.isEntityConvertEmptyStringToNull())
-            get {
-                if (_${col.uncapitalisedJavaName} != null && _${col.uncapitalisedJavaName}.Length == 0) {
-                    return null;
-                }
-                return _${col.uncapitalisedJavaName};
-            }
+            get { return ConvertEmptyToNull(_${col.uncapitalisedJavaName}); }
 #else
             get { return _${col.uncapitalisedJavaName}; }
 #end
@@ -508,6 +503,15 @@ namespace ${myExtendedEntityPackageName} {
             }
         }
 
+#end
+#if ($table.hasEntityConvertEmptyStringToNull())
+
+        protected virtual String ConvertEmptyToNull(String value) {
+            if (value != null && value.Length == 0) {
+                return null;
+            }
+            return value;
+        }
 #end
         #endregion
     }

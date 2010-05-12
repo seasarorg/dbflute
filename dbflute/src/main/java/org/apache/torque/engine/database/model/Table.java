@@ -2567,6 +2567,19 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                        Empty String
+    //                                                                        ============
+    public boolean hasEntityConvertEmptyStringToNull() {
+        final List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.isEntityConvertEmptyStringToNull()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                            Flex DTO
     //                                                                            ========
     public boolean isFlexDtoBindable() {
