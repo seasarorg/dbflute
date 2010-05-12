@@ -2062,6 +2062,16 @@ public class Column {
     }
 
     // ===================================================================================
+    //                                                                        Empty String
+    //                                                                        ============
+    public boolean isEntityConvertEmptyStringToNull() {
+        if (!isJavaNativeStringObject()) {
+            return false;
+        }
+        return getProperties().getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
+    }
+
+    // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============
     private String _behaviorFilterBeforeInsertColumnExpression;

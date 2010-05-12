@@ -492,7 +492,16 @@ namespace ${myExtendedEntityPackageName} {
 #end
         [Seasar.Dao.Attrs.Column("${col.Name}")]
         public ${col.JavaNative} ${col.javaName} {
+#if ($col.isEntityConvertEmptyStringToNull())
+            get {
+                if (_${col.uncapitalisedJavaName} != null && _${col.uncapitalisedJavaName}.Length == 0) {
+                    return null;
+                }
+                return _${col.uncapitalisedJavaName};
+            }
+#else
             get { return _${col.uncapitalisedJavaName}; }
+#end
             set {
                 _modifiedProperties.AddPropertyName("${col.javaBeansRulePropertyNameInitCap}");
                 _${col.uncapitalisedJavaName} = value;

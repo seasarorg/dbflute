@@ -10,6 +10,7 @@
 # o isCheckSelectedClassification: (NotRequired - Default false)
 # o isForceClassificationSetting: (NotRequired - Default false)
 # o isMakeEntityChaseRelation: (NotRequired - Default false)
+# o isEntityConvertEmptyStringToNull: (NotRequired - Default false)
 # o isMakeConditionQueryEqualEmptyString: (NotRequired - Default false)
 # o isMakeDeprecated: (NotRequired - Default false)
 # o isMakeRecentlyDeprecated: (NotRequired - Default true)
@@ -105,6 +106,17 @@ map:{
     #     Non.
     #
     #; isMakeEntityChaseRelation = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isEntityConvertEmptyStringToNull: (NotRequired - Default false)
+    #   [true]
+    #     Convert empty-string data to null in entity.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isEntityConvertEmptyStringToNull = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -134,7 +134,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public boolean hasPrimaryKeyValue() {
 #foreach ($col in $table.primaryKey)
-        if (_${col.uncapitalisedJavaName} == null) { return false; }
+        if (get${col.javaName}() == null) { return false; }
 #end
         return ${table.hasPrimaryKey()};
     }
@@ -176,7 +176,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The instance of classification definition (as ENUM type). (Nullable)
      */
     public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
-        return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        return ${glCDef}.${col.classificationName}.codeOf(get${col.javaName}());
     }
 
 #end
@@ -631,7 +631,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The value of the column '${col.name}'. (Nullable)
      */
     public ${col.javaNative} get${col.javaName}() {
+#if ($col.isEntityConvertEmptyStringToNull())
+        return InternalUtil.convertEmptyToNull(_${col.uncapitalisedJavaName});
+#else
         return _${col.uncapitalisedJavaName};
+#end
     }
 
     /**

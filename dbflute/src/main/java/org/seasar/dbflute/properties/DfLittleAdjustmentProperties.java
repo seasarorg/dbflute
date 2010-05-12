@@ -92,6 +92,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeEntityChaseRelation", false);
     }
 
+    public boolean isEntityConvertEmptyStringToNull() {
+        return isProperty("isEntityConvertEmptyStringToNull", false);
+    }
+
     // ===================================================================================
     //                                                                      ConditionQuery
     //                                                                      ==============

@@ -1335,6 +1335,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityChaseRelation();
     }
 
+    public boolean isEntityConvertEmptyStringToNull() {
+        return getProperties().getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
+    }
+
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
     }
