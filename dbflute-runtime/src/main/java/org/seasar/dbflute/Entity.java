@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -195,6 +196,10 @@ public interface Entity {
                 return result;
             }
             return (31 * result) + (value instanceof byte[] ? ((byte[]) value).length : value.hashCode());
+        }
+
+        public static String convertEmptyToNull(String value) {
+            return ParameterUtil.convertEmptyToNull(value);
         }
 
         public static String toClassTitle(Entity entity) {

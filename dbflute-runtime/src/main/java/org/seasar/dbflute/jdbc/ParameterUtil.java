@@ -31,7 +31,7 @@ public class ParameterUtil {
      * @return Converted value. (Nullable)
      */
     public static String convertEmptyToNull(String value) {
-        return ((value != null && !"".equals(value)) ? value : null);
+        return Srl.isEmpty(value) ? null : value;
     }
 
     /**
