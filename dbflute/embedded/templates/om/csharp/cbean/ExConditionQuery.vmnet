@@ -16,6 +16,7 @@ namespace ${glPackageCQ} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
+        // You should NOT touch with this constructor.
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -27,7 +28,11 @@ namespace ${glPackageCQ} {
             : base(childQuery, sqlClause, aliasName, nestLevel) {}
 
         // ===============================================================================
-        //                                                                    Your Orignal
-        //                                                                    ============
+        //                                                                   Arrange Query
+        //                                                                   =============
+        // You can make your arranged query methods here.
+        //public void ArrangeXxx() {
+        //    ...
+        //}
     }
 }
