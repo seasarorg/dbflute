@@ -203,16 +203,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         reg${tmpJavaName}(CK_LE, fRES(${tmpUncapitalisedJavaName}));
     }
 #end
-#if (${col.isAvailableStringPrefixSearch()})
-
-    /**
-     * PrefixSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch.
-     */
-    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP());
-    }
-#end
 #if (${col.isAvailableStringInScope()})
 
     /**
@@ -277,10 +267,21 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
+#if (${col.isAvailableStringPrefixSearch()})
+
+    /**
+     * PrefixSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch.
+     */
+    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP());
+    }
+#end
 #if (${col.isAvailableStringLikeSearch()})
 
     /**
-     * LikeSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * LikeSearch with various options. (versatile) {like '%xxx%' escape ...} <br />
+     * And NullOrEmptyIgnored, SeveralRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
@@ -291,7 +292,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringNotLikeSearch()})
 
     /**
-     * NotLikeSearch(not like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * NotLikeSearch with various options. (versatile) {not like 'xxx%' escape ...} <br />
+     * And NullOrEmptyIgnored, SeveralRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
@@ -314,7 +316,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'ExistsReferrer' (co-related sub-query). <br />
+     * Set up ExistsReferrer (co-related sub-query). <br />
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * <pre>
@@ -350,7 +352,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'NotExistsReferrer' (co-related sub-query). <br />
+     * Set up NotExistsReferrer (co-related sub-query). <br />
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * <pre>
@@ -378,7 +380,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
 
     /**
-     * Set up 'InScopeRelation' (sub-query). <br />
+     * Set up InScopeRelation (sub-query). <br />
      * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
      * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
@@ -406,7 +408,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'InScopeRelation' (sub-query). <br />
+     * Set up InScopeRelation (sub-query). <br />
      * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
@@ -427,7 +429,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
 
     /**
-     * Set up 'NotInScopeRelation' (sub-query). <br />
+     * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
      * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
@@ -455,7 +457,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'NotInScopeRelation' (sub-query). <br />
+     * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
@@ -726,7 +728,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'ExistsReferrer' (co-related sub-query). <br />
+     * Set up ExistsReferrer (co-related sub-query). <br />
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * <pre>
@@ -762,7 +764,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'NotExistsReferrer' (co-related sub-query). <br />
+     * Set up NotExistsReferrer (co-related sub-query). <br />
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * <pre>
@@ -790,7 +792,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
 
     /**
-     * Set up 'InScopeRelation' (sub-query). <br />
+     * Set up InScopeRelation (sub-query). <br />
      * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
      * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
@@ -818,7 +820,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'InScopeRelation' (sub-query). <br />
+     * Set up InScopeRelation (sub-query). <br />
      * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
@@ -839,7 +841,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
 
     /**
-     * Set up 'NotInScopeRelation' (sub-query). <br />
+     * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
      * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
@@ -867,7 +869,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up 'NotInScopeRelation' (sub-query). <br />
+     * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
@@ -908,7 +910,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
     /**
-     * Prepare for '(Query)DerivedReferrer'. <br />
+     * Prepare for (Query)DerivedReferrer. <br />
      * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @return The object to set up a function for referrer table. (NotNull)
@@ -998,8 +1000,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateFromTo()} && !${col.isJdbcTypeTime()})
 
     /**
-     * FromTo(fromDatetime &lt;= column &lt;= toDatetime). <br />
-     * And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * FromTo with various options. (versatile) {fromDatetime &lt;= column &lt;= toDatetime} <br />
+     * And NullIgnored, OnlyOnceRegistered.
      * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (Nullable)
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
@@ -1013,7 +1015,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     /**
-     * DateFromTo(fromDate &lt;= column &lt; toDate + 1 day). <br />
+     * DateFromTo. (Date means yyyy/MM/dd) {fromDate &lt;= column &lt; toDate + 1 day} <br />
      * And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (Nullable)
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (Nullable)

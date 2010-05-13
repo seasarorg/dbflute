@@ -138,20 +138,26 @@ public class ${myClassName} extends AbstractConditionBean {
      * Prepare for various queries. <br />
      * Examples of main functions are following:
      * <pre>
-     * // Basic
+     * // Basic Queries
      * cb.query().setMemberId_Equal(value);        // =
      * cb.query().setMemberId_NotEqual(value);     // !=
      * cb.query().setMemberId_GreaterThan(value);  // &gt;
      * cb.query().setMemberId_LessThan(value);     // &lt;
      * cb.query().setMemberId_GreaterEqual(value); // &gt;=
      * cb.query().setMemberId_LessEqual(value);    // &lt;=
-     * cb.query().setBirthdate_FromTo(fromDatetime, toDatetime, option);
-     * cb.query().setBirthdate_DateFromTo(fromDate, toDate); // yyyy/MM/dd
      * cb.query().setMemberName_InScope(valueList);    // in ('a', 'b')
      * cb.query().setMemberName_NotInScope(valueList); // not in ('a', 'b')
-     * cb.query().setMemberName_PrefixSearch(value);       // like 'a%' escape '|'
-     * cb.query().setMemberName_LikeSearch(value, option); // like [with various option]
+     * cb.query().setMemberName_PrefixSearch(value);   // like 'a%' escape '|'
+     * // LikeSearch with various options: (versatile)
+     * // {like ... [options]}
+     * cb.query().setMemberName_LikeSearch(value, option);
      * cb.query().setMemberName_NotLikeSearch(value, option); // not like ...
+     * // FromTo with various options: (versatile)
+     * // {fromDatetime &lt;= BIRTHDATE &lt;= toDatetime}
+     * cb.query().setBirthdate_FromTo(fromDatetime, toDatetime, option);
+     * // DateFromTo: (Date means yyyy/MM/dd)
+     * // {fromDate &lt;= BIRTHDATE &lt; toDate + 1 day}
+     * cb.query().setBirthdate_DateFromTo(fromDate, toDate);
      * cb.query().setBirthdate_IsNull();    // is null
      * cb.query().setBirthdate_IsNotNull(); // is not null
      * 
