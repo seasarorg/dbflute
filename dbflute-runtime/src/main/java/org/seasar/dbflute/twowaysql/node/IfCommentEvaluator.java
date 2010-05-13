@@ -496,7 +496,7 @@ public class IfCommentEvaluator {
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
-        msg = msg + "[Not Found Method]" + ln();
+        msg = msg + "[not found Method]" + ln();
         msg = msg + (baseObject != null ? DfTypeUtil.toClassTitle(baseObject) + "." : "");
         msg = msg + notFoundMethod + "()" + ln();
         msg = msg + ln();
@@ -522,7 +522,7 @@ public class IfCommentEvaluator {
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
-        msg = msg + "[Not Found Property]" + ln();
+        msg = msg + "[not found Property]" + ln();
         msg = msg + (baseObject != null ? DfTypeUtil.toClassTitle(baseObject) + "." : "");
         msg = msg + notFoundProperty + ln();
         msg = msg + ln();

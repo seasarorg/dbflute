@@ -204,7 +204,7 @@ public class AccessContext {
     protected static void throwAccessContextNotFoundException(String methodName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The access context was Not Found on thread!" + ln();
+        msg = msg + "The access context was not found on thread!" + ln();
         msg = msg + "{When you used AccessContext." + methodName + "}" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();

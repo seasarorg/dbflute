@@ -105,7 +105,7 @@ public class OutsideSqlContext {
     public static void throwOutsideSqlNotFoundException(String path) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The outsideSql was Not Found!" + getLineSeparator();
+        msg = msg + "The outsideSql was not found!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm the existence of your target file of outsideSql on your classpath."

@@ -2010,7 +2010,7 @@ public abstract class AbstractSqlClause implements SqlClause {
                     final int markIndex = line.indexOf(beginMarkPrefix);
                     final int terminalIndex = line.indexOf(identityTerminal);
                     if (terminalIndex < 0) {
-                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        String msg = "Identity terminal was not found at the begin line: [" + line + "]";
                         throw new SubQueryIndentFailureException(msg);
                     }
                     final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
@@ -2028,7 +2028,7 @@ public abstract class AbstractSqlClause implements SqlClause {
                     final int markIndex = line.indexOf(endMarkPrefix);
                     final int terminalIndex = line.indexOf(identityTerminal);
                     if (terminalIndex < 0) {
-                        String msg = "Identity terminal was Not Found at the begin line: [" + line + "]";
+                        String msg = "Identity terminal was not found at the begin line: [" + line + "]";
                         throw new SubQueryIndentFailureException(msg);
                     }
                     final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
@@ -2050,7 +2050,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         final String filteredSql = mainSb.toString();
 
         if (throughBegin) {
-            String msg = "End Mark Not Found!";
+            String msg = "End Mark not found!";
             msg = msg + ln() + "[Current SubQueryIdentity]" + ln();
             msg = msg + subQueryIdentity + ln();
             msg = msg + ln() + "[Before Filter]" + ln() + sql;

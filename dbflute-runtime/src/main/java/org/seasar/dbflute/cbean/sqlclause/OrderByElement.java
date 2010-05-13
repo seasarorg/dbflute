@@ -180,7 +180,7 @@ public class OrderByElement implements Serializable {
             Map<String, String> selectClauseRealColumnAliasMap) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The column for order-by was Not Found in select-clause!" + ln();
+        msg = msg + "The column for order-by was not found in select-clause!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "If you use 'union()' or 'unionAll()', Check your condition-bean!" + ln();

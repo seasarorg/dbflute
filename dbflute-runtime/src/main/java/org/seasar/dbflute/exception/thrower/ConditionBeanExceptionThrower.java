@@ -382,7 +382,7 @@ public class ConditionBeanExceptionThrower {
     public void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The aliasName was Not Found in specified alias names." + ln();
+        msg = msg + "The aliasName was not found in specified alias names." + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should specified an alias name that is the same as one in specify-derived-referrer." + ln();
@@ -409,7 +409,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"LATEST_PURCHASE_DATETIME\");" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
         msg = msg + ln();
-        msg = msg + "[Not Found Alias Name]" + ln() + aliasName + ln();
+        msg = msg + "[not found Alias Name]" + ln() + aliasName + ln();
         msg = msg + "* * * * * * * * * */";
         throw new SpecifiedDerivedOrderByAliasNameNotFoundException(msg);
     }

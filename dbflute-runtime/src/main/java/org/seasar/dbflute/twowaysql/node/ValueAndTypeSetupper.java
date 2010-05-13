@@ -217,7 +217,7 @@ public class ValueAndTypeSetupper {
     protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class<?> targetType,
             String notFoundProperty, String specifiedSql, boolean bind) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!");
+        br.addNotice("The property on the " + (bind ? "bind variable" : "embedded value") + " comment was not found!");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your property on your arguments.");
         br.addElement("And has the property had misspelling?");

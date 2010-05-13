@@ -551,7 +551,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String capPropName = initCap(dbmeta.findPropertyName(colName));
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + ln();
+        msg = msg + "The likeSearchOption was not found! (Should not be null!)" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your method call:" + ln();

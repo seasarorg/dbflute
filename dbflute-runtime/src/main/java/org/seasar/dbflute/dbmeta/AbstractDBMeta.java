@@ -858,7 +858,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             String propertyName) {
         Eps<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
         if (setupper == null) {
-            String msg = "The propertyName was Not Found in the map of setupper of entity property:";
+            String msg = "The propertyName was not found in the map of setupper of entity property:";
             msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()="
                     + entityPropertySetupperMap.keySet();
             throw new IllegalStateException(msg);
