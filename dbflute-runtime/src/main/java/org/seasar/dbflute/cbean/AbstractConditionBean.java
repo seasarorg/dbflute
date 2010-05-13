@@ -630,14 +630,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                     StatementConfig
     //                                                                     ===============
     /**
-     * @param statementConfig The configuration of statement. (Nullable)
+     * {@inheritDoc}
      */
     public void configure(StatementConfig statementConfig) {
         _statementConfig = statementConfig;
     }
 
     /**
-     * @return The configuration of statement. (Nullable)
+     * {@inheritDoc}
      */
     public StatementConfig getStatementConfig() {
         return _statementConfig;
@@ -647,8 +647,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                          DisplaySQL
     //                                                                          ==========
     /**
-     * Convert this conditionBean to SQL for display.
-     * @return SQL for display. (NotNull and NotEmpty)
+     * {@inheritDoc}
      */
     public String toDisplaySql() {
         final SqlAnalyzerFactory factory = getSqlAnalyzerFactory();

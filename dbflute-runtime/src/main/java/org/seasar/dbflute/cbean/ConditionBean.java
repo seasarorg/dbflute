@@ -132,12 +132,14 @@ public interface ConditionBean extends PagingBean {
     //                                                                    Statement Config
     //                                                                    ================
     /**
-     * @param statementConfig The config of statement. (Nullable)
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param statementConfig The configuration of statement. (Nullable)
      */
     void configure(StatementConfig statementConfig);
 
     /**
-     * @return The config of statement. (Nullable)
+     * Get the configuration of statement that is set through configure().
+     * @return The configuration of statement. (Nullable)
      */
     StatementConfig getStatementConfig();
 
