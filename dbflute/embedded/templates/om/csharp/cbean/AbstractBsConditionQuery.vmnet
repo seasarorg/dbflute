@@ -23,6 +23,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($col in $table.columns)
 #set ($tmpJavaName = "${col.javaName}")
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
+#set ($fk = $col.foreignKey)
 #if (${col.isJavaNativeStringObject()})
 
         ${col.propertySettingModifier} void Set${tmpJavaName}_Equal(${col.javaNative} v) { DoSet${tmpJavaName}_Equal(fRES(v)); }
@@ -30,7 +31,7 @@ namespace ${glPackageBaseCQ} {
         ${col.propertySettingModifier} void Set${tmpJavaName}_Equal_EmptyString() { DoSet${tmpJavaName}_Equal(""); }
 #end
 #if (${col.hasClassification()})
-#foreach ($classificationMap in $col.ClassificationMapList)
+#foreach ($classificationMap in $col.classificationMapList)
         /// <summary>
         /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as equal. { = }
         /// $database.buildClassificationApplicationComment($classificationMap)
@@ -88,63 +89,6 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotLikeSearch($col.javaNative v, ${glLikeSearchOption} option)
         { regLSQ(CK_NLS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", option); }
 #end
-#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
-#set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-        public void InScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
-            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
-        }
-        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
-#if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.singleKeyReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
-#end
-        public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
-            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
-        }
-        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
-#end
-#if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.singleKeyReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
-#end
-        public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
-            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
-        }
-        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
-#end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -185,6 +129,76 @@ namespace ${glPackageBaseCQ} {
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+        public void InScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+        public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+        public void NotInScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+        public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -283,63 +297,6 @@ namespace ${glPackageBaseCQ} {
 #if (${col.isAvailableNumberNotInScope()})
         public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { regINS<${col.JavaNative}>(CK_NINS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
-#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
-#set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
-        public void InScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
-            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
-        }
-        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
-#if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.SingleKeyReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
-#end
-        public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
-            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
-        }
-        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
-#end
-#if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.SingleKeyReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
-#end
-        public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
-            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
-            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
-        }
-        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-#end
-#end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -380,6 +337,76 @@ namespace ${glPackageBaseCQ} {
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+        public void InScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.SingleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+        public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
+        public void NotInScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
+        }
+        public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.SingleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+        public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+            assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
+            registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end

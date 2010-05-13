@@ -134,6 +134,74 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
+    /**
+     * Prepare for various queries. <br />
+     * Examples of main functions are following:
+     * <pre>
+     * // Basic
+     * cb.query().setMemberId_Equal(value);        // =
+     * cb.query().setMemberId_NotEqual(value);     // !=
+     * cb.query().setMemberId_GreaterThan(value);  // &gt;
+     * cb.query().setMemberId_LessThan(value);     // &lt;
+     * cb.query().setMemberId_GreaterEqual(value); // &gt;=
+     * cb.query().setMemberId_LessEqual(value);    // &lt;=
+     * cb.query().setBirthdate_FromTo(fromDatetime, toDatetime, option);
+     * cb.query().setBirthdate_DateFromTo(fromDate, toDate); // yyyy/MM/dd
+     * cb.query().setMemberName_InScope(valueList);    // in ('a', 'b')
+     * cb.query().setMemberName_NotInScope(valueList); // not in ('a', 'b')
+     * cb.query().setMemberName_PrefixSearch(value);       // like 'a%' escape '|'
+     * cb.query().setMemberName_LikeSearch(value, option); // like [with various option]
+     * cb.query().setMemberName_NotLikeSearch(value, option); // not like ...
+     * cb.query().setBirthdate_IsNull();    // is null
+     * cb.query().setBirthdate_IsNotNull(); // is not null
+     * 
+     * // ExistsReferrer: (co-related sub-query)
+     * // {where exists (select PURCHASE_ID from PURCHASE where ...)}
+     * cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.query().setXxx... // referrer sub-query condition
+     *     }
+     * });
+     * cb.query().notExistsPurchaseList...
+     * 
+     * // InScopeRelation: (sub-query)
+     * // {where MEMBER_STATUS_CODE in (select MEMBER_STATUS_CODE from MEMBER_STATUS where ...)}
+     * cb.query().inScopeMemberStatus(new SubQuery&lt;MemberStatusCB&gt;() {
+     *     public void query(MemberStatusCB subCB) {
+     *         subCB.query().setXxx... // relation sub-query condition
+     *     }
+     * });
+     * cb.query().notInScopeMemberStatus...
+     * 
+     * // (Query)DerivedReferrer: (co-related sub-query)
+     * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchasePrice(); // derived column for function
+     *         subCB.query().setXxx... // referrer sub-query condition
+     *     }
+     * }).greaterEqual(value);
+     * 
+     * // ScalarCondition: (self-table sub-query)
+     * cb.query().scalar_Equal().max(new SubQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB subCB) {
+     *         subCB.specify().columnBirthdate(); // derived column for function
+     *         subCB.query().setXxx... // scalar sub-query condition
+     *     }
+     * });
+     * 
+     * // OrderBy
+     * cb.query().addOrderBy_MemberName_Asc();
+     * cb.query().addOrderBy_MemberName_Desc().withManualOrder(valueList);
+     * cb.query().addOrderBy_MemberName_Desc().withNullsFirst();
+     * cb.query().addOrderBy_MemberName_Desc().withNullsLast();
+     * cb.query().addSpecifiedDerivedOrderBy_Desc(aliasName);
+     * 
+     * // Query(Relation)
+     * cb.query().queryMemberStatus()...;
+     * cb.query().queryMemberAddressAsValid(targetDate)...;
+     * </pre>
+     * @return The instance of condition-query for base-point table to set up query. (NotNull)
+     */
     public ${myConditionQueryClassName} query() {
         return getConditionQuery();
     }
@@ -161,7 +229,9 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                               Union
     //                                                                               =====
     /**
-     * Set up 'union'.
+     * Set up 'union' for base-point table. <br />
+     * You don't need to call SetupSelect in union-query,
+     * because it inherits calls before. (Don't call SetupSelect after here)
      * <pre>
      * cb.query().union(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} unionCB) {
@@ -178,7 +248,9 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     /**
-     * Set up 'union all'.
+     * Set up 'union all' for base-point table. <br />
+     * You don't need to call SetupSelect in union-query,
+     * because it inherits calls before. (Don't call SetupSelect after here)
      * <pre>
      * cb.query().unionAll(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} unionCB) {
@@ -186,7 +258,7 @@ public class ${myClassName} extends AbstractConditionBean {
      *     }
      * });
      * </pre>
-     * @param unionQuery The query of 'union'. (NotNull)
+     * @param unionQuery The query of 'union all'. (NotNull)
      */
     public void unionAll(UnionQuery<${myConditionBeanClassName}> unionQuery) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
@@ -268,6 +340,14 @@ public class ${myClassName} extends AbstractConditionBean {
         if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
+    /**
+     * Set up relation columns to select clause. <br />
+     * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+#if ($fk.hasDynamicFixedCondition())
+${fk.dynamicFixedConditionJavaDocParams}
+#end
+     * @return The set-upper of nested relation. (NotNull)
+     */
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
@@ -286,6 +366,11 @@ public class ${myClassName} extends AbstractConditionBean {
         if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
         return _nss${tmpPropertyNameInitCap};
     }
+    /**
+     * Set up relation columns to select clause. <br />
+     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+     * @return The set-upper of nested relation. (NotNull)
+     */
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
@@ -299,6 +384,22 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                             Specify
     //                                                                             =======
     protected HpSpecification _specification;
+
+    /**
+     * Prepare for SpecifyColumn, (Specify)DerivedReferrer.
+     * <pre>
+     * cb.specify().columnMemberId(...);
+     * cb.specify().columnMemberName(...);
+     * cb.specify().derived${tmpPropertyNameInitCap}().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchaseDatetime();
+     *         subCB.query().set...
+     *     }
+     * }, aliasName);
+     * cb.specify().specifyMemberStatus()...
+     * </pre>
+     * @return The instance of specification. (NotNull)
+     */
     public HpSpecification specify() {
         if (_specification == null) { _specification = new HpSpecification(this
             , new HpSpQyCall<${myConditionQueryClassName}>() {
@@ -359,8 +460,9 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
         /**
+         * Prepare to specify functions about relation table. <br />
          * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
-         * @return Next specification. (NotNull)
+         * @return The instance for specification for relation table to specify. (NotNull)
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
@@ -385,8 +487,9 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         /**
+         * Prepare to specify functions about relation table. <br />
          * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
-         * @return Next specification. (NotNull)
+         * @return The instance for specification for relation table to specify. (NotNull)
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
@@ -408,8 +511,17 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         /**
+         * Prepare for '(Specify)DerivedReferrer'. <br />
          * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
-         * @return Function. (NotNull)
+         * <pre>
+         * cb.specify().derived${tmpPropertyNameInitCap}().max(new SubQuery&lt;${tmpCBClassName}&gt;() {
+         *     public void query(${myConditionBeanClassName} subCB) {
+         *         subCB.specify().columnXxx... // derived column for function
+         *         subCB.query().setYyy... // referrer condition
+         *     }
+         * }, aliasName);
+         * </pre>
+         * @return The object to set up a function for referrer table. (NotNull)
          */
         public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
             return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
@@ -429,8 +541,21 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                         ColumnQuery
     //                                                                         ===========
     /**
-     * @param leftSpecifyQuery The specify-query for left column. (NotNull)
-     * @return The object for setting up operand and right column. (NotNull)
+     * Set up column-query. {column1 = column2}
+     * <pre>
+     * // where FOO &lt; BAR
+     * cb.columnQuery(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} cb) {
+     *         cb.specify().columnFoo(); // left side column
+     *     }
+     * }).lessThan(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} cb) {
+     *         cb.specify().columnBar(); // right side column
+     *     }
+     * });
+     * </pre>
+     * @param leftSpecifyQuery The specify-query for left side column. (NotNull)
+     * @return The object for setting up operand and right side column. (NotNull)
      */
     public HpColQyOperand<${myConditionBeanClassName}> columnQuery(final SpecifyQuery<${myConditionBeanClassName}> leftSpecifyQuery) {
         return new HpColQyOperand<${myConditionBeanClassName}>(new HpColQyHandler<${myConditionBeanClassName}>() {
@@ -449,6 +574,19 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                        OrScopeQuery
     //                                                                        ============
+    /**
+     * Set up the query for or-scope.
+     * <pre>
+     * // where (FOO = '...' or BAR = '...')
+     * cb.orScopeQuery(new OrQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} orCB) {
+     *         orCB.query().setFOO_Equal...
+     *         orCB.query().setBAR_Equal...
+     *     }
+     * });
+     * </pre>
+     * @param orQuery The query for or-condition. (NotNull)
+     */
     public void orScopeQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
         xorSQ((${myConditionBeanClassName})this, orQuery);
     }
