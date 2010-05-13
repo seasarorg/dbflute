@@ -600,49 +600,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // -----------------------------------------------------
-    //                                       InScopeSubQuery
-    //                                       ---------------
-    // {Modified at DBFlute-0.7.5}
-    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
-            String propertyName) {
-        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
-    }
-
-    protected void registerNotInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
-            String propertyName) {
-        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
-    }
-
-    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
-            String propertyName, String inScopeOption) {
-        assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
-        inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
-        final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        final String endIndent = "       ";
-        final String clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln()
-                + endIndent + ")" + endMark;
-        registerWhereClause(clause);
-    }
-
-    protected String getInScopeSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
-    }
-
-    protected String getInScopeSubQuerySql(ConditionQuery subQuery, String relatedColumnName, String propertyName) {
-        final String tableAliasName = getSqlClause().getLocalTableAliasName();
-        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
-        final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
-                selectClause, tableAliasName);
-        return selectClause + " " + fromWhereClause;
-    }
-
-    // -----------------------------------------------------
     //                                        ExistsSubQuery
     //                                        --------------
     // {Modified at DBFlute-0.7.5}
@@ -719,6 +676,49 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
         final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnNames,
                 propertyName, selectClause, tableAliasName, realColumnNames);
+        return selectClause + " " + fromWhereClause;
+    }
+
+    // -----------------------------------------------------
+    //                                       InScopeSubQuery
+    //                                       ---------------
+    // {Modified at DBFlute-0.7.5}
+    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName) {
+        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
+    }
+
+    protected void registerNotInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName) {
+        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
+    }
+
+    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName, String inScopeOption) {
+        assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
+        inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
+        final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
+        xincrementLocalSubQueryLevelIfNeeds(subQuery);
+        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        final String endIndent = "       ";
+        final String clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln()
+                + endIndent + ")" + endMark;
+        registerWhereClause(clause);
+    }
+
+    protected String getInScopeSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
+    }
+
+    protected String getInScopeSubQuerySql(ConditionQuery subQuery, String relatedColumnName, String propertyName) {
+        final String tableAliasName = getSqlClause().getLocalTableAliasName();
+        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
+        final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+                selectClause, tableAliasName);
         return selectClause + " " + fromWhereClause;
     }
 
