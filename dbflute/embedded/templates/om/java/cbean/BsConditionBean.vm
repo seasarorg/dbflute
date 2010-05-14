@@ -153,7 +153,7 @@ public class ${myClassName} extends AbstractConditionBean {
      * cb.query().setMemberName_LikeSearch(value, option);
      * cb.query().setMemberName_NotLikeSearch(value, option); // not like ...
      * // FromTo with various options: (versatile)
-     * // {fromDatetime &lt;= BIRTHDATE &lt;= toDatetime}
+     * // {(default) fromDatetime &lt;= BIRTHDATE &lt;= toDatetime}
      * cb.query().setBirthdate_FromTo(fromDatetime, toDatetime, option);
      * // DateFromTo: (Date means yyyy/MM/dd)
      * // {fromDate &lt;= BIRTHDATE &lt; toDate + 1 day}

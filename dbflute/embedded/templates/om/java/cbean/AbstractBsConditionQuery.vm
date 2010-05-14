@@ -1000,7 +1000,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateFromTo()} && !${col.isJdbcTypeTime()})
 
     /**
-     * FromTo with various options. (versatile) {fromDatetime &lt;= column &lt;= toDatetime} <br />
+     * FromTo with various options. (versatile) <br />
+     * {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
      * And NullIgnored, OnlyOnceRegistered.
      * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (Nullable)
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (Nullable)
@@ -1015,7 +1016,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     /**
-     * DateFromTo. (Date means yyyy/MM/dd) {fromDate &lt;= column &lt; toDate + 1 day} <br />
+     * DateFromTo. (Date means yyyy/MM/dd) <br />
+     * {fromDate &lt;= column &lt; toDate + 1 day} <br />
      * And NullIgnored, OnlyOnceRegistered.
      * <pre>
      * ex) fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
