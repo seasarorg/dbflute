@@ -52,14 +52,16 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
             sqlClause = createSqlClauseDb2(tableDbName, dbmetaProvider);
         } else if (isCurrentDBDef(DBDef.SQLServer)) {
             sqlClause = createSqlClauseSqlServer(tableDbName, dbmetaProvider);
-        } else if (isCurrentDBDef(DBDef.FireBird)) {
-            sqlClause = createSqlClauseFirebird(tableDbName, dbmetaProvider);
         } else if (isCurrentDBDef(DBDef.H2)) {
             sqlClause = createSqlClauseH2(tableDbName, dbmetaProvider);
         } else if (isCurrentDBDef(DBDef.Derby)) {
             sqlClause = createSqlClauseDerby(tableDbName, dbmetaProvider);
         } else if (isCurrentDBDef(DBDef.SQLite)) {
             sqlClause = createSqlClauseSqlite(tableDbName, dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.MSAccess)) {
+            sqlClause = createSqlClauseMsAccess(tableDbName, dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.FireBird)) {
+            sqlClause = createSqlClauseFirebird(tableDbName, dbmetaProvider);
         } else {
             // as the database when generating
             sqlClause = createSqlClause${database.generateDbName}(tableDbName, dbmetaProvider);
@@ -87,10 +89,6 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         return new SqlClauseSqlServer(tableDbName).provider(dbmetaProvider);
     }
 
-    protected SqlClause createSqlClauseFirebird(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseFirebird(tableDbName).provider(dbmetaProvider);
-    }
-
     protected SqlClause createSqlClauseH2(String tableDbName, DBMetaProvider dbmetaProvider) {
         return new SqlClauseH2(tableDbName).provider(dbmetaProvider);
     }
@@ -101,6 +99,14 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected SqlClause createSqlClauseSqlite(String tableDbName, DBMetaProvider dbmetaProvider) {
         return new SqlClauseSqlite(tableDbName).provider(dbmetaProvider);
+    }
+
+    protected SqlClause createSqlClauseMsAccess(String tableDbName, DBMetaProvider dbmetaProvider) {
+        return new SqlClauseMsAccess(tableDbName).provider(dbmetaProvider);
+    }
+
+    protected SqlClause createSqlClauseFirebird(String tableDbName, DBMetaProvider dbmetaProvider) {
+        return new SqlClauseFirebird(tableDbName).provider(dbmetaProvider);
     }
 
     protected SqlClause createSqlClauseDefault(String tableDbName, DBMetaProvider dbmetaProvider) {
