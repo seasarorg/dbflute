@@ -16,7 +16,7 @@
 package org.seasar.dbflute.cbean.sqlclause;
 
 /**
- * SqlClause for MSSQL.
+ * SqlClause for SQL Server.
  * @author jflute
  */
 public class SqlClauseSqlServer extends AbstractSqlClause {

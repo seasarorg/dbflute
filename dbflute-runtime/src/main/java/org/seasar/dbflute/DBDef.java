@@ -45,11 +45,11 @@ public enum DBDef {
     , Oracle("oracle", null, new WayOfOracle()) // supported
     , DB2("db2", null, new WayOfDB2()) // supported
     , SQLServer("sqlserver", "mssql", new WayOfSQLServer()) // supported
-    , FireBird("firebird", null, new WayOfFirebird()) // unsupported
     , H2("h2", null, new WayOfH2()) // supported
     , Derby("derby", null, new WayOfDerby()) // supported
     , SQLite("sqlite", null, new WayOfSQLite()) // semi-supported
     , MSAccess("msaccess", null, new WayOfMSAccess()) // semi-supported
+    , FireBird("firebird", null, new WayOfFirebird()) // unsupported
     , Unknown("unknown", null, new WayOfUnknown());
 
     // ===================================================================================

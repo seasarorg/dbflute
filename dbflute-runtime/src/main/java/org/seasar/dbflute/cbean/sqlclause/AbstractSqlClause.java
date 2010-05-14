@@ -594,7 +594,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                           From Clause
     //                                           -----------
     public String getFromClause() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         buildFromClause(sb);
         return sb.toString();
     }
@@ -602,6 +602,11 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected void buildFromClause(StringBuilder sb) {
         sb.append(ln()).append("  ");
         sb.append("from ");
+        if (isJoinInParentheses()) {
+            for (int i = 0; i < _outerJoinMap.size(); i++) {
+                sb.append("(");
+            }
+        }
         final String tableSqlName = getDBMeta().getTableSqlName();
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(tableSqlName).append(" dflocal");
@@ -613,15 +618,16 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     protected String getLeftOuterJoinClause() {
-        String fixedConditionKey = getFixedConditionKey();
-        StringBuilder sb = new StringBuilder();
-        for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext();) {
-            String aliasName = ite.next();
-            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo) _outerJoinMap.get(aliasName);
-            String joinTableDbName = joinInfo.getJoinTableDbName();
-            List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-            List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
-            Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
+        final String fixedConditionKey = getFixedConditionKey();
+        final StringBuilder sb = new StringBuilder();
+        final Set<Entry<String, LeftOuterJoinInfo>> outerJoinSet = _outerJoinMap.entrySet();
+        for (Entry<String, LeftOuterJoinInfo> outerJoinEntry : outerJoinSet) {
+            final String aliasName = outerJoinEntry.getKey();
+            final LeftOuterJoinInfo joinInfo = outerJoinEntry.getValue();
+            final String joinTableDbName = joinInfo.getJoinTableDbName();
+            final List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+            final List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
+            final Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
             sb.append(ln()).append("   ");
@@ -638,10 +644,10 @@ public abstract class AbstractSqlClause implements SqlClause {
             }
             sb.append(" ").append(aliasName).append(" on ");
             int count = 0;
-            Set<Entry<String, String>> entrySet = joinOnMap.entrySet();
-            for (Entry<String, String> entry : entrySet) {
-                String localColumnName = entry.getKey();
-                String foreignColumnName = entry.getValue();
+            final Set<Entry<String, String>> joinOnSet = joinOnMap.entrySet();
+            for (Entry<String, String> joinOnEntry : joinOnSet) {
+                final String localColumnName = joinOnEntry.getKey();
+                final String foreignColumnName = joinOnEntry.getValue();
                 if (count > 0) {
                     sb.append(" and ");
                 }
@@ -655,8 +661,15 @@ public abstract class AbstractSqlClause implements SqlClause {
             for (String additionalOnClause : additionalOnClauseList) {
                 sb.append(" and ").append(additionalOnClause);
             }
+            if (isJoinInParentheses()) {
+                sb.append(")");
+            }
         }
         return sb.toString();
+    }
+
+    protected boolean isJoinInParentheses() {
+        return false;
     }
 
     protected String getInlineViewClause(String joinTableName, List<String> inlineWhereClauseList) {
