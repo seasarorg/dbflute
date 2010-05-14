@@ -33,6 +33,12 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
+    /** The bind value for paging as 'from'. */
+    protected Integer _pagingBindFrom;
+
+    /** The bind value for paging as 'to'. */
+    protected Integer _pagingBindTo;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -79,10 +85,24 @@ public class SqlClauseDb2 extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected void doFetchPage() {
-        final RownumPagingProcessor processor = new RownumPagingProcessor(getRownumExpression());
+        final RownumPagingProcessor processor = createRownumPagingProcessor(getRownumExpression());
         processor.processRowNumberPaging();
         _fetchScopeSelectHint = processor.getSelectHint();
         _fetchScopeSqlSuffix = processor.getSqlSuffix();
+        _pagingBindFrom = processor.getPagingBindFrom();
+        _pagingBindTo = processor.getPagingBindTo();
+    }
+
+    protected RownumPagingProcessor createRownumPagingProcessor(String expression) {
+        final RownumPagingProcessor processor = new RownumPagingProcessor(expression);
+        if (isBindPagingCondition()) {
+            processor.useBindVariable();
+        }
+        return processor;
+    }
+
+    protected boolean isBindPagingCondition() {
+        return true; // as default
     }
 
     protected String getRownumExpression() {
@@ -157,5 +177,17 @@ public class SqlClauseDb2 extends AbstractSqlClause {
 
     public void lockWithUR() {
         _lockSqlSuffix = " with UR";
+    }
+
+    // [DBFlute-0.9.6.9]
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Integer getPagingBindFrom() { // for parameter comment
+        return _pagingBindFrom;
+    }
+
+    public Integer getPagingBindTo() { // for parameter comment
+        return _pagingBindTo;
     }
 }

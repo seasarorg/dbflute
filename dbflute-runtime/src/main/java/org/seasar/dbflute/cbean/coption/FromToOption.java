@@ -25,23 +25,25 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
  * <pre>
  * ex) fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
  *
- *   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
  *   new FromToOption().compareAsDate(); 
- *     --&gt; column &gt;= '2007/04/10 00:00:00' and column &lt; '2007/04/17 00:00:00'
- *   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+ *     --&gt; column &gt;= '2007/04/10 00:00:00'
+ *     and column &lt; '2007/04/17 00:00:00'
  *
  *   new FromToOption(); 
- *     --&gt; column &gt;= '2007/04/10 08:24:53' and column &lt;= '2007/04/16 14:36:29'
+ *     --&gt; column &gt;= '2007/04/10 08:24:53'
+ *     and column &lt;= '2007/04/16 14:36:29'
  *
  *   new FromToOption().greaterThan(); 
- *     --&gt; column &gt; '2007/04/10 08:24:53' and column &lt;= '2007/04/16 14:36:29'
+ *     --&gt; column &gt; '2007/04/10 08:24:53'
+ *     and column &lt;= '2007/04/16 14:36:29'
  *
  *   new FromToOption().lessThan(); 
- *     --&gt; column &gt;= '2007/04/10 08:24:53' and column &lt; '2007/04/16 14:36:29'
+ *     --&gt; column &gt;= '2007/04/10 08:24:53'
+ *     and column &lt; '2007/04/16 14:36:29'
  *
  *   new FromToOption().greaterThan().lessThan(); 
- *     --&gt; column &gt; '2007/04/10 08:24:53' and column &lt; '2007/04/16 14:36:29'
- * 
+ *     --&gt; column &gt; '2007/04/10 08:24:53'
+ *     and column &lt; '2007/04/16 14:36:29'
  * </pre>
  * @author jflute
  */
@@ -65,8 +67,8 @@ public class FromToOption implements ConditionOption {
     }
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                          Adjustment
+    //                                                                          ==========
     public FromToOption greaterThan() {
         _fromDateGreaterThan = true;
         return this;
@@ -77,15 +79,18 @@ public class FromToOption implements ConditionOption {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                             Pattern
+    //                                                                             =======
     /**
-     * Compare as date.
+     * Compare as date. <br />
+     * This method ignores greaterThan() and lessThan().
      * <pre>
      * ex) fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
      *
      *   new FromToOption().compareAsDate();
-     *     --&gt; column &gt;= '2007/04/10 00:00:00' and column &lt; '2007/04/17 00:00:00'
-     * 
-     * This method ignore greaterThan() and lessThan().
+     *     --&gt; column &gt;= '2007/04/10 00:00:00'
+     *     and column &lt; '2007/04/17 00:00:00'
      * </pre>
      * @return this. (NotNull)
      */

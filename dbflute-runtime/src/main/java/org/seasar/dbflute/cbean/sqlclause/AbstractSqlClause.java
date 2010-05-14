@@ -1714,9 +1714,16 @@ public abstract class AbstractSqlClause implements SqlClause {
         protected String _rownumExpression;
         protected String _selectHint = "";
         protected String _sqlSuffix = "";
+        protected Integer _pagingBindFrom;
+        protected Integer _pagingBindTo;
+        protected boolean _bind;
 
         public RownumPagingProcessor(String rownumExpression) {
             _rownumExpression = rownumExpression;
+        }
+
+        public void useBindVariable() {
+            _bind = true;
         }
 
         public void processRowNumberPaging() {
@@ -1738,14 +1745,18 @@ public abstract class AbstractSqlClause implements SqlClause {
             final String fromEnd = "       ) plain" + ln() + "       ) ext" + ln();
             if (offset) {
                 final int pageStartIndex = getPageStartIndex();
-                suffixSb.append(fromEnd).append(" where ext.rn > ").append(pageStartIndex);
+                _pagingBindFrom = pageStartIndex;
+                final String exp = _bind ? "/*pmb.sqlClause.pagingBindFrom*/" : String.valueOf(pageStartIndex);
+                suffixSb.append(fromEnd).append(" where ext.rn > ").append(exp);
             }
             if (limit) {
                 final int pageEndIndex = getPageEndIndex();
+                _pagingBindTo = pageEndIndex;
+                final String exp = _bind ? "/*pmb.sqlClause.pagingBindTo*/" : String.valueOf(pageEndIndex);
                 if (offset) {
-                    suffixSb.append(ln()).append("   and ext.rn <= ").append(pageEndIndex);
+                    suffixSb.append(ln()).append("   and ext.rn <= ").append(exp);
                 } else {
-                    suffixSb.append(fromEnd).append(" where ext.rn <= ").append(pageEndIndex);
+                    suffixSb.append(fromEnd).append(" where ext.rn <= ").append(exp);
                 }
             }
 
@@ -1759,6 +1770,14 @@ public abstract class AbstractSqlClause implements SqlClause {
 
         public String getSqlSuffix() {
             return _sqlSuffix;
+        }
+
+        public Integer getPagingBindFrom() {
+            return _pagingBindFrom;
+        }
+
+        public Integer getPagingBindTo() {
+            return _pagingBindTo;
         }
     }
 
