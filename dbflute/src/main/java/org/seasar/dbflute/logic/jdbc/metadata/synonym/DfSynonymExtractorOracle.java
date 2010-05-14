@@ -542,7 +542,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             while (rs.next()) {
                 String columnName = rs.getString("COLUMN_NAME");
                 String pkName = rs.getString("CONSTRAINT_NAME");
-                pkInfo.addPrimaryKeyList(columnName, pkName);
+                pkInfo.addPrimaryKey(columnName, pkName);
             }
             return pkInfo;
         } finally {

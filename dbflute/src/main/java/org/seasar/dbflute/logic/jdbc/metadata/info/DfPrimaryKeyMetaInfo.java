@@ -45,7 +45,9 @@ public class DfPrimaryKeyMetaInfo {
         return new ArrayList<String>(_primaryKeyMap.keySet());
     }
 
-    public void addPrimaryKeyList(String columnName, String pkName) {
+    public void addPrimaryKey(String columnName, String pkName) {
+        // basically same PK name at any columns
+        // but meta data treats PK name per column 
         _primaryKeyMap.put(columnName, pkName);
     }
 

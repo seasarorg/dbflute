@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +31,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -68,6 +71,9 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             throws SQLException {
         final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
         if (!isPrimaryKeyExtractingSupported()) {
+            if (isDatabaseMsAccess()) {
+                return processMSAccess(metaData, unifiedSchema, tableName);
+            }
             return info;
         }
         ResultSet parts = null;
@@ -79,7 +85,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 while (parts.next()) {
                     final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
                     final String pkName = getPrimaryKeyNameFromDBMeta(parts);
-                    info.addPrimaryKeyList(columnName, pkName);
+                    info.addPrimaryKey(columnName, pkName);
                 }
             }
             if (!info.hasPrimaryKey()) { // for lower case
@@ -88,7 +94,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                     while (lowerSpare.next()) {
                         final String columnName = getPrimaryKeyColumnNameFromDBMeta(lowerSpare);
                         final String pkName = getPrimaryKeyNameFromDBMeta(lowerSpare);
-                        info.addPrimaryKeyList(columnName, pkName);
+                        info.addPrimaryKey(columnName, pkName);
                     }
                 }
             }
@@ -98,7 +104,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                     while (upperSpare.next()) {
                         final String columnName = getPrimaryKeyColumnNameFromDBMeta(upperSpare);
                         final String pkName = getPrimaryKeyNameFromDBMeta(upperSpare);
-                        info.addPrimaryKeyList(columnName, pkName);
+                        info.addPrimaryKey(columnName, pkName);
                     }
                 }
             }
@@ -150,6 +156,24 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         }
     }
 
+    protected DfPrimaryKeyMetaInfo processMSAccess(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName) throws SQLException {
+        // it can get from unique key from JDBC of MS Access
+        final List<String> emptyList = DfCollectionUtil.emptyList();
+        final Map<String, Map<Integer, String>> uqMap = getUniqueKeyMap(metaData, unifiedSchema, tableName, emptyList);
+        final String pkName = "PrimaryKey";
+        final Map<Integer, String> pkMap = uqMap.get(pkName);
+        if (pkMap == null) {
+            return null;
+        }
+        final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
+        final Set<Entry<Integer, String>> entrySet = pkMap.entrySet();
+        for (Entry<Integer, String> entry : entrySet) {
+            info.addPrimaryKey(entry.getValue(), pkName);
+        }
+        return info;
+    }
+
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
@@ -157,7 +181,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      * Retrieves an map of the columns composing the unique key for a given table.
      * @param metaData JDBC meta data. (NotNull)
      * @param tableInfo The meta information of table. (NotNull)
-     * @return The meta information map of unique keys. (NotNull)
+     * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException
      */
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
@@ -176,7 +200,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      * @param metaData JDBC meta data. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
      * @param tableName The name of table. (NotNull)
-     * @return The meta information of unique keys. (NotNull)
+     * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException
      */
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
@@ -195,7 +219,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             UnifiedSchema unifiedSchema, String tableName, List<String> pkList) throws SQLException { // non primary key only
         final StringSet pkSet = StringSet.createAsFlexible();
         pkSet.addAll(pkList);
-        final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
+        final Map<String, Map<Integer, String>> uniqueKeyMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = true;
@@ -251,13 +275,13 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                     }
                 }
 
-                if (uniqueMap.containsKey(indexName)) {
-                    final Map<Integer, String> uniqueElementMap = uniqueMap.get(indexName);
+                if (uniqueKeyMap.containsKey(indexName)) {
+                    final Map<Integer, String> uniqueElementMap = uniqueKeyMap.get(indexName);
                     uniqueElementMap.put(ordinalPosition, columnName);
                 } else {
                     final Map<Integer, String> uniqueElementMap = new LinkedHashMap<Integer, String>();
                     uniqueElementMap.put(ordinalPosition, columnName);
-                    uniqueMap.put(indexName, uniqueElementMap);
+                    uniqueKeyMap.put(indexName, uniqueElementMap);
                 }
             }
         } finally {
@@ -265,7 +289,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 parts.close();
             }
         }
-        return uniqueMap;
+        return uniqueKeyMap;
     }
 
     protected void assertUQColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {
