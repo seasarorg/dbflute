@@ -120,7 +120,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected SqlClauseCreator createSqlClauseCreator() {
-        return new ${glImplementedSqlClauseCreator}();
+        SqlClauseCreator creator = ${glDBFluteConfig}.getInstance().getSqlClauseCreator();
+        if (creator != null) {
+            return creator;
+        }
+        return new ${glImplementedSqlClauseCreator}(); // as default
     }
 
     // -----------------------------------------------------

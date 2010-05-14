@@ -12,6 +12,7 @@ import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.*;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
@@ -36,7 +37,6 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private final DBMetaProvider _dbmetaProvider = new ${glDBMetaInstanceHandler}();
     protected ${myConditionQueryClassName} _conditionQuery;
 
     // ===================================================================================
@@ -44,7 +44,11 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                           =========
     @Override
     protected SqlClause createSqlClause() {
-        return new ${glImplementedSqlClauseCreator}().createSqlClause(this);
+        SqlClauseCreator creator = ${glDBFluteConfig}.getInstance().getSqlClauseCreator();
+        if (creator != null) {
+            return creator.createSqlClause(this);
+        }
+        return new ${glImplementedSqlClauseCreator}().createSqlClause(this); // as default
     }
 
     // ===================================================================================
@@ -52,7 +56,7 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                     ===============
     @Override
     protected DBMetaProvider getDBMetaProvider() {
-        return _dbmetaProvider;
+        return new ${glDBMetaInstanceHandler}(); // as default
     }
 
     // ===================================================================================
