@@ -61,7 +61,8 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         } else if (isCurrentDBDef(DBDef.SQLite)) {
             sqlClause = createSqlClauseSqlite(tableDbName, dbmetaProvider);
         } else {
-            sqlClause = createDefaultSqlClause(tableDbName, dbmetaProvider);
+            // as the database when generating
+            sqlClause = createSqlClause${database.generateDbName}(tableDbName, dbmetaProvider);
         }
         return sqlClause;
     }
@@ -102,9 +103,8 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         return new SqlClauseSqlite(tableDbName).provider(dbmetaProvider);
     }
 
-    protected SqlClause createDefaultSqlClause(String tableDbName, DBMetaProvider dbmetaProvider) {
-        // as the database when generating
-        return createSqlClause${database.generateDbName}(tableDbName, dbmetaProvider);
+    protected SqlClause createSqlClauseDefault(String tableDbName, DBMetaProvider dbmetaProvider) {
+        return new SqlClauseDefault(tableDbName).provider(dbmetaProvider);
     }
 
     // ===================================================================================
