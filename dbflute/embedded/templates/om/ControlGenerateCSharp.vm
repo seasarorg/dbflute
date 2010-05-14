@@ -947,6 +947,10 @@ $database.info("    parse('SqlClauseSqlite')")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClause}Sqlite.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseSqlite.${glTemplateFileExtension}",$path ,"" ,"")
 
+$database.info("    parse('SqlClauseMsAccess')")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClause}MsAccess.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseMsAccess.${glTemplateFileExtension}",$path ,"" ,"")
+
 $database.info("    parse('SqlClauseFirebird')")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClause}Firebird.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClauseFirebird.${glTemplateFileExtension}",$path ,"" ,"")

@@ -475,6 +475,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public void buildFromClause(StringBuilder sb) {
         sb.append(ln()).append("  ");
         sb.append("from ");
+        if (isJoinInParentheses()) {
+            for (int i = 0; i < _outerJoinMap.size(); i++) {
+                sb.append("(");
+            }
+        }
         String tableSqlName = getDBMeta().TableSqlName;
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(tableSqlName).append(" dflocal");
@@ -527,8 +532,15 @@ public abstract class ${myClassName} : ${glSqlClause} {
             foreach (String additionalOnClause in additionalOnClauseList) {
                 sb.append(" and ").append(additionalOnClause);
             }
+            if (isJoinInParentheses()) {
+                sb.append(")");
+            }
         }
         return sb.toString();
+    }
+
+    protected virtual bool isJoinInParentheses() { // for DBMS that needs to join in parentheses
+        return false; // as default
     }
 
     protected String getInlineViewClause(String joinTableName, List<String> inlineWhereClauseList) {
