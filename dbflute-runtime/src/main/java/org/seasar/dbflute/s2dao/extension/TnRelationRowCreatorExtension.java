@@ -131,6 +131,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         final TnPropertyMapping mapping = res.getCurrentPropertyMapping();
         Object value = null;
         if (res.containsRelKeyValueIfExists(columnName)) {
+            // if this column is relation key, it gets the value from relation key values
+            // for performance and avoiding twice getting same column value
             value = res.extractRelKeyValue(columnName);
         } else {
             final ValueType valueType = mapping.getValueType();

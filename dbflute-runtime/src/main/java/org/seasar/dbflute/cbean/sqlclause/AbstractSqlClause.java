@@ -668,8 +668,8 @@ public abstract class AbstractSqlClause implements SqlClause {
         return sb.toString();
     }
 
-    protected boolean isJoinInParentheses() {
-        return false;
+    protected boolean isJoinInParentheses() { // for DBMS that needs to join in parentheses
+        return false; // as default
     }
 
     protected String getInlineViewClause(String joinTableName, List<String> inlineWhereClauseList) {

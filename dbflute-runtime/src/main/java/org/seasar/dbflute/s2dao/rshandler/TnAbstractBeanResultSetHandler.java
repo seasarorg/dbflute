@@ -103,7 +103,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
      * @param selectColumnSet The name set of select column. (NotNull)
-     * @param relKeyValues The map of relation key values. (Nullable)
+     * @param relKeyValues The map of relation key values. The key is relation column name. (Nullable)
      * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException
@@ -118,9 +118,9 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param row The row of result list. (NotNull)
      */
     protected void postCreateRow(final Object row) {
-        if (row instanceof Entity) { // DBFlute Target
+        if (row instanceof Entity) { // DBFlute target
             ((Entity) row).clearModifiedPropertyNames();
-        } else { // Basically Unreachable
+        } else { // basically unreachable
             final TnBeanMetaData bmd = getBeanMetaData();
             final Set<String> names = bmd.getModifiedPropertyNames(row);
             names.clear();

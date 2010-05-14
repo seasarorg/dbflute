@@ -34,7 +34,7 @@ public interface TnRelationRowCreator {
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
      * @param columnNames The set of column name. (NotNull)
-     * @param relKeyValues The map of relation key values. (Nullable)
+     * @param relKeyValues The map of relation key values. The key is relation column name. (Nullable)
      * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException

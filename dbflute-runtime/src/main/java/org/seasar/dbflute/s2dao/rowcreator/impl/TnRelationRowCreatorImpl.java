@@ -103,7 +103,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     protected abstract void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException;
 
     protected boolean isValidRelationPerPropertyLoop(TnRelationRowCreationResource res) throws SQLException {
-        return true;// Always true as default. This method is for extension(for override).
+        return true; // always true as default (this is for override)
     }
 
     protected boolean isValidRelationAfterPropertyLoop(TnRelationRowCreationResource res) throws SQLException {

@@ -46,7 +46,7 @@ public class TnRelationRowCreationResource {
     /** The name set of select column. */
     protected Set<String> _selectColumnSet;
 
-    /** The map of relation key values. */
+    /** The map of relation key values. The key is relation column name. */
     protected Map<String, Object> _relKeyValues;
 
     /** The map of relation property cache. (keys are relationNoSuffix, columnName) */

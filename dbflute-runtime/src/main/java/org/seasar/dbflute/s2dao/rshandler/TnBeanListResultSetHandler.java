@@ -171,7 +171,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param rs The result set. (NotNull)
      * @param rpt The property type of relation. (NotNull)
      * @param columnNames The names of columns. (NotNull)
-     * @param relKeyValues The values of relation keys. (NotNull)
+     * @param relKeyValues The values of relation keys. The key is relation column name. (NotNull)
      * @param selectIndexMap The map of select index. (Nullable: If it's null, it doesn't use select index.)
      * @return The key of relation. (NotNull)
      * @throws SQLException
@@ -181,21 +181,15 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         final List<Object> keyList = new ArrayList<Object>();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final ValueType valueType;
-            String columnName = rpt.getMyKey(i);
-            if (columnNames.contains(columnName)) { // the local column exists on select clause
-                // basically here because local columns for relation key
-                // are required on ConditionBean (when it uses setupSelect)
-                final TnPropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);
+            final TnPropertyType pt = rpt.getBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
+            final String relationNoSuffix = buildRelationNoSuffix(rpt);
+            final String columnName = pt.getColumnName() + relationNoSuffix;
+            if (columnNames.contains(columnName)) {
                 valueType = pt.getValueType();
-            } else { // the local column does not exist on select clause so it uses a foreign column
-                final TnPropertyType pt = rpt.getBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
-                final String relationNoSuffix = buildRelationNoSuffix(rpt);
-                columnName = pt.getColumnName() + relationNoSuffix; // switch to foreign column
-                if (columnNames.contains(columnName)) {
-                    valueType = pt.getValueType();
-                } else {
-                    return null;
-                }
+            } else {
+                // basically unreachable because
+                // its existence has already been checked
+                return null;
             }
             final Object value;
             if (selectIndexMap != null) {
@@ -204,6 +198,8 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 value = valueType.getValue(rs, columnName);
             }
             if (value == null) {
+                // reachable when local column data is null
+                // or the relation is one-to-one and so on
                 return null;
             }
             relKeyValues.put(columnName, value);
