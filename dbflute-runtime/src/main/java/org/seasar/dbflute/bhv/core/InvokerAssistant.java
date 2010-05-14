@@ -50,6 +50,9 @@ public interface InvokerAssistant {
     DBMetaProvider assistDBMetaProvider();
 
     /**
+     * Assist the creator of SQL clause. <br />
+     * This is only used in internal world of DBFlute (to judge unique-constraint).
+     * So condition-bean does not use this.
      * @return The create of SQL clause. (NotNull)
      */
     SqlClauseCreator assistSqlClauseCreator();
