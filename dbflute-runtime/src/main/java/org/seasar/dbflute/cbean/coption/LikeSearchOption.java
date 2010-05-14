@@ -45,6 +45,7 @@ public class LikeSearchOption extends SimpleStringOption {
     // ===================================================================================
     //                                                                         Rear Option
     //                                                                         ===========
+    @Override
     public String getRearOption() {
         if (_escape == null || _escape.trim().length() == 0) {
             return "";
@@ -189,6 +190,7 @@ public class LikeSearchOption extends SimpleStringOption {
     // ===================================================================================
     //                                                                          Real Value
     //                                                                          ==========
+    @Override
     public String generateRealValue(String value) {
         value = super.generateRealValue(value);
 
@@ -222,6 +224,7 @@ public class LikeSearchOption extends SimpleStringOption {
         return ResourceContext.isCurrentDBDef(currentDBDef);
     }
 
+    @Override
     protected SimpleStringOption newDeepCopyInstance() {
         return new LikeSearchOption();
     }
@@ -254,7 +257,7 @@ public class LikeSearchOption extends SimpleStringOption {
     @Override
     public String toString() {
         final String title = DfTypeUtil.toClassTitle(this);
-        return title + ":{like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit = "
-                + _asOrSplit + "}";
+        return title + ":{like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit=" + _asOrSplit
+                + "}";
     }
 }

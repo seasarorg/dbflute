@@ -183,6 +183,22 @@ public class FromToOptionTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public void test_toString() {
+        // ## Arrange ##
+        FromToOption option = createOption();
+        option.compareAsDate();
+
+        // ## Act ##
+        String actual = option.toString();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("lessThan=true"));
+    }
+
+    // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
     protected FromToOption createOption() {

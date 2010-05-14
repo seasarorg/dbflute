@@ -128,4 +128,27 @@ public class LikeSearchOptionTest extends PlainTestCase {
             assertEquals("abc|%def|_ghijk||l", realValue);
         }
     }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public void test_toString() {
+        // ## Arrange ##
+        LikeSearchOption option = createOption();
+        option.likePrefix();
+
+        // ## Act ##
+        String actual = option.toString();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("escape=|"));
+    }
+
+    // ===================================================================================
+    //                                                                         Test Helper
+    //                                                                         ===========
+    protected LikeSearchOption createOption() {
+        return new LikeSearchOption();
+    }
 }

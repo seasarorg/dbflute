@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The option of from-to.
@@ -409,5 +410,15 @@ public class FromToOption implements ConditionOption {
         cal.clear(Calendar.SECOND);
         cal.clear(Calendar.MINUTE);
         cal.set(Calendar.HOUR_OF_DAY, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final String title = DfTypeUtil.toClassTitle(this);
+        return title + ":{greaterThan=" + _greaterThan + ", lessThan=" + _lessThan + ", usePattern=" + _usePattern
+                + "}";
     }
 }
