@@ -57,7 +57,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isJavaNativeStringObject()})
 
     /**
-     * Equal(=). And NullOrEmptyIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -529,7 +530,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isJavaNativeNumberObject()})
     
     /**
-     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -941,7 +943,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isJavaNativeDateObject()})
     
     /**
-     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -1035,7 +1038,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isJavaNativeBooleanObject()})
 
     /**
-     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -1057,7 +1061,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isJavaNativeUUIDObject()})
 
     /**
-     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
