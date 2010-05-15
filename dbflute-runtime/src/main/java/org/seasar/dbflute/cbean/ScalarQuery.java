@@ -15,6 +15,26 @@
  */
 package org.seasar.dbflute.cbean;
 
+/**
+ * The interface of scalar-query.
+ * <pre>
+ * fooBhv.scalarSelect(Date.class).max(new ScalarQuery&lt;FooCB&gt;() {
+ *     public void query(FooCB cb) {
+ *         cb.specify().columnFooDatetime(); // required for a function
+ *         cb.query().setFoo...
+ *     }
+ * }
+ * </pre>
+ * @author jflute
+ * @param <CB> The type of condition-bean.
+ */
 public interface ScalarQuery<CB extends ConditionBean> {
-    public void query(CB cb);
+
+    /**
+     * Set up your query condition for scalar-query. <br />
+     * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
+     * and they are ignored if you call.
+     * @param cb The condition-bean for scalar-query. (NotNull)
+     */
+    void query(CB cb);
 }

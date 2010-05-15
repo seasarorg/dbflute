@@ -16,10 +16,11 @@
 package org.seasar.dbflute.cbean;
 
 /**
+ * The interface of sub-query.
  * <pre>
- * cb.query.existsBarList(new SubQuery&lt;FooCB&gt;() {
- *     public void query(FooCB subCB) {
- *         subCB.query().setXxx_Yyy...
+ * cb.query.existsBarList(new SubQuery&lt;BarCB&gt;() {
+ *     public void query(BarCB subCB) {
+ *         subCB.query().setBar...
  *     }
  * }
  * </pre>
@@ -34,5 +35,5 @@ public interface SubQuery<SUB_CB extends ConditionBean> {
      * and they are ignored if you call.
      * @param subCB The condition-bean for sub-query. (NotNull)
      */
-    public void query(SUB_CB subCB);
+    void query(SUB_CB subCB);
 }

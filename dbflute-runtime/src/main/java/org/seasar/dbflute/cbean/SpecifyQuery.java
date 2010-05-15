@@ -16,6 +16,18 @@
 package org.seasar.dbflute.cbean;
 
 /**
+ * The interface of specify-query.
+ * <pre>
+ * cb.columnQuery(new SpecifyQuery&lt;FooCB&gt;() {
+ *     public void query(FooCB cb) {
+ *         cb.specify().columnFoo...();
+ *     }
+ * }).lessThan(new SpecifyQuery&lt;FooCB&gt;() {
+ *     public void query(FooCB cb) {
+ *         cb.specify().columnBar...();
+ *     }
+ * });
+ * </pre>
  * @author jflute
  * @param <CB> The type of condition-bean for specification.
  */

@@ -16,10 +16,11 @@
 package org.seasar.dbflute.cbean;
 
 /**
+ * The interface of union-query.
  * <pre>
  * cb.union(new UnionQuery&lt;FooCB&gt;() {
- *     public void query(MemberCB unionCB) {
- *         unionCB.query().setXxx_Yyy...
+ *     public void query(FooCB unionCB) {
+ *         unionCB.query().setFoo...
  *     }
  * }
  * </pre>
@@ -34,5 +35,5 @@ public interface UnionQuery<UNION_CB extends ConditionBean> {
      * and they are ignored if you call.
      * @param unionCB The condition-bean for union. (NotNull)
      */
-    public void query(UNION_CB unionCB);
+    void query(UNION_CB unionCB);
 }
