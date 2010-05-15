@@ -445,7 +445,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * Get the condition-query for relation table. <br />
      * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
 #if ($fk.hasDynamicFixedCondition())
-${fk.dynamicFixedConditionJavaDocParams}
+     * ${fk.dynamicFixedConditionArgsJavaDocString}
 #end
      * @return The instance of condition-query. (NotNull)
      */

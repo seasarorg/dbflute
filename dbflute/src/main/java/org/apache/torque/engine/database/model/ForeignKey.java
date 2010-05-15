@@ -1040,14 +1040,19 @@ public class ForeignKey {
         return sb.toString();
     }
 
-    public String getDynamicFixedConditionJavaDocParams() {
+    public String getDynamicFixedConditionArgsJavaDocString() {
         final Set<Entry<String, String>> entrySet = _dynamicFixedConditionMap.entrySet();
         final StringBuilder sb = new StringBuilder();
+        int count = 0;
         for (Entry<String, String> entry : entrySet) {
             final String parameterName = entry.getKey();
-            sb.append("     * @param ").append(parameterName).append(" ");
+            if (count > 0) {
+                sb.append("     * ");
+            }
+            sb.append("@param ").append(parameterName).append(" ");
             sb.append("The bind parameter of fixed condition for ").append(parameterName).append(". (NotNull)");
             sb.append(getBasicProperties().getSourceCodeLineSeparator());
+            ++count;
         }
         final String result = Srl.rtrim(sb.toString()); // trim last line separator
         return result;
