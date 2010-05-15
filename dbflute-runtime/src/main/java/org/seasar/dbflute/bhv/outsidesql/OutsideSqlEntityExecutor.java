@@ -66,7 +66,20 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select entity.
+     * Select entity by the outside-SQL.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * SimpleMember member
+     *     = memberBhv.outsideSql().entityHandling().selectEntity(path, pmb, entityType);
+     * if (member != null) {
+     *     ... = member.get...();
+     * } else {
+     *     ...
+     * }
+     * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
@@ -98,7 +111,16 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     }
 
     /**
-     * Select entity with deleted check.
+     * Select entity with deleted check by the outside-SQL.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * SimpleMember member
+     *     = memberBhv.outsideSql().entityHandling().selectEntity(path, pmb, entityType);
+     * ... = member.get...(); // the entity always be not null
+     * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)

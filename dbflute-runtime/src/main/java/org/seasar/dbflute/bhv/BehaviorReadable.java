@@ -49,13 +49,13 @@ public interface BehaviorReadable {
     //                                                                        New Instance
     //                                                                        ============
     /**
-     * New entity.
+     * New entity instance.
      * @return Entity. (NotNull)
      */
     Entity newEntity();
 
     /**
-     * New condition-bean.
+     * New condition-bean instance.
      * @return Condition-bean. (NotNull)
      */
     ConditionBean newConditionBean();
@@ -64,11 +64,9 @@ public interface BehaviorReadable {
     //                                                                    Basic Read Count
     //                                                                    ================
     /**
-     * Read count by condition-bean.
-     * <pre>
+     * Read count by condition-bean. <br />
      * If the argument 'condition-bean' is effective about fetch-scope,
      * this method invoke select count ignoring the fetch-scope.
-     * </pre>
      * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
      * @return Read count. (NotNull)
      */

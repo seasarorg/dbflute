@@ -95,7 +95,27 @@ public class OutsideSqlBasicExecutor {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select the list of the entity.
+     * Select the list of the entity by the outside-SQL.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * ListResultBean&lt;SimpleMember&gt; memberList
+     *     = memberBhv.outsideSql().selectList(path, pmb, entityType);
+     * for (SimpleMember member : memberList) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * It needs to use customize-entity and parameter-bean.
+     * The way to generate them is following:
+     * <pre>
+     * -- #df:entity#
+     * -- !df:pmb!
+     * -- !!Integer memberId!!
+     * -- !!String memberName!!
+     * -- !!...!!
+     * </pre>
      * @param <ENTITY> The type of entity for element.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
@@ -116,7 +136,13 @@ public class OutsideSqlBasicExecutor {
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute. {Insert/Update/Delete/Etc...}
+     * Execute the outside-SQL. {insert, update, delete, etc...}
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * int count = memberBhv.outsideSql().execute(path, pmb);
+     * </pre>
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @return The count of execution.
@@ -131,7 +157,16 @@ public class OutsideSqlBasicExecutor {
     //                                                                      Procedure Call
     //                                                                      ==============
     /**
-     * Call stored procedure.
+     * Call the procedure.
+     * <pre>
+     * SpInOutParameterPmb pmb = new SpInOutParameterPmb();
+     * pmb.setVInVarchar("foo");
+     * pmb.setVInOutVarchar("bar");
+     * memberBhv.outsideSql().call(pmb);
+     * String outVar = pmb.getVOutVarchar();
+     * </pre>
+     * It needs to use parameter-bean for procedure (ProcedurePmb).
+     * The way to generate is to set the option of DBFlute property and execute Sql2Entity.
      * @param pmb The parameter-bean for procedure. (NotNull)
      */
     public void call(ProcedurePmb pmb) {
@@ -203,12 +238,9 @@ public class OutsideSqlBasicExecutor {
     //                                       Result Handling
     //                                       ---------------
     /**
-     * Specify cursor handling.
+     * Prepare cursor handling.
      * <pre>
-     * # ex) Your Program
-     * #
-     * # executor.cursorHandling().selectCursor(path, pmb, handler);
-     * #
+     * memberBhv.outsideSql().cursorHandling().selectCursor(path, pmb, handler);
      * </pre>
      * @return The cursor executor of outside-SQL. (NotNull)
      */
@@ -221,12 +253,9 @@ public class OutsideSqlBasicExecutor {
     }
 
     /**
-     * Specify entity handling.
+     * Prepare entity handling.
      * <pre>
-     * # ex) Your Program
-     * #
-     * # executor.entityHandling().selectEntityWithDeletedCheck(path, pmb, Xxx.class);
-     * #
+     * memberBhv.outsideSql().entityHandling().selectEntityWithDeletedCheck(path, pmb, SimpleMember.class);
      * </pre>
      * @return The cursor executor of outside-SQL. (NotNull)
      */
@@ -242,44 +271,46 @@ public class OutsideSqlBasicExecutor {
     //                                                Paging
     //                                                ------
     /**
-     * Option of autoPaging. <br />
-     * If you invoke this, you don't need to write paging condition on your SQL.
+     * Prepare the paging as manualPaging.
      * <pre>
-     * # ex) Your SQL {MySQL}
-     * #
-     * # select member.MEMBER_ID, member...
-     * #   from Member member
-     * #  where ...
-     * #  order by ...
-     * # -- limit 40, 20        *Here is unnecessary!
-     * #
+     * memberBhv.outsideSql().manualPaging().selectPage(path, pmb, SimpleMember.class);
      * </pre>
-     * @return The executor of paging that the paging mode is auto. (NotNull)
-     */
-    public OutsideSqlPagingExecutor autoPaging() {
-        final OutsideSqlOption option = createOutsideSqlOption();
-        option.autoPaging();
-        return createOutsideSqlPagingExecutor(option);
-    }
-
-    /**
-     * Option of manualPaging. <br />
-     * If you invoke this, you need to write paging condition on your SQL.
+     * If you call this, you need to write paging condition on your SQL.
      * <pre>
-     * # ex) Your SQL {MySQL}
-     * #
-     * # select member.MEMBER_ID, member...
-     * #   from Member member
-     * #  where ...
-     * #  order by ...
-     * #  limit 40, 20        *Here is necessary!
-     * #
+     * ex) MySQL
+     * select member.MEMBER_ID, member...
+     *   from Member member
+     *  where ...
+     *  order by ...
+     *  limit 40, 20 *is necessary!
      * </pre>
      * @return The executor of paging that the paging mode is manual. (NotNull)
      */
     public OutsideSqlPagingExecutor manualPaging() {
         final OutsideSqlOption option = createOutsideSqlOption();
         option.manualPaging();
+        return createOutsideSqlPagingExecutor(option);
+    }
+
+    /**
+     * Prepare the paging as autoPaging.
+     * <pre>
+     * memberBhv.outsideSql().autoPaging().selectPage(path, pmb, SimpleMember.class);
+     * </pre>
+     * If you call this, you don't need to write paging condition on your SQL.
+     * <pre>
+     * ex) MySQL
+     * select member.MEMBER_ID, member...
+     *   from Member member
+     *  where ...
+     *  order by ...
+     * -- limit 40, 20 *is unnecessary!
+     * </pre>
+     * @return The executor of paging that the paging mode is auto. (NotNull)
+     */
+    public OutsideSqlPagingExecutor autoPaging() {
+        final OutsideSqlOption option = createOutsideSqlOption();
+        option.autoPaging();
         return createOutsideSqlPagingExecutor(option);
     }
 
@@ -291,6 +322,11 @@ public class OutsideSqlBasicExecutor {
     // -----------------------------------------------------
     //                                       Dynamic Binding
     //                                       ---------------
+    /**
+     * Set up dynamic-binding for this outside-SQL. <br />
+     * You can use bind variable in embedded variable by this.
+     * @return this. (NotNull)
+     */
     public OutsideSqlBasicExecutor dynamicBinding() {
         _dynamicBinding = true;
         return this;
@@ -299,6 +335,11 @@ public class OutsideSqlBasicExecutor {
     // -----------------------------------------------------
     //                                      Statement Config
     //                                      ----------------
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param statementConfig The configuration of statement. (Nullable)
+     * @return this. (NotNull)
+     */
     public OutsideSqlBasicExecutor configure(StatementConfig statementConfig) {
         _statementConfig = statementConfig;
         return this;

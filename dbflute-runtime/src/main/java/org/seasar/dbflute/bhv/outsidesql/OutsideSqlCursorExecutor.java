@@ -60,7 +60,29 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select the cursor of the entity.
+     * Select the cursor of the entity by outside-SQL.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * memberBhv.outsideSql().cursorHandling()
+     *         .selectCursor(path, pmb, new PurchaseSummaryMemberCursorHandler() {
+     *     public void Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
+     *         while (cursor.next()) {
+     *             Integer memberId = cursor.getMemberId();
+     *             String memberName = cursor.getMemberName();
+     *             ...
+     *         }
+     *         return null;
+     *     }
+     * });
+     * </pre>
+     * It needs to use type-safe-cursor instead of customize-entity.
+     * The way to generate it is following:
+     * <pre>
+     * -- #df:entity#
+     * -- +cursor+
+     * </pre>
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param handler The handler of cursor. (NotNull)

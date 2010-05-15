@@ -70,28 +70,41 @@ public class OutsideSqlPagingExecutor {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select list with paging.
-     * <p>
-     * The SQL should have Paging without Count. <br />
-     * You do not need to use pagingBean's isPaging() method on your 'Parameter Comment'. <br />
+     * Select list with paging by the outside-SQL. (count-select is not executed, only paging-select)<br />
      * <pre>
-     * - - - - - - - - - - - - - - - - - - - - - - -
-     * ex) Your Correct SQL {MySQL and manualPaging}
-     * - - - - - - - - - - - - - - - - - - - - - - -
-     * # select member.MEMBER_ID
-     * #      , member.MEMBER_NAME
-     * #      , memberStatus.MEMBER_STATUS_NAME
-     * #   from MEMBER member
-     * #     left outer join MEMBER_STATUS memberStatus
-     * #       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
-     * #  /*BEGIN&#42;/where
-     * #    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
-     * #    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
-     * #  /*END&#42;/
-     * #  order by member.UPDATE_DATETIME desc
-     * #  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
-     * # 
-     * o If it's autoPaging, the line of 'limit 80, 20' is unnecessary!
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * pmb.paging(20, 3); // 20 records per a page and current page number is 3
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * ListResultBean&lt;SimpleMember&gt; memberList
+     *     = memberBhv.outsideSql().manualPaging().selectList(path, pmb, entityType);
+     * for (SimpleMember member : memberList) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * The parameter-bean needs to extend SimplePagingBean.
+     * The way to generate it is following:
+     * <pre>
+     * -- !df:pmb extends SPB!
+     * -- !!Integer memberId!!
+     * -- !!...!!
+     * </pre>
+     * You don't need to use pagingBean's isPaging() method on your 'Parameter Comment'.
+     * <pre>
+     * ex) manualPaging and MySQL 
+     * select member.MEMBER_ID
+     *      , member.MEMBER_NAME
+     *      , memberStatus.MEMBER_STATUS_NAME
+     *   from MEMBER member
+     *     left outer join MEMBER_STATUS memberStatus
+     *       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
+     *  /*BEGIN&#42;/where
+     *    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
+     *    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
+     *  /*END&#42;/
+     *  order by member.UPDATE_DATETIME desc
+     *  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL that executes count and paging. (NotNull)
@@ -115,52 +128,57 @@ public class OutsideSqlPagingExecutor {
     }
 
     /**
-     * Select page.
-     * <p>
-     * The SQL should have Count and Paging. <br />
-     * You can realize by pagingBean's isPaging() method on your 'Parameter Comment'. For example, 'IF Comment'. <br />
-     * It returns false when it executes Count. And it returns true when it executes Paging. <br />
+     * Select page by the outside-SQL. <br />
+     * (both count-select and paging-select are executed)
      * <pre>
-     * - - - - - - - - - - - - - - - - - - - - - - -
-     * ex) Your Correct SQL {MySQL and manualPaging}
-     * - - - - - - - - - - - - - - - - - - - - - - -
-     * # /*IF pmb.isPaging()&#42;/
-     * # select member.MEMBER_ID
-     * #      , member.MEMBER_NAME
-     * #      , memberStatus.MEMBER_STATUS_NAME
-     * # -- ELSE select count(*)
-     * # /*END&#42;/
-     * #   from MEMBER member
-     * #     /*IF pmb.isPaging()&#42;/
-     * #     left outer join MEMBER_STATUS memberStatus
-     * #       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
-     * #     /*END&#42;/
-     * #  /*BEGIN&#42;/where
-     * #    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
-     * #    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
-     * #  /*END&#42;/
-     * #  /*IF pmb.isPaging()&#42;/
-     * #  order by member.UPDATE_DATETIME desc
-     * #  /*END&#42;/
-     * #  /*IF pmb.isPaging()&#42;/
-     * #  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
-     * #  /*END&#42;/
-     * # 
-     * o If it's autoPaging, the line of 'limit 80, 20' is unnecessary!
-     * 
-     * - - - - - - - - - - - - - - - - - - - - - - - - -
-     * ex) Wrong SQL {part 1}
-     *     -- Line comment before ELSE comment --
-     * - - - - - - - - - - - - - - - - - - - - - - - - -
-     * # /*IF pmb.isPaging()&#42;/
-     * # select member.MEMBER_ID
-     * #      , member.MEMBER_NAME -- The name of member...    *NG
-     * #      -- The status name of member...                  *NG
-     * #      , memberStatus.MEMBER_STATUS_NAME
-     * # -- ELSE select count(*)
-     * # /*END&#42;/
-     * # ...
-     * o It's restriction...Sorry
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * pmb.paging(20, 3); // 20 records per a page and current page number is 3
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * PagingResultBean&lt;SimpleMember&gt; page
+     *     = memberBhv.outsideSql().manualPaging().selectPage(path, pmb, entityType);
+     * int allRecordCount = page.getAllRecordCount();
+     * int allPageCount = page.getAllPageCount();
+     * boolean isExistPrePage = page.isExistPrePage();
+     * boolean isExistNextPage = page.isExistNextPage();
+     * ...
+     * for (SimpleMember member : page) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * The parameter-bean needs to extend SimplePagingBean.
+     * The way to generate it is following:
+     * <pre>
+     * -- !df:pmb extends SPB!
+     * -- !!Integer memberId!!
+     * -- !!...!!
+     * </pre>
+     * You can realize by pagingBean's isPaging() method on your 'Parameter Comment'.
+     * It returns false when it executes Count. And it returns true when it executes Paging.
+     * <pre>
+     * ex) manualPaging and MySQL
+     * /*IF pmb.isPaging()&#42;/
+     * select member.MEMBER_ID
+     *      , member.MEMBER_NAME
+     *      , memberStatus.MEMBER_STATUS_NAME
+     * -- ELSE select count(*)
+     * /*END&#42;/
+     *   from MEMBER member
+     *     /*IF pmb.isPaging()&#42;/
+     *     left outer join MEMBER_STATUS memberStatus
+     *       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
+     *     /*END&#42;/
+     *  /*BEGIN&#42;/where
+     *    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
+     *    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
+     *  /*END&#42;/
+     *  /*IF pmb.isPaging()&#42;/
+     *  order by member.UPDATE_DATETIME desc
+     *  /*END&#42;/
+     *  /*IF pmb.isPaging()&#42;/
+     *  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
+     *  /*END&#42;/
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL that executes count and paging. (NotNull)
