@@ -148,8 +148,16 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 
     /**
      * Set the value of pageGroupOption. <br />
-     * pageGroup() needs this setting before calling. <br />
-     * If you want to use fill-limit option, use this instead of setPageGroupSize()
+     * pageGroup() needs this setting before calling.
+     * <pre>
+     * PageGroupOption option = new PageGroupOption();
+     * option.<span style="color: #FD4747">setPageGroupSize</span>(10);
+     * page.<span style="color: #FD4747">setPageGroupOption</span>(option);
+     * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageGroup()</span>.createPageNumberList();
+     * 
+     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">// previous 1 2 3 4 5 6 7 8 9 10 next</span>
+     * </pre>
      * @param pageGroupOption The value of pageGroupOption. (Nullable)
      */
     public void setPageGroupOption(PageGroupOption pageGroupOption) {
@@ -216,6 +224,14 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Set the value of pageRangeSize. <br />
      * pageRange() needs this setting before calling. <br />
      * This method is easy-to-use of setPageRangeOption(). (only setting size)
+     * <pre>
+     * ex) range-size=5, current-page=8 
+     * page.<span style="color: #FD4747">setPageRangeSize</span>(5);
+     * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageRange()</span>.createPageNumberList();
+     * 
+     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
+     * </pre>
      * @param pageRangeSize The value of pageRangeSize.
      */
     public void setPageRangeSize(int pageRangeSize) {
@@ -228,6 +244,21 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Set the value of pageRangeOption. <br />
      * pageRange() needs this setting before calling. <br />
      * If you want to use fill-limit option, use this instead of setPageRangeSize()
+     * <pre>
+     * ex) range-size=5, current-page=8 
+     * PageRangeOption option = new PageRangeOption();
+     * option.<span style="color: #FD4747">setPageRangeSize</span>(5);
+     * option.<span style="color: #FD4747">setFillLimit</span>(true);
+     * page.<span style="color: #FD4747">setPageRangeOption</span>(option);
+     * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageRange()</span>.createPageNumberList();
+     * 
+     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
+     * 
+     * <span style="color: #3F7E5E">// ex) fillLimit=true, current-page=3</span>
+     * <span style="color: #3F7E5E">//  3 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">//</span> <span style="color: #FD4747">1 2 3 4 5 6 7 8 9 10 11</span> <span style="color: #3F7E5E">next</span>
+     * </pre>
      * @param pageRangeOption The value of pageRangeOption. (Nullable)
      */
     public void setPageRangeOption(PageRangeOption pageRangeOption) {
