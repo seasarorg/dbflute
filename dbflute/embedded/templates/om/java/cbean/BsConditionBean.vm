@@ -142,71 +142,71 @@ public class ${myClassName} extends AbstractConditionBean {
      * Prepare for various queries. <br />
      * Examples of main functions are following:
      * <pre>
-     * // Basic Queries
-     * cb.query().setMemberId_Equal(value);        // =
-     * cb.query().setMemberId_NotEqual(value);     // !=
-     * cb.query().setMemberId_GreaterThan(value);  // &gt;
-     * cb.query().setMemberId_LessThan(value);     // &lt;
-     * cb.query().setMemberId_GreaterEqual(value); // &gt;=
-     * cb.query().setMemberId_LessEqual(value);    // &lt;=
-     * cb.query().setMemberName_InScope(valueList);    // in ('a', 'b')
-     * cb.query().setMemberName_NotInScope(valueList); // not in ('a', 'b')
-     * cb.query().setMemberName_PrefixSearch(value);   // like 'a%' escape '|'
-     * // LikeSearch with various options: (versatile)
-     * // {like ... [options]}
+     * <span style="color: #3F7E5E">// Basic Queries</span>
+     * cb.query().setMemberId_Equal(value);        <span style="color: #3F7E5E">// =</span>
+     * cb.query().setMemberId_NotEqual(value);     <span style="color: #3F7E5E">// !=</span>
+     * cb.query().setMemberId_GreaterThan(value);  <span style="color: #3F7E5E">// &gt;</span>
+     * cb.query().setMemberId_LessThan(value);     <span style="color: #3F7E5E">// &lt;</span>
+     * cb.query().setMemberId_GreaterEqual(value); <span style="color: #3F7E5E">// &gt;=</span>
+     * cb.query().setMemberId_LessEqual(value);    <span style="color: #3F7E5E">// &lt;=</span>
+     * cb.query().setMemberName_InScope(valueList);    <span style="color: #3F7E5E">// in ('a', 'b')</span>
+     * cb.query().setMemberName_NotInScope(valueList); <span style="color: #3F7E5E">// not in ('a', 'b')</span>
+     * cb.query().setMemberName_PrefixSearch(value);   <span style="color: #3F7E5E">// like 'a%' escape '|'</span>
+     * <span style="color: #3F7E5E">// LikeSearch with various options: (versatile)</span>
+     * <span style="color: #3F7E5E">// {like ... [options]}</span>
      * cb.query().setMemberName_LikeSearch(value, option);
-     * cb.query().setMemberName_NotLikeSearch(value, option); // not like ...
-     * // FromTo with various options: (versatile)
-     * // {(default) fromDatetime &lt;= BIRTHDATE &lt;= toDatetime}
+     * cb.query().setMemberName_NotLikeSearch(value, option); <span style="color: #3F7E5E">// not like ...</span>
+     * <span style="color: #3F7E5E">// FromTo with various options: (versatile)</span>
+     * <span style="color: #3F7E5E">// {(default) fromDatetime &lt;= BIRTHDATE &lt;= toDatetime}</span>
      * cb.query().setBirthdate_FromTo(fromDatetime, toDatetime, option);
-     * // DateFromTo: (Date means yyyy/MM/dd)
-     * // {fromDate &lt;= BIRTHDATE &lt; toDate + 1 day}
+     * <span style="color: #3F7E5E">// DateFromTo: (Date means yyyy/MM/dd)</span>
+     * <span style="color: #3F7E5E">// {fromDate &lt;= BIRTHDATE &lt; toDate + 1 day}</span>
      * cb.query().setBirthdate_DateFromTo(fromDate, toDate);
-     * cb.query().setBirthdate_IsNull();    // is null
-     * cb.query().setBirthdate_IsNotNull(); // is not null
+     * cb.query().setBirthdate_IsNull();    <span style="color: #3F7E5E">// is null</span>
+     * cb.query().setBirthdate_IsNotNull(); <span style="color: #3F7E5E">// is not null</span>
      * 
-     * // ExistsReferrer: (co-related sub-query)
-     * // {where exists (select PURCHASE_ID from PURCHASE where ...)}
+     * <span style="color: #3F7E5E">// ExistsReferrer: (co-related sub-query)</span>
+     * <span style="color: #3F7E5E">// {where exists (select PURCHASE_ID from PURCHASE where ...)}</span>
      * cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.query().setXxx... // referrer sub-query condition
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// referrer sub-query condition</span>
      *     }
      * });
      * cb.query().notExistsPurchaseList...
      * 
-     * // InScopeRelation: (sub-query)
-     * // {where MEMBER_STATUS_CODE in (select MEMBER_STATUS_CODE from MEMBER_STATUS where ...)}
+     * <span style="color: #3F7E5E">// InScopeRelation: (sub-query)</span>
+     * <span style="color: #3F7E5E">// {where MEMBER_STATUS_CODE in (select MEMBER_STATUS_CODE from MEMBER_STATUS where ...)}</span>
      * cb.query().inScopeMemberStatus(new SubQuery&lt;MemberStatusCB&gt;() {
      *     public void query(MemberStatusCB subCB) {
-     *         subCB.query().setXxx... // relation sub-query condition
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// relation sub-query condition</span>
      *     }
      * });
      * cb.query().notInScopeMemberStatus...
      * 
-     * // (Query)DerivedReferrer: (co-related sub-query)
+     * <span style="color: #3F7E5E">// (Query)DerivedReferrer: (co-related sub-query)</span>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // derived column for function
-     *         subCB.query().setXxx... // referrer sub-query condition
+     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// referrer sub-query condition</span>
      *     }
      * }).greaterEqual(value);
      * 
-     * // ScalarCondition: (self-table sub-query)
+     * <span style="color: #3F7E5E">// ScalarCondition: (self-table sub-query)</span>
      * cb.query().scalar_Equal().max(new SubQuery&lt;MemberCB&gt;() {
      *     public void query(MemberCB subCB) {
-     *         subCB.specify().columnBirthdate(); // derived column for function
-     *         subCB.query().setXxx... // scalar sub-query condition
+     *         subCB.specify().columnBirthdate(); <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// scalar sub-query condition</span>
      *     }
      * });
      * 
-     * // OrderBy
+     * <span style="color: #3F7E5E">// OrderBy</span>
      * cb.query().addOrderBy_MemberName_Asc();
      * cb.query().addOrderBy_MemberName_Desc().withManualOrder(valueList);
      * cb.query().addOrderBy_MemberName_Desc().withNullsFirst();
      * cb.query().addOrderBy_MemberName_Desc().withNullsLast();
      * cb.query().addSpecifiedDerivedOrderBy_Desc(aliasName);
      * 
-     * // Query(Relation)
+     * <span style="color: #3F7E5E">// Query(Relation)</span>
      * cb.query().queryMemberStatus()...;
      * cb.query().queryMemberAddressAsValid(targetDate)...;
      * </pre>
@@ -243,7 +243,7 @@ public class ${myClassName} extends AbstractConditionBean {
      * You don't need to call SetupSelect in union-query,
      * because it inherits calls before. (Don't call SetupSelect after here)
      * <pre>
-     * cb.query().union(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #FD4747">union</span>(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} unionCB) {
      *         unionCB.query().setXxx...
      *     }
@@ -262,7 +262,7 @@ public class ${myClassName} extends AbstractConditionBean {
      * You don't need to call SetupSelect in union-query,
      * because it inherits calls before. (Don't call SetupSelect after here)
      * <pre>
-     * cb.query().unionAll(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #FD4747">unionAll</span>(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} unionCB) {
      *         unionCB.query().setXxx...
      *     }
@@ -400,7 +400,7 @@ public class ${myClassName} extends AbstractConditionBean {
      * <pre>
      * cb.specify().columnMemberId(...);
      * cb.specify().columnMemberName(...);
-     * cb.specify().derived${tmpPropertyNameInitCap}().max(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchaseDatetime();
      *         subCB.query().set...
@@ -524,10 +524,10 @@ public class ${myClassName} extends AbstractConditionBean {
          * Prepare for '(Specify)DerivedReferrer'. <br />
          * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
          * <pre>
-         * cb.specify().derived${tmpPropertyNameInitCap}().max(new SubQuery&lt;${tmpCBClassName}&gt;() {
-         *     public void query(${myConditionBeanClassName} subCB) {
-         *         subCB.specify().columnXxx... // derived column for function
-         *         subCB.query().setYyy... // referrer condition
+         * cb.specify().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.max(new SubQuery&lt;${tmpCBClassName}&gt;() {
+         *     public void query(${tmpCBClassName} subCB) {
+         *         subCB.specify().<span style="color: #FD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column for function</span>
+         *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
          *     }
          * }, aliasName);
          * </pre>
@@ -553,14 +553,14 @@ public class ${myClassName} extends AbstractConditionBean {
     /**
      * Set up column-query. {column1 = column2}
      * <pre>
-     * // where FOO &lt; BAR
-     * cb.columnQuery(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     * <span style="color: #3F7E5E">// where FOO &lt; BAR</span>
+     * cb.<span style="color: #FD4747">columnQuery</span>(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} cb) {
-     *         cb.specify().columnFoo(); // left side column
+     *         cb.specify().<span style="color: #FD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left side column</span>
      *     }
      * }).lessThan(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} cb) {
-     *         cb.specify().columnBar(); // right side column
+     *         cb.specify().<span style="color: #FD4747">columnBar()</span>; <span style="color: #3F7E5E">// right side column</span>
      *     }
      * });
      * </pre>
@@ -587,8 +587,8 @@ public class ${myClassName} extends AbstractConditionBean {
     /**
      * Set up the query for or-scope.
      * <pre>
-     * // where (FOO = '...' or BAR = '...')
-     * cb.orScopeQuery(new OrQuery&lt;${myConditionBeanClassName}&gt;() {
+     * <span style="color: #3F7E5E">// where (FOO = '...' or BAR = '...')</span>
+     * cb.<span style="color: #FD4747">orScopeQuery</span>(new OrQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} orCB) {
      *         orCB.query().setFOO_Equal...
      *         orCB.query().setBAR_Equal...

@@ -78,7 +78,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                ====================
 #foreach ($col in $table.columns)
 #set ($tmpJavaName = "${col.JavaName}")
-#set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+#set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #set ($fk = $col.foreignKey)
     protected ConditionValue getCValue${tmpJavaName}() { return _myCQ.get${tmpJavaName}(); }
 #if (${col.isJavaNativeStringObject()})

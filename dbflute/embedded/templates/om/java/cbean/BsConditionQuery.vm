@@ -33,12 +33,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                              Inline
     //                                                                              ======
     /**
-     * Prepare inline query. <br />
-     * {select ... from ... left outer join (select * from ${table.name}) where abc = [abc] ...}
+     * Prepare in-line query. <br />
+     * {select ... from ... left outer join (select * from ${table.name}) where FOO = [value] ...}
      * <pre>
-     * cb.query().queryMemberStatus().inline().setXxx_;
+     * cb.query().queryMemberStatus().<span style="color: #FD4747">inline()</span>.setFoo...;
      * </pre>
-     * @return The condition-inline-query for in-line query. (NotNull)
+     * @return The condition-query for in-line query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} inline() {
         if (_inlineQuery == null) { _inlineQuery = createInlineQuery(); }
@@ -50,9 +50,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     /**
      * Prepare on-clause query. <br />
-     * {select ... from ... left outer join ${table.name} on ... and abc = [abc] ...}
+     * {select ... from ... left outer join ${table.name} on ... and FOO = [value] ...}
      * <pre>
-     * cb.query().queryMemberStatus().on().setXxx_;
+     * cb.query().queryMemberStatus().<span style="color: #FD4747">on()</span>.setFoo...;
      * </pre>
      * @return The condition-inline-query for on-clause query. (NotNull)
      * @throws IllegalConditionBeanOperationException When this condition-query is base query.
@@ -395,15 +395,54 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
 
+    /** 
+     * Add order-by as ascend.
+     * @return this. (NotNull)
+     */
     public ${myClassName} addOrderBy_${tmpJavaName}_Asc() { regOBA("${col.name}"); return this; }
+    /**
+     * Add order-by as descend.
+     * @return this. (NotNull)
+     */
     public ${myClassName} addOrderBy_${tmpJavaName}_Desc() { regOBD("${col.name}"); return this; }
 #end
 
     // ===================================================================================
     //                                                           Specified Derived OrderBy
     //                                                           =========================
-    public ${myClassName} addSpecifiedDerivedOrderBy_Asc(String aliasName) { registerSpecifiedDerivedOrderBy_Asc(aliasName); return this; }
-    public ${myClassName} addSpecifiedDerivedOrderBy_Desc(String aliasName) { registerSpecifiedDerivedOrderBy_Desc(aliasName); return this; }
+    /**
+     * Add order-by for specified derived column as ascend.
+     * <pre>
+     * cb.specify().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchaseDatetime();
+     *     }
+     * }, <span style="color: #FD4747">aliasName</span>);
+     * <span style="color: #3F7E5E">// order by [alias-name] asc</span>
+     * cb.<span style="color: #FD4747">addSpecifiedDerivedOrderBy_Asc</span>(<span style="color: #FD4747">aliasName</span>);
+     * </pre>
+     * @param aliasName The alias name specified at (Specify)DerivedReferrer. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} addSpecifiedDerivedOrderBy_Asc(String aliasName)
+    { registerSpecifiedDerivedOrderBy_Asc(aliasName); return this; }
+
+    /**
+     * Add order-by for specified derived column as descend.
+     * <pre>
+     * cb.specify().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchaseDatetime();
+     *     }
+     * }, <span style="color: #FD4747">aliasName</span>);
+     * <span style="color: #3F7E5E">// order by [alias-name] desc</span>
+     * cb.<span style="color: #FD4747">addSpecifiedDerivedOrderBy_Desc</span>(<span style="color: #FD4747">aliasName</span>);
+     * </pre>
+     * @param aliasName The alias name specified at (Specify)DerivedReferrer. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} addSpecifiedDerivedOrderBy_Desc(String aliasName)
+    { registerSpecifiedDerivedOrderBy_Desc(aliasName); return this; }
 
     // ===================================================================================
     //                                                                         Union Query

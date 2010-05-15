@@ -122,7 +122,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
-     * int count = ${myEntityVariableName}Bhv.selectCount(cb);
+     * int count = ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectCount</span>(cb);
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected count.
@@ -149,7 +149,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
-     * ${myEntityVariableName}Bhv.selectCursor(cb, new EntityRowHandler&lt;${myExtendedObjectClassName}&gt;() {
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectCursor</span>(cb, new EntityRowHandler&lt;${myExtendedObjectClassName}&gt;() {
      *     public void handle(${myExtendedObjectClassName} entity) {
      *         ... = entity.getFoo...();
      *     }
@@ -176,7 +176,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
-     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.selectEntity(cb);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectEntity</span>(cb);
      * if (${myEntityVariableName} != null) {
      *     ... = ${myEntityVariableName}.get...();
      * } else {
@@ -206,8 +206,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
-     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.selectEntityWithDeletedCheck(cb);
-     * ... = ${myEntityVariableName}.get...(); // the entity always be not null
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectEntityWithDeletedCheck</span>(cb);
+     * ... = ${myEntityVariableName}.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected entity. (NotNull)
@@ -275,7 +275,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
      * cb.query().addOrderBy_Bar...();
-     * ListResultBean&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myEntityVariableName}Bhv.selectList(cb);
+     * ListResultBean&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectList</span>(cb);
      * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
      *     ... = ${myEntityVariableName}.get...();
      * }
@@ -312,8 +312,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
      * cb.query().addOrderBy_Bar...();
-     * cb.paging(20, 3); // 20 records per a page and current page number is 3
-     * PagingResultBean&lt;${myExtendedObjectClassName}&gt; page = ${myEntityVariableName}Bhv.selectPage(cb);
+     * cb.<span style="color: #FD4747">paging</span>(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
+     * PagingResultBean&lt;${myExtendedObjectClassName}&gt; page = ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectPage</span>(cb);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -361,9 +361,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Select the scalar value derived by a function. <br />
      * You should call a function method after this method called like as follows:
      * <pre>
-     * ${table.uncapitalisedJavaName}Bhv.scalarSelect(Date.class).max(new ScalarQuery() {
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">scalarSelect</span>(Date.class).max(new ScalarQuery() {
      *     public void query(${myConditionBeanClassName} cb) {
-     *         cb.specify().columnFooDatetime(); // required for a function
+     *         cb.specify().<span style="color: #FD4747">columnFooDatetime()</span>; <span style="color: #3F7E5E">// required for a function</span>
      *         cb.query().setBarName_PrefixSearch("S");
      *     }
      * });
@@ -433,7 +433,19 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
     }
     /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the set-upper for condition-bean of referrer. <br />
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the set-upper for condition-bean of referrer.
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ConditionBeanSetupper&lt;${referrerCBClassName}&gt;() {
+     *     public void setup(${referrerCBClassName} cb) {
+     *         cb.setupSelect...();
+     *         cb.query().setFoo...(value);
+     *         cb.query().addOrderBy_Bar...(); <span style="color: #3F7E5E">// basically you should order referrer list</span>
+     *     }
+     * });
+     * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
+     *     ... = ${myEntityVariableName}.<span style="color: #FD4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
+     * }
+     * </pre>
      * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
      * The condition-bean that the set-upper provides have settings before you touch it. It is as follows:
      * <pre>
@@ -659,11 +671,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Insert the entity.
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * // if auto-increment, you don't need to set the PK value
+     * <span style="color: #3F7E5E">// if auto-increment, you don't need to set the PK value</span>
      * ${myEntityVariableName}.setFoo...(value);
      * ${myEntityVariableName}.setBar...(value);
-     * ${myEntityVariableName}Bhv.insert(${myEntityVariableName});
-     * ... = ${myEntityVariableName}.getPK...(); // if auto-increment, you can get the value after
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">insert</span>(${myEntityVariableName});
+     * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
      * </pre>
      * @param ${myEntityVariableName} The entity of insert target. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
@@ -682,13 +694,13 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Update the entity modified-only. {UpdateCountZeroException, ExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * ${myEntityVariableName}.setPK...(value); // required
-     * ${myEntityVariableName}.setBar...(value); // you should set only modified columns
-     * // if exclusive control, the value of exclusive control column is required
-     * ${myEntityVariableName}.setVersionNo(value);
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * ${myEntityVariableName}.setBar...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// if exclusive control, the value of exclusive control column is required</span>
+     * ${myEntityVariableName}.<span style="color: #FD4747">setVersionNo</span>(value);
      * try {
-     *     ${myEntityVariableName}Bhv.update(${myEntityVariableName});
-     * } catch (EntityAlreadyUpdatedException e) { // if concurrent update
+     *     ${myEntityVariableName}Bhv.<span style="color: #FD4747">update</span>(${myEntityVariableName});
+     * } catch (EntityAlreadyUpdatedException e) { <span style="color: #3F7E5E">// if concurrent update</span>
      *     ...
      * } 
      * </pre>
@@ -716,12 +728,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * ${myEntityVariableName}.setPK...(value); // required
-     * ${myEntityVariableName}.setBar...(value); // you should set only modified columns
-     * // you don't need to set the value of exclusive control column
-     * // (auto-increment for version number is valid though non-exclusive control)
-     * //${myEntityVariableName}.setVersionNo(value);
-     * ${myEntityVariableName}Bhv.updateNonstrict(${myEntityVariableName});
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * ${myEntityVariableName}.setBar...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">updateNonstrict</span>(${myEntityVariableName});
      * </pre>
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
@@ -797,12 +809,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Delete the entity. {UpdateCountZeroException, ExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * ${myEntityVariableName}.setPK...(value); // required
-     * // if exclusive control, the value of exclusive control column is required
-     * ${myEntityVariableName}.setVersionNo(value);
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * <span style="color: #3F7E5E">// if exclusive control, the value of exclusive control column is required</span>
+     * ${myEntityVariableName}.<span style="color: #FD4747">setVersionNo</span>(value);
      * try {
-     *     ${myEntityVariableName}Bhv.delete(${myEntityVariableName});
-     * } catch (EntityAlreadyUpdatedException e) { // if concurrent update
+     *     ${myEntityVariableName}Bhv.<span style="color: #FD4747">delete</span>(${myEntityVariableName});
+     * } catch (EntityAlreadyUpdatedException e) { <span style="color: #3F7E5E">// if concurrent update</span>
      *     ...
      * } 
      * </pre>
@@ -829,11 +841,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Delete the entity non-strictly. {UpdateCountZeroException, NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * ${myEntityVariableName}.setPK...(value); // required
-     * // you don't need to set the value of exclusive control column
-     * // (auto-increment for version number is valid though non-exclusive control)
-     * //${myEntityVariableName}.setVersionNo(value);
-     * ${myEntityVariableName}Bhv.deleteNonstrict(${myEntityVariableName});
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrict</span>(${myEntityVariableName});
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
@@ -848,12 +860,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * ${myEntityVariableName}.setPK...(value); // required
-     * // you don't need to set the value of exclusive control column
-     * // (auto-increment for version number is valid though non-exclusive control)
-     * //${myEntityVariableName}.setVersionNo(value);
-     * ${myEntityVariableName}Bhv.deleteNonstrictIgnoreDeleted(${myEntityVariableName});
-     * // if the target entity doesn't exist, no exception
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrictIgnoreDeleted</span>(${myEntityVariableName});
+     * <span style="color: #3F7E5E">// if the target entity doesn't exist, no exception</span>
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -946,15 +958,15 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Query update the several entities non-strictly modified-only. {NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * // you don't need to set PK value
-     * //${myEntityVariableName}.setPK...(value);
-     * ${myEntityVariableName}.setFoo...(value); // you should set only modified columns
-     * // you don't need to set the value of exclusive control column
-     * // (auto-increment for version number is valid though non-exclusive control)
-     * //${myEntityVariableName}.setVersionNo(value);
+     * <span style="color: #3F7E5E">// you don't need to set PK value</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
-     * ${myEntityVariableName}Bhv.queryUpdate(${myEntityVariableName}, cb);
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryUpdate</span>(${myEntityVariableName}, cb);
      * </pre>
      * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
@@ -972,7 +984,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
-     * ${myEntityVariableName}Bhv.queryDelete(${myEntityVariableName}, cb);
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryDelete</span>(${myEntityVariableName}, cb);
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The deleted count.
@@ -994,7 +1006,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myEntityVariableName}.setPK...(value);
      * ${myEntityVariableName}.setFoo...(value);
      * ${myEntityVariableName}.setBar...(value);
-     * ${myEntityVariableName}Bhv.insert(${myEntityVariableName});
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">insert</span>(${myEntityVariableName});
      * </pre>
      * @param ${myEntityVariableName} The entity for insert. (NotNull)
      */
