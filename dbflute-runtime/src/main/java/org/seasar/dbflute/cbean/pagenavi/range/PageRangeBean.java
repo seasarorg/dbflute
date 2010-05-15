@@ -68,7 +68,7 @@ public class PageRangeBean implements java.io.Serializable {
      * List&lt;Integer&gt; numberList = page.pageRange().<span style="color: #FD4747">createPageNumberList()</span>;
      * 
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">3 4 5 6 7 8 9 10 11 12</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @return The list of page number. (NotNull)
      */
@@ -132,7 +132,7 @@ public class PageRangeBean implements java.io.Serializable {
      * <pre>
      * ex) range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
      * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">2</span>
      * </pre>
@@ -152,9 +152,9 @@ public class PageRangeBean implements java.io.Serializable {
      * <pre>
      * ex) range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
-     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">13</span>
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">14</span>
      * </pre>
      * @return Determination.
      */
@@ -233,7 +233,7 @@ public class PageRangeBean implements java.io.Serializable {
      * <pre>
      * ex) range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
      * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #FD4747">2</span>
      * </pre>
@@ -255,9 +255,9 @@ public class PageRangeBean implements java.io.Serializable {
      * <pre>
      * ex) range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
-     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #FD4747">13</span>
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #FD4747">14</span>
      * </pre>
      * @return The value of nextRangeNearestPageNumber.
      */
