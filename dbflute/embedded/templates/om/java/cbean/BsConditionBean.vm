@@ -353,10 +353,17 @@ public class ${myClassName} extends AbstractConditionBean {
     /**
      * Set up relation columns to select clause. <br />
      * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.<span style="color: #FD4747">setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})</span>; <span style="color: #3F7E5E">// ...().with[nested-relation]()</span>
+     * cb.query().setFoo...(value);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.selectEntityWithDeletedCheck(cb);
+     * ... = ${myEntityVariableName}.<span style="color: #FD4747">get${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// you can get by using SetupSelect</span>
+     * </pre>
 #if ($fk.hasDynamicFixedCondition())
      * ${fk.dynamicFixedConditionArgsJavaDocString}
 #end
-     * @return The set-upper of nested relation. (NotNull)
+     * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
      */
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
@@ -379,7 +386,14 @@ public class ${myClassName} extends AbstractConditionBean {
     /**
      * Set up relation columns to select clause. <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
-     * @return The set-upper of nested relation. (NotNull)
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.<span style="color: #FD4747">setupSelect_${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// ...().with[nested-relation]()</span>
+     * cb.query().setFoo...(value);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.selectEntityWithDeletedCheck(cb);
+     * ... = ${myEntityVariableName}.<span style="color: #FD4747">get${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// you can get by using SetupSelect</span>
+     * </pre>
+     * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
      */
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(); } });
