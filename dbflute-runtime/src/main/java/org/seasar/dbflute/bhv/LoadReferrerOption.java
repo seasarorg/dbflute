@@ -88,19 +88,19 @@ public class LoadReferrerOption<REFERRER_CONDITION_BEAN extends ConditionBean, R
         return this;
     }
 
-    public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERRER_CONDITION_BEAN cb) {// Internal
+    public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERRER_CONDITION_BEAN cb) { // internal
         if (!_toLastKeyCondition) {
             cb.getSqlClause().exchangeFirstWhereClauseForLastOne();
         }
     }
 
-    public void delegateConditionBeanSettingUp(REFERRER_CONDITION_BEAN cb) {// Internal
+    public void delegateConditionBeanSettingUp(REFERRER_CONDITION_BEAN cb) { // internal
         if (_conditionBeanSetupper != null) {
             _conditionBeanSetupper.setup(cb);
         }
     }
 
-    public void delegateEntitySettingUp(List<REFERRER_ENTITY> entityList) {// Internal
+    public void delegateEntitySettingUp(List<REFERRER_ENTITY> entityList) { // internal
         if (_entityListSetupper != null) {
             _entityListSetupper.setup(entityList);
         }

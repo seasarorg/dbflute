@@ -16,7 +16,7 @@
 package org.seasar.dbflute.cbean.mapping;
 
 /**
- * The mapper of entity to DTO.
+ * The map-per of entity to DTO.
  * @param <ENTITY> The type of entity.
  * @param <DTO> The type of DTO.
  * @author jflute
@@ -28,5 +28,5 @@ public interface EntityDtoMapper<ENTITY, DTO> {
      * @param entity Entity. (NotNull)
      * @return Data transfer object. (NotNull)
      */
-    public DTO map(ENTITY entity);
+    DTO map(ENTITY entity);
 }

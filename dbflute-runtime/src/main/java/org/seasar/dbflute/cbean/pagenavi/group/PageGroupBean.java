@@ -62,6 +62,14 @@ public class PageGroupBean implements java.io.Serializable {
 
     /**
      * Create the list of page number.
+     * <pre>
+     * ex) group-size=10, current-page=8 
+     * page.<span style="color: #FD4747">setPageGroupSize</span>(10);
+     * List&lt;Integer&gt; numberList = page.pageGroup().<span style="color: #FD4747">createPageNumberList()</span>;
+     * 
+     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">//</span> <span style="color: #FD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
+     * </pre>
      * @return The list of page number. (NotNull)
      */
     public List<Integer> createPageNumberList() {
@@ -111,7 +119,8 @@ public class PageGroupBean implements java.io.Serializable {
     }
 
     /**
-     * Create the array of page number.
+     * Create the array of page number. <br />
+     * This method returns array of same numbers as createPageNumberList().
      * @return The array of page number. (NotNUll)
      */
     public int[] createPageNumberArray() {
@@ -125,6 +134,13 @@ public class PageGroupBean implements java.io.Serializable {
     /**
      * Is existing previous page-group?
      * Using values are currentPageNumber and pageGroupSize.
+     * <pre>
+     * ex) group-size=10, current-page=12
+     *  12 / 23 pages (453 records)
+     * previous 11 12 13 14 15 16 17 18 19 20 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">10</span>
+     * </pre>
      * @return Determination.
      */
     public boolean isExistPrePageGroup() {
@@ -135,6 +151,13 @@ public class PageGroupBean implements java.io.Serializable {
     /**
      * Is existing next page-group?
      * Using values are currentPageNumber and pageGroupSize and allPageCount.
+     * <pre>
+     * ex) group-size=10, current-page=12
+     *  12 / 23 pages (453 records)
+     * previous 11 12 13 14 15 16 17 18 19 20 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">21</span>
+     * </pre>
      * @return Determination.
      */
     public boolean isExistNextPageGroup() {
@@ -217,6 +240,13 @@ public class PageGroupBean implements java.io.Serializable {
     /**
      * Get the value of preGroupNearestPageNumber that is calculated. <br />
      * You should use this.isExistPrePageGroup() before calling this. (call only when true)
+     * <pre>
+     * ex) group-size=10, current-page=12
+     *  12 / 23 pages (453 records)
+     * previous 11 12 13 14 15 16 17 18 19 20 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #FD4747">10</span>
+     * </pre>
      * @return The value of preGroupNearestPageNumber.
      */
     public int getPreGroupNearestPageNumber() {
@@ -232,6 +262,13 @@ public class PageGroupBean implements java.io.Serializable {
     /**
      * Get the value of nextGroupNearestPageNumber that is calculated. <br />
      * You should use this.isExistNextPageGroup() before calling this. (call only when true)
+     * <pre>
+     * ex) group-size=10, current-page=12
+     *  12 / 23 pages (453 records)
+     * previous 11 12 13 14 15 16 17 18 19 20 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #FD4747">21</span>
+     * </pre>
      * @return The value of nextGroupNearestPageNumber.
      */
     public int getNextGroupNearestPageNumber() {

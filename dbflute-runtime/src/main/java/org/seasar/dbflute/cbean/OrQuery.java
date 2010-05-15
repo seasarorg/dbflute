@@ -16,10 +16,12 @@
 package org.seasar.dbflute.cbean;
 
 /**
+ * The interface of or-query.
  * <pre>
  * cb.orQuery(new OrQuery&lt;FooCB&gt;() {
  *     public void query(FooCB orCB) {
- *         orCB.orQuery().setXxx_Yyy...
+ *         orCB.orQuery().setFoo...
+ *         orCB.orQuery().setBar...
  *     }
  * }
  * </pre>
@@ -34,5 +36,5 @@ public interface OrQuery<OR_CB extends ConditionBean> {
      * and they are ignored if you call.
      * @param orCB The condition-bean for or-query. (NotNull)
      */
-    public void query(OR_CB orCB);
+    void query(OR_CB orCB);
 }

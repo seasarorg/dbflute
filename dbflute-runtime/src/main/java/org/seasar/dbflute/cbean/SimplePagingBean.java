@@ -374,8 +374,8 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                             SqlClause
     //                                             ---------
     /**
-     * Get sqlClause.
-     * @return SqlClause. (NotNull)
+     * Get SQL clause instance. {Internal}<br />
+     * @return SQL clause. (NotNull)
      */
     protected SqlClause getSqlClause() {
         return _sqlClause;

@@ -73,7 +73,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * pmb.setMemberId(3);
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().selectEntity(path, pmb, entityType);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #FD4747">selectEntity</span>(path, pmb, entityType);
      * if (member != null) {
      *     ... = member.get...();
      * } else {
@@ -118,8 +118,8 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * pmb.setMemberId(3);
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().selectEntity(path, pmb, entityType);
-     * ... = member.get...(); // the entity always be not null
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #FD4747">selectEntityWithDeletedCheck</span>(path, pmb, entityType);
+     * ... = member.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
@@ -209,13 +209,23 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public OutsideSqlEntityExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {
-        _outsideSqlOption.setStatementConfig(statementConfig);
+    /**
+     * Set up dynamic-binding for this outside-SQL. <br />
+     * You can use bind variable in embedded variable by this.
+     * @return this. (NotNull)
+     */
+    public OutsideSqlEntityExecutor<PARAMETER_BEAN> dynamicBinding() {
+        _outsideSqlOption.dynamicBinding();
         return this;
     }
 
-    public OutsideSqlEntityExecutor<PARAMETER_BEAN> dynamicBinding() {
-        _outsideSqlOption.dynamicBinding();
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param statementConfig The configuration of statement. (Nullable)
+     * @return this. (NotNull)
+     */
+    public OutsideSqlEntityExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {
+        _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
 

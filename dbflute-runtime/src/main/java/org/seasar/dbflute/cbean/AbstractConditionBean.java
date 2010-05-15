@@ -183,7 +183,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                   =================
     /**
      * {@inheritDoc}
-     * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
      */
     public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
         if (primaryKeyMapString == null) {

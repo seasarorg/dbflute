@@ -56,18 +56,30 @@ public class LikeSearchOption extends SimpleStringOption {
     // ===================================================================================
     //                                                                                Like
     //                                                                                ====
+    /**
+     * Set up prefix-search. {like 'foo%' escape '|'}
+     * @return this. (NotNull)
+     */
     public LikeSearchOption likePrefix() {
         _like = LIKE_PREFIX;
         doLikeAutoEscape();
         return this;
     }
 
+    /**
+     * Set up suffix-search. {like '%foo' escape '|'}
+     * @return this. (NotNull)
+     */
     public LikeSearchOption likeSuffix() {
         _like = LIKE_SUFFIX;
         doLikeAutoEscape();
         return this;
     }
 
+    /**
+     * Set up contain-search. {like '%foo%' escape '|'}
+     * @return this. (NotNull)
+     */
     public LikeSearchOption likeContain() {
         _like = LIKE_CONTAIN;
         doLikeAutoEscape();
@@ -82,7 +94,7 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                                              Escape
     //                                                                              ======
     /**
-     * Escape like search by PipeLine '|'.
+     * Escape like search by pipeLine '|'.
      * @return The option of like search. (NotNull)
      */
     public LikeSearchOption escape() {

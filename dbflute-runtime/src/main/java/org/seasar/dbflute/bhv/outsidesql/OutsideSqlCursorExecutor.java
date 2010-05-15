@@ -66,7 +66,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
-     *         .selectCursor(path, pmb, new PurchaseSummaryMemberCursorHandler() {
+     *         .<span style="color: #FD4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
      *     public void Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
@@ -80,8 +80,8 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * It needs to use type-safe-cursor instead of customize-entity.
      * The way to generate it is following:
      * <pre>
-     * -- #df:entity#
-     * -- +cursor+
+     * <span style="color: #3F7E5E">-- #df:entity#</span>
+     * <span style="color: #3F7E5E">-- +cursor+</span>
      * </pre>
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
@@ -129,11 +129,21 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    /**
+     * Set up dynamic-binding for this outside-SQL. <br />
+     * You can use bind variable in embedded variable by this.
+     * @return this. (NotNull)
+     */
     public OutsideSqlCursorExecutor<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
     }
 
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param statementConfig The configuration of statement. (Nullable)
+     * @return this. (NotNull)
+     */
     public OutsideSqlCursorExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;

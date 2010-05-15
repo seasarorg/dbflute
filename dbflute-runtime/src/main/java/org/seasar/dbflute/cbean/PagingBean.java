@@ -47,6 +47,14 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                      ==============
     /**
      * Set up paging resources.
+     * <pre>
+     * ex) ConditionBean
+     * MemberCB cb = new MemberCB();
+     * cb.query().setMemberName_PrefixSearch("S");
+     * cb.query().addOrderBy_Birthdate_Desc();
+     * cb.<span style="color: #FD4747">paging</span>(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
+     * PagingResultBean&lt;Member&gt; page = memberBhv.<span style="color: #FD4747">selectPage</span>(cb);
+     * </pre>
      * @param pageSize The page size per one page. (NotMinus & NotZero)
      * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
      * @throws org.seasar.dbflute.exception.PagingPageSizeNotPlusException When the page size for paging is minus or zero. 
@@ -73,16 +81,22 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                       Fetch Setting
     //                                                                       =============
     /**
-     * Fetch first. <br />
-     * Your SQL returns [fetch-size] records from first.
+     * Fetch first records only.
+     * ex) ConditionBean
+     * MemberCB cb = new MemberCB();
+     * cb.query().setMemberName_PrefixSearch("S");
+     * cb.query().addOrderBy_Birthdate_Desc();
+     * cb.<span style="color: #FD4747">fetchFirst</span>(5); <span style="color: #3F7E5E">// top 5</span>
+     * ListResultBean&lt;Member&gt; memberList = memberBhv.<span style="color: #FD4747">selectList</span>(cb);
+     * </pre>
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
     PagingBean fetchFirst(int fetchSize);
 
     /**
-     * Fetch scope. <br />
-     * Your SQL returns [fetch-size] records from [fetch-start-index].
+     * Fetch records in the scope only. {Internal}<br />
+     * This method is an old style, so you should use paging() instead of this. <br />
      * @param fetchStartIndex The start index of fetch. 0 origin. (NotMinus)
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
@@ -90,7 +104,8 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     PagingBean fetchScope(int fetchStartIndex, int fetchSize);
 
     /**
-     * Fetch page. This method is an old style, so you should use paging() instead of this. <br />
+     * Fetch page. {Internal}<br />
+     * This method is an old style, so you should use paging() instead of this. <br />
      * When you call this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br />
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br />
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].

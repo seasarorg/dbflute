@@ -21,7 +21,7 @@ import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
  * The class of in-scope-option.
  * @author jflute
  */
-public class InScopeOption extends SimpleStringOption {
+public class InScopeOption extends SimpleStringOption { // basically unused (old function)
 
     // =====================================================================================
     //                                                                                 Split

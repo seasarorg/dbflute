@@ -139,11 +139,13 @@ public interface Entity {
     //                                                                      Display String
     //                                                                      ==============
     /**
+     * Convert the entity to display string with relation information.
      * @return The display string of basic informations with one-nested relation values. (NotNull)
      */
     String toStringWithRelation();
 
     /**
+     * Build display string flexibly.
      * @param name The name for display. (Nullable: If it's null, it does not have a name)
      * @param column Does it contains column values or not?
      * @param relation Does it contains relation existences or not?

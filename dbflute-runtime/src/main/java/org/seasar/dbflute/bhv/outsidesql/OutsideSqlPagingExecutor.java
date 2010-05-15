@@ -70,74 +70,16 @@ public class OutsideSqlPagingExecutor {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select list with paging by the outside-SQL. (count-select is not executed, only paging-select)<br />
-     * <pre>
-     * String path = MemberBhv.PATH_selectSimpleMember;
-     * SimpleMemberPmb pmb = new SimpleMemberPmb();
-     * pmb.setMemberName_PrefixSearch("S");
-     * pmb.paging(20, 3); // 20 records per a page and current page number is 3
-     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
-     * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().manualPaging().selectList(path, pmb, entityType);
-     * for (SimpleMember member : memberList) {
-     *     ... = member.get...();
-     * }
-     * </pre>
-     * The parameter-bean needs to extend SimplePagingBean.
-     * The way to generate it is following:
-     * <pre>
-     * -- !df:pmb extends SPB!
-     * -- !!Integer memberId!!
-     * -- !!...!!
-     * </pre>
-     * You don't need to use pagingBean's isPaging() method on your 'Parameter Comment'.
-     * <pre>
-     * ex) manualPaging and MySQL 
-     * select member.MEMBER_ID
-     *      , member.MEMBER_NAME
-     *      , memberStatus.MEMBER_STATUS_NAME
-     *   from MEMBER member
-     *     left outer join MEMBER_STATUS memberStatus
-     *       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
-     *  /*BEGIN&#42;/where
-     *    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
-     *    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
-     *  /*END&#42;/
-     *  order by member.UPDATE_DATETIME desc
-     *  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
-     * </pre>
-     * @param <ENTITY> The type of entity.
-     * @param path The path of SQL that executes count and paging. (NotNull)
-     * @param pmb The bean of paging parameter. (NotNull)
-     * @param entityType The type of result entity. (NotNull)
-     * @return The result bean of paged list. (NotNull)
-     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     */
-    public <ENTITY> ListResultBean<ENTITY> selectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
-        return doSelectList(path, pmb, entityType);
-    }
-
-    protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
-        setupScrollableCursorIfNeeds();
-        final List<ENTITY> selectedList = invoke(createSelectListCommand(path, pmb, entityType));
-        return createListResultBean(selectedList);
-    }
-
-    protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
-        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(selectedList);
-    }
-
-    /**
      * Select page by the outside-SQL. <br />
      * (both count-select and paging-select are executed)
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
-     * pmb.paging(20, 3); // 20 records per a page and current page number is 3
+     * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().selectPage(path, pmb, entityType);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #FD4747">selectPage</span>(path, pmb, entityType);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -150,35 +92,40 @@ public class OutsideSqlPagingExecutor {
      * The parameter-bean needs to extend SimplePagingBean.
      * The way to generate it is following:
      * <pre>
-     * -- !df:pmb extends SPB!
-     * -- !!Integer memberId!!
-     * -- !!...!!
+     * <span style="color: #3F7E5E">-- !df:pmb extends SPB!</span>
+     * <span style="color: #3F7E5E">-- !!Integer memberId!!</span>
+     * <span style="color: #3F7E5E">-- !!...!!</span>
      * </pre>
      * You can realize by pagingBean's isPaging() method on your 'Parameter Comment'.
      * It returns false when it executes Count. And it returns true when it executes Paging.
      * <pre>
-     * ex) manualPaging and MySQL
-     * /*IF pmb.isPaging()&#42;/
+     * ex) ManualPaging and MySQL
+     * <span style="color: #3F7E5E">/*IF pmb.isPaging()&#42;/</span>
      * select member.MEMBER_ID
      *      , member.MEMBER_NAME
      *      , memberStatus.MEMBER_STATUS_NAME
-     * -- ELSE select count(*)
-     * /*END&#42;/
+     * <span style="color: #3F7E5E">-- ELSE select count(*)</span>
+     * <span style="color: #3F7E5E">/*END&#42;/</span>
      *   from MEMBER member
-     *     /*IF pmb.isPaging()&#42;/
+     *     <span style="color: #3F7E5E">/*IF pmb.isPaging()&#42;/</span>
      *     left outer join MEMBER_STATUS memberStatus
      *       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
-     *     /*END&#42;/
-     *  /*BEGIN&#42;/where
-     *    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
-     *    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
-     *  /*END&#42;/
-     *  /*IF pmb.isPaging()&#42;/
+     *     <span style="color: #3F7E5E">/*END&#42;/</span>
+     *  <span style="color: #3F7E5E">/*BEGIN&#42;/</span>
+     *  where
+     *    <span style="color: #3F7E5E">/*IF pmb.memberId != null&#42;/</span>
+     *    member.MEMBER_ID = <span style="color: #3F7E5E">/*pmb.memberId&#42;/</span>'123'
+     *    <span style="color: #3F7E5E">/*END&#42;/</span>
+     *    <span style="color: #3F7E5E">/*IF pmb.memberName != null&#42;/</span>
+     *    and member.MEMBER_NAME like <span style="color: #3F7E5E">/*pmb.memberName&#42;/</span>'Billy%'
+     *    <span style="color: #3F7E5E">/*END&#42;/</span>
+     *  <span style="color: #3F7E5E">/*END&#42;/</span>
+     *  <span style="color: #3F7E5E">/*IF pmb.isPaging()&#42;/</span>
      *  order by member.UPDATE_DATETIME desc
-     *  /*END&#42;/
-     *  /*IF pmb.isPaging()&#42;/
-     *  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
-     *  /*END&#42;/
+     *  <span style="color: #3F7E5E">/*END&#42;/</span>
+     *  <span style="color: #3F7E5E">/*IF pmb.isPaging()&#42;/</span>
+     *  limit <span style="color: #3F7E5E">/*$pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*$pmb.fetchSize&#42;/</span>20
+     *  <span style="color: #3F7E5E">/*END&#42;/</span>
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL that executes count and paging. (NotNull)
@@ -241,6 +188,69 @@ public class OutsideSqlPagingExecutor {
         statementConfig.typeScrollInsensitive();
     }
 
+    /**
+     * Select list with paging by the outside-SQL. (count-select is not executed, only paging-select)<br />
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * ListResultBean&lt;SimpleMember&gt; memberList
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #FD4747">selectList</span>(path, pmb, entityType);
+     * for (SimpleMember member : memberList) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * The parameter-bean needs to extend SimplePagingBean.
+     * The way to generate it is following:
+     * <pre>
+     * <span style="color: #3F7E5E">-- !df:pmb extends SPB!</span>
+     * <span style="color: #3F7E5E">-- !!Integer memberId!!</span>
+     * <span style="color: #3F7E5E">-- !!...!!</span>
+     * </pre>
+     * You don't need to use pagingBean's isPaging() method on your 'Parameter Comment'.
+     * <pre>
+     * ex) ManualPaging and MySQL 
+     * select member.MEMBER_ID
+     *      , member.MEMBER_NAME
+     *      , memberStatus.MEMBER_STATUS_NAME
+     *   from MEMBER member
+     *     left outer join MEMBER_STATUS memberStatus
+     *       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
+     *  <span style="color: #3F7E5E">/*BEGIN&#42;/</span>
+     *  where
+     *    <span style="color: #3F7E5E">/*IF pmb.memberId != null&#42;/</span>
+     *    member.MEMBER_ID = <span style="color: #3F7E5E">/*pmb.memberId&#42;/</span>'123'
+     *    <span style="color: #3F7E5E">/*END&#42;/</span>
+     *    <span style="color: #3F7E5E">/*IF pmb.memberName != null&#42;/</span>
+     *    and member.MEMBER_NAME like <span style="color: #3F7E5E">/*pmb.memberName&#42;/</span>'Billy%'
+     *    <span style="color: #3F7E5E">/*END&#42;/</span>
+     *  <span style="color: #3F7E5E">/*END&#42;/</span>
+     *  order by member.UPDATE_DATETIME desc
+     *  limit <span style="color: #3F7E5E">/*$pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*$pmb.fetchSize&#42;/</span>20
+     * </pre>
+     * @param <ENTITY> The type of entity.
+     * @param path The path of SQL that executes count and paging. (NotNull)
+     * @param pmb The bean of paging parameter. (NotNull)
+     * @param entityType The type of result entity. (NotNull)
+     * @return The result bean of paged list. (NotNull)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     */
+    public <ENTITY> ListResultBean<ENTITY> selectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
+        return doSelectList(path, pmb, entityType);
+    }
+
+    protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
+        setupScrollableCursorIfNeeds();
+        final List<ENTITY> selectedList = invoke(createSelectListCommand(path, pmb, entityType));
+        return createListResultBean(selectedList);
+    }
+
+    protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
+        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(selectedList);
+    }
+
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
@@ -279,13 +289,23 @@ public class OutsideSqlPagingExecutor {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public OutsideSqlPagingExecutor configure(StatementConfig statementConfig) {
-        _outsideSqlOption.setStatementConfig(statementConfig);
+    /**
+     * Set up dynamic-binding for this outside-SQL. <br />
+     * You can use bind variable in embedded variable by this.
+     * @return this. (NotNull)
+     */
+    public OutsideSqlPagingExecutor dynamicBinding() {
+        _outsideSqlOption.dynamicBinding();
         return this;
     }
 
-    public OutsideSqlPagingExecutor dynamicBinding() {
-        _outsideSqlOption.dynamicBinding();
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param statementConfig The configuration of statement. (Nullable)
+     * @return this. (NotNull)
+     */
+    public OutsideSqlPagingExecutor configure(StatementConfig statementConfig) {
+        _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
 }

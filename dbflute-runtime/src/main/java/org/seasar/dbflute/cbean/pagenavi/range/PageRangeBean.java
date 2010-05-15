@@ -62,6 +62,14 @@ public class PageRangeBean implements java.io.Serializable {
 
     /**
      * Create the list of page number.
+     * <pre>
+     * ex) range-size=5, current-page=8 
+     * page.<span style="color: #FD4747">setPageRangeSize</span>(5);
+     * List&lt;Integer&gt; numberList = page.pageRange().<span style="color: #FD4747">createPageNumberList()</span>;
+     * 
+     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">3 4 5 6 7 8 9 10 11 12</span> <span style="color: #3F7E5E">next</span>
+     * </pre>
      * @return The list of page number. (NotNull)
      */
     public List<Integer> createPageNumberList() {
@@ -107,7 +115,8 @@ public class PageRangeBean implements java.io.Serializable {
     }
 
     /**
-     * Get the array of page number.
+     * Get the array of page number. <br />
+     * This method returns array of same numbers as createPageNumberList().
      * @return The array of page number. (NotNull)
      */
     public int[] createPageNumberArray() {
@@ -120,6 +129,13 @@ public class PageRangeBean implements java.io.Serializable {
     //                                                                       =============
     /**
      * Is existing previous page range?
+     * <pre>
+     * ex) range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">2</span>
+     * </pre>
      * @return Determination.
      */
     public boolean isExistPrePageRange() {
@@ -133,6 +149,13 @@ public class PageRangeBean implements java.io.Serializable {
 
     /**
      * Is existing next page range?
+     * <pre>
+     * ex) range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">13</span>
+     * </pre>
      * @return Determination.
      */
     public boolean isExistNextPageRange() {
@@ -207,6 +230,13 @@ public class PageRangeBean implements java.io.Serializable {
     /**
      * Get the value of preRangeNearestPageNumber that is calculated. <br />
      * You should use this.isExistPrePageRange() before calling this. (call only when true)
+     * <pre>
+     * ex) range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #FD4747">2</span>
+     * </pre>
      * @return The value of preRangeNearestPageNumber.
      */
     public int getPreRangeNearestPageNumber() {
@@ -222,6 +252,13 @@ public class PageRangeBean implements java.io.Serializable {
     /**
      * Get the value of nextRangeNearestPageNumber that is calculated. <br />
      * You should use this.isExistNextPageRange() before calling this. (call only when true)
+     * <pre>
+     * ex) range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * previous 3 4 5 6 7 8 9 10 11 12 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #FD4747">13</span>
+     * </pre>
      * @return The value of nextRangeNearestPageNumber.
      */
     public int getNextRangeNearestPageNumber() {

@@ -50,8 +50,8 @@ public interface ConditionBean extends PagingBean {
     //                                                                           SqlClause
     //                                                                           =========
     /**
-     * Get SQL-clause instance.
-     * @return SQL-clause. (NotNull)
+     * Get SQL clause instance. {Internal}<br />
+     * @return SQL clause. (NotNull)
      */
     SqlClause getSqlClause();
 
@@ -95,11 +95,9 @@ public interface ConditionBean extends PagingBean {
     //                                                                        Lock Setting
     //                                                                        ============
     /**
-     * Lock for update.
-     * <p>
-     * If you call this, your SQL lock target records for update.
+     * Lock for update. <br />
+     * If you call this, your SQL lock target records for update. <br />
      * It depends whether this method supports this on the database type.
-     * </p>
      * @return this. (NotNull)
      */
     ConditionBean lockForUpdate();

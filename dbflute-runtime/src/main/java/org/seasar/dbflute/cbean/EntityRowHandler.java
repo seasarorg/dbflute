@@ -26,5 +26,5 @@ public interface EntityRowHandler<ENTITY> {
      * Handle entity as row.
      * @param entity The entity as row. (NotNull)
      */
-    public void handle(ENTITY entity);
+    void handle(ENTITY entity);
 }

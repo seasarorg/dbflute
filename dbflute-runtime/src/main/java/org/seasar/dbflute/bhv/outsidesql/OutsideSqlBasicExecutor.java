@@ -102,7 +102,7 @@ public class OutsideSqlBasicExecutor {
      * pmb.setMemberName_PrefixSearch("S");
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().selectList(path, pmb, entityType);
+     *     = memberBhv.outsideSql().<span style="color: #FD4747">selectList</span>(path, pmb, entityType);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -141,7 +141,7 @@ public class OutsideSqlBasicExecutor {
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().execute(path, pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #FD4747">execute</span>(path, pmb);
      * </pre>
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
@@ -162,7 +162,7 @@ public class OutsideSqlBasicExecutor {
      * SpInOutParameterPmb pmb = new SpInOutParameterPmb();
      * pmb.setVInVarchar("foo");
      * pmb.setVInOutVarchar("bar");
-     * memberBhv.outsideSql().call(pmb);
+     * memberBhv.outsideSql().<span style="color: #FD4747">call</span>(pmb);
      * String outVar = pmb.getVOutVarchar();
      * </pre>
      * It needs to use parameter-bean for procedure (ProcedurePmb).
@@ -240,7 +240,7 @@ public class OutsideSqlBasicExecutor {
     /**
      * Prepare cursor handling.
      * <pre>
-     * memberBhv.outsideSql().cursorHandling().selectCursor(path, pmb, handler);
+     * memberBhv.outsideSql().<span style="color: #FD4747">cursorHandling()</span>.selectCursor(path, pmb, handler);
      * </pre>
      * @return The cursor executor of outside-SQL. (NotNull)
      */
@@ -255,7 +255,7 @@ public class OutsideSqlBasicExecutor {
     /**
      * Prepare entity handling.
      * <pre>
-     * memberBhv.outsideSql().entityHandling().selectEntityWithDeletedCheck(path, pmb, SimpleMember.class);
+     * memberBhv.outsideSql().<span style="color: #FD4747">entityHandling()</span>.selectEntityWithDeletedCheck(path, pmb, SimpleMember.class);
      * </pre>
      * @return The cursor executor of outside-SQL. (NotNull)
      */
@@ -273,7 +273,7 @@ public class OutsideSqlBasicExecutor {
     /**
      * Prepare the paging as manualPaging.
      * <pre>
-     * memberBhv.outsideSql().manualPaging().selectPage(path, pmb, SimpleMember.class);
+     * memberBhv.outsideSql().<span style="color: #FD4747">manualPaging()</span>.selectPage(path, pmb, SimpleMember.class);
      * </pre>
      * If you call this, you need to write paging condition on your SQL.
      * <pre>
@@ -282,7 +282,7 @@ public class OutsideSqlBasicExecutor {
      *   from Member member
      *  where ...
      *  order by ...
-     *  limit 40, 20 *is necessary!
+     *  limit 40, 20 <span style="color: #3F7E5E">-- is necessary!</span>
      * </pre>
      * @return The executor of paging that the paging mode is manual. (NotNull)
      */
@@ -295,7 +295,7 @@ public class OutsideSqlBasicExecutor {
     /**
      * Prepare the paging as autoPaging.
      * <pre>
-     * memberBhv.outsideSql().autoPaging().selectPage(path, pmb, SimpleMember.class);
+     * memberBhv.outsideSql().<span style="color: #FD4747">autoPaging()</span>.selectPage(path, pmb, SimpleMember.class);
      * </pre>
      * If you call this, you don't need to write paging condition on your SQL.
      * <pre>
@@ -304,7 +304,7 @@ public class OutsideSqlBasicExecutor {
      *   from Member member
      *  where ...
      *  order by ...
-     * -- limit 40, 20 *is unnecessary!
+     * <span style="color: #3F7E5E">-- limit 40, 20 -- is unnecessary!</span>
      * </pre>
      * @return The executor of paging that the paging mode is auto. (NotNull)
      */
