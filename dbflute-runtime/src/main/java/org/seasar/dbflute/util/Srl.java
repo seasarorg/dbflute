@@ -85,6 +85,22 @@ public class Srl {
     // ===================================================================================
     //                                                                                Trim
     //                                                                                ====
+    public static final String trim(String str) {
+        return doTrim(str, null);
+    }
+
+    public static final String trim(String str, String trimStr) {
+        return doTrim(str, trimStr);
+    }
+
+    public static final String ltrim(String str) {
+        return doLTrim(str, null);
+    }
+
+    public static final String ltrim(String str, String trimStr) {
+        return doLTrim(str, trimStr);
+    }
+
     public static final String rtrim(String str) {
         return doRTrim(str, null);
     }
@@ -93,7 +109,28 @@ public class Srl {
         return doRTrim(str, trimStr);
     }
 
-    public static final String doRTrim(String str, String trimStr) {
+    protected static final String doTrim(String str, String trimStr) {
+        return doRTrim(doLTrim(str, trimStr), trimStr);
+    }
+
+    protected static final String doLTrim(String str, String trimStr) {
+        assertStringNotNull(str);
+
+        // for trim target same as String.trim()
+        if (trimStr == null) {
+            final String notTrimmedString = "a";
+            final String trimmed = (str + notTrimmedString).trim();
+            return trimmed.substring(0, trimmed.length() - notTrimmedString.length());
+        }
+
+        // for original trim target
+        int pos;
+        for (pos = 0; pos < str.length() && trimStr.indexOf(str.charAt(pos)) >= 0; pos++)
+            ;
+        return str.substring(pos);
+    }
+
+    protected static final String doRTrim(String str, String trimStr) {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
@@ -243,6 +280,36 @@ public class Srl {
         } else {
             return str + sb;
         }
+    }
+
+    // ===================================================================================
+    //                                                                  Quotation Handling
+    //                                                                  ==================
+    public static boolean isSingleQuoted(String str) {
+        assertStringNotNull(str);
+        return str.length() > 1 && str.startsWith("'") && str.endsWith("'");
+
+    }
+
+    public static boolean isDoubleQuoted(String str) {
+        assertStringNotNull(str);
+        return str.length() > 1 && str.startsWith("\"") && str.endsWith("\"");
+    }
+
+    public static String unquoteSingle(String str) {
+        assertStringNotNull(str);
+        if (!isSingleQuoted(str)) {
+            return str;
+        }
+        return trim(str, "'");
+    }
+
+    public static String unquoteDouble(String str) {
+        assertStringNotNull(str);
+        if (!isDoubleQuoted(str)) {
+            return str;
+        }
+        return trim(str, "\"");
     }
 
     // ===================================================================================

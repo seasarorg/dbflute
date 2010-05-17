@@ -6,6 +6,7 @@ import static org.seasar.dbflute.util.Srl.connectSuffix;
 import static org.seasar.dbflute.util.Srl.decamelize;
 import static org.seasar.dbflute.util.Srl.extractFirstScope;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
+import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.removeLineComment;
 import static org.seasar.dbflute.util.Srl.rtrim;
 import static org.seasar.dbflute.util.Srl.splitList;
@@ -14,6 +15,9 @@ import static org.seasar.dbflute.util.Srl.substringFirstFront;
 import static org.seasar.dbflute.util.Srl.substringFirstRear;
 import static org.seasar.dbflute.util.Srl.substringLastFront;
 import static org.seasar.dbflute.util.Srl.substringLastRear;
+import static org.seasar.dbflute.util.Srl.trim;
+import static org.seasar.dbflute.util.Srl.unquoteDouble;
+import static org.seasar.dbflute.util.Srl.unquoteSingle;
 
 import java.util.List;
 
@@ -52,6 +56,42 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                                Trim
     //                                                                                ====
+    public void test_trim_default() {
+        assertEquals("foo", trim(" foo "));
+        assertEquals("foo", trim("\n foo "));
+        assertEquals("foo", trim("\n \n foo "));
+        assertEquals("foo", trim(" \r\n foo "));
+        assertEquals("foo", trim(" \r\n \r\n foo "));
+    }
+
+    public void test_trim_originalTrimTarget() {
+        assertEquals(" foo ", trim("\n foo ", "\n"));
+        assertEquals(" \n foo ", trim(" \n foo ", "\n"));
+        assertEquals("\r foo ", trim("\n\r foo ", "\n"));
+        assertEquals(" foo ", trim("\r\n foo ", "\r\n"));
+        assertEquals("foo", trim("'foo'", "'"));
+        assertEquals("f'o'o", trim("'f'o'o'", "'"));
+        assertEquals("fo''o", trim("'fo''o'", "'"));
+        assertEquals("foo", trim("\"foo\"", "\""));
+        assertEquals("f\"o\"o", trim("\"f\"o\"o\"", "\""));
+        assertEquals("fo\"\"o", trim("\"fo\"\"o\"", "\""));
+    }
+
+    public void test_ltrim_default() {
+        assertEquals("foo ", ltrim(" foo "));
+        assertEquals("foo ", ltrim("\n foo "));
+        assertEquals("foo ", ltrim("\n \n foo "));
+        assertEquals("foo ", ltrim(" \r\n foo "));
+        assertEquals("foo ", ltrim(" \r\n \r\n foo "));
+    }
+
+    public void test_ltrim_originalTrimTarget() {
+        assertEquals(" foo ", ltrim("\n foo ", "\n"));
+        assertEquals(" \n foo ", ltrim(" \n foo ", "\n"));
+        assertEquals("\r foo ", ltrim("\n\r foo ", "\n"));
+        assertEquals(" foo ", ltrim("\r\n foo ", "\r\n"));
+    }
+
     public void test_rtrim_default() {
         assertEquals(" foo", rtrim(" foo "));
         assertEquals(" foo", rtrim(" foo \n "));
@@ -128,6 +168,31 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("foo", connectSuffix("foo", " ", "."));
         assertEquals("foo.bar", connectSuffix("foo", "bar", "."));
         assertEquals("foo/bar", connectSuffix("foo", "bar", "/"));
+    }
+
+    // ===================================================================================
+    //                                                                  Quotation Handling
+    //                                                                  ==================
+    public void test_unquoteSingle_basic() {
+        assertEquals("", unquoteSingle(""));
+        assertEquals("", unquoteSingle("''"));
+        assertEquals("f", unquoteSingle("'f'"));
+        assertEquals("foo", unquoteSingle("'foo'"));
+        assertEquals("foo", unquoteSingle("foo"));
+        assertEquals("\"foo\"", unquoteSingle("\"foo\""));
+        assertEquals("'foo", unquoteSingle("'foo"));
+        assertEquals("\"foo\"", unquoteSingle("'\"foo\"'"));
+    }
+
+    public void test_unquoteDouble_basic() {
+        assertEquals("", unquoteDouble(""));
+        assertEquals("", unquoteDouble("\"\""));
+        assertEquals("f", unquoteDouble("\"f\""));
+        assertEquals("foo", unquoteDouble("\"foo\""));
+        assertEquals("foo", unquoteDouble("foo"));
+        assertEquals("'foo'", unquoteDouble("'foo'"));
+        assertEquals("\"foo", unquoteDouble("\"foo"));
+        assertEquals("'foo'", unquoteDouble("\"'foo'\""));
     }
 
     // ===================================================================================
