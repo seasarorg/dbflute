@@ -16,22 +16,34 @@
 package org.seasar.dbflute.helper.io.data.impl;
 
 import java.math.BigDecimal;
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.DfTypeUtil.ParseBooleanException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeOutOfCalendarException;
@@ -53,12 +65,84 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The data source. (NotNull) */
+    protected DataSource _dataSource;
+
+    /** The unified schema (for getting database meta data). (Nullable) */
+    protected UnifiedSchema _unifiedSchema;
+
+    /** Does it output the insert SQLs as logging? */
+    protected boolean _loggingInsertSql;
+
     /** The handler of columns for getting column meta information(as helper). */
-    protected DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected final DfColumnHandler _columnHandler = new DfColumnHandler();
+
+    /** The cache map of meta info. The key is table name. */
+    protected final Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
+
+    /** The cache map of string processor. The key is table name. */
+    protected final Map<String, Map<String, StringProcessor>> _stringProcessorCacheMap = StringKeyMap
+            .createAsFlexible();
+
+    /** The definition list of string processor instances. (NotNull, ReadOnly) */
+    protected final List<StringProcessor> _stringProcessorList = DfCollectionUtil.newArrayList();
+    {
+        _stringProcessorList.add(new TimestampStringProcessor());
+        _stringProcessorList.add(new TimeStringProcessor());
+        _stringProcessorList.add(new BooleanStringProcessor());
+        _stringProcessorList.add(new NumberStringProcessor());
+        _stringProcessorList.add(new UUIDStringProcessor());
+        _stringProcessorList.add(new ArrayStringProcessor());
+        _stringProcessorList.add(new RealStringProcessor());
+    }
 
     // ===================================================================================
-    //                                                                    Process per Type
-    //                                                                    ================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfAbsractDataWriter(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
+
+    // ===================================================================================
+    //                                                                     Process Binding
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                            Null Value
+    //                                            ----------
+    protected boolean processNull(String tableName, String columnName, Object value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (!isNullValue(value)) {
+            return false;
+        }
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo == null) {
+            return false;
+        }
+        final int jdbcType = columnMetaInfo.getJdbcDefValue();
+        try {
+            ps.setNull(bindCount, jdbcType);
+        } catch (SQLException e) {
+            if (jdbcType != Types.OTHER) {
+                throw e;
+            }
+            final String torqueType = _columnHandler.getColumnJdbcType(columnMetaInfo);
+            final Integer mappedJdbcType = TypeMap.getJdbcDefValueByJdbcType(torqueType);
+            try {
+                ps.setNull(bindCount, mappedJdbcType);
+            } catch (SQLException ignored) {
+                String msg = "Failed to re-try setNull(" + columnName + ", " + mappedJdbcType + "):";
+                msg = msg + " " + ignored.getMessage();
+                _log.info(msg);
+                throw e;
+            }
+        }
+        return true;
+    }
+
+    protected boolean isNullValue(Object value) {
+        return value == null;
+    }
+
     // -----------------------------------------------------
     //                                     NotNull NotString
     //                                     -----------------
@@ -126,40 +210,189 @@ public abstract class DfAbsractDataWriter {
     }
 
     // -----------------------------------------------------
-    //                                            Null Value
-    //                                            ----------
-    protected boolean processNull(String tableName, String columnName, Object value, PreparedStatement ps,
+    //                                        NotNull String
+    //                                        --------------
+    protected void processNotNullString(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
-        if (!isNullValue(value)) {
-            return false;
+        if (value == null) {
+            String msg = "This method is only for NotNull and StringExpression:";
+            msg = msg + " value=" + value + " type=" + (value != null ? value.getClass() : "null");
+            throw new IllegalStateException(msg);
         }
-        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-        if (columnMetaInfo == null) {
-            return false;
+        value = Srl.unquoteDouble(value);
+        Map<String, StringProcessor> cacheMap = _stringProcessorCacheMap.get(tableName);
+        if (cacheMap == null) {
+            cacheMap = StringKeyMap.createAsFlexibleOrdered();
+            _stringProcessorCacheMap.put(tableName, cacheMap);
         }
-        final int jdbcType = columnMetaInfo.getJdbcDefValue();
-        try {
-            ps.setNull(bindCount, jdbcType);
-        } catch (SQLException e) {
-            if (jdbcType != Types.OTHER) {
-                throw e;
+        final StringProcessor processor = cacheMap.get(columnName);
+        if (processor != null) { // cache hit
+            final boolean processed = processor.process(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+            if (!processed) {
+                throwColumnValueProcessingFailureException(processor, tableName, columnName, value);
             }
-            final String torqueType = _columnHandler.getColumnJdbcType(columnMetaInfo);
-            final Integer mappedJdbcType = TypeMap.getJdbcDefValueByJdbcType(torqueType);
-            try {
-                ps.setNull(bindCount, mappedJdbcType);
-            } catch (SQLException ignored) {
-                String msg = "Failed to re-try setNull(" + columnName + ", " + mappedJdbcType + "):";
-                msg = msg + " " + ignored.getMessage();
-                _log.info(msg);
-                throw e;
+            return;
+        }
+        for (StringProcessor tryProcessor : _stringProcessorList) {
+            // processing and searching target processor
+            if (tryProcessor.process(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                cacheMap.put(columnName, tryProcessor); // use cache next times
+                break;
             }
         }
-        return true;
     }
 
-    protected boolean isNullValue(Object value) {
-        return value == null;
+    protected void throwColumnValueProcessingFailureException(StringProcessor processor, String tableName,
+            String columnName, String value) {
+        final Class<?> type = processor.getTargetType();
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column value could not be treated as " + type.getName() + ".");
+        br.addItem("Advice");
+        br.addElement("The column has string expressions judging the type of the column");
+        br.addElement("by analyzing the value of first record.");
+        br.addElement("But the value of second or more record did not match the type.");
+        br.addElement("So confirm your expressions.");
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Column Name");
+        br.addElement(columnName);
+        br.addItem("String Expression");
+        br.addElement(value);
+        br.addItem("Analyzed Type");
+        br.addElement(type);
+        final String msg = br.buildExceptionMessage();
+        throw new DfTableDataRegistrationFailureException(msg);
+    }
+
+    public static interface StringProcessor {
+        boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException;
+
+        Class<?> getTargetType();
+    }
+
+    protected class TimestampStringProcessor implements StringProcessor {
+
+        public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            return processTimestamp(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+        }
+
+        public Class<?> getTargetType() {
+            return Timestamp.class;
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
+    protected class TimeStringProcessor implements StringProcessor {
+
+        public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            return processTime(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+        }
+
+        public Class<?> getTargetType() {
+            return Time.class;
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
+    protected class BooleanStringProcessor implements StringProcessor {
+
+        public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            return processBoolean(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+        }
+
+        public Class<?> getTargetType() {
+            return Boolean.class;
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
+    protected class NumberStringProcessor implements StringProcessor {
+
+        public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            return processNumber(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+        }
+
+        public Class<?> getTargetType() {
+            return Number.class;
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
+    protected class UUIDStringProcessor implements StringProcessor {
+
+        public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            return processUUID(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+        }
+
+        public Class<?> getTargetType() {
+            return UUID.class;
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
+    protected class ArrayStringProcessor implements StringProcessor {
+
+        public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            return processArray(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+        }
+
+        public Class<?> getTargetType() {
+            return Array.class;
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
+    protected class RealStringProcessor implements StringProcessor {
+
+        public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
+                Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            ps.setString(bindCount, value);
+            return true;
+        }
+
+        public Class<?> getTargetType() {
+            return String.class;
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
+    protected String buildProcessorToString(StringProcessor processor) {
+        return DfTypeUtil.toClassTitle(processor);
     }
 
     // -----------------------------------------------------
@@ -168,7 +401,7 @@ public abstract class DfAbsractDataWriter {
     protected boolean processTimestamp(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
-            return false;
+            return false; // basically no way
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         boolean typeChecked = false;
@@ -215,7 +448,7 @@ public abstract class DfAbsractDataWriter {
     protected boolean processTime(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
-            return false;
+            return false; // basically no way
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
@@ -251,7 +484,7 @@ public abstract class DfAbsractDataWriter {
     protected boolean processBoolean(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
-            return false;
+            return false; // basically no way
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
@@ -275,7 +508,7 @@ public abstract class DfAbsractDataWriter {
     protected boolean processNumber(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
-            return false;
+            return false; // basically no way
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
@@ -334,6 +567,9 @@ public abstract class DfAbsractDataWriter {
     //                                                  ----
     protected boolean processUUID(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value == null) {
+            return false; // basically no way
+        }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             if (columnMetaInfo.getJdbcDefValue() != Types.OTHER
@@ -364,6 +600,9 @@ public abstract class DfAbsractDataWriter {
     //                                    ------------------
     protected boolean processArray(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value == null) {
+            return false; // basically no way
+        }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             //rsMeta#getColumnTypeName() returns value starts with "_" if
@@ -429,7 +668,60 @@ public abstract class DfAbsractDataWriter {
         return clazz;
     }
 
+    // ===================================================================================
+    //                                                                    Column Meta Info
+    //                                                                    ================
+    protected Map<String, DfColumnMetaInfo> getColumnMetaInfo(String tableName) {
+        if (_metaInfoCacheMap.containsKey(tableName)) {
+            return _metaInfoCacheMap.get(tableName);
+        }
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexible();
+        Connection conn = null;
+        try {
+            conn = _dataSource.getConnection();
+            final DatabaseMetaData metaData = conn.getMetaData();
+            final List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableName);
+            for (DfColumnMetaInfo columnMetaInfo : columnList) {
+                columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
+            }
+            _metaInfoCacheMap.put(tableName, columnMetaInfoMap);
+            return columnMetaInfoMap;
+        } catch (SQLException e) {
+            String msg = "Failed to get column meta informations: table=" + tableName;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema;
+    }
+
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        _unifiedSchema = unifiedSchema;
+    }
+
+    public boolean isLoggingInsertSql() {
+        return _loggingInsertSql;
+    }
+
+    public void setLoggingInsertSql(boolean loggingInsertSql) {
+        this._loggingInsertSql = loggingInsertSql;
     }
 }

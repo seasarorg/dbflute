@@ -141,7 +141,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     protected void writeDbFromXls(String directoryPath) {
         final DfXlsDataHandlerImpl xlsDataHandler = getXlsDataHandlerImpl();
-        xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
+        xlsDataHandler.writeSeveralData(directoryPath);
     }
 
     protected DfXlsDataHandlerImpl getXlsDataHandlerImpl() {
@@ -149,13 +149,13 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         if (xlsDataHandlerImpl == null) {
             final DfXlsDataHandlerImpl xlsDataHandler;
             if (basicProperties.isDatabaseSQLServer()) {
-                xlsDataHandler = new DfXlsDataHandlerSQLServer();
+                xlsDataHandler = new DfXlsDataHandlerSQLServer(getDataSource());
             } else {
-                xlsDataHandler = new DfXlsDataHandlerImpl();
+                xlsDataHandler = new DfXlsDataHandlerImpl(getDataSource());
             }
+            xlsDataHandler.setUnifiedSchema(_mainSchema); // for getting database meta data
             xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
             xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-            xlsDataHandler.setUnifiedSchema(_mainSchema); // for getting database meta data
             xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
             xlsDataHandlerImpl = xlsDataHandler;
         }

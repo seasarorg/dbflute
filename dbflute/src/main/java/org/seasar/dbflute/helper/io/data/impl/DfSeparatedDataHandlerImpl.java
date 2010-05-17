@@ -99,10 +99,9 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                 final Map<String, String> defaultValueMap = getDefaultValueMap(info, elementName);
                 for (String fileName : sortedFileNameSet) {
                     final String fileNamePath = info.getBasePath() + "/" + elementName + "/" + fileName;
-                    final DfSeparatedDataWriterImpl writerImpl = new DfSeparatedDataWriterImpl();
-                    writerImpl.setLoggingInsertSql(isLoggingInsertSql());
-                    writerImpl.setDataSource(_dataSource);
+                    final DfSeparatedDataWriterImpl writerImpl = new DfSeparatedDataWriterImpl(_dataSource);
                     writerImpl.setUnifiedSchema(_unifiedSchema);
+                    writerImpl.setLoggingInsertSql(isLoggingInsertSql());
                     writerImpl.setFilename(fileNamePath);
                     writerImpl.setEncoding(elementName);
                     writerImpl.setDelimiter(info.getDelimter());

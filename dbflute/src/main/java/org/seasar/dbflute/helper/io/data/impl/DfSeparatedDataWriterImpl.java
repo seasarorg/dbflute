@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.helper.io.data.impl;
 
-import java.sql.DatabaseMetaData;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -53,9 +53,6 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _loggingInsertSql;
-    protected DataSource _dataSource;
-    protected UnifiedSchema _unifiedSchema;
     protected String _filename;
     protected String _encoding;
     protected String _delimiter;
@@ -67,16 +64,21 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSeparatedDataWriterImpl(DataSource dataSource) {
+        super(dataSource);
+    }
+
+    // ===================================================================================
     //                                                                               Write
     //                                                                               =====
     /**
      * Write data from separated-file.
      * @param notFoundColumnMap Not found column map. (NotNUl)
-     * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void writeData(Map<String, Set<String>> notFoundColumnMap) throws java.io.FileNotFoundException,
-            java.io.IOException {
+    public void writeData(Map<String, Set<String>> notFoundColumnMap) throws IOException {
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
         _log.info("writeData(" + _filename + ", " + _encoding + ")");
         _log.info("= = = = = = =/");
@@ -88,7 +90,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         if (tableName.indexOf("-") >= 0) {
             tableName = tableName.substring(tableName.indexOf("-") + "-".length());
         }
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(_dataSource, tableName);
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(tableName);
         if (columnMetaInfoMap.isEmpty()) {
             String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
             throw new IllegalStateException(msg);
@@ -176,6 +178,17 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             final String columnName = entry.getKey();
                             final Object obj = entry.getValue();
 
+                            // - - - - - - - - - - - - - - - - - - -
+                            // Process Null (against Null Headache)
+                            // - - - - - - - - - - - - - - - - - - -
+                            if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // - - - - - - - - - - - - - - -
+                            // Process NotNull and NotString
+                            // - - - - - - - - - - - - - - -
                             // If the value is not null and the value has the own type except string,
                             // It registers the value to statement by the type.
                             if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
@@ -183,59 +196,11 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                                 continue;
                             }
 
-                            // - - - - - - - - - - - - - - 
-                            // Against Null Headache
-                            // - - - - - - - - - - - - - -
-                            if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // * * * * * * * * * * * * * * * *
-                            //       Here String Only
-                            // * * * * * * * * * * * * * * * *
-                            String value = (String) obj;
-
                             // - - - - - - - - - - - - - - - - - - -
-                            // Remove double quotation if it exists.
+                            // Process NotNull and StringExpression
                             // - - - - - - - - - - - - - - - - - - -
-                            if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
-                                value = removeDoubleQuotation(value);
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Timestamp Headache
-                            // - - - - - - - - - - - - - -
-                            if (processTimestamp(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Time Headache
-                            // - - - - - - - - - - - - - -
-                            if (processTime(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Boolean Headache
-                            // - - - - - - - - - - - - - -
-                            if (processBoolean(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Number Headache
-                            // - - - - - - - - - - - - - -
-                            if (processNumber(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            ps.setString(bindCount, value);
+                            final String value = (String) obj;
+                            processNotNullString(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
                             bindCount++;
                         }
                         ps.execute();
@@ -313,28 +278,6 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         }
         String str = (String) value;
         return str.length() == 0 || str.equals("\"\"");
-    }
-
-    // ===================================================================================
-    //                                                                    Column Meta Info
-    //                                                                    ================
-    protected Map<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
-        if (_metaInfoCacheMap.containsKey(tableName)) {
-            return _metaInfoCacheMap.get(tableName);
-        }
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexible();
-        try {
-            final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-            final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumnList(metaData, _unifiedSchema,
-                    tableName);
-            for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
-                columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
-            }
-            _metaInfoCacheMap.put(tableName, columnMetaInfoMap);
-            return columnMetaInfoMap;
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     // ===================================================================================
@@ -685,14 +628,6 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
 
     public void setFilename(String filename) {
         this._filename = filename;
-    }
-
-    public DataSource getDataSource() {
-        return _dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this._dataSource = dataSource;
     }
 
     public Map<String, Map<String, String>> getConvertValueMap() {

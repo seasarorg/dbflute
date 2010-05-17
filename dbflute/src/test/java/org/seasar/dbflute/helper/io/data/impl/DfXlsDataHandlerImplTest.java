@@ -1,6 +1,5 @@
 package org.seasar.dbflute.helper.io.data.impl;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -21,20 +20,6 @@ import org.seasar.dbflute.unit.PlainTestCase;
 public class DfXlsDataHandlerImplTest extends PlainTestCase {
 
     // ===================================================================================
-    //                                                                               Write
-    //                                                                               =====
-    @Test
-    public void test_removeDoubleQuotation() {
-        // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
-
-        // ## Act & Assert ##
-        assertEquals("aaa", impl.removeDoubleQuotation("\"aaa\""));
-        assertEquals("a", impl.removeDoubleQuotation("\"a\""));
-        assertEquals("", impl.removeDoubleQuotation("\"\""));
-    }
-
-    // ===================================================================================
     //                                                                    Process per Type
     //                                                                    ================
     // -----------------------------------------------------
@@ -43,7 +28,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
     @Test
     public void test_DfXlsDataHandlerImpl_isNotNullNotString() {
         // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
+        final DfXlsDataHandlerImpl impl = createHandler();
 
         // ## Act & Assert ##
         assertFalse(impl.isNotNullNotString(null));
@@ -58,7 +43,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
     @Test
     public void test_processBoolean() throws Exception {
         // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl() {
+        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl(null) {
             @Override
             protected Class<?> getColumnType4Judgement(DfColumnMetaInfo columnMetaInfo) {
                 return BigDecimal.class;
@@ -85,7 +70,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
     @Test
     public void test_DfXlsDataHandlerImpl_setSkipSheet_SyntaxError() {
         // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
+        final DfXlsDataHandlerImpl impl = createHandler();
 
         // ## Act & Assert ##
         try {
@@ -98,5 +83,9 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
             log(e.getCause().getMessage());
             assertTrue(e.getCause() instanceof PatternSyntaxException);
         }
+    }
+
+    protected DfXlsDataHandlerImpl createHandler() {
+        return new DfXlsDataHandlerImpl(null);
     }
 }

@@ -19,13 +19,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
@@ -42,7 +42,14 @@ public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Set<String> _identityTableSet = new HashSet<String>();
+    protected Set<String> _identityTableSet = StringSet.createAsFlexible();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfXlsDataHandlerSQLServer(DataSource dataSource) {
+        super(dataSource);
+    }
 
     // ===================================================================================
     //                                                                            Override

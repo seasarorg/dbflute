@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -39,7 +38,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -70,20 +68,18 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Does it output the insert SQLs as logging? */
-    protected boolean _loggingInsertSql;
-
-    /** The name of schema. (Nullable) */
-    protected UnifiedSchema _unifiedSchema;
-
     /** The pattern of skip sheet. (Nullable) */
     protected Pattern _skipSheetPattern;
 
     /** Does it suppress batch updates? */
     protected boolean _suppressBatchUpdate;
 
-    /** The cache map of meta info. The key is table name. */
-    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfXlsDataHandlerImpl(DataSource dataSource) {
+        super(dataSource); // use database only when writing
+    }
 
     // ===================================================================================
     //                                                                                Read
@@ -101,10 +97,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
-    public void writeSeveralData(String dataDirectoryName, final DataSource dataSource) {
+    public void writeSeveralData(String dataDirectoryName) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
-        final boolean useBatchUpdate = !_suppressBatchUpdate;
-
         for (File file : xlsList) {
             _log.info("");
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
@@ -113,233 +107,160 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
             final DfDataSet dataSet = xlsReader.read();
 
-            filterValidColumn(dataSet, dataSource);
-            setupDefaultValue(dataDirectoryName, dataSet, dataSource);
+            filterValidColumn(dataSet);
+            setupDefaultValue(dataDirectoryName, dataSet);
 
-            for (int i = 0; i < dataSet.getTableSize(); i++) {
-                final DfDataTable dataTable = dataSet.getTable(i);
-                final String tableName = dataTable.getTableName();
-                if (dataTable.getRowSize() == 0) {
-                    _log.info("*Not found row at the table: " + tableName);
-                    continue;
+            doWriteDataSet(file, dataSet);
+        }
+    }
+
+    protected void doWriteDataSet(File file, DfDataSet dataSet) {
+        for (int i = 0; i < dataSet.getTableSize(); i++) {
+            final DfDataTable dataTable = dataSet.getTable(i);
+            doWriteDataTable(file, dataTable);
+        }
+    }
+
+    protected void doWriteDataTable(File file, DfDataTable dataTable) {
+        final String tableName = dataTable.getTableName();
+        if (dataTable.getRowSize() == 0) {
+            _log.info("*Not found row at the table: " + tableName);
+            return;
+        }
+
+        // Set up columnMetaInfo.
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(tableName);
+
+        // Extension Point as Before.
+        beforeHandlingTable(dataTable);
+
+        // Set up columnNameList.
+        final List<String> columnNameList = new ArrayList<String>();
+        for (int j = 0; j < dataTable.getColumnSize(); j++) {
+            final DfDataColumn dataColumn = dataTable.getColumn(j);
+            final String columnName = dataColumn.getColumnName();
+            columnNameList.add(columnName);
+        }
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = _dataSource.getConnection();
+            for (int j = 0; j < dataTable.getRowSize(); j++) {
+                final DfDataRow dataRow = dataTable.getRow(j);
+                if (ps == null) {
+                    final MyCreatedState myCreatedState = new MyCreatedState();
+                    final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
+                    ps = conn.prepareStatement(preparedSql);
                 }
-
-                // Set up columnMetaInfo.
-                final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource, tableName);
-
-                // Extension Point as Before.
-                beforeHandlingTable(dataSource, dataTable);
-
-                // Set up columnNameList.
-                final List<String> columnNameList = new ArrayList<String>();
-                for (int j = 0; j < dataTable.getColumnSize(); j++) {
-                    final DfDataColumn dataColumn = dataTable.getColumn(j);
-                    final String columnName = dataColumn.getColumnName();
-                    columnNameList.add(columnName);
-                }
-
-                PreparedStatement ps = null;
-                try {
-                    for (int j = 0; j < dataTable.getRowSize(); j++) {
-                        final DfDataRow dataRow = dataTable.getRow(j);
-                        if (ps == null) {
-                            final MyCreatedState myCreatedState = new MyCreatedState();
-                            final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
-                            ps = dataSource.getConnection().prepareStatement(preparedSql);
-                        }
-
-                        // ColumnValue and ColumnObject
-                        final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
-                        final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
-                        if (columnValueMap.isEmpty()) {
-                            String msg = "The table was Not Found in the file:";
-                            msg = msg + " tableName=" + tableName + " file=" + file;
-                            throw new DfTableNotFoundException(msg);
-                        }
-                        if (_loggingInsertSql) {
-                            final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
-                            _log.info(getSql4Log(tableName, columnNameList, valueList));
-                        }
-                        int bindCount = 1;
-                        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
-                        for (Entry<String, Object> entry : entrySet) {
-                            final String columnName = entry.getKey();
-                            final Object obj = entry.getValue();
-
-                            // If the value is not null and the value has the own type except string,
-                            // It registers the value to statement by the type.
-                            if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Null Headache
-                            // - - - - - - - - - - - - - -
-                            if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // * * * * * * * * * * * * * * * *
-                            //       Here String Only
-                            // * * * * * * * * * * * * * * * *
-                            String value = (String) obj;
-
-                            // - - - - - - - - - - - - - - - - - - -
-                            // Remove double quotation if it exists.
-                            // - - - - - - - - - - - - - - - - - - -
-                            if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
-                                value = removeDoubleQuotation(value);
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Timestamp Headache
-                            // - - - - - - - - - - - - - -
-                            if (processTimestamp(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Time Headache
-                            // - - - - - - - - - - - - - -
-                            if (processTime(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Boolean Headache
-                            // - - - - - - - - - - - - - -
-                            if (processBoolean(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Number Headache
-                            // - - - - - - - - - - - - - -
-                            if (processNumber(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against UUID Headache
-                            // - - - - - - - - - - - - - -
-                            if (processUUID(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - 
-                            // Against Array Headache
-                            // - - - - - - - - - - - - - -
-                            if (processArray(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            ps.setString(bindCount, value);
-                            bindCount++;
-                        }
-                        if (useBatchUpdate) {
-                            ps.addBatch();
-                        } else {
-                            ps.execute();
-                        }
-                    }
-                    if (ps == null) {
-                        String msg = "The statement should not be null:";
-                        msg = msg + " currentTable=" + dataTable.getTableName();
-                        msg = msg + " rowSize=" + dataTable.getRowSize();
-                        throw new IllegalStateException(msg);
-                    }
-                    if (useBatchUpdate) {
-                        ps.executeBatch();
-                    }
-                } catch (SQLException e) {
-                    final SQLException nextEx = e.getNextException();
-                    if (nextEx != null && !e.equals(nextEx)) {
-                        if (e instanceof BatchUpdateException) {
-                            _log.warn("");
-                            _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                            _log.warn("[BatchUpdateException]");
-                            _log.warn(e.getMessage());
-                            _log.warn(" - - - - - - - -");
-                            _log.warn("Also look at the nextException thrown!");
-                            _log.warn("* * * * * * * * * */");
-                            _log.warn("");
-                            String msg = "Failed to register the table data: " + tableName;
-                            throw new DfTableDataRegistrationFailureException(msg, nextEx); // Switch!
-                        } else {
-                            _log.warn("");
-                            _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                            _log.warn("[NextException]", nextEx);
-                            _log.warn("* * * * * * * * * */");
-                            _log.warn("");
-                            String msg = "Failed to register the table data: " + tableName;
-                            throw new DfTableDataRegistrationFailureException(msg, e);
-                        }
-                    }
+                doWriteDataRow(file, dataTable, dataRow, columnMetaInfoMap, columnNameList, ps);
+            }
+            if (!_suppressBatchUpdate) {
+                ps.executeBatch();
+            }
+        } catch (SQLException e) {
+            final SQLException nextEx = e.getNextException();
+            if (nextEx != null && !e.equals(nextEx)) {
+                if (e instanceof BatchUpdateException) {
+                    _log.warn("");
+                    _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+                    _log.warn("[BatchUpdateException]");
+                    _log.warn(e.getMessage());
+                    _log.warn(" - - - - - - - -");
+                    _log.warn("Also look at the nextException thrown!");
+                    _log.warn("* * * * * * * * * */");
+                    _log.warn("");
+                    String msg = "Failed to register the table data: " + tableName;
+                    throw new DfTableDataRegistrationFailureException(msg, nextEx); // Switch!
+                } else {
+                    _log.warn("");
+                    _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+                    _log.warn("[NextException]", nextEx);
+                    _log.warn("* * * * * * * * * */");
+                    _log.warn("");
                     String msg = "Failed to register the table data: " + tableName;
                     throw new DfTableDataRegistrationFailureException(msg, e);
-                } finally {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        } catch (SQLException ignored) {
-                            _log.info("statement.close() threw the exception!", ignored);
-                        }
-                    }
-                    // Extension Point as Finally.
-                    finallyHandlingTable(dataSource, dataTable);
                 }
             }
-        }
-    }
-
-    protected void beforeHandlingTable(DataSource dataSource, DfDataTable dataTable) {
-    }
-
-    protected void finallyHandlingTable(DataSource dataSource, DfDataTable dataTable) {
-    }
-
-    protected String removeDoubleQuotation(String value) {
-        value = value.substring(1);
-        value = value.substring(0, value.length() - 1);
-        return value;
-    }
-
-    // ===================================================================================
-    //                                                                    Column Meta Info
-    //                                                                    ================
-    protected Map<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
-        if (_metaInfoCacheMap.containsKey(tableName)) {
-            return _metaInfoCacheMap.get(tableName);
-        }
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexible();
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableName);
-            for (DfColumnMetaInfo columnMetaInfo : columnList) {
-                columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
-            }
-            _metaInfoCacheMap.put(tableName, columnMetaInfoMap);
-            return columnMetaInfoMap;
-        } catch (SQLException e) {
-            String msg = "Failed to get column meta informations: table=" + tableName;
-            throw new IllegalStateException(msg, e);
+            String msg = "Failed to register the table data: " + tableName;
+            throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ignored) {
+                    _log.info("Statement#close() threw the exception!", ignored);
+                }
+            }
             if (conn != null) {
                 try {
                     conn.close();
                 } catch (SQLException ignored) {
+                    _log.info("Connection#close() threw the exception!", ignored);
                 }
             }
+            // Extension Point as Finally.
+            finallyHandlingTable(dataTable);
+        }
+    }
+
+    protected void beforeHandlingTable(DfDataTable dataTable) {
+    }
+
+    protected void finallyHandlingTable(DfDataTable dataTable) {
+    }
+
+    protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap, List<String> columnNameList, PreparedStatement ps)
+            throws SQLException {
+        final String tableName = dataTable.getTableName();
+        // ColumnValue and ColumnObject
+        final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
+        final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
+        if (columnValueMap.isEmpty()) {
+            String msg = "The table was not found in the file:";
+            msg = msg + " tableName=" + tableName + " file=" + file;
+            throw new DfTableNotFoundException(msg);
+        }
+        if (_loggingInsertSql) {
+            final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
+            _log.info(getSql4Log(tableName, columnNameList, valueList));
+        }
+        int bindCount = 1;
+        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String columnName = entry.getKey();
+            final Object obj = entry.getValue();
+
+            // - - - - - - - - - - - - - - - - - - -
+            // Process Null (against Null Headache)
+            // - - - - - - - - - - - - - - - - - - -
+            if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                bindCount++;
+                continue;
+            }
+
+            // - - - - - - - - - - - - - - -
+            // Process NotNull and NotString
+            // - - - - - - - - - - - - - - -
+            // If the value is not null and the value has the own type except string,
+            // It registers the value to statement by the type.
+            if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                bindCount++;
+                continue;
+            }
+
+            // - - - - - - - - - - - - - - - - - - -
+            // Process NotNull and StringExpression
+            // - - - - - - - - - - - - - - - - - - -
+            final String value = (String) obj;
+            processNotNullString(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+            bindCount++;
+        }
+        if (_suppressBatchUpdate) {
+            ps.execute();
+        } else {
+            ps.addBatch();
         }
     }
 
@@ -384,12 +305,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return new ArrayList<File>(sortedFileSet);
     }
 
-    protected void filterValidColumn(final DfDataSet dataSet, final DataSource dataSource) {
+    protected void filterValidColumn(final DfDataSet dataSet) {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable table = dataSet.getTable(i);
             final String tableName = table.getTableName();
 
-            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
+            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DfDataColumn dataColumn = table.getColumn(j);
                 if (!metaInfoMap.containsKey(dataColumn.getColumnName())) {
@@ -402,14 +323,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    protected void setupDefaultValue(String dataDirectoryName, final DfDataSet dataSet, final DataSource dataSource) {
+    protected void setupDefaultValue(String dataDirectoryName, final DfDataSet dataSet) {
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectoryName);
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable table = dataSet.getTable(i);
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableName();
 
-            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
+            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
@@ -554,28 +475,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public boolean isLoggingInsertSql() {
-        return _loggingInsertSql;
-    }
-
-    public void setLoggingInsertSql(boolean loggingInsertSql) {
-        this._loggingInsertSql = loggingInsertSql;
-    }
-
     public boolean isSuppressBatchUpdate() {
         return _suppressBatchUpdate;
     }
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
         this._suppressBatchUpdate = suppressBatchUpdate;
-    }
-
-    public UnifiedSchema getUnifiedSchema() {
-        return _unifiedSchema;
-    }
-
-    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
-        _unifiedSchema = unifiedSchema;
     }
 
     public void setSkipSheet(String skipSheet) {

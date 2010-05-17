@@ -18,8 +18,6 @@ package org.seasar.dbflute.helper.io.data;
 import java.io.File;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 
 /**
@@ -27,9 +25,9 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
  */
 public interface DfXlsDataHandler {
 
-    public List<DfDataSet> readSeveralData(String dataDirectoryName);
+    List<DfDataSet> readSeveralData(String dataDirectoryName);
 
-    public void writeSeveralData(String dataDirectoryName, DataSource dataSource);
+    void writeSeveralData(String dataDirectoryName);
 
-    public List<File> getXlsList(String dataDirectoryName);
+    List<File> getXlsList(String dataDirectoryName);
 }

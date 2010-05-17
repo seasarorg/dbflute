@@ -102,7 +102,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.w3c.dom.Element;
 
@@ -258,75 +257,41 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         _log.info("$ /= = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         for (int i = 0; i < tableList.size(); i++) {
-            final DfTableMetaInfo tableMataInfo = tableList.get(i);
-            if (tableMataInfo.isOutOfGenerateTarget()) {
+            final DfTableMetaInfo tableMetaInfo = tableList.get(i);
+            if (tableMetaInfo.isOutOfGenerateTarget()) {
                 // for example, sequence synonym and so on...
-                _log.info("$ " + tableMataInfo.buildTableDisplayName() + " is out of generate target!");
+                _log.info("$ " + tableMetaInfo.buildTableDisplayName() + " is out of generate target!");
                 continue;
             }
-            _log.info("$ " + tableMataInfo);
+            _log.info("$ " + tableMetaInfo);
 
             final Element tableElement = _doc.createElement("table");
-            tableElement.setAttribute("name", tableMataInfo.getTableName());
-            tableElement.setAttribute("type", tableMataInfo.getTableType());
-            final UnifiedSchema unifiedSchema = tableMataInfo.getUnifiedSchema();
+            tableElement.setAttribute("name", tableMetaInfo.getTableName());
+            tableElement.setAttribute("type", tableMetaInfo.getTableType());
+            final UnifiedSchema unifiedSchema = tableMetaInfo.getUnifiedSchema();
             if (unifiedSchema.hasSchema()) {
                 tableElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
             }
-            final String tableComment = tableMataInfo.getTableComment();
+            final String tableComment = tableMetaInfo.getTableComment();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(tableComment)) {
                 tableElement.setAttribute("comment", tableComment);
             }
-            final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnMetaInfo(metaData, tableMataInfo);
-            final List<DfColumnMetaInfo> columns = getColumns(metaData, tableMataInfo);
+            final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnMetaInfo(metaData, tableMetaInfo);
+            final List<DfColumnMetaInfo> columns = getColumns(metaData, tableMetaInfo);
             for (int j = 0; j < columns.size(); j++) {
                 final DfColumnMetaInfo columnMetaInfo = columns.get(j);
-                final String columnName = columnMetaInfo.getColumnName();
-
                 final Element columnElement = _doc.createElement("column");
-                columnElement.setAttribute("name", columnName);
 
-                setupColumnType(columnMetaInfo, columnElement);
-                setupColumnDbType(columnMetaInfo, columnElement);
-                setupColumnJavaType(columnMetaInfo, columnElement);
-                setupColumnSize(columnMetaInfo, columnElement);
-
-                if (columnMetaInfo.isRequired()) {
-                    columnElement.setAttribute("required", "true");
-                }
-                if (pkInfo.containsColumn(columnName)) {
-                    columnElement.setAttribute("primaryKey", "true");
-                    final String pkName = pkInfo.getPrimaryKeyName(columnName);
-                    if (pkName != null && pkName.trim().length() > 0) {
-                        columnElement.setAttribute("pkName", pkInfo.getPrimaryKeyName(columnName));
-                    }
-                }
-
-                final String columnComment = columnMetaInfo.getColumnComment();
-                if (columnComment != null) {
-                    columnElement.setAttribute("comment", columnComment);
-                }
-
-                String defaultValue = columnMetaInfo.getDefaultValue();
-                if (defaultValue != null) {
-                    // trim out parens & quotes out of default value.
-                    // makes sense for MSSQL. not sure about others.
-                    if (defaultValue.startsWith("(") && defaultValue.endsWith(")")) {
-                        defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
-                    }
-
-                    if (defaultValue.startsWith("'") && defaultValue.endsWith("'")) {
-                        defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
-                    }
-
-                    columnElement.setAttribute("default", defaultValue);
-                }
-
-                if (pkInfo.containsColumn(columnName)) {
-                    if (isAutoIncrementColumn(conn, tableMataInfo, columnName)) {
-                        columnElement.setAttribute("autoIncrement", "true");
-                    }
-                }
+                processColumnName(columnMetaInfo, columnElement);
+                processColumnType(columnMetaInfo, columnElement);
+                processColumnDbType(columnMetaInfo, columnElement);
+                processColumnJavaType(columnMetaInfo, columnElement);
+                processColumnSize(columnMetaInfo, columnElement);
+                processRequired(columnMetaInfo, columnElement);
+                processPrimaryKey(columnMetaInfo, pkInfo, columnElement);
+                processColumnComment(columnMetaInfo, columnElement);
+                processDefaultValue(columnMetaInfo, columnElement);
+                processAutoIncrement(tableMetaInfo, columnMetaInfo, pkInfo, conn, columnElement);
 
                 tableElement.appendChild(columnElement);
             }
@@ -334,99 +299,21 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             // /= = = = = = = = = = = = = =
             // Foreign keys for this table.
             // = = = = = = = = = =/
-            final Map<String, DfForeignKeyMetaInfo> foreignKeyMap = getForeignKeys(metaData, tableMataInfo);
-            final Set<String> foreignKeyKeySet = foreignKeyMap.keySet();
-            for (String foreignKeyName : foreignKeyKeySet) {
-                final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMap.get(foreignKeyName);
-                final Element foreignKeyElement = _doc.createElement("foreign-key");
-                foreignKeyElement.setAttribute("foreignTable", foreignKeyMetaInfo.getForeignTableName());
-                foreignKeyElement.setAttribute("name", foreignKeyMetaInfo.getForeignKeyName());
-                final Map<String, String> columnNameMap = foreignKeyMetaInfo.getColumnNameMap();
-                final Set<String> columnNameKeySet = columnNameMap.keySet();
-                for (String localColumnName : columnNameKeySet) {
-                    final String foreignColumnName = columnNameMap.get(localColumnName);
-                    final Element referenceElement = _doc.createElement("reference");
-                    referenceElement.setAttribute("local", localColumnName);
-                    referenceElement.setAttribute("foreign", foreignColumnName);
-                    foreignKeyElement.appendChild(referenceElement);
-                }
-                tableElement.appendChild(foreignKeyElement);
-            }
+            processForeignKeyElement(metaData, tableMetaInfo, tableElement);
 
             // /= = = = = = = = = = = = = = = =
             // Unique keys for this table.
             // = = = = = = = = = =/
-            Map<String, Map<Integer, String>> uniqueMapForGettingIndex = null;
-            {
-                Map<String, Map<Integer, String>> uniqueMap = null;
-                try {
-                    uniqueMap = getUniqueKeyMap(metaData, tableMataInfo);
-                } catch (SQLException e) {
-                    _log.warn("Failed to get unique column information! But continue...", e);
-                } finally {
-                    if (uniqueMap == null) {
-                        uniqueMap = DfCollectionUtil.newLinkedHashMap();
-                    }
-                }
-                uniqueMapForGettingIndex = uniqueMap;
-                final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
-                for (final String uniqueIndexName : uniqueKeySet) {
-                    final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
-                    if (uniqueElementMap.isEmpty()) {
-                        String msg = "The uniqueKey has no elements: " + uniqueIndexName + " : " + uniqueMap;
-                        throw new IllegalStateException(msg);
-                    }
-                    final Element uniqueKeyElement = _doc.createElement("unique");
-                    uniqueKeyElement.setAttribute("name", uniqueIndexName);
-                    final Set<Integer> uniqueElementKeySet = uniqueElementMap.keySet();
-                    for (final Integer ordinalPosition : uniqueElementKeySet) {
-                        final String columnName = uniqueElementMap.get(ordinalPosition);
-                        final Element uniqueColumnElement = _doc.createElement("unique-column");
-                        uniqueColumnElement.setAttribute("name", columnName);
-                        uniqueColumnElement.setAttribute("position", ordinalPosition.toString());
-                        uniqueKeyElement.appendChild(uniqueColumnElement);
-                    }
-                    tableElement.appendChild(uniqueKeyElement);
-                }
-            }
+            final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKeyElement(metaData, tableMetaInfo,
+                    tableElement);
 
             // /= = = = = = = = = = = =
             // Indexes for this table.
             // = = = = = = = = = =/
-            {
-                Map<String, Map<Integer, String>> indexMap = null;
-                try {
-                    indexMap = getIndexMap(metaData, tableMataInfo, uniqueMapForGettingIndex);
-                } catch (SQLException e) {
-                    _log.warn("Failed to get unique column information! But continue...", e);
-                } finally {
-                    if (indexMap == null) {
-                        indexMap = DfCollectionUtil.newLinkedHashMap();
-                    }
-                }
-                final java.util.Set<String> indexKeySet = indexMap.keySet();
-                for (final String indexName : indexKeySet) {
-                    final Map<Integer, String> indexElementMap = indexMap.get(indexName);
-                    if (indexElementMap.isEmpty()) {
-                        String msg = "The index has no elements: " + indexName + " : " + indexMap;
-                        throw new IllegalStateException(msg);
-                    }
-                    final Element uniqueKeyElement = _doc.createElement("index");
-                    uniqueKeyElement.setAttribute("name", indexName);
-                    final Set<Integer> uniqueElementKeySet = indexElementMap.keySet();
-                    for (final Integer ordinalPosition : uniqueElementKeySet) {
-                        final String columnName = indexElementMap.get(ordinalPosition);
-                        final Element uniqueColumnElement = _doc.createElement("index-column");
-                        uniqueColumnElement.setAttribute("name", columnName);
-                        uniqueColumnElement.setAttribute("position", ordinalPosition.toString());
-                        uniqueKeyElement.appendChild(uniqueColumnElement);
-                    }
-                    tableElement.appendChild(uniqueKeyElement);
-                }
-            }
+            processIndexElement(metaData, tableMetaInfo, tableElement, uniqueKeyMap);
 
             _databaseNode.appendChild(tableElement);
-        } // End of Table Loop
+        } // end of table loop
         _log.info("$ = = = = = = = = = =/");
 
         final boolean exists = setupAddtionalTableIfNeeds(); // since 0.8.0
@@ -456,15 +343,20 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         throw new DfTableNotFoundException(msg);
     }
 
-    protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+    protected void processColumnName(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final String columnName = columnMetaInfo.getColumnName();
+        columnElement.setAttribute("name", columnName);
+    }
+
+    protected void processColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         columnElement.setAttribute("type", getColumnJdbcType(columnMetaInfo));
     }
 
-    protected String getColumnJdbcType(final DfColumnMetaInfo columnMetaInfo) {
-        return _columnHandler.getColumnJdbcType(columnMetaInfo);
+    protected void processColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        columnElement.setAttribute("dbType", columnMetaInfo.getDbTypeName());
     }
 
-    protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+    protected void processColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         final String jdbcType = getColumnJdbcType(columnMetaInfo);
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
@@ -473,11 +365,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         columnElement.setAttribute("javaType", javaNative);
     }
 
-    protected void setupColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        columnElement.setAttribute("dbType", columnMetaInfo.getDbTypeName());
+    protected String getColumnJdbcType(DfColumnMetaInfo columnMetaInfo) {
+        return _columnHandler.getColumnJdbcType(columnMetaInfo);
     }
 
-    protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+    protected void processColumnSize(DfColumnMetaInfo columnMetaInfo, Element columnElement) {
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
         if (DfColumnHandler.isColumnSizeValid(columnSize)) {
@@ -486,6 +378,128 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             } else {
                 columnElement.setAttribute("size", String.valueOf(columnSize));
             }
+        }
+    }
+
+    protected void processRequired(DfColumnMetaInfo columnMetaInfo, Element columnElement) {
+        if (columnMetaInfo.isRequired()) {
+            columnElement.setAttribute("required", "true");
+        }
+    }
+
+    protected void processPrimaryKey(DfColumnMetaInfo columnMetaInfo, DfPrimaryKeyMetaInfo pkInfo, Element columnElement) {
+        final String columnName = columnMetaInfo.getColumnName();
+        if (pkInfo.containsColumn(columnName)) {
+            columnElement.setAttribute("primaryKey", "true");
+            final String pkName = pkInfo.getPrimaryKeyName(columnName);
+            if (pkName != null && pkName.trim().length() > 0) {
+                columnElement.setAttribute("pkName", pkInfo.getPrimaryKeyName(columnName));
+            }
+        }
+    }
+
+    protected void processColumnComment(DfColumnMetaInfo columnMetaInfo, Element columnElement) {
+        final String columnComment = columnMetaInfo.getColumnComment();
+        if (columnComment != null) {
+            columnElement.setAttribute("comment", columnComment);
+        }
+    }
+
+    protected void processDefaultValue(DfColumnMetaInfo columnMetaInfo, Element columnElement) {
+        String defaultValue = columnMetaInfo.getDefaultValue();
+        if (defaultValue != null) {
+            // trim out parens & quotes out of default value.
+            // makes sense for MSSQL. not sure about others.
+            if (defaultValue.startsWith("(") && defaultValue.endsWith(")")) {
+                defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
+            }
+
+            if (defaultValue.startsWith("'") && defaultValue.endsWith("'")) {
+                defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
+            }
+
+            columnElement.setAttribute("default", defaultValue);
+        }
+    }
+
+    protected void processAutoIncrement(DfTableMetaInfo tableMetaInfo, DfColumnMetaInfo columnMetaInfo,
+            DfPrimaryKeyMetaInfo pkInfo, Connection conn, Element columnElement) throws SQLException {
+        final String columnName = columnMetaInfo.getColumnName();
+        if (pkInfo.containsColumn(columnName)) {
+            if (isAutoIncrementColumn(conn, tableMetaInfo, columnName)) {
+                columnElement.setAttribute("autoIncrement", "true");
+            }
+        }
+    }
+
+    protected void processForeignKeyElement(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo,
+            Element tableElement) throws SQLException {
+        final Map<String, DfForeignKeyMetaInfo> foreignKeyMap = getForeignKeys(metaData, tableMetaInfo);
+        final Set<String> foreignKeyKeySet = foreignKeyMap.keySet();
+        for (String foreignKeyName : foreignKeyKeySet) {
+            final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMap.get(foreignKeyName);
+            final Element foreignKeyElement = _doc.createElement("foreign-key");
+            foreignKeyElement.setAttribute("foreignTable", foreignKeyMetaInfo.getForeignTableName());
+            foreignKeyElement.setAttribute("name", foreignKeyMetaInfo.getForeignKeyName());
+            final Map<String, String> columnNameMap = foreignKeyMetaInfo.getColumnNameMap();
+            final Set<String> columnNameKeySet = columnNameMap.keySet();
+            for (String localColumnName : columnNameKeySet) {
+                final String foreignColumnName = columnNameMap.get(localColumnName);
+                final Element referenceElement = _doc.createElement("reference");
+                referenceElement.setAttribute("local", localColumnName);
+                referenceElement.setAttribute("foreign", foreignColumnName);
+                foreignKeyElement.appendChild(referenceElement);
+            }
+            tableElement.appendChild(foreignKeyElement);
+        }
+    }
+
+    protected Map<String, Map<Integer, String>> processUniqueKeyElement(DatabaseMetaData metaData,
+            DfTableMetaInfo tableMetaInfo, Element tableElement) throws SQLException {
+        final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableMetaInfo);
+        final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
+        for (final String uniqueIndexName : uniqueKeySet) {
+            final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
+            if (uniqueElementMap.isEmpty()) {
+                String msg = "The uniqueKey has no elements: " + uniqueIndexName + " : " + uniqueMap;
+                throw new IllegalStateException(msg);
+            }
+            final Element uniqueKeyElement = _doc.createElement("unique");
+            uniqueKeyElement.setAttribute("name", uniqueIndexName);
+            final Set<Integer> uniqueElementKeySet = uniqueElementMap.keySet();
+            for (final Integer ordinalPosition : uniqueElementKeySet) {
+                final String columnName = uniqueElementMap.get(ordinalPosition);
+                final Element uniqueColumnElement = _doc.createElement("unique-column");
+                uniqueColumnElement.setAttribute("name", columnName);
+                uniqueColumnElement.setAttribute("position", ordinalPosition.toString());
+                uniqueKeyElement.appendChild(uniqueColumnElement);
+            }
+            tableElement.appendChild(uniqueKeyElement);
+        }
+        return uniqueMap;
+    }
+
+    protected void processIndexElement(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo, Element tableElement,
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
+        final Map<String, Map<Integer, String>> indexMap = getIndexMap(metaData, tableMetaInfo, uniqueKeyMap);
+        final java.util.Set<String> indexKeySet = indexMap.keySet();
+        for (final String indexName : indexKeySet) {
+            final Map<Integer, String> indexElementMap = indexMap.get(indexName);
+            if (indexElementMap.isEmpty()) {
+                String msg = "The index has no elements: " + indexName + " : " + indexMap;
+                throw new IllegalStateException(msg);
+            }
+            final Element indexElement = _doc.createElement("index");
+            indexElement.setAttribute("name", indexName);
+            final Set<Integer> uniqueElementKeySet = indexElementMap.keySet();
+            for (final Integer ordinalPosition : uniqueElementKeySet) {
+                final String columnName = indexElementMap.get(ordinalPosition);
+                final Element uniqueColumnElement = _doc.createElement("index-column");
+                uniqueColumnElement.setAttribute("name", columnName);
+                uniqueColumnElement.setAttribute("position", ordinalPosition.toString());
+                indexElement.appendChild(uniqueColumnElement);
+            }
+            tableElement.appendChild(indexElement);
         }
     }
 
