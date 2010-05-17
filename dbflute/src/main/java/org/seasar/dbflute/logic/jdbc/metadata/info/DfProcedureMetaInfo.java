@@ -72,8 +72,8 @@ public class DfProcedureMetaInfo {
         }
         final DfBasicProperties prop = DfBuildProperties.getInstance().getBasicProperties();
         final String sqlName = getProcedureSchema().buildSqlName(getProcedureName());
-        // DB2 needs schema prefix for calling procedures. (actually tried)
         if (prop.isDatabaseDB2() && !sqlName.contains(".")) {
+            // DB2 needs schema prefix for calling procedures. (actually tried)
             _procedureSqlName = getProcedureSchema().buildSchemaQualifiedName(sqlName);
         } else {
             _procedureSqlName = sqlName;
