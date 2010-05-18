@@ -72,7 +72,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
         if (!isPrimaryKeyExtractingSupported()) {
             if (isDatabaseMsAccess()) {
-                return processMSAccess(metaData, unifiedSchema, tableName);
+                return processMSAccess(metaData, unifiedSchema, tableName, info);
             }
             return info;
         }
@@ -156,17 +156,24 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         }
     }
 
+    /**
+     * @param metaData JDBC meta data. (NotNull)
+     * @param unifiedSchema The unified schema. (NotNull)
+     * @param tableName The name of table. (NotNull)
+     * @param info The empty meta information of primary key. (NotNull)
+     * @return The meta information of primary key. (NotNull)
+     * @throws SQLException
+     */
     protected DfPrimaryKeyMetaInfo processMSAccess(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName) throws SQLException {
+            String tableName, DfPrimaryKeyMetaInfo info) throws SQLException {
         // it can get from unique key from JDBC of MS Access
         final List<String> emptyList = DfCollectionUtil.emptyList();
         final Map<String, Map<Integer, String>> uqMap = getUniqueKeyMap(metaData, unifiedSchema, tableName, emptyList);
         final String pkName = "PrimaryKey";
         final Map<Integer, String> pkMap = uqMap.get(pkName);
         if (pkMap == null) {
-            return null;
+            return info;
         }
-        final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
         final Set<Entry<Integer, String>> entrySet = pkMap.entrySet();
         for (Entry<Integer, String> entry : entrySet) {
             info.addPrimaryKey(entry.getValue(), pkName);

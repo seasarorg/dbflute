@@ -258,91 +258,70 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ /= = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMetaInfo = tableList.get(i);
-            if (tableMetaInfo.isOutOfGenerateTarget()) {
-                // for example, sequence synonym and so on...
-                _log.info("$ " + tableMetaInfo.buildTableDisplayName() + " is out of generate target!");
-                continue;
-            }
-            _log.info("$ " + tableMetaInfo);
-
-            final Element tableElement = _doc.createElement("table");
-            tableElement.setAttribute("name", tableMetaInfo.getTableName());
-            tableElement.setAttribute("type", tableMetaInfo.getTableType());
-            final UnifiedSchema unifiedSchema = tableMetaInfo.getUnifiedSchema();
-            if (unifiedSchema.hasSchema()) {
-                tableElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
-            }
-            final String tableComment = tableMetaInfo.getTableComment();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(tableComment)) {
-                tableElement.setAttribute("comment", tableComment);
-            }
-            final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnMetaInfo(metaData, tableMetaInfo);
-            final List<DfColumnMetaInfo> columns = getColumns(metaData, tableMetaInfo);
-            for (int j = 0; j < columns.size(); j++) {
-                final DfColumnMetaInfo columnMetaInfo = columns.get(j);
-                final Element columnElement = _doc.createElement("column");
-
-                processColumnName(columnMetaInfo, columnElement);
-                processColumnType(columnMetaInfo, columnElement);
-                processColumnDbType(columnMetaInfo, columnElement);
-                processColumnJavaType(columnMetaInfo, columnElement);
-                processColumnSize(columnMetaInfo, columnElement);
-                processRequired(columnMetaInfo, columnElement);
-                processPrimaryKey(columnMetaInfo, pkInfo, columnElement);
-                processColumnComment(columnMetaInfo, columnElement);
-                processDefaultValue(columnMetaInfo, columnElement);
-                processAutoIncrement(tableMetaInfo, columnMetaInfo, pkInfo, conn, columnElement);
-
-                tableElement.appendChild(columnElement);
-            }
-
-            // /= = = = = = = = = = = = = =
-            // Foreign keys for this table.
-            // = = = = = = = = = =/
-            processForeignKeyElement(metaData, tableMetaInfo, tableElement);
-
-            // /= = = = = = = = = = = = = = = =
-            // Unique keys for this table.
-            // = = = = = = = = = =/
-            final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKeyElement(metaData, tableMetaInfo,
-                    tableElement);
-
-            // /= = = = = = = = = = = =
-            // Indexes for this table.
-            // = = = = = = = = = =/
-            processIndexElement(metaData, tableMetaInfo, tableElement, uniqueKeyMap);
-
-            _databaseNode.appendChild(tableElement);
+            processTable(conn, metaData, tableMetaInfo);
         } // end of table loop
         _log.info("$ = = = = = = = = = =/");
 
-        final boolean exists = setupAddtionalTableIfNeeds(); // since 0.8.0
-        if (tableList.isEmpty() && !exists) {
+        final boolean additionalTableExists = setupAddtionalTableIfNeeds();
+        if (tableList.isEmpty() && !additionalTableExists) {
             throwTableNotFoundException();
         }
         _doc.appendChild(_databaseNode);
     }
 
-    protected void throwTableNotFoundException() {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "A table was NOT FOUND in the schema!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the database connection settings." + ln();
-        msg = msg + "If you've not created the schema yet, please create it." + ln();
-        msg = msg + "You can create easily by using replace-schema." + ln();
-        msg = msg + "Set up ./playsql/replace-schema.sql and execute ReplaceSchema task." + ln();
-        msg = msg + ln();
-        msg = msg + "[Connection Settings]" + ln();
-        msg = msg + " driver = " + _driver + ln();
-        msg = msg + " url    = " + _url + ln();
-        msg = msg + " schema = " + _mainSchema + ln();
-        msg = msg + " user   = " + _userId + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfTableNotFoundException(msg);
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
+    protected void processTable(Connection conn, DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
+        if (tableMetaInfo.isOutOfGenerateTarget()) {
+            // for example, sequence synonym and so on...
+            _log.info("$ " + tableMetaInfo.buildTableDisplayName() + " is out of generate target!");
+            return;
+        }
+        _log.info("$ " + tableMetaInfo);
+
+        final Element tableElement = _doc.createElement("table");
+        tableElement.setAttribute("name", tableMetaInfo.getTableName());
+        tableElement.setAttribute("type", tableMetaInfo.getTableType());
+        final UnifiedSchema unifiedSchema = tableMetaInfo.getUnifiedSchema();
+        if (unifiedSchema.hasSchema()) {
+            tableElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
+        }
+        final String tableComment = tableMetaInfo.getTableComment();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(tableComment)) {
+            tableElement.setAttribute("comment", tableComment);
+        }
+        final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnMetaInfo(metaData, tableMetaInfo);
+        final List<DfColumnMetaInfo> columns = getColumns(metaData, tableMetaInfo);
+        for (int j = 0; j < columns.size(); j++) {
+            final DfColumnMetaInfo columnMetaInfo = columns.get(j);
+            final Element columnElement = _doc.createElement("column");
+
+            processColumnName(columnMetaInfo, columnElement);
+            processColumnType(columnMetaInfo, columnElement);
+            processColumnDbType(columnMetaInfo, columnElement);
+            processColumnJavaType(columnMetaInfo, columnElement);
+            processColumnSize(columnMetaInfo, columnElement);
+            processRequired(columnMetaInfo, columnElement);
+            processPrimaryKey(columnMetaInfo, pkInfo, columnElement);
+            processColumnComment(columnMetaInfo, columnElement);
+            processDefaultValue(columnMetaInfo, columnElement);
+            processAutoIncrement(tableMetaInfo, columnMetaInfo, pkInfo, conn, columnElement);
+
+            tableElement.appendChild(columnElement);
+        }
+
+        processForeignKey(metaData, tableMetaInfo, tableElement);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMetaInfo, tableElement);
+        processIndex(metaData, tableMetaInfo, tableElement, uniqueKeyMap);
+
+        _databaseNode.appendChild(tableElement);
     }
 
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
     protected void processColumnName(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         final String columnName = columnMetaInfo.getColumnName();
         columnElement.setAttribute("name", columnName);
@@ -432,8 +411,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
-    protected void processForeignKeyElement(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo,
-            Element tableElement) throws SQLException {
+    // -----------------------------------------------------
+    //                                            Constraint
+    //                                            ----------
+    protected void processForeignKey(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo, Element tableElement)
+            throws SQLException {
         final Map<String, DfForeignKeyMetaInfo> foreignKeyMap = getForeignKeys(metaData, tableMetaInfo);
         final Set<String> foreignKeyKeySet = foreignKeyMap.keySet();
         for (String foreignKeyName : foreignKeyKeySet) {
@@ -454,7 +436,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
-    protected Map<String, Map<Integer, String>> processUniqueKeyElement(DatabaseMetaData metaData,
+    protected Map<String, Map<Integer, String>> processUniqueKey(DatabaseMetaData metaData,
             DfTableMetaInfo tableMetaInfo, Element tableElement) throws SQLException {
         final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableMetaInfo);
         final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
@@ -479,7 +461,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         return uniqueMap;
     }
 
-    protected void processIndexElement(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo, Element tableElement,
+    protected void processIndex(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo, Element tableElement,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
         final Map<String, Map<Integer, String>> indexMap = getIndexMap(metaData, tableMetaInfo, uniqueKeyMap);
         final java.util.Set<String> indexKeySet = indexMap.keySet();
@@ -501,6 +483,26 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
             tableElement.appendChild(indexElement);
         }
+    }
+
+    protected void throwTableNotFoundException() {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "A table was NOT FOUND in the schema!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the database connection settings." + ln();
+        msg = msg + "If you've not created the schema yet, please create it." + ln();
+        msg = msg + "You can create easily by using replace-schema." + ln();
+        msg = msg + "Set up ./playsql/replace-schema.sql and execute ReplaceSchema task." + ln();
+        msg = msg + ln();
+        msg = msg + "[Connection Settings]" + ln();
+        msg = msg + " driver = " + _driver + ln();
+        msg = msg + " url    = " + _url + ln();
+        msg = msg + " schema = " + _mainSchema + ln();
+        msg = msg + " user   = " + _userId + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfTableNotFoundException(msg);
     }
 
     // ===================================================================================
@@ -851,7 +853,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                    Additional Table
     //                                                                    ================
-    protected boolean setupAddtionalTableIfNeeds() { // since 0.8.0
+    protected boolean setupAddtionalTableIfNeeds() {
         boolean exists = false;
         final String tableType = "TABLE";
         final DfAdditionalTableProperties prop = getProperties().getAdditionalTableProperties();
