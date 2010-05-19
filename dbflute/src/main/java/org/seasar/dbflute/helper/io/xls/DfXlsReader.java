@@ -42,7 +42,7 @@ import org.seasar.dbflute.helper.dataset.DfDataSetConstants;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
-import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.logic.loaddata.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;

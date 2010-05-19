@@ -7,11 +7,11 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.io.data.DfSeparatedDataResultInfo;
-import org.seasar.dbflute.helper.io.data.DfSeparatedDataSeveralHandlingInfo;
-import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
-import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerImpl;
-import org.seasar.dbflute.helper.io.data.impl.DfXlsDataHandlerSQLServer;
+import org.seasar.dbflute.logic.loaddata.DfSeparatedDataResultInfo;
+import org.seasar.dbflute.logic.loaddata.DfSeparatedDataSeveralHandlingInfo;
+import org.seasar.dbflute.logic.loaddata.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.logic.loaddata.impl.DfXlsDataHandlerImpl;
+import org.seasar.dbflute.logic.loaddata.impl.DfXlsDataHandlerSQLServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 

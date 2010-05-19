@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.data.impl;
+package org.seasar.dbflute.logic.loaddata.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,9 +32,9 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.helper.io.data.DfSeparatedDataHandler;
-import org.seasar.dbflute.helper.io.data.DfSeparatedDataResultInfo;
-import org.seasar.dbflute.helper.io.data.DfSeparatedDataSeveralHandlingInfo;
+import org.seasar.dbflute.logic.loaddata.DfSeparatedDataHandler;
+import org.seasar.dbflute.logic.loaddata.DfSeparatedDataResultInfo;
+import org.seasar.dbflute.logic.loaddata.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.io.data.impl.internal;
+package org.seasar.dbflute.logic.loaddata.impl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

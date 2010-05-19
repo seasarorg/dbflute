@@ -2,6 +2,7 @@ package org.seasar.dbflute.helper.io.data.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.seasar.dbflute.logic.loaddata.impl.DfSeparatedDataHandlerImpl;
 
 /**
  * @author jflute

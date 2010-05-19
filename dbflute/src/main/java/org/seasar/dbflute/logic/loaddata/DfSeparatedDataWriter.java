@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2006 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,23 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.data;
+package org.seasar.dbflute.logic.loaddata;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author jflute
  */
-public interface DfSeparatedDataHandler {
+public interface DfSeparatedDataWriter {
 
-    public DfSeparatedDataResultInfo writeSeveralData(DfSeparatedDataSeveralHandlingInfo info);
+    /**
+     * Write data from separated-file.
+     * @param notFoundColumnMap Not found column map. (NotNUl)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public void writeData(Map<String, Set<String>> notFoundColumnMap) throws FileNotFoundException, IOException;
 }

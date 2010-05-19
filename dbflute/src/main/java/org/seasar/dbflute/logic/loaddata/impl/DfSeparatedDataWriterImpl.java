@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.data.impl;
+package org.seasar.dbflute.logic.loaddata.impl;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -32,10 +32,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
-import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
-import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.loaddata.DfSeparatedDataWriter;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
