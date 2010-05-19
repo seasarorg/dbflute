@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author jflute
  */
-public class DfInternalSqlBuildingResult {
+public class DfLoadSqlBuildingResult {
 
     // ===================================================================================
     //                                                                           Attribute
