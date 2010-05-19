@@ -38,5 +38,4 @@ public class DfSeparatedDataResultInfo {
     public void setNotFoundColumnMap(Map<String, Set<String>> notFoundColumnMap) {
         this.notFoundColumnMap = notFoundColumnMap;
     }
-
 }

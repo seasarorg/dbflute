@@ -45,7 +45,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
         // ## Arrange ##
         final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl(null) {
             @Override
-            protected Class<?> getColumnType4Judgement(DfColumnMetaInfo columnMetaInfo) {
+            protected Class<?> getBindType(String tableName, DfColumnMetaInfo columnMetaInfo) {
                 return BigDecimal.class;
             }
         };

@@ -145,8 +145,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
             // * * *
             final Map<String, Object> typeMappingMap = getJdbcTypeMappingMap();
             if (typeMappingMap.isEmpty()) {
-                Map<String, Object> defaultMap = getLanguageMetaData().getJdbcToJavaNativeMap(); // Actually Empty
-                _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", defaultMap); // for compatible
+                _jdbcToJavaNativeMap = getLanguageMetaData().getJdbcToJavaNativeMap(); // actually empty
             } else {
                 _jdbcToJavaNativeMap = typeMappingMap;
             }
@@ -164,8 +163,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
 
         Map<String, Object> typeMappingMap = getJdbcTypeMappingMap();
         if (typeMappingMap.isEmpty()) {
-            Map<String, Object> defaultMap = getLanguageMetaData().getJdbcToJavaNativeMap();
-            _jdbcToJavaNativeMap = mapProp("torque.jdbcToJavaNativeMap", defaultMap); // for compatible
+            _jdbcToJavaNativeMap = getLanguageMetaData().getJdbcToJavaNativeMap();
         } else {
             _jdbcToJavaNativeMap = typeMappingMap;
         }

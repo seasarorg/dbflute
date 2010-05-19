@@ -55,7 +55,6 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.sql.Types;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,6 +66,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -183,10 +183,11 @@ public class TypeMap {
     // ===================================================================================
     //                                                                            Type Map
     //                                                                            ========
-    private static Hashtable<String, String> _jdbcTypeToJavaNativeMap = null;
-    private static Hashtable<Integer, String> _jdbcDefValueToJdbcTypeMap = null;
-    private static Hashtable<String, Integer> _jdbcTypeToJdbcDefValueMap = null;
-    private static Hashtable<String, String> _javaNativeToFlexNativeMap = null;
+    private static final Map<String, String> _jdbcTypeToJavaNativeMap = DfCollectionUtil.newHashMap();
+    private static final Map<Integer, String> _jdbcDefValueToJdbcTypeMap = DfCollectionUtil.newHashMap();
+    private static final Map<String, Integer> _jdbcTypeToJdbcDefValueMap = DfCollectionUtil.newHashMap();
+    private static final Map<String, String> _javaNativeToFqcnMap = DfCollectionUtil.newHashMap();
+    private static final Map<String, String> _javaNativeToFlexNativeMap = DfCollectionUtil.newHashMap();
 
     // ===================================================================================
     //                                                        Property jdbcToJavaNativeMap
@@ -232,8 +233,6 @@ public class TypeMap {
         // * * * * * * * * * * * * * * * * * * * 
         // The map of JDBC Type to Java Native
         // * * * * * * * * * * * * * * * * * * * 
-        _jdbcTypeToJavaNativeMap = new Hashtable<String, String>();
-
         // Default types are for Java.
         _jdbcTypeToJavaNativeMap.put(CHAR, initializeJavaNative(CHAR, CHAR_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(VARCHAR, initializeJavaNative(VARCHAR, VARCHAR_NATIVE_TYPE));
@@ -275,7 +274,6 @@ public class TypeMap {
         // * * * * * * * * * * * * * * * * * * * * * * *
         // The map of JDBC Definition-Value to JDBC Type
         // * * * * * * * * * * * * * * * * * * * * * * *
-        _jdbcDefValueToJdbcTypeMap = new Hashtable<Integer, String>();
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.CHAR), CHAR);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.VARCHAR), VARCHAR);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.LONGVARCHAR), LONGVARCHAR);
@@ -305,7 +303,6 @@ public class TypeMap {
         // * * * * * * * * * * * * * * * * * * * * * * *
         // The map of JDBC Type to JDBC Definition-Value
         // * * * * * * * * * * * * * * * * * * * * * * *
-        _jdbcTypeToJdbcDefValueMap = new Hashtable<String, Integer>();
         {
             Set<Integer> keySet = _jdbcDefValueToJdbcTypeMap.keySet();
             for (Integer jdbcDefValue : keySet) {
@@ -315,9 +312,18 @@ public class TypeMap {
         }
 
         // * * * * * * * * * * * * * * * * * * * 
+        // The map of Java Native to (Java) FQCN
+        // * * * * * * * * * * * * * * * * * * *
+        _javaNativeToFqcnMap.put("String", String.class.getName());
+        _javaNativeToFqcnMap.put("Boolean", Boolean.class.getName());
+        _javaNativeToFqcnMap.put("Byte", Byte.class.getName());
+        _javaNativeToFqcnMap.put("Short", Short.class.getName());
+        _javaNativeToFqcnMap.put("Integer", Integer.class.getName());
+        _javaNativeToFqcnMap.put("Long", Long.class.getName());
+
+        // * * * * * * * * * * * * * * * * * * * 
         // The map of Java Native to Flex Native
         // * * * * * * * * * * * * * * * * * * *
-        _javaNativeToFlexNativeMap = new Hashtable<String, String>();
         _javaNativeToFlexNativeMap.put("String", initializeFlexNative("String", "String"));
         _javaNativeToFlexNativeMap.put("Short", initializeFlexNative("Short", "int"));
         _javaNativeToFlexNativeMap.put("Integer", initializeFlexNative("Integer", "int"));
@@ -404,6 +410,7 @@ public class TypeMap {
     // -----------------------------------------------------
     //                                           Java Native
     //                                           -----------
+    // *Java Native is NOT always FQCN (For example, String and CSharp's type)
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         final String javaType = getJavaNative(jdbcType);
