@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.io.data.impl;
+package org.seasar.dbflute.logic.loaddata.impl;
 
 import org.junit.Assert;
 import org.junit.Test;

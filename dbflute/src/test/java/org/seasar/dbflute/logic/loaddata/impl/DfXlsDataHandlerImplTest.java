@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.io.data.impl;
+package org.seasar.dbflute.logic.loaddata.impl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
