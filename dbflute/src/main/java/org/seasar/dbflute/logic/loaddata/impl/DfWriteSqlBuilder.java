@@ -12,7 +12,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 /**
  * @author jflute
  */
-public class DfLoadSqlBuilder {
+public class DfWriteSqlBuilder {
 
     //====================================================================================
     //                                                                           Attribute
@@ -30,8 +30,8 @@ public class DfLoadSqlBuilder {
     // ===================================================================================
     //                                                                           Build SQL
     //                                                                           =========
-    public DfLoadSqlBuildingResult buildSql() {
-        final DfLoadSqlBuildingResult sqlBuildingResult = new DfLoadSqlBuildingResult();
+    public DfWriteSqlBuildingResult buildSql() {
+        final DfWriteSqlBuildingResult sqlBuildingResult = new DfWriteSqlBuildingResult();
         final Map<String, Object> columnValueMap = setupColumnValueMap();
         final StringBuilder sb = new StringBuilder();
         final Set<String> columnNameSet = columnValueMap.keySet();
@@ -86,7 +86,7 @@ public class DfLoadSqlBuilder {
     }
 
     protected String setupValuesStringAndParameter(final Set<String> columnNameSet, Map<String, Object> columnValueMap,
-            DfLoadSqlBuildingResult sqlBuildingResult) {
+            DfWriteSqlBuildingResult sqlBuildingResult) {
         final StringBuilder sbValues = new StringBuilder();
         for (String columnName : columnNameSet) {
             if (hasDefaultValue(columnName)) {

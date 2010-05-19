@@ -151,7 +151,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                         continue;
                     }
 
-                    final DfLoadSqlBuilder sqlBuilder = new DfLoadSqlBuilder();
+                    final DfWriteSqlBuilder sqlBuilder = new DfWriteSqlBuilder();
                     sqlBuilder.setTableName(tableName);
                     sqlBuilder.setColumnMap(columnMetaInfoMap);
                     sqlBuilder.setColumnNameList(columnNameList);
@@ -161,7 +161,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                     sqlBuilder.setAdditionalDefaultColumnNameToLowerMap(additionalDefaultColumnNameToLowerKeyMap);
                     sqlBuilder.setConvertValueMap(_convertValueMap);
                     sqlBuilder.setDefaultValueMap(_defaultValueMap);
-                    final DfLoadSqlBuildingResult sqlBuildingResult = sqlBuilder.buildSql();
+                    final DfWriteSqlBuildingResult sqlBuildingResult = sqlBuilder.buildSql();
                     PreparedStatement ps = null;
                     try {
                         final String sql = sqlBuildingResult.getSql();
