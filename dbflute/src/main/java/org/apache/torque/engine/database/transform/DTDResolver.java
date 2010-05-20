@@ -69,17 +69,26 @@ import org.xml.sax.SAXException;
  */
 public class DTDResolver implements EntityResolver {
 
-    /** Where the DTD is located on the web. */
-    public static final String WEB_SITE_DTD = "http://dbflute.sandbox.seasar.org/dtd/database.dtd";
-
-    /** InputSource for <code>database.dtd</code>. */
-    private InputSource databaseDTD = null;
-
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Logging class from commons.logging */
     private static Log log = LogFactory.getLog(DTDResolver.class);
 
+    /** URL the DTD is located on the web. */
+    public static final String WEB_SITE_DTD = "http://dbflute.sandbox.seasar.org/meta/database.dtd";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** InputSource for database.dtd. */
+    private InputSource databaseDTD = null;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
-     * constructor
+     * Constructor.
      */
     public DTDResolver() throws SAXException {
         try {
@@ -98,6 +107,9 @@ public class DTDResolver implements EntityResolver {
         }
     }
 
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
     /**
      * An implementation of the SAX <code>EntityResolver</code>
      * interface to be called by the XML parser.
@@ -123,7 +135,7 @@ public class DTDResolver implements EntityResolver {
     /**
      * Retrieves a XML input source for the specified URL.
      * @param urlString The URL of the input source.
-     * @return <code>InputSource</code> for the URL.
+     * @return InputSource for the URL.
      */
     private InputSource getInputSource(String urlString) throws IOException {
         URL url = new URL(urlString);
