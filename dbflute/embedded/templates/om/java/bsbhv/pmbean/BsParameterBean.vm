@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
+import java.io.Serializable;
 import java.util.*;
 
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
@@ -29,9 +30,9 @@ import ${glPackageExtendedCustomizeEntity}.*;
  * @author ${database.classAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-public class ${myClassName} implements ProcedurePmb {
+public class ${myClassName} implements ProcedurePmb, Serializable {
 #else
-public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean, FetchBean {
+public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean, FetchBean, Serializable {
 #end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 
