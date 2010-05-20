@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -32,13 +31,7 @@ import org.seasar.dbflute.util.Srl;
  * The information of referrer relation.
  * @author jflute
  */
-public class ReferrerInfo implements RelationInfo, Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public class ReferrerInfo implements RelationInfo {
 
     // ===================================================================================
     //                                                                           Attribute

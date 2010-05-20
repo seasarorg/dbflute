@@ -15,20 +15,12 @@
  */
 package org.seasar.dbflute.cbean.grouping;
 
-import java.io.Serializable;
-
 /**
  * The class of option for grouping.
  * @param  <ENTITY> The type of entity.
  * @author jflute
  */
-public class GroupingOption<ENTITY> implements Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public class GroupingOption<ENTITY> {
 
     // ===================================================================================
     //                                                                           Attribute

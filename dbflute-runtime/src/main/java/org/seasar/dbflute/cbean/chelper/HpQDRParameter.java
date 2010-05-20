@@ -1,7 +1,5 @@
 package org.seasar.dbflute.cbean.chelper;
 
-import java.io.Serializable;
-
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SubQuery;
 
@@ -10,13 +8,7 @@ import org.seasar.dbflute.cbean.SubQuery;
  * @param <CB> The type of condition-bean.
  * @param <PARAMETER> The type of parameter.
  */
-public class HpQDRParameter<CB extends ConditionBean, PARAMETER> implements Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
 
     // ===================================================================================
     //                                                                           Attribute

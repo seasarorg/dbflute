@@ -33,7 +33,11 @@ public class StringSet implements Set<String>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** The dummy value for internal map value. */
-    protected static final transient Object DUMMY_VALUE = new Object();
+    protected static final Object DUMMY_VALUE = new SerializableDummyObject();
+
+    protected static class SerializableDummyObject implements Serializable {
+        private static final long serialVersionUID = 1L;
+    }
 
     // ===================================================================================
     //                                                                           Attribute

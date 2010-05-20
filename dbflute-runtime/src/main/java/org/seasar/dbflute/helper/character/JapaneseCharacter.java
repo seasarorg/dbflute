@@ -21,5 +21,5 @@ package org.seasar.dbflute.helper.character;
  */
 public interface JapaneseCharacter {
 
-    public String toDoubleByteKatakana(String target);
+    String toDoubleByteKatakana(String target);
 }

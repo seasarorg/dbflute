@@ -1,7 +1,5 @@
 package org.seasar.dbflute.cbean.chelper;
 
-import java.io.Serializable;
-
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -12,13 +10,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * @author jflute
  * @param <CQ> The type of condition-query.
  */
-public abstract class HpAbstractSpecification<CQ extends ConditionQuery> implements Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
 
     // ===================================================================================
     //                                                                           Attribute

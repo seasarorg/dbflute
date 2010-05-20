@@ -37,7 +37,7 @@ public class JapaneseOptionPartsAgent implements Serializable {
     //                                                                           =========
     protected boolean _toDoubleByteKatakana;
     protected boolean _removeLastLongVowel;
-    private JapaneseCharacter _japaneseCharacter;
+    private transient JapaneseCharacter _japaneseCharacter;
 
     // ===================================================================================
     //                                                                                Main

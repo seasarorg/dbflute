@@ -37,13 +37,7 @@ import org.seasar.dbflute.util.Srl;
  * The information of column.
  * @author jflute
  */
-public class ColumnInfo implements Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public class ColumnInfo {
 
     /** The empty read-only list for empty property. */
     protected static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<String>());

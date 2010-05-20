@@ -58,7 +58,7 @@ import org.seasar.dbflute.util.Srl;
  * The abstract class of DB meta.
  * @author jflute
  */
-public abstract class AbstractDBMeta implements DBMeta, Serializable {
+public abstract class AbstractDBMeta implements DBMeta {
 
     // ===================================================================================
     //                                                                          Definition
@@ -67,7 +67,7 @@ public abstract class AbstractDBMeta implements DBMeta, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** The dummy value for internal map value. */
-    protected static final transient Object DUMMY_VALUE = new Object();
+    protected static final Object DUMMY_VALUE = new Object();
 
     // ===================================================================================
     //                                                                           Attribute

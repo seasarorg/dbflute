@@ -39,7 +39,7 @@ public class ToSingleByteOptionParts implements Serializable {
     protected boolean _toSingleByteAlphabetNumber;
     protected boolean _toSingleByteAlphabetNumberMark;
 
-    private GeneralCharacter _generalCharacter;
+    private transient GeneralCharacter _generalCharacter;
 
     // ===================================================================================
     //                                                                                Main
