@@ -15,13 +15,20 @@
  */
 package org.seasar.dbflute.jdbc;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 
 /**
  * The config of statement.
  * @author jflute
  */
-public class StatementConfig {
+public class StatementConfig implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute
