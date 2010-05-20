@@ -1,5 +1,7 @@
 package org.seasar.dbflute.cbean.chelper;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
 
@@ -7,13 +9,29 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
  * @author jflute
  * @param <CB> The type of condition-bean.
  */
-public class HpColQyOperand<CB extends ConditionBean> {
+public class HpColQyOperand<CB extends ConditionBean> implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected HpColQyHandler<CB> _handler;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public HpColQyOperand(HpColQyHandler<CB> handler) {
         _handler = handler;
     }
 
+    // ===================================================================================
+    //                                                                          Comparison
+    //                                                                          ==========
     /**
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */

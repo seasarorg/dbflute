@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,7 +32,13 @@ import org.seasar.dbflute.util.Srl;
  * The information of foreign relation.
  * @author jflute
  */
-public class ForeignInfo implements RelationInfo {
+public class ForeignInfo implements RelationInfo, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

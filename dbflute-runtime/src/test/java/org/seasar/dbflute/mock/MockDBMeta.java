@@ -15,6 +15,8 @@ import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 
 public class MockDBMeta extends AbstractDBMeta {
 
+    private static final long serialVersionUID = 1L;
+
     public DBDef getCurrentDBDef() {
         return null;
     }

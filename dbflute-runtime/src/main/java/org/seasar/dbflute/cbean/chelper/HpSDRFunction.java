@@ -1,5 +1,7 @@
 package org.seasar.dbflute.cbean.chelper;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.SubQuery;
@@ -12,7 +14,13 @@ import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <LOCAL_CQ> The type of local condition-query.
  */
-public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
+public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

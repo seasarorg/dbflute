@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.helper;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,12 +24,16 @@ import java.util.Set;
 /**
  * @author jflute
  */
-public class StringSet implements Set<String> {
+public class StringSet implements Set<String>, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Object DUMMY_VALUE = new Object();
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /** The dummy value for internal map value. */
+    protected static final transient Object DUMMY_VALUE = new Object();
 
     // ===================================================================================
     //                                                                           Attribute

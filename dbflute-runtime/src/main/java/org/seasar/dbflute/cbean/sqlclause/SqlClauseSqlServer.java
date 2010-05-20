@@ -22,6 +22,12 @@ package org.seasar.dbflute.cbean.sqlclause;
 public class SqlClauseSqlServer extends AbstractSqlClause {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** String of fetch-first as select-hint. */

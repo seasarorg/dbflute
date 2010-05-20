@@ -25,15 +25,15 @@ import org.seasar.dbflute.dbmeta.DBMeta;
  */
 public interface RelationInfo {
 
-    public String getRelationPropertyName();
+    String getRelationPropertyName();
 
-    public DBMeta getLocalDBMeta();
+    DBMeta getLocalDBMeta();
 
-    public DBMeta getTargetDBMeta();
+    DBMeta getTargetDBMeta();
 
-    public Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
+    Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
 
-    public boolean isOneToOne();
+    boolean isOneToOne();
 
-    public boolean isReferrer();
+    boolean isReferrer();
 }

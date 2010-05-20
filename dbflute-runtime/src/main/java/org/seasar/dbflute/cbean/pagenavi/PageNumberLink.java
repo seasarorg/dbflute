@@ -15,11 +15,13 @@
  */
 package org.seasar.dbflute.cbean.pagenavi;
 
+import java.io.Serializable;
+
 /**
  * The class of page number link.
  * @author jflute
  */
-public class PageNumberLink implements java.io.Serializable {
+public class PageNumberLink implements Serializable {
 
     // ===================================================================================
     //                                                                          Definition

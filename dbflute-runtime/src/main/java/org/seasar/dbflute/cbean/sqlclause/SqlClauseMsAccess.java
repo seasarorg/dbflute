@@ -24,6 +24,12 @@ import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 public class SqlClauseMsAccess extends AbstractSqlClause {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**

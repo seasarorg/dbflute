@@ -26,12 +26,15 @@ import org.seasar.dbflute.util.DfSystemUtil;
  */
 public class OrderByElement implements Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The value of alias name. */
     protected String _aliasName;
 
@@ -56,9 +59,9 @@ public class OrderByElement implements Serializable {
     /** The information of manual order. */
     protected transient OrderByClause.ManumalOrderInfo _manualOrderInfo;
 
-    // =====================================================================================
-    //                                                                          Manipulation
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Manipulation
+    //                                                                        ============
     public void setupAsc() {
         _ascDesc = "asc";
     }
@@ -82,9 +85,9 @@ public class OrderByElement implements Serializable {
         }
     }
 
-    // =====================================================================================
-    //                                                                   Order-By Expression
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Order-By Expression
+    //                                                                 ===================
     public boolean isAsc() {
         if (_ascDesc == null) {
             String msg = "The attribute[ascDesc] should not be null.";
@@ -223,9 +226,9 @@ public class OrderByElement implements Serializable {
         return DfSystemUtil.getLineSeparator();
     }
 
-    // =====================================================================================
-    //                                                                        Basic Override
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * This method overrides the method that is declared at super.
      * @return The view-string of all-columns value. (NotNull)
@@ -240,9 +243,9 @@ public class OrderByElement implements Serializable {
         return sb.toString();
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getAliasName() {
         return _aliasName;
     }

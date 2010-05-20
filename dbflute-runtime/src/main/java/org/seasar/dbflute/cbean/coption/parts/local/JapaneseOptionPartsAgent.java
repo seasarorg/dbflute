@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.coption.parts.local;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.helper.character.JapaneseCharacter;
 import org.seasar.dbflute.helper.character.impl.JapaneseCharacterImpl;
 
@@ -22,18 +24,24 @@ import org.seasar.dbflute.helper.character.impl.JapaneseCharacterImpl;
  * The class of condition-option-parts-agent.
  * @author jflute
  */
-public class JapaneseOptionPartsAgent {
+public class JapaneseOptionPartsAgent implements Serializable {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected boolean _toDoubleByteKatakana;
     protected boolean _removeLastLongVowel;
     private JapaneseCharacter _japaneseCharacter;
 
-    // =====================================================================================
-    //                                                                                  Main
-    //                                                                                  ====
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public boolean isToDoubleByteKatakana() {
         return _toDoubleByteKatakana;
     }
@@ -50,9 +58,9 @@ public class JapaneseOptionPartsAgent {
         _removeLastLongVowel = true;
     }
 
-    // =====================================================================================
-    //                                                                            Real Value
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
     public String generateRealValue(String value) {
         if (value == null) {
             return value;
@@ -72,9 +80,9 @@ public class JapaneseOptionPartsAgent {
         return value;
     }
 
-    // =====================================================================================
-    //                                                                                Helper
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
     protected JapaneseCharacter getJapaneseCharacter() {
         if (_japaneseCharacter == null) {
             _japaneseCharacter = new JapaneseCharacterImpl();
@@ -82,9 +90,9 @@ public class JapaneseOptionPartsAgent {
         return _japaneseCharacter;
     }
 
-    // =====================================================================================
-    //                                                                              DeepCopy
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                           Deep Copy
+    //                                                                           =========
     public Object createDeepCopy() {
         final JapaneseOptionPartsAgent deepCopy = new JapaneseOptionPartsAgent();
         deepCopy._toDoubleByteKatakana = _toDoubleByteKatakana;

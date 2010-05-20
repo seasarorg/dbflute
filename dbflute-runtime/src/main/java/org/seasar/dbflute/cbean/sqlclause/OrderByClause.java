@@ -27,26 +27,29 @@ import java.util.StringTokenizer;
  */
 public class OrderByClause implements Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final List<OrderByElement> _orderByList = new ArrayList<OrderByElement>();
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public OrderByClause() {
     }
 
-    // =====================================================================================
-    //                                                                          Manipulation
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Manipulation
+    //                                                                        ============
     /**
      * Add order-by element.
      * @param orderByElement Order-by element. (NotNull)
@@ -136,9 +139,9 @@ public class OrderByClause implements Serializable {
         }
     }
 
-    // =====================================================================================
-    //                                                                   Order-By Expression
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Order-By Expression
+    //                                                                 ===================
     public List<OrderByElement> getOrderByList() {
         return _orderByList;
     }
@@ -189,9 +192,9 @@ public class OrderByClause implements Serializable {
         return true;
     }
 
-    // =====================================================================================
-    //                                                                         First Element
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       First Element
+    //                                                                       =============
     public boolean isFirstElementAsc() {
         if (isEmpty()) {
             String msg = "This order-by clause is empty: " + toString();
@@ -273,9 +276,9 @@ public class OrderByClause implements Serializable {
         }
     }
 
-    // =====================================================================================
-    //                                                                      Delegate of List
-    //                                                                      ================
+    // ===================================================================================
+    //                                                                    Delegate of List
+    //                                                                    ================
     /**
      * Is empty?
      * @return Determination.
@@ -299,9 +302,9 @@ public class OrderByClause implements Serializable {
         _orderByList.clear();
     }
 
-    // =====================================================================================
-    //                                                                        Basic Override
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * This method overrides the method that is declared at super.
      * @return The view string of all-columns value. (NotNUll)

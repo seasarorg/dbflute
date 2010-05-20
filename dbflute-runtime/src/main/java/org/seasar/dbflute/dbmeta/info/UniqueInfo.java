@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,13 @@ import org.seasar.dbflute.dbmeta.DBMeta;
  * The information of unique constraint.
  * @author jflute
  */
-public class UniqueInfo {
+public class UniqueInfo implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.cbean.coption.parts.SplitOptionParts;
 import org.seasar.dbflute.cbean.coption.parts.ToSingleByteOptionParts;
 import org.seasar.dbflute.cbean.coption.parts.ToUpperLowerCaseOptionParts;
@@ -25,23 +27,32 @@ import org.seasar.dbflute.util.Srl;
  * The class of simple-string-option.
  * @author jflute
  */
-public class SimpleStringOption implements ConditionOption {
+public class SimpleStringOption implements ConditionOption, Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected SplitOptionParts _splitOptionParts;
     protected ToUpperLowerCaseOptionParts _toUpperLowerCaseOptionParts;
     protected ToSingleByteOptionParts _toSingleByteCaseOptionParts;
     protected JapaneseOptionPartsAgent _japaneseOptionPartsAgent;
 
-    // =====================================================================================
-    //                                                                           Rear Option
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Rear Option
+    //                                                                         ===========
     public String getRearOption() {
         return "";
     }
 
-    // =====================================================================================
-    //                                                                                 Split
-    //                                                                                 =====
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
     protected SimpleStringOption doSplitBySpace() {
         getSplitOptionParts().splitBySpace();
         return this;
@@ -87,9 +98,9 @@ public class SimpleStringOption implements ConditionOption {
         return getSplitOptionParts().generateSplitValueArray(value);
     }
 
-    // =====================================================================================
-    //                                                                   To Upper/Lower Case
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 To Upper/Lower Case
+    //                                                                 ===================
     protected SimpleStringOption doToUpperCase() {
         getToUpperLowerCaseOptionParts().toUpperCase();
         return this;
@@ -107,9 +118,9 @@ public class SimpleStringOption implements ConditionOption {
         return _toUpperLowerCaseOptionParts;
     }
 
-    // =====================================================================================
-    //                                                                        To Single Byte
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      To Single Byte
+    //                                                                      ==============
     protected SimpleStringOption doToSingleByteSpace() {
         getToSingleByteOptionParts().toSingleByteSpace();
         return this;
@@ -132,13 +143,13 @@ public class SimpleStringOption implements ConditionOption {
         return _toSingleByteCaseOptionParts;
     }
 
-    // =====================================================================================
-    //                                                                        To Double Byte
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      To Double Byte
+    //                                                                      ==============
 
-    // =====================================================================================
-    //                                                                              Japanese
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Japanese
+    //                                                                            ========
     protected JapaneseOptionPartsAgent doLocalJapanese() {
         return getJapaneseOptionPartsAgent();
     }
@@ -150,9 +161,9 @@ public class SimpleStringOption implements ConditionOption {
         return _japaneseOptionPartsAgent;
     }
 
-    // =====================================================================================
-    //                                                                            Real Value
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
     public String generateRealValue(String value) {
         value = getToUpperLowerCaseOptionParts().generateRealValue(value);
         value = getToSingleByteOptionParts().generateRealValue(value);
@@ -160,29 +171,30 @@ public class SimpleStringOption implements ConditionOption {
         return value;
     }
 
-    // =====================================================================================
-    //                                                                        General Helper
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
     }
 
-    // =====================================================================================
-    //                                                                              DeepCopy
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                           Deep Copy
+    //                                                                           =========
     public Object createDeepCopy() {
         final SimpleStringOption deepCopy = newDeepCopyInstance();
-        deepCopy._splitOptionParts = _splitOptionParts != null ? (SplitOptionParts) _splitOptionParts.createDeepCopy()
-                : null;
-        deepCopy._toUpperLowerCaseOptionParts = _toUpperLowerCaseOptionParts != null ? (ToUpperLowerCaseOptionParts) _toUpperLowerCaseOptionParts
-                .createDeepCopy()
-                : null;
-        deepCopy._toSingleByteCaseOptionParts = _toSingleByteCaseOptionParts != null ? (ToSingleByteOptionParts) _toSingleByteCaseOptionParts
-                .createDeepCopy()
-                : null;
-        deepCopy._japaneseOptionPartsAgent = _japaneseOptionPartsAgent != null ? (JapaneseOptionPartsAgent) _japaneseOptionPartsAgent
-                .createDeepCopy()
-                : null;
+        if (_splitOptionParts != null) {
+            deepCopy._splitOptionParts = (SplitOptionParts) _splitOptionParts;
+        }
+        if (_toUpperLowerCaseOptionParts != null) {
+            deepCopy._toUpperLowerCaseOptionParts = (ToUpperLowerCaseOptionParts) _toUpperLowerCaseOptionParts;
+        }
+        if (_toSingleByteCaseOptionParts != null) {
+            deepCopy._toSingleByteCaseOptionParts = (ToSingleByteOptionParts) _toSingleByteCaseOptionParts;
+        }
+        if (_japaneseOptionPartsAgent != null) {
+            deepCopy._japaneseOptionPartsAgent = (JapaneseOptionPartsAgent) _japaneseOptionPartsAgent;
+        }
         return deepCopy;
     }
 

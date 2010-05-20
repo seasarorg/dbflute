@@ -8,5 +8,6 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
  * @param <CB> The type of condition-bean.
  */
 public interface HpColQyHandler<CB extends ConditionBean> {
+
     void handle(SpecifyQuery<CB> rightSp, String operand);
 }

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.grouping;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,18 +24,24 @@ import java.util.List;
  * @param <ENTITY> The type of entity.
  * @author jflute
  */
-public class GroupingRowResource<ENTITY> {
+public class GroupingRowResource<ENTITY> implements Serializable {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected List<ENTITY> _groupingRowList = new ArrayList<ENTITY>();
     protected int _elementCurrentIndex;
     protected int _breakCount;
 
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
     /**
      * @return Does the list of grouping row size up the break count?
      */
@@ -42,9 +49,9 @@ public class GroupingRowResource<ENTITY> {
         return _elementCurrentIndex == (_breakCount - 1);
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * @return The list of grouping row. (NotNull and NotEmpty)
      */

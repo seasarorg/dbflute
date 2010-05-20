@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,11 +46,14 @@ import org.seasar.dbflute.util.Srl;
  * The abstract class of SQL clause.
  * @author jflute
  */
-public abstract class AbstractSqlClause implements SqlClause {
+public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
     protected static final SelectClauseType DEFAULT_SELECT_CLAUSE_TYPE = SelectClauseType.COLUMNS;
     protected static final String SELECT_HINT = "/*$pmb.selectHint*/";
 

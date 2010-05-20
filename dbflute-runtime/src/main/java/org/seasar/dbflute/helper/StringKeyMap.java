@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.helper;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,7 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author jflute
  * @param <VALUE> The type of value.
  */
-public class StringKeyMap<VALUE> implements Map<String, VALUE> {
+public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

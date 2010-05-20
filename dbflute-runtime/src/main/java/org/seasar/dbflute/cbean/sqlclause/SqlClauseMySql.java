@@ -27,6 +27,12 @@ import org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier;
 public class SqlClauseMySql extends AbstractSqlClause {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** String of fetch-scope as sql-suffix. */

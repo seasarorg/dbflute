@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.pagenavi.range;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper;
  * The bean of page range.
  * @author jflute
  */
-public class PageRangeBean implements java.io.Serializable {
+public class PageRangeBean implements Serializable {
 
     // ===================================================================================
     //                                                                          Definition

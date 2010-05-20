@@ -16,7 +16,7 @@
 package org.seasar.dbflute.cbean.grouping;
 
 /**
- * The setupper of grouping row.
+ * The set-upper of grouping row.
  * @param <ROW> The type of row.
  * @param <ENTITY> The type of entity.
  * @author jflute
@@ -28,5 +28,5 @@ public interface GroupingRowSetupper<ROW, ENTITY> {
      * @param groupingRowResource Grouping row resource. (NotNull)
      * @return The instance of grouping row. (NotNull)
      */
-    public ROW setup(GroupingRowResource<ENTITY> groupingRowResource);
+    ROW setup(GroupingRowResource<ENTITY> groupingRowResource);
 }

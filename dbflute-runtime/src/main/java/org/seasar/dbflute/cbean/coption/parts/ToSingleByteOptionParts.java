@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.coption.parts;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.helper.character.GeneralCharacter;
 import org.seasar.dbflute.helper.character.impl.GeneralCharacterImpl;
 
@@ -22,20 +24,26 @@ import org.seasar.dbflute.helper.character.impl.GeneralCharacterImpl;
  * The interface of condition-option.
  * @author jflute
  */
-public class ToSingleByteOptionParts {
+public class ToSingleByteOptionParts implements Serializable {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected boolean _toSingleByteSpace;
     protected boolean _toSingleByteAlphabetNumber;
     protected boolean _toSingleByteAlphabetNumberMark;
 
     private GeneralCharacter _generalCharacter;
 
-    // =====================================================================================
-    //                                                                                  Main
-    //                                                                                  ====
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public boolean isToSingleByteSpace() {
         return _toSingleByteSpace;
     }
@@ -52,9 +60,9 @@ public class ToSingleByteOptionParts {
         _toSingleByteAlphabetNumberMark = true;
     }
 
-    // =====================================================================================
-    //                                                                            Real Value
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
     public String generateRealValue(String value) {
         if (value == null) {
             return value;
@@ -72,9 +80,9 @@ public class ToSingleByteOptionParts {
         return value;
     }
 
-    // =====================================================================================
-    //                                                                                Helper
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected GeneralCharacter getGeneralCharacter() {
         if (_generalCharacter == null) {
             _generalCharacter = new GeneralCharacterImpl();
@@ -82,9 +90,9 @@ public class ToSingleByteOptionParts {
         return _generalCharacter;
     }
 
-    // =====================================================================================
-    //                                                                              DeepCopy
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                           Deep Copy
+    //                                                                           =========
     public Object createDeepCopy() {
         final ToSingleByteOptionParts deepCopy = new ToSingleByteOptionParts();
         deepCopy._toSingleByteSpace = _toSingleByteSpace;

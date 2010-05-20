@@ -53,6 +53,8 @@ public class PagingInvokerTest extends PlainTestCase {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
         final SimplePagingBean pagingBean = new SimplePagingBean() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean canPagingCountLater() {
                 return true;
@@ -130,6 +132,8 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean canPagingCountLater() {
                 return true;
@@ -171,6 +175,8 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean canPagingCountLater() {
                 return true;
@@ -248,6 +254,8 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean canPagingCountLater() {
                 return true;
@@ -326,6 +334,8 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean canPagingCountLater() {
                 return true;
@@ -368,6 +378,8 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean canPagingCountLater() {
                 return true;

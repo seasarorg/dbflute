@@ -28,5 +28,5 @@ public interface GroupingRowEndDeterminer<ENTITY> {
      * @param nextEntity The entity of next element. (NotNull and the rowResource does not contain yet)
      * @return Whether the grouping row is end. (If the value is true, break grouping row and the nextEntity is registered to next row)
      */
-    public boolean determine(GroupingRowResource<ENTITY> rowResource, ENTITY nextEntity);
+    boolean determine(GroupingRowResource<ENTITY> rowResource, ENTITY nextEntity);
 }

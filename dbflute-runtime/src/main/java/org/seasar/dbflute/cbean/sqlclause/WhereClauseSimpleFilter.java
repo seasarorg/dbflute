@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
 /**
@@ -41,11 +43,14 @@ public interface WhereClauseSimpleFilter {
 
     /**
      * The simple filter for where clause to embedded. <br />
-     * *Attention -- Target column is not perfect. This class determines by column name only!
+     * Attention: Searching column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
      * @author jflute
      */
-    public static class WhereClauseToEmbeddedSimpleFilter implements WhereClauseSimpleFilter {
+    public static class WhereClauseToEmbeddedSimpleFilter implements WhereClauseSimpleFilter, Serializable {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
 
         protected java.util.Set<ColumnInfo> _filterTargetColumnInfoSet;
 
@@ -113,11 +118,14 @@ public interface WhereClauseSimpleFilter {
 
     /**
      * The simple filter for where clause to embedded and quoted. <br />
-     * *Attention -- Target column is not perfect. This class determines by column name only!
+     * Attention: Searching column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
      * @author jflute
      */
     public static class WhereClauseToEmbeddedQuotedSimpleFilter extends WhereClauseToEmbeddedSimpleFilter {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
 
         public WhereClauseToEmbeddedQuotedSimpleFilter(ColumnInfo filterTargetColumnInfo) {
             super(filterTargetColumnInfo);

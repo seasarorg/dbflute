@@ -28,9 +28,18 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
  */
 public class ConditionKeyIsNotNull extends ConditionKey {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
     /** Log-instance. */
     private static final Log _log = LogFactory.getLog(ConditionKeyIsNotNull.class);
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
@@ -39,13 +48,11 @@ public class ConditionKeyIsNotNull extends ConditionKey {
         _operand = "is not null";
     }
 
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
     /**
-     * Is valid registration?
-     * 
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param callerName Caller name. (NotNull)
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
         if (conditionValue.hasIsNotNull()) {
@@ -56,23 +63,14 @@ public class ConditionKeyIsNotNull extends ConditionKey {
     }
 
     /**
-     * This method implements super#doAddWhereClause().
-     * 
-     * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
-     * @param value Condition value. (NotNull)
+     * {@inheritDoc}
      */
     protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
         conditionList.add(buildClauseWithoutValue(columnName));
     }
 
     /**
-     * This method implements super#doAddWhereClause().
-     * 
-     * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
-     * @param value Condition value. (NotNull)
-     * @param option Condition option. (NotNull)
+     * {@inheritDoc}
      */
     protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
             ConditionOption option) {
@@ -80,23 +78,14 @@ public class ConditionKeyIsNotNull extends ConditionKey {
     }
 
     /**
-     * This method implements super#doSetupConditionValue().
-     * 
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param location Location. (NotNull)
+     * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
         conditionValue.setIsNotNull(DUMMY_OBJECT).setIsNotNullLocation(location);
     }
 
     /**
-     * This method implements super#doSetupConditionValue().
-     * 
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param location Location. (NotNull)
-     * @param option Condition option. (NotNull)
+     * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {

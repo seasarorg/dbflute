@@ -50,9 +50,9 @@ import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
  */
 public abstract class AbstractConditionBean implements ConditionBean {
 
-    // =====================================================================================
-    //                                                                            Definition
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Map-string map-mark. */
     private static final String MAP_STRING_MAP_MARK = "map:";
 

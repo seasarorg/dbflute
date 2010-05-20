@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -61,7 +62,13 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * </pre>
  * @author jflute
  */
-public class FromToOption implements ConditionOption {
+public class FromToOption implements ConditionOption, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

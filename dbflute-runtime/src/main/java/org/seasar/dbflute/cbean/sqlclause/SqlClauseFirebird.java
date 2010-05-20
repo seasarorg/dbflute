@@ -21,12 +21,24 @@ package org.seasar.dbflute.cbean.sqlclause;
  */
 public class SqlClauseFirebird extends AbstractSqlClause {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** String of fetch-scope as select-hint. */
     protected String _fetchScopeSelectHint = "";
 
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * @param tableDbName The DB name of table. (NotNull)
@@ -35,6 +47,9 @@ public class SqlClauseFirebird extends AbstractSqlClause {
         super(tableDbName);
     }
 
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     /**
      * {@inheritDoc}
      */
@@ -66,6 +81,9 @@ public class SqlClauseFirebird extends AbstractSqlClause {
         _fetchScopeSelectHint = "";
     }
 
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
      */
@@ -74,6 +92,9 @@ public class SqlClauseFirebird extends AbstractSqlClause {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
      */

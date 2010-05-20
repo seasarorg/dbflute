@@ -29,6 +29,12 @@ package org.seasar.dbflute.cbean.coption;
 public class DateFromToOption extends FromToOption {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DateFromToOption() {

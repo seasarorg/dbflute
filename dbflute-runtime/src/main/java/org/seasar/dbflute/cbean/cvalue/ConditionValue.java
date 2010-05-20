@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.cvalue;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,13 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
  * The value of condition.
  * @author jflute
  */
-public class ConditionValue {
+public class ConditionValue implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

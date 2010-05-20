@@ -15,23 +15,31 @@
  */
 package org.seasar.dbflute.cbean.grouping;
 
+import java.io.Serializable;
+
 /**
  * The class of option for grouping.
  * @param  <ENTITY> The type of entity.
  * @author jflute
  */
-public class GroupingOption<ENTITY> {
+public class GroupingOption<ENTITY> implements Serializable {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected int _elementCount;
 
     protected GroupingRowEndDeterminer<ENTITY> _groupingRowEndDeterminer;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor. You should set the determiner of grouping row end after you create the instance.
      */
@@ -46,9 +54,9 @@ public class GroupingOption<ENTITY> {
         _elementCount = elementCount;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public int getElementCount() {
         return this._elementCount;
     }

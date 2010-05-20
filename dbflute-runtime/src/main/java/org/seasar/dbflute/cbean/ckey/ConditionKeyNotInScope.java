@@ -26,6 +26,15 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
  */
 public class ConditionKeyNotInScope extends ConditionKey {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
@@ -34,12 +43,11 @@ public class ConditionKeyNotInScope extends ConditionKey {
         _operand = "not in";
     }
 
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
     /**
-     * Is valid registration?
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param callerName Caller name. (NotNull)
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
         if (value == null) {
@@ -52,21 +60,14 @@ public class ConditionKeyNotInScope extends ConditionKey {
     }
 
     /**
-     * This method implements super#doAddWhereClause().
-     * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
-     * @param value Condition value. (NotNull)
+     * {@inheritDoc}
      */
     protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
         conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
     }
 
     /**
-     * This method implements super#doAddWhereClause().
-     * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
-     * @param value Condition value. (NotNull)
-     * @param option Condition option. (NotNull)
+     * {@inheritDoc}
      */
     protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
             ConditionOption option) {
@@ -74,21 +75,14 @@ public class ConditionKeyNotInScope extends ConditionKey {
     }
 
     /**
-     * This method implements super#doSetupConditionValue().
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param location Location. (NotNull)
+     * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
         conditionValue.setNotInScope((List<?>) value).setNotInScopeLocation(location);
     }
 
     /**
-     * This method implements super#doSetupConditionValue().
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param location Location. (NotNull)
-     * @param option Condition option. (NotNull)
+     * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {

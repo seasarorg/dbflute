@@ -28,12 +28,12 @@ public interface SqlClauseCreator {
      * @param cb Condition-bean. (NotNull) 
      * @return SQL clause. (NotNull)
      */
-    public SqlClause createSqlClause(ConditionBean cb);
+    SqlClause createSqlClause(ConditionBean cb);
 
     /**
      * Create SQL clause.
      * @param tableDbName The DB name of table. (NotNull) 
      * @return SQL clause. (NotNull)
      */
-    public SqlClause createSqlClause(String tableDbName);
+    SqlClause createSqlClause(String tableDbName);
 }

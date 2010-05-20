@@ -28,9 +28,18 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
  */
 public class ConditionKeyLessThan extends ConditionKey {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
     /** Log-instance. */
     private static final Log _log = LogFactory.getLog(ConditionKeyLessThan.class);
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
@@ -39,6 +48,9 @@ public class ConditionKeyLessThan extends ConditionKey {
         _operand = "<";
     }
 
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
     /**
      * {@inheritDoc}
      */

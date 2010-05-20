@@ -15,6 +15,10 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
 
 /**
@@ -23,9 +27,15 @@ import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
  */
 public class InScopeOption extends SimpleStringOption { // basically unused (old function)
 
-    // =====================================================================================
-    //                                                                                 Split
-    //                                                                                 =====
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
     public InScopeOption splitBySpace() {
         return (InScopeOption) doSplitBySpace();
     }
@@ -50,9 +60,9 @@ public class InScopeOption extends SimpleStringOption { // basically unused (old
         return (InScopeOption) doSplitByPipeLine(splitLimitCount);
     }
 
-    // =====================================================================================
-    //                                                                   To Upper/Lower Case
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 To Upper/Lower Case
+    //                                                                 ===================
     public InScopeOption toUpperCase() {
         return (InScopeOption) doToUpperCase();
     }
@@ -61,9 +71,9 @@ public class InScopeOption extends SimpleStringOption { // basically unused (old
         return (InScopeOption) doToLowerCase();
     }
 
-    // =====================================================================================
-    //                                                                        To Single Byte
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      To Single Byte
+    //                                                                      ==============
     public InScopeOption toSingleByteSpace() {
         return (InScopeOption) doToSingleByteSpace();
     }
@@ -76,23 +86,23 @@ public class InScopeOption extends SimpleStringOption { // basically unused (old
         return (InScopeOption) doToSingleByteAlphabetNumberMark();
     }
 
-    // =====================================================================================
-    //                                                                        To Double Byte
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      To Double Byte
+    //                                                                      ==============
 
-    // =====================================================================================
-    //                                                                              Japanese
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Japanese
+    //                                                                            ========
     public JapaneseOptionPartsAgent localJapanese() {
         return doLocalJapanese();
     }
 
-    // =====================================================================================
-    //                                                                            Real Value
-    //                                                                            ==========
-    public java.util.List<String> generateRealValueList(java.util.List<String> valueList) {
-        final java.util.List<String> resultList = new java.util.ArrayList<String>();
-        for (final java.util.Iterator<String> ite = valueList.iterator(); ite.hasNext();) {
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
+    public List<String> generateRealValueList(java.util.List<String> valueList) {
+        final List<String> resultList = new ArrayList<String>();
+        for (final Iterator<String> ite = valueList.iterator(); ite.hasNext();) {
             final String value = ite.next();
             resultList.add(generateRealValue(value));
         }

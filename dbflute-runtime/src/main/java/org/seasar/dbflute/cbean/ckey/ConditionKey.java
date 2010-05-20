@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.ckey;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -24,7 +25,13 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
  * The abstract class of condition-key.
  * @author jflute
  */
-public abstract class ConditionKey {
+public abstract class ConditionKey implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                          Definition

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.pagenavi.group;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper;
  * The bean of page group.
  * @author jflute
  */
-public class PageGroupBean implements java.io.Serializable {
+public class PageGroupBean implements Serializable {
 
     // ===================================================================================
     //                                                                          Definition

@@ -21,18 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.mapstring.MapListString;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The implementation of MapList-String.
  * @author jflute
  */
 public class MapListStringImpl implements MapListString {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Line separator. */
-    public static final String NEW_LINE = System.getProperty("line.separator");
 
     // ===================================================================================
     //                                                                           Attribute
@@ -581,7 +576,7 @@ public class MapListStringImpl implements MapListString {
      * @return New-line and indent. (NotNull)
      */
     protected String getNewLineAndIndent() {
-        return NEW_LINE + "    ";
+        return ln() + "    ";
     }
 
     /**
@@ -861,6 +856,13 @@ public class MapListStringImpl implements MapListString {
             msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected final String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

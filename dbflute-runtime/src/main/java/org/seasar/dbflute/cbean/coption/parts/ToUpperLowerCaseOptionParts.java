@@ -15,21 +15,29 @@
  */
 package org.seasar.dbflute.cbean.coption.parts;
 
+import java.io.Serializable;
+
 /**
  * The class of condition-option-parts about toUpperCase/toLowerCase.
  * @author jflute
  */
-public class ToUpperLowerCaseOptionParts {
+public class ToUpperLowerCaseOptionParts implements Serializable {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected boolean _toUpperCase;
     protected boolean _toLowerCase;
 
-    // =====================================================================================
-    //                                                                                  Main
-    //                                                                                  ====
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public void toUpperCase() {
         _toUpperCase = true;
         _toLowerCase = false;
@@ -40,9 +48,9 @@ public class ToUpperLowerCaseOptionParts {
         _toLowerCase = true;
     }
 
-    // =====================================================================================
-    //                                                                            Real Value
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
     public String generateRealValue(String value) {
         if (value == null) {
             return value;
@@ -58,9 +66,9 @@ public class ToUpperLowerCaseOptionParts {
         return value;
     }
 
-    // =====================================================================================
-    //                                                                              DeepCopy
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                           Deep Copy
+    //                                                                           =========
     public Object createDeepCopy() {
         final ToUpperLowerCaseOptionParts deepCopy = new ToUpperLowerCaseOptionParts();
         deepCopy._toUpperCase = _toUpperCase;

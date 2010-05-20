@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +29,13 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * The context of DB access.
  * @author jflute
  */
-public class AccessContext {
+public class AccessContext implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                        Thread Local

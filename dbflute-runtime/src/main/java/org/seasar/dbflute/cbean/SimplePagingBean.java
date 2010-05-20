@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +30,13 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * The simple paging-bean.
  * @author jflute
  */
-public class SimplePagingBean implements PagingBean, MapParameterBean {
+public class SimplePagingBean implements PagingBean, MapParameterBean, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

@@ -25,6 +25,12 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 public class SqlClauseOracle extends AbstractSqlClause {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** String of fetch-scope as select-hint. */

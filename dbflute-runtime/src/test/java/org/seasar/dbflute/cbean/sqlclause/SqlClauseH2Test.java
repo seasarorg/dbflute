@@ -16,9 +16,13 @@ public class SqlClauseH2Test extends PlainTestCase {
     public void test_getLeftOuterJoinClause_outerJoin() {
         // ## Arrange ##
         SqlClauseH2 target = new SqlClauseH2("test") {
+            private static final long serialVersionUID = 1L;
+
             @Override
             protected DBMeta findDBMeta(String tableDbName) {
                 return new MockDBMeta() {
+                    private static final long serialVersionUID = 1L;
+
                     @Override
                     public String getTableSqlName() {
                         return "BAR";
@@ -43,9 +47,13 @@ public class SqlClauseH2Test extends PlainTestCase {
     public void test_getLeftOuterJoinClause_innerJoin() {
         // ## Arrange ##
         SqlClauseH2 target = new SqlClauseH2("test") {
+            private static final long serialVersionUID = 1L;
+
             @Override
             protected DBMeta findDBMeta(final String tableDbName) {
                 return new MockDBMeta() {
+                    private static final long serialVersionUID = 1L;
+
                     @Override
                     public String getTableSqlName() {
                         return tableDbName.equals("FOO") ? "FOO" : "BAR";
