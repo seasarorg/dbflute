@@ -12,4 +12,7 @@ import ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName};
  * @author ${database.classAuthor}
  */
 public class ${myClassName} extends ${myBaseParameterBeanClassName} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 }

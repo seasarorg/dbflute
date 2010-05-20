@@ -34,11 +34,14 @@ public class ${myClassName} implements ProcedurePmb, Serializable {
 #else
 public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean, FetchBean, Serializable {
 #end
-#if ($database.isPmbMetaDataForProcedure($pmbClassName))
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+
     // -----------------------------------------------------
     //                                   Procedure Parameter
     //                                   -------------------

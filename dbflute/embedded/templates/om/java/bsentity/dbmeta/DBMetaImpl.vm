@@ -22,6 +22,12 @@ import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 public class ${myClassName} extends AbstractDBMeta {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
     //                                                                           Singleton
     //                                                                           =========
     private static final ${myClassName} _instance = new ${myClassName}();
