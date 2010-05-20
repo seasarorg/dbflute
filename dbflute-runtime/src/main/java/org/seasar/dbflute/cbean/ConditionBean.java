@@ -192,10 +192,19 @@ public interface ConditionBean extends PagingBean {
     // ===================================================================================
     //                                                                      Free Parameter
     //                                                                      ==============
+    /**
+     * Register free parameters. {Internal}
+     * @param key The key for the parameter. (NotNull)
+     * @param value The value for the parameter. (Nullable)
+     */
     void xregisterFreeParameter(String key, Object value);
 
     // ===================================================================================
     //                                                                  Query Synchronizer
     //                                                                  ==================
+    /**
+     * Register union-query synchronizer. {Internal}
+     * @param unionQuerySynchronizer The synchronizer of union query. (Nullable)
+     */
     void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer);
 }

@@ -732,17 +732,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                      Free Parameter
     //                                                                      ==============
     /**
-     * Get the map for free parameters for OGNL.
+     * Get the map for free parameters for parameter comment. {Internal}
      * @return The map for free parameters. (Nullable)
      */
-    public Map<String, Object> getFreeParameterMap() { // Very Internal
+    public Map<String, Object> getFreeParameterMap() {
         return _freeParameterMap;
     }
 
     /**
-     * {Internal}
-     * @param key The key for the parameter. (NotNull)
-     * @param value The value for the parameter. (Nullable)
+     * {@inheritDoc}
      */
     public void xregisterFreeParameter(String key, Object value) {
         if (_freeParameterMap == null) {
@@ -756,7 +754,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                  Query Synchronizer
     //                                                                  ==================
     /**
-     * {Internal}
+     * Synchronize union-query. {Internal}
      * @param unionCB The condition-bean for union. (NotNull)
      */
     protected void xsyncUQ(ConditionBean unionCB) { // synchronizeUnionQuery()
@@ -766,8 +764,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     /**
-     * {Internal}
-     * @param unionQuerySynchronizer THe synchronizer of union query. (Nullable)
+     * {@inheritDoc}
      */
     public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
         _unionQuerySynchronizer = unionQuerySynchronizer;
@@ -777,27 +774,27 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
-    public void xsetupForDerivedReferrer() { // Very Internal
+    public void xsetupForDerivedReferrer() { // very internal
         _forDerivedReferrer = true;
     }
 
-    public void xsetupForScalarSelect() { // Very Internal
+    public void xsetupForScalarSelect() { // very internal
         _forScalarSelect = true;
     }
 
-    public void xsetupForScalarSubQuery() { // Very Internal
+    public void xsetupForScalarSubQuery() { // very internal
         _forScalarSubQuery = true;
     }
 
-    public void xsetupForUnion() { // Very Internal
+    public void xsetupForUnion() { // very internal
         _forUnion = true;
     }
 
-    public void xsetupForExistsSubQuery() { // Very Internal
+    public void xsetupForExistsSubQuery() { // very internal
         _forExistsSubQuery = true;
     }
 
-    public void xsetupForInScopeSubQuery() { // Very Internal
+    public void xsetupForInScopeSubQuery() { // very internal
         _forInScopeSubQuery = true;
     }
 
