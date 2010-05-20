@@ -1353,6 +1353,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
                     throw new IllegalArgumentException(msg);
                 }
                 invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
+                    private static final long serialVersionUID = 1L;
                     @Override
                     public org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger getWhereClauseArranger() {
                         return ((org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause())
