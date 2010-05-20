@@ -12,13 +12,16 @@ import ${glPackageCQ}.${myConditionQueryClassName};
  */
 public class ${myClassName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected ${myConditionQueryClassName} _query;
     public ${myClassName}(${myConditionQueryClassName} query) { _query = query; }
     public boolean hasConditionQuery() { return _query != null; }
 
     // ===================================================================================
-    //                                                           With Nested Foreign Table
-    //                                                           =========================
+    //                                                                     Nested Relation
+    //                                                                     ===============
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
@@ -34,9 +37,6 @@ public class ${myClassName} {
     }
 #end
 
-    // ===================================================================================
-    //                                                          With Nested Referrer Table
-    //                                                          ==========================
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")

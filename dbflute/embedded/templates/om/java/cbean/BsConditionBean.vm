@@ -438,7 +438,6 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     public static class HpSpecification extends HpAbstractSpecification<${myConditionQueryClassName}> {
-        private static final long serialVersionUID = 1L;
         protected HpSpQyCall<${myConditionQueryClassName}> _myQyCall;
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
