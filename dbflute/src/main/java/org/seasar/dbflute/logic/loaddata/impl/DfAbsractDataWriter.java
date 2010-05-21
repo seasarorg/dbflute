@@ -33,7 +33,6 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfJDBCException;
-import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -156,6 +155,7 @@ public abstract class DfAbsractDataWriter {
                         try {
                             ps.setNull(bindCount, Types.OTHER); // last try
                         } catch (SQLException iiignored) {
+                            throw e;
                         }
                     }
                 }
@@ -226,7 +226,7 @@ public abstract class DfAbsractDataWriter {
     }
 
     protected void throwColumnValueProcessingFailureException(StringProcessor processor, String tableName,
-            String columnName, String value) {
+            String columnName, String value) throws SQLException {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The column value could not be treated by the processor.");
         br.addItem("Advice");
@@ -243,7 +243,7 @@ public abstract class DfAbsractDataWriter {
         br.addItem("Processor");
         br.addElement(processor);
         final String msg = br.buildExceptionMessage();
-        throw new DfTableDataRegistrationFailureException(msg);
+        throw new DfJDBCException(msg);
     }
 
     public static interface StringProcessor {
@@ -592,7 +592,7 @@ public abstract class DfAbsractDataWriter {
         final ValueType valueType = TnValueTypes.getValueType(bindType);
         try {
             valueType.bindValue(ps, bindCount, value);
-        } catch (RuntimeException e) {
+        } catch (SQLException e) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
             msg = msg + "Failed to bind the value!" + ln();
@@ -605,7 +605,7 @@ public abstract class DfAbsractDataWriter {
             msg = msg + ln();
             msg = msg + "[Bound Value]" + ln() + value + ln();
             msg = msg + "- - - - - - - - - -/";
-            throw new DfTableDataRegistrationFailureException(msg, e);
+            throw new DfJDBCException(msg, e);
         }
     }
 
