@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.loaddata.impl;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -31,6 +32,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.loaddata.DfSeparatedDataWriter;
@@ -230,15 +233,19 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                     preContinueString = "";
                 }
             }
-        } catch (java.io.FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw e;
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             throw e;
         } catch (SQLException e) {
-            String msg = "SQLException: filename=" + _filename + " encoding=" + _encoding;
-            msg = msg + " columnNameList=" + columnNameList + " lineString=" + lineString + " defaultValueMap="
-                    + _defaultValueMap;
-            throw new RuntimeException(msg, e);
+            final SQLException nextEx = e.getNextException();
+            if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
+                _log.warn("*Failed to register: " + e.getMessage());
+                String msg = buildExceptionMessage(_filename, lineString, tableName, nextEx);
+                throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
+            }
+            String msg = buildExceptionMessage(_filename, lineString, tableName, e);
+            throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
             String msg = "RuntimeException: filename=" + _filename + " encoding=" + _encoding;
             msg = msg + " columnNameList=" + columnNameList + " lineString=" + lineString + " defaultValueMap="
@@ -259,6 +266,36 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                 _log.warn("File-close threw the exception: ", ignored);
             }
         }
+    }
+
+    protected String buildExceptionMessage(String filename, String tableName, String lineString, Exception e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to register the table data.");
+        br.addItem("File");
+        br.addElement(filename);
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Line String");
+        br.addElement(lineString);
+        br.addItem("Message");
+        br.addElement(e.getMessage());
+        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableName);
+        if (bindTypeCacheMap != null) {
+            br.addItem("Bind Type");
+            final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
+            for (Entry<String, Class<?>> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        }
+        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableName);
+        if (bindTypeCacheMap != null) {
+            br.addItem("String Processor");
+            final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
+            for (Entry<String, StringProcessor> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        }
+        return br.buildExceptionMessage();
     }
 
     // ===================================================================================

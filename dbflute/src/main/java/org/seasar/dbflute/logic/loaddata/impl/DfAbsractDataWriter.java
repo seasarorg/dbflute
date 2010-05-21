@@ -16,7 +16,6 @@
 package org.seasar.dbflute.logic.loaddata.impl;
 
 import java.math.BigDecimal;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -209,9 +208,8 @@ public abstract class DfAbsractDataWriter {
 
     protected void throwColumnValueProcessingFailureException(StringProcessor processor, String tableName,
             String columnName, String value) {
-        final Class<?> type = processor.getTargetType();
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The column value could not be treated as " + type.getName() + ".");
+        br.addNotice("The column value could not be treated by the processor.");
         br.addItem("Advice");
         br.addElement("The column has string expressions judging the type of the column");
         br.addElement("by analyzing the value of first record.");
@@ -223,8 +221,8 @@ public abstract class DfAbsractDataWriter {
         br.addElement(columnName);
         br.addItem("String Expression");
         br.addElement(value);
-        br.addItem("Analyzed Type");
-        br.addElement(type);
+        br.addItem("Processor");
+        br.addElement(processor);
         final String msg = br.buildExceptionMessage();
         throw new DfTableDataRegistrationFailureException(msg);
     }
@@ -232,8 +230,6 @@ public abstract class DfAbsractDataWriter {
     public static interface StringProcessor {
         boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
                 Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException;
-
-        Class<?> getTargetType();
     }
 
     protected class DateStringProcessor implements StringProcessor {
@@ -241,10 +237,6 @@ public abstract class DfAbsractDataWriter {
         public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
                 Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
             return processDate(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
-        }
-
-        public Class<?> getTargetType() {
-            return Timestamp.class;
         }
 
         @Override
@@ -260,10 +252,6 @@ public abstract class DfAbsractDataWriter {
             return processBoolean(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
         }
 
-        public Class<?> getTargetType() {
-            return Boolean.class;
-        }
-
         @Override
         public String toString() {
             return buildProcessorToString(this);
@@ -275,10 +263,6 @@ public abstract class DfAbsractDataWriter {
         public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
                 Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
             return processNumber(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
-        }
-
-        public Class<?> getTargetType() {
-            return Number.class;
         }
 
         @Override
@@ -294,10 +278,6 @@ public abstract class DfAbsractDataWriter {
             return processUUID(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
         }
 
-        public Class<?> getTargetType() {
-            return UUID.class;
-        }
-
         @Override
         public String toString() {
             return buildProcessorToString(this);
@@ -309,10 +289,6 @@ public abstract class DfAbsractDataWriter {
         public boolean process(String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
                 Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
             return processArray(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
-        }
-
-        public Class<?> getTargetType() {
-            return Array.class;
         }
 
         @Override
@@ -328,10 +304,6 @@ public abstract class DfAbsractDataWriter {
             return processXml(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
         }
 
-        public Class<?> getTargetType() {
-            return String.class;
-        }
-
         @Override
         public String toString() {
             return buildProcessorToString(this);
@@ -344,10 +316,6 @@ public abstract class DfAbsractDataWriter {
                 Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
             ps.setString(bindCount, value);
             return true;
-        }
-
-        public Class<?> getTargetType() {
-            return String.class;
         }
 
         @Override
@@ -375,6 +343,7 @@ public abstract class DfAbsractDataWriter {
                 if (!java.util.Date.class.isAssignableFrom(columnType)) {
                     return false;
                 }
+                System.out.println("***: " + columnName + " = " + value + " (" + columnType.getSimpleName() + ")");
                 bindNotNullValueByColumnType(tableName, columnName, ps, bindCount, value, columnType);
                 return true;
             }
