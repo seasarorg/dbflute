@@ -40,6 +40,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.DfDataColumn;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
@@ -159,30 +160,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 ps.executeBatch();
             }
         } catch (SQLException e) {
-            final SQLException nextEx = e.getNextException();
-            if (nextEx != null && !e.equals(nextEx)) {
-                if (e instanceof BatchUpdateException) {
-                    _log.warn("");
-                    _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                    _log.warn("[BatchUpdateException]");
-                    _log.warn(e.getMessage());
-                    _log.warn(" - - - - - - - -");
-                    _log.warn("Also look at the nextException thrown!");
-                    _log.warn("* * * * * * * * * */");
-                    _log.warn("");
-                    String msg = "Failed to register the table data: " + tableName;
-                    throw new DfTableDataRegistrationFailureException(msg, nextEx); // Switch!
-                } else {
-                    _log.warn("");
-                    _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                    _log.warn("[NextException]", nextEx);
-                    _log.warn("* * * * * * * * * */");
-                    _log.warn("");
-                    String msg = "Failed to register the table data: " + tableName;
-                    throw new DfTableDataRegistrationFailureException(msg, e);
+            if (e instanceof BatchUpdateException) {
+                final SQLException nextEx = e.getNextException();
+                if (nextEx != null && !e.equals(nextEx)) {
+                    String msg = buildExceptionMessage(tableName, nextEx);
+                    throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
                 }
             }
-            String msg = "Failed to register the table data: " + tableName;
+            String msg = buildExceptionMessage(tableName, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             if (ps != null) {
@@ -202,6 +187,32 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // Extension Point as Finally.
             finallyHandlingTable(dataTable);
         }
+    }
+
+    protected String buildExceptionMessage(String tableName, Exception e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to register the table data.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Message");
+        br.addElement(e.getMessage());
+        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableName);
+        if (bindTypeCacheMap != null) {
+            br.addItem("Bind Type");
+            final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
+            for (Entry<String, Class<?>> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        }
+        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableName);
+        if (bindTypeCacheMap != null) {
+            br.addItem("String Processor");
+            final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
+            for (Entry<String, StringProcessor> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        }
+        return br.buildExceptionMessage();
     }
 
     protected void beforeHandlingTable(DfDataTable dataTable) {
