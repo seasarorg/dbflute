@@ -61,12 +61,12 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.DfJDBCTypeNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -362,22 +362,18 @@ public class TypeMap {
     //                                                                           =========
     /**
      * @param jdbcDefValue The JDBC definition value. (NotNull)
-     * @return The type as JDBC. (Nullable: If the jdbcDefValue is OTHER type)
+     * @return The type as JDBC. (Nullable: when not found)
      */
     public static String findJdbcTypeByJdbcDefValue(Integer jdbcDefValue) {
         // Make sure the we are initialized.
         if (!_initialized) {
             initialize();
         }
-        if (Types.OTHER == jdbcDefValue) {
+        final String jdbcType = _jdbcDefValueToJdbcTypeMap.get(jdbcDefValue);
+        if (Srl.is_Null_or_TrimmedEmpty(jdbcType)) {
             return null;
         }
-        if (!_jdbcDefValueToJdbcTypeMap.containsKey(jdbcDefValue)) {
-            String msg = "_jdbcDefValueToJdbcTypeMap doesn't contain the type as key: ";
-            msg = msg + "key=" + jdbcDefValue + " map=" + _jdbcDefValueToJdbcTypeMap;
-            throw new DfJDBCTypeNotFoundException(msg);
-        }
-        return _jdbcDefValueToJdbcTypeMap.get(jdbcDefValue);
+        return jdbcType;
     }
 
     public static Integer getJdbcDefValueByJdbcType(String jdbcType) {
@@ -385,16 +381,11 @@ public class TypeMap {
         if (!_initialized) {
             initialize();
         }
-        if (UUID.equalsIgnoreCase(jdbcType)) {
-            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
+        final Integer defValue = _jdbcTypeToJdbcDefValueMap.get(jdbcType);
+        if (defValue == null) {
             return Types.OTHER;
         }
-        if (!_jdbcTypeToJdbcDefValueMap.containsKey(jdbcType)) {
-            String msg = "_jdbcTypeToJdbcDefValueMap doesn't contain the type as key: ";
-            msg = msg + "key=" + jdbcType + " map=" + _jdbcTypeToJdbcDefValueMap;
-            throw new DfJDBCTypeNotFoundException(msg);
-        }
-        return _jdbcTypeToJdbcDefValueMap.get(jdbcType);
+        return defValue;
     }
 
     // ===================================================================================
