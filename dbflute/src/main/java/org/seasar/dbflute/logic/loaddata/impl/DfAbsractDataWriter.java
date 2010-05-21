@@ -343,7 +343,6 @@ public abstract class DfAbsractDataWriter {
                 if (!java.util.Date.class.isAssignableFrom(columnType)) {
                     return false;
                 }
-                System.out.println("***: " + columnName + " = " + value + " (" + columnType.getSimpleName() + ")");
                 bindNotNullValueByColumnType(tableName, columnName, ps, bindCount, value, columnType);
                 return true;
             }
@@ -607,6 +606,7 @@ public abstract class DfAbsractDataWriter {
     //                                                                    Column Bind Type
     //                                                                    ================
     /**
+     * Get the bind type to find a value type.
      * @param columnMetaInfo The meta information of column. (NotNull)
      * @return The type of column. (Nullable: However Basically NotNull)
      */
@@ -621,11 +621,25 @@ public abstract class DfAbsractDataWriter {
         if (bindType != null) { // cache hit
             return bindType;
         }
+
+        final String jdbcType = _columnHandler.getColumnJdbcType(columnMetaInfo);
+        if (TypeMap.UUID.equalsIgnoreCase(jdbcType)) {
+            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
+            bindType = UUID.class;
+            cacheMap.put(columnName, bindType);
+            return bindType;
+        }
+
+        // use mapped JDBC defined value
+        // (not use plain value of meta data)
+        // because it has already been resolved
+        // about JDBC specification per DBMS
+        final Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
+        //final int jdbcDefValue = columnMetaInfo.getJdbcDefValue();
+
         // ReplaceSchema uses an own original mapping way
         // (not uses Generate mapping)
         // it's simple mapping (for string processor)
-        final int jdbcDefValue = columnMetaInfo.getJdbcDefValue();
-        final String dbTypeName = columnMetaInfo.getDbTypeName();
         if (jdbcDefValue == Types.CHAR || jdbcDefValue == Types.VARCHAR || jdbcDefValue == Types.LONGVARCHAR) {
             bindType = String.class;
         } else if (jdbcDefValue == Types.TINYINT || jdbcDefValue == Types.SMALLINT || jdbcDefValue == Types.INTEGER) {
@@ -644,8 +658,6 @@ public abstract class DfAbsractDataWriter {
             bindType = java.util.Date.class;
         } else if (jdbcDefValue == Types.BIT || jdbcDefValue == Types.BOOLEAN) {
             bindType = Boolean.class;
-        } else if (jdbcDefValue == Types.OTHER && "uuid".equalsIgnoreCase(dbTypeName)) { // basically for PostgreSQL
-            bindType = UUID.class;
         } else {
             bindType = Object.class;
         }

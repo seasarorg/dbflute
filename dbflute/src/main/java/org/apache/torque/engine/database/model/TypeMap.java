@@ -186,7 +186,6 @@ public class TypeMap {
     private static final Map<String, String> _jdbcTypeToJavaNativeMap = DfCollectionUtil.newHashMap();
     private static final Map<Integer, String> _jdbcDefValueToJdbcTypeMap = DfCollectionUtil.newHashMap();
     private static final Map<String, Integer> _jdbcTypeToJdbcDefValueMap = DfCollectionUtil.newHashMap();
-    private static final Map<String, String> _javaNativeToFqcnMap = DfCollectionUtil.newHashMap();
     private static final Map<String, String> _javaNativeToFlexNativeMap = DfCollectionUtil.newHashMap();
 
     // ===================================================================================
@@ -310,16 +309,6 @@ public class TypeMap {
                 _jdbcTypeToJdbcDefValueMap.put(jdbcType, jdbcDefValue);
             }
         }
-
-        // * * * * * * * * * * * * * * * * * * * 
-        // The map of Java Native to (Java) FQCN
-        // * * * * * * * * * * * * * * * * * * *
-        _javaNativeToFqcnMap.put("String", String.class.getName());
-        _javaNativeToFqcnMap.put("Boolean", Boolean.class.getName());
-        _javaNativeToFqcnMap.put("Byte", Byte.class.getName());
-        _javaNativeToFqcnMap.put("Short", Short.class.getName());
-        _javaNativeToFqcnMap.put("Integer", Integer.class.getName());
-        _javaNativeToFqcnMap.put("Long", Long.class.getName());
 
         // * * * * * * * * * * * * * * * * * * * 
         // The map of Java Native to Flex Native
