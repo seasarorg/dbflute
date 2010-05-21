@@ -396,6 +396,9 @@ public class TypeMap {
     //                                           -----------
     // *Java Native is NOT always FQCN (For example, String and CSharp's type)
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {
+        if (Srl.is_Null_or_TrimmedEmpty(jdbcType)) {
+            throw new IllegalArgumentException("The argument 'jdbcType' should not be null!");
+        }
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         final String javaType = getJavaNative(jdbcType);
         if (isAutoMappingTargetType(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {

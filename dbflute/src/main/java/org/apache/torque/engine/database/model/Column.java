@@ -65,6 +65,7 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.schemahtml.DfSchemaHtmlBuilder;
@@ -1235,6 +1236,14 @@ public class Column {
     public String getJavaNative() {
         if (_sql2EntityForcedJavaNative != null && _sql2EntityForcedJavaNative.trim().length() > 0) {
             return _sql2EntityForcedJavaNative;
+        }
+        if (Srl.is_Null_or_TrimmedEmpty(_jdbcType)) {
+            ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Not found JDBC type of the column.");
+            br.addItem("Column");
+            br.addElement(getTable().getName() + "." + getName());
+            String msg = br.buildExceptionMessage();
+            throw new IllegalStateException(msg);
         }
         return TypeMap.findJavaNativeByJdbcType(_jdbcType, getIntegerColumnSize(), getDecimalDigits());
     }
