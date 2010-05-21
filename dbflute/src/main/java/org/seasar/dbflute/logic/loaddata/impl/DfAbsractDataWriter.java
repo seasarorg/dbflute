@@ -664,18 +664,19 @@ public abstract class DfAbsractDataWriter {
             return bindType;
         }
 
-        // use mapped JDBC defined value
-        // (not use plain value of meta data)
-        // because it has already been resolved
-        // about JDBC specification per DBMS
+        // use mapped JDBC defined value if found (basically found)
+        // because it has already been resolved about JDBC specification per DBMS
         final String jdbcType = _columnHandler.getColumnJdbcType(columnMetaInfo);
-        final Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
-        //final int jdbcDefValue = columnMetaInfo.getJdbcDefValue();
+        Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
+        if (jdbcDefValue == null) { // basically no way
+            jdbcDefValue = columnMetaInfo.getJdbcDefValue(); // as plain
+        }
 
         // ReplaceSchema uses an own original mapping way
         // (not uses Generate mapping)
         // it's simple mapping (for string processor)
-        if (jdbcDefValue == Types.CHAR || jdbcDefValue == Types.VARCHAR || jdbcDefValue == Types.LONGVARCHAR) {
+        if (jdbcDefValue == Types.CHAR || jdbcDefValue == Types.VARCHAR || jdbcDefValue == Types.LONGVARCHAR
+                || jdbcDefValue == Types.CLOB) {
             bindType = String.class;
         } else if (jdbcDefValue == Types.TINYINT || jdbcDefValue == Types.SMALLINT || jdbcDefValue == Types.INTEGER) {
             bindType = Integer.class;

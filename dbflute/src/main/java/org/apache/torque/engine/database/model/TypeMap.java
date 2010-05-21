@@ -357,6 +357,12 @@ public class TypeMap {
         return flexNative;
     }
 
+    protected static void initializeIfNeeds() {
+        if (!_initialized) {
+            initialize();
+        }
+    }
+
     // ===================================================================================
     //                                                                           JDBC Type
     //                                                                           =========
@@ -365,10 +371,7 @@ public class TypeMap {
      * @return The type as JDBC. (Nullable: when not found)
      */
     public static String findJdbcTypeByJdbcDefValue(Integer jdbcDefValue) {
-        // Make sure the we are initialized.
-        if (!_initialized) {
-            initialize();
-        }
+        initializeIfNeeds();
         final String jdbcType = _jdbcDefValueToJdbcTypeMap.get(jdbcDefValue);
         if (Srl.is_Null_or_TrimmedEmpty(jdbcType)) {
             return null;
@@ -377,10 +380,7 @@ public class TypeMap {
     }
 
     public static Integer getJdbcDefValueByJdbcType(String jdbcType) {
-        // Make sure the we are initialized.
-        if (!_initialized) {
-            initialize();
-        }
+        initializeIfNeeds();
         final Integer defValue = _jdbcTypeToJdbcDefValueMap.get(jdbcType);
         if (defValue == null) {
             return Types.OTHER;
@@ -396,6 +396,7 @@ public class TypeMap {
     //                                           -----------
     // *Java Native is NOT always FQCN (For example, String and CSharp's type)
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {
+        initializeIfNeeds();
         if (Srl.is_Null_or_TrimmedEmpty(jdbcType)) {
             throw new IllegalArgumentException("The argument 'jdbcType' should not be null!");
         }
@@ -473,10 +474,7 @@ public class TypeMap {
     }
 
     protected static String getJavaNative(String jdbcType) {
-        // Make sure the we are initialized.
-        if (!_initialized) {
-            initialize();
-        }
+        initializeIfNeeds();
         if (!_jdbcTypeToJavaNativeMap.containsKey(jdbcType)) {
             String msg = "_jdbcTypeToJavaNativeMap doesn't contain the type as key: ";
             msg = msg + "key=" + jdbcType + " map=" + _jdbcTypeToJavaNativeMap;
@@ -487,10 +485,7 @@ public class TypeMap {
     }
 
     protected static String getFlexNative(String javaNative) {
-        // Make sure the we are initialized.
-        if (!_initialized) {
-            initialize();
-        }
+        initializeIfNeeds();
         if (!_javaNativeToFlexNativeMap.containsKey(javaNative)) {
             String msg = "_javaNativeToFlexNativeMap doesn't contain the type as key: ";
             msg = msg + "key=" + javaNative + " map=" + _javaNativeToFlexNativeMap;

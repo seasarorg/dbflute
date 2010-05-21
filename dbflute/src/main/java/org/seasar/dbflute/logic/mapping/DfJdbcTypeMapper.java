@@ -19,7 +19,7 @@ import java.sql.Types;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.TypeMap;
-import org.seasar.dbflute.exception.DfJDBCTypeNotFoundException;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -90,11 +90,12 @@ public class DfJdbcTypeMapper {
         // Priority 3
         // * * * * * *
         if (!isOtherType(jdbcDefValue)) {
-            try {
-                return getJdbcType(jdbcDefValue);
-            } catch (DfJDBCTypeNotFoundException ignored) {
+            final String jdbcType = getJdbcType(jdbcDefValue);
+            if (Srl.is_NotNull_and_NotEmpty(jdbcType)) {
+                return jdbcType;
             }
         }
+        // here means that it cannot determine by jdbcDefValue
 
         // * * * * * *
         // Priority 4
