@@ -29,11 +29,10 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -55,12 +54,6 @@ import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
  * @since 0.9.4 (2009/03/25 Wednesday)
  */
 public abstract class DfAbsractDataWriter {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfAbsractDataWriter.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -121,22 +114,51 @@ public abstract class DfAbsractDataWriter {
             return false;
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-        if (columnMetaInfo == null) {
-            return false;
-        }
-        final String jdbcType = _columnHandler.getColumnJdbcType(columnMetaInfo);
-        final Integer mappedJdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
-        try {
-            ps.setNull(bindCount, mappedJdbcDefValue);
-        } catch (SQLException e) {
-            final int plainJdbcDefValue = columnMetaInfo.getJdbcDefValue();
+        if (columnMetaInfo != null) {
+            // use mapped type at first
+            final String mappedJdbcType = _columnHandler.getColumnJdbcType(columnMetaInfo);
+            final Integer mappedJdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(mappedJdbcType);
             try {
-                ps.setNull(bindCount, plainJdbcDefValue);
-            } catch (SQLException ignored) {
-                String msg = "Failed to re-try setNull(" + columnName + ", " + mappedJdbcDefValue + "):";
-                msg = msg + " " + ignored.getMessage();
-                _log.info(msg);
-                throw e;
+                ps.setNull(bindCount, mappedJdbcDefValue);
+            } catch (SQLException e) {
+                // retry by plain type
+                final int plainJdbcDefValue = columnMetaInfo.getJdbcDefValue();
+                try {
+                    ps.setNull(bindCount, plainJdbcDefValue);
+                } catch (SQLException ignored) {
+                    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                    br.addNotice("Failed to execute setNull(bindCount, jdbcDefValue).");
+                    br.addItem("Column");
+                    br.addElement(tableName + "." + columnName);
+                    br.addElement(columnMetaInfo.toString());
+                    br.addItem("Mapped JDBC Type");
+                    br.addElement(mappedJdbcType);
+                    br.addItem("First JDBC Def-Value");
+                    br.addElement(mappedJdbcDefValue);
+                    br.addItem("Retry JDBC Def-Value");
+                    br.addElement(plainJdbcDefValue);
+                    br.addItem("Retry Message");
+                    br.addElement(ignored.getMessage());
+                    String msg = br.buildExceptionMessage();
+                    throw new DfJDBCException(msg, e);
+                }
+            }
+        } else { // basically no way
+            try {
+                ps.setNull(bindCount, Types.VARCHAR); // as default
+            } catch (SQLException e) {
+                try {
+                    ps.setNull(bindCount, Types.NUMERIC);
+                } catch (SQLException ignored) {
+                    try {
+                        ps.setNull(bindCount, Types.TIMESTAMP);
+                    } catch (SQLException iignored) {
+                        try {
+                            ps.setNull(bindCount, Types.OTHER); // last try
+                        } catch (SQLException iiignored) {
+                        }
+                    }
+                }
             }
         }
         return true;
