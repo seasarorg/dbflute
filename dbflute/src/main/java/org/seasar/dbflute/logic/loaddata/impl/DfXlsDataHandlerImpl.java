@@ -17,7 +17,6 @@ package org.seasar.dbflute.logic.loaddata.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -160,14 +159,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 ps.executeBatch();
             }
         } catch (SQLException e) {
-            if (e instanceof BatchUpdateException) {
-                final SQLException nextEx = e.getNextException();
-                if (nextEx != null && !e.equals(nextEx)) {
-                    String msg = buildExceptionMessage(tableName, nextEx);
-                    throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
-                }
+            final SQLException nextEx = e.getNextException();
+            if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
+                _log.warn("*Failed to register: " + e.getMessage());
+                String msg = buildExceptionMessage(file, tableName, nextEx);
+                throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildExceptionMessage(tableName, e);
+            String msg = buildExceptionMessage(file, tableName, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             if (ps != null) {
@@ -189,9 +187,11 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    protected String buildExceptionMessage(String tableName, Exception e) {
+    protected String buildExceptionMessage(File file, String tableName, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
+        br.addItem("Xls File");
+        br.addElement(file);
         br.addItem("Table");
         br.addElement(tableName);
         br.addItem("Message");

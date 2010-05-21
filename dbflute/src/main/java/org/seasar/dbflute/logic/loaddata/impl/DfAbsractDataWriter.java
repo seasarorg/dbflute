@@ -78,15 +78,16 @@ public abstract class DfAbsractDataWriter {
     /** The handler of columns for getting column meta information(as helper). */
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
 
-    /** The cache map of meta info. The key is table name. */
-    protected final Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
+    /** The cache map of meta info. The key is table name. (ordered for display) */
+    protected final Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap
+            .createAsFlexibleOrdered();
 
-    /** The cache map of bind type. The key is table name. */
-    protected final Map<String, Map<String, Class<?>>> _bindTypeCacheMap = StringKeyMap.createAsFlexible();
+    /** The cache map of bind type. The key is table name. (ordered for display) */
+    protected final Map<String, Map<String, Class<?>>> _bindTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
 
-    /** The cache map of string processor. The key is table name. */
+    /** The cache map of string processor. The key is table name. (ordered for display) */
     protected final Map<String, Map<String, StringProcessor>> _stringProcessorCacheMap = StringKeyMap
-            .createAsFlexible();
+            .createAsFlexibleOrdered();
 
     /** The definition list of string processor instances. (NotNull, ReadOnly) */
     protected final List<StringProcessor> _stringProcessorList = DfCollectionUtil.newArrayList();
@@ -643,7 +644,7 @@ public abstract class DfAbsractDataWriter {
     protected Class<?> getBindType(String tableName, DfColumnMetaInfo columnMetaInfo) {
         Map<String, Class<?>> cacheMap = _bindTypeCacheMap.get(tableName);
         if (cacheMap == null) {
-            cacheMap = StringKeyMap.createAsFlexible();
+            cacheMap = StringKeyMap.createAsFlexibleOrdered();
             _bindTypeCacheMap.put(tableName, cacheMap);
         }
         final String columnName = columnMetaInfo.getColumnName();
