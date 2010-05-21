@@ -124,19 +124,16 @@ public abstract class DfAbsractDataWriter {
         if (columnMetaInfo == null) {
             return false;
         }
-        final int jdbcType = columnMetaInfo.getJdbcDefValue();
+        final String jdbcType = _columnHandler.getColumnJdbcType(columnMetaInfo);
+        final Integer mappedJdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
         try {
-            ps.setNull(bindCount, jdbcType);
+            ps.setNull(bindCount, mappedJdbcDefValue);
         } catch (SQLException e) {
-            if (jdbcType != Types.OTHER) {
-                throw e;
-            }
-            final String torqueType = _columnHandler.getColumnJdbcType(columnMetaInfo);
-            final Integer mappedJdbcType = TypeMap.getJdbcDefValueByJdbcType(torqueType);
+            final int plainJdbcDefValue = columnMetaInfo.getJdbcDefValue();
             try {
-                ps.setNull(bindCount, mappedJdbcType);
+                ps.setNull(bindCount, plainJdbcDefValue);
             } catch (SQLException ignored) {
-                String msg = "Failed to re-try setNull(" + columnName + ", " + mappedJdbcType + "):";
+                String msg = "Failed to re-try setNull(" + columnName + ", " + mappedJdbcDefValue + "):";
                 msg = msg + " " + ignored.getMessage();
                 _log.info(msg);
                 throw e;
@@ -622,18 +619,11 @@ public abstract class DfAbsractDataWriter {
             return bindType;
         }
 
-        final String jdbcType = _columnHandler.getColumnJdbcType(columnMetaInfo);
-        if (TypeMap.UUID.equalsIgnoreCase(jdbcType)) {
-            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
-            bindType = UUID.class;
-            cacheMap.put(columnName, bindType);
-            return bindType;
-        }
-
         // use mapped JDBC defined value
         // (not use plain value of meta data)
         // because it has already been resolved
         // about JDBC specification per DBMS
+        final String jdbcType = _columnHandler.getColumnJdbcType(columnMetaInfo);
         final Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
         //final int jdbcDefValue = columnMetaInfo.getJdbcDefValue();
 
@@ -658,6 +648,9 @@ public abstract class DfAbsractDataWriter {
             bindType = java.util.Date.class;
         } else if (jdbcDefValue == Types.BIT || jdbcDefValue == Types.BOOLEAN) {
             bindType = Boolean.class;
+        } else if (jdbcDefValue == Types.OTHER && TypeMap.UUID.equalsIgnoreCase(jdbcType)) {
+            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
+            bindType = UUID.class;
         } else {
             bindType = Object.class;
         }

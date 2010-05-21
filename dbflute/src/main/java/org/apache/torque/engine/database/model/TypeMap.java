@@ -369,7 +369,7 @@ public class TypeMap {
         if (!_initialized) {
             initialize();
         }
-        if (java.sql.Types.OTHER == jdbcDefValue) {
+        if (Types.OTHER == jdbcDefValue) {
             return null;
         }
         if (!_jdbcDefValueToJdbcTypeMap.containsKey(jdbcDefValue)) {
@@ -384,6 +384,10 @@ public class TypeMap {
         // Make sure the we are initialized.
         if (!_initialized) {
             initialize();
+        }
+        if (UUID.equalsIgnoreCase(jdbcType)) {
+            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
+            return Types.OTHER;
         }
         if (!_jdbcTypeToJdbcDefValueMap.containsKey(jdbcType)) {
             String msg = "_jdbcTypeToJdbcDefValueMap doesn't contain the type as key: ";
