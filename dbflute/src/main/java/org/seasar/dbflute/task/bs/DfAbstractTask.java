@@ -37,6 +37,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
  * The abstract task.
@@ -85,6 +86,7 @@ public abstract class DfAbstractTask extends Task {
             if (isUseDataSource()) {
                 setupDataSource();
             }
+            initializeVariousEnvironment();
             doExecute();
         } catch (Exception e) {
             cause = e;
@@ -267,6 +269,13 @@ public abstract class DfAbstractTask extends Task {
         _mainSchema = getDatabaseProperties().getDatabaseSchema();
         _password = getDatabaseProperties().getDatabasePassword();
         _connectionProperties = getDatabaseProperties().getDatabaseConnectionProperties();
+    }
+
+    protected void initializeVariousEnvironment() {
+        if (getBasicProperties().isDatabaseOracle()) {
+            // basically for data loading of ReplaceSchema
+            TnValueTypes.registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
+        }
     }
 
     abstract protected void doExecute();

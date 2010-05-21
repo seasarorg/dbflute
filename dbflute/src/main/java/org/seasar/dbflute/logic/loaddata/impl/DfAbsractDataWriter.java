@@ -669,7 +669,9 @@ public abstract class DfAbsractDataWriter {
         } else if (jdbcDefValue == Types.TIME) {
             bindType = Time.class;
         } else if (jdbcDefValue == Types.DATE) {
-            bindType = java.sql.Date.class;
+            // it depends on value type settings
+            // that which is bound java.sql.Date or java.sql.Timestamp
+            bindType = java.util.Date.class;
         } else if (jdbcDefValue == Types.BIT || jdbcDefValue == Types.BOOLEAN) {
             bindType = Boolean.class;
         } else if (jdbcDefValue == Types.OTHER && "uuid".equalsIgnoreCase(dbTypeName)) { // basically for PostgreSQL
