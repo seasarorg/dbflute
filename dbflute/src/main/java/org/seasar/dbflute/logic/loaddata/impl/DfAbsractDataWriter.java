@@ -121,8 +121,8 @@ public abstract class DfAbsractDataWriter {
             _nullTypeCacheMap.put(tableName, cacheMap);
         }
         final Integer cachedType = cacheMap.get(columnName);
-        if (cachedType != null) {
-            ps.setNull(bindCount, cachedType); // must be OK
+        if (cachedType != null) { // cache hit
+            ps.setNull(bindCount, cachedType); // basically no exception
             return true;
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
