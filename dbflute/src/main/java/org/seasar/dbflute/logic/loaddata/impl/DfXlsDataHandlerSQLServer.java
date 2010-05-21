@@ -42,7 +42,7 @@ public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Set<String> _identityTableSet = StringSet.createAsFlexible();
+    protected final Set<String> _identityTableSet = StringSet.createAsFlexible();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -54,16 +54,18 @@ public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-    protected void beforeHandlingTable(DataSource dataSource, DfDataTable dataTable) {
-        if (hasIdentityColumn(dataSource, dataTable)) {
-            turnOnIdentityInsert(dataSource, dataTable);
+    @Override
+    protected void beforeHandlingTable(DfDataTable dataTable) {
+        if (hasIdentityColumn(_dataSource, dataTable)) {
+            turnOnIdentityInsert(_dataSource, dataTable);
             _identityTableSet.add(dataTable.getTableName());
         }
     }
 
-    protected void finallyHandlingTable(DataSource dataSource, DfDataTable dataTable) {
+    @Override
+    protected void finallyHandlingTable(DfDataTable dataTable) {
         if (_identityTableSet.contains(dataTable.getTableName())) {
-            turnOffIdentityInsert(dataSource, dataTable);
+            turnOffIdentityInsert(_dataSource, dataTable);
         }
     }
 
@@ -120,8 +122,9 @@ public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
         if (_loggingInsertSql) {
             _log.info(sql);
         }
-        final Connection conn = getConnection(dataSource);
+        Connection conn = null;
         try {
+            conn = getConnection(dataSource);
             final Statement stmt = createStatement(conn);
             try {
                 stmt.execute(sql);
