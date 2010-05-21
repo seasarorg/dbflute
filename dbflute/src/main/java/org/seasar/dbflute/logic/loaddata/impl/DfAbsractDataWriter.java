@@ -94,6 +94,9 @@ public abstract class DfAbsractDataWriter {
         _stringProcessorList.add(new RealStringProcessor());
     }
 
+    /** The cache map of null type. The key is table name. (ordered for display) */
+    protected final Map<String, Map<String, Integer>> _nullTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -112,6 +115,16 @@ public abstract class DfAbsractDataWriter {
         if (!isNullValue(value)) {
             return false;
         }
+        Map<String, Integer> cacheMap = _nullTypeCacheMap.get(tableName);
+        if (cacheMap == null) {
+            cacheMap = StringKeyMap.createAsFlexibleOrdered();
+            _nullTypeCacheMap.put(tableName, cacheMap);
+        }
+        final Integer cachedType = cacheMap.get(columnName);
+        if (cachedType != null) {
+            ps.setNull(bindCount, cachedType); // must be OK
+            return true;
+        }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             // use mapped type at first
@@ -119,11 +132,13 @@ public abstract class DfAbsractDataWriter {
             final Integer mappedJdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(mappedJdbcType);
             try {
                 ps.setNull(bindCount, mappedJdbcDefValue);
+                cacheMap.put(columnName, mappedJdbcDefValue);
             } catch (SQLException e) {
                 // retry by plain type
                 final int plainJdbcDefValue = columnMetaInfo.getJdbcDefValue();
                 try {
                     ps.setNull(bindCount, plainJdbcDefValue);
+                    cacheMap.put(columnName, plainJdbcDefValue);
                 } catch (SQLException ignored) {
                     final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
                     br.addNotice("Failed to execute setNull(bindCount, jdbcDefValue).");
@@ -143,17 +158,25 @@ public abstract class DfAbsractDataWriter {
                 }
             }
         } else { // basically no way
+            Integer tryType = Types.VARCHAR; // as default
             try {
-                ps.setNull(bindCount, Types.VARCHAR); // as default
+                ps.setNull(bindCount, tryType);
+                cacheMap.put(columnName, tryType);
             } catch (SQLException e) {
+                tryType = Types.NUMERIC;
                 try {
-                    ps.setNull(bindCount, Types.NUMERIC);
+                    ps.setNull(bindCount, tryType);
+                    cacheMap.put(columnName, tryType);
                 } catch (SQLException ignored) {
+                    tryType = Types.TIMESTAMP;
                     try {
-                        ps.setNull(bindCount, Types.TIMESTAMP);
+                        ps.setNull(bindCount, tryType);
+                        cacheMap.put(columnName, tryType);
                     } catch (SQLException iignored) {
+                        tryType = Types.OTHER;
                         try {
-                            ps.setNull(bindCount, Types.OTHER); // last try
+                            ps.setNull(bindCount, tryType); // last try
+                            cacheMap.put(columnName, tryType);
                         } catch (SQLException iiignored) {
                             throw e;
                         }
