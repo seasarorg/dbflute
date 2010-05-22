@@ -115,33 +115,6 @@ public class ValueAndTypeSetupper {
                     likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
                 }
             }
-            if (List.class.isInstance(value) && currentName.startsWith("get(") && currentName.endsWith(")")) {
-                // used when FOR comment
-                final List<?> list = (List<?>) value;
-                final String exp = Srl.extractFirstScope(currentName, "get(", ")");
-                try {
-                    final Integer index = DfTypeUtil.toInteger(exp);
-                    value = list.get(index);
-                    if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                        value = likeSearchOption.generateRealValue((String) value);
-                        rearOption = likeSearchOption.getRearOption();
-                    }
-                    clazz = (value != null ? value.getClass() : null);
-                    continue;
-                } catch (NumberFormatException e) {
-                    throwListIndexNumberException(_expression, exp, _specifiedSql, _commentType, e);
-                }
-            }
-            if (Map.class.isInstance(value)) { // used by union-query and so on...
-                final Map<?, ?> map = (Map<?, ?>) value;
-                value = map.get(currentName);
-                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                    value = likeSearchOption.generateRealValue((String) value);
-                    rearOption = likeSearchOption.getRearOption();
-                }
-                clazz = (value != null ? value.getClass() : null);
-                continue;
-            }
             final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
             if (beanDesc.hasPropertyDesc(currentName)) { // main case
                 final DfPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
@@ -153,9 +126,41 @@ public class ValueAndTypeSetupper {
                 clazz = (value != null ? value.getClass() : pd.getPropertyType());
                 continue;
             }
+            if (List.class.isInstance(value)) {
+                if (currentName.startsWith("get(") && currentName.endsWith(")")) {
+                    // used when FOR comment
+                    final List<?> list = (List<?>) value;
+                    final String exp = Srl.extractFirstScope(currentName, "get(", ")");
+                    try {
+                        final Integer index = DfTypeUtil.toInteger(exp);
+                        value = list.get(index);
+                        if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
+                            value = likeSearchOption.generateRealValue((String) value);
+                            rearOption = likeSearchOption.getRearOption();
+                        }
+                        clazz = (value != null ? value.getClass() : null);
+                        continue;
+                    } catch (NumberFormatException e) {
+                        throwListIndexNumberException(_expression, exp, _specifiedSql, _commentType, e);
+                    }
+                }
+            }
+            if (Map.class.isInstance(value)) { // used by union-query and so on...
+                final Map<?, ?> map = (Map<?, ?>) value;
+                // if the key does not exist, treated same as a null value
+                value = map.get(currentName);
+                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
+                    value = likeSearchOption.generateRealValue((String) value);
+                    rearOption = likeSearchOption.getRearOption();
+                }
+                clazz = (value != null ? value.getClass() : null);
+                continue;
+            }
             if (MapParameterBean.class.isAssignableFrom(clazz)) { // priority low
                 final Map<String, Object> map = ((MapParameterBean) value).getParameterMap();
-                if (map.containsKey(currentName)) { // if the property is defined
+                // if the key does not exist, it does not process
+                // (different specification with Map)
+                if (map.containsKey(currentName)) {
                     value = map.get(currentName);
                     if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
                         value = likeSearchOption.generateRealValue((String) value);
@@ -177,17 +182,16 @@ public class ValueAndTypeSetupper {
     //                             -------------------------
     protected boolean hasLikeSearchProperty(DfBeanDesc beanDesc, String currentName, Object pmb) {
         final String propertyName = buildLikeSearchPropertyName(currentName);
+        boolean result = false;
         if (beanDesc.hasPropertyDesc(propertyName)) { // main case
-            return true;
-        }
-        if (Map.class.isInstance(pmb)) {
-            return ((Map<?, ?>) pmb).containsKey(propertyName);
-        }
-        if (MapParameterBean.class.isInstance(pmb)) {
+            result = true;
+        } else if (Map.class.isInstance(pmb)) {
+            result = ((Map<?, ?>) pmb).containsKey(propertyName);
+        } else if (MapParameterBean.class.isInstance(pmb)) {
             final Map<String, Object> map = ((MapParameterBean) pmb).getParameterMap();
-            return map.containsKey(propertyName);
+            result = map.containsKey(propertyName);
         }
-        return false;
+        return result;
     }
 
     protected LikeSearchOption getLikeSearchOption(DfBeanDesc beanDesc, String currentName, Object pmb) {
@@ -206,6 +210,7 @@ public class ValueAndTypeSetupper {
             throw new IllegalStateException(msg);
         }
         // no check here for various situation
+        // (parameter-bean checks option's existence and wrong operation)
         return option;
     }
 

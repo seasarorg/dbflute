@@ -36,9 +36,9 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
-import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
+import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -372,8 +372,13 @@ public class IfCommentEvaluator {
         if (baseObject == null) {
             throwIfCommentNullPointerException(preProperty);
         }
+        System.out.println("property:" + property);
         final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(baseObject.getClass());
-        if (property.endsWith(METHOD_SUFFIX)) {
+        if (beanDesc.hasPropertyDesc(property)) { // main case
+            final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
+            return propertyDesc.getValue(baseObject);
+        }
+        if (property.endsWith(METHOD_SUFFIX)) { // sub-main case
             final String methodName = property.substring(0, property.length() - METHOD_SUFFIX.length());
             try {
                 final Method method = beanDesc.getMethod(methodName);
@@ -383,28 +388,34 @@ public class IfCommentEvaluator {
                 return null; // unreachable
             }
         }
-        if (List.class.isInstance(baseObject) && property.startsWith("get(") && property.endsWith(")")) {
-            final List<?> list = (List<?>) baseObject;
-            final String exp = Srl.extractFirstScope(property, "get(", ")");
-            try {
-                final Integer index = DfTypeUtil.toInteger(exp);
-                return list.get(index);
-            } catch (NumberFormatException e) {
-                throwIfCommentListIndexNumberException(_expression, exp, e);
-                return null; // unreachable
+        if (List.class.isInstance(baseObject)) {
+            if (property.startsWith("get(") && property.endsWith(")")) {
+                final List<?> list = (List<?>) baseObject;
+                final String exp = Srl.extractFirstScope(property, "get(", ")");
+                try {
+                    final Integer index = DfTypeUtil.toInteger(exp);
+                    return list.get(index);
+                } catch (NumberFormatException e) {
+                    throwIfCommentListIndexNumberException(_expression, exp, e);
+                    return null; // unreachable
+                }
             }
         }
         if (Map.class.isInstance(baseObject)) {
+            // if the key does not exist, treated same as a null value
             final Map<?, ?> map = (Map<?, ?>) baseObject;
             return map.get(property);
         }
-        try {
-            final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
-            return propertyDesc.getValue(baseObject);
-        } catch (DfBeanPropertyNotFoundException e) {
-            throwIfCommentNotFoundPropertyException(baseObject, property);
-            return null; // unreachable
+        if (MapParameterBean.class.isInstance(baseObject)) { // priority low
+            // if the key does not exist, it does not process
+            // (different specification with Map)
+            final Map<?, ?> map = ((MapParameterBean) baseObject).getParameterMap();
+            if (map.containsKey(property)) {
+                return map.get(property);
+            }
         }
+        throwIfCommentNotFoundPropertyException(baseObject, property);
+        return null; // unreachable
     }
 
     // ===================================================================================

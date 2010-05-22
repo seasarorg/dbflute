@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
-import org.seasar.dbflute.exception.IfCommentWrongExpressionException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.Srl;
 
@@ -42,24 +41,14 @@ public class IfNode extends ContainerNode {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
+    @Override
     public void accept(CommandContext ctx) {
         doAcceptByEvaluator(ctx);
     }
 
     protected void doAcceptByEvaluator(CommandContext ctx) {
         final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx, _expression);
-        boolean result = false;
-        try {
-            result = evaluator.evaluate();
-        } catch (IfCommentWrongExpressionException e) {
-            final String replaced = replace(_expression, "pmb.", "pmb.parameterMap.");
-            final IfCommentEvaluator another = createIfCommentEvaluator(ctx, replaced);
-            try {
-                result = another.evaluate();
-            } catch (IfCommentWrongExpressionException ignored) {
-                throw e;
-            }
-        }
+        final boolean result = evaluator.evaluate();
         if (result) {
             super.accept(ctx);
             ctx.setEnabled(true);

@@ -82,7 +82,9 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     }
 
     protected void logDynamicBinding() {
-        XLog.log("...Executing with dynamic binding" + (_forcedDynamicBinding ? " (forced)" : ""));
+        if (XLog.isLogEnabled()) {
+            XLog.log("...Executing as dynamic binding" + (_forcedDynamicBinding ? " (forced)" : ""));
+        }
     }
 
     protected boolean isDynamicBinding(OutsideSqlContext outsideSqlContext) {

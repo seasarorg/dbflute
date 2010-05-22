@@ -1,5 +1,7 @@
 package org.seasar.dbflute.twowaysql;
 
+import org.seasar.dbflute.cbean.SimplePagingBean;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
@@ -525,11 +527,14 @@ public class SqlAnalyzerTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
-    public void test_parse_BEGIN_with_wrong_IF() {
+    // -----------------------------------------------------
+    //                                     NotFound Property
+    //                                     -----------------
+    public void test_parse_BEGIN_IF_notFoundProperty_basic() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
         sql = sql + " /*IF pmb.wrongMemberId != null*/member.MEMBER_ID = 3/*END*/";
-        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = 'foo'/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
@@ -547,6 +552,70 @@ public class SqlAnalyzerTest extends PlainTestCase {
             // OK
             log(e.getMessage());
         }
+    }
+
+    public void test_parse_BEGIN_IF_notFoundProperty_with_likeSearch() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.wrongMemberId != null*/member.MEMBER_ID = /*pmb.memberId*/3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME like /*pmb.memberName*/'foo%'/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        try {
+            LikeSearchMemberPmb pmb = new LikeSearchMemberPmb();
+            Node rootNode = analyzer.analyze();
+            CommandContext ctx = createCtx(pmb);
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentNotFoundPropertyException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_parse_BEGIN_IF_notFoundProperty_with_parameterMap() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.wrongMemberId != null*/member.MEMBER_ID = /*pmb.memberId*/3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME like /*pmb.memberName*/'foo%'/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        try {
+            PagingMemberPmb pmb = new PagingMemberPmb();
+            Node rootNode = analyzer.analyze();
+            CommandContext ctx = createCtx(pmb);
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentNotFoundPropertyException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_parse_BEGIN_BIND_notFoundProperty_IF_false() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = /*pmb.wrongMemberId*/3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME like /*pmb.memberName*/'foo%'/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        assertEquals("", ctx.getSql());
     }
 
     // ===================================================================================
@@ -573,7 +642,56 @@ public class SqlAnalyzerTest extends PlainTestCase {
         }
     }
 
-    private CommandContext createCtx(SimpleMemberPmb pmb) {
+    protected static class LikeSearchMemberPmb {
+        protected Integer _memberId;
+        protected String _memberName;
+        protected LikeSearchOption _memberNameInternalLikeSearchOption;
+
+        public Integer getMemberId() {
+            return _memberId;
+        }
+
+        public void setMemberId(Integer memberId) {
+            this._memberId = memberId;
+        }
+
+        public String getMemberName() {
+            return _memberName;
+        }
+
+        public void setMemberName_PrefixSearch(String memberName) {
+            this._memberName = memberName;
+            this._memberNameInternalLikeSearchOption = new LikeSearchOption().likePrefix();
+        }
+
+        public LikeSearchOption getMemberNameInternalLikeSearchOption() {
+            return _memberNameInternalLikeSearchOption;
+        }
+    }
+
+    protected static class PagingMemberPmb extends SimplePagingBean {
+        private static final long serialVersionUID = 1L;
+        protected Integer _memberId;
+        protected String _memberName;
+
+        public Integer getMemberId() {
+            return _memberId;
+        }
+
+        public void setMemberId(Integer memberId) {
+            this._memberId = memberId;
+        }
+
+        public String getMemberName() {
+            return _memberName;
+        }
+
+        public void setMemberName(String memberName) {
+            this._memberName = memberName;
+        }
+    }
+
+    private CommandContext createCtx(Object pmb) {
         return xcreateCommandContext(new Object[] { pmb }, new String[] { "pmb" }, new Class<?>[] { pmb.getClass() });
     }
 
