@@ -29,34 +29,34 @@ public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DataSource dataSource;
-    private StatementFactory statementFactory;
-    private String sql;
+    private DataSource _dataSource;
+    private StatementFactory _statementFactory;
+    private String _sql;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractSqlCommand(DataSource dataSource, StatementFactory statementFactory) {
-        this.dataSource = dataSource;
-        this.statementFactory = statementFactory;
+        this._dataSource = dataSource;
+        this._statementFactory = statementFactory;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public DataSource getDataSource() {
-        return dataSource;
+        return _dataSource;
     }
 
     public StatementFactory getStatementFactory() {
-        return statementFactory;
+        return _statementFactory;
     }
 
     public String getSql() {
-        return sql;
+        return _sql;
     }
 
     public void setSql(String sql) {
-        this.sql = sql;
+        this._sql = sql;
     }
 }

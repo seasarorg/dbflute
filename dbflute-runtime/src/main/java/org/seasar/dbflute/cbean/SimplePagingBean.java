@@ -27,7 +27,7 @@ import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * The simple paging-bean.
+ * The simple implementation of paging-bean.
  * @author jflute
  */
 public class SimplePagingBean implements PagingBean, MapParameterBean, Serializable {
@@ -352,6 +352,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean, Serializa
      * {@inheritDoc}
      */
     public Map<String, Object> getParameterMap() {
+        initializeParameterMapIfNeeds();
         return _parameterMap;
     }
 
@@ -361,10 +362,14 @@ public class SimplePagingBean implements PagingBean, MapParameterBean, Serializa
      * @param value The value of parameter. (Nullable)
      */
     public void addParameter(String key, Object value) {
+        initializeParameterMapIfNeeds();
+        _parameterMap.put(key, value);
+    }
+
+    protected void initializeParameterMapIfNeeds() {
         if (_parameterMap == null) {
             _parameterMap = new LinkedHashMap<String, Object>();
         }
-        _parameterMap.put(key, value);
     }
 
     // ===================================================================================

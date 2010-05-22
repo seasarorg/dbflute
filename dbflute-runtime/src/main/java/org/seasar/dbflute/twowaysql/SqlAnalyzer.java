@@ -28,7 +28,7 @@ import org.seasar.dbflute.twowaysql.node.BeginNode;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
 import org.seasar.dbflute.twowaysql.node.ContainerNode;
 import org.seasar.dbflute.twowaysql.node.ElseNode;
-import org.seasar.dbflute.twowaysql.node.EmbeddedValueNode;
+import org.seasar.dbflute.twowaysql.node.EmbeddedVariableNode;
 import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.twowaysql.node.PrefixSqlNode;
@@ -50,7 +50,7 @@ public class SqlAnalyzer {
     protected Stack<Node> _nodeStack = new Stack<Node>();
     protected List<String> _researchIfCommentList;
     protected List<String> _researchBindVariableCommentList;
-    protected List<String> _researchEmbeddedValueCommentList;
+    protected List<String> _researchEmbeddedVariableCommentList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -222,7 +222,7 @@ public class SqlAnalyzer {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
         if (expr.startsWith("$")) {
-            peek().addChild(createEmbeddedValueNode(expr.substring(1), testValue));
+            peek().addChild(createEmbeddedVariableNode(expr.substring(1), testValue));
         } else {
             peek().addChild(createBindVariableNode(expr, testValue));
         }
@@ -284,9 +284,9 @@ public class SqlAnalyzer {
         return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
-    protected EmbeddedValueNode createEmbeddedValueNode(String expr, String testValue) {
-        researchIfNeed(_researchEmbeddedValueCommentList, expr); // for research
-        return new EmbeddedValueNode(expr, testValue, _specifiedSql, _blockNullParameter);
+    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue) {
+        researchIfNeed(_researchEmbeddedVariableCommentList, expr); // for research
+        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
     protected SqlNode createSqlNode(String sql) {
@@ -329,14 +329,14 @@ public class SqlAnalyzer {
     }
 
     /**
-     * Research embedded value comments. (basically for research only, NOT for execution)<br />
+     * Research embedded variable comments. (basically for research only, NOT for execution)<br />
      * This method should be called before calling analyze(). <br />
-     * The returned list is filled with embedded value comment after calling analyze().
-     * @return The list of embedded value comment. (NotNull)
+     * The returned list is filled with embedded variable comment after calling analyze().
+     * @return The list of embedded variable comment. (NotNull)
      */
-    public List<String> researchEmbeddedValueComment() { // should NOT be called with execution
+    public List<String> researchEmbeddedVariableComment() { // should NOT be called with execution
         final List<String> resultList = new ArrayList<String>();
-        _researchEmbeddedValueCommentList = resultList;
+        _researchEmbeddedVariableCommentList = resultList;
         return resultList;
     }
 

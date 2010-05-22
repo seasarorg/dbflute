@@ -205,6 +205,8 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals(null, DfStringUtil.extractFirstScope("beginBARedDODO", "begin", "end"));
         assertEquals(null, DfStringUtil.extractFirstScope("begnBARendDODO", "begin", "end"));
         assertEquals(null, DfStringUtil.extractFirstScope("begnBARedDODO", "begin", "end"));
+        assertEquals("9", DfStringUtil.extractFirstScope("get(9)", "get(", ")"));
+        assertEquals("99", DfStringUtil.extractFirstScope("get(99)", "get(", ")"));
     }
 
     // ===================================================================================

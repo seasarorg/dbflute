@@ -46,6 +46,14 @@ public class DfCollectionUtil {
         return new ArrayList<ELEMENT>();
     }
 
+    public static <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
+        final List<ELEMENT> list = newArrayList();
+        for (ELEMENT element : elements) {
+            list.add(element);
+        }
+        return list;
+    }
+
     @SuppressWarnings("unchecked")
     public static <ELEMENT> List<ELEMENT> emptyList() {
         return (List<ELEMENT>) EMPTY_LIST;
@@ -96,8 +104,24 @@ public class DfCollectionUtil {
         return new HashSet<ELEMENT>();
     }
 
+    public static <ELEMENT> Set<ELEMENT> newHashSet(ELEMENT... elements) {
+        Set<ELEMENT> set = new HashSet<ELEMENT>();
+        for (ELEMENT element : elements) {
+            set.add(element);
+        }
+        return set;
+    }
+
     public static <ELEMENT> Set<ELEMENT> newLinkedHashSet() {
         return new LinkedHashSet<ELEMENT>();
+    }
+
+    public static <ELEMENT> Set<ELEMENT> newLinkedHashSet(ELEMENT... elements) {
+        Set<ELEMENT> set = newLinkedHashSet();
+        for (ELEMENT element : elements) {
+            set.add(element);
+        }
+        return set;
     }
 
     @SuppressWarnings("unchecked")

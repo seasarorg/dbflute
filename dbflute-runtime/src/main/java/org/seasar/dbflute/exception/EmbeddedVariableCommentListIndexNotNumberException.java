@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the parameter of bind variable is null about outsideSql.
+ * The exception of when the list index on embedded variable comment is not number about outsideSql.
  * @author jflute
  */
-public class BindVariableCommentParameterNullValueException extends RuntimeException {
+public class EmbeddedVariableCommentListIndexNotNumberException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class BindVariableCommentParameterNullValueException extends RuntimeExcep
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public BindVariableCommentParameterNullValueException(String msg) {
+    public EmbeddedVariableCommentListIndexNotNumberException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public EmbeddedVariableCommentListIndexNotNumberException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

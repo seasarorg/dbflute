@@ -20,13 +20,14 @@ import java.util.List;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
+import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class EmbeddedValueNode extends AbstractNode {
+public class EmbeddedVariableNode extends AbstractNode {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -40,7 +41,7 @@ public class EmbeddedValueNode extends AbstractNode {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public EmbeddedValueNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
+    public EmbeddedVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         this._expression = expression;
         this._testValue = testValue;
         this._nameList = Srl.splitList(expression, ".");
@@ -110,7 +111,8 @@ public class EmbeddedValueNode extends AbstractNode {
     }
 
     protected void setupValueAndType(ValueAndType valueAndType) {
-        final ValueAndTypeSetupper setupper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql, false);
+        final CommentType type = CommentType.EMBEDDED;
+        final ValueAndTypeSetupper setupper = new ValueAndTypeSetupper(_nameList, _expression, _specifiedSql, type);
         setupper.setupValueAndType(valueAndType);
     }
 

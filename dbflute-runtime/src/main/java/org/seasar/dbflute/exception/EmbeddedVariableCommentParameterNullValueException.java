@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the value of embedded value is null about outsideSql.
+ * The exception of when the parameter of embedded variable is null about outsideSql.
  * @author jflute
  */
-public class EmbeddedValueCommentParameterNullValueException extends RuntimeException {
+public class EmbeddedVariableCommentParameterNullValueException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class EmbeddedValueCommentParameterNullValueException extends RuntimeExce
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EmbeddedValueCommentParameterNullValueException(String msg) {
+    public EmbeddedVariableCommentParameterNullValueException(String msg) {
         super(msg);
     }
 }

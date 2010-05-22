@@ -20,8 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.exception.BindVariableCommentListIndexNotNumberException;
 import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException;
-import org.seasar.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
+import org.seasar.dbflute.exception.EmbeddedVariableCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.EmbeddedVariableCommentNotFoundPropertyException;
+import org.seasar.dbflute.exception.ForCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.ForCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -47,19 +51,48 @@ public class ValueAndTypeSetupper {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _expression;
     protected List<String> _nameList;
-    protected String _specifiedSql;
-    protected boolean _bind;
+    protected String _expression; // for logging only
+    protected String _specifiedSql; // for logging only
+    protected CommentType _commentType; // for logging only
+
+    public enum CommentType {
+        BIND("bind variable comment", "Bind Variable Comment") // bind
+        , EMBEDDED("embedded variable comment", "Embedded Variable Comment") // embedded
+        , FORCOMMENT("FOR comment", "FOR COMMENT") // for comment
+        ;
+        private String _textName;
+        private String _titleName;
+
+        private CommentType(String commentName, String titleName) {
+            _textName = commentName;
+            _titleName = titleName;
+        }
+
+        public String textName() {
+            return _textName;
+        }
+
+        public String titleName() {
+            return _titleName;
+        }
+    }
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ValueAndTypeSetupper(String expression, List<String> nameList, String specifiedSql, boolean bind) {
-        this._expression = expression;
+    /**
+     * Constructor.
+     * @param nameList The list of property names. (NotNull)
+     * @param expression The expression of the comment for logging only. (NotNull)
+     * @param specifiedSql The specified SQL for logging only. (NotNull)
+     * @param commentType The type of comment for logging only. (NotNull)
+     */
+    public ValueAndTypeSetupper(List<String> nameList, String expression, String specifiedSql, CommentType commentType) {
         this._nameList = nameList;
+        this._expression = expression;
         this._specifiedSql = specifiedSql;
-        this._bind = bind;
+        this._commentType = commentType;
     }
 
     // ===================================================================================
@@ -78,75 +111,102 @@ public class ValueAndTypeSetupper {
                 break;
             }
             final String currentName = _nameList.get(pos);
-            if (pos == 1) { // at the First Loop
+            if (pos == 1) { // at the first Loop
                 final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
-                if (hasLikeSearchOption(beanDesc, currentName)) {
+                if (hasLikeSearchProperty(beanDesc, currentName, value)) {
                     likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
                 }
             }
-            if (Map.class.isInstance(value)) {
+            if (List.class.isInstance(value) && currentName.startsWith("get(") && currentName.endsWith(")")) {
+                // used when FOR comment
+                final List<?> list = (List<?>) value;
+                final String exp = Srl.extractFirstScope(currentName, "get(", ")");
+                try {
+                    final Integer index = DfTypeUtil.toInteger(exp);
+                    value = list.get(index);
+                    if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
+                        value = likeSearchOption.generateRealValue((String) value);
+                        rearOption = likeSearchOption.getRearOption();
+                    }
+                    clazz = (value != null ? value.getClass() : null);
+                    continue;
+                } catch (NumberFormatException e) {
+                    throwListIndexNumberException(_expression, exp, _specifiedSql, _commentType, e);
+                }
+            }
+            if (Map.class.isInstance(value)) { // used by union-query and so on...
                 final Map<?, ?> map = (Map<?, ?>) value;
-                value = map.get(_nameList.get(pos));
-                if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) { // at the Last Loop
+                value = map.get(currentName);
+                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
                     value = likeSearchOption.generateRealValue((String) value);
                     rearOption = likeSearchOption.getRearOption();
                 }
-                clazz = (value != null ? value.getClass() : clazz);
+                clazz = (value != null ? value.getClass() : null);
                 continue;
             }
             final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
-            if (beanDesc.hasPropertyDesc(currentName)) {
+            if (beanDesc.hasPropertyDesc(currentName)) { // main case
                 final DfPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                 value = getPropertyValue(clazz, value, currentName, pd);
-                if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) { // at the Last Loop
+                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
                     value = likeSearchOption.generateRealValue((String) value);
                     rearOption = likeSearchOption.getRearOption();
                 }
                 clazz = (value != null ? value.getClass() : pd.getPropertyType());
                 continue;
             }
-            final String methodName = "get" + initCap(currentName);
-            if (beanDesc.hasMethod(methodName)) { // basically unused because of using propertyDesc before
-                final Method method = beanDesc.getMethod(methodName);
-                value = invokeGetter(method, value);
-                clazz = method.getReturnType();
-                continue;
-            }
-            if (pos == 1 && MapParameterBean.class.isAssignableFrom(clazz)) {
-                final MapParameterBean pmb = (MapParameterBean) value;
-                final Map<String, Object> map = pmb.getParameterMap();
-                final Object elementValue = (map != null ? map.get(_nameList.get(pos)) : null);
-                if (elementValue != null) {
-                    value = elementValue;
-                    clazz = value.getClass();
+            if (MapParameterBean.class.isAssignableFrom(clazz)) { // priority low
+                final Map<String, Object> map = ((MapParameterBean) value).getParameterMap();
+                if (map.containsKey(currentName)) { // if the property is defined
+                    value = map.get(currentName);
+                    if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
+                        value = likeSearchOption.generateRealValue((String) value);
+                        rearOption = likeSearchOption.getRearOption();
+                    }
+                    clazz = (value != null ? value.getClass() : null);
                     continue;
                 }
             }
-            throwBindOrEmbeddedCommentNotFoundPropertyException(_expression, clazz, currentName, _specifiedSql, _bind);
+            throwNotFoundPropertyException(_expression, clazz, currentName, _specifiedSql, _commentType);
         }
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
         valueAndType.setRearOption(rearOption);
     }
 
-    // for OutsideSql
-    protected boolean isLastLoop4LikeSearch(int pos, LikeSearchOption likeSearchOption) {
-        return _nameList.size() == (pos + 1) && likeSearchOption != null;
+    // -----------------------------------------------------
+    //                             LikeSearch for OutsideSql
+    //                             -------------------------
+    protected boolean hasLikeSearchProperty(DfBeanDesc beanDesc, String currentName, Object pmb) {
+        final String propertyName = buildLikeSearchPropertyName(currentName);
+        if (beanDesc.hasPropertyDesc(propertyName)) { // main case
+            return true;
+        }
+        if (Map.class.isInstance(pmb)) {
+            return ((Map<?, ?>) pmb).containsKey(propertyName);
+        }
+        if (MapParameterBean.class.isAssignableFrom(pmb.getClass())) {
+            final Map<String, Object> map = ((MapParameterBean) pmb).getParameterMap();
+            return map.containsKey(propertyName);
+        }
+        return false;
     }
 
-    protected boolean isValidStringValue(Object value) {
-        return value != null && value instanceof String && ((String) value).length() > 0;
-    }
-
-    // for OutsideSql
-    protected boolean hasLikeSearchOption(DfBeanDesc beanDesc, String currentName) {
-        return beanDesc.hasPropertyDesc(currentName + LIKE_SEARCH_OPTION_SUFFIX);
-    }
-
-    // for OutsideSql
     protected LikeSearchOption getLikeSearchOption(DfBeanDesc beanDesc, String currentName, Object pmb) {
-        final DfPropertyDesc pb = beanDesc.getPropertyDesc(currentName + LIKE_SEARCH_OPTION_SUFFIX);
-        final LikeSearchOption option = (LikeSearchOption) pb.getValue(pmb);
+        final String propertyName = buildLikeSearchPropertyName(currentName);
+        final LikeSearchOption option;
+        if (beanDesc.hasPropertyDesc(propertyName)) { // main case
+            final DfPropertyDesc pb = beanDesc.getPropertyDesc(propertyName);
+            option = (LikeSearchOption) pb.getValue(pmb);
+        } else if (Map.class.isInstance(pmb)) {
+            option = (LikeSearchOption) ((Map<?, ?>) pmb).get(propertyName);
+        } else if (MapParameterBean.class.isAssignableFrom(pmb.getClass())) {
+            final Map<String, Object> map = ((MapParameterBean) pmb).getParameterMap();
+            option = (LikeSearchOption) map.get(propertyName);
+        } else { // no way
+            String msg = "Not found the like search property: name=" + propertyName;
+            throw new IllegalStateException(msg);
+        }
         if (option == null) { // basically no way because of check in parameter-bean
             throwLikeSearchOptionNotFoundException(pmb, currentName);
         }
@@ -156,54 +216,66 @@ public class ValueAndTypeSetupper {
         return option;
     }
 
+    protected String buildLikeSearchPropertyName(String resourceName) {
+        return resourceName + LIKE_SEARCH_OPTION_SUFFIX;
+    }
+
     // for OutsideSql
     protected void throwLikeSearchOptionNotFoundException(Object pmb, String currentName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The likeSearchOption was not found! (Should not be null!)" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your method call:" + ln();
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The value of LikeSearchOption was not found! (should not be null)");
+        br.addItem("Advice");
         final String beanName = DfTypeUtil.toClassTitle(pmb);
-        final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
-        msg = msg + "    " + beanName + "." + methodName + ln();
-        // *because basically it does not come here by checking in parameter-bean
-        //  (and for security to application data)
-        //msg = msg + ln();
-        //msg = msg + "[ParameterBean]" + ln() + pmb + ln();
-        msg = msg + "* * * * * * * * * */";
+        final String goodMethod = "set" + initCap(currentName) + "_LikeSearch(value, new LikeSearchOption().like...);";
+        final String badMethod = "set" + initCap(currentName) + "_LikeSearch(value, null); // No!";
+        br.addElement("The setting for LikeSearchOption is required.");
+        br.addElement("Don't set null for the argument.");
+        br.addElement("  (x):");
+        br.addElement("    " + beanName + "." + badMethod);
+        br.addElement("  (o):");
+        br.addElement("    " + beanName + "." + goodMethod);
+        String msg = br.buildExceptionMessage();
         throw new RequiredOptionNotFoundException(msg);
     }
 
     // for OutsideSql
     protected void throwOutsideSqlLikeSearchOptionSplitUnavailableException(LikeSearchOption option, Object pmb,
             String currentName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The splitByXxx() of LikeSearchOption is unavailable at OutsideSql!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your method call:" + ln();
-        msg = msg + "For example:" + ln();
-        msg = msg + "  (x):" + ln();
+
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The splitByXxx() of LikeSearchOption is unavailable at OutsideSql!");
+        br.addItem("Advice");
+        br.addElement("Please confirm your method call:");
+        br.addElement("  (x):");
         final String beanName = DfTypeUtil.toClassTitle(pmb.getClass().getName());
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
-        msg = msg + "    " + beanName + " pmb = new " + beanName + "();" + ln();
-        msg = msg + "    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();" + ln();
-        msg = msg + "    likeSearchOption.splitBySpace(); // *No! Don't invoke this!" + ln();
-        msg = msg + "    pmb." + methodName + ln();
-        msg = msg + "  (o):" + ln();
-        msg = msg + "    " + beanName + " pmb = new " + beanName + "();" + ln();
-        msg = msg + "    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();" + ln();
-        msg = msg + "    pmb." + methodName + ln();
-        msg = msg + ln();
-        msg = msg + "[LikeSearchOption]" + ln() + option + ln();
+        br.addElement("    " + beanName + " pmb = new " + beanName + "();");
+        br.addElement("    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();");
+        br.addElement("    likeSearchOption.splitBySpace(); // *No! Don't invoke this!");
+        br.addElement("    pmb." + methodName);
+        br.addElement("  (o):");
+        br.addElement("    " + beanName + " pmb = new " + beanName + "();");
+        br.addElement("    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();");
+        br.addElement("    pmb." + methodName);
+        br.addItem("LikeSearchOption");
+        br.addElement(option);
         // *because basically it does not come here by checking in parameter-bean
         //  (and for security to application data)
-        //msg = msg + ln();
-        //msg = msg + "[ParameterBean]" + ln() + pmb + ln();
-        msg = msg + "* * * * * * * * * */";
+        //br.addItem("ParameterBean");
+        //br.addElement(pmb);
+        String msg = br.buildExceptionMessage();
         throw new IllegalOutsideSqlOperationException(msg);
+    }
+
+    protected boolean isLastLoopAndValidLikeSearch(int pos, LikeSearchOption option, Object value) {
+        return isLastLoop(pos) && option != null && value != null && value instanceof String;
+    }
+
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
+    protected boolean isLastLoop(int pos) {
+        return _nameList.size() == (pos + 1);
     }
 
     protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, DfPropertyDesc pd) {
@@ -214,24 +286,54 @@ public class ValueAndTypeSetupper {
         return DfReflectionUtil.invoke(method, target, null);
     }
 
-    protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class<?> targetType,
-            String notFoundProperty, String specifiedSql, boolean bind) {
+    protected void throwNotFoundPropertyException(String expression, Class<?> targetType, String notFoundProperty,
+            String specifiedSql, CommentType commentType) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The property on the " + (bind ? "bind variable" : "embedded value") + " comment was not found!");
+        br.addNotice("The property on the " + commentType.textName() + " was not found!");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your property on your arguments.");
         br.addElement("And has the property had misspelling?");
-        br.addItem((bind ? "Bind Variable" : "Embedded Value") + " Comment");
+        br.addItem(commentType.titleName());
         br.addElement(expression);
         br.addItem("NotFound Property");
         br.addElement((targetType != null ? targetType.getName() + "#" : "") + notFoundProperty);
         br.addItem("Specified SQL");
         br.addElement(specifiedSql);
         final String msg = br.buildExceptionMessage();
-        if (bind) {
+        if (CommentType.BIND.equals(commentType)) {
             throw new BindVariableCommentNotFoundPropertyException(msg);
-        } else {
-            throw new EmbeddedValueCommentNotFoundPropertyException(msg);
+        } else if (CommentType.EMBEDDED.equals(commentType)) {
+            throw new EmbeddedVariableCommentNotFoundPropertyException(msg);
+        } else if (CommentType.FORCOMMENT.equals(commentType)) {
+            throw new ForCommentNotFoundPropertyException(msg);
+        } else { // no way
+            throw new BindVariableCommentNotFoundPropertyException(msg);
+        }
+    }
+
+    protected void throwListIndexNumberException(String expression, String notNumberIndex, String specifiedSql,
+            CommentType commentType, NumberFormatException e) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The list index on the " + commentType.textName() + " was not number!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the index on your comment.");
+        br.addItem(commentType.titleName());
+        br.addElement(expression);
+        br.addItem("NotNumber Index");
+        br.addElement(notNumberIndex);
+        br.addItem("NumberFormatException");
+        br.addElement(e.getMessage());
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        if (CommentType.BIND.equals(commentType)) {
+            throw new BindVariableCommentListIndexNotNumberException(msg, e);
+        } else if (CommentType.EMBEDDED.equals(commentType)) {
+            throw new EmbeddedVariableCommentListIndexNotNumberException(msg, e);
+        } else if (CommentType.FORCOMMENT.equals(commentType)) {
+            throw new ForCommentListIndexNotNumberException(msg, e);
+        } else { // no way
+            throw new BindVariableCommentListIndexNotNumberException(msg, e);
         }
     }
 

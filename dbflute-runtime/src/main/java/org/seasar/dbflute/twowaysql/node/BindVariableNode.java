@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
+import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.Srl;
 
@@ -94,7 +95,8 @@ public class BindVariableNode extends AbstractNode {
     }
 
     protected void setupValueAndType(ValueAndType valueAndType) {
-        final ValueAndTypeSetupper setuper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql, true);
+        final CommentType type = CommentType.BIND;
+        final ValueAndTypeSetupper setuper = new ValueAndTypeSetupper(_nameList, _expression, _specifiedSql, type);
         setuper.setupValueAndType(valueAndType);
     }
 

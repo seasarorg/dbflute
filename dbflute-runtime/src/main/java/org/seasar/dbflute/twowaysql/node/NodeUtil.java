@@ -17,7 +17,7 @@ package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.exception.BindVariableCommentParameterNullValueException;
-import org.seasar.dbflute.exception.EmbeddedValueCommentParameterNullValueException;
+import org.seasar.dbflute.exception.EmbeddedVariableCommentParameterNullValueException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -45,7 +45,7 @@ public class NodeUtil {
             String specifiedSql, boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The value of " + (bind ? "bind variable" : "embedded value") + " was Null!" + ln();
+        msg = msg + "The value of " + (bind ? "bind" : "embedded") + " variable was null!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Is it within the scope of your assumption?" + ln();
@@ -64,13 +64,13 @@ public class NodeUtil {
         if (bind) {
             throw new BindVariableCommentParameterNullValueException(msg);
         } else {
-            throw new EmbeddedValueCommentParameterNullValueException(msg);
+            throw new EmbeddedVariableCommentParameterNullValueException(msg);
         }
     }
 
     public static void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(String expression,
             String specifiedSql, boolean bind, ParameterBean pmb) {
-        String name = (bind ? "bind variable" : "embedded value");
+        String name = (bind ? "bind variable" : "embedded variable");
         String emmark = (bind ? "" : "$");
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -96,7 +96,7 @@ public class NodeUtil {
         if (bind) {
             throw new BindVariableCommentIllegalParameterBeanSpecificationException(msg);
         } else {
-            throw new EmbeddedValueCommentParameterNullValueException(msg);
+            throw new EmbeddedVariableCommentParameterNullValueException(msg);
         }
     }
 
@@ -104,7 +104,7 @@ public class NodeUtil {
             boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was empty!" + ln();
+        msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was empty!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();
@@ -129,7 +129,7 @@ public class NodeUtil {
             boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was 'Null Only List'!" + ln();
+        msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was null-only list'!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();

@@ -150,7 +150,12 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
         cmd.setSql(sql);
+        cmd.setForcedDynamicBinding(containsForComment(sql));
         return cmd;
+    }
+
+    protected boolean containsForComment(String sql) {
+        return sql.contains("/*END FOR*/");
     }
 
     public Object[] getSqlExecutionArgument() {

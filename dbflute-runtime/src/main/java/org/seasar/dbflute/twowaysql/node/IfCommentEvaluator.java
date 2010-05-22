@@ -25,12 +25,14 @@ import java.util.Map;
 import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
 import org.seasar.dbflute.exception.IfCommentIllegalParameterBeanSpecificationException;
+import org.seasar.dbflute.exception.IfCommentListIndexNotNumberException;
 import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
 import org.seasar.dbflute.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedTypeComparisonException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
@@ -112,9 +114,12 @@ public class IfCommentEvaluator {
         if (_expression == null || _expression.trim().length() == 0) {
             throwIfCommentEmptyExpressionException();
         }
-        String filtered = Srl.replace(_expression, "()", "");
-        if (filtered.contains("(") || filtered.contains(")")) {
-            throwIfCommentUnsupportedExpressionException();
+        {
+            String filtered = Srl.replace(_expression, "()", "");
+            filtered = Srl.replace(filtered, ".get(", "");
+            if (filtered.contains("(")) {
+                throwIfCommentUnsupportedExpressionException();
+            }
         }
         if (_expression.contains(AND) && _expression.contains(OR)) {
             throwIfCommentUnsupportedExpressionException();
@@ -377,19 +382,28 @@ public class IfCommentEvaluator {
                 throwIfCommentNotFoundMethodException(baseObject, methodName);
                 return null; // unreachable
             }
-        } else {
-            if (Map.class.isInstance(baseObject)) {
-                final Map<?, ?> map = (Map<?, ?>) baseObject;
-                return map.get(property);
-            } else {
-                try {
-                    final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
-                    return propertyDesc.getValue(baseObject);
-                } catch (DfBeanPropertyNotFoundException e) {
-                    throwIfCommentNotFoundPropertyException(baseObject, property);
-                    return null; // unreachable
-                }
+        }
+        if (List.class.isInstance(baseObject) && property.startsWith("get(") && property.endsWith(")")) {
+            final List<?> list = (List<?>) baseObject;
+            final String exp = Srl.extractFirstScope(property, "get(", ")");
+            try {
+                final Integer index = DfTypeUtil.toInteger(exp);
+                return list.get(index);
+            } catch (NumberFormatException e) {
+                throwIfCommentListIndexNumberException(_expression, exp, e);
+                return null; // unreachable
             }
+        }
+        if (Map.class.isInstance(baseObject)) {
+            final Map<?, ?> map = (Map<?, ?>) baseObject;
+            return map.get(property);
+        }
+        try {
+            final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
+            return propertyDesc.getValue(baseObject);
+        } catch (DfBeanPropertyNotFoundException e) {
+            throwIfCommentNotFoundPropertyException(baseObject, property);
+            return null; // unreachable
         }
     }
 
@@ -623,8 +637,31 @@ public class IfCommentEvaluator {
         throw new IfCommentNotBooleanResultException(msg);
     }
 
+    protected void throwIfCommentListIndexNumberException(String expression, String notNumberIndex,
+            NumberFormatException e) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The list index on the IF comment was not number!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the index on your comment.");
+        br.addItem("IF Comment");
+        br.addElement(expression);
+        br.addItem("NotNumber Index");
+        br.addElement(notNumberIndex);
+        br.addItem("NumberFormatException");
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        throw new IfCommentListIndexNotNumberException(msg, e);
+    }
+
     protected Object getDisplayParameterBean() {
         return _finder.find("pmb");
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ExceptionMessageBuilder createExceptionMessageBuilder() {
+        return new ExceptionMessageBuilder();
     }
 
     // ===================================================================================

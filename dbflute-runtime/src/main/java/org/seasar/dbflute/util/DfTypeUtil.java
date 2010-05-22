@@ -356,6 +356,11 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                             Integer
     //                                                                             =======
+    /**
+     * @param obj The resource value to integer. (Nullable)
+     * @return The value as integer. (Nullable)
+     * @throws NumberFormatException
+     */
     public static Integer toInteger(Object obj) {
         return toInteger(obj, null);
     }

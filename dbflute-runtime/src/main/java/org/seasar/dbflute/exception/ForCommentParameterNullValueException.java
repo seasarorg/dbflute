@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the parameter of bind variable is null about outsideSql.
+ * The exception of when the parameter of FOR comment is null about outsideSql.
  * @author jflute
  */
-public class BindVariableCommentParameterNullValueException extends RuntimeException {
+public class ForCommentParameterNullValueException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class BindVariableCommentParameterNullValueException extends RuntimeExcep
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public BindVariableCommentParameterNullValueException(String msg) {
+    public ForCommentParameterNullValueException(String msg) {
         super(msg);
     }
 }

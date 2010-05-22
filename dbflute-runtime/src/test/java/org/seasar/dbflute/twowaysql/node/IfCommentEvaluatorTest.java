@@ -1,7 +1,9 @@
 package org.seasar.dbflute.twowaysql.node;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
@@ -742,6 +744,33 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         assertFalse(createEvaluator(pmb, "pmb.mapPmb.fooKey > 3").evaluate());
     }
 
+    public void test_evaluate_list() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        List<NextPmb> ls = new ArrayList<NextPmb>();
+        {
+            NextPmb nextPmb = new NextPmb();
+            nextPmb.setExistsLogin(false);
+            ls.add(nextPmb);
+        }
+        {
+            NextPmb nextPmb = new NextPmb();
+            nextPmb.setExistsLogin(true);
+            ls.add(nextPmb);
+        }
+        {
+            NextPmb nextPmb = new NextPmb();
+            nextPmb.setExistsLogin(false);
+            ls.add(nextPmb);
+        }
+        pmb.setListPmb(ls);
+
+        // ## Act && Assert ##
+        assertFalse(createEvaluator(pmb, "pmb.listPmb.get(0).existsLogin").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.listPmb.get(1).existsLogin").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.listPmb.get(2).existsLogin").evaluate());
+    }
+
     public void test_evaluate_scalarPmb() {
         // ## Arrange & Act && Assert ##
         assertTrue(createEvaluator(3, "pmb > 2").evaluate());
@@ -798,6 +827,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         private Date _birthdate;
         private NextPmb _nextPmb;
         private Map<String, Integer> _mapPmb = new HashMap<String, Integer>();
+        private List<NextPmb> _listPmb;
 
         public void checkSafetyResult(int safetyMaxResultSize) {
 
@@ -875,6 +905,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
 
         public void putMapPmb(String key, Integer value) {
             this._mapPmb.put(key, value);
+        }
+
+        public List<NextPmb> getListPmb() {
+            return _listPmb;
+        }
+
+        public void setListPmb(List<NextPmb> listPmb) {
+            this._listPmb = listPmb;
         }
     }
 

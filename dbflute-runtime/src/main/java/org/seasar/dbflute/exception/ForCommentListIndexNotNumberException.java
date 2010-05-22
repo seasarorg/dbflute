@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the property on embedded value comment is not found about outsideSql.
+ * The exception of when the list index on FOR comment is not number about outsideSql.
  * @author jflute
  */
-public class EmbeddedValueCommentNotFoundPropertyException extends RuntimeException {
+public class ForCommentListIndexNotNumberException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class EmbeddedValueCommentNotFoundPropertyException extends RuntimeExcept
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EmbeddedValueCommentNotFoundPropertyException(String msg) {
+    public ForCommentListIndexNotNumberException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class EmbeddedValueCommentNotFoundPropertyException extends RuntimeExcept
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public EmbeddedValueCommentNotFoundPropertyException(String msg, Throwable cause) {
+    public ForCommentListIndexNotNumberException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }
