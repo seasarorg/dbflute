@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
@@ -73,10 +74,15 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
         if (isDynamicBinding(outsideSqlContext)) { // basically to use FOR comment
             // *dynamic binding is supported in select statement only
+            logDynamicBinding();
             return executeOutsideSqlAsDynamic(args, outsideSqlContext);
         } else { // main case
             return executeOutsideSqlAsStatic(args, outsideSqlContext);
         }
+    }
+
+    protected void logDynamicBinding() {
+        XLog.log("...Executing with dynamic binding" + (_forcedDynamicBinding ? " (forced)" : ""));
     }
 
     protected boolean isDynamicBinding(OutsideSqlContext outsideSqlContext) {

@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.seasar.dbflute.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.exception.ForCommentParameterNotListException;
-import org.seasar.dbflute.exception.ForCommentParameterNullValueException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.Srl;
@@ -38,8 +37,10 @@ public class ForNode {
     public static final String START_MARK = "/*FOR ";
     public static final String CLOSE_MARK = "*/";
     public static final String END_COMMENT = "/*END FOR*/";
-    public static final String AND_NEXT = "/*$$AndNext$$*/";
-    public static final String OR_NEXT = "/*$$OrNext$$*/";
+    public static final String AND_EXP = "AND NEXT";
+    public static final String OR_EXP = "OR NEXT";
+    public static final String AND_COMMENT = "/*" + AND_EXP + "*/";
+    public static final String OR_COMMENT = "/*" + OR_EXP + "*/";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -58,8 +59,8 @@ public class ForNode {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public static final boolean isAndOrNext(String expression) {
-        return expression.equals(AND_NEXT) || expression.equals(OR_NEXT);
+    public static final boolean isAndOrNextComment(String expression) {
+        return expression.equals(AND_EXP) || expression.equals(OR_EXP);
     }
 
     // ===================================================================================
@@ -73,8 +74,8 @@ public class ForNode {
         final String startMark = ForNode.START_MARK;
         final String closeMark = ForNode.CLOSE_MARK;
         final String endMark = ForNode.END_COMMENT;
-        final String andNext = ForNode.AND_NEXT;
-        final String orNext = ForNode.OR_NEXT;
+        final String andNext = ForNode.AND_COMMENT;
+        final String orNext = ForNode.OR_COMMENT;
         String rear = _dynamicSql;
         final StringBuilder sb = new StringBuilder();
         while (true) {
@@ -136,14 +137,7 @@ public class ForNode {
         setupper.setupValueAndType(valueAndType);
         final Object targetValue = valueAndType.getTargetValue();
         if (targetValue == null) {
-            ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("The parameter for FOR coment was null value.");
-            br.addItem("FOR Comment");
-            br.addElement(ForNode.START_MARK + expression + ForNode.END_COMMENT);
-            br.addItem("Specified SQL");
-            br.addElement(dynamicSql);
-            String msg = br.buildExceptionMessage();
-            throw new ForCommentParameterNullValueException(msg);
+            return 0;
         }
         if (!List.class.isInstance(targetValue)) {
             ExceptionMessageBuilder br = new ExceptionMessageBuilder();

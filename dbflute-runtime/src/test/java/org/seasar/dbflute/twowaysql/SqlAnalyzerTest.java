@@ -1,5 +1,6 @@
 package org.seasar.dbflute.twowaysql;
 
+import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.Node;
@@ -522,6 +523,30 @@ public class SqlAnalyzerTest extends PlainTestCase {
         log("ctx:" + ctx);
         String expected = "where  AAA and BBB OR CCC or DDD";
         assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_with_wrong_IF() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.wrongMemberId != null*/member.MEMBER_ID = 3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        try {
+            SimpleMemberPmb pmb = new SimpleMemberPmb();
+            pmb.setMemberName("foo");
+            Node rootNode = analyzer.analyze();
+            CommandContext ctx = createCtx(pmb);
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentNotFoundPropertyException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     // ===================================================================================

@@ -21,7 +21,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   /*$$AndNext$$*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*AND NEXT*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
         sb.append("   /*END FOR*/").append(ln());
 
         // ## Act ##
@@ -33,8 +33,8 @@ public class ForNodeTest extends PlainTestCase {
         assertTrue(actual.contains(" where"));
         assertFalse(actual.contains("/*FOR "));
         assertFalse(actual.contains("/*END FOR*/"));
-        assertFalse(actual.contains("$$AndNext$$"));
-        assertFalse(actual.contains("$$NextOr$$"));
+        assertFalse(actual.contains("AND NEXT"));
+        assertFalse(actual.contains("OR NEXT"));
         assertTrue(actual.contains("  /*IF pmb.memberNameList.size() > 0*/"));
         assertTrue(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
         assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
@@ -53,7 +53,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   (/*FOR pmb.memberNameList*/").append(ln());
-        sb.append("    /*$$OrNext$$*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("    /*OR NEXT*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
         sb.append("   /*END FOR*/)").append(ln());
 
         // ## Act ##
@@ -65,8 +65,8 @@ public class ForNodeTest extends PlainTestCase {
         assertTrue(actual.contains(" where"));
         assertFalse(actual.contains("/*FOR "));
         assertFalse(actual.contains("/*END FOR*/"));
-        assertFalse(actual.contains("$$AndNext$$"));
-        assertFalse(actual.contains("$$OrNext$$"));
+        assertFalse(actual.contains("AND NEXT"));
+        assertFalse(actual.contains("OR NEXT"));
         assertTrue(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
         assertTrue(actual.contains(" or MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
         assertTrue(actual.contains(" or MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));
@@ -83,7 +83,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("/*FOR pmb.memberNameList*/");
-        sb.append(" /*$$OrNext$$*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'");
+        sb.append(" /*OR NEXT*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'");
         sb.append("/*END FOR*/");
 
         // ## Act ##
@@ -95,8 +95,8 @@ public class ForNodeTest extends PlainTestCase {
         assertTrue(actual.contains(" where"));
         assertFalse(actual.contains("/*FOR "));
         assertFalse(actual.contains("/*END FOR*/"));
-        assertFalse(actual.contains("$$AndNext$$"));
-        assertFalse(actual.contains("$$OrNext$$"));
+        assertFalse(actual.contains("AND NEXT"));
+        assertFalse(actual.contains("OR NEXT"));
         assertTrue(actual.contains(" MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
         assertTrue(actual.contains(" or MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
         assertTrue(actual.contains(" or MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));
@@ -104,7 +104,7 @@ public class ForNodeTest extends PlainTestCase {
         assertFalse(actual.contains("pmb.memberNameList.get(index)"));
     }
 
-    public void test_resolveDynamicForComment_noElement() throws Exception {
+    public void test_resolveDynamicForComment_emptyList() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
         pmb.setMemberNameList(new ArrayList<String>());
@@ -113,7 +113,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   /*$$AndNext$$*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*AND NEXT*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
         sb.append("   /*END FOR*/").append(ln());
 
         // ## Act ##
@@ -125,7 +125,37 @@ public class ForNodeTest extends PlainTestCase {
         assertTrue(actual.contains(" where"));
         assertFalse(actual.contains("/*FOR "));
         assertFalse(actual.contains("/*END FOR*/"));
-        assertFalse(actual.contains("$$AndNext$$"));
+        assertFalse(actual.contains("AND NEXT"));
+        assertFalse(actual.contains("$$NextOr$$"));
+        assertFalse(actual.contains("/*IF pmb.memberNameList.size() > 0*/"));
+        assertFalse(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
+        assertFalse(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
+        assertFalse(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));
+        assertFalse(actual.contains("pmb.memberNameList.get(3)"));
+        assertFalse(actual.contains("pmb.memberNameList.get(index)"));
+        assertFalse(actual.contains("/*END*/"));
+    }
+
+    public void test_resolveDynamicForComment_nullList() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" where").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   /*AND NEXT*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*END FOR*/").append(ln());
+
+        // ## Act ##
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("select * from MEMBER"));
+        assertTrue(actual.contains(" where"));
+        assertFalse(actual.contains("/*FOR "));
+        assertFalse(actual.contains("/*END FOR*/"));
+        assertFalse(actual.contains("AND NEXT"));
         assertFalse(actual.contains("$$NextOr$$"));
         assertFalse(actual.contains("/*IF pmb.memberNameList.size() > 0*/"));
         assertFalse(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
@@ -146,7 +176,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   /*$$AndNext$$*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*AND NEXT*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
         sb.append("   /*END FOR*/").append(ln());
         sb.append("   /*FOR pmb.memberAccountList*/").append(ln());
         sb.append("   and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(index)*/'foo%'").append(ln());
@@ -161,7 +191,7 @@ public class ForNodeTest extends PlainTestCase {
         assertTrue(actual.contains(" where"));
         assertFalse(actual.contains("/*FOR "));
         assertFalse(actual.contains("/*END FOR*/"));
-        assertFalse(actual.contains("$$AndNext$$"));
+        assertFalse(actual.contains("AND NEXT"));
         assertFalse(actual.contains("$$NextOr$$"));
         assertTrue(actual.contains("  /*IF pmb.memberNameList.size() > 0*/"));
         assertTrue(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
@@ -199,8 +229,8 @@ public class ForNodeTest extends PlainTestCase {
         assertTrue(actual.contains("   and 0 = 1"));
         assertFalse(actual.contains("/*FOR "));
         assertFalse(actual.contains("/*END FOR*/"));
-        assertFalse(actual.contains("$$AndNext$$"));
-        assertFalse(actual.contains("$$OrNext$$"));
+        assertFalse(actual.contains("AND NEXT"));
+        assertFalse(actual.contains("OR NEXT"));
         assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
         assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
         assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));

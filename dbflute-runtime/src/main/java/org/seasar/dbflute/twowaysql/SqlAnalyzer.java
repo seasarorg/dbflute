@@ -222,8 +222,8 @@ public class SqlAnalyzer {
     protected void parseCommentBindVariable() {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
-        if (ForNode.isAndOrNext(expr)) {
-            peek().addChild(createSqlNode(expr)); // if FOR comment elements
+        if (ForNode.isAndOrNextComment(expr)) { // FOR comment elements
+            peek().addChild(createSqlNode(expr));
         } else if (expr.startsWith("$")) {
             peek().addChild(createEmbeddedVariableNode(expr.substring(1), testValue));
         } else {

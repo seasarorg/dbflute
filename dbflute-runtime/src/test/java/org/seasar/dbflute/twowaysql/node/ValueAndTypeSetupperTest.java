@@ -6,8 +6,6 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.SimplePagingBean;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.exception.ForCommentNotFoundPropertyException;
-import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
-import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -63,15 +61,11 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         ValueAndType valueAndType = createTargetAndType(pmb);
 
         // ## Act ##
-        try {
-            setupper.setupValueAndType(valueAndType);
+        setupper.setupValueAndType(valueAndType);
 
-            // ## Assert ##
-            fail();
-        } catch (RequiredOptionNotFoundException e) {
-            // OK
-            log(e.getMessage());
-        }
+        // ## Assert ##
+        assertEquals("f|o%o", valueAndType.getTargetValue());
+        assertEquals(String.class, valueAndType.getTargetType());
     }
 
     public void test_setupValueAndType_bean_likeSearch_split() {
@@ -83,15 +77,11 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         ValueAndType valueAndType = createTargetAndType(pmb);
 
         // ## Act ##
-        try {
-            setupper.setupValueAndType(valueAndType);
+        setupper.setupValueAndType(valueAndType); // no check here
 
-            // ## Assert ##
-            fail();
-        } catch (IllegalOutsideSqlOperationException e) {
-            // OK
-            log(e.getMessage());
-        }
+        // ## Assert ##
+        assertEquals("f||o|%o%", valueAndType.getTargetValue());
+        assertEquals(String.class, valueAndType.getTargetType());
     }
 
     public void test_setupValueAndType_bean_nest() {

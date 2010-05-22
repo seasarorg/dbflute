@@ -26,8 +26,6 @@ import org.seasar.dbflute.exception.EmbeddedVariableCommentListIndexNotNumberExc
 import org.seasar.dbflute.exception.EmbeddedVariableCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.ForCommentListIndexNotNumberException;
 import org.seasar.dbflute.exception.ForCommentNotFoundPropertyException;
-import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
-import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -106,7 +104,7 @@ public class ValueAndTypeSetupper {
         LikeSearchOption likeSearchOption = null;
         String rearOption = null;
 
-        for (int pos = 1; pos < _nameList.size(); ++pos) {
+        for (int pos = 1; pos < _nameList.size(); pos++) {
             if (value == null) {
                 break;
             }
@@ -185,7 +183,7 @@ public class ValueAndTypeSetupper {
         if (Map.class.isInstance(pmb)) {
             return ((Map<?, ?>) pmb).containsKey(propertyName);
         }
-        if (MapParameterBean.class.isAssignableFrom(pmb.getClass())) {
+        if (MapParameterBean.class.isInstance(pmb)) {
             final Map<String, Object> map = ((MapParameterBean) pmb).getParameterMap();
             return map.containsKey(propertyName);
         }
@@ -200,71 +198,19 @@ public class ValueAndTypeSetupper {
             option = (LikeSearchOption) pb.getValue(pmb);
         } else if (Map.class.isInstance(pmb)) {
             option = (LikeSearchOption) ((Map<?, ?>) pmb).get(propertyName);
-        } else if (MapParameterBean.class.isAssignableFrom(pmb.getClass())) {
+        } else if (MapParameterBean.class.isInstance(pmb)) {
             final Map<String, Object> map = ((MapParameterBean) pmb).getParameterMap();
             option = (LikeSearchOption) map.get(propertyName);
         } else { // no way
             String msg = "Not found the like search property: name=" + propertyName;
             throw new IllegalStateException(msg);
         }
-        if (option == null) { // basically no way because of check in parameter-bean
-            throwLikeSearchOptionNotFoundException(pmb, currentName);
-        }
-        if (option.isSplit()) { // basically no way because of check in parameter-bean
-            throwOutsideSqlLikeSearchOptionSplitUnavailableException(option, pmb, currentName);
-        }
+        // no check here for various situation
         return option;
     }
 
     protected String buildLikeSearchPropertyName(String resourceName) {
         return resourceName + LIKE_SEARCH_OPTION_SUFFIX;
-    }
-
-    // for OutsideSql
-    protected void throwLikeSearchOptionNotFoundException(Object pmb, String currentName) {
-        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The value of LikeSearchOption was not found! (should not be null)");
-        br.addItem("Advice");
-        final String beanName = DfTypeUtil.toClassTitle(pmb);
-        final String goodMethod = "set" + initCap(currentName) + "_LikeSearch(value, new LikeSearchOption().like...);";
-        final String badMethod = "set" + initCap(currentName) + "_LikeSearch(value, null); // No!";
-        br.addElement("The setting for LikeSearchOption is required.");
-        br.addElement("Don't set null for the argument.");
-        br.addElement("  (x):");
-        br.addElement("    " + beanName + "." + badMethod);
-        br.addElement("  (o):");
-        br.addElement("    " + beanName + "." + goodMethod);
-        String msg = br.buildExceptionMessage();
-        throw new RequiredOptionNotFoundException(msg);
-    }
-
-    // for OutsideSql
-    protected void throwOutsideSqlLikeSearchOptionSplitUnavailableException(LikeSearchOption option, Object pmb,
-            String currentName) {
-
-        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The splitByXxx() of LikeSearchOption is unavailable at OutsideSql!");
-        br.addItem("Advice");
-        br.addElement("Please confirm your method call:");
-        br.addElement("  (x):");
-        final String beanName = DfTypeUtil.toClassTitle(pmb.getClass().getName());
-        final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
-        br.addElement("    " + beanName + " pmb = new " + beanName + "();");
-        br.addElement("    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();");
-        br.addElement("    likeSearchOption.splitBySpace(); // *No! Don't invoke this!");
-        br.addElement("    pmb." + methodName);
-        br.addElement("  (o):");
-        br.addElement("    " + beanName + " pmb = new " + beanName + "();");
-        br.addElement("    LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();");
-        br.addElement("    pmb." + methodName);
-        br.addItem("LikeSearchOption");
-        br.addElement(option);
-        // *because basically it does not come here by checking in parameter-bean
-        //  (and for security to application data)
-        //br.addItem("ParameterBean");
-        //br.addElement(pmb);
-        String msg = br.buildExceptionMessage();
-        throw new IllegalOutsideSqlOperationException(msg);
     }
 
     protected boolean isLastLoopAndValidLikeSearch(int pos, LikeSearchOption option, Object value) {
