@@ -372,7 +372,6 @@ public class IfCommentEvaluator {
         if (baseObject == null) {
             throwIfCommentNullPointerException(preProperty);
         }
-        System.out.println("property:" + property);
         final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(baseObject.getClass());
         if (beanDesc.hasPropertyDesc(property)) { // main case
             final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
