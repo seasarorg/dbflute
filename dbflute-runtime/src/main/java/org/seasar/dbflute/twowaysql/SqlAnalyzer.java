@@ -29,6 +29,7 @@ import org.seasar.dbflute.twowaysql.node.BindVariableNode;
 import org.seasar.dbflute.twowaysql.node.ContainerNode;
 import org.seasar.dbflute.twowaysql.node.ElseNode;
 import org.seasar.dbflute.twowaysql.node.EmbeddedVariableNode;
+import org.seasar.dbflute.twowaysql.node.ForNode;
 import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.twowaysql.node.PrefixSqlNode;
@@ -110,7 +111,7 @@ public class SqlAnalyzer {
                 } else {
                     node.addChild(createPrefixSqlNode(",", sql.substring(1)));
                 }
-            } else if ("AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token)) { // is prefix
+            } else if ("and".equalsIgnoreCase(token) || "or".equalsIgnoreCase(token)) { // is prefix
                 node.addChild(createPrefixSqlNode(st.getBefore(), st.getAfter()));
             } else { // is not prefix
                 node.addChild(createSqlNodeAsIfElseChildNode(sql));
@@ -221,7 +222,9 @@ public class SqlAnalyzer {
     protected void parseCommentBindVariable() {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
-        if (expr.startsWith("$")) {
+        if (ForNode.isAndOrNext(expr)) {
+            peek().addChild(createSqlNode(expr)); // if FOR comment elements
+        } else if (expr.startsWith("$")) {
             peek().addChild(createEmbeddedVariableNode(expr.substring(1), testValue));
         } else {
             peek().addChild(createBindVariableNode(expr, testValue));

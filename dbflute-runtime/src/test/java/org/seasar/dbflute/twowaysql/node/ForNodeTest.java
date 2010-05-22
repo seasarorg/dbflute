@@ -1,5 +1,6 @@
-package org.seasar.dbflute.bhv.core.execution;
+package org.seasar.dbflute.twowaysql.node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
@@ -9,11 +10,10 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class OutsideSqlSelectExecutionTest extends PlainTestCase {
+public class ForNodeTest extends PlainTestCase {
 
     public void test_resolveDynamicForComment_AndNext() throws Exception {
         // ## Arrange ##
-        OutsideSqlSelectExecution target = createTarget();
         MockPmb pmb = new MockPmb();
         pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
         pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
@@ -25,7 +25,7 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
         sb.append("   /*END FOR*/").append(ln());
 
         // ## Act ##
-        String actual = target.resolveDynamicForComment(pmb, sb.toString());
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
 
         // ## Assert ##
         log(actual);
@@ -35,16 +35,17 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
         assertFalse(actual.contains("/*END FOR*/"));
         assertFalse(actual.contains("$$AndNext$$"));
         assertFalse(actual.contains("$$NextOr$$"));
+        assertTrue(actual.contains("  /*IF pmb.memberNameList.size() > 0*/"));
         assertTrue(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
         assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
         assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));
         assertFalse(actual.contains("pmb.memberNameList.get(3)"));
         assertFalse(actual.contains("pmb.memberNameList.get(index)"));
+        assertTrue(actual.contains("  /*END*/"));
     }
 
     public void test_resolveDynamicForComment_OrNext() throws Exception {
         // ## Arrange ##
-        OutsideSqlSelectExecution target = createTarget();
         MockPmb pmb = new MockPmb();
         pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
         pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
@@ -56,7 +57,7 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
         sb.append("   /*END FOR*/)").append(ln());
 
         // ## Act ##
-        String actual = target.resolveDynamicForComment(pmb, sb.toString());
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
 
         // ## Assert ##
         log(actual);
@@ -75,7 +76,6 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
 
     public void test_resolveDynamicForComment_noLineSeparator() throws Exception {
         // ## Arrange ##
-        OutsideSqlSelectExecution target = createTarget();
         MockPmb pmb = new MockPmb();
         pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
         pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
@@ -87,7 +87,7 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
         sb.append("/*END FOR*/");
 
         // ## Act ##
-        String actual = target.resolveDynamicForComment(pmb, sb.toString());
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
 
         // ## Assert ##
         log(actual);
@@ -104,9 +104,80 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
         assertFalse(actual.contains("pmb.memberNameList.get(index)"));
     }
 
+    public void test_resolveDynamicForComment_noElement() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(new ArrayList<String>());
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" where").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   /*$$AndNext$$*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*END FOR*/").append(ln());
+
+        // ## Act ##
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("select * from MEMBER"));
+        assertTrue(actual.contains(" where"));
+        assertFalse(actual.contains("/*FOR "));
+        assertFalse(actual.contains("/*END FOR*/"));
+        assertFalse(actual.contains("$$AndNext$$"));
+        assertFalse(actual.contains("$$NextOr$$"));
+        assertFalse(actual.contains("/*IF pmb.memberNameList.size() > 0*/"));
+        assertFalse(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
+        assertFalse(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
+        assertFalse(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));
+        assertFalse(actual.contains("pmb.memberNameList.get(3)"));
+        assertFalse(actual.contains("pmb.memberNameList.get(index)"));
+        assertFalse(actual.contains("/*END*/"));
+    }
+
+    public void test_resolveDynamicForComment_several() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        pmb.setMemberAccountList(DfCollectionUtil.newArrayList("abc", "def"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" where").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   /*$$AndNext$$*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*END FOR*/").append(ln());
+        sb.append("   /*FOR pmb.memberAccountList*/").append(ln());
+        sb.append("   and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*END FOR*/").append(ln());
+
+        // ## Act ##
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("select * from MEMBER"));
+        assertTrue(actual.contains(" where"));
+        assertFalse(actual.contains("/*FOR "));
+        assertFalse(actual.contains("/*END FOR*/"));
+        assertFalse(actual.contains("$$AndNext$$"));
+        assertFalse(actual.contains("$$NextOr$$"));
+        assertTrue(actual.contains("  /*IF pmb.memberNameList.size() > 0*/"));
+        assertTrue(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
+        assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
+        assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));
+        assertFalse(actual.contains("pmb.memberNameList.get(3)"));
+        assertFalse(actual.contains("pmb.memberNameList.get(index)"));
+        assertTrue(actual.contains(" and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(0)*/"));
+        assertTrue(actual.contains(" and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(1)*/"));
+        assertFalse(actual.contains(" and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(2)*/"));
+        assertFalse(actual.contains(" and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(index)*/"));
+        assertTrue(actual.contains("  /*END*/"));
+    }
+
     public void test_resolveDynamicForComment_withOtherCondition() throws Exception {
         // ## Arrange ##
-        OutsideSqlSelectExecution target = createTarget();
         MockPmb pmb = new MockPmb();
         pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
         pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
@@ -119,7 +190,7 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
         sb.append("   and 0 = 1").append(ln());
 
         // ## Act ##
-        String actual = target.resolveDynamicForComment(pmb, sb.toString());
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
 
         // ## Assert ##
         log(actual);
@@ -137,14 +208,15 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
         assertFalse(actual.contains("pmb.memberNameList.get(index)"));
     }
 
-    protected OutsideSqlSelectExecution createTarget() {
-        return new OutsideSqlSelectExecution(null, null, null);
+    protected ForNode createTarget(Object pmb, String dynamicSql) {
+        return new ForNode(pmb, dynamicSql);
     }
 
     protected static class MockPmb {
         protected Integer _memberId;
         protected List<String> _memberNameList;
         protected LikeSearchOption _memberNameListInternalLikeSearchOption;
+        protected List<String> _memberAccountList;
         protected MockPmb _nestPmb;
         protected MockPmb _nestLikePmb;
         protected LikeSearchOption _nestLikePmbInternalLikeSearchOption;
@@ -171,6 +243,14 @@ public class OutsideSqlSelectExecutionTest extends PlainTestCase {
 
         public void setMemberNameListInternalLikeSearchOption(LikeSearchOption memberNameInternalLikeSearchOption) {
             this._memberNameListInternalLikeSearchOption = memberNameInternalLikeSearchOption;
+        }
+
+        public List<String> getMemberAccountList() {
+            return _memberAccountList;
+        }
+
+        public void setMemberAccountList(List<String> memberAccountList) {
+            this._memberAccountList = memberAccountList;
         }
 
         public MockPmb getNestPmb() {
