@@ -133,18 +133,17 @@ public class SqlAnalyzer {
             } else {
                 parseCommentBindVariable();
             }
-        } else if (comment != null && 0 < comment.length()) {
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        } else if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+            // general comment and FOR comment (elements) here
             String before = _tokenizer.getBefore();
             peek().addChild(createSqlNode(before.substring(before.lastIndexOf("/*"))));
         }
     }
 
     protected void parseIf() {
-        final String condition = _tokenizer.getToken().substring(2).trim();
-        if (Srl.is_Null_or_Empty(condition)) {
+        final String comment = _tokenizer.getToken();
+        final String condition = comment.substring("IF".length()).trim();
+        if (Srl.is_Null_or_TrimmedEmpty(condition)) {
             throwIfCommentConditionNotFoundException();
         }
         final IfNode ifNode = createIfNode(condition);
@@ -222,9 +221,7 @@ public class SqlAnalyzer {
     protected void parseCommentBindVariable() {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
-        if (ForNode.isAndOrNextComment(expr)) { // FOR comment elements
-            peek().addChild(createSqlNode(expr));
-        } else if (expr.startsWith("$")) {
+        if (expr.startsWith("$")) {
             peek().addChild(createEmbeddedVariableNode(expr.substring(1), testValue));
         } else {
             peek().addChild(createBindVariableNode(expr, testValue));
@@ -258,7 +255,18 @@ public class SqlAnalyzer {
     }
 
     private static boolean isTargetComment(String comment) {
-        return comment != null && comment.length() > 0 && Character.isJavaIdentifierStart(comment.charAt(0));
+        if (Srl.is_Null_or_TrimmedEmpty(comment)) {
+            return false;
+        }
+        if (ForNode.isForCommentElement(comment)) {
+            return false;
+        }
+        // basically check for bind variable
+        // (embedded variable has fixed mark which is identifier)
+        if (!Character.isJavaIdentifierStart(comment.charAt(0))) {
+            return false;
+        }
+        return true;
     }
 
     private static boolean isIfComment(String comment) {

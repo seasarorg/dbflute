@@ -4,6 +4,7 @@ import static org.seasar.dbflute.util.Srl.camelize;
 import static org.seasar.dbflute.util.Srl.connectPrefix;
 import static org.seasar.dbflute.util.Srl.connectSuffix;
 import static org.seasar.dbflute.util.Srl.decamelize;
+import static org.seasar.dbflute.util.Srl.extractAllScope;
 import static org.seasar.dbflute.util.Srl.extractFirstScope;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
 import static org.seasar.dbflute.util.Srl.ltrim;
@@ -199,14 +200,31 @@ public class DfStringUtilTest extends PlainTestCase {
     //                                                                      Scope Handling
     //                                                                      ==============
     public void test_extractFirstScope_basic() {
-        assertEquals("BAR", DfStringUtil.extractFirstScope("FOObeginBARendDODO", "begin", "end"));
+        assertEquals("BAR", extractFirstScope("FOObeginBARendDODO", "begin", "end"));
         assertEquals("BAR", extractFirstScope("FOObeginBARend", "begin", "end"));
-        assertEquals("BAR", DfStringUtil.extractFirstScope("beginBARendDODO", "begin", "end"));
-        assertEquals(null, DfStringUtil.extractFirstScope("beginBARedDODO", "begin", "end"));
-        assertEquals(null, DfStringUtil.extractFirstScope("begnBARendDODO", "begin", "end"));
-        assertEquals(null, DfStringUtil.extractFirstScope("begnBARedDODO", "begin", "end"));
-        assertEquals("9", DfStringUtil.extractFirstScope("get(9)", "get(", ")"));
-        assertEquals("99", DfStringUtil.extractFirstScope("get(99)", "get(", ")"));
+        assertEquals("BAR", extractFirstScope("beginBARendDODO", "begin", "end"));
+        assertEquals(null, extractFirstScope("beginBARedDODO", "begin", "end"));
+        assertEquals(null, extractFirstScope("begnBARendDODO", "begin", "end"));
+        assertEquals(null, extractFirstScope("begnBARedDODO", "begin", "end"));
+        assertEquals("9", extractFirstScope("get(9)", "get(", ")"));
+        assertEquals("99", extractFirstScope("get(99)", "get(", ")"));
+        assertEquals(" 99 ", extractFirstScope("get( 99 )", "get(", ")")); // not trimmed
+    }
+
+    public void test_extractAllScope_basic() {
+        // ## Arrange ##
+        String str = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
+
+        // ## Act ##
+        List<String> list = extractAllScope(str, "/*", "*/");
+
+        // ## Assert ##
+        assertEquals(5, list.size());
+        assertEquals("BEGIN", list.get(0));
+        assertEquals("FOR pmb", list.get(1));
+        assertEquals("FIRST 'foo'", list.get(2));
+        assertEquals("END FOR", list.get(3));
+        assertEquals(" END ", list.get(4)); // not trimmed
     }
 
     // ===================================================================================

@@ -17,6 +17,9 @@ package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 /**
  * String Utility for Internal Programming of DBFlute.
@@ -80,6 +83,16 @@ public class Srl {
                 return sb.toString();
             }
         } while (true);
+    }
+
+    public static final String replace(String str, Map<String, String> fromToMap) {
+        assertStringNotNull(str);
+        assertFromToMapNotNull(fromToMap);
+        final Set<Entry<String, String>> entrySet = fromToMap.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            str = replace(str, entry.getKey(), entry.getValue());
+        }
+        return str;
     }
 
     // ===================================================================================
@@ -371,15 +384,15 @@ public class Srl {
         final String ret;
         {
             String tmp = str;
-            final int startIndex = tmp.indexOf(beginMark);
-            if (startIndex < 0) {
+            final int beginIndex = tmp.indexOf(beginMark);
+            if (beginIndex < 0) {
                 return null;
             }
-            tmp = tmp.substring(startIndex + beginMark.length());
+            tmp = tmp.substring(beginIndex + beginMark.length());
             if (tmp.indexOf(endMark) < 0) {
                 return null;
             }
-            ret = tmp.substring(0, tmp.indexOf(endMark)).trim();
+            ret = tmp.substring(0, tmp.indexOf(endMark));
         }
         return ret;
     }
@@ -391,15 +404,15 @@ public class Srl {
         final List<String> resultList = new ArrayList<String>();
         String tmp = str;
         while (true) {
-            final int startIndex = tmp.indexOf(beginMark);
-            if (startIndex < 0) {
+            final int beginIndex = tmp.indexOf(beginMark);
+            if (beginIndex < 0) {
                 break;
             }
-            tmp = tmp.substring(startIndex + beginMark.length());
+            tmp = tmp.substring(beginIndex + beginMark.length());
             if (tmp.indexOf(endMark) < 0) {
                 break;
             }
-            resultList.add(tmp.substring(0, tmp.indexOf(endMark)).trim());
+            resultList.add(tmp.substring(0, tmp.indexOf(endMark)));
             tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
         }
         return resultList;
@@ -651,6 +664,10 @@ public class Srl {
     //                                                                       =============
     protected static void assertStringNotNull(String str) {
         assertObjectNotNull("str", str);
+    }
+
+    protected static void assertFromToMapNotNull(Map<String, String> fromToMap) {
+        assertObjectNotNull("fromToMap", fromToMap);
     }
 
     protected static void assertDelimiterNotNull(String delimiter) {
