@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -147,10 +150,16 @@ public class DfOutsideSqlMarkAnalyzer {
     }
 
     protected String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        return DfStringUtil.extractFirstScope(targetStr, beginMark, endMark);
+        final ScopeInfo scope = Srl.extractScopeFirst(targetStr, beginMark, endMark);
+        return scope != null ? scope.getContent() : null;
     }
 
     protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        return DfStringUtil.extractAllScope(targetStr, beginMark, endMark);
+        final List<ScopeInfo> scopeList = Srl.extractScopeList(targetStr, beginMark, endMark);
+        final List<String> resultList = DfCollectionUtil.newArrayList();
+        for (ScopeInfo scope : scopeList) {
+            resultList.add(scope.getContent());
+        }
+        return resultList;
     }
 }

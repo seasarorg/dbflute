@@ -29,7 +29,9 @@ import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlChecker;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -162,7 +164,12 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             }
 
             protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-                return Srl.extractAllScope(targetStr, beginMark, endMark);
+                final List<ScopeInfo> scopeList = Srl.extractScopeList(targetStr, beginMark, endMark);
+                final List<String> resultList = DfCollectionUtil.newArrayList();
+                for (ScopeInfo scope : scopeList) {
+                    resultList.add(scope.getContent());
+                }
+                return resultList;
             }
         };
     }
