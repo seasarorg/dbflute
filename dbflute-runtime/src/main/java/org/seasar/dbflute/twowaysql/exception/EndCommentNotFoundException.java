@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the method invocation of IF comment fails.
+ * The exception of when the end comment is not found in outsideSql.
  * @author jflute
  */
-public class IfCommentMethodInvocationFailureException extends IfCommentWrongExpressionException {
+public class EndCommentNotFoundException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,7 @@ public class IfCommentMethodInvocationFailureException extends IfCommentWrongExp
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentMethodInvocationFailureException(String msg) {
+    public EndCommentNotFoundException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public IfCommentMethodInvocationFailureException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the list index on IF comment is not number.
+ * The exception of when the list index on IF comment is out of boudns.
  * @author jflute
  */
-public class IfCommentListIndexNotNumberException extends IfCommentWrongExpressionException {
+public class IfCommentListIndexOutOfBoundsException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IfCommentListIndexNotNumberException extends IfCommentWrongExpressi
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentListIndexNotNumberException(String msg) {
+    public IfCommentListIndexOutOfBoundsException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IfCommentListIndexNotNumberException extends IfCommentWrongExpressi
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IfCommentListIndexNotNumberException(String msg, Throwable cause) {
+    public IfCommentListIndexOutOfBoundsException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

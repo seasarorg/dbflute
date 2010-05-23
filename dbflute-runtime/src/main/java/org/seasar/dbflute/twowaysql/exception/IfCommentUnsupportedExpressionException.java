@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the parameter of bind variable is null.
+ * The exception of when the IF comment expression is unsupported.
  * @author jflute
  */
-public class BindVariableCommentParameterNullValueException extends RuntimeException {
+public class IfCommentUnsupportedExpressionException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class BindVariableCommentParameterNullValueException extends RuntimeExcep
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public BindVariableCommentParameterNullValueException(String msg) {
+    public IfCommentUnsupportedExpressionException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public IfCommentUnsupportedExpressionException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

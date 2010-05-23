@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the IF comment expression is unsupported.
+ * The exception of when the list index on FOR comment is out of bounds.
  * @author jflute
  */
-public class IfCommentUnsupportedExpressionException extends IfCommentWrongExpressionException {
+public class ForCommentListIndexOutOfBoundsException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IfCommentUnsupportedExpressionException extends IfCommentWrongExpre
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentUnsupportedExpressionException(String msg) {
+    public ForCommentListIndexOutOfBoundsException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IfCommentUnsupportedExpressionException extends IfCommentWrongExpre
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IfCommentUnsupportedExpressionException(String msg, Throwable cause) {
+    public ForCommentListIndexOutOfBoundsException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the IF comment has a null pointer.
+ * The exception of when the IF comment has a wrong expression about outsideSql.
  * @author jflute
  */
-public class IfCommentNullPointerException extends IfCommentWrongExpressionException {
+public class IfCommentWrongExpressionException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IfCommentNullPointerException extends IfCommentWrongExpressionExcep
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentNullPointerException(String msg) {
+    public IfCommentWrongExpressionException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IfCommentNullPointerException extends IfCommentWrongExpressionExcep
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IfCommentNullPointerException(String msg, Throwable cause) {
+    public IfCommentWrongExpressionException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

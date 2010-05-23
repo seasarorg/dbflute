@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the list index on FOR comment is out of bounds.
+ * The exception of when the result of IF comment expression is empty.
  * @author jflute
  */
-public class ForCommentListIndexOutOfBoundsException extends RuntimeException {
+public class IfCommentEmptyExpressionException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class ForCommentListIndexOutOfBoundsException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public ForCommentListIndexOutOfBoundsException(String msg) {
+    public IfCommentEmptyExpressionException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class ForCommentListIndexOutOfBoundsException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public ForCommentListIndexOutOfBoundsException(String msg, Throwable cause) {
+    public IfCommentEmptyExpressionException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

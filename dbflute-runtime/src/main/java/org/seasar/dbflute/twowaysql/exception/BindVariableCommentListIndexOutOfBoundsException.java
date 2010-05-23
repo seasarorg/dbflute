@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the IF comment has a wrong expression about outsideSql.
+ * The exception of when the list index on bind variable comment is out of bounds.
  * @author jflute
  */
-public class IfCommentWrongExpressionException extends RuntimeException {
+public class BindVariableCommentListIndexOutOfBoundsException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IfCommentWrongExpressionException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentWrongExpressionException(String msg) {
+    public BindVariableCommentListIndexOutOfBoundsException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IfCommentWrongExpressionException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IfCommentWrongExpressionException(String msg, Throwable cause) {
+    public BindVariableCommentListIndexOutOfBoundsException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

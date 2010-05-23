@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the property on bind variable comment is not found.
+ * The exception of when the list index on FOR comment is not number.
  * @author jflute
  */
-public class BindVariableCommentNotFoundPropertyException extends RuntimeException {
+public class ForCommentListIndexNotNumberException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class BindVariableCommentNotFoundPropertyException extends RuntimeExcepti
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public BindVariableCommentNotFoundPropertyException(String msg) {
+    public ForCommentListIndexNotNumberException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class BindVariableCommentNotFoundPropertyException extends RuntimeExcepti
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public BindVariableCommentNotFoundPropertyException(String msg, Throwable cause) {
+    public ForCommentListIndexNotNumberException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

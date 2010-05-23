@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the method on the IF comment is not found.
+ * The exception of when the parameter of bind variable is null.
  * @author jflute
  */
-public class IfCommentNotFoundMethodException extends IfCommentWrongExpressionException {
+public class BindVariableCommentParameterNullValueException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,7 @@ public class IfCommentNotFoundMethodException extends IfCommentWrongExpressionEx
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentNotFoundMethodException(String msg) {
+    public BindVariableCommentParameterNullValueException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public IfCommentNotFoundMethodException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

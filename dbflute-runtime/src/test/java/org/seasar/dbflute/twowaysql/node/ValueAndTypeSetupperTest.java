@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.SimpleMapPmb;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
-import org.seasar.dbflute.exception.BindVariableCommentListIndexNotNumberException;
-import org.seasar.dbflute.exception.BindVariableCommentListIndexOutOfBoundsException;
-import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException;
-import org.seasar.dbflute.exception.ForCommentNotFoundPropertyException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexNotNumberException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexOutOfBoundsException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyException;
+import org.seasar.dbflute.twowaysql.exception.ForCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;

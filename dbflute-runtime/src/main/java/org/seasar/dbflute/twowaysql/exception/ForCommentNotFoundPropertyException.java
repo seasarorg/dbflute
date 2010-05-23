@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the IF comment has different type comparison.
+ * The exception of when the property on FOR comment is not found.
  * @author jflute
  */
-public class IfCommentDifferentTypeComparisonException extends IfCommentWrongExpressionException {
+public class ForCommentNotFoundPropertyException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class IfCommentDifferentTypeComparisonException extends IfCommentWrongExp
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentDifferentTypeComparisonException(String msg) {
+    public ForCommentNotFoundPropertyException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public ForCommentNotFoundPropertyException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

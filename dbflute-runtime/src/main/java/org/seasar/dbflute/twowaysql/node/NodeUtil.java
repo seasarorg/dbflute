@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
-import org.seasar.dbflute.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
-import org.seasar.dbflute.exception.BindVariableCommentParameterNullValueException;
-import org.seasar.dbflute.exception.EmbeddedVariableCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
 

@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the list index on embedded variable comment is not number.
+ * The exception of when the parameter of embedded variable is null.
  * @author jflute
  */
-public class EmbeddedVariableCommentListIndexNotNumberException extends RuntimeException {
+public class EmbeddedVariableCommentParameterNullValueException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,7 @@ public class EmbeddedVariableCommentListIndexNotNumberException extends RuntimeE
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EmbeddedVariableCommentListIndexNotNumberException(String msg) {
+    public EmbeddedVariableCommentParameterNullValueException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public EmbeddedVariableCommentListIndexNotNumberException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

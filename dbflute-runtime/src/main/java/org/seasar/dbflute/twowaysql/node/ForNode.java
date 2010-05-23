@@ -17,9 +17,9 @@ package org.seasar.dbflute.twowaysql.node;
 
 import java.util.List;
 
-import org.seasar.dbflute.exception.EndCommentNotFoundException;
-import org.seasar.dbflute.exception.ForCommentParameterNotListException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
+import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNotListException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.Srl;
 

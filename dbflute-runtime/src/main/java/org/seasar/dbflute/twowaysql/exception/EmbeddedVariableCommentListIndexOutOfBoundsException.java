@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the result of IF comment expression is empty.
+ * The exception of when the list index on embedded variable comment is out of bounds.
  * @author jflute
  */
-public class IfCommentEmptyExpressionException extends IfCommentWrongExpressionException {
+public class EmbeddedVariableCommentListIndexOutOfBoundsException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IfCommentEmptyExpressionException extends IfCommentWrongExpressionE
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentEmptyExpressionException(String msg) {
+    public EmbeddedVariableCommentListIndexOutOfBoundsException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IfCommentEmptyExpressionException extends IfCommentWrongExpressionE
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IfCommentEmptyExpressionException(String msg, Throwable cause) {
+    public EmbeddedVariableCommentListIndexOutOfBoundsException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

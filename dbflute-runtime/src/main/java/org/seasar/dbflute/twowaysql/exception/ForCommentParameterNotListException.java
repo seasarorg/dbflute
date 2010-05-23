@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the property on FOR comment is not found.
+ * The exception of when the parameter of FOR comment is not list.
  * @author jflute
  */
-public class ForCommentNotFoundPropertyException extends RuntimeException {
+public class ForCommentParameterNotListException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,7 @@ public class ForCommentNotFoundPropertyException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public ForCommentNotFoundPropertyException(String msg) {
+    public ForCommentParameterNotListException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public ForCommentNotFoundPropertyException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

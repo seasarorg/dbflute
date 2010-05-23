@@ -2,9 +2,9 @@ package org.seasar.dbflute.twowaysql;
 
 import org.seasar.dbflute.cbean.SimplePagingBean;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
-import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
+import org.seasar.dbflute.twowaysql.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.unit.PlainTestCase;
 

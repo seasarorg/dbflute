@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the IF comment has unsupported type comparison.
+ * The exception of when the method invocation of IF comment fails.
  * @author jflute
  */
-public class IfCommentUnsupportedTypeComparisonException extends IfCommentWrongExpressionException {
+public class IfCommentMethodInvocationFailureException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class IfCommentUnsupportedTypeComparisonException extends IfCommentWrongE
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentUnsupportedTypeComparisonException(String msg) {
+    public IfCommentMethodInvocationFailureException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public IfCommentMethodInvocationFailureException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

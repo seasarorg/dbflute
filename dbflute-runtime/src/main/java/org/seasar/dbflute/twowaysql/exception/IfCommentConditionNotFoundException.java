@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the list index on embedded variable comment is out of bounds.
+ * The exception of when the condition of IF comment is not found about outsideSql.
  * @author jflute
  */
-public class EmbeddedVariableCommentListIndexOutOfBoundsException extends RuntimeException {
+public class IfCommentConditionNotFoundException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,7 @@ public class EmbeddedVariableCommentListIndexOutOfBoundsException extends Runtim
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EmbeddedVariableCommentListIndexOutOfBoundsException(String msg) {
+    public IfCommentConditionNotFoundException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public EmbeddedVariableCommentListIndexOutOfBoundsException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

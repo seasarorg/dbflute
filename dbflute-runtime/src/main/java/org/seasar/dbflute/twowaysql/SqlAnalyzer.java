@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.seasar.dbflute.exception.EndCommentNotFoundException;
-import org.seasar.dbflute.exception.IfCommentConditionNotFoundException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
+import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
+import org.seasar.dbflute.twowaysql.exception.IfCommentConditionNotFoundException;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.twowaysql.node.BeginNode;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;

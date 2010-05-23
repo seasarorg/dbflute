@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the property on embedded variable comment is not found.
+ * The exception of when the IF comment has different type comparison.
  * @author jflute
  */
-public class EmbeddedVariableCommentNotFoundPropertyException extends RuntimeException {
+public class IfCommentDifferentTypeComparisonException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,7 @@ public class EmbeddedVariableCommentNotFoundPropertyException extends RuntimeExc
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EmbeddedVariableCommentNotFoundPropertyException(String msg) {
+    public IfCommentDifferentTypeComparisonException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public EmbeddedVariableCommentNotFoundPropertyException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

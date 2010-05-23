@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the bind variable comment has illegal parameter-bean specification.
+ * The exception of when the property on embedded variable comment is not found.
  * @author jflute
  */
-public class BindVariableCommentIllegalParameterBeanSpecificationException extends RuntimeException {
+public class EmbeddedVariableCommentNotFoundPropertyException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class BindVariableCommentIllegalParameterBeanSpecificationException exten
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public BindVariableCommentIllegalParameterBeanSpecificationException(String msg) {
+    public EmbeddedVariableCommentNotFoundPropertyException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class BindVariableCommentIllegalParameterBeanSpecificationException exten
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public BindVariableCommentIllegalParameterBeanSpecificationException(String msg, Throwable cause) {
+    public EmbeddedVariableCommentNotFoundPropertyException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

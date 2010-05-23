@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the list index on bind variable comment is not number.
+ * The exception of when the IF comment has unsupported type comparison.
  * @author jflute
  */
-public class BindVariableCommentListIndexNotNumberException extends RuntimeException {
+public class IfCommentUnsupportedTypeComparisonException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,7 @@ public class BindVariableCommentListIndexNotNumberException extends RuntimeExcep
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public BindVariableCommentListIndexNotNumberException(String msg) {
+    public IfCommentUnsupportedTypeComparisonException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public BindVariableCommentListIndexNotNumberException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }
