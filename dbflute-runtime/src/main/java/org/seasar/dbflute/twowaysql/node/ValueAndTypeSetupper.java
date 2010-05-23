@@ -136,7 +136,7 @@ public class ValueAndTypeSetupper {
             if (List.class.isInstance(value)) { // used by FOR comment
                 if (currentName.startsWith("get(") && currentName.endsWith(")")) {
                     final List<?> list = (List<?>) value;
-                    final String exp = Srl.extractFirstScope(currentName, "get(", ")");
+                    final String exp = Srl.extractScopeFirst(currentName, "get(", ")").getContent();
                     try {
                         final Integer index = DfTypeUtil.toInteger(exp);
                         value = list.get(index);

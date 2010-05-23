@@ -3,9 +3,10 @@ package org.seasar.dbflute.util;
 import static org.seasar.dbflute.util.Srl.camelize;
 import static org.seasar.dbflute.util.Srl.connectPrefix;
 import static org.seasar.dbflute.util.Srl.connectSuffix;
+import static org.seasar.dbflute.util.Srl.count;
 import static org.seasar.dbflute.util.Srl.decamelize;
-import static org.seasar.dbflute.util.Srl.extractAllScope;
-import static org.seasar.dbflute.util.Srl.extractFirstScope;
+import static org.seasar.dbflute.util.Srl.extractScopeFirst;
+import static org.seasar.dbflute.util.Srl.extractScopeList;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
 import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.removeLineComment;
@@ -23,6 +24,7 @@ import static org.seasar.dbflute.util.Srl.unquoteSingle;
 import java.util.List;
 
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -153,6 +155,17 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                               Count
+    //                                                                               =====
+    public void test_count_basic() {
+        assertEquals(0, count("foobar", "."));
+        assertEquals(1, count("foo.bar", "."));
+        assertEquals(1, count("foo.bar", "foo"));
+        assertEquals(2, count("foo.bar.baz", "."));
+        assertEquals(4, count(".foo.bar.baz.", "."));
+    }
+
+    // ===================================================================================
     //                                                                             Connect
     //                                                                             =======
     public void test_connectPrefix_basic() {
@@ -199,32 +212,94 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                      Scope Handling
     //                                                                      ==============
-    public void test_extractFirstScope_basic() {
-        assertEquals("BAR", extractFirstScope("FOObeginBARendDODO", "begin", "end"));
-        assertEquals("BAR", extractFirstScope("FOObeginBARend", "begin", "end"));
-        assertEquals("BAR", extractFirstScope("beginBARendDODO", "begin", "end"));
-        assertEquals(null, extractFirstScope("beginBARedDODO", "begin", "end"));
-        assertEquals(null, extractFirstScope("begnBARendDODO", "begin", "end"));
-        assertEquals(null, extractFirstScope("begnBARedDODO", "begin", "end"));
-        assertEquals("9", extractFirstScope("get(9)", "get(", ")"));
-        assertEquals("99", extractFirstScope("get(99)", "get(", ")"));
-        assertEquals(" 99 ", extractFirstScope("get( 99 )", "get(", ")")); // not trimmed
+    public void test_extractScopeFirst_content() {
+        assertEquals("BAR", extractScopeFirst("FOObeginBARendDODO", "begin", "end").getContent());
+        assertEquals("BAR", extractScopeFirst("FOObeginBARend", "begin", "end").getContent());
+        assertEquals("BAR", extractScopeFirst("beginBARendDODO", "begin", "end").getContent());
+        assertEquals(null, extractScopeFirst("beginBARedDODO", "begin", "end"));
+        assertEquals(null, extractScopeFirst("begnBARendDODO", "begin", "end"));
+        assertEquals(null, extractScopeFirst("begnBARedDODO", "begin", "end"));
+        assertEquals("9", extractScopeFirst("get(9)", "get(", ")").getContent());
+        assertEquals("99", extractScopeFirst("get(99)", "get(", ")").getContent());
+        assertEquals(" 99 ", extractScopeFirst("get( 99 )", "get(", ")").getContent()); // not trimmed
+        assertEquals("foo", extractScopeFirst("get(foo)-get(bar)", "get(", ")").getContent());
+        assertEquals("foo", extractScopeFirst("@foo@-get@bar@", "@", "@").getContent());
     }
 
-    public void test_extractAllScope_basic() {
+    public void test_extractScopeFirst_scope() {
+        assertEquals("beginBARend", extractScopeFirst("FOObeginBARendDODO", "begin", "end").getScope());
+        assertEquals("beginBARend", extractScopeFirst("FOObeginBARend", "begin", "end").getScope());
+        assertEquals("beginBARend", extractScopeFirst("beginBARendDODO", "begin", "end").getScope());
+        assertEquals(null, extractScopeFirst("beginBARedDODO", "begin", "end"));
+        assertEquals(null, extractScopeFirst("begnBARendDODO", "begin", "end"));
+        assertEquals(null, extractScopeFirst("begnBARedDODO", "begin", "end"));
+        assertEquals("get(9)", extractScopeFirst("xget(9)x", "get(", ")").getScope());
+        assertEquals("get(99)", extractScopeFirst("xget(99)x", "get(", ")").getScope());
+        assertEquals("get( 99 )", extractScopeFirst("xget( 99 )x", "get(", ")").getScope()); // not trimmed
+        assertEquals("get(foo)", extractScopeFirst("get(foo)-get(bar)", "get(", ")").getScope());
+        assertEquals("@foo@", extractScopeFirst("@foo@-get@bar@", "@", "@").getScope());
+    }
+
+    public void test_extractScopeList_basic() {
         // ## Arrange ##
         String str = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
 
         // ## Act ##
-        List<String> list = extractAllScope(str, "/*", "*/");
+        List<ScopeInfo> list = extractScopeList(str, "/*", "*/");
 
         // ## Assert ##
         assertEquals(5, list.size());
-        assertEquals("BEGIN", list.get(0));
-        assertEquals("FOR pmb", list.get(1));
-        assertEquals("FIRST 'foo'", list.get(2));
-        assertEquals("END FOR", list.get(3));
-        assertEquals(" END ", list.get(4)); // not trimmed
+        assertEquals(str.indexOf("/*BEGIN*/"), list.get(0).getBeginIndex());
+        assertEquals(str.indexOf("/*FOR pmb*/"), list.get(1).getBeginIndex());
+        assertEquals(str.indexOf("/*FIRST 'foo'*/"), list.get(2).getBeginIndex());
+        assertEquals(str.indexOf("/*END FOR*/"), list.get(3).getBeginIndex());
+        assertEquals(str.indexOf("/* END */"), list.get(4).getBeginIndex());
+        assertEquals(str.indexOf("/*BEGIN*/") + "/*BEGIN*/".length(), list.get(0).getEndIndex());
+        assertEquals(str.indexOf("/*FOR pmb*/") + "/*FOR pmb*/".length(), list.get(1).getEndIndex());
+        assertEquals(str.indexOf("/*FIRST 'foo'*/") + "/*FIRST 'foo'*/".length(), list.get(2).getEndIndex());
+        assertEquals(str.indexOf("/*END FOR*/") + "/*END FOR*/".length(), list.get(3).getEndIndex());
+        assertEquals(str.indexOf("/* END */") + "/* END */".length(), list.get(4).getEndIndex());
+        assertEquals("BEGIN", list.get(0).getContent());
+        assertEquals("FOR pmb", list.get(1).getContent());
+        assertEquals("FIRST 'foo'", list.get(2).getContent());
+        assertEquals("END FOR", list.get(3).getContent());
+        assertEquals(" END ", list.get(4).getContent()); // not trimmed
+        assertEquals("/*BEGIN*/", list.get(0).getScope());
+        assertEquals("/*FOR pmb*/", list.get(1).getScope());
+        assertEquals("/*FIRST 'foo'*/", list.get(2).getScope());
+        assertEquals("/*END FOR*/", list.get(3).getScope());
+        assertEquals("/* END */", list.get(4).getScope()); // not trimmed
+    }
+
+    public void test_extractScopeList_sameMark() {
+        // ## Arrange ##
+        String str = "baz@@BEGIN@@where @@FOR pmb@@ @@FIRST 'foo'@@member...@@END FOR@@@@ END @@bar";
+
+        // ## Act ##
+        List<ScopeInfo> list = extractScopeList(str, "@@", "@@");
+
+        // ## Assert ##
+        assertEquals(5, list.size());
+        assertEquals(str.indexOf("@@BEGIN@@"), list.get(0).getBeginIndex());
+        assertEquals(str.indexOf("@@FOR pmb@@"), list.get(1).getBeginIndex());
+        assertEquals(str.indexOf("@@FIRST 'foo'@@"), list.get(2).getBeginIndex());
+        assertEquals(str.indexOf("@@END FOR@@"), list.get(3).getBeginIndex());
+        assertEquals(str.indexOf("@@ END @@"), list.get(4).getBeginIndex());
+        assertEquals(str.indexOf("@@BEGIN@@") + "@@BEGIN@@".length(), list.get(0).getEndIndex());
+        assertEquals(str.indexOf("@@FOR pmb@@") + "@@FOR pmb@@".length(), list.get(1).getEndIndex());
+        assertEquals(str.indexOf("@@FIRST 'foo'@@") + "@@FIRST 'foo'@@".length(), list.get(2).getEndIndex());
+        assertEquals(str.indexOf("@@END FOR@@") + "@@END FOR@@".length(), list.get(3).getEndIndex());
+        assertEquals(str.indexOf("@@ END @@") + "@@ END @@".length(), list.get(4).getEndIndex());
+        assertEquals("BEGIN", list.get(0).getContent());
+        assertEquals("FOR pmb", list.get(1).getContent());
+        assertEquals("FIRST 'foo'", list.get(2).getContent());
+        assertEquals("END FOR", list.get(3).getContent());
+        assertEquals(" END ", list.get(4).getContent()); // not trimmed
+        assertEquals("@@BEGIN@@", list.get(0).getScope());
+        assertEquals("@@FOR pmb@@", list.get(1).getScope());
+        assertEquals("@@FIRST 'foo'@@", list.get(2).getScope());
+        assertEquals("@@END FOR@@", list.get(3).getScope());
+        assertEquals("@@ END @@", list.get(4).getScope()); // not trimmed
     }
 
     // ===================================================================================

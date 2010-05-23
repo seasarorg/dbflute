@@ -24,6 +24,7 @@ import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNotListExceptio
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * The node for FOR (loop). <br />
@@ -32,24 +33,6 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class ForNode {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
-    public static final String FOR_EXP = "FOR";
-    public static final String FOR_MARK = "/*" + FOR_EXP + " ";
-    public static final String CLOSE_MARK = "*/";
-    public static final String END_COMMENT = "/*END FOR*/";
-
-    // -----------------------------------------------------
-    //                                         Loop Variable
-    //                                         -------------
-    public static final String FIRST_EXP = "FIRST";
-    public static final String NEXT_EXP = "NEXT";
-    public static final String LAST_EXP = "LAST";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -73,10 +56,10 @@ public class ForNode {
      * @return Is the comment one of FOR comment elements?
      */
     public static final boolean isForCommentElement(String comment) {
-        if (comment.startsWith(FOR_MARK)) {
+        if (comment.startsWith("FOR")) {
             return true;
         }
-        if (comment.startsWith(FIRST_EXP) || comment.startsWith(NEXT_EXP) || comment.startsWith(LAST_EXP)) {
+        if (comment.startsWith("FIRST") || comment.startsWith("NEXT") || comment.startsWith("LAST")) {
             return true;
         }
         return false;
@@ -90,20 +73,20 @@ public class ForNode {
             return _dynamicSql;
         }
         // *nested FOR comments are unsupported 
-        final String startMark = ForNode.FOR_MARK;
-        final String closeMark = ForNode.CLOSE_MARK;
-        final String endMark = ForNode.END_COMMENT;
+        final String beginMark = "/*FOR ";
+        final String closeMark = "*/";
+        final String endMark = "/*END FOR*/";
         String rear = _dynamicSql;
         final StringBuilder sb = new StringBuilder();
         while (true) {
-            final int startIndex = rear.indexOf(startMark);
-            if (startIndex < 0) {
+            final int beginIndex = rear.indexOf(beginMark);
+            if (beginIndex < 0) {
                 sb.append(rear);
                 break;
             }
 
-            sb.append(rear.substring(0, startIndex));
-            rear = rear.substring(startIndex + startMark.length());
+            sb.append(rear.substring(0, beginIndex));
+            rear = rear.substring(beginIndex + beginMark.length());
             final int closeIndex = rear.indexOf(closeMark);
             if (closeIndex < 0) {
                 sb.append(rear);
@@ -167,7 +150,7 @@ public class ForNode {
             ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("The parameter for FOR coment was not list.");
             br.addItem("FOR Comment");
-            br.addElement(ForNode.FOR_MARK + expression + ForNode.END_COMMENT);
+            br.addElement("/*FOR " + expression + "*/");
             br.addItem("Parameter");
             br.addElement(targetValue.getClass());
             br.addElement(targetValue);
@@ -199,26 +182,73 @@ public class ForNode {
 
     protected LoopVariableInfo extractLoopVariableInfo(String content) {
         final LoopVariableInfo info = new LoopVariableInfo();
-        final List<String> replacementList = Srl.extractAllScope(content, "/*", "*/");
-        for (String replacement : replacementList) {
-            final String key = "/*" + replacement + "*/";
-            if (replacement.startsWith(FIRST_EXP)) {
-                info.addFirst(key, extractVariableValue(replacement));
-                info.addNext(key, "");
-            } else if (replacement.startsWith(NEXT_EXP)) {
-                info.addFirst(key, "");
-                info.addNext(key, extractVariableValue(replacement));
-            } else if (replacement.startsWith(LAST_EXP)) {
-                info.addFirst(key, "");
-                info.addNext(key, ""); // LAST replacement should be executed before NEXT
-                info.addLast(key, extractVariableValue(replacement));
+        final List<ScopeInfo> scopeList = Srl.extractScopeList(content, "/*", "*/");
+        for (int i = 0; i < scopeList.size(); i++) {
+            final ScopeInfo scope = scopeList.get(i);
+            if (Srl.count(scope.getContent(), "'") < 2) {
+                continue;
+            }
+            if (scope.getContent().startsWith("FIRST")) {
+                final KeyValueContainer keyValue = processKeyValue(content, scopeList, i, "FIRST");
+                info.addFirst(keyValue.getKey(), keyValue.getValue());
+                info.addNext(keyValue.getKey(), "");
+            } else if (scope.getContent().startsWith("NEXT")) {
+                final KeyValueContainer keyValue = processKeyValue(content, scopeList, i, "NEXT");
+                info.addFirst(keyValue.getKey(), "");
+                info.addNext(keyValue.getKey(), keyValue.getValue());
+            } else if (scope.getContent().startsWith("LAST")) {
+                final KeyValueContainer keyValue = processKeyValue(content, scopeList, i, "NEXT");
+                info.addFirst(keyValue.getKey(), "");
+                info.addNext(keyValue.getKey(), ""); // LAST replacement should be executed before NEXT
+                info.addLast(keyValue.getKey(), keyValue.getValue());
             }
         }
         return info;
     }
 
-    protected String extractVariableValue(String replacement) {
-        return Srl.extractFirstScope(replacement, "'", "'");
+    protected KeyValueContainer processKeyValue(String content, List<ScopeInfo> scopeList, int i, String keyword) {
+        final ScopeInfo scope = scopeList.get(i);
+        final String adding = Srl.extractScopeFirst(scope.getContent(), "'", "'").getContent();
+        String key = null;
+        String value = null;
+        if (i < (scopeList.size() - 1)) { // has next scope
+            final ScopeInfo nextScope = scopeList.get(i + 1);
+            if (("END " + keyword).equals(nextScope.getContent())) {
+                key = content.substring(scope.getBeginIndex(), nextScope.getEndIndex());
+                value = content.substring(scope.getEndIndex(), nextScope.getBeginIndex()) + adding;
+            }
+        }
+        if (key == null) {
+            key = scope.getScope();
+        }
+        if (value == null) {
+            value = adding;
+        }
+        final KeyValueContainer container = new KeyValueContainer();
+        container.setKey(key);
+        container.setValue(value);
+        return container;
+    }
+
+    protected static class KeyValueContainer {
+        protected String _key;
+        protected String _value;
+
+        public String getKey() {
+            return _key;
+        }
+
+        public void setKey(String key) {
+            this._key = key;
+        }
+
+        public String getValue() {
+            return _value;
+        }
+
+        public void setValue(String value) {
+            this._value = value;
+        }
     }
 
     protected static class LoopVariableInfo {

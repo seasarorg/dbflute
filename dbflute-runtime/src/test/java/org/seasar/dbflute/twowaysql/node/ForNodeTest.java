@@ -185,7 +185,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   /*NEXT 'and '*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
         sb.append("   /*END FOR*/").append(ln());
         sb.append("   /*FOR pmb.memberAccountList*/").append(ln());
-        sb.append("   and /*FIRST '('*//*NEXT '  or '*/MEMBER_ACCOUNT");
+        sb.append("   /*FIRST '('*/and /*END FIRST*//*NEXT '  or '*/MEMBER_ACCOUNT");
         sb.append(" like /*pmb.memberAccountList.get(index)*/'foo%'/*LAST ')'*/").append(ln());
         sb.append("   /*END FOR*/").append(ln());
 

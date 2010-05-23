@@ -249,6 +249,22 @@ public class Srl {
     }
 
     // ===================================================================================
+    //                                                                               Count
+    //                                                                               =====
+    public static int count(String str, String element) {
+        int count = 0;
+        while (true) {
+            final int index = str.indexOf(element);
+            if (index < 0) {
+                break;
+            }
+            str = str.substring(index + element.length());
+            ++count;
+        }
+        return count;
+    }
+
+    // ===================================================================================
     //                                                                             Connect
     //                                                                             =======
     public static final String connectPrefix(String str, String prefix, String delimiter) {
@@ -377,45 +393,102 @@ public class Srl {
     // ===================================================================================
     //                                                                      Scope Handling
     //                                                                      ==============
-    public static final String extractFirstScope(String str, String beginMark, String endMark) {
-        assertStringNotNull(str);
-        assertBeginMarkNotNull(beginMark);
-        assertEndMarkNotNull(endMark);
-        final String ret;
-        {
-            String tmp = str;
-            final int beginIndex = tmp.indexOf(beginMark);
-            if (beginIndex < 0) {
-                return null;
-            }
-            tmp = tmp.substring(beginIndex + beginMark.length());
-            if (tmp.indexOf(endMark) < 0) {
-                return null;
-            }
-            ret = tmp.substring(0, tmp.indexOf(endMark));
+    public static final ScopeInfo extractScopeFirst(String str, String beginMark, String endMark) {
+        final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, true);
+        if (scopeList.isEmpty()) {
+            return null;
         }
-        return ret;
+        if (scopeList.size() > 1) {
+            String msg = "This method should extract only one scope: " + scopeList;
+            throw new IllegalStateException(msg);
+        }
+        return scopeList.get(0);
     }
 
-    public static final List<String> extractAllScope(String str, String beginMark, String endMark) {
+    public static final List<ScopeInfo> extractScopeList(String str, String beginMark, String endMark) {
+        return doExtractScopeList(str, beginMark, endMark, false);
+    }
+
+    public static final List<ScopeInfo> doExtractScopeList(String str, String beginMark, String endMark,
+            boolean firstOnly) {
         assertStringNotNull(str);
         assertBeginMarkNotNull(beginMark);
         assertEndMarkNotNull(endMark);
-        final List<String> resultList = new ArrayList<String>();
-        String tmp = str;
+        final List<ScopeInfo> resultList = new ArrayList<ScopeInfo>();
+        int currentBeginIndex = 0;
+        String rear = str;
         while (true) {
-            final int beginIndex = tmp.indexOf(beginMark);
+            final int beginIndex = rear.indexOf(beginMark);
             if (beginIndex < 0) {
                 break;
             }
-            tmp = tmp.substring(beginIndex + beginMark.length());
-            if (tmp.indexOf(endMark) < 0) {
+            rear = rear.substring(beginIndex); // scope begins
+            if (rear.length() <= beginMark.length()) {
                 break;
             }
-            resultList.add(tmp.substring(0, tmp.indexOf(endMark)));
-            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
+            rear = rear.substring(beginMark.length()); // skip begin-mark
+            final int endIndex = rear.indexOf(endMark);
+            if (endIndex < 0) {
+                break;
+            }
+            final String scope = beginMark + rear.substring(0, endIndex + endMark.length());
+            final ScopeInfo info = new ScopeInfo();
+            info.setBeginIndex(currentBeginIndex + beginIndex);
+            info.setEndIndex(info.getBeginIndex() + scope.length());
+            info.setContent(rtrim(ltrim(scope, beginMark), endMark));
+            info.setScope(scope);
+            resultList.add(info);
+            if (currentBeginIndex == 0 && firstOnly) {
+                break;
+            }
+            currentBeginIndex = info.getEndIndex();
+            rear = str.substring(currentBeginIndex);
         }
         return resultList;
+    }
+
+    public static class ScopeInfo {
+        protected int beginIndex;
+        protected int endIndex;
+        protected String content;
+        protected String scope;
+
+        @Override
+        public String toString() {
+            return scope;
+        }
+
+        public int getBeginIndex() {
+            return beginIndex;
+        }
+
+        public void setBeginIndex(int beginIndex) {
+            this.beginIndex = beginIndex;
+        }
+
+        public int getEndIndex() {
+            return endIndex;
+        }
+
+        public void setEndIndex(int endIndex) {
+            this.endIndex = endIndex;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
+        }
     }
 
     // ===================================================================================

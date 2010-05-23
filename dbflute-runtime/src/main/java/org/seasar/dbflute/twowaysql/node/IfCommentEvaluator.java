@@ -403,7 +403,7 @@ public class IfCommentEvaluator {
         if (List.class.isInstance(baseObject)) { // used by FOR comment
             if (property.startsWith("get(") && property.endsWith(")")) {
                 final List<?> list = (List<?>) baseObject;
-                final String exp = Srl.extractFirstScope(property, "get(", ")");
+                final String exp = Srl.extractScopeFirst(property, "get(", ")").getContent();
                 try {
                     final Integer index = DfTypeUtil.toInteger(exp);
                     return list.get(index);
