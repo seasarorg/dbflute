@@ -18,11 +18,13 @@ import org.seasar.dbflute.twowaysql.exception.IfCommentNotBooleanResultException
 import org.seasar.dbflute.twowaysql.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentNullPointerException;
+import org.seasar.dbflute.twowaysql.exception.IfCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 
 /**
  * 
@@ -576,6 +578,28 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         createEvaluator("foo", "pmbb != null").evaluate(); // no exception
     }
 
+    public void test_evaluate_IfCommentPropertyReadFailureException() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb() {
+            @Override
+            public String getMemberName() { // not accessible
+                throw null;
+            }
+        };
+
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb.memberName == null").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentPropertyReadFailureException e) {
+            // OK
+            log(e.getMessage());
+            assertEquals(ReflectionFailureException.class, e.getCause().getCause().getClass());
+        }
+    }
+
     public void test_evaluate_notFoundMethodProperty() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
@@ -933,7 +957,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
-            sb.append(getClass().getSimpleName()).append(":");
+            sb.append(DfTypeUtil.toClassTitle(this)).append(":");
             sb.append(xbuildColumnString());
             return sb.toString();
         }

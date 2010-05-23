@@ -9,6 +9,7 @@ import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexNotNum
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentNotFoundPropertyException;
+import org.seasar.dbflute.twowaysql.exception.ForCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -122,6 +123,30 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         assertEquals("f||o|%o%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
         assertEquals(" escape '|'", valueAndType.getRearOption());
+    }
+
+    public void test_setupValueAndType_bean_propertyReadFailure() {
+        // ## Arrange ##
+        ValueAndTypeSetupper setupper = createTargetAsForComment("pmb.memberId");
+        MockPmb pmb = new MockPmb() {
+            @Override
+            public Integer getMemberId() { // not accessible
+                return super.getMemberId();
+            }
+        };
+        pmb.setMemberId(3);
+        ValueAndType valueAndType = createTargetAndType(pmb);
+
+        // ## Act ##
+        try {
+            setupper.setupValueAndType(valueAndType);
+
+            // ## Assert ##
+            fail();
+        } catch (ForCommentPropertyReadFailureException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     public void test_setupValueAndType_bean_notFoundProperty() {

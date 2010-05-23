@@ -23,16 +23,20 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexNotNumberException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentListIndexNotNumberException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentNotFoundPropertyException;
+import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentListIndexNotNumberException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentNotFoundPropertyException;
+import org.seasar.dbflute.twowaysql.exception.ForCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -137,9 +141,9 @@ public class ValueAndTypeSetupper {
                         final Integer index = DfTypeUtil.toInteger(exp);
                         value = list.get(index);
                     } catch (NumberFormatException e) {
-                        throwListIndexNotNumberException(_expression, exp, _specifiedSql, _commentType, e);
+                        throwListIndexNotNumberException(exp, e);
                     } catch (IndexOutOfBoundsException e) {
-                        throwListIndexOutOfBoundsException(_expression, exp, _specifiedSql, _commentType, e);
+                        throwListIndexOutOfBoundsException(exp, e);
                     }
                     if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
                         value = likeSearchOption.generateRealValue((String) value);
@@ -174,7 +178,7 @@ public class ValueAndTypeSetupper {
                 clazz = (value != null ? value.getClass() : null);
                 continue;
             }
-            throwNotFoundPropertyException(_expression, clazz, currentName, _specifiedSql, _commentType);
+            throwNotFoundPropertyException(clazz, currentName);
         }
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
@@ -234,84 +238,124 @@ public class ValueAndTypeSetupper {
     }
 
     protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, DfPropertyDesc pd) {
-        return pd.getValue(beanValue);
+        try {
+            return pd.getValue(beanValue);
+        } catch (DfBeanIllegalPropertyException e) {
+            throwPropertyReadFailureException(beanType, currentName, e);
+            return null; // unreachable
+        }
     }
 
     protected Object invokeGetter(Method method, Object target) {
         return DfReflectionUtil.invoke(method, target, null);
     }
 
-    protected void throwNotFoundPropertyException(String expression, Class<?> targetType, String notFoundProperty,
-            String specifiedSql, CommentType commentType) {
+    protected void throwPropertyReadFailureException(Class<?> targetType, String propertyName,
+            DfBeanIllegalPropertyException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The property on the " + commentType.textName() + " was not found!");
+        br.addNotice("Failed to read the property on the " + _commentType.textName() + "!");
+        br.addItem("Advice");
+        br.addElement("Please confirm your comment properties.");
+        br.addElement("(readable? accessbile? and so on...)");
+        br.addItem(_commentType.titleName());
+        br.addElement(_expression);
+        br.addItem("Illegal Property");
+        br.addElement(DfTypeUtil.toClassTitle(targetType) + "." + propertyName);
+        br.addItem("Exception Message");
+        br.addElement(e.getClass());
+        br.addElement(e.getMessage());
+        final Throwable cause = e.getCause();
+        if (cause != null) { // basically DfBeanIllegalPropertyException has its cause
+            br.addElement(cause.getClass());
+            br.addElement(cause.getMessage());
+            final Throwable nextCause = cause.getCause();
+            if (nextCause != null) {
+                br.addElement(nextCause.getClass());
+                br.addElement(nextCause.getMessage());
+            }
+        }
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        if (CommentType.BIND.equals(_commentType)) {
+            throw new BindVariableCommentPropertyReadFailureException(msg, e);
+        } else if (CommentType.EMBEDDED.equals(_commentType)) {
+            throw new EmbeddedVariableCommentPropertyReadFailureException(msg, e);
+        } else if (CommentType.FORCOMMENT.equals(_commentType)) {
+            throw new ForCommentPropertyReadFailureException(msg, e);
+        } else { // no way
+            throw new BindVariableCommentPropertyReadFailureException(msg, e);
+        }
+    }
+
+    protected void throwNotFoundPropertyException(Class<?> targetType, String notFoundProperty) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The property on the " + _commentType.textName() + " was not found!");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your property on your arguments.");
         br.addElement("And has the property had misspelling?");
-        br.addItem(commentType.titleName());
-        br.addElement(expression);
+        br.addItem(_commentType.titleName());
+        br.addElement(_expression);
         br.addItem("NotFound Property");
         br.addElement((targetType != null ? targetType.getName() + "#" : "") + notFoundProperty);
         br.addItem("Specified SQL");
-        br.addElement(specifiedSql);
+        br.addElement(_specifiedSql);
         final String msg = br.buildExceptionMessage();
-        if (CommentType.BIND.equals(commentType)) {
+        if (CommentType.BIND.equals(_commentType)) {
             throw new BindVariableCommentNotFoundPropertyException(msg);
-        } else if (CommentType.EMBEDDED.equals(commentType)) {
+        } else if (CommentType.EMBEDDED.equals(_commentType)) {
             throw new EmbeddedVariableCommentNotFoundPropertyException(msg);
-        } else if (CommentType.FORCOMMENT.equals(commentType)) {
+        } else if (CommentType.FORCOMMENT.equals(_commentType)) {
             throw new ForCommentNotFoundPropertyException(msg);
         } else { // no way
             throw new BindVariableCommentNotFoundPropertyException(msg);
         }
     }
 
-    protected void throwListIndexNotNumberException(String expression, String notNumberIndex, String specifiedSql,
-            CommentType commentType, NumberFormatException e) {
+    protected void throwListIndexNotNumberException(String notNumberIndex, NumberFormatException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The list index on the " + commentType.textName() + " was not number!");
+        br.addNotice("The list index on the " + _commentType.textName() + " was not number!");
         br.addItem("Advice");
         br.addElement("Please confirm the index on your comment.");
-        br.addItem(commentType.titleName());
-        br.addElement(expression);
+        br.addItem(_commentType.titleName());
+        br.addElement(_expression);
         br.addItem("NotNumber Index");
         br.addElement(notNumberIndex);
         br.addItem("NumberFormatException");
         br.addElement(e.getMessage());
         br.addItem("Specified SQL");
-        br.addElement(specifiedSql);
+        br.addElement(_specifiedSql);
         final String msg = br.buildExceptionMessage();
-        if (CommentType.BIND.equals(commentType)) {
+        if (CommentType.BIND.equals(_commentType)) {
             throw new BindVariableCommentListIndexNotNumberException(msg, e);
-        } else if (CommentType.EMBEDDED.equals(commentType)) {
+        } else if (CommentType.EMBEDDED.equals(_commentType)) {
             throw new EmbeddedVariableCommentListIndexNotNumberException(msg, e);
-        } else if (CommentType.FORCOMMENT.equals(commentType)) {
+        } else if (CommentType.FORCOMMENT.equals(_commentType)) {
             throw new ForCommentListIndexNotNumberException(msg, e);
         } else { // no way
             throw new BindVariableCommentListIndexNotNumberException(msg, e);
         }
     }
 
-    protected void throwListIndexOutOfBoundsException(String expression, String numberIndex, String specifiedSql,
-            CommentType commentType, IndexOutOfBoundsException e) {
+    protected void throwListIndexOutOfBoundsException(String numberIndex, IndexOutOfBoundsException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The list index on the " + commentType.textName() + " was out of bounds!");
+        br.addNotice("The list index on the " + _commentType.textName() + " was out of bounds!");
         br.addItem("Advice");
         br.addElement("Please confirm the index on your comment.");
-        br.addItem(commentType.titleName());
-        br.addElement(expression);
+        br.addItem(_commentType.titleName());
+        br.addElement(_expression);
         br.addItem("OutOfBounds Index");
         br.addElement(numberIndex);
         br.addItem("IndexOutOfBoundsException");
         br.addElement(e.getMessage());
         br.addItem("Specified SQL");
-        br.addElement(specifiedSql);
+        br.addElement(_specifiedSql);
         final String msg = br.buildExceptionMessage();
-        if (CommentType.BIND.equals(commentType)) {
+        if (CommentType.BIND.equals(_commentType)) {
             throw new BindVariableCommentListIndexOutOfBoundsException(msg, e);
-        } else if (CommentType.EMBEDDED.equals(commentType)) {
+        } else if (CommentType.EMBEDDED.equals(_commentType)) {
             throw new EmbeddedVariableCommentListIndexOutOfBoundsException(msg, e);
-        } else if (CommentType.FORCOMMENT.equals(commentType)) {
+        } else if (CommentType.FORCOMMENT.equals(_commentType)) {
             throw new ForCommentListIndexOutOfBoundsException(msg, e);
         } else { // no way
             throw new BindVariableCommentListIndexOutOfBoundsException(msg, e);

@@ -182,7 +182,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
         try {
             if (!readable) {
                 final Class<?> beanClass = beanDesc.getBeanClass();
-                String msg = DfTypeUtil.toClassTitle(beanClass) + "#" + propertyName;
+                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + propertyName;
                 msg = msg + " is not readable.";
                 throw new IllegalStateException(msg);
             } else if (hasReadMethod()) {
@@ -203,7 +203,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
             value = convertIfNeed(value);
             if (!writable) {
                 final Class<?> beanClass = beanDesc.getBeanClass();
-                String msg = DfTypeUtil.toClassTitle(beanClass) + "#" + propertyName;
+                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + propertyName;
                 msg = msg + " is not writable.";
                 throw new IllegalStateException(msg);
             } else if (hasWriteMethod()) {

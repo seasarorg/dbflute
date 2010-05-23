@@ -25,6 +25,7 @@ import java.util.Map;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.twowaysql.exception.IfCommentDifferentTypeComparisonException;
@@ -37,6 +38,7 @@ import org.seasar.dbflute.twowaysql.exception.IfCommentNotBooleanResultException
 import org.seasar.dbflute.twowaysql.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentNullPointerException;
+import org.seasar.dbflute.twowaysql.exception.IfCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
@@ -378,7 +380,12 @@ public class IfCommentEvaluator {
         final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(baseObject.getClass());
         if (beanDesc.hasPropertyDesc(property)) { // main case
             final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
-            return propertyDesc.getValue(baseObject);
+            try {
+                return propertyDesc.getValue(baseObject);
+            } catch (DfBeanIllegalPropertyException e) {
+                throwIfCommentPropertyReadFailureException(baseObject, propertyDesc.getPropertyName(), e);
+                return null; // unreachable
+            }
         }
         if (property.endsWith(METHOD_SUFFIX)) { // sub-main case
             final String methodName = property.substring(0, property.length() - METHOD_SUFFIX.length());
@@ -514,6 +521,38 @@ public class IfCommentEvaluator {
         throw new IfCommentIllegalParameterBeanSpecificationException(msg);
     }
 
+    protected void throwIfCommentPropertyReadFailureException(Object baseObject, String propertyName,
+            DfBeanIllegalPropertyException e) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Failed to read the property on the IF comment!");
+        br.addItem("Advice");
+        br.addElement("Please confirm your IF comment properties.");
+        br.addElement("(readable? accessbile? and so on...)");
+        br.addItem("IF Comment");
+        br.addElement(_expression);
+        br.addItem("Illegal Property");
+        br.addElement(DfTypeUtil.toClassTitle(baseObject) + "." + propertyName);
+        br.addItem("Exception Message");
+        br.addElement(e.getClass());
+        br.addElement(e.getMessage());
+        final Throwable cause = e.getCause();
+        if (cause != null) { // basically DfBeanIllegalPropertyException has its cause
+            br.addElement(cause.getClass());
+            br.addElement(cause.getMessage());
+            final Throwable nextCause = cause.getCause();
+            if (nextCause != null) {
+                br.addElement(nextCause.getClass());
+                br.addElement(nextCause.getMessage());
+            }
+        }
+        br.addItem("Specified ParameterBean");
+        br.addElement(getDisplayParameterBean());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new IfCommentPropertyReadFailureException(msg, e);
+    }
+
     protected void throwIfCommentNotFoundMethodException(Object baseObject, String notFoundMethod) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The method on the IF comment was not found!");
@@ -524,7 +563,7 @@ public class IfCommentEvaluator {
         br.addElement("  (x) - /*IF pmb.getMemborWame() != null*/");
         br.addElement("  (o) - /*IF pmb.getMemberName() != null*/");
         br.addElement("  - - - - - - - - - -/");
-        br.addItem("IF Comment Expression");
+        br.addItem("IF Comment");
         br.addElement(_expression);
         br.addItem("NotFound Method");
         br.addElement(DfTypeUtil.toClassTitle(baseObject) + "." + notFoundMethod + "()");
@@ -542,11 +581,11 @@ public class IfCommentEvaluator {
         br.addNotice("Failed to invoke the method on the IF comment!");
         br.addItem("Advice");
         br.addElement("Please confirm the method implementation on your comment.");
-        br.addItem("IF Comment Expression");
+        br.addItem("IF Comment");
         br.addElement(_expression);
         br.addItem("Failure Method");
         br.addElement(DfTypeUtil.toClassTitle(baseObject) + "." + methodName + "()");
-        br.addItem("ReflectionFailureException");
+        br.addItem("Exception Message");
         br.addElement(e.getMessage());
         br.addItem("Specified ParameterBean");
         br.addElement(getDisplayParameterBean());
@@ -678,7 +717,7 @@ public class IfCommentEvaluator {
         br.addNotice("The list index on the IF comment was not number!");
         br.addItem("Advice");
         br.addElement("Please confirm the index on your comment.");
-        br.addItem("IF Comment Expression");
+        br.addItem("IF Comment");
         br.addElement(_expression);
         br.addItem("Target List");
         br.addElement(list);
@@ -700,7 +739,7 @@ public class IfCommentEvaluator {
         br.addNotice("The list index on the IF comment was out of bounds!");
         br.addItem("Advice");
         br.addElement("Please confirm the index on your comment.");
-        br.addItem("IF Comment Expression");
+        br.addItem("IF Comment");
         br.addElement(_expression);
         br.addItem("Target List");
         br.addElement(list);
