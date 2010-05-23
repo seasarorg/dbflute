@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.bhv.core.execution;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -31,7 +30,6 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.ForNode;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -43,7 +41,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     //                                                                           Attribute
     //                                                                           =========
     /** The handler of resultSet. */
-    protected TnResultSetHandler resultSetHandler;
+    protected TnResultSetHandler _resultSetHandler;
 
     /** Is it forced to enable the dynamic binding? */
     protected boolean _forcedDynamicBinding;
@@ -60,7 +58,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     public OutsideSqlSelectExecution(DataSource dataSource, StatementFactory statementFactory,
             TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
-        this.resultSetHandler = resultSetHandler;
+        this._resultSetHandler = resultSetHandler;
     }
 
     // ===================================================================================
@@ -83,12 +81,12 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
 
     protected void logDynamicBinding() {
         if (XLog.isLogEnabled()) {
-            XLog.log("...Executing as dynamic binding" + (_forcedDynamicBinding ? " (forced)" : ""));
+            XLog.log("...Executing as dynamic binding" + (isForcedDynamicBinding() ? " (forced)" : ""));
         }
     }
 
     protected boolean isDynamicBinding(OutsideSqlContext outsideSqlContext) {
-        return _forcedDynamicBinding || outsideSqlContext.isDynamicBinding();
+        return isForcedDynamicBinding() || outsideSqlContext.isDynamicBinding();
     }
 
     // -----------------------------------------------------
@@ -96,47 +94,39 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     //                                               -------
     /**
      * Execute outside-SQL as Dynamic.
-     * @param args The array of argument. (NotNull, The first element should be the instance of Pmb)
+     * @param args The array of argument. (NotNull, The first element should be the instance of parameter-bean)
      * @param outsideSqlContext The context of outside-SQL. (NotNull)
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsDynamic(Object[] args, OutsideSqlContext outsideSqlContext) {
-        final Object firstArg = args[0];
+        final Object pmb = args[0];
         String dynamicSql = getSql();
-        if (firstArg != null) {
-            dynamicSql = resolveDynamicForComment(firstArg, dynamicSql);
-            dynamicSql = resolveDynamicEmbedded(firstArg, dynamicSql);
+        if (pmb != null) {
+            dynamicSql = resolveDynamicForComment(pmb, dynamicSql);
+            dynamicSql = resolveDynamicEmbedded(pmb, dynamicSql);
         }
-
-        final OutsideSqlSelectExecution outsideSqlCommand = createDynamicSqlFactory();
-        outsideSqlCommand.setArgNames(getArgNames());
-        outsideSqlCommand.setArgTypes(getArgTypes());
-        outsideSqlCommand.setSql(dynamicSql);
-
-        final CommandContext ctx = outsideSqlCommand.apply(args);
-        final List<Object> bindVariableList = new ArrayList<Object>();
-        final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>();
-        addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
-        final Object[] bindVariableArray = bindVariableList.toArray();
-        selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
-        return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
+        final OutsideSqlSelectExecution dynamicSqlFactory = createDynamicSqlFactory();
+        dynamicSqlFactory.setArgNames(getArgNames());
+        dynamicSqlFactory.setArgTypes(getArgTypes());
+        dynamicSqlFactory.setSql(dynamicSql);
+        final CommandContext ctx = dynamicSqlFactory.apply(args);
+        return doExecuteOutsideSql(ctx);
     }
 
-    protected String resolveDynamicForComment(Object firstArg, String dynamicSql) {
-        if (firstArg == null) {
+    protected String resolveDynamicForComment(Object pmb, String dynamicSql) {
+        if (pmb == null) {
             return dynamicSql;
         }
-        final ForNode node = new ForNode(firstArg, dynamicSql);
+        final ForNode node = new ForNode(pmb, dynamicSql);
         return node.resolveDynamicForComment();
     }
 
-    protected String resolveDynamicEmbedded(Object firstArg, String dynamicSql) {
-        if (firstArg == null) {
+    protected String resolveDynamicEmbedded(Object pmb, String dynamicSql) {
+        if (pmb == null) {
             return dynamicSql;
         }
         // *nested properties are unsupported 
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(firstArg.getClass());
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(pmb.getClass());
         final List<String> proppertyNameList = beanDesc.getProppertyNameList();
         for (String proppertyName : proppertyNameList) {
             final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(proppertyName);
@@ -144,7 +134,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
             if (!propertyType.equals(String.class)) {
                 continue;
             }
-            final String outsideSqlPiece = (String) propertyDesc.getValue(firstArg);
+            final String outsideSqlPiece = (String) propertyDesc.getValue(pmb);
             if (outsideSqlPiece == null) {
                 continue;
             }
@@ -154,33 +144,35 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         return dynamicSql;
     }
 
+    protected OutsideSqlSelectExecution createDynamicSqlFactory() {
+        return new OutsideSqlSelectExecution(getDataSource(), getStatementFactory(), _resultSetHandler);
+    }
+
     // -----------------------------------------------------
     //                                                Static
     //                                                ------
     /**
      * Execute outside-SQL as static.
-     * @param args The array of argument. (NotNull, The first element should be the instance of Pmb)
+     * @param args The array of argument. (NotNull, The first element should be the instance of parameter-bean)
      * @param outsideSqlContext The context of outside-SQL. (NotNull)
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsStatic(Object[] args, OutsideSqlContext outsideSqlContext) {
         final CommandContext ctx = apply(args);
-        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
-        final Object[] bindVariableArray = ctx.getBindVariables();
-        selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
-        return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
+        return doExecuteOutsideSql(ctx);
     }
 
-    // ===================================================================================
-    //                                                                 Dynamic SQL Factory
-    //                                                                 ===================
-    protected OutsideSqlSelectExecution createDynamicSqlFactory() {
-        return new OutsideSqlSelectExecution(getDataSource(), getStatementFactory(), resultSetHandler);
+    // -----------------------------------------------------
+    //                                                Common
+    //                                                ------
+    protected Object doExecuteOutsideSql(CommandContext ctx) {
+        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), _resultSetHandler);
+        final Object[] bindVariables = ctx.getBindVariables();
+        final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
+        selectHandler.setExceptionMessageSqlArgs(bindVariables);
+        return selectHandler.execute(bindVariables, bindVariableTypes);
     }
 
-    // ===================================================================================
-    //                                                                      Select Handler
-    //                                                                      ==============
     protected TnBasicSelectHandler createBasicSelectHandler(String realSql, TnResultSetHandler rsh) {
         return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
     }
@@ -194,46 +186,10 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     }
 
     // ===================================================================================
-    //                                                                        Setup Helper
-    //                                                                        ============
-    protected Class<?>[] toClassArray(List<Class<?>> bindVariableTypeList) {
-        final Class<?>[] bindVariableTypesArray = new Class<?>[bindVariableTypeList.size()];
-        for (int i = 0; i < bindVariableTypeList.size(); i++) {
-            final Class<?> bindVariableType = (Class<?>) bindVariableTypeList.get(i);
-            bindVariableTypesArray[i] = bindVariableType;
-        }
-        return bindVariableTypesArray;
-    }
-
-    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList,
-            List<Class<?>> bindVariableTypeList) {
-        final Object[] bindVariables = ctx.getBindVariables();
-        addBindVariableList(bindVariableList, bindVariables);
-        final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
-        addBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
-    }
-
-    protected void addBindVariableList(List<Object> bindVariableList, Object[] bindVariables) {
-        for (int i = 0; i < bindVariables.length; i++) {
-            bindVariableList.add(bindVariables[i]);
-        }
-    }
-
-    protected void addBindVariableTypeList(List<Class<?>> bindVariableTypeList, Class<?>[] bindVariableTypes) {
-        for (int i = 0; i < bindVariableTypes.length; i++) {
-            bindVariableTypeList.add(bindVariableTypes[i]);
-        }
-    }
-
-    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
-    }
-
-    protected String getLineSeparator() {
-        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
