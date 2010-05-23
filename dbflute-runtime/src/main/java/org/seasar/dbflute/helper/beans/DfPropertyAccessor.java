@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.helper.beans;
 
+import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
+
 /**
  * @author jflute
  */
@@ -24,8 +26,18 @@ public interface DfPropertyAccessor {
 
     Class<?> getPropertyType();
 
+    /**
+     * @param target The target instance. (Nullable)
+     * @return The value of the property. (Nullable)
+     * @throws DfBeanIllegalPropertyException When the property of bean is illegal
+     */
     Object getValue(Object target);
 
+    /**
+     * @param target The target instance. (Nullable)
+     * @param value The value of the property. (Nullable)
+     * @throws DfBeanIllegalPropertyException When the property of bean is illegal
+     */
     void setValue(Object target, Object value);
 
     boolean isReadable();

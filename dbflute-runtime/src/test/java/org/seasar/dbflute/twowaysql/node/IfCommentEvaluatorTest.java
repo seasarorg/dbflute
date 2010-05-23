@@ -6,9 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.SimpleMapPmb;
 import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
 import org.seasar.dbflute.exception.IfCommentIllegalParameterBeanSpecificationException;
+import org.seasar.dbflute.exception.IfCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.IfCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
 import org.seasar.dbflute.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
@@ -705,6 +708,133 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                                List
+    //                                                                                ====
+    public void test_evaluate_list_basic() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        List<NextPmb> ls = new ArrayList<NextPmb>();
+        {
+            NextPmb nextPmb = new NextPmb();
+            nextPmb.setExistsLogin(false);
+            ls.add(nextPmb);
+        }
+        {
+            NextPmb nextPmb = new NextPmb();
+            nextPmb.setExistsLogin(true);
+            ls.add(nextPmb);
+        }
+        {
+            NextPmb nextPmb = new NextPmb();
+            nextPmb.setExistsLogin(false);
+            ls.add(nextPmb);
+        }
+        pmb.setListPmb(ls);
+
+        // ## Act && Assert ##
+        assertFalse(createEvaluator(pmb, "pmb.listPmb.get(0).existsLogin").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.listPmb.get(1).existsLogin").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.listPmb.get(2).existsLogin").evaluate());
+    }
+
+    public void test_evaluate_list_notNumber() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        List<NextPmb> ls = new ArrayList<NextPmb>();
+        NextPmb nextPmb = new NextPmb();
+        nextPmb.setExistsLogin(false);
+        ls.add(nextPmb);
+        pmb.setListPmb(ls);
+
+        // ## Act ##
+        createEvaluator(pmb, "pmb.listPmb.get(0).existsLogin").evaluate(); // no exception
+        try {
+            createEvaluator(pmb, "pmb.listPmb.get(index).existsLogin").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentListIndexNotNumberException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_evaluate_list_outOfBounds() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        List<NextPmb> ls = new ArrayList<NextPmb>();
+        NextPmb nextPmb = new NextPmb();
+        nextPmb.setExistsLogin(false);
+        ls.add(nextPmb);
+        pmb.setListPmb(ls);
+
+        // ## Act ##
+        createEvaluator(pmb, "pmb.listPmb.get(0).existsLogin").evaluate(); // no exception
+        try {
+            createEvaluator(pmb, "pmb.listPmb.get(1).existsLogin").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentListIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                              MapPmb
+    //                                                                              ======
+    public void test_evaluate_mappmb_basic() {
+        // ## Arrange ##
+        SimpleMapPmb<Integer> pmb = new SimpleMapPmb<Integer>();
+        pmb.addParameter("fooKey", 3);
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.fooKey > 2").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.fooKey > 3").evaluate());
+    }
+
+    public void test_evaluate_mappmb_notKey() {
+        // ## Arrange ##
+        SimpleMapPmb<Integer> pmb = new SimpleMapPmb<Integer>();
+        pmb.addParameter("notKey", 3);
+
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb.fooKey > 2").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentNotFoundPropertyException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                                 Map
+    //                                                                                 ===
+    public void test_evaluate_map_basic() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.putMapPmb("fooKey", 3);
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.mapPmb.fooKey > 2").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.mapPmb.fooKey > 3").evaluate());
+    }
+
+    public void test_evaluate_map_notKey() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.putMapPmb("notKey", 3);
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.mapPmb.fooKey == null").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.mapPmb.fooKey != null").evaluate());
+    }
+
+    // ===================================================================================
     //                                                                             Various
     //                                                                             =======
     public void test_evaluate_trim() {
@@ -732,43 +862,6 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         assertTrue(createEvaluator(pmb, "3 > pmb.memberId && date '2009/11/22' > pmb.birthdate").evaluate());
         assertTrue(createEvaluator(pmb, "pmb.memberId < 3 && date '2009/11/22' > pmb.birthdate").evaluate());
         assertTrue(createEvaluator(pmb, "3 == pmb.memberId || date '2009/11/22' > pmb.birthdate").evaluate());
-    }
-
-    public void test_evaluate_map() {
-        // ## Arrange ##
-        BasePmb pmb = new BasePmb();
-        pmb.putMapPmb("fooKey", 3);
-
-        // ## Act && Assert ##
-        assertTrue(createEvaluator(pmb, "pmb.mapPmb.fooKey > 2").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.mapPmb.fooKey > 3").evaluate());
-    }
-
-    public void test_evaluate_list() {
-        // ## Arrange ##
-        BasePmb pmb = new BasePmb();
-        List<NextPmb> ls = new ArrayList<NextPmb>();
-        {
-            NextPmb nextPmb = new NextPmb();
-            nextPmb.setExistsLogin(false);
-            ls.add(nextPmb);
-        }
-        {
-            NextPmb nextPmb = new NextPmb();
-            nextPmb.setExistsLogin(true);
-            ls.add(nextPmb);
-        }
-        {
-            NextPmb nextPmb = new NextPmb();
-            nextPmb.setExistsLogin(false);
-            ls.add(nextPmb);
-        }
-        pmb.setListPmb(ls);
-
-        // ## Act && Assert ##
-        assertFalse(createEvaluator(pmb, "pmb.listPmb.get(0).existsLogin").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.listPmb.get(1).existsLogin").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.listPmb.get(2).existsLogin").evaluate());
     }
 
     public void test_evaluate_scalarPmb() {

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +45,12 @@ public class DfCollectionUtil {
     //                                                                                ====
     public static <ELEMENT> List<ELEMENT> newArrayList() {
         return new ArrayList<ELEMENT>();
+    }
+
+    public static <ELEMENT> List<ELEMENT> newArrayList(Collection<ELEMENT> elements) {
+        final List<ELEMENT> list = newArrayList();
+        list.addAll(elements);
+        return list;
     }
 
     public static <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
@@ -104,8 +111,14 @@ public class DfCollectionUtil {
         return new HashSet<ELEMENT>();
     }
 
+    public static <ELEMENT> Set<ELEMENT> newHashSet(Collection<ELEMENT> elements) {
+        final Set<ELEMENT> set = newHashSet();
+        set.addAll(elements);
+        return set;
+    }
+
     public static <ELEMENT> Set<ELEMENT> newHashSet(ELEMENT... elements) {
-        Set<ELEMENT> set = new HashSet<ELEMENT>();
+        final Set<ELEMENT> set = newHashSet();
         for (ELEMENT element : elements) {
             set.add(element);
         }
@@ -116,8 +129,14 @@ public class DfCollectionUtil {
         return new LinkedHashSet<ELEMENT>();
     }
 
+    public static <ELEMENT> Set<ELEMENT> newLinkedHashSet(Collection<ELEMENT> elements) {
+        final Set<ELEMENT> set = newLinkedHashSet();
+        set.addAll(elements);
+        return set;
+    }
+
     public static <ELEMENT> Set<ELEMENT> newLinkedHashSet(ELEMENT... elements) {
-        Set<ELEMENT> set = newLinkedHashSet();
+        final Set<ELEMENT> set = newLinkedHashSet();
         for (ELEMENT element : elements) {
             set.add(element);
         }

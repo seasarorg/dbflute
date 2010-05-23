@@ -21,10 +21,13 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.exception.BindVariableCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.BindVariableCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.EmbeddedVariableCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.EmbeddedVariableCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.exception.EmbeddedVariableCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.ForCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.ForCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.exception.ForCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
@@ -126,38 +129,28 @@ public class ValueAndTypeSetupper {
                 clazz = (value != null ? value.getClass() : pd.getPropertyType());
                 continue;
             }
-            if (List.class.isInstance(value)) {
+            if (List.class.isInstance(value)) { // used by FOR comment
                 if (currentName.startsWith("get(") && currentName.endsWith(")")) {
-                    // used when FOR comment
                     final List<?> list = (List<?>) value;
                     final String exp = Srl.extractFirstScope(currentName, "get(", ")");
                     try {
                         final Integer index = DfTypeUtil.toInteger(exp);
                         value = list.get(index);
-                        if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                            value = likeSearchOption.generateRealValue((String) value);
-                            rearOption = likeSearchOption.getRearOption();
-                        }
-                        clazz = (value != null ? value.getClass() : null);
-                        continue;
                     } catch (NumberFormatException e) {
-                        throwListIndexNumberException(_expression, exp, _specifiedSql, _commentType, e);
+                        throwListIndexNotNumberException(_expression, exp, _specifiedSql, _commentType, e);
+                    } catch (IndexOutOfBoundsException e) {
+                        throwListIndexOutOfBoundsException(_expression, exp, _specifiedSql, _commentType, e);
                     }
+                    if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
+                        value = likeSearchOption.generateRealValue((String) value);
+                        rearOption = likeSearchOption.getRearOption();
+                    }
+                    clazz = (value != null ? value.getClass() : null);
+                    continue;
                 }
             }
-            if (Map.class.isInstance(value)) { // used by union-query and so on...
-                final Map<?, ?> map = (Map<?, ?>) value;
-                // if the key does not exist, treated same as a null value
-                value = map.get(currentName);
-                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                    value = likeSearchOption.generateRealValue((String) value);
-                    rearOption = likeSearchOption.getRearOption();
-                }
-                clazz = (value != null ? value.getClass() : null);
-                continue;
-            }
-            if (MapParameterBean.class.isAssignableFrom(clazz)) { // priority low
-                final Map<String, Object> map = ((MapParameterBean) value).getParameterMap();
+            if (MapParameterBean.class.isAssignableFrom(clazz)) { // used by union-query internally
+                final Map<?, ?> map = ((MapParameterBean<?>) value).getParameterMap();
                 // if the key does not exist, it does not process
                 // (different specification with Map)
                 if (map.containsKey(currentName)) {
@@ -169,6 +162,17 @@ public class ValueAndTypeSetupper {
                     clazz = (value != null ? value.getClass() : null);
                     continue;
                 }
+            }
+            if (Map.class.isInstance(value)) {
+                final Map<?, ?> map = (Map<?, ?>) value;
+                // if the key does not exist, treated same as a null value
+                value = map.get(currentName);
+                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
+                    value = likeSearchOption.generateRealValue((String) value);
+                    rearOption = likeSearchOption.getRearOption();
+                }
+                clazz = (value != null ? value.getClass() : null);
+                continue;
             }
             throwNotFoundPropertyException(_expression, clazz, currentName, _specifiedSql, _commentType);
         }
@@ -185,11 +189,11 @@ public class ValueAndTypeSetupper {
         boolean result = false;
         if (beanDesc.hasPropertyDesc(propertyName)) { // main case
             result = true;
+        } else if (MapParameterBean.class.isInstance(pmb)) {
+            final Map<?, ?> map = ((MapParameterBean<?>) pmb).getParameterMap();
+            result = map.containsKey(propertyName);
         } else if (Map.class.isInstance(pmb)) {
             result = ((Map<?, ?>) pmb).containsKey(propertyName);
-        } else if (MapParameterBean.class.isInstance(pmb)) {
-            final Map<String, Object> map = ((MapParameterBean) pmb).getParameterMap();
-            result = map.containsKey(propertyName);
         }
         return result;
     }
@@ -200,11 +204,11 @@ public class ValueAndTypeSetupper {
         if (beanDesc.hasPropertyDesc(propertyName)) { // main case
             final DfPropertyDesc pb = beanDesc.getPropertyDesc(propertyName);
             option = (LikeSearchOption) pb.getValue(pmb);
+        } else if (MapParameterBean.class.isInstance(pmb)) {
+            final Map<?, ?> map = ((MapParameterBean<?>) pmb).getParameterMap();
+            option = (LikeSearchOption) map.get(propertyName);
         } else if (Map.class.isInstance(pmb)) {
             option = (LikeSearchOption) ((Map<?, ?>) pmb).get(propertyName);
-        } else if (MapParameterBean.class.isInstance(pmb)) {
-            final Map<String, Object> map = ((MapParameterBean) pmb).getParameterMap();
-            option = (LikeSearchOption) map.get(propertyName);
         } else { // no way
             String msg = "Not found the like search property: name=" + propertyName;
             throw new IllegalStateException(msg);
@@ -262,7 +266,7 @@ public class ValueAndTypeSetupper {
         }
     }
 
-    protected void throwListIndexNumberException(String expression, String notNumberIndex, String specifiedSql,
+    protected void throwListIndexNotNumberException(String expression, String notNumberIndex, String specifiedSql,
             CommentType commentType, NumberFormatException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The list index on the " + commentType.textName() + " was not number!");
@@ -285,6 +289,32 @@ public class ValueAndTypeSetupper {
             throw new ForCommentListIndexNotNumberException(msg, e);
         } else { // no way
             throw new BindVariableCommentListIndexNotNumberException(msg, e);
+        }
+    }
+
+    protected void throwListIndexOutOfBoundsException(String expression, String numberIndex, String specifiedSql,
+            CommentType commentType, IndexOutOfBoundsException e) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The list index on the " + commentType.textName() + " was out of bounds!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the index on your comment.");
+        br.addItem(commentType.titleName());
+        br.addElement(expression);
+        br.addItem("OutOfBounds Index");
+        br.addElement(numberIndex);
+        br.addItem("IndexOutOfBoundsException");
+        br.addElement(e.getMessage());
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        if (CommentType.BIND.equals(commentType)) {
+            throw new BindVariableCommentListIndexOutOfBoundsException(msg, e);
+        } else if (CommentType.EMBEDDED.equals(commentType)) {
+            throw new EmbeddedVariableCommentListIndexOutOfBoundsException(msg, e);
+        } else if (CommentType.FORCOMMENT.equals(commentType)) {
+            throw new ForCommentListIndexOutOfBoundsException(msg, e);
+        } else { // no way
+            throw new BindVariableCommentListIndexOutOfBoundsException(msg, e);
         }
     }
 

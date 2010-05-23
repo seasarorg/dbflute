@@ -134,7 +134,7 @@ public class DfReflectionUtil {
             String msg = "Failed to instantiate the class: " + constructor;
             throw new ReflectionFailureException(msg, e);
         } catch (IllegalAccessException e) {
-            String msg = "Illegal access to the class: " + constructor;
+            String msg = "Illegal access to the constructor: " + constructor;
             throw new ReflectionFailureException(msg, e);
         } catch (InvocationTargetException e) {
             String msg = "The InvocationTargetException occurred: " + constructor;
@@ -209,7 +209,8 @@ public class DfReflectionUtil {
         try {
             return field.get(target);
         } catch (IllegalAccessException e) {
-            String msg = "Illegal access to the field: field=" + field + " target=" + target;
+            String msg = "Illegal access to the field:";
+            msg = msg + " field=" + field + " target=" + target;
             throw new ReflectionFailureException(msg, e);
         }
     }
@@ -219,7 +220,9 @@ public class DfReflectionUtil {
         try {
             field.set(target, value);
         } catch (IllegalAccessException e) {
-            String msg = "Illegal access to the field: field=" + field + " target=" + target;
+            String msg = "Illegal access to the field:";
+            msg = msg + " field=" + field + " target=" + target;
+            msg = msg + " value=" + value;
             throw new ReflectionFailureException(msg, e);
         }
     }
@@ -301,6 +304,14 @@ public class DfReflectionUtil {
         return null;
     }
 
+    /**
+     * Invoke the method by reflection.
+     * @param method The instance of method. (NotNull)
+     * @param target The invocation target instance. (Nullable: if null, it means static method)
+     * @param args The array of arguments. (Nullable)
+     * @return The return value of the method. (Nullable)
+     * @throws ReflectionFailureException When invocation failure and illegal access
+     */
     public static Object invoke(Method method, Object target, Object[] args) {
         assertObjectNotNull("method", method);
         try {
@@ -319,7 +330,7 @@ public class DfReflectionUtil {
             throw new ReflectionFailureException(msg, t);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the method:";
-            msg = msg + " method =" + method;
+            msg = msg + " method=" + method + " target=" + target;
             msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
             throw new ReflectionFailureException(msg, e);
         }

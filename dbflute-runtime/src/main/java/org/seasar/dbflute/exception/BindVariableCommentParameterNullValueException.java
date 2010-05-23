@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the parameter of bind variable is null about outsideSql.
+ * The exception of when the parameter of bind variable is null.
  * @author jflute
  */
 public class BindVariableCommentParameterNullValueException extends RuntimeException {

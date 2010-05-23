@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the parameter of FOR comment is not list.
+ * The exception of when the list index on embedded variable comment is out of bounds.
  * @author jflute
  */
-public class ForCommentParameterNotListException extends RuntimeException {
+public class EmbeddedVariableCommentListIndexOutOfBoundsException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class ForCommentParameterNotListException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public ForCommentParameterNotListException(String msg) {
+    public EmbeddedVariableCommentListIndexOutOfBoundsException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public EmbeddedVariableCommentListIndexOutOfBoundsException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

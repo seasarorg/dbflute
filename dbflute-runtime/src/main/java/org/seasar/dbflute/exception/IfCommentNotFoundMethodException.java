@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the IF comment method is not found.
+ * The exception of when the method on the IF comment is not found.
  * @author jflute
  */
 public class IfCommentNotFoundMethodException extends IfCommentWrongExpressionException {

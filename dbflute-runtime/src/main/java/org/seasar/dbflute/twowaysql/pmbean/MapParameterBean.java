@@ -20,12 +20,13 @@ import java.util.Map;
 /**
  * The parameter-bean that uses map for parameters.
  * @author jflute
+ * @param <VALUE> The type of value.
  */
-public interface MapParameterBean extends ParameterBean {
+public interface MapParameterBean<VALUE> extends ParameterBean {
 
     /**
      * Get the map of parameter.
      * @return The map of parameter. (NotNull)
      */
-    Map<String, Object> getParameterMap();
+    Map<String, VALUE> getParameterMap();
 }

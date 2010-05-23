@@ -26,6 +26,8 @@ import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
 import org.seasar.dbflute.exception.IfCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.exception.IfCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.IfCommentListIndexOutOfBoundsException;
+import org.seasar.dbflute.exception.IfCommentMethodInvocationFailureException;
 import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
 import org.seasar.dbflute.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
@@ -44,6 +46,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
 
 /**
@@ -385,9 +388,12 @@ public class IfCommentEvaluator {
             } catch (DfBeanMethodNotFoundException e) {
                 throwIfCommentNotFoundMethodException(baseObject, methodName);
                 return null; // unreachable
+            } catch (ReflectionFailureException e) {
+                throwIfCommentMethodInvocationFailureException(baseObject, methodName, e);
+                return null; // unreachable
             }
         }
-        if (List.class.isInstance(baseObject)) {
+        if (List.class.isInstance(baseObject)) { // used by FOR comment
             if (property.startsWith("get(") && property.endsWith(")")) {
                 final List<?> list = (List<?>) baseObject;
                 final String exp = Srl.extractFirstScope(property, "get(", ")");
@@ -395,23 +401,26 @@ public class IfCommentEvaluator {
                     final Integer index = DfTypeUtil.toInteger(exp);
                     return list.get(index);
                 } catch (NumberFormatException e) {
-                    throwIfCommentListIndexNumberException(_expression, exp, e);
+                    throwIfCommentListIndexNotNumberException(list, exp, e);
+                    return null; // unreachable
+                } catch (IndexOutOfBoundsException e) {
+                    throwIfCommentListIndexOutOfBoundsException(list, exp, e);
                     return null; // unreachable
                 }
+            }
+        }
+        if (MapParameterBean.class.isInstance(baseObject)) { // used by union-query internally
+            // if the key does not exist, it does not process
+            // (different specification with Map)
+            final Map<?, ?> map = ((MapParameterBean<?>) baseObject).getParameterMap();
+            if (map.containsKey(property)) {
+                return map.get(property);
             }
         }
         if (Map.class.isInstance(baseObject)) {
             // if the key does not exist, treated same as a null value
             final Map<?, ?> map = (Map<?, ?>) baseObject;
             return map.get(property);
-        }
-        if (MapParameterBean.class.isInstance(baseObject)) { // priority low
-            // if the key does not exist, it does not process
-            // (different specification with Map)
-            final Map<?, ?> map = ((MapParameterBean) baseObject).getParameterMap();
-            if (map.containsKey(property)) {
-                return map.get(property);
-            }
         }
         throwIfCommentNotFoundPropertyException(baseObject, property);
         return null; // unreachable
@@ -506,29 +515,45 @@ public class IfCommentEvaluator {
     }
 
     protected void throwIfCommentNotFoundMethodException(Object baseObject, String notFoundMethod) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The IF comment method was not found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your IF comment properties." + ln();
-        msg = msg + "For example, wrong and correct IF comment is as below:" + ln();
-        msg = msg + "  /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "  (x) - /*IF pmb.getMemborWame() != null*/" + ln();
-        msg = msg + "  (o) - /*IF pmb.getMemberName() != null*/" + ln();
-        msg = msg + "  - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
-        msg = msg + ln();
-        msg = msg + "[not found Method]" + ln();
-        msg = msg + (baseObject != null ? DfTypeUtil.toClassTitle(baseObject) + "." : "");
-        msg = msg + notFoundMethod + "()" + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The method on the IF comment was not found!");
+        br.addItem("Advice");
+        br.addElement("Please confirm your IF comment properties.");
+        br.addElement("For example, wrong and correct IF comment is as below:");
+        br.addElement("  /- - - - - - - - - - - - - - - - - - - - - - - - - - ");
+        br.addElement("  (x) - /*IF pmb.getMemborWame() != null*/");
+        br.addElement("  (o) - /*IF pmb.getMemberName() != null*/");
+        br.addElement("  - - - - - - - - - -/");
+        br.addItem("IF Comment Expression");
+        br.addElement(_expression);
+        br.addItem("NotFound Method");
+        br.addElement(DfTypeUtil.toClassTitle(baseObject) + "." + notFoundMethod + "()");
+        br.addItem("Specified ParameterBean");
+        br.addElement(getDisplayParameterBean());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
         throw new IfCommentNotFoundMethodException(msg);
+    }
+
+    protected void throwIfCommentMethodInvocationFailureException(Object baseObject, String methodName,
+            ReflectionFailureException e) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Failed to invoke the method on the IF comment!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the method implementation on your comment.");
+        br.addItem("IF Comment Expression");
+        br.addElement(_expression);
+        br.addItem("Failure Method");
+        br.addElement(DfTypeUtil.toClassTitle(baseObject) + "." + methodName + "()");
+        br.addItem("ReflectionFailureException");
+        br.addElement(e.getMessage());
+        br.addItem("Specified ParameterBean");
+        br.addElement(getDisplayParameterBean());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new IfCommentMethodInvocationFailureException(msg, e);
     }
 
     protected void throwIfCommentNotFoundPropertyException(Object baseObject, String notFoundProperty) {
@@ -560,7 +585,7 @@ public class IfCommentEvaluator {
     protected void throwIfCommentNullPointerException(String nullProperty) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The IF comment had the null pointer!" + ln();
+        msg = msg + "The IF comment met the null pointer!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your IF comment and its property values." + ln();
@@ -647,23 +672,53 @@ public class IfCommentEvaluator {
         throw new IfCommentNotBooleanResultException(msg);
     }
 
-    protected void throwIfCommentListIndexNumberException(String expression, String notNumberIndex,
+    protected void throwIfCommentListIndexNotNumberException(List<?> list, String notNumberIndex,
             NumberFormatException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The list index on the IF comment was not number!");
         br.addItem("Advice");
         br.addElement("Please confirm the index on your comment.");
-        br.addItem("IF Comment");
-        br.addElement(expression);
+        br.addItem("IF Comment Expression");
+        br.addElement(_expression);
+        br.addItem("Target List");
+        br.addElement(list);
         br.addItem("NotNumber Index");
         br.addElement(notNumberIndex);
         br.addItem("NumberFormatException");
         br.addElement(e.getMessage());
+        br.addItem("Specified ParameterBean");
+        br.addElement(getDisplayParameterBean());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
         final String msg = br.buildExceptionMessage();
         throw new IfCommentListIndexNotNumberException(msg, e);
     }
 
+    protected void throwIfCommentListIndexOutOfBoundsException(List<?> list, String numberIndex,
+            IndexOutOfBoundsException e) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The list index on the IF comment was out of bounds!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the index on your comment.");
+        br.addItem("IF Comment Expression");
+        br.addElement(_expression);
+        br.addItem("Target List");
+        br.addElement(list);
+        br.addItem("OutOfBounds Index");
+        br.addElement(numberIndex);
+        br.addItem("IndexOutOfBoundsException");
+        br.addElement(e.getMessage());
+        br.addItem("Specified ParameterBean");
+        br.addElement(getDisplayParameterBean());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new IfCommentListIndexOutOfBoundsException(msg, e);
+    }
+
     protected Object getDisplayParameterBean() {
+        // basically these exceptions are for debug,
+        // so it can show the values of parameter-bean
         return _finder.find("pmb");
     }
 

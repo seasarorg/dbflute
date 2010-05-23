@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the property on FOR comment is not found about outsideSql.
+ * The exception of when the property on FOR comment is not found.
  * @author jflute
  */
 public class ForCommentNotFoundPropertyException extends RuntimeException {

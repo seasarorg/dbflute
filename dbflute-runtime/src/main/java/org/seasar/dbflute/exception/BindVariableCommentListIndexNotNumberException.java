@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the list index on bind variable comment is not number about outsideSql.
+ * The exception of when the list index on bind variable comment is not number.
  * @author jflute
  */
 public class BindVariableCommentListIndexNotNumberException extends RuntimeException {

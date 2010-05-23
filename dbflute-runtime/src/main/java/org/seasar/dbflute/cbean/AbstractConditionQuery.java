@@ -286,16 +286,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
-    /** The map of union query. */
-    protected Map<String, ConditionQuery> _unionQueryMap;
+    /** The map parameter-bean of union query. */
+    protected SimpleMapPmb<ConditionQuery> _unionQueryMap;
 
     /**
-     * Get the map of union query.
-     * @return The map of union query. (NotNull)
+     * Get the map parameter-bean of union query. (for parameter comment) {Internal}
+     * @return The instance of map parameter-bean. (NotNull)
      */
-    public Map<String, ConditionQuery> getUnionQueryMap() {// for Internal
+    public SimpleMapPmb<ConditionQuery> getUnionQueryMap() {
         if (_unionQueryMap == null) {
-            _unionQueryMap = new LinkedHashMap<String, ConditionQuery>();
+            _unionQueryMap = xcreateUnionMapPmb();
         }
         return _unionQueryMap;
     }
@@ -308,18 +308,22 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         xsetupUnion(unionQuery, false, getUnionQueryMap());
     }
 
-    /** The map of union all query. */
-    protected Map<String, ConditionQuery> _unionAllQueryMap;
+    /** The map parameter-bean of union all query. */
+    protected SimpleMapPmb<ConditionQuery> _unionAllQueryMap;
 
     /**
-     * Get the map of union all query.
-     * @return The map of union all query. (NotNull)
+     * Get the map parameter-bean of union all query. (for parameter comment) {Internal}
+     * @return The instance of map parameter-bean. (NotNull)
      */
-    public Map<String, ConditionQuery> getUnionAllQueryMap() {// for Internal
+    public SimpleMapPmb<ConditionQuery> getUnionAllQueryMap() {
         if (_unionAllQueryMap == null) {
-            _unionAllQueryMap = new LinkedHashMap<String, ConditionQuery>();
+            _unionAllQueryMap = xcreateUnionMapPmb();
         }
         return _unionAllQueryMap;
+    }
+
+    protected SimpleMapPmb<ConditionQuery> xcreateUnionMapPmb() {
+        return new SimpleMapPmb<ConditionQuery>();
     }
 
     /**
@@ -330,14 +334,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         xsetupUnion(unionAllQuery, true, getUnionAllQueryMap());
     }
 
-    protected void xsetupUnion(ConditionQuery unionQuery, boolean unionAll, Map<String, ConditionQuery> unionQueryMap) {
+    protected void xsetupUnion(ConditionQuery unionQuery, boolean unionAll, SimpleMapPmb<ConditionQuery> unionQueryMap) {
         if (unionQuery == null) {
             String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
         }
         reflectRelationOnUnionQuery(this, unionQuery); // Reflect Relation!
         String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
-        unionQueryMap.put(key, unionQuery);
+        unionQueryMap.addParameter(key, unionQuery);
         registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
     }
 
@@ -356,28 +360,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public boolean hasUnionQueryOrUnionAllQuery() {
         return (_unionQueryMap != null && !_unionQueryMap.isEmpty())
                 || (_unionAllQueryMap != null && !_unionAllQueryMap.isEmpty());
-    }
-
-    /**
-     * Get the list of union query.
-     * @return The list of union query. (NotNull)
-     */
-    public List<ConditionQuery> getUnionQueryList() {
-        if (_unionQueryMap == null) {
-            return new ArrayList<ConditionQuery>();
-        }
-        return new ArrayList<ConditionQuery>(_unionQueryMap.values());
-    }
-
-    /**
-     * Get the list of union all query.
-     * @return The list of union all query. (NotNull)
-     */
-    public List<ConditionQuery> getUnionAllQueryList() {
-        if (_unionAllQueryMap == null) {
-            return new ArrayList<ConditionQuery>();
-        }
-        return new ArrayList<ConditionQuery>(_unionAllQueryMap.values());
     }
 
     // ===================================================================================

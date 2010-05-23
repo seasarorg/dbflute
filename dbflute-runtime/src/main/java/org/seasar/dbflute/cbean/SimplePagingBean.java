@@ -30,7 +30,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * The simple implementation of paging-bean.
  * @author jflute
  */
-public class SimplePagingBean implements PagingBean, MapParameterBean, Serializable {
+public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -65,9 +65,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean, Serializa
 
     /** Is fetch narrowing valid? */
     protected boolean _fetchNarrowing = true;
-
-    /** The map for parameter. */
-    protected Map<String, Object> _map;
 
     // ===================================================================================
     //                                                        Implementation of PagingBean

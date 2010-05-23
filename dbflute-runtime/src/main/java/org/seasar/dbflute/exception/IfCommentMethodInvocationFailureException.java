@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the parameter of FOR comment is not list.
+ * The exception of when the method invocation of IF comment fails.
  * @author jflute
  */
-public class ForCommentParameterNotListException extends RuntimeException {
+public class IfCommentMethodInvocationFailureException extends IfCommentWrongExpressionException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class ForCommentParameterNotListException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public ForCommentParameterNotListException(String msg) {
+    public IfCommentMethodInvocationFailureException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public IfCommentMethodInvocationFailureException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

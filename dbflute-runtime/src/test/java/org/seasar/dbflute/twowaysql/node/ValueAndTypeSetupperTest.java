@@ -3,8 +3,11 @@ package org.seasar.dbflute.twowaysql.node;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.cbean.SimplePagingBean;
+import org.seasar.dbflute.cbean.SimpleMapPmb;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.exception.BindVariableCommentListIndexNotNumberException;
+import org.seasar.dbflute.exception.BindVariableCommentListIndexOutOfBoundsException;
+import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.ForCommentNotFoundPropertyException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.unit.PlainTestCase;
@@ -123,7 +126,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
     public void test_setupValueAndType_bean_notFoundProperty() {
         // ## Arrange ##
-        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberIo");
+        ValueAndTypeSetupper setupper = createTargetAsForComment("pmb.memberIo");
         MockPmb pmb = new MockPmb();
         pmb.setMemberId(3);
         ValueAndType valueAndType = createTargetAndType(pmb);
@@ -158,6 +161,101 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         assertEquals("ba|%r%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
         assertEquals(" escape '|'", valueAndType.getRearOption());
+    }
+
+    public void test_setupValueAndType_list_notNumber() {
+        // ## Arrange ##
+        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberNameList.get(index)");
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("f|oo", "ba%r", "b|a%z"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        ValueAndType valueAndType = createTargetAndType(pmb);
+
+        // ## Act ##
+        try {
+            setupper.setupValueAndType(valueAndType);
+
+            // ## Assert ##
+            fail();
+        } catch (BindVariableCommentListIndexNotNumberException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_setupValueAndType_list_outOfBounds() {
+        // ## Arrange ##
+        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberNameList.get(4)");
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("f|oo", "ba%r", "b|a%z"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        ValueAndType valueAndType = createTargetAndType(pmb);
+
+        // ## Act ##
+        try {
+            setupper.setupValueAndType(valueAndType);
+
+            // ## Assert ##
+            fail();
+        } catch (BindVariableCommentListIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                              MapPmb
+    //                                                                              ======
+    public void test_setupValueAndType_mappmb_basic() {
+        // ## Arrange ##
+        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberId");
+        SimpleMapPmb<Integer> pmb = new SimpleMapPmb<Integer>();
+        pmb.addParameter("memberId", 3);
+        ValueAndType valueAndType = createTargetAndType(pmb);
+
+        // ## Act ##
+        setupper.setupValueAndType(valueAndType);
+
+        // ## Assert ##
+        assertEquals(3, valueAndType.getTargetValue());
+        assertEquals(Integer.class, valueAndType.getTargetType());
+        assertNull(valueAndType.getRearOption());
+    }
+
+    public void test_setupValueAndType_mappmb_likeSearch() {
+        // ## Arrange ##
+        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberName");
+        SimpleMapPmb<Object> pmb = new SimpleMapPmb<Object>();
+        pmb.addParameter("memberId", 3);
+        pmb.addParameter("memberName", "f|o%o");
+        pmb.addParameter("memberNameInternalLikeSearchOption", new LikeSearchOption().likePrefix());
+        ValueAndType valueAndType = createTargetAndType(pmb);
+
+        // ## Act ##
+        setupper.setupValueAndType(valueAndType);
+
+        // ## Assert ##
+        assertEquals("f||o|%o%", valueAndType.getTargetValue());
+        assertEquals(String.class, valueAndType.getTargetType());
+        assertEquals(" escape '|'", valueAndType.getRearOption());
+    }
+
+    public void test_setupValueAndType_mappmb_notKey() {
+        // ## Arrange ##
+        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberId");
+        SimpleMapPmb<Integer> pmb = new SimpleMapPmb<Integer>();
+        ValueAndType valueAndType = createTargetAndType(pmb);
+
+        // ## Act ##
+        try {
+            setupper.setupValueAndType(valueAndType);
+
+            // ## Assert ##
+            fail();
+        } catch (BindVariableCommentNotFoundPropertyException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     // ===================================================================================
@@ -197,46 +295,30 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         assertEquals(" escape '|'", valueAndType.getRearOption());
     }
 
-    // ===================================================================================
-    //                                                                            Map Bean
-    //                                                                            ========
-    public void test_setupValueAndType_mappmb_basic() {
+    public void test_setupValueAndType_map_notKey() {
         // ## Arrange ##
         ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberId");
-        SimplePagingBean pmb = new SimplePagingBean();
-        pmb.addParameter("memberId", 3);
+        Map<String, Object> pmb = DfCollectionUtil.newHashMap();
         ValueAndType valueAndType = createTargetAndType(pmb);
 
         // ## Act ##
         setupper.setupValueAndType(valueAndType);
 
         // ## Assert ##
-        assertEquals(3, valueAndType.getTargetValue());
-        assertEquals(Integer.class, valueAndType.getTargetType());
+        assertEquals(null, valueAndType.getTargetValue());
+        assertEquals(null, valueAndType.getTargetType());
         assertNull(valueAndType.getRearOption());
-    }
-
-    public void test_setupValueAndType_mappmb_likeSearch() {
-        // ## Arrange ##
-        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.memberName");
-        SimplePagingBean pmb = new SimplePagingBean();
-        pmb.addParameter("memberName", "f|o%o");
-        pmb.addParameter("memberNameInternalLikeSearchOption", new LikeSearchOption().likePrefix());
-        ValueAndType valueAndType = createTargetAndType(pmb);
-
-        // ## Act ##
-        setupper.setupValueAndType(valueAndType);
-
-        // ## Assert ##
-        assertEquals("f||o|%o%", valueAndType.getTargetValue());
-        assertEquals(String.class, valueAndType.getTargetType());
-        assertEquals(" escape '|'", valueAndType.getRearOption());
     }
 
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
     protected ValueAndTypeSetupper createTargetAsBind(String expression) {
+        CommentType type = CommentType.BIND;
+        return new ValueAndTypeSetupper(Srl.splitList(expression, "."), expression, "select * from ...", type);
+    }
+
+    protected ValueAndTypeSetupper createTargetAsForComment(String expression) {
         CommentType type = CommentType.FORCOMMENT;
         return new ValueAndTypeSetupper(Srl.splitList(expression, "."), expression, "select * from ...", type);
     }
