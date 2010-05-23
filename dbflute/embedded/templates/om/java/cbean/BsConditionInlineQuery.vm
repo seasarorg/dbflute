@@ -39,7 +39,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                             =======================
     @Override
     protected void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper, ConditionQuery unionQueryAsSuper) {
-        String msg = "InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper;
+        String msg = "InlineView must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper;
         throw new IllegalConditionBeanOperationException(msg);
     }
 
@@ -61,7 +61,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     @Override
     protected String getInScopeSubQueryRealColumnName(String columnName) {
         if (_onClauseInline) {
-            String msg = "Sorry! InScopeSubQuery of on-clause is unavailable";
+            String msg = "Sorry! InScopeRelation of OnClause is unavailable";
             throw new IllegalConditionBeanOperationException(msg);
         }
         return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
@@ -69,7 +69,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     @Override
     protected void registerExistsSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName, String propertyName) {
-        String msg = "Sorry! ExistsSubQuery at in-line view is unavailable. So please use InScopeSubQyery.";
+        String msg = "Sorry! ExistsReferrer at InlineView is unavailable. So please use InScopeRelation instead.";
         throw new IllegalConditionBeanOperationException(msg);
     }
 

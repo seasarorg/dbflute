@@ -33,12 +33,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                              Inline
     //                                                                              ======
     /**
-     * Prepare in-line query. <br />
+     * Prepare InlineView query. <br />
      * {select ... from ... left outer join (select * from ${table.name}) where FOO = [value] ...}
      * <pre>
      * cb.query().queryMemberStatus().<span style="color: #FD4747">inline()</span>.setFoo...;
      * </pre>
-     * @return The condition-query for in-line query. (NotNull)
+     * @return The condition-query for InlineView query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} inline() {
         if (_inlineQuery == null) { _inlineQuery = createInlineQuery(); }
@@ -49,16 +49,16 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     { return new ${myConditionInlineQueryClassName}(getReferrerQuery(), getSqlClause(), getAliasName(), getNestLevel(), this); }
 
     /**
-     * Prepare on-clause query. <br />
+     * Prepare OnClause query. <br />
      * {select ... from ... left outer join ${table.name} on ... and FOO = [value] ...}
      * <pre>
      * cb.query().queryMemberStatus().<span style="color: #FD4747">on()</span>.setFoo...;
      * </pre>
-     * @return The condition-inline-query for on-clause query. (NotNull)
+     * @return The condition-query for OnClause query. (NotNull)
      * @throws IllegalConditionBeanOperationException When this condition-query is base query.
      */
     public ${myConditionInlineQueryClassName} on() {
-        if (isBaseQuery()) { throw new IllegalConditionBeanOperationException("On-clause for local table is unavailable!"); }
+        if (isBaseQuery()) { throw new IllegalConditionBeanOperationException("OnClause for local table is unavailable!"); }
         ${myConditionInlineQueryClassName} inlineQuery = inline(); inlineQuery.xsetOnClauseInline(true); return inlineQuery;
     }
 
