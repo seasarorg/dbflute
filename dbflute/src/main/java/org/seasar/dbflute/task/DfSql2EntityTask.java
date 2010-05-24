@@ -249,9 +249,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 }
                 // The line comment is special mark on Sql2Entity
                 // so this timing to do is bad because the special mark is removed.
-                // if (!jdbcDeterminer.isLineCommentValid()) {
-                //     sql = removeLineComment(sql);
-                // }
+                //if (!jdbcDeterminer.isLineCommentValid()) {
+                //    sql = removeLineComment(sql);
+                //}
                 return super.filterSql(sql);
             }
 

@@ -6,6 +6,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.QLog;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -58,6 +59,7 @@ public class ${glDBFluteConfig} {
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected SqlClauseCreator _sqlClauseCreator;
     protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
+	protected OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
 	protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
 	protected boolean _disableSelectIndex;
 	protected boolean _internalDebug;
@@ -265,6 +267,22 @@ public class ${glDBFluteConfig} {
 	    _outsideSqlPackage = outsideSqlPackage;
 	}
 
+    // [DBFlute-0.9.7.0]
+    // ===================================================================================
+    //                                                                 OutsideSql Executor
+    //                                                                 ===================
+	public OutsideSqlExecutorFactory getOutsideSqlExecutorFactory() {
+	    return _outsideSqlExecutorFactory;
+	}
+
+	public void setOutsideSqlExecutorFactory(OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting outsideSqlExecutorFactory: " + outsideSqlExecutorFactory);
+		}
+	    _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
+	}
+
     // [DBFlute-0.8.2]
     // ===================================================================================
     //                                                                    SQL Log Registry
@@ -272,7 +290,7 @@ public class ${glDBFluteConfig} {
 	public boolean isUseSqlLogRegistry() {
 	    return _useSqlLogRegistry;
 	}
-	
+
 	public void setUseSqlLogRegistry(boolean useSqlLogRegistry) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
