@@ -77,7 +77,7 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                                                  Lock
     //                                                  ----
-	protected boolean _locked = false; // at first unlocked
+	protected boolean _locked = true; // at first locked
 
     // ===================================================================================
     //                                                                         Constructor
