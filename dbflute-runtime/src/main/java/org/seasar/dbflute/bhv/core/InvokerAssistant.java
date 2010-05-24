@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
@@ -53,7 +54,7 @@ public interface InvokerAssistant {
      * Assist the creator of SQL clause. <br />
      * This is only used in internal world of DBFlute (to judge unique-constraint).
      * So condition-bean does not use this.
-     * @return The create of SQL clause. (NotNull)
+     * @return The instance of creator. (NotNull)
      */
     SqlClauseCreator assistSqlClauseCreator();
 
@@ -71,19 +72,25 @@ public interface InvokerAssistant {
      * Assist the factory of SQL analyzer. <br />
      * This factory is also used on ConditionBean.toDisplaySql().
      * So this method should be state-less.
-     * @return The factory of SQL analyzer. (NotNull)
+     * @return The instance of factory. (NotNull)
      */
     SqlAnalyzerFactory assistSqlAnalyzerFactory();
 
     /**
+     * Assist the factory of outside SQL executor.
+     * @return The instance of factory. (NotNull)
+     */
+    OutsideSqlExecutorFactory assistOutsideSqlExecutorFactory();
+
+    /**
      * Assist the factory of SQLException handler.
-     * @return The factory of SQLException handler. (NotNull)
+     * @return The instance of factory. (NotNull)
      */
     SQLExceptionHandlerFactory assistSQLExceptionHandlerFactory();
 
     /**
      * Assist the handler of sequence cache.
-     * @return The handler of sequence cache. (NotNull)
+     * @return The instance of handler. (NotNull)
      */
     SequenceCacheHandler assistSequenceCacheHandler();
 

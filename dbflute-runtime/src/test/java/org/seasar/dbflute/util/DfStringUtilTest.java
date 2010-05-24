@@ -5,9 +5,9 @@ import static org.seasar.dbflute.util.Srl.connectPrefix;
 import static org.seasar.dbflute.util.Srl.connectSuffix;
 import static org.seasar.dbflute.util.Srl.count;
 import static org.seasar.dbflute.util.Srl.decamelize;
+import static org.seasar.dbflute.util.Srl.extractDelimiterList;
 import static org.seasar.dbflute.util.Srl.extractScopeFirst;
 import static org.seasar.dbflute.util.Srl.extractScopeList;
-import static org.seasar.dbflute.util.Srl.indexListOf;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
 import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.removeBlockComment;
@@ -27,6 +27,7 @@ import static org.seasar.dbflute.util.Srl.unquoteSingle;
 import java.util.List;
 
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.Srl.DelimiterInfo;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
@@ -34,30 +35,6 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
  * @since 0.9.5 (2009/04/10 Friday)
  */
 public class DfStringUtilTest extends PlainTestCase {
-
-    public void test_splitList() {
-        String ln = DfSystemUtil.getLineSeparator();
-        List<String> splitList = splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
-        assertEquals("aaa", splitList.get(0));
-        assertEquals("bbb", splitList.get(1));
-        assertEquals("ccc", splitList.get(2));
-    }
-
-    public void test_splitList_notTrim() {
-        String ln = DfSystemUtil.getLineSeparator();
-        List<String> splitList = DfStringUtil.splitList("aaa " + ln + "bbb" + ln + " ccc", ln);
-        assertEquals("aaa ", splitList.get(0));
-        assertEquals("bbb", splitList.get(1));
-        assertEquals(" ccc", splitList.get(2));
-    }
-
-    public void test_splitListTrimmed_trim() {
-        String ln = DfSystemUtil.getLineSeparator();
-        List<String> splitList = splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
-        assertEquals("aaa", splitList.get(0));
-        assertEquals("bbb", splitList.get(1));
-        assertEquals("ccc", splitList.get(2));
-    }
 
     // ===================================================================================
     //                                                                                Trim
@@ -114,50 +91,6 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     // ===================================================================================
-    //                                                                             IndexOf
-    //                                                                             =======
-    public void test_indexListOf_basic() {
-        // ## Arrange ##
-        String str = "foo--bar--baz--and";
-
-        // ## Act ##
-        List<Integer> list = indexListOf(str, "--");
-
-        // ## Assert ##
-        assertEquals(3, list.size());
-        assertEquals(Integer.valueOf(3), list.get(0));
-        assertEquals(Integer.valueOf(8), list.get(1));
-        assertEquals(Integer.valueOf(13), list.get(2));
-    }
-
-    public void test_indexListOf_bothSide() {
-        // ## Arrange ##
-        String str = "--foo--bar--baz--and--";
-
-        // ## Act ##
-        List<Integer> list = indexListOf(str, "--");
-
-        // ## Assert ##
-        assertEquals(5, list.size());
-        assertEquals(Integer.valueOf(0), list.get(0));
-        assertEquals(Integer.valueOf(5), list.get(1));
-        assertEquals(Integer.valueOf(10), list.get(2));
-        assertEquals(Integer.valueOf(15), list.get(3));
-        assertEquals(Integer.valueOf(20), list.get(4));
-    }
-
-    public void test_indexListOf_noDelimiter() {
-        // ## Arrange ##
-        String str = "foo-bar-baz-and";
-
-        // ## Act ##
-        List<Integer> list = indexListOf(str, "--");
-
-        // ## Assert ##
-        assertEquals(0, list.size());
-    }
-
-    // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
     public void test_substringFirstFront_basic() {
@@ -175,7 +108,7 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("bar.don", substringFirstRear("foo.bar.don", "."));
         assertEquals("foobar", substringFirstRear("foobar", "."));
         assertEquals("don.moo", substringFirstRear("foo/bar.don.moo", "."));
-        assertEquals("bar.don.moo", substringFirstRear("foo/bar.don.moo", ".", "/"));
+        assertEquals("don.moo", substringFirstRear("foo/bar.don.moo", ".", "/"));
         assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", ".", "/"));
         assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", "/", "."));
     }
@@ -185,7 +118,7 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("foo.bar", substringLastFront("foo.bar.don", "."));
         assertEquals("foobar", substringLastFront("foobar", "."));
         assertEquals("foo.bar", substringLastFront("foo.bar.don/moo", "."));
-        assertEquals("foo.bar.don", substringLastFront("foo.bar.don/moo", ".", "/"));
+        assertEquals("foo.bar", substringLastFront("foo.bar.don/moo", ".", "/"));
         assertEquals("foo.bar.don", substringLastFront("foo.bar.don.moo", ".", "/"));
         assertEquals("foo.bar.don", substringLastFront("foo.bar.don.moo", "/", "."));
 
@@ -199,6 +132,33 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("moo", substringLastRear("foo.bar.don/moo", ".", "/"));
         assertEquals("moo", substringLastRear("foo.bar.don.moo", ".", "/"));
         assertEquals("moo", substringLastRear("foo.bar.don.moo", "/", "."));
+    }
+
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
+    public void test_splitList() {
+        String ln = DfSystemUtil.getLineSeparator();
+        List<String> splitList = splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
+        assertEquals("aaa", splitList.get(0));
+        assertEquals("bbb", splitList.get(1));
+        assertEquals("ccc", splitList.get(2));
+    }
+
+    public void test_splitList_notTrim() {
+        String ln = DfSystemUtil.getLineSeparator();
+        List<String> splitList = DfStringUtil.splitList("aaa " + ln + "bbb" + ln + " ccc", ln);
+        assertEquals("aaa ", splitList.get(0));
+        assertEquals("bbb", splitList.get(1));
+        assertEquals(" ccc", splitList.get(2));
+    }
+
+    public void test_splitListTrimmed_trim() {
+        String ln = DfSystemUtil.getLineSeparator();
+        List<String> splitList = splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
+        assertEquals("aaa", splitList.get(0));
+        assertEquals("bbb", splitList.get(1));
+        assertEquals("ccc", splitList.get(2));
     }
 
     // ===================================================================================
@@ -254,6 +214,59 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("'foo'", unquoteDouble("'foo'"));
         assertEquals("\"foo", unquoteDouble("\"foo"));
         assertEquals("'foo'", unquoteDouble("\"'foo'\""));
+    }
+
+    // ===================================================================================
+    //                                                                  Delimiter Handling
+    //                                                                  ==================
+    public void test_extractDelimiterList_basic() {
+        // ## Arrange ##
+        String str = "foo--bar--baz--and";
+
+        // ## Act ##
+        List<DelimiterInfo> list = extractDelimiterList(str, "--");
+
+        // ## Assert ##
+        assertEquals(3, list.size());
+        assertEquals(3, list.get(0).getBeginIndex());
+        assertEquals(8, list.get(1).getBeginIndex());
+        assertEquals(13, list.get(2).getBeginIndex());
+        assertEquals(5, list.get(0).getEndIndex());
+        assertEquals(10, list.get(1).getEndIndex());
+        assertEquals(15, list.get(2).getEndIndex());
+        assertEquals("foo", list.get(0).substringInterspaceToPrevious());
+        assertEquals("bar", list.get(1).substringInterspaceToPrevious());
+        assertEquals("baz", list.get(2).substringInterspaceToPrevious());
+        assertEquals("bar", list.get(0).substringInterspaceToNext());
+        assertEquals("baz", list.get(1).substringInterspaceToNext());
+        assertEquals("and", list.get(2).substringInterspaceToNext());
+    }
+
+    public void test_extractDelimiterList_bothSide() {
+        // ## Arrange ##
+        String str = "--foo--bar--baz--and--";
+
+        // ## Act ##
+        List<DelimiterInfo> list = extractDelimiterList(str, "--");
+
+        // ## Assert ##
+        assertEquals(5, list.size());
+        assertEquals(0, list.get(0).getBeginIndex());
+        assertEquals(5, list.get(1).getBeginIndex());
+        assertEquals(10, list.get(2).getBeginIndex());
+        assertEquals(15, list.get(3).getBeginIndex());
+        assertEquals(20, list.get(4).getBeginIndex());
+    }
+
+    public void test_extractDelimiterList_noDelimiter() {
+        // ## Arrange ##
+        String str = "foo-bar-baz-and";
+
+        // ## Act ##
+        List<DelimiterInfo> list = extractDelimiterList(str, "--");
+
+        // ## Assert ##
+        assertEquals(0, list.size());
     }
 
     // ===================================================================================
@@ -316,11 +329,21 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("/*FIRST 'foo'*/", list.get(2).getScope());
         assertEquals("/*END FOR*/", list.get(3).getScope());
         assertEquals("/* END */", list.get(4).getScope()); // not trimmed
+        assertEquals("baz", list.get(0).substringInterspaceToPrevious());
+        assertEquals("where ", list.get(1).substringInterspaceToPrevious());
+        assertEquals(" ", list.get(2).substringInterspaceToPrevious());
+        assertEquals("member...", list.get(3).substringInterspaceToPrevious());
+        assertEquals("", list.get(4).substringInterspaceToPrevious());
         assertEquals("where ", list.get(0).substringInterspaceToNext());
         assertEquals(" ", list.get(1).substringInterspaceToNext());
         assertEquals("member...", list.get(2).substringInterspaceToNext());
         assertEquals("", list.get(3).substringInterspaceToNext());
         assertEquals("bar", list.get(4).substringInterspaceToNext());
+        assertEquals("baz/*BEGIN*/", list.get(0).substringScopeToPrevious());
+        assertEquals("/*BEGIN*/where /*FOR pmb*/", list.get(1).substringScopeToPrevious());
+        assertEquals("/*FOR pmb*/ /*FIRST 'foo'*/", list.get(2).substringScopeToPrevious());
+        assertEquals("/*FIRST 'foo'*/member.../*END FOR*/", list.get(3).substringScopeToPrevious());
+        assertEquals("/*END FOR*//* END */", list.get(4).substringScopeToPrevious());
         assertEquals("/*BEGIN*/where /*FOR pmb*/", list.get(0).substringScopeToNext());
         assertEquals("/*FOR pmb*/ /*FIRST 'foo'*/", list.get(1).substringScopeToNext());
         assertEquals("/*FIRST 'foo'*/member.../*END FOR*/", list.get(2).substringScopeToNext());

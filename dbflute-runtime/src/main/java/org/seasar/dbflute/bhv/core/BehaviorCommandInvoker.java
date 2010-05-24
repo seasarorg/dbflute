@@ -26,6 +26,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -819,9 +820,10 @@ public class BehaviorCommandInvoker {
      * @return The basic executor of outside SQL. (NotNull) 
      */
     public OutsideSqlBasicExecutor createOutsideSqlBasicExecutor(String tableDbName) {
-        final DBDef dbDef = _invokerAssistant.assistCurrentDBDef();
-        final StatementConfig statementConfig = _invokerAssistant.assistDefaultStatementConfig();
-        return new OutsideSqlBasicExecutor(this, tableDbName, dbDef, statementConfig);
+        final OutsideSqlExecutorFactory factory = _invokerAssistant.assistOutsideSqlExecutorFactory();
+        final DBDef dbdef = _invokerAssistant.assistCurrentDBDef();
+        final StatementConfig config = _invokerAssistant.assistDefaultStatementConfig();
+        return factory.createBasic(this, tableDbName, dbdef, config);
     }
 
     // ===================================================================================

@@ -60,42 +60,6 @@ public class Srl {
     }
 
     // ===================================================================================
-    //                                                                             Replace
-    //                                                                             =======
-    public static final String replace(String str, String fromStr, String toStr) {
-        assertStringNotNull(str);
-        assertFromStringNotNull(fromStr);
-        assertToStringNotNull(toStr);
-        final StringBuilder sb = new StringBuilder();
-        int pos = 0;
-        int pos2 = 0;
-        do {
-            pos = str.indexOf(fromStr, pos2);
-            if (pos == 0) {
-                sb.append(toStr);
-                pos2 = fromStr.length();
-            } else if (pos > 0) {
-                sb.append(str.substring(pos2, pos));
-                sb.append(toStr);
-                pos2 = pos + fromStr.length();
-            } else {
-                sb.append(str.substring(pos2));
-                return sb.toString();
-            }
-        } while (true);
-    }
-
-    public static final String replace(String str, Map<String, String> fromToMap) {
-        assertStringNotNull(str);
-        assertFromToMapNotNull(fromToMap);
-        final Set<Entry<String, String>> entrySet = fromToMap.entrySet();
-        for (Entry<String, String> entry : entrySet) {
-            str = replace(str, entry.getKey(), entry.getValue());
-        }
-        return str;
-    }
-
-    // ===================================================================================
     //                                                                                Trim
     //                                                                                ====
     public static final String trim(String str) {
@@ -162,24 +126,114 @@ public class Srl {
     // ===================================================================================
     //                                                                             IndexOf
     //                                                                             =======
-    public static final List<Integer> indexListOf(String str, String delimiter) {
-        assertStringNotNull(str);
-        assertDelimiterNotNull(delimiter);
-        final List<Integer> indexList = new ArrayList<Integer>();
-        Integer currentBeginIndex = 0;
-        String rear = str;
-        while (true) {
-            final int index = rear.indexOf(delimiter);
+    public static IndexOfInfo indexOfFirstFront(final String str, final String... delimiters) {
+        int minIndex = -1;
+        String targetDelimiter = null;
+        for (String delimiter : delimiters) {
+            final int index = str.indexOf(delimiter);
             if (index < 0) {
-                break;
+                continue;
             }
-            final int absoluteIndex = currentBeginIndex + index;
-            indexList.add(absoluteIndex);
-            currentBeginIndex = absoluteIndex + delimiter.length();
-            rear = rear.substring(index + delimiter.length());
-            continue;
+            if (minIndex < 0 || minIndex > index) {
+                minIndex = index;
+                targetDelimiter = delimiter;
+            }
         }
-        return indexList;
+        final IndexOfInfo info = new IndexOfInfo();
+        info.setBaseStr(str);
+        info.setIndex(minIndex);
+        info.setDelimiter(targetDelimiter);
+        return info;
+    }
+
+    public static IndexOfInfo indexOfFirstRear(final String str, final String... delimiters) {
+        int maxIndex = -1;
+        String targetDelimiter = null;
+        for (String delimiter : delimiters) {
+            final int index = str.indexOf(delimiter);
+            if (index < 0) {
+                continue;
+            }
+            if (maxIndex < 0 || maxIndex < index) {
+                maxIndex = index;
+                targetDelimiter = delimiter;
+            }
+        }
+        final IndexOfInfo info = new IndexOfInfo();
+        info.setBaseStr(str);
+        info.setIndex(maxIndex);
+        info.setDelimiter(targetDelimiter);
+        return info;
+    }
+
+    public static IndexOfInfo indexOfLastFront(final String str, final String... delimiters) {
+        int minIndex = -1;
+        String targetDelimiter = null;
+        for (String delimiter : delimiters) {
+            final int index = str.lastIndexOf(delimiter);
+            if (index < 0) {
+                continue;
+            }
+            if (minIndex < 0 || minIndex > index) {
+                minIndex = index;
+                targetDelimiter = delimiter;
+            }
+        }
+        final IndexOfInfo info = new IndexOfInfo();
+        info.setBaseStr(str);
+        info.setIndex(minIndex);
+        info.setDelimiter(targetDelimiter);
+        return info;
+    }
+
+    public static IndexOfInfo indexOfLastRear(final String str, final String... delimiters) {
+        int maxIndex = -1;
+        String targetDelimiter = null;
+        for (String delimiter : delimiters) {
+            final int index = str.lastIndexOf(delimiter);
+            if (index < 0) {
+                continue;
+            }
+            if (maxIndex < 0 || maxIndex < index) {
+                maxIndex = index;
+                targetDelimiter = delimiter;
+            }
+        }
+        final IndexOfInfo info = new IndexOfInfo();
+        info.setBaseStr(str);
+        info.setIndex(maxIndex);
+        info.setDelimiter(targetDelimiter);
+        return info;
+    }
+
+    public static class IndexOfInfo {
+        protected String baseStr;
+        protected int index;
+        protected String delimiter;
+
+        public String getBaseStr() {
+            return baseStr;
+        }
+
+        public void setBaseStr(String baseStr) {
+            this.baseStr = baseStr;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public void setIndex(int index) {
+            this.index = index;
+        }
+
+        public String getDelimiter() {
+            return delimiter;
+        }
+
+        public void setDelimiter(String delimiter) {
+            this.delimiter = delimiter;
+        }
     }
 
     // ===================================================================================
@@ -195,21 +249,11 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringFirstFront(String str, String... delimiters) {
+    public static final String substringFirstFront(final String str, final String... delimiters) {
         assertStringNotNull(str);
-        Integer firstIndex = null;
-        for (String delimiter : delimiters) {
-            final int currentIndex = str.indexOf(delimiter);
-            if (currentIndex < 0) {
-                continue;
-            }
-            if (firstIndex == null) {
-                firstIndex = currentIndex;
-            } else if (currentIndex >= 0 && firstIndex > currentIndex) {
-                firstIndex = currentIndex;
-            }
-        }
-        if (firstIndex == null || firstIndex < 0) {
+        final IndexOfInfo info = indexOfFirstFront(str, delimiters);
+        final int firstIndex = info.getIndex();
+        if (firstIndex < 0) {
             return str;
         }
         return str.substring(0, firstIndex);
@@ -227,25 +271,12 @@ public class Srl {
      */
     public static final String substringFirstRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        Integer firstIndex = null;
-        Integer delimiterLength = null;
-        for (String delimiter : delimiters) {
-            final int currentIndex = str.indexOf(delimiter);
-            if (currentIndex < 0) {
-                continue;
-            }
-            if (firstIndex == null) {
-                firstIndex = currentIndex;
-                delimiterLength = delimiter.length();
-            } else if (currentIndex >= 0 && firstIndex > currentIndex) {
-                firstIndex = currentIndex;
-                delimiterLength = delimiter.length();
-            }
-        }
-        if (firstIndex == null || firstIndex < 0) {
+        final IndexOfInfo info = indexOfFirstRear(str, delimiters);
+        final int firstIndex = info.getIndex();
+        if (firstIndex < 0) {
             return str;
         }
-        return str.substring(firstIndex + delimiterLength);
+        return str.substring(firstIndex + info.getDelimiter().length());
     }
 
     /**
@@ -260,19 +291,9 @@ public class Srl {
      */
     public static final String substringLastFront(String str, String... delimiters) {
         assertStringNotNull(str);
-        Integer lastIndex = null;
-        for (String delimiter : delimiters) {
-            final int currentIndex = str.lastIndexOf(delimiter);
-            if (currentIndex < 0) {
-                continue;
-            }
-            if (lastIndex == null) {
-                lastIndex = currentIndex;
-            } else if (currentIndex >= 0 && lastIndex < currentIndex) {
-                lastIndex = currentIndex;
-            }
-        }
-        if (lastIndex == null || lastIndex < 0) {
+        final IndexOfInfo info = indexOfLastFront(str, delimiters);
+        final int lastIndex = info.getIndex();
+        if (lastIndex < 0) {
             return str;
         }
         return str.substring(0, lastIndex);
@@ -290,25 +311,100 @@ public class Srl {
      */
     public static final String substringLastRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        Integer lastIndex = null;
-        Integer delimiterLength = null;
-        for (String delimiter : delimiters) {
-            final int currentIndex = str.lastIndexOf(delimiter);
-            if (currentIndex < 0) {
-                continue;
-            }
-            if (lastIndex == null) {
-                lastIndex = currentIndex;
-                delimiterLength = delimiter.length();
-            } else if (currentIndex >= 0 && lastIndex < currentIndex) {
-                lastIndex = currentIndex;
-                delimiterLength = delimiter.length();
-            }
-        }
-        if (lastIndex == null || lastIndex < 0) {
+        final IndexOfInfo info = indexOfLastRear(str, delimiters);
+        final int lastIndex = info.getIndex();
+        if (lastIndex < 0) {
             return str;
         }
-        return str.substring(lastIndex + delimiterLength);
+        return str.substring(lastIndex + info.getDelimiter().length());
+    }
+
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list. (NotNull)
+     */
+    public static final List<String> splitList(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, false);
+    }
+
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list that their elements is trimmed. (NotNull)
+     */
+    public static final List<String> splitListTrimmed(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, true);
+    }
+
+    protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
+        assertStringNotNull(str);
+        assertDelimiterNotNull(delimiter);
+        final List<String> list = new ArrayList<String>();
+        int i = 0;
+        int j = str.indexOf(delimiter);
+        for (int h = 0; j >= 0; h++) {
+            final String element = str.substring(i, j);
+            list.add(trim ? element.trim() : element);
+            i = j + delimiter.length();
+            j = str.indexOf(delimiter, i);
+        }
+        final String element = str.substring(i);
+        list.add(trim ? element.trim() : element);
+        return list;
+    }
+
+    // ===================================================================================
+    //                                                                             Replace
+    //                                                                             =======
+    public static final String replace(String str, String fromStr, String toStr) {
+        assertStringNotNull(str);
+        assertFromStringNotNull(fromStr);
+        assertToStringNotNull(toStr);
+        final StringBuilder sb = new StringBuilder();
+        int pos = 0;
+        int pos2 = 0;
+        do {
+            pos = str.indexOf(fromStr, pos2);
+            if (pos == 0) {
+                sb.append(toStr);
+                pos2 = fromStr.length();
+            } else if (pos > 0) {
+                sb.append(str.substring(pos2, pos));
+                sb.append(toStr);
+                pos2 = pos + fromStr.length();
+            } else {
+                sb.append(str.substring(pos2));
+                return sb.toString();
+            }
+        } while (true);
+    }
+
+    public static final String replace(String str, Map<String, String> fromToMap) {
+        assertStringNotNull(str);
+        assertFromToMapNotNull(fromToMap);
+        final Set<Entry<String, String>> entrySet = fromToMap.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            str = replace(str, entry.getKey(), entry.getValue());
+        }
+        return str;
+    }
+
+    // ===================================================================================
+    //                                                                            Contains
+    //                                                                            ========
+    public static boolean containsIgnoreCase(List<String> strList, String str) {
+        assertListStringNotNull(strList);
+        assertStringNotNull(str);
+        for (String element : strList) {
+            if (str.equalsIgnoreCase(element)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================
@@ -405,52 +501,121 @@ public class Srl {
     }
 
     // ===================================================================================
-    //                                                                       List Handling
-    //                                                                       =============
-    /**
-     * @param str The split target string. (NotNull)
-     * @param delimiter The delimiter for split. (NotNull)
-     * @return The split list. (NotNull)
-     */
-    public static final List<String> splitList(final String str, final String delimiter) {
-        return doSplitList(str, delimiter, false);
-    }
-
-    /**
-     * @param str The split target string. (NotNull)
-     * @param delimiter The delimiter for split. (NotNull)
-     * @return The split list that their elements is trimmed. (NotNull)
-     */
-    public static final List<String> splitListTrimmed(final String str, final String delimiter) {
-        return doSplitList(str, delimiter, true);
-    }
-
-    protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
+    //                                                                  Delimiter Handling
+    //                                                                  ==================
+    public static final List<DelimiterInfo> extractDelimiterList(final String str, final String delimiter) {
         assertStringNotNull(str);
         assertDelimiterNotNull(delimiter);
-        final List<String> list = new ArrayList<String>();
-        int i = 0;
-        int j = str.indexOf(delimiter);
-        for (int h = 0; j >= 0; h++) {
-            final String element = str.substring(i, j);
-            list.add(trim ? element.trim() : element);
-            i = j + delimiter.length();
-            j = str.indexOf(delimiter, i);
+        final List<DelimiterInfo> delimiterList = new ArrayList<DelimiterInfo>();
+        DelimiterInfo previous = null;
+        String rear = str;
+        while (true) {
+            final int beginIndex = rear.indexOf(delimiter);
+            if (beginIndex < 0) {
+                break;
+            }
+            final DelimiterInfo info = new DelimiterInfo();
+            info.setBaseStr(str);
+            info.setDelimiter(delimiter);
+            final int absoluteIndex = (previous != null ? previous.getEndIndex() : 0) + beginIndex;
+            info.setBeginIndex(absoluteIndex);
+            info.setEndIndex(absoluteIndex + delimiter.length());
+            if (previous != null) {
+                info.setPrevious(previous);
+                previous.setNext(info);
+            }
+            delimiterList.add(info);
+            previous = info;
+            rear = str.substring(info.getEndIndex());
+            continue;
         }
-        final String element = str.substring(i);
-        list.add(trim ? element.trim() : element);
-        return list;
+        return delimiterList;
     }
 
-    public static boolean containsIgnoreCase(List<String> strList, String str) {
-        assertListStringNotNull(strList);
-        assertStringNotNull(str);
-        for (String element : strList) {
-            if (str.equalsIgnoreCase(element)) {
-                return true;
+    public static class DelimiterInfo {
+        protected String _baseStr;
+        protected int _beginIndex;
+        protected int _endIndex;
+        protected String _delimiter;
+        protected DelimiterInfo _previous;
+        protected DelimiterInfo _next;
+
+        public String substringInterspaceToPrevious() {
+            int previousIndex = -1;
+            if (_previous != null) {
+                previousIndex = _previous.getBeginIndex();
+            }
+            if (previousIndex >= 0) {
+                return _baseStr.substring(previousIndex + _previous.getDelimiter().length(), _beginIndex);
+            } else {
+                return _baseStr.substring(0, _beginIndex);
             }
         }
-        return false;
+
+        public String substringInterspaceToNext() {
+            int nextIndex = -1;
+            if (_next != null) {
+                nextIndex = _next.getBeginIndex();
+            }
+            if (nextIndex >= 0) {
+                return _baseStr.substring(_endIndex, nextIndex);
+            } else {
+                return _baseStr.substring(_endIndex);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return _delimiter + ":(" + _beginIndex + ", " + _endIndex + ")";
+        }
+
+        public String getBaseStr() {
+            return _baseStr;
+        }
+
+        public void setBaseStr(String baseStr) {
+            this._baseStr = baseStr;
+        }
+
+        public int getBeginIndex() {
+            return _beginIndex;
+        }
+
+        public void setBeginIndex(int beginIndex) {
+            this._beginIndex = beginIndex;
+        }
+
+        public int getEndIndex() {
+            return _endIndex;
+        }
+
+        public void setEndIndex(int endIndex) {
+            this._endIndex = endIndex;
+        }
+
+        public String getDelimiter() {
+            return _delimiter;
+        }
+
+        public void setDelimiter(String delimiter) {
+            this._delimiter = delimiter;
+        }
+
+        public DelimiterInfo getPrevious() {
+            return _previous;
+        }
+
+        public void setPrevious(DelimiterInfo previous) {
+            this._previous = previous;
+        }
+
+        public DelimiterInfo getNext() {
+            return _next;
+        }
+
+        public void setNext(DelimiterInfo next) {
+            this._next = next;
+        }
     }
 
     // ===================================================================================
@@ -478,7 +643,7 @@ public class Srl {
         assertBeginMarkNotNull(beginMark);
         assertEndMarkNotNull(endMark);
         final List<ScopeInfo> resultList = new ArrayList<ScopeInfo>();
-        ScopeInfo preScope = null;
+        ScopeInfo previous = null;
         String rear = str;
         while (true) {
             final int beginIndex = rear.indexOf(beginMark);
@@ -497,18 +662,20 @@ public class Srl {
             final String scope = beginMark + rear.substring(0, endIndex + endMark.length());
             final ScopeInfo info = new ScopeInfo();
             info.setBaseStr(str);
-            info.setBeginIndex((preScope != null ? preScope.getEndIndex() : 0) + beginIndex);
-            info.setEndIndex(info.getBeginIndex() + scope.length());
+            final int absoluteIndex = (previous != null ? previous.getEndIndex() : 0) + beginIndex;
+            info.setBeginIndex(absoluteIndex);
+            info.setEndIndex(absoluteIndex + scope.length());
             info.setContent(rtrim(ltrim(scope, beginMark), endMark));
             info.setScope(scope);
-            if (preScope != null) {
-                preScope.setNext(info);
+            if (previous != null) {
+                info.setPrevious(previous);
+                previous.setNext(info);
             }
             resultList.add(info);
-            if (preScope == null && firstOnly) {
+            if (previous == null && firstOnly) {
                 break;
             }
-            preScope = info;
+            previous = info;
             rear = str.substring(info.getEndIndex());
         }
         return resultList;
@@ -520,6 +687,7 @@ public class Srl {
         protected int _endIndex;
         protected String _content;
         protected String _scope;
+        protected ScopeInfo _previous;
         protected ScopeInfo _next;
 
         public boolean isBeforeScope(int index) {
@@ -528,6 +696,18 @@ public class Srl {
 
         public boolean isInScope(int index) {
             return index >= _beginIndex && index <= _endIndex;
+        }
+
+        public String substringInterspaceToPrevious() {
+            int previousEndIndex = -1;
+            if (_previous != null) {
+                previousEndIndex = _previous.getEndIndex();
+            }
+            if (previousEndIndex >= 0) {
+                return _baseStr.substring(previousEndIndex, _beginIndex);
+            } else {
+                return _baseStr.substring(0, _beginIndex);
+            }
         }
 
         public String substringInterspaceToNext() {
@@ -539,6 +719,18 @@ public class Srl {
                 return _baseStr.substring(_endIndex, nextBeginIndex);
             } else {
                 return _baseStr.substring(_endIndex);
+            }
+        }
+
+        public String substringScopeToPrevious() {
+            int previousBeginIndex = -1;
+            if (_previous != null) {
+                previousBeginIndex = _previous.getBeginIndex();
+            }
+            if (previousBeginIndex >= 0) {
+                return _baseStr.substring(previousBeginIndex, _endIndex);
+            } else {
+                return _baseStr.substring(0, _endIndex);
             }
         }
 
@@ -597,6 +789,14 @@ public class Srl {
 
         public void setScope(String scope) {
             this._scope = scope;
+        }
+
+        public ScopeInfo getPrevious() {
+            return _previous;
+        }
+
+        public void setPrevious(ScopeInfo previous) {
+            this._previous = previous;
         }
 
         public ScopeInfo getNext() {
@@ -858,20 +1058,21 @@ public class Srl {
             if (line.trim().startsWith("--")) {
                 continue;
             }
-            final List<Integer> indexList = indexListOf(line, "--");
+            final List<DelimiterInfo> delimiterList = extractDelimiterList(line, "--");
             int realIndex = -1;
-            indexLoop: for (Integer index : indexList) {
+            indexLoop: for (DelimiterInfo delimiter : delimiterList) {
                 final List<ScopeInfo> scopeList = extractScopeList(line, "/*", "*/");
+                final int delimiterIndex = delimiter.getBeginIndex();
                 for (ScopeInfo scope : scopeList) {
-                    if (scope.isBeforeScope(index)) {
+                    if (scope.isBeforeScope(delimiterIndex)) {
                         break;
                     }
-                    if (scope.isInScope(index)) {
+                    if (scope.isInScope(delimiterIndex)) {
                         continue indexLoop;
                     }
                 }
                 // found
-                realIndex = index;
+                realIndex = delimiterIndex;
             }
             if (realIndex >= 0) {
                 line = line.substring(0, realIndex);
