@@ -77,29 +77,30 @@ public class ForNode {
         final String closeMark = "*/";
         final String endMark = "/*END FOR*/";
         String rear = _dynamicSql;
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder mainSqlSb = new StringBuilder();
         while (true) {
             final int beginIndex = rear.indexOf(beginMark);
             if (beginIndex < 0) {
-                sb.append(rear);
+                mainSqlSb.append(rear);
                 break;
             }
 
-            sb.append(rear.substring(0, beginIndex));
+            mainSqlSb.append(rear.substring(0, beginIndex));
             rear = rear.substring(beginIndex + beginMark.length());
             final int closeIndex = rear.indexOf(closeMark);
             if (closeIndex < 0) {
-                sb.append(rear);
+                mainSqlSb.append(rear);
                 break;
             }
             final String expression = rear.substring(0, closeIndex);
             final int loopSize = extractLoopSize(_pmb, _dynamicSql, expression);
 
+            final StringBuilder loopClauseSb = new StringBuilder();
             if (loopSize > 0) {
                 // add IF comment which always returns true
                 // to prevent BEGIN comment from removing all
                 // and to adjust and/or prefix
-                sb.append("/*IF ").append(expression).append(".size() > 0*/");
+                loopClauseSb.append("/*IF ").append(expression).append(".size() > 0*/");
             }
 
             rear = rear.substring(closeIndex + closeMark.length());
@@ -121,14 +122,15 @@ public class ForNode {
                 if (i > 0) { // next loop
                     element = Srl.replace(element, loopVariableInfo.getNextMap());
                 }
-                sb.append(element);
+                loopClauseSb.append(element);
             }
             if (loopSize > 0) {
-                sb.append("/*END*/"); // for IF comment
+                loopClauseSb.append("/*END*/"); // for IF comment
             }
+            mainSqlSb.append(loopClauseSb); // reflect loop clause to main SQL
             rear = rear.substring(endIndex + endMark.length()); // to next
         }
-        return sb.toString();
+        return mainSqlSb.toString();
     }
 
     // ===================================================================================
