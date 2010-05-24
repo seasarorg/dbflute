@@ -34,6 +34,8 @@ public class OutsideSqlOption {
 
     protected boolean _dynamicBinding;
 
+    protected boolean _formatSql;
+
     /** The configuration of statement. (Nullable) */
     protected StatementConfig _statementConfig;
 
@@ -60,11 +62,15 @@ public class OutsideSqlOption {
         _dynamicBinding = true;
     }
 
+    public void formatSql() {
+        _formatSql = true;
+    }
+
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
     public String generateUniqueKey() {
-        return "{" + _pagingRequestType + "/" + _dynamicBinding + "}";
+        return "{" + _pagingRequestType + "/" + _dynamicBinding + "/" + _formatSql + "}";
     }
 
     // ===================================================================================
@@ -85,6 +91,7 @@ public class OutsideSqlOption {
     //                                                                      ==============
     @Override
     public String toString() {
+        // not show formatSql because of not important
         return "{paging=" + _pagingRequestType + ", dynamic=" + _dynamicBinding + "}";
     }
 
@@ -104,6 +111,10 @@ public class OutsideSqlOption {
 
     public boolean isDynamicBinding() {
         return _dynamicBinding;
+    }
+
+    public boolean isFormatSql() {
+        return _formatSql;
     }
 
     public StatementConfig getStatementConfig() {

@@ -185,19 +185,16 @@ public class ForNode {
         final List<ScopeInfo> scopeList = Srl.extractScopeList(content, "/*", "*/");
         for (int i = 0; i < scopeList.size(); i++) {
             final ScopeInfo scope = scopeList.get(i);
-            if (Srl.count(scope.getContent(), "'") < 2) {
-                continue;
-            }
             if (scope.getContent().startsWith("FIRST")) {
-                final KeyValueContainer keyValue = processKeyValue(content, scopeList, i, "FIRST");
+                final KeyValueContainer keyValue = processKeyValue(content, scope, "FIRST");
                 info.addFirst(keyValue.getKey(), keyValue.getValue());
                 info.addNext(keyValue.getKey(), "");
             } else if (scope.getContent().startsWith("NEXT")) {
-                final KeyValueContainer keyValue = processKeyValue(content, scopeList, i, "NEXT");
+                final KeyValueContainer keyValue = processKeyValue(content, scope, "NEXT");
                 info.addFirst(keyValue.getKey(), "");
                 info.addNext(keyValue.getKey(), keyValue.getValue());
             } else if (scope.getContent().startsWith("LAST")) {
-                final KeyValueContainer keyValue = processKeyValue(content, scopeList, i, "NEXT");
+                final KeyValueContainer keyValue = processKeyValue(content, scope, "LAST");
                 info.addFirst(keyValue.getKey(), "");
                 info.addNext(keyValue.getKey(), ""); // LAST replacement should be executed before NEXT
                 info.addLast(keyValue.getKey(), keyValue.getValue());
@@ -206,23 +203,35 @@ public class ForNode {
         return info;
     }
 
-    protected KeyValueContainer processKeyValue(String content, List<ScopeInfo> scopeList, int i, String keyword) {
-        final ScopeInfo scope = scopeList.get(i);
-        final String adding = Srl.extractScopeFirst(scope.getContent(), "'", "'").getContent();
+    protected KeyValueContainer processKeyValue(String content, ScopeInfo scope, String keyword) {
         String key = null;
         String value = null;
-        if (i < (scopeList.size() - 1)) { // has next scope
-            final ScopeInfo nextScope = scopeList.get(i + 1);
-            if (("END " + keyword).equals(nextScope.getContent())) {
-                key = content.substring(scope.getBeginIndex(), nextScope.getEndIndex());
-                value = content.substring(scope.getEndIndex(), nextScope.getBeginIndex()) + adding;
+        final ScopeInfo next = scope.getNext();
+        if (next != null && next.getContent().startsWith("END " + keyword)) {
+            key = scope.substringScopeToNext();
+            String prefix = "";
+            final ScopeInfo prefixScope = Srl.extractScopeFirst(scope.getContent(), "'", "'");
+            if (prefixScope != null) {
+                prefix = prefixScope.getContent();
             }
+            String suffix = "";
+            final ScopeInfo suffixScope = Srl.extractScopeFirst(next.getContent(), "'", "'");
+            if (suffixScope != null) {
+                suffix = suffixScope.getContent();
+            }
+            final String interspace = scope.substringInterspaceToNext();
+            value = prefix + interspace + suffix;
         }
         if (key == null) {
             key = scope.getScope();
         }
         if (value == null) {
-            value = adding;
+            String replacement = "";
+            final ScopeInfo replacementScope = Srl.extractScopeFirst(scope.getContent(), "'", "'");
+            if (replacementScope != null) {
+                replacement = replacementScope.getContent();
+            }
+            value = replacement;
         }
         final KeyValueContainer container = new KeyValueContainer();
         container.setKey(key);

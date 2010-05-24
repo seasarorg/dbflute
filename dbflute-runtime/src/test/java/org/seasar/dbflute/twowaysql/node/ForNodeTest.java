@@ -172,7 +172,7 @@ public class ForNodeTest extends PlainTestCase {
         assertFalse(actual.contains("/*END*/"));
     }
 
-    public void test_resolveDynamicForComment_several() throws Exception {
+    public void test_resolveDynamicForComment_several_firstAnd() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
         pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
@@ -185,7 +185,50 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   /*NEXT 'and '*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
         sb.append("   /*END FOR*/").append(ln());
         sb.append("   /*FOR pmb.memberAccountList*/").append(ln());
-        sb.append("   /*FIRST '('*/and /*END FIRST*//*NEXT '  or '*/MEMBER_ACCOUNT");
+        sb.append("   /*FIRST*/and (/*END FIRST*//*NEXT '  or '*/MEMBER_ACCOUNT");
+        sb.append(" like /*pmb.memberAccountList.get(index)*/'foo%'/*LAST*/)/*END LAST*/").append(ln());
+        sb.append("   /*END FOR*/").append(ln());
+
+        // ## Act ##
+        String actual = createTarget(pmb, sb.toString()).resolveDynamicForComment();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("select * from MEMBER"));
+        assertTrue(actual.contains(" where"));
+        assertFalse(actual.contains("/*FOR "));
+        assertFalse(actual.contains("/*END FOR*/"));
+        assertFalse(actual.contains("FIRST"));
+        assertFalse(actual.contains("NEXT"));
+        assertFalse(actual.contains("LAST"));
+        assertTrue(actual.contains("  /*IF pmb.memberNameList.size() > 0*/"));
+        assertTrue(actual.contains("  MEMBER_NAME like /*pmb.memberNameList.get(0)*/"));
+        assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(1)*/"));
+        assertTrue(actual.contains(" and MEMBER_NAME like /*pmb.memberNameList.get(2)*/"));
+        assertFalse(actual.contains("pmb.memberNameList.get(3)"));
+        assertFalse(actual.contains("pmb.memberNameList.get(index)"));
+        assertTrue(actual.contains(" and (MEMBER_ACCOUNT like /*pmb.memberAccountList.get(0)*/"));
+        assertFalse(actual.contains(" and   or "));
+        assertTrue(actual.contains(" or MEMBER_ACCOUNT like /*pmb.memberAccountList.get(1)*/'foo%')"));
+        assertFalse(actual.contains(" and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(2)*/'foo%')"));
+        assertFalse(actual.contains(" and MEMBER_ACCOUNT like /*pmb.memberAccountList.get(index)*/"));
+        assertTrue(actual.contains("  /*END*/"));
+    }
+
+    public void test_resolveDynamicForComment_several_fisrtSuffix() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        pmb.setMemberAccountList(DfCollectionUtil.newArrayList("abc", "def"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" where").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   /*NEXT 'and '*/MEMBER_NAME like /*pmb.memberNameList.get(index)*/'foo%'").append(ln());
+        sb.append("   /*END FOR*/").append(ln());
+        sb.append("   /*FOR pmb.memberAccountList*/").append(ln());
+        sb.append("   /*FIRST*/and /*END FIRST '('*//*NEXT '  or '*/MEMBER_ACCOUNT");
         sb.append(" like /*pmb.memberAccountList.get(index)*/'foo%'/*LAST ')'*/").append(ln());
         sb.append("   /*END FOR*/").append(ln());
 

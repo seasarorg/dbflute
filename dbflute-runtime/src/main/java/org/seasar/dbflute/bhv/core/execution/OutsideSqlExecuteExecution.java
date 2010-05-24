@@ -13,24 +13,30 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.sqlcommand;
+package org.seasar.dbflute.bhv.core.execution;
 
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.util.Srl;
 
 /**
- * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnUpdateDynamicCommand extends TnAbstractDynamicCommand {
+public class OutsideSqlExecuteExecution extends TnAbstractDynamicCommand {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _removeEmptyLine;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 
@@ -46,6 +52,21 @@ public class TnUpdateDynamicCommand extends TnAbstractDynamicCommand {
     }
 
     protected TnBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
-        return new TnBasicUpdateHandler(getDataSource(), ctx.getSql(), getStatementFactory());
+        String realSql = ctx.getSql();
+        if (isRemoveEmptyLine()) {
+            realSql = Srl.removeEmptyLine(realSql);
+        }
+        return new TnBasicUpdateHandler(getDataSource(), realSql, getStatementFactory());
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isRemoveEmptyLine() {
+        return _removeEmptyLine;
+    }
+
+    public void setRemoveEmptyLine(boolean removeEmptyLine) {
+        this._removeEmptyLine = removeEmptyLine;
     }
 }

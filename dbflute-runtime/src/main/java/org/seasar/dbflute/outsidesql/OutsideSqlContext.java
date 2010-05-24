@@ -157,6 +157,8 @@ public class OutsideSqlContext {
 
     protected boolean _autoPagingLogging; // for logging
 
+    protected boolean _removeEmptyLine;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -183,8 +185,9 @@ public class OutsideSqlContext {
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
      */
     public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
-        final String sql = readOutsideSql(sqlFileEncoding, dbmsSuffix);
-        return replaceOutsideSqlBindCharacterOnLineComment(sql);
+        String sql = readOutsideSql(sqlFileEncoding, dbmsSuffix);
+        sql = replaceOutsideSqlBindCharacterOnLineComment(sql);
+        return sql;
     }
 
     protected String replaceOutsideSqlBindCharacterOnLineComment(String sql) {
@@ -472,5 +475,13 @@ public class OutsideSqlContext {
 
     public void setAutoPagingLogging(boolean autoPagingLogging) { // for logging
         this._autoPagingLogging = autoPagingLogging;
+    }
+
+    public boolean isRemoveEmptyLine() {
+        return _removeEmptyLine;
+    }
+
+    public void setRemoveEmptyLine(boolean removeEmptyLine) {
+        this._removeEmptyLine = removeEmptyLine;
     }
 }

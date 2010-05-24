@@ -57,14 +57,15 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         final Object pmb = _parameterBean;
         final OutsideSqlOption option = _outsideSqlOption;
         final OutsideSqlContext outsideSqlContext = createOutsideSqlContext();
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
+        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
+        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setRemoveEmptyLine(option.isFormatSql());
         outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         OutsideSqlContext.setOutsideSqlContextOnThread(outsideSqlContext);
     }
@@ -112,7 +113,8 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         final String[] argNames = (pmb != null ? new String[] { "pmb" } : new String[] {});
         final Class<?>[] argTypes = (pmb != null ? new Class<?>[] { pmb.getClass() } : new Class<?>[] {});
 
-        return createUpdateDynamicCommand(argNames, argTypes, sql);
+        final boolean removeEmptyLine = outsideSqlContext.isRemoveEmptyLine();
+        return createUpdateDynamicCommand(argNames, argTypes, sql, removeEmptyLine);
     }
 
     public Object[] getSqlExecutionArgument() {

@@ -46,6 +46,9 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     /** Is it forced to enable the dynamic binding? */
     protected boolean _forcedDynamicBinding;
 
+    /** Does it remove empty lines in SQL? */
+    protected boolean _removeEmptyLine;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -166,7 +169,11 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     //                                                Common
     //                                                ------
     protected Object doExecuteOutsideSql(CommandContext ctx) {
-        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), _resultSetHandler);
+        String realSql = ctx.getSql();
+        if (isRemoveEmptyLine()) {
+            realSql = Srl.removeEmptyLine(realSql);
+        }
+        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(realSql, _resultSetHandler);
         final Object[] bindVariables = ctx.getBindVariables();
         final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
         selectHandler.setExceptionMessageSqlArgs(bindVariables);
@@ -201,5 +208,13 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
 
     public void setForcedDynamicBinding(boolean forcedDynamicBinding) {
         this._forcedDynamicBinding = forcedDynamicBinding;
+    }
+
+    public boolean isRemoveEmptyLine() {
+        return _removeEmptyLine;
+    }
+
+    public void setRemoveEmptyLine(boolean removeEmptyLine) {
+        this._removeEmptyLine = removeEmptyLine;
     }
 }

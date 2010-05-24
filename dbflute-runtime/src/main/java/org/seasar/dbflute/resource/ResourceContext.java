@@ -237,6 +237,14 @@ public class ResourceContext {
         return resourceParameter.getLogTimestampFormat();
     }
 
+    public static boolean isRemoveEmptyLine() {
+        ResourceParameter resourceParameter = resourceParameter();
+        if (resourceParameter == null) {
+            return false;
+        }
+        return resourceParameter.isRemoveEmptyLine();
+    }
+
     protected static ResourceParameter resourceParameter() {
         if (!isExistResourceContextOnThread()) {
             return null;

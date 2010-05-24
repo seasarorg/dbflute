@@ -160,8 +160,41 @@ public class Srl {
     }
 
     // ===================================================================================
+    //                                                                             IndexOf
+    //                                                                             =======
+    public static final List<Integer> indexListOf(String str, String delimiter) {
+        assertStringNotNull(str);
+        assertDelimiterNotNull(delimiter);
+        final List<Integer> indexList = new ArrayList<Integer>();
+        Integer currentBeginIndex = 0;
+        String rear = str;
+        while (true) {
+            final int index = rear.indexOf(delimiter);
+            if (index < 0) {
+                break;
+            }
+            final int absoluteIndex = currentBeginIndex + index;
+            indexList.add(absoluteIndex);
+            currentBeginIndex = absoluteIndex + delimiter.length();
+            rear = rear.substring(index + delimiter.length());
+            continue;
+        }
+        return indexList;
+    }
+
+    // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
+    /**
+     * Extract front sub-string from first index of delimiter.
+     * <pre>
+     * substringFirstFront("foo.bar.baz", ".")
+     * returns "foo"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
     public static final String substringFirstFront(String str, String... delimiters) {
         assertStringNotNull(str);
         Integer firstIndex = null;
@@ -182,6 +215,16 @@ public class Srl {
         return str.substring(0, firstIndex);
     }
 
+    /**
+     * Extract rear sub-string from first index of delimiter.
+     * <pre>
+     * substringFirstRear("foo.bar.baz", ".")
+     * returns "bar.baz"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
     public static final String substringFirstRear(String str, String... delimiters) {
         assertStringNotNull(str);
         Integer firstIndex = null;
@@ -205,6 +248,16 @@ public class Srl {
         return str.substring(firstIndex + delimiterLength);
     }
 
+    /**
+     * Extract front sub-string from last index of delimiter.
+     * <pre>
+     * substringLastFront("foo.bar.baz", ".")
+     * returns "foo.bar"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
     public static final String substringLastFront(String str, String... delimiters) {
         assertStringNotNull(str);
         Integer lastIndex = null;
@@ -225,6 +278,16 @@ public class Srl {
         return str.substring(0, lastIndex);
     }
 
+    /**
+     * Extract rear sub-string from rear index of delimiter.
+     * <pre>
+     * substringLastRear("foo.bar.baz", ".")
+     * returns "baz"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
     public static final String substringLastRear(String str, String... delimiters) {
         assertStringNotNull(str);
         Integer lastIndex = null;
@@ -393,7 +456,7 @@ public class Srl {
     // ===================================================================================
     //                                                                      Scope Handling
     //                                                                      ==============
-    public static final ScopeInfo extractScopeFirst(String str, String beginMark, String endMark) {
+    public static final ScopeInfo extractScopeFirst(final String str, final String beginMark, final String endMark) {
         final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, true);
         if (scopeList.isEmpty()) {
             return null;
@@ -405,17 +468,17 @@ public class Srl {
         return scopeList.get(0);
     }
 
-    public static final List<ScopeInfo> extractScopeList(String str, String beginMark, String endMark) {
+    public static final List<ScopeInfo> extractScopeList(final String str, final String beginMark, final String endMark) {
         return doExtractScopeList(str, beginMark, endMark, false);
     }
 
-    public static final List<ScopeInfo> doExtractScopeList(String str, String beginMark, String endMark,
-            boolean firstOnly) {
+    public static final List<ScopeInfo> doExtractScopeList(final String str, final String beginMark,
+            final String endMark, final boolean firstOnly) {
         assertStringNotNull(str);
         assertBeginMarkNotNull(beginMark);
         assertEndMarkNotNull(endMark);
         final List<ScopeInfo> resultList = new ArrayList<ScopeInfo>();
-        int currentBeginIndex = 0;
+        ScopeInfo preScope = null;
         String rear = str;
         while (true) {
             final int beginIndex = rear.indexOf(beginMark);
@@ -433,62 +496,167 @@ public class Srl {
             }
             final String scope = beginMark + rear.substring(0, endIndex + endMark.length());
             final ScopeInfo info = new ScopeInfo();
-            info.setBeginIndex(currentBeginIndex + beginIndex);
+            info.setBaseStr(str);
+            info.setBeginIndex((preScope != null ? preScope.getEndIndex() : 0) + beginIndex);
             info.setEndIndex(info.getBeginIndex() + scope.length());
             info.setContent(rtrim(ltrim(scope, beginMark), endMark));
             info.setScope(scope);
+            if (preScope != null) {
+                preScope.setNext(info);
+            }
             resultList.add(info);
-            if (currentBeginIndex == 0 && firstOnly) {
+            if (preScope == null && firstOnly) {
                 break;
             }
-            currentBeginIndex = info.getEndIndex();
-            rear = str.substring(currentBeginIndex);
+            preScope = info;
+            rear = str.substring(info.getEndIndex());
         }
         return resultList;
     }
 
     public static class ScopeInfo {
-        protected int beginIndex;
-        protected int endIndex;
-        protected String content;
-        protected String scope;
+        protected String _baseStr;
+        protected int _beginIndex;
+        protected int _endIndex;
+        protected String _content;
+        protected String _scope;
+        protected ScopeInfo _next;
+
+        public boolean isBeforeScope(int index) {
+            return index < _beginIndex;
+        }
+
+        public boolean isInScope(int index) {
+            return index >= _beginIndex && index <= _endIndex;
+        }
+
+        public String substringInterspaceToNext() {
+            int nextBeginIndex = -1;
+            if (_next != null) {
+                nextBeginIndex = _next.getBeginIndex();
+            }
+            if (nextBeginIndex >= 0) {
+                return _baseStr.substring(_endIndex, nextBeginIndex);
+            } else {
+                return _baseStr.substring(_endIndex);
+            }
+        }
+
+        public String substringScopeToNext() {
+            int nextEndIndex = -1;
+            if (_next != null) {
+                nextEndIndex = _next.getEndIndex();
+            }
+            if (nextEndIndex >= 0) {
+                return _baseStr.substring(_beginIndex, nextEndIndex);
+            } else {
+                return _baseStr.substring(_beginIndex);
+            }
+        }
 
         @Override
         public String toString() {
-            return scope;
+            return _scope + ":(" + _beginIndex + ", " + _endIndex + ")";
+        }
+
+        public String getBaseStr() {
+            return _baseStr;
+        }
+
+        public void setBaseStr(String baseStr) {
+            this._baseStr = baseStr;
         }
 
         public int getBeginIndex() {
-            return beginIndex;
+            return _beginIndex;
         }
 
         public void setBeginIndex(int beginIndex) {
-            this.beginIndex = beginIndex;
+            this._beginIndex = beginIndex;
         }
 
         public int getEndIndex() {
-            return endIndex;
+            return _endIndex;
         }
 
         public void setEndIndex(int endIndex) {
-            this.endIndex = endIndex;
+            this._endIndex = endIndex;
         }
 
         public String getContent() {
-            return content;
+            return _content;
         }
 
         public void setContent(String content) {
-            this.content = content;
+            this._content = content;
         }
 
         public String getScope() {
-            return scope;
+            return _scope;
         }
 
         public void setScope(String scope) {
-            this.scope = scope;
+            this._scope = scope;
         }
+
+        public ScopeInfo getNext() {
+            return _next;
+        }
+
+        public void setNext(ScopeInfo next) {
+            this._next = next;
+        }
+    }
+
+    public static String removeScope(final String str, String beginMark, String endMark) {
+        assertStringNotNull(str);
+        final StringBuilder sb = new StringBuilder();
+        String rear = str;
+        while (true) {
+            final int beginIndex = rear.indexOf(beginMark);
+            if (beginIndex < 0) {
+                sb.append(rear);
+                break;
+            }
+            final int endIndex = rear.indexOf(endMark);
+            if (endIndex < 0) {
+                sb.append(rear);
+                break;
+            }
+            if (beginIndex > endIndex) {
+                final int borderIndex = endIndex + endMark.length();
+                sb.append(rear.substring(0, borderIndex));
+                rear = rear.substring(borderIndex);
+                continue;
+            }
+            sb.append(rear.substring(0, beginIndex));
+            rear = rear.substring(endIndex + endMark.length());
+        }
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                       Line Handling
+    //                                                                       =============
+    /**
+     * Remove empty lines. <br />
+     * And CR is removed.
+     * @param str The target string. (NotNull)
+     * @return The filtered string. (NotNull)
+     */
+    public static String removeEmptyLine(String str) {
+        assertStringNotNull(str);
+        final StringBuilder sb = new StringBuilder();
+        final List<String> splitList = splitList(str, "\n");
+        for (String line : splitList) {
+            if (Srl.is_Null_or_TrimmedEmpty(line)) {
+                continue; // skip
+            }
+            line = removeCR(line); // remove CR!
+            sb.append(line).append("\n");
+        }
+        final String filtered = sb.toString();
+        return filtered.substring(0, filtered.length() - "\n".length());
     }
 
     // ===================================================================================
@@ -662,48 +830,56 @@ public class Srl {
     // ===================================================================================
     //                                                                        SQL Handling
     //                                                                        ============
-    public static String removeBlockComment(final String sql) {
-        assertObjectNotNull("sql", sql);
-        final String beginMark = "/*";
-        final String endMark = "*/";
-        final StringBuilder sb = new StringBuilder();
-        String tmp = sql;
-        while (true) {
-            if (tmp.indexOf(beginMark) < 0) {
-                sb.append(tmp);
-                break;
-            }
-            if (tmp.indexOf(endMark) < 0) {
-                sb.append(tmp);
-                break;
-            }
-            if (tmp.indexOf(beginMark) > tmp.indexOf(endMark)) {
-                final int borderIndex = tmp.indexOf(endMark) + endMark.length();
-                sb.append(tmp.substring(0, borderIndex));
-                tmp = tmp.substring(borderIndex);
-                continue;
-            }
-            sb.append(tmp.substring(0, tmp.indexOf(beginMark)));
-            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
-        }
-        return sb.toString();
+    /**
+     * Remove block comments.
+     * @param sql The string of SQL. (NotNull)
+     * @return The filtered string. (NotNull)
+     */
+    public static String removeBlockComment(String sql) {
+        assertSqlNotNull(sql);
+        return removeScope(sql, "/*", "*/");
     }
 
-    public static String removeLineComment(final String sql) { // with removing CR!
-        assertObjectNotNull("sql", sql);
+    /**
+     * Remove line comments. <br />
+     * And CR is removed.
+     * @param sql The string of SQL. (NotNull)
+     * @return The filtered string. (NotNull)
+     */
+    public static String removeLineComment(String sql) { // with removing CR!
+        assertSqlNotNull(sql);
         final StringBuilder sb = new StringBuilder();
-        final String[] lines = sql.split("\n");
-        for (String line : lines) {
+        final List<String> splitList = splitList(sql, "\n");
+        for (String line : splitList) {
             if (line == null) {
                 continue;
             }
             line = removeCR(line); // remove CR!
-            if (line.startsWith("--")) {
+            if (line.trim().startsWith("--")) {
                 continue;
+            }
+            final List<Integer> indexList = indexListOf(line, "--");
+            int realIndex = -1;
+            indexLoop: for (Integer index : indexList) {
+                final List<ScopeInfo> scopeList = extractScopeList(line, "/*", "*/");
+                for (ScopeInfo scope : scopeList) {
+                    if (scope.isBeforeScope(index)) {
+                        break;
+                    }
+                    if (scope.isInScope(index)) {
+                        continue indexLoop;
+                    }
+                }
+                // found
+                realIndex = index;
+            }
+            if (realIndex >= 0) {
+                line = line.substring(0, realIndex);
             }
             sb.append(line).append("\n");
         }
-        return sb.toString();
+        final String filtered = sb.toString();
+        return filtered.substring(0, filtered.length() - "\n".length());
     }
 
     protected static String removeCR(String str) {
@@ -773,6 +949,10 @@ public class Srl {
 
     protected static void assertCamelNameNotNull(String camelName) {
         assertObjectNotNull("camelName", camelName);
+    }
+
+    protected static void assertSqlNotNull(String sql) {
+        assertObjectNotNull("sql", sql);
     }
 
     /**

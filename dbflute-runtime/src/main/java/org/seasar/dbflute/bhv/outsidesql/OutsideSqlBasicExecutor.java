@@ -77,6 +77,9 @@ public class OutsideSqlBasicExecutor {
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
 
+    /** Does it format the SQL? */
+    protected boolean _formatSql;
+
     /** The configuration of statement. (Nullable) */
     protected StatementConfig _statementConfig;
 
@@ -333,6 +336,19 @@ public class OutsideSqlBasicExecutor {
     }
 
     // -----------------------------------------------------
+    //                                            Format SQL
+    //                                            ----------
+    /**
+     * Set up format-SQL for this outside-SQL. <br />
+     * (For example, removed empty lines)
+     * @return this. (NotNull)
+     */
+    public OutsideSqlBasicExecutor formatSql() {
+        _formatSql = true;
+        return this;
+    }
+
+    // -----------------------------------------------------
     //                                      Statement Config
     //                                      ----------------
     /**
@@ -353,6 +369,9 @@ public class OutsideSqlBasicExecutor {
         option.setStatementConfig(_statementConfig);
         if (_dynamicBinding) {
             option.dynamicBinding();
+        }
+        if (_formatSql) {
+            option.formatSql();
         }
         option.setTableDbName(_tableDbName);// as information
         return option;

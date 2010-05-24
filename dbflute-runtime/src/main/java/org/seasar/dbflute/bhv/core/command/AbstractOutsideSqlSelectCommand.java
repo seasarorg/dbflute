@@ -74,6 +74,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
+        outsideSqlContext.setRemoveEmptyLine(option.isFormatSql());
         outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }
 
@@ -141,11 +142,12 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // - - - - - - - - - - -
         // Create SqlExecution.
         // - - - - - - - - - - -
-        return createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
+        final boolean removeEmptyLine = outsideSqlContext.isRemoveEmptyLine();
+        return createOutsideSqlSelectExecution(handler, argNames, argTypes, sql, removeEmptyLine);
     }
 
     protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(TnResultSetHandler handler, String[] argNames,
-            Class<?>[] argTypes, String sql) {
+            Class<?>[] argTypes, String sql, boolean removeEmptyLine) {
         final OutsideSqlSelectExecution cmd = new OutsideSqlSelectExecution(_dataSource, _statementFactory, handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
@@ -155,6 +157,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // (dynamic binding is supported in select statement only)
         cmd.setForcedDynamicBinding(containsForComment(sql));
 
+        cmd.setRemoveEmptyLine(removeEmptyLine);
         return cmd;
     }
 

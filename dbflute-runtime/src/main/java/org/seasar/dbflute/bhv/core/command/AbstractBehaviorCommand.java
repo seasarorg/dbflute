@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandComponentSetup;
+import org.seasar.dbflute.bhv.core.execution.OutsideSqlExecuteExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
@@ -31,7 +32,6 @@ import org.seasar.dbflute.s2dao.rshandler.TnBeanListResultSetHandler;
 import org.seasar.dbflute.s2dao.rshandler.TnScalarDynamicResultSetHandler;
 import org.seasar.dbflute.s2dao.rshandler.TnScalarListResultSetHandler;
 import org.seasar.dbflute.s2dao.rshandler.TnScalarResultSetHandler;
-import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateDynamicCommand;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -67,13 +67,15 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                   UpdateDynamicCommnd
     //                                   -------------------
-    protected TnUpdateDynamicCommand createUpdateDynamicCommand(String[] argNames, Class<?>[] argTypes, String sql) {
-        final TnUpdateDynamicCommand cmd = new TnUpdateDynamicCommand(_dataSource, _statementFactory);
+    protected OutsideSqlExecuteExecution createUpdateDynamicCommand(String[] argNames, Class<?>[] argTypes, String sql,
+            boolean removeEmptyLine) {
+        final OutsideSqlExecuteExecution cmd = new OutsideSqlExecuteExecution(_dataSource, _statementFactory);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
         if (sql != null) {
             cmd.setSql(sql);
         }
+        cmd.setRemoveEmptyLine(removeEmptyLine);
         return cmd;
     }
 

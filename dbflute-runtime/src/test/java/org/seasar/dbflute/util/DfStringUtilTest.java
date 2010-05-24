@@ -7,8 +7,11 @@ import static org.seasar.dbflute.util.Srl.count;
 import static org.seasar.dbflute.util.Srl.decamelize;
 import static org.seasar.dbflute.util.Srl.extractScopeFirst;
 import static org.seasar.dbflute.util.Srl.extractScopeList;
+import static org.seasar.dbflute.util.Srl.indexListOf;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
 import static org.seasar.dbflute.util.Srl.ltrim;
+import static org.seasar.dbflute.util.Srl.removeBlockComment;
+import static org.seasar.dbflute.util.Srl.removeEmptyLine;
 import static org.seasar.dbflute.util.Srl.removeLineComment;
 import static org.seasar.dbflute.util.Srl.rtrim;
 import static org.seasar.dbflute.util.Srl.splitList;
@@ -108,6 +111,50 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals(" foo \n ", DfStringUtil.rtrim(" foo \n ", "\n"));
         assertEquals(" foo \r", DfStringUtil.rtrim(" foo \r\n", "\n"));
         assertEquals(" foo ", DfStringUtil.rtrim(" foo \r\n", "\r\n"));
+    }
+
+    // ===================================================================================
+    //                                                                             IndexOf
+    //                                                                             =======
+    public void test_indexListOf_basic() {
+        // ## Arrange ##
+        String str = "foo--bar--baz--and";
+
+        // ## Act ##
+        List<Integer> list = indexListOf(str, "--");
+
+        // ## Assert ##
+        assertEquals(3, list.size());
+        assertEquals(Integer.valueOf(3), list.get(0));
+        assertEquals(Integer.valueOf(8), list.get(1));
+        assertEquals(Integer.valueOf(13), list.get(2));
+    }
+
+    public void test_indexListOf_bothSide() {
+        // ## Arrange ##
+        String str = "--foo--bar--baz--and--";
+
+        // ## Act ##
+        List<Integer> list = indexListOf(str, "--");
+
+        // ## Assert ##
+        assertEquals(5, list.size());
+        assertEquals(Integer.valueOf(0), list.get(0));
+        assertEquals(Integer.valueOf(5), list.get(1));
+        assertEquals(Integer.valueOf(10), list.get(2));
+        assertEquals(Integer.valueOf(15), list.get(3));
+        assertEquals(Integer.valueOf(20), list.get(4));
+    }
+
+    public void test_indexListOf_noDelimiter() {
+        // ## Arrange ##
+        String str = "foo-bar-baz-and";
+
+        // ## Act ##
+        List<Integer> list = indexListOf(str, "--");
+
+        // ## Assert ##
+        assertEquals(0, list.size());
     }
 
     // ===================================================================================
@@ -269,6 +316,16 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("/*FIRST 'foo'*/", list.get(2).getScope());
         assertEquals("/*END FOR*/", list.get(3).getScope());
         assertEquals("/* END */", list.get(4).getScope()); // not trimmed
+        assertEquals("where ", list.get(0).substringInterspaceToNext());
+        assertEquals(" ", list.get(1).substringInterspaceToNext());
+        assertEquals("member...", list.get(2).substringInterspaceToNext());
+        assertEquals("", list.get(3).substringInterspaceToNext());
+        assertEquals("bar", list.get(4).substringInterspaceToNext());
+        assertEquals("/*BEGIN*/where /*FOR pmb*/", list.get(0).substringScopeToNext());
+        assertEquals("/*FOR pmb*/ /*FIRST 'foo'*/", list.get(1).substringScopeToNext());
+        assertEquals("/*FIRST 'foo'*/member.../*END FOR*/", list.get(2).substringScopeToNext());
+        assertEquals("/*END FOR*//* END */", list.get(3).substringScopeToNext());
+        assertEquals("/* END */bar", list.get(4).substringScopeToNext());
     }
 
     public void test_extractScopeList_sameMark() {
@@ -300,6 +357,35 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("@@FIRST 'foo'@@", list.get(2).getScope());
         assertEquals("@@END FOR@@", list.get(3).getScope());
         assertEquals("@@ END @@", list.get(4).getScope()); // not trimmed
+        assertEquals("FOR pmb", list.get(0).getNext().getContent());
+        assertEquals("FIRST 'foo'", list.get(1).getNext().getContent());
+        assertEquals("END FOR", list.get(2).getNext().getContent());
+        assertEquals(" END ", list.get(3).getNext().getContent());
+        assertEquals(null, list.get(4).getNext());
+        assertEquals("where ", list.get(0).substringInterspaceToNext());
+        assertEquals(" ", list.get(1).substringInterspaceToNext());
+        assertEquals("member...", list.get(2).substringInterspaceToNext());
+        assertEquals("", list.get(3).substringInterspaceToNext());
+        assertEquals("bar", list.get(4).substringInterspaceToNext());
+    }
+
+    // ===================================================================================
+    //                                                                       Line Handling
+    //                                                                       =============
+    public void test_removeEmptyLine_basic() {
+        // ## Arrange ##
+        String sql = "aaaa\r\n";
+        sql = sql + "bbbb\r\n";
+        sql = sql + "--\r\n";
+        sql = sql + "\r\n";
+        sql = sql + "\n";
+        sql = sql + "cccc\r\n";
+
+        // ## Act ##
+        String actual = removeEmptyLine(sql);
+
+        // ## Assert ##
+        assertEquals("aaaa\nbbbb\n--\ncccc", actual);
     }
 
     // ===================================================================================
@@ -368,14 +454,58 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                        SQL Handling
     //                                                                        ============
+    public void test_removeBlockComment_basic() {
+        // ## Arrange ##
+        String sql = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
+
+        // ## Act ##
+        String actual = removeBlockComment(sql);
+
+        // ## Assert ##
+        assertEquals("bazwhere  member...bar", actual);
+    }
+
+    public void test_removeBlockComment_noComment() {
+        // ## Arrange ##
+        String sql = "barbaz";
+
+        // ## Act ##
+        String actual = removeBlockComment(sql);
+
+        // ## Assert ##
+        assertEquals("barbaz", actual);
+    }
+
+    public void test_removeLineComment_basic() throws Exception {
+        // ## Arrange ##
+        String sql = "aaa\n";
+        sql = sql + "bbb\n";
+        sql = sql + "--\n";
+        sql = sql + "ccc -- foo\n";
+        sql = sql + "ddd /* -- foo */\n";
+        sql = sql + "eee\n";
+
+        // ## Act ##
+        String actual = removeLineComment(sql);
+
+        // ## Assert ##
+        log(actual);
+        assertEquals("aaa\nbbb\nccc \nddd /* -- foo */\neee\n", actual);
+    }
+
     public void test_removeLineComment_Lf() throws Exception {
+        // ## Arrange ##
         String sql = "aaaa\n";
         sql = sql + "bbbb\n";
         sql = sql + "--\n";
         sql = sql + "cccc\n";
-        String removed = removeLineComment(sql);
-        System.out.println(removed);
-        assertEquals("aaaa\nbbbb\ncccc\n", removed);
+
+        // ## Act ##
+        String actual = removeLineComment(sql);
+
+        // ## Assert ##
+        log(actual);
+        assertEquals("aaaa\nbbbb\ncccc\n", actual);
     }
 
     public void test_removeLineComment_CrLf() throws Exception {
@@ -383,10 +513,10 @@ public class DfStringUtilTest extends PlainTestCase {
         sql = sql + "bbbb\r\n";
         sql = sql + "--\r\n";
         sql = sql + "cccc\r\n";
-        String removed = DfStringUtil.removeLineComment(sql);
-        System.out.println(removed);
-        assertFalse(removed.contains("--"));
-        assertFalse(removed.contains("\r"));
-        assertEquals("aaaa\nbbbb\ncccc\n", removed);
+        String actual = DfStringUtil.removeLineComment(sql);
+        log(actual);
+        assertFalse(actual.contains("--"));
+        assertFalse(actual.contains("\r"));
+        assertEquals("aaaa\nbbbb\ncccc\n", actual);
     }
 }
