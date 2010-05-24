@@ -230,7 +230,7 @@
 	</target>
 
 	<target name="reflect-to-basic" depends="prepare-reflection" description="==> reflect to basic example">
-	  	<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${basic.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${basic.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${basic.example.dir}/lib/${runtime.jar}" overwrite="true"/>
@@ -242,7 +242,7 @@
 	</target>
 
 	<target name="reflect-to-spring" depends="prepare-reflection" description="==> reflect to spring example">
-	  	<copy todir="${spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${spring.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${spring.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${spring.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${spring.example.dir}/lib/${runtime.jar}" overwrite="true"/>
@@ -254,7 +254,7 @@
 	</target>
 
 	<target name="reflect-to-guice" depends="prepare-reflection" description="==> reflect to guice example">
-	  	<copy todir="${guice.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${guice.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${guice.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${guice.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${guice.example.dir}/lib/${runtime.jar}" overwrite="true"/>
@@ -266,7 +266,7 @@
 	</target>
 
 	<target name="reflect-to-lucy" depends="prepare-reflection" description="==> reflect to lucy example">
-	  	<copy todir="${lucy.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${lucy.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${lucy.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${lucy.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${lucy.example.dir}/lib/${runtime.jar}" overwrite="true"/>
@@ -278,7 +278,7 @@
 	</target>
 
 	<target name="reflect-to-mysql" depends="prepare-reflection" description="==> reflect to mysql example">
-	  	<copy todir="${mysql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${mysql.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${mysql.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${mysql.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<replace file="${mysql.example.dir}/dbflute_nextexampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
@@ -288,7 +288,7 @@
 	</target>
 
 	<target name="reflect-to-postgresql" depends="prepare-reflection" description="==> reflect to postgresql example">
-	  	<copy todir="${postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${postgresql.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${postgresql.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${postgresql.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<replace file="${postgresql.example.dir}/dbflute_nextschema/_project.bat" token="-${pre.version}" value="-${version}"/>
@@ -298,7 +298,7 @@
 	</target>
 
 	<target name="reflect-to-oracle" depends="prepare-reflection" description="==> reflect to oracle example">
-	  	<copy todir="${oracle.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${oracle.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${oracle.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${oracle.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<replace file="${oracle.example.dir}/dbflute_nextexampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
@@ -308,7 +308,7 @@
 	</target>
 
 	<target name="reflect-to-db2" depends="prepare-reflection" description="==> reflect to db2 example">
-	  	<copy todir="${db2.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${db2.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${db2.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${db2.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${db2.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -316,14 +316,14 @@
 	</target>
 
 	<target name="reflect-to-sqlserver" depends="prepare-reflection" description="==> reflect to sqlserver example">
-	  	<copy todir="${sqlserver.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${sqlserver.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${sqlserver.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${sqlserver.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-msaccess" depends="prepare-reflection" description="==> reflect to msaccess example">
-	  	<copy todir="${msaccess.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${msaccess.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${msaccess.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${msaccess.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${msaccess.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -331,7 +331,7 @@
 	</target>
 
 	<target name="reflect-to-ymir" depends="prepare-reflection" description="==> reflect to ymir example">
-	  	<copy todir="${ymir.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${ymir.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${ymir.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.pre.jar}"/>
 		<delete file="${ymir.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${ymir.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.jar}" overwrite="true"/>
@@ -343,7 +343,7 @@
 	</target>
 
 	<target name="reflect-to-sastruts" depends="prepare-reflection" description="==> reflect to sastruts example">
-	  	<copy todir="${sastruts.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${sastruts.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.pre.jar}"/>
 		<delete file="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.jar}" overwrite="true"/>
@@ -355,7 +355,7 @@
 	</target>
 
 	<target name="reflect-to-teeda" depends="prepare-reflection" description="==> reflect to teeda example">
-	  	<copy todir="${teeda.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${teeda.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${teeda.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${teeda.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${teeda.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -363,7 +363,7 @@
 	</target>
 
 	<target name="reflect-to-buri" depends="prepare-reflection" description="==> reflect to buri example">
-	  	<copy todir="${buri.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${buri.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${buri.example.dir}/dbflute_buriexampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${buri.example.dir}/dbflute_buriexampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${buri.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -371,7 +371,7 @@
 	</target>
 
 	<target name="reflect-to-hibernate" depends="prepare-reflection" description="==> reflect to hibernate example">
-	  	<copy todir="${hibernate.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${hibernate.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${hibernate.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${hibernate.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${hibernate.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -379,7 +379,7 @@
 	</target>
 
 	<target name="reflect-to-s2jdbc" depends="prepare-reflection" description="==> reflect to s2jdbc example">
-	  	<copy todir="${s2jdbc.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${s2jdbc.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${s2jdbc.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${s2jdbc.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${s2jdbc.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -387,7 +387,7 @@
 	</target>
 
 	<target name="reflect-to-flex" depends="prepare-reflection" description="==> reflect to flex example">
-	  	<copy todir="${flex.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${flex.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${flex.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${flex.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${flex.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -395,7 +395,7 @@
 	</target>
 
 	<target name="reflect-to-doma" depends="prepare-reflection" description="==> reflect to flex example">
-	  	<copy todir="${doma.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${doma.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${doma.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${doma.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${doma.example.dir}/mydbflute/dbflute-${pre.version}"/>
@@ -403,8 +403,8 @@
 	</target>
 
 	<target name="reflect-to-multipledb" depends="prepare-reflection" description="==> reflect to multipledb example">
-	  	<copy todir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
-	  	<copy todir="${multipledb.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${multipledb.spring.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<replace file="${multipledb.seasar.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
@@ -435,7 +435,7 @@
 	</target>
 
 	<target name="reflect-to-tricky" depends="prepare-reflection" description="==> reflect to tricky example">
-	  	<copy todir="${tricky.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${tricky.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${tricky.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${tricky.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${tricky.example.dir}/lib/${runtime.jar}" overwrite="true"/>

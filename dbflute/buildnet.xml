@@ -180,21 +180,21 @@
 	</target>
 
 	<target name="reflect-to-basic" depends="deploy-dist" description="==> reflect to basic example">
-		<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${basic.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${basic.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-asp.net" depends="deploy-dist" description="==> reflect to asp.net example">
-		<copy todir="${asp.net.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<copy todir="${asp.net.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${asp.net.example.dir}/dbflute_dfnetexdb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${asp.net.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-multipledb-quill" depends="deploy-dist" description="==> reflect to multipledb quill example">
-		<copy todir="${multipledb.quill.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<copy todir="${multipledb.quill.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${multipledb.quill.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${multipledb.quill.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${multipledb.quill.example.dir}/mydbflute/dbflute-${pre.version}"/>
