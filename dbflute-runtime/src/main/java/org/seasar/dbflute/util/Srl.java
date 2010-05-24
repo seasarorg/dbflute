@@ -140,7 +140,7 @@ public class Srl {
             }
         }
         final IndexOfInfo info = new IndexOfInfo();
-        info.setBaseStr(str);
+        info.setBaseString(str);
         info.setIndex(minIndex);
         info.setDelimiter(targetDelimiter);
         return info;
@@ -160,7 +160,7 @@ public class Srl {
             }
         }
         final IndexOfInfo info = new IndexOfInfo();
-        info.setBaseStr(str);
+        info.setBaseString(str);
         info.setIndex(maxIndex);
         info.setDelimiter(targetDelimiter);
         return info;
@@ -180,7 +180,7 @@ public class Srl {
             }
         }
         final IndexOfInfo info = new IndexOfInfo();
-        info.setBaseStr(str);
+        info.setBaseString(str);
         info.setIndex(minIndex);
         info.setDelimiter(targetDelimiter);
         return info;
@@ -200,39 +200,39 @@ public class Srl {
             }
         }
         final IndexOfInfo info = new IndexOfInfo();
-        info.setBaseStr(str);
+        info.setBaseString(str);
         info.setIndex(maxIndex);
         info.setDelimiter(targetDelimiter);
         return info;
     }
 
     public static class IndexOfInfo {
-        protected String baseStr;
-        protected int index;
-        protected String delimiter;
+        protected String _baseString;
+        protected int _index;
+        protected String _delimiter;
 
-        public String getBaseStr() {
-            return baseStr;
+        public String getBaseString() {
+            return _baseString;
         }
 
-        public void setBaseStr(String baseStr) {
-            this.baseStr = baseStr;
+        public void setBaseString(String baseStr) {
+            this._baseString = baseStr;
         }
 
         public int getIndex() {
-            return index;
+            return _index;
         }
 
         public void setIndex(int index) {
-            this.index = index;
+            this._index = index;
         }
 
         public String getDelimiter() {
-            return delimiter;
+            return _delimiter;
         }
 
         public void setDelimiter(String delimiter) {
-            this.delimiter = delimiter;
+            this._delimiter = delimiter;
         }
     }
 
@@ -393,6 +393,24 @@ public class Srl {
         return str;
     }
 
+    public static final String replaceScopeContent(String str, String fromStr, String toStr, String beginMark,
+            String endMark) {
+        final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
+        if (scopeList.isEmpty()) {
+            return str;
+        }
+        return scopeList.get(0).replaceContentOnBaseString(fromStr, toStr);
+    }
+
+    public static final String replaceScopeInterspace(String str, String fromStr, String toStr, String beginMark,
+            String endMark) {
+        final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
+        if (scopeList.isEmpty()) {
+            return str;
+        }
+        return scopeList.get(0).replaceInterspaceOnBaseString(fromStr, toStr);
+    }
+
     // ===================================================================================
     //                                                                            Contains
     //                                                                            ========
@@ -515,7 +533,7 @@ public class Srl {
                 break;
             }
             final DelimiterInfo info = new DelimiterInfo();
-            info.setBaseStr(str);
+            info.setBaseString(str);
             info.setDelimiter(delimiter);
             final int absoluteIndex = (previous != null ? previous.getEndIndex() : 0) + beginIndex;
             info.setBeginIndex(absoluteIndex);
@@ -533,7 +551,7 @@ public class Srl {
     }
 
     public static class DelimiterInfo {
-        protected String _baseStr;
+        protected String _baseString;
         protected int _beginIndex;
         protected int _endIndex;
         protected String _delimiter;
@@ -546,9 +564,9 @@ public class Srl {
                 previousIndex = _previous.getBeginIndex();
             }
             if (previousIndex >= 0) {
-                return _baseStr.substring(previousIndex + _previous.getDelimiter().length(), _beginIndex);
+                return _baseString.substring(previousIndex + _previous.getDelimiter().length(), _beginIndex);
             } else {
-                return _baseStr.substring(0, _beginIndex);
+                return _baseString.substring(0, _beginIndex);
             }
         }
 
@@ -558,9 +576,9 @@ public class Srl {
                 nextIndex = _next.getBeginIndex();
             }
             if (nextIndex >= 0) {
-                return _baseStr.substring(_endIndex, nextIndex);
+                return _baseString.substring(_endIndex, nextIndex);
             } else {
-                return _baseStr.substring(_endIndex);
+                return _baseString.substring(_endIndex);
             }
         }
 
@@ -569,12 +587,12 @@ public class Srl {
             return _delimiter + ":(" + _beginIndex + ", " + _endIndex + ")";
         }
 
-        public String getBaseStr() {
-            return _baseStr;
+        public String getBaseString() {
+            return _baseString;
         }
 
-        public void setBaseStr(String baseStr) {
-            this._baseStr = baseStr;
+        public void setBaseString(String baseStr) {
+            this._baseString = baseStr;
         }
 
         public int getBeginIndex() {
@@ -661,10 +679,12 @@ public class Srl {
             }
             final String scope = beginMark + rear.substring(0, endIndex + endMark.length());
             final ScopeInfo info = new ScopeInfo();
-            info.setBaseStr(str);
+            info.setBaseString(str);
             final int absoluteIndex = (previous != null ? previous.getEndIndex() : 0) + beginIndex;
             info.setBeginIndex(absoluteIndex);
             info.setEndIndex(absoluteIndex + scope.length());
+            info.setBeginMark(beginMark);
+            info.setEndMark(endMark);
             info.setContent(rtrim(ltrim(scope, beginMark), endMark));
             info.setScope(scope);
             if (previous != null) {
@@ -682,9 +702,11 @@ public class Srl {
     }
 
     public static class ScopeInfo {
-        protected String _baseStr;
+        protected String _baseString;
         protected int _beginIndex;
         protected int _endIndex;
+        protected String beginMark;
+        protected String endMark;
         protected String _content;
         protected String _scope;
         protected ScopeInfo _previous;
@@ -698,15 +720,65 @@ public class Srl {
             return index >= _beginIndex && index <= _endIndex;
         }
 
+        public String replaceContentOnBaseString(String fromStr, String toStr) {
+            final List<ScopeInfo> scopeList = takeScopeList();
+            final StringBuilder sb = new StringBuilder();
+            for (ScopeInfo scope : scopeList) {
+                sb.append(scope.substringInterspaceToPrevious());
+                sb.append(scope.getBeginMark());
+                sb.append(Srl.replace(scope.getContent(), fromStr, toStr));
+                sb.append(scope.getEndMark());
+                if (scope.getNext() == null) { // last
+                    sb.append(scope.substringInterspaceToNext());
+                }
+            }
+            return sb.toString();
+        }
+
+        public String replaceInterspaceOnBaseString(String fromStr, String toStr) {
+            final List<ScopeInfo> scopeList = takeScopeList();
+            final StringBuilder sb = new StringBuilder();
+            for (ScopeInfo scope : scopeList) {
+                sb.append(Srl.replace(scope.substringInterspaceToPrevious(), fromStr, toStr));
+                sb.append(scope.getScope());
+                if (scope.getNext() == null) { // last
+                    sb.append(Srl.replace(scope.substringInterspaceToNext(), fromStr, toStr));
+                }
+            }
+            return sb.toString();
+        }
+
+        protected List<ScopeInfo> takeScopeList() {
+            ScopeInfo scope = this;
+            while (true) {
+                final ScopeInfo previous = scope.getPrevious();
+                if (previous == null) {
+                    break;
+                }
+                scope = previous;
+            }
+            final List<ScopeInfo> scopeList = new ArrayList<ScopeInfo>();
+            scopeList.add(scope);
+            while (true) {
+                final ScopeInfo next = scope.getNext();
+                if (next == null) {
+                    break;
+                }
+                scope = next;
+                scopeList.add(next);
+            }
+            return scopeList;
+        }
+
         public String substringInterspaceToPrevious() {
             int previousEndIndex = -1;
             if (_previous != null) {
                 previousEndIndex = _previous.getEndIndex();
             }
             if (previousEndIndex >= 0) {
-                return _baseStr.substring(previousEndIndex, _beginIndex);
+                return _baseString.substring(previousEndIndex, _beginIndex);
             } else {
-                return _baseStr.substring(0, _beginIndex);
+                return _baseString.substring(0, _beginIndex);
             }
         }
 
@@ -716,9 +788,9 @@ public class Srl {
                 nextBeginIndex = _next.getBeginIndex();
             }
             if (nextBeginIndex >= 0) {
-                return _baseStr.substring(_endIndex, nextBeginIndex);
+                return _baseString.substring(_endIndex, nextBeginIndex);
             } else {
-                return _baseStr.substring(_endIndex);
+                return _baseString.substring(_endIndex);
             }
         }
 
@@ -728,9 +800,9 @@ public class Srl {
                 previousBeginIndex = _previous.getBeginIndex();
             }
             if (previousBeginIndex >= 0) {
-                return _baseStr.substring(previousBeginIndex, _endIndex);
+                return _baseString.substring(previousBeginIndex, _endIndex);
             } else {
-                return _baseStr.substring(0, _endIndex);
+                return _baseString.substring(0, _endIndex);
             }
         }
 
@@ -740,9 +812,9 @@ public class Srl {
                 nextEndIndex = _next.getEndIndex();
             }
             if (nextEndIndex >= 0) {
-                return _baseStr.substring(_beginIndex, nextEndIndex);
+                return _baseString.substring(_beginIndex, nextEndIndex);
             } else {
-                return _baseStr.substring(_beginIndex);
+                return _baseString.substring(_beginIndex);
             }
         }
 
@@ -751,12 +823,12 @@ public class Srl {
             return _scope + ":(" + _beginIndex + ", " + _endIndex + ")";
         }
 
-        public String getBaseStr() {
-            return _baseStr;
+        public String getBaseString() {
+            return _baseString;
         }
 
-        public void setBaseStr(String baseStr) {
-            this._baseStr = baseStr;
+        public void setBaseString(String baseString) {
+            this._baseString = baseString;
         }
 
         public int getBeginIndex() {
@@ -773,6 +845,22 @@ public class Srl {
 
         public void setEndIndex(int endIndex) {
             this._endIndex = endIndex;
+        }
+
+        public String getBeginMark() {
+            return beginMark;
+        }
+
+        public void setBeginMark(String beginMark) {
+            this.beginMark = beginMark;
+        }
+
+        public String getEndMark() {
+            return endMark;
+        }
+
+        public void setEndMark(String endMark) {
+            this.endMark = endMark;
         }
 
         public String getContent() {
@@ -808,7 +896,7 @@ public class Srl {
         }
     }
 
-    public static String removeScope(final String str, String beginMark, String endMark) {
+    public static String removeScope(final String str, final String beginMark, final String endMark) {
         assertStringNotNull(str);
         final StringBuilder sb = new StringBuilder();
         String rear = str;

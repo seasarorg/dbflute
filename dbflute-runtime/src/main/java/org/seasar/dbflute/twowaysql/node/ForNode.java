@@ -108,10 +108,12 @@ public class ForNode {
             assertEndForComment(_pmb, _dynamicSql, expression, endIndex);
             final String content = rear.substring(0, endIndex);
 
+            final String fromIndexStr = ".get(index)";
             final LoopVariableInfo loopVariableInfo = extractLoopVariableInfo(content);
             for (int i = 0; i < loopSize; i++) {
                 String element = content;
-                element = Srl.replace(element, ".get(index)", ".get(" + i + ")");
+                final String toIndexStr = ".get(" + i + ")";
+                element = Srl.replaceScopeContent(element, fromIndexStr, toIndexStr, "/*", "*/");
                 if (i == 0) { // first loop
                     element = Srl.replace(element, loopVariableInfo.getFirstMap());
                 }

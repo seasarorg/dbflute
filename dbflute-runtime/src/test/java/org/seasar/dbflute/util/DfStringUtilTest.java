@@ -13,6 +13,8 @@ import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.removeBlockComment;
 import static org.seasar.dbflute.util.Srl.removeEmptyLine;
 import static org.seasar.dbflute.util.Srl.removeLineComment;
+import static org.seasar.dbflute.util.Srl.replaceScopeContent;
+import static org.seasar.dbflute.util.Srl.replaceScopeInterspace;
 import static org.seasar.dbflute.util.Srl.rtrim;
 import static org.seasar.dbflute.util.Srl.splitList;
 import static org.seasar.dbflute.util.Srl.splitListTrimmed;
@@ -159,6 +161,31 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
+    }
+
+    // ===================================================================================
+    //                                                                             Replace
+    //                                                                             =======
+    public void test_replaceScopeContent_basic() {
+        // ## Arrange ##
+        String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
+
+        // ## Act ##
+        String actual = replaceScopeContent(str, "foo", "jflute", "/*", "*/");
+
+        // ## Assert ##
+        assertEquals("/*jflute*/foo/*bar*/bar/*jflutebarbaz*/", actual);
+    }
+
+    public void test_replaceInterspaceContent_basic() {
+        // ## Arrange ##
+        String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
+
+        // ## Act ##
+        String actual = replaceScopeInterspace(str, "foo", "jflute", "/*", "*/");
+
+        // ## Assert ##
+        assertEquals("/*foo*/jflute/*bar*/bar/*foobarbaz*/", actual);
     }
 
     // ===================================================================================
@@ -349,6 +376,38 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("/*FIRST 'foo'*/member.../*END FOR*/", list.get(2).substringScopeToNext());
         assertEquals("/*END FOR*//* END */", list.get(3).substringScopeToNext());
         assertEquals("/* END */bar", list.get(4).substringScopeToNext());
+    }
+
+    public void test_extractScopeList_replaceContentOnBaseString() {
+        // ## Arrange ##
+        String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
+
+        // ## Act ##
+        List<ScopeInfo> list = extractScopeList(str, "/*", "*/");
+
+        // ## Assert ##
+        ScopeInfo scope = list.get(1);
+        String baseString1 = scope.replaceContentOnBaseString("foo", "jflute");
+        assertEquals("/*jflute*/foo/*bar*/bar/*jflutebarbaz*/", baseString1);
+        String baseString2 = scope.replaceContentOnBaseString("*", "jflute");
+        assertEquals(str, baseString2); // marks no change
+        assertEquals(str, scope.getBaseString()); // no change
+    }
+
+    public void test_extractScopeList_replaceInterspaceOnBaseString() {
+        // ## Arrange ##
+        String str = "/*foo*/foo/*bar*/bar/*foobarbaz*/";
+
+        // ## Act ##
+        List<ScopeInfo> list = extractScopeList(str, "/*", "*/");
+
+        // ## Assert ##
+        ScopeInfo scope = list.get(1);
+        String baseString1 = scope.replaceInterspaceOnBaseString("foo", "jflute");
+        assertEquals("/*foo*/jflute/*bar*/bar/*foobarbaz*/", baseString1);
+        String baseString2 = scope.replaceInterspaceOnBaseString("*", "jflute");
+        assertEquals(str, baseString2); // marks no change
+        assertEquals(str, scope.getBaseString()); // no change
     }
 
     public void test_extractScopeList_sameMark() {
