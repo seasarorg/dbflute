@@ -26,7 +26,6 @@ import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.ForNode;
@@ -35,7 +34,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
+public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -45,9 +44,6 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
 
     /** Is it forced to enable the dynamic binding? */
     protected boolean _forcedDynamicBinding;
-
-    /** Does it remove empty lines in SQL? */
-    protected boolean _removeEmptyLine;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -169,10 +165,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
     //                                                Common
     //                                                ------
     protected Object doExecuteOutsideSql(CommandContext ctx) {
-        String realSql = ctx.getSql();
-        if (isRemoveEmptyLine()) {
-            realSql = Srl.removeEmptyLine(realSql);
-        }
+        final String realSql = filterSql(ctx.getSql());
         final TnBasicSelectHandler selectHandler = createBasicSelectHandler(realSql, _resultSetHandler);
         final Object[] bindVariables = ctx.getBindVariables();
         final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
@@ -208,13 +201,5 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
 
     public void setForcedDynamicBinding(boolean forcedDynamicBinding) {
         this._forcedDynamicBinding = forcedDynamicBinding;
-    }
-
-    public boolean isRemoveEmptyLine() {
-        return _removeEmptyLine;
-    }
-
-    public void setRemoveEmptyLine(boolean removeEmptyLine) {
-        this._removeEmptyLine = removeEmptyLine;
     }
 }

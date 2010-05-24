@@ -16,7 +16,7 @@
 package org.seasar.dbflute.resource;
 
 /**
- * The context of internal resource.
+ * The parameters as internal resource.
  * @author jflute
  */
 public class ResourceParameter {
@@ -27,7 +27,6 @@ public class ResourceParameter {
     protected String _outsideSqlPackage;
     protected String _logDateFormat;
     protected String _logTimestampFormat;
-    protected boolean _removeEmptyLine;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -54,13 +53,5 @@ public class ResourceParameter {
 
     public void setLogTimestampFormat(String logTimestampFormat) {
         _logTimestampFormat = logTimestampFormat;
-    }
-
-    public boolean isRemoveEmptyLine() {
-        return _removeEmptyLine;
-    }
-
-    public void setRemoveEmptyLine(boolean removeEmptyLine) {
-        this._removeEmptyLine = removeEmptyLine;
     }
 }

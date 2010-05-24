@@ -157,7 +157,11 @@ public class OutsideSqlContext {
 
     protected boolean _autoPagingLogging; // for logging
 
-    protected boolean _removeEmptyLine;
+    protected boolean removeBlockComment;
+
+    protected boolean removeLineComment;
+
+    protected boolean _formatSql;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -477,11 +481,27 @@ public class OutsideSqlContext {
         this._autoPagingLogging = autoPagingLogging;
     }
 
-    public boolean isRemoveEmptyLine() {
-        return _removeEmptyLine;
+    public boolean isRemoveBlockComment() {
+        return removeBlockComment;
     }
 
-    public void setRemoveEmptyLine(boolean removeEmptyLine) {
-        this._removeEmptyLine = removeEmptyLine;
+    public void setRemoveBlockComment(boolean removeBlockComment) {
+        this.removeBlockComment = removeBlockComment;
+    }
+
+    public boolean isRemoveLineComment() {
+        return removeLineComment;
+    }
+
+    public void setRemoveLineComment(boolean removeLineComment) {
+        this.removeLineComment = removeLineComment;
+    }
+
+    public boolean isFormatSql() {
+        return _formatSql;
+    }
+
+    public void setFormatSql(boolean formatSql) {
+        this._formatSql = formatSql;
     }
 }

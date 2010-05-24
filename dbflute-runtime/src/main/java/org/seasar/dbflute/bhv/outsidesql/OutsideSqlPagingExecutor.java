@@ -300,6 +300,34 @@ public class OutsideSqlPagingExecutor {
     }
 
     /**
+     * Set up remove-block-comment for this outside-SQL.
+     * @return this. (NotNull)
+     */
+    public OutsideSqlPagingExecutor removeBlockComment() {
+        _outsideSqlOption.removeBlockComment();
+        return this;
+    }
+
+    /**
+     * Set up remove-line-comment for this outside-SQL.
+     * @return this. (NotNull)
+     */
+    public OutsideSqlPagingExecutor removeLineComment() {
+        _outsideSqlOption.removeLineComment();
+        return this;
+    }
+
+    /**
+     * Set up format-SQL for this outside-SQL. <br />
+     * (For example, empty lines removed)
+     * @return this. (NotNull)
+     */
+    public OutsideSqlPagingExecutor formatSql() {
+        _outsideSqlOption.formatSql();
+        return this;
+    }
+
+    /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
      * @param statementConfig The configuration of statement. (Nullable)
      * @return this. (NotNull)

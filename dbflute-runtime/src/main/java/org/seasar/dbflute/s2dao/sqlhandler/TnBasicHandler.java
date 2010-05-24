@@ -24,7 +24,6 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.CallbackContext;
-import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.QLog;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
@@ -340,30 +339,6 @@ public class TnBasicHandler {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    // It needs this method if the target database does not support line comment.
-    protected String removeLineComment(final String sql) { // With removing CR!
-        if (sql == null || sql.trim().length() == 0) {
-            return sql;
-        }
-        final StringBuilder sb = new StringBuilder();
-        final String[] lines = sql.split("\n");
-        for (String line : lines) {
-            if (line == null) {
-                continue;
-            }
-            line = line.replaceAll("\r", ""); // Remove CR!
-            if (line.startsWith("--")) {
-                continue;
-            }
-            sb.append(line).append("\n");
-        }
-        final String filteredSql = sb.toString();
-        return filteredSql.substring(0, filteredSql.lastIndexOf("\n"));
-    }
-
-    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
@@ -386,19 +361,7 @@ public class TnBasicHandler {
     }
 
     public void setSql(String sql) {
-        if (isRemoveLineCommentFromSql()) {
-            sql = removeLineComment(sql);
-        }
         this.sql = sql;
-    }
-
-    protected boolean isRemoveLineCommentFromSql() {
-        // Because the MS-Access does not support line comments.
-        return isCurrentDBDef(DBDef.MSAccess);
-    }
-
-    protected boolean isCurrentDBDef(DBDef currentDBDef) {
-        return ResourceContext.isCurrentDBDef(currentDBDef);
     }
 
     public StatementFactory getStatementFactory() {

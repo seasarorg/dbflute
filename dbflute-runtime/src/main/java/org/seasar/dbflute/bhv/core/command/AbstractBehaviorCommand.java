@@ -65,17 +65,16 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     //                                                                             Factory
     //                                                                             =======
     // -----------------------------------------------------
-    //                                   UpdateDynamicCommnd
-    //                                   -------------------
-    protected OutsideSqlExecuteExecution createUpdateDynamicCommand(String[] argNames, Class<?>[] argTypes, String sql,
-            boolean removeEmptyLine) {
+    //                            OutsideSqlExecuteExecution
+    //                            --------------------------
+    protected OutsideSqlExecuteExecution createOutsideSqlExecuteExecution(String[] argNames, Class<?>[] argTypes,
+            String sql) {
         final OutsideSqlExecuteExecution cmd = new OutsideSqlExecuteExecution(_dataSource, _statementFactory);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
         if (sql != null) {
             cmd.setSql(sql);
         }
-        cmd.setRemoveEmptyLine(removeEmptyLine);
         return cmd;
     }
 

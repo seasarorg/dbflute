@@ -393,17 +393,20 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      *   o entityHandling().selectEntity()
      *   o entityHandling().selectEntityWithDeletedCheck()
      * 
-     * {Cursor}
-     *   o cursorHandling().selectCursor()
-     * 
      * {Paging}
      *   o autoPaging().selectList()
      *   o autoPaging().selectPage()
      *   o manualPaging().selectList()
      *   o manualPaging().selectPage()
      * 
-     * {Option -- Dynamic}
+     * {Cursor}
+     *   o cursorHandling().selectCursor()
+     * 
+     * {Option}
      *   o dynamicBinding().selectList()
+     *   o removeBlockComment().selectList()
+     *   o removeLineComment().selectList()
+     *   o formatSql().selectList()
      * </pre>
      * @return The basic executor of outside-SQL. (NotNull) 
      */

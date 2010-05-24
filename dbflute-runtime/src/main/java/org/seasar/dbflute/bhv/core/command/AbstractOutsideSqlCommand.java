@@ -88,6 +88,23 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         return (productName != null ? "_" + productName.toLowerCase() : "");
     }
 
+    protected boolean isRemoveBlockComment(OutsideSqlContext context) {
+        return context.isRemoveBlockComment() || needsToRemoveBlockComment();
+    }
+
+    protected boolean isRemoveLineComment(OutsideSqlContext context) {
+        return context.isRemoveLineComment() || needsToRemoveLineComment();
+    }
+
+    protected boolean needsToRemoveBlockComment() {
+        return false;
+    }
+
+    protected boolean needsToRemoveLineComment() {
+        assertOutsideSqlBasic("isCurrentDBDef");
+        return _currentDBDef.equals(DBDef.MSAccess);
+    }
+
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============

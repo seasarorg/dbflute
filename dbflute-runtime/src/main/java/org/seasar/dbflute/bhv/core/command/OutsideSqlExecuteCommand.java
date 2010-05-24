@@ -17,6 +17,7 @@ package org.seasar.dbflute.bhv.core.command;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.bhv.core.execution.OutsideSqlExecuteExecution;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
@@ -65,7 +66,9 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setRemoveEmptyLine(option.isFormatSql());
+        outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
+        outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
+        outsideSqlContext.setFormatSql(option.isFormatSql());
         outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         OutsideSqlContext.setOutsideSqlContextOnThread(outsideSqlContext);
     }
@@ -113,8 +116,11 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         final String[] argNames = (pmb != null ? new String[] { "pmb" } : new String[] {});
         final Class<?>[] argTypes = (pmb != null ? new Class<?>[] { pmb.getClass() } : new Class<?>[] {});
 
-        final boolean removeEmptyLine = outsideSqlContext.isRemoveEmptyLine();
-        return createUpdateDynamicCommand(argNames, argTypes, sql, removeEmptyLine);
+        final OutsideSqlExecuteExecution execution = createOutsideSqlExecuteExecution(argNames, argTypes, sql);
+        execution.setRemoveBlockComment(isRemoveBlockComment(outsideSqlContext));
+        execution.setRemoveLineComment(isRemoveLineComment(outsideSqlContext));
+        execution.setFormatSql(outsideSqlContext.isFormatSql());
+        return execution;
     }
 
     public Object[] getSqlExecutionArgument() {

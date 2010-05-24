@@ -42,19 +42,21 @@ import org.seasar.dbflute.outsidesql.ProcedurePmb;
  *   o entityHandling().selectEntity()
  *   o entityHandling().selectEntityWithDeletedCheck()
  * 
- * {Cursor}
- *   o cursorHandling().selectCursor()
- * 
  * {Paging}
  *   o autoPaging().selectList()
  *   o autoPaging().selectPage()
  *   o manualPaging().selectList()
  *   o manualPaging().selectPage()
  * 
- * {Option -- Dynamic}
- *   o dynamicBinding().selectList()
- * </pre>
+ * {Cursor}
+ *   o cursorHandling().selectCursor()
  * 
+ * {Option}
+ *   o dynamicBinding().selectList()
+ *   o removeBlockComment().selectList()
+ *   o removeLineComment().selectList()
+ *   o formatSql().selectList()
+ * </pre>
  * @author jflute
  */
 public class OutsideSqlBasicExecutor {
@@ -76,6 +78,12 @@ public class OutsideSqlBasicExecutor {
 
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
+
+    /** Does it remove block comments from the SQL? */
+    protected boolean _removeBlockComment;
+
+    /** Does it remove line comments from the SQL? */
+    protected boolean _removeLineComment;
 
     /** Does it format the SQL? */
     protected boolean _formatSql;
@@ -235,44 +243,8 @@ public class OutsideSqlBasicExecutor {
     }
 
     // ===================================================================================
-    //                                                                              Option
+    //                                                                              Paging
     //                                                                              ======
-    // -----------------------------------------------------
-    //                                       Result Handling
-    //                                       ---------------
-    /**
-     * Prepare cursor handling.
-     * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">cursorHandling()</span>.selectCursor(path, pmb, handler);
-     * </pre>
-     * @return The cursor executor of outside-SQL. (NotNull)
-     */
-    public OutsideSqlCursorExecutor<Object> cursorHandling() {
-        return createOutsideSqlCursorExecutor(createOutsideSqlOption());
-    }
-
-    protected OutsideSqlCursorExecutor<Object> createOutsideSqlCursorExecutor(OutsideSqlOption option) {
-        return new OutsideSqlCursorExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
-    }
-
-    /**
-     * Prepare entity handling.
-     * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">entityHandling()</span>.selectEntityWithDeletedCheck(path, pmb, SimpleMember.class);
-     * </pre>
-     * @return The cursor executor of outside-SQL. (NotNull)
-     */
-    public OutsideSqlEntityExecutor<Object> entityHandling() {
-        return createOutsideSqlEntityExecutor(createOutsideSqlOption());
-    }
-
-    protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor(OutsideSqlOption option) {
-        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
-    }
-
-    // -----------------------------------------------------
-    //                                                Paging
-    //                                                ------
     /**
      * Prepare the paging as manualPaging.
      * <pre>
@@ -322,12 +294,48 @@ public class OutsideSqlBasicExecutor {
                 _defaultStatementConfig);
     }
 
+    // ===================================================================================
+    //                                                                              Cursor
+    //                                                                              ======
+    /**
+     * Prepare cursor handling.
+     * <pre>
+     * memberBhv.outsideSql().<span style="color: #FD4747">cursorHandling()</span>.selectCursor(path, pmb, handler);
+     * </pre>
+     * @return The cursor executor of outside-SQL. (NotNull)
+     */
+    public OutsideSqlCursorExecutor<Object> cursorHandling() {
+        return createOutsideSqlCursorExecutor(createOutsideSqlOption());
+    }
+
+    protected OutsideSqlCursorExecutor<Object> createOutsideSqlCursorExecutor(OutsideSqlOption option) {
+        return new OutsideSqlCursorExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+    }
+
+    /**
+     * Prepare entity handling.
+     * <pre>
+     * memberBhv.outsideSql().<span style="color: #FD4747">entityHandling()</span>.selectEntityWithDeletedCheck(path, pmb, SimpleMember.class);
+     * </pre>
+     * @return The cursor executor of outside-SQL. (NotNull)
+     */
+    public OutsideSqlEntityExecutor<Object> entityHandling() {
+        return createOutsideSqlEntityExecutor(createOutsideSqlOption());
+    }
+
+    protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor(OutsideSqlOption option) {
+        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
     // -----------------------------------------------------
     //                                       Dynamic Binding
     //                                       ---------------
     /**
      * Set up dynamic-binding for this outside-SQL. <br />
-     * You can use bind variable in embedded variable by this.
+     * You can use bind variable comment in embedded variable comment by this.
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor dynamicBinding() {
@@ -336,11 +344,32 @@ public class OutsideSqlBasicExecutor {
     }
 
     // -----------------------------------------------------
+    //                                       Remove from SQL
+    //                                       ---------------
+    /**
+     * Set up remove-block-comment for this outside-SQL.
+     * @return this. (NotNull)
+     */
+    public OutsideSqlBasicExecutor removeBlockComment() {
+        _removeBlockComment = true;
+        return this;
+    }
+
+    /**
+     * Set up remove-line-comment for this outside-SQL.
+     * @return this. (NotNull)
+     */
+    public OutsideSqlBasicExecutor removeLineComment() {
+        _removeLineComment = true;
+        return this;
+    }
+
+    // -----------------------------------------------------
     //                                            Format SQL
     //                                            ----------
     /**
      * Set up format-SQL for this outside-SQL. <br />
-     * (For example, removed empty lines)
+     * (For example, empty lines removed)
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor formatSql() {
@@ -366,13 +395,19 @@ public class OutsideSqlBasicExecutor {
     //                                                                       =============
     protected OutsideSqlOption createOutsideSqlOption() {
         final OutsideSqlOption option = new OutsideSqlOption();
-        option.setStatementConfig(_statementConfig);
         if (_dynamicBinding) {
             option.dynamicBinding();
+        }
+        if (_removeBlockComment) {
+            option.removeBlockComment();
+        }
+        if (_removeLineComment) {
+            option.removeLineComment();
         }
         if (_formatSql) {
             option.formatSql();
         }
+        option.setStatementConfig(_statementConfig);
         option.setTableDbName(_tableDbName);// as information
         return option;
     }

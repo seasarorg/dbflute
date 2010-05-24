@@ -18,20 +18,13 @@ package org.seasar.dbflute.bhv.core.execution;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class OutsideSqlExecuteExecution extends TnAbstractDynamicCommand {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected boolean _removeEmptyLine;
+public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -52,21 +45,7 @@ public class OutsideSqlExecuteExecution extends TnAbstractDynamicCommand {
     }
 
     protected TnBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
-        String realSql = ctx.getSql();
-        if (isRemoveEmptyLine()) {
-            realSql = Srl.removeEmptyLine(realSql);
-        }
+        final String realSql = filterSql(ctx.getSql());
         return new TnBasicUpdateHandler(getDataSource(), realSql, getStatementFactory());
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean isRemoveEmptyLine() {
-        return _removeEmptyLine;
-    }
-
-    public void setRemoveEmptyLine(boolean removeEmptyLine) {
-        this._removeEmptyLine = removeEmptyLine;
     }
 }

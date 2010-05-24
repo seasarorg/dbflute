@@ -74,7 +74,9 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
-        outsideSqlContext.setRemoveEmptyLine(option.isFormatSql());
+        outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
+        outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
+        outsideSqlContext.setFormatSql(option.isFormatSql());
         outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }
 
@@ -142,12 +144,15 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // - - - - - - - - - - -
         // Create SqlExecution.
         // - - - - - - - - - - -
-        final boolean removeEmptyLine = outsideSqlContext.isRemoveEmptyLine();
-        return createOutsideSqlSelectExecution(handler, argNames, argTypes, sql, removeEmptyLine);
+        final OutsideSqlSelectExecution execution = createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
+        execution.setRemoveBlockComment(isRemoveBlockComment(outsideSqlContext));
+        execution.setRemoveLineComment(isRemoveLineComment(outsideSqlContext));
+        execution.setFormatSql(outsideSqlContext.isFormatSql());
+        return execution;
     }
 
     protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(TnResultSetHandler handler, String[] argNames,
-            Class<?>[] argTypes, String sql, boolean removeEmptyLine) {
+            Class<?>[] argTypes, String sql) {
         final OutsideSqlSelectExecution cmd = new OutsideSqlSelectExecution(_dataSource, _statementFactory, handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
@@ -156,8 +161,6 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // if FOR comment exists, it always uses dynamic binding
         // (dynamic binding is supported in select statement only)
         cmd.setForcedDynamicBinding(containsForComment(sql));
-
-        cmd.setRemoveEmptyLine(removeEmptyLine);
         return cmd;
     }
 

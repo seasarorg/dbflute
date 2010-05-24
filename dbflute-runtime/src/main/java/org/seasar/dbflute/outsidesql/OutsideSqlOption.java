@@ -34,6 +34,10 @@ public class OutsideSqlOption {
 
     protected boolean _dynamicBinding;
 
+    protected boolean _removeBlockComment;
+
+    protected boolean _removeLineComment;
+
     protected boolean _formatSql;
 
     /** The configuration of statement. (Nullable) */
@@ -60,6 +64,14 @@ public class OutsideSqlOption {
 
     public void dynamicBinding() {
         _dynamicBinding = true;
+    }
+
+    public void removeBlockComment() {
+        _removeBlockComment = true;
+    }
+
+    public void removeLineComment() {
+        _removeLineComment = true;
     }
 
     public void formatSql() {
@@ -111,6 +123,14 @@ public class OutsideSqlOption {
 
     public boolean isDynamicBinding() {
         return _dynamicBinding;
+    }
+
+    public boolean isRemoveBlockComment() {
+        return _removeBlockComment;
+    }
+
+    public boolean isRemoveLineComment() {
+        return _removeLineComment;
     }
 
     public boolean isFormatSql() {
