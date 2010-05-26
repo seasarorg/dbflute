@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.dataassert;
+package org.seasar.dbflute.logic.dftask.generate.dataassert;
 
 import java.io.File;
 import java.sql.ResultSet;
