@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.dataxls;
+package org.seasar.dbflute.logic.dftask.doc.dataxls;
 
 import java.sql.Time;
 import java.sql.Timestamp;
