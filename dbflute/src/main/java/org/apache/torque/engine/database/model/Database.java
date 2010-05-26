@@ -83,6 +83,8 @@ import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.dftask.sql2entity.pmbean.DfParameterBeanBasicHandler;
 import org.seasar.dbflute.logic.dftask.sql2entity.pmbean.DfParameterBeanMetaData;
+import org.seasar.dbflute.logic.exmange.CopyrightResolver;
+import org.seasar.dbflute.logic.exmange.SerialVersionUIDResolver;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileCollector;
@@ -845,7 +847,11 @@ public class Database {
     public void reflectAllExCopyright(String path) {
         final String outputPath = DfGenerator.getInstance().getOutputPath();
         final String absolutePath = outputPath + "/" + path;
-        getProperties().getAllClassCopyrightProperties().reflectAllExCopyright(absolutePath);
+        final String sourceCodeEncoding = getTemplateFileEncoding();
+        final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+        final CopyrightResolver resolver = new CopyrightResolver(sourceCodeEncoding, sourceCodeLn);
+        final String copyright = getProperties().getAllClassCopyrightProperties().getAllClassCopyright();
+        resolver.reflectAllExCopyright(absolutePath, copyright);
     }
 
     // -----------------------------------------------------
@@ -962,6 +968,21 @@ public class Database {
 
     public String getBehaviorQueryPathEndMark() {
         return getBasicProperties().getBehaviorQueryPathEndMark();
+    }
+
+    // -----------------------------------------------------
+    //                                    Serial Version UID
+    //                                    ------------------
+    public void reflectAllExSerialVersionUID(String path) {
+        // basically for parameter-bean
+        // because it has become to need it since 0.9.7.0
+        // (supported classes since older versions don't need this)
+        final String outputPath = DfGenerator.getInstance().getOutputPath();
+        final String absolutePath = outputPath + "/" + path;
+        final String sourceCodeEncoding = getTemplateFileEncoding();
+        final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+        final SerialVersionUIDResolver resolver = new SerialVersionUIDResolver(sourceCodeEncoding, sourceCodeLn);
+        resolver.reflectAllExSerialUID(absolutePath);
     }
 
     // ===================================================================================
