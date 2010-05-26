@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.pmbean;
+package org.seasar.dbflute.logic.dftask.sql2entity.pmbean;
 
 import java.util.List;
 

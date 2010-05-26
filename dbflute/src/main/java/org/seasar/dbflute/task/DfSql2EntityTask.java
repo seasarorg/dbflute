@@ -54,6 +54,7 @@ import org.seasar.dbflute.logic.cmentity.DfCustomizeEntityMetaExtractor;
 import org.seasar.dbflute.logic.cmentity.DfProcedureExecutionMetaExtractor;
 import org.seasar.dbflute.logic.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
 import org.seasar.dbflute.logic.dftask.common.DfSchemaXmlReader;
+import org.seasar.dbflute.logic.dftask.sql2entity.pmbean.DfParameterBeanMetaData;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
@@ -66,7 +67,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedu
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
-import org.seasar.dbflute.logic.pmbean.DfParameterBeanMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
