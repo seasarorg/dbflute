@@ -35,7 +35,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory.InitializeType;
-import org.seasar.dbflute.logic.task.replaceschema.schemainitializer.DfSchemaInitializer;
+import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 

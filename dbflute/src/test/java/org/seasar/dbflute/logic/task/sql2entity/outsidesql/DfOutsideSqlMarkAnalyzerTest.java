@@ -3,7 +3,7 @@ package org.seasar.dbflute.logic.task.sql2entity.outsidesql;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.seasar.dbflute.logic.task.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
+import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
 
 /**
  * 

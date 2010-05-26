@@ -31,9 +31,9 @@ import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.logic.factory.DfSequenceHandlerFactory;
+import org.seasar.dbflute.logic.generate.dataassert.DfDataAssertHandler;
+import org.seasar.dbflute.logic.generate.dataassert.DfDataAssertProvider;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandler;
-import org.seasar.dbflute.logic.task.generate.dataassert.DfDataAssertHandler;
-import org.seasar.dbflute.logic.task.generate.dataassert.DfDataAssertProvider;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 
