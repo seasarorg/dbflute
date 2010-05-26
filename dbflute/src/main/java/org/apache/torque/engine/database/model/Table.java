@@ -72,7 +72,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.schemahtml.DfSchemaHtmlBuilder;
+import org.seasar.dbflute.logic.task.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.various.DfColumnListToStringUtil;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;

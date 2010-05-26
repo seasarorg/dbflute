@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.schemahtml;
+package org.seasar.dbflute.logic.task.doc.schemahtml;
 
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.seasar.dbflute.properties.DfDocumentProperties;
