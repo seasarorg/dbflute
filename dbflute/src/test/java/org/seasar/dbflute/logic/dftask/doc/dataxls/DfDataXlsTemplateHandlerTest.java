@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.dataxls;
+package org.seasar.dbflute.logic.dftask.doc.dataxls;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +20,7 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
+import org.seasar.dbflute.logic.dftask.doc.dataxls.DfDataXlsTemplateHandler;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
