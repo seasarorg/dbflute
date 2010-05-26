@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.initializer;
+package org.seasar.dbflute.logic.propinit;
 
 import java.util.List;
 import java.util.Map;
