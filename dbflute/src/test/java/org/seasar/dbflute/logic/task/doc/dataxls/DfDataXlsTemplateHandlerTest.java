@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.dftask.doc.dataxls;
+package org.seasar.dbflute.logic.task.doc.dataxls;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

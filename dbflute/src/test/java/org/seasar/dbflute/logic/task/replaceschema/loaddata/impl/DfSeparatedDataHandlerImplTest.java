@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
+package org.seasar.dbflute.logic.task.replaceschema.loaddata.impl;
 
 import org.junit.Assert;
 import org.junit.Test;

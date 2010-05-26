@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
+package org.seasar.dbflute.logic.task.replaceschema.loaddata.impl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
