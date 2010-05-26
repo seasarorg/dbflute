@@ -50,7 +50,7 @@ import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.friends.velocity.DfOriginalLog4JLogSystem;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
-import org.seasar.dbflute.logic.schemaconnector.DfCurrentSchemaConnector;
+import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.logic.task.common.DfAntTaskUtil;
 import org.seasar.dbflute.logic.task.sql2entity.outsidesql.DfSqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
