@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.exmange;
+package org.seasar.dbflute.logic.dftask.generate.exmange;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
