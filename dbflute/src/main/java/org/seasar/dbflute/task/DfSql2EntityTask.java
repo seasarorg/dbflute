@@ -58,7 +58,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
-import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.logic.task.common.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.task.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.task.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
@@ -67,6 +66,7 @@ import org.seasar.dbflute.logic.task.sql2entity.cmentity.DfCustomizeEntityMetaEx
 import org.seasar.dbflute.logic.task.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.task.sql2entity.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.task.sql2entity.pmbean.DfParameterBeanMetaData;
+import org.seasar.dbflute.logic.task.sql2entity.pmbean.DfStandardApiPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.pkgresolver;
+package org.seasar.dbflute.logic.task.sql2entity.pmbean;
 
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfStringUtil;
