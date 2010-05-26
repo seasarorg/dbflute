@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.sqlfile;
+package org.seasar.dbflute.logic.sql2entity.outsidesql;
 
 import static org.junit.Assert.fail;
 
