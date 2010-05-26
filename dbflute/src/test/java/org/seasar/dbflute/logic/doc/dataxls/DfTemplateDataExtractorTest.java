@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.task.doc.dataxls;
+package org.seasar.dbflute.logic.doc.dataxls;
 
 import static org.junit.Assert.assertEquals;
 
