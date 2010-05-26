@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.loaddata.impl;
+package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
 
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;

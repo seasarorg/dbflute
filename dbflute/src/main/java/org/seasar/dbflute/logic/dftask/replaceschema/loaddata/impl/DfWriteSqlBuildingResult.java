@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.loaddata.impl;
+package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

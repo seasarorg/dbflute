@@ -16,7 +16,7 @@ import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.scmconn.DfCurrentSchemaConnector;
+import org.seasar.dbflute.logic.schemaconnector.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfStringFileReader;

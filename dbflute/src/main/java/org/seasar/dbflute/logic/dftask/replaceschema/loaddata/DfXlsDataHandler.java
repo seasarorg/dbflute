@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2006 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,21 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.loaddata;
+package org.seasar.dbflute.logic.dftask.replaceschema.loaddata;
+
+import java.io.File;
+import java.util.List;
+
+import org.seasar.dbflute.helper.dataset.DfDataSet;
 
 /**
  * @author jflute
  */
-public interface DfSeparatedDataHandler {
+public interface DfXlsDataHandler {
 
-    public DfSeparatedDataResultInfo writeSeveralData(DfSeparatedDataSeveralHandlingInfo info);
+    List<DfDataSet> readSeveralData(String dataDirectoryName);
+
+    void writeSeveralData(String dataDirectoryName);
+
+    List<File> getXlsList(String dataDirectoryName);
 }

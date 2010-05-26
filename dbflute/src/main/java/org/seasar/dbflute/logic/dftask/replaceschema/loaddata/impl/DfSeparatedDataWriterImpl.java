@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.loaddata.impl;
+package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,8 +35,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.dftask.replaceschema.loaddata.DfSeparatedDataWriter;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.loaddata.DfSeparatedDataWriter;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 

@@ -61,26 +61,26 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
         }
         final StringBuilder sb = new StringBuilder();
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
-        String lineString = null;
+        String line = null;
         int index = 0;
         try {
             while (true) {
-                lineString = br.readLine();
-                if (lineString == null) {
+                line = br.readLine();
+                if (line == null) {
                     break;
                 }
                 if (index == 0) { // first line
-                    if (!lineString.trim().startsWith("package ")) {
+                    if (!line.trim().startsWith("package ")) { // unsupported
                         return;
                     }
                     sb.append(copyright);
                 }
-                sb.append(lineString);
+                sb.append(line);
                 sb.append(sourceCodeLn);
                 ++index;
             }
         } catch (IOException e) {
-            String msg = "bufferedReader.readLine() threw the exception: current line=" + lineString;
+            String msg = "bufferedReader.readLine() threw the exception: current line=" + line;
             throw new IllegalStateException(msg, e);
         } finally {
             try {
@@ -88,11 +88,11 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
             } catch (IOException ignored) {
             }
         }
-        BufferedWriter bufferedWriter = null;
+        BufferedWriter bw = null;
         try {
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exfile), encoding));
-            bufferedWriter.write(sb.toString());
-            bufferedWriter.flush();
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exfile), encoding));
+            bw.write(sb.toString());
+            bw.flush();
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: encoding=" + encoding;
             throw new IllegalStateException(msg, e);
@@ -103,9 +103,9 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
             String msg = "bufferedWriter.write() threw the exception: bsbhvFile=" + exfile;
             throw new IllegalStateException(msg, e);
         } finally {
-            if (bufferedWriter != null) {
+            if (bw != null) {
                 try {
-                    bufferedWriter.close();
+                    bw.close();
                 } catch (IOException ignored) {
                 }
             }

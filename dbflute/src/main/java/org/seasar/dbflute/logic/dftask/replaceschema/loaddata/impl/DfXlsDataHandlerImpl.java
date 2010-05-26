@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.loaddata.impl;
+package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -50,8 +50,8 @@ import org.seasar.dbflute.helper.dataset.states.DfDtsSqlContext;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
+import org.seasar.dbflute.logic.dftask.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**

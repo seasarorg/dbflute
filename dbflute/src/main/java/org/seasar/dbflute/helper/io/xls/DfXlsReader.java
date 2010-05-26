@@ -42,7 +42,6 @@ import org.seasar.dbflute.helper.dataset.DfDataSetConstants;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
-import org.seasar.dbflute.logic.loaddata.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -57,7 +56,7 @@ public class DfXlsReader {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
+    private static final Log _log = LogFactory.getLog(DfXlsReader.class);
 
     // ===================================================================================
     //                                                                           Attribute
