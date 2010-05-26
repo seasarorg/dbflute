@@ -12,7 +12,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
-import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
+import org.seasar.dbflute.logic.task.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.task.sql2entity.pmbean.DfParameterBeanMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;

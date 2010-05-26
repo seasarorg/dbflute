@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.seasar.dbflute.friends.velocity.DfGenerator;
-import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
+import org.seasar.dbflute.logic.task.generate.packagepath.DfPackagePathHandler;
 
 /**
  * @author jflute

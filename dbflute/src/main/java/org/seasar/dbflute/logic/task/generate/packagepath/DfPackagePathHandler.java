@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.pathhandling;
+package org.seasar.dbflute.logic.task.generate.packagepath;
 
 import java.io.File;
 

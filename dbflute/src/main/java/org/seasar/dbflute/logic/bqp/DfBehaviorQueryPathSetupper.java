@@ -42,7 +42,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfBehaviorNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
+import org.seasar.dbflute.logic.task.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.task.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
