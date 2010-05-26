@@ -11,20 +11,19 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
-public class CopyrightResolver {
+public class DfSerialVersionUIDResolver {
 
     protected String _sourceEncoding;
     protected String _sourceLn;
 
-    public CopyrightResolver(String sourceEncoding, String sourceLn) {
+    public DfSerialVersionUIDResolver(String sourceEncoding, String sourceLn) {
         _sourceEncoding = sourceEncoding;
         _sourceLn = sourceLn;
     }
 
-    public void reflectAllExCopyright(String path, String copyright) {
-        if (copyright == null || copyright.trim().length() == 0) {
-            return;
-        }
+    public void reflectAllExSerialUID(String path) {
+        final String serialComment = "/** Serial version UID. (Default) */";
+        final String serialDefinition = "private static final long serialVersionUID = 1L;";
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;
         final BufferedReader br;
@@ -47,14 +46,15 @@ public class CopyrightResolver {
                 if (line == null) {
                     break;
                 }
-                if (index == 0) { // first line
-                    if (!line.trim().startsWith("package ")) { // unsupported
-                        return;
-                    }
-                    sb.append(copyright);
+                if (line.contains("serialVersionUID")) {
+                    return;
                 }
-                sb.append(line);
-                sb.append(sourceCodeLn);
+                sb.append(line).append(sourceCodeLn);
+                if (line.startsWith("public class") && line.contains(" extends ") && line.endsWith("{")) {
+                    sb.append(sourceCodeLn); // for empty line
+                    sb.append("    " + serialComment).append(sourceCodeLn);
+                    sb.append("    " + serialDefinition).append(sourceCodeLn);
+                }
                 ++index;
             }
         } catch (IOException e) {

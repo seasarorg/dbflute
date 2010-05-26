@@ -80,8 +80,8 @@ import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
-import org.seasar.dbflute.logic.generate.exmange.CopyrightResolver;
-import org.seasar.dbflute.logic.generate.exmange.SerialVersionUIDResolver;
+import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
+import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -849,7 +849,7 @@ public class Database {
         final String absolutePath = outputPath + "/" + path;
         final String sourceCodeEncoding = getTemplateFileEncoding();
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
-        final CopyrightResolver resolver = new CopyrightResolver(sourceCodeEncoding, sourceCodeLn);
+        final DfCopyrightResolver resolver = new DfCopyrightResolver(sourceCodeEncoding, sourceCodeLn);
         final String copyright = getProperties().getAllClassCopyrightProperties().getAllClassCopyright();
         resolver.reflectAllExCopyright(absolutePath, copyright);
     }
@@ -981,7 +981,7 @@ public class Database {
         final String absolutePath = outputPath + "/" + path;
         final String sourceCodeEncoding = getTemplateFileEncoding();
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
-        final SerialVersionUIDResolver resolver = new SerialVersionUIDResolver(sourceCodeEncoding, sourceCodeLn);
+        final DfSerialVersionUIDResolver resolver = new DfSerialVersionUIDResolver(sourceCodeEncoding, sourceCodeLn);
         resolver.reflectAllExSerialUID(absolutePath);
     }
 
