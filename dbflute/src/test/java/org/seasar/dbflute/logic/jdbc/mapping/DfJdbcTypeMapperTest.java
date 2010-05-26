@@ -17,7 +17,7 @@ import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
  * @author jflute
  * @since 0.9.5 (2009/04/21 Tuesday)
  */
-public class DfTorqueTypeMapperTest {
+public class DfJdbcTypeMapperTest {
 
     @Test
     public void test_getColumnTorqueType_NameToTorqueTypeMap() {
