@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.scmconn;
+package org.seasar.dbflute.logic.schemaconnector;
 
 import java.io.File;
 import java.sql.Connection;

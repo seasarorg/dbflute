@@ -11,19 +11,20 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
-public class SerialVersionUIDResolver {
+public class CopyrightResolver {
 
     protected String _sourceEncoding;
     protected String _sourceLn;
 
-    public SerialVersionUIDResolver(String sourceEncoding, String sourceLn) {
+    public CopyrightResolver(String sourceEncoding, String sourceLn) {
         _sourceEncoding = sourceEncoding;
         _sourceLn = sourceLn;
     }
 
-    public void reflectAllExSerialUID(String path) {
-        final String serialComment = "/** Serial version UID. (Default) */";
-        final String serialDefinition = "private static final long serialVersionUID = 1L;";
+    public void reflectAllExCopyright(String path, String copyright) {
+        if (copyright == null || copyright.trim().length() == 0) {
+            return;
+        }
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;
         final BufferedReader br;
@@ -46,16 +47,14 @@ public class SerialVersionUIDResolver {
                 if (line == null) {
                     break;
                 }
-                if (line.contains("serialVersionUID")) {
-                    return;
+                if (index == 0) { // first line
+                    if (!line.trim().startsWith("package ")) { // unsupported
+                        return;
+                    }
+                    sb.append(copyright);
                 }
-                sb.append(line).append(sourceCodeLn);
-                final String trimmed = line.trim();
-                if (trimmed.startsWith("public class") && trimmed.contains(" extends ") && trimmed.endsWith("{")) {
-                    sb.append(sourceCodeLn); // for empty line
-                    sb.append("    " + serialComment).append(sourceCodeLn);
-                    sb.append("    " + serialDefinition).append(sourceCodeLn);
-                }
+                sb.append(line);
+                sb.append(sourceCodeLn);
                 ++index;
             }
         } catch (IOException e) {
