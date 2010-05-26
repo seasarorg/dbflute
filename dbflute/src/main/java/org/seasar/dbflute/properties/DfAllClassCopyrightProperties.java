@@ -49,9 +49,9 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
         }
         final File exfile = new File(path);
         final String encoding = getBasicProperties().getTemplateFileEncoding();
-        final BufferedReader bufferedReader;
+        final BufferedReader br;
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(exfile), encoding));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(exfile), encoding));
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: encoding=" + encoding;
             throw new IllegalStateException(msg, e);
@@ -65,7 +65,7 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
         int index = 0;
         try {
             while (true) {
-                lineString = bufferedReader.readLine();
+                lineString = br.readLine();
                 if (lineString == null) {
                     break;
                 }
@@ -84,7 +84,7 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
             throw new IllegalStateException(msg, e);
         } finally {
             try {
-                bufferedReader.close();
+                br.close();
             } catch (IOException ignored) {
             }
         }

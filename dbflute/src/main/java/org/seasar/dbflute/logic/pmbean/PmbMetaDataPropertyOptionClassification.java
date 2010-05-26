@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.pmb;
+package org.seasar.dbflute.logic.pmbean;
 
 import java.util.List;
 import java.util.Map;

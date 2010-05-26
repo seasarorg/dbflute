@@ -1,0 +1,98 @@
+package org.seasar.dbflute.logic.exmange;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+
+public class SerialVersionUIDResolver {
+
+    protected String _sourceCodeEncoding;
+    protected String _sourceCodeLn;
+
+    public SerialVersionUIDResolver(String sourceCodeEncoding, String sourceCodeLn) {
+        _sourceCodeEncoding = sourceCodeEncoding;
+        _sourceCodeLn = sourceCodeLn;
+    }
+
+    public void reflectAllExSerialUID(String path) {
+        final String serialComment = "/** Serial version UID. (Default) */";
+        final String serialDefinition = "private static final long serialVersionUID = 1L;";
+        final File exfile = new File(path);
+        final String encoding = _sourceCodeEncoding;
+        final BufferedReader br;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(exfile), encoding));
+        } catch (UnsupportedEncodingException e) {
+            String msg = "The encoding is unsupported: encoding=" + encoding;
+            throw new IllegalStateException(msg, e);
+        } catch (FileNotFoundException e) {
+            String msg = "The file of extended class was NOT found: exfile=" + exfile;
+            throw new IllegalStateException(msg, e);
+        }
+        final StringBuilder sb = new StringBuilder();
+        final String sourceCodeLn = _sourceCodeLn;
+        boolean alreadyExists = false;
+        String line = null;
+        int index = 0;
+        try {
+            while (true) {
+                line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                if (line.contains("serialVersionUID")) {
+                    alreadyExists = true;
+                    break;
+                }
+                sb.append(line).append(sourceCodeLn);
+                final String trimmed = line.trim();
+                if (trimmed.startsWith("public class") && trimmed.contains(" extends ") && trimmed.endsWith("{")) {
+                    sb.append(sourceCodeLn); // for empty line
+                    sb.append("    " + serialComment).append(sourceCodeLn);
+                    sb.append("    " + serialDefinition).append(sourceCodeLn);
+                }
+                ++index;
+            }
+        } catch (IOException e) {
+            String msg = "bufferedReader.readLine() threw the exception: current line=" + line;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            try {
+                br.close();
+            } catch (IOException ignored) {
+            }
+        }
+        if (alreadyExists) {
+            return;
+        }
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exfile), encoding));
+            bw.write(sb.toString());
+            bw.flush();
+        } catch (UnsupportedEncodingException e) {
+            String msg = "The encoding is unsupported: encoding=" + encoding;
+            throw new IllegalStateException(msg, e);
+        } catch (FileNotFoundException e) {
+            String msg = "The file of base behavior was not found: bsbhvFile=" + exfile;
+            throw new IllegalStateException(msg, e);
+        } catch (IOException e) {
+            String msg = "bufferedWriter.write() threw the exception: bsbhvFile=" + exfile;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+}
