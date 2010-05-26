@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.mapping;
+package org.seasar.dbflute.logic.jdbc.mapping;
 
 import static org.junit.Assert.assertEquals;
 
