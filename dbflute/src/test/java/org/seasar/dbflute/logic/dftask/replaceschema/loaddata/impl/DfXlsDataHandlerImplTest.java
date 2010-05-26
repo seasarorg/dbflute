@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.loaddata.impl;
+package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -14,8 +14,8 @@ import java.util.regex.PatternSyntaxException;
 
 import org.junit.Test;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 public class DfXlsDataHandlerImplTest extends PlainTestCase {

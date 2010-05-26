@@ -1,8 +1,8 @@
-package org.seasar.dbflute.logic.loaddata.impl;
+package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.logic.loaddata.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl.DfSeparatedDataHandlerImpl;
 
 /**
  * @author jflute
