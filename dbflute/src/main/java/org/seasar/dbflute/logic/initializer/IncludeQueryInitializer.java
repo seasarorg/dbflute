@@ -73,53 +73,53 @@ public class IncludeQueryInitializer {
 
     protected void throwIncludeQueryTableNotFoundException(String queryElementKey, String tableName,
             Map<String, Map<String, Map<String, List<String>>>> map) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The table was Not Found in includeQueryMap!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Query Type]" + getLineSeparator() + queryElementKey + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Table Name]" + getLineSeparator() + tableName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Include Query Map]" + getLineSeparator() + map + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The table was Not Found in includeQueryMap!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Query Type]" + ln() + queryElementKey + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Name]" + ln() + tableName + ln();
+        msg = msg + ln();
+        msg = msg + "[Include Query Map]" + ln() + map + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IncludeQueryTableNotFoundException(msg);
     }
 
     protected void throwIncludeQueryNotListColumnSpecificationException(String queryElementKey, String tableName,
             Map<String, Map<String, Map<String, List<String>>>> map, RuntimeException e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The column specification of the table was Not List Type in includeQueryMap!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "You shuold specify them this way:" + getLineSeparator();
-        msg = msg + "    --------------------------------------------" + getLineSeparator();
-        msg = msg + "    " + tableName + " = list:{XXX_ID ; XXX_NAME}" + getLineSeparator();
-        msg = msg + "    --------------------------------------------" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Query Type]" + getLineSeparator() + queryElementKey + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Table Name]" + getLineSeparator() + tableName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Include Query Map]" + getLineSeparator() + map + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The column specification of the table was Not List Type in includeQueryMap!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "You shuold specify them this way:" + ln();
+        msg = msg + "    --------------------------------------------" + ln();
+        msg = msg + "    " + tableName + " = list:{XXX_ID ; XXX_NAME}" + ln();
+        msg = msg + "    --------------------------------------------" + ln();
+        msg = msg + ln();
+        msg = msg + "[Query Type]" + ln() + queryElementKey + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Name]" + ln() + tableName + ln();
+        msg = msg + ln();
+        msg = msg + "[Include Query Map]" + ln() + map + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IncludeQueryNotListColumnSpecificationException(msg, e);
     }
 
     protected void throwIncludeQueryColumnNotFoundException(String queryElementKey, String tableName,
             String columnName, Map<String, Map<String, Map<String, List<String>>>> map) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The column was Not Found in includeQueryMap!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Query Type]" + getLineSeparator() + queryElementKey + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Table Name]" + getLineSeparator() + tableName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Column Name]" + getLineSeparator() + columnName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Include Query Map]" + getLineSeparator() + map + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The column was Not Found in includeQueryMap!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Query Type]" + ln() + queryElementKey + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Name]" + ln() + tableName + ln();
+        msg = msg + ln();
+        msg = msg + "[Column Name]" + ln() + columnName + ln();
+        msg = msg + ln();
+        msg = msg + "[Include Query Map]" + ln() + map + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IncludeQueryColumnNotFoundException(msg);
     }
@@ -151,7 +151,7 @@ public class IncludeQueryInitializer {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    public String getLineSeparator() {
+    public String ln() {
         return "\n";
     }
 
