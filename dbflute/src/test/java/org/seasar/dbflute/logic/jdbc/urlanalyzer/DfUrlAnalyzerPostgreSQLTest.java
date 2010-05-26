@@ -1,18 +1,18 @@
-package org.seasar.dbflute.logic.urlanalyzer;
+package org.seasar.dbflute.logic.jdbc.urlanalyzer;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
-import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerMySQL;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerPostgreSQL;
 import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfUrlAnalyzerMySQLTest extends PlainTestCase {
+public class DfUrlAnalyzerPostgreSQLTest extends PlainTestCase {
 
     @Test
     public void test_extractCatalog_basic() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql://localhost:43306/exampledb");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:postgresql://localhost:5432/exampledb");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -24,7 +24,7 @@ public class DfUrlAnalyzerMySQLTest extends PlainTestCase {
     @Test
     public void test_extractCatalog_option_ampersand() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql://localhost:43306/exampledb&charSet=UTF-8");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:postgresql://localhost:5432/exampledb&charSet=UTF-8");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -36,7 +36,7 @@ public class DfUrlAnalyzerMySQLTest extends PlainTestCase {
     @Test
     public void test_extractCatalog_option_question() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql://localhost:43306/exampledb?charSet=UTF-8");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:postgresql://localhost:5432/exampledb?charSet=UTF-8");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -48,7 +48,7 @@ public class DfUrlAnalyzerMySQLTest extends PlainTestCase {
     @Test
     public void test_extractCatalog_nohost() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql:exampledb");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:postgresql:exampledb");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -58,6 +58,6 @@ public class DfUrlAnalyzerMySQLTest extends PlainTestCase {
     }
 
     protected DfUrlAnalyzer createTarget(String url) {
-        return new DfUrlAnalyzerMySQL(url);
+        return new DfUrlAnalyzerPostgreSQL(url);
     }
 }

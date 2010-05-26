@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.urlanalyzer;
+package org.seasar.dbflute.logic.jdbc.urlanalyzer;
 
 import static org.junit.Assert.assertEquals;
 

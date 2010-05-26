@@ -1,18 +1,18 @@
-package org.seasar.dbflute.logic.urlanalyzer;
+package org.seasar.dbflute.logic.jdbc.urlanalyzer;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
-import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerH2;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSQLite;
 import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfUrlAnalyzerH2Test extends PlainTestCase {
+public class DfUrlAnalyzerSQLiteTest extends PlainTestCase {
 
     @Test
     public void test_extractCatalog_basic() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:h2:file:../src/main/resources/ponpon/exampledb");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlite:../src/main/resources/ponpon/exampledb.db");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -24,7 +24,7 @@ public class DfUrlAnalyzerH2Test extends PlainTestCase {
     @Test
     public void test_extractCatalog_option() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:h2:file:../src/main/resources/ponpon/exampledb;charSet=UTF-8");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlite:../src/main/resources/ponpon/exampledb.db;charSet=UTF-8");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -36,7 +36,7 @@ public class DfUrlAnalyzerH2Test extends PlainTestCase {
     @Test
     public void test_extractCatalog_nopath() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:h2:file:exampledb");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlite:exampledb.db");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -46,6 +46,6 @@ public class DfUrlAnalyzerH2Test extends PlainTestCase {
     }
 
     protected DfUrlAnalyzer createTarget(String url) {
-        return new DfUrlAnalyzerH2(url);
+        return new DfUrlAnalyzerSQLite(url);
     }
 }

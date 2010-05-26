@@ -1,18 +1,18 @@
-package org.seasar.dbflute.logic.urlanalyzer;
+package org.seasar.dbflute.logic.jdbc.urlanalyzer;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
-import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSQLServer;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerMySQL;
 import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfUrlAnalyzerSQLServerTest extends PlainTestCase {
+public class DfUrlAnalyzerMySQLTest extends PlainTestCase {
 
     @Test
     public void test_extractCatalog_basic() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlserver://localhost:1433;DatabaseName=exampledb;");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql://localhost:43306/exampledb");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -22,9 +22,21 @@ public class DfUrlAnalyzerSQLServerTest extends PlainTestCase {
     }
 
     @Test
-    public void test_extractCatalog_option() throws Exception {
+    public void test_extractCatalog_option_ampersand() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlserver://localhost:1433;DatabaseName=exampledb;charSet=UTF-8");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql://localhost:43306/exampledb&charSet=UTF-8");
+
+        // ## Act ##
+        String catalog = analyzer.extractCatalog();
+
+        // ## Assert ##
+        assertEquals("exampledb", catalog);
+    }
+
+    @Test
+    public void test_extractCatalog_option_question() throws Exception {
+        // ## Arrange ##
+        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql://localhost:43306/exampledb?charSet=UTF-8");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -36,7 +48,7 @@ public class DfUrlAnalyzerSQLServerTest extends PlainTestCase {
     @Test
     public void test_extractCatalog_nohost() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlserver:;DatabaseName=exampledb;");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:mysql:exampledb");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
@@ -46,6 +58,6 @@ public class DfUrlAnalyzerSQLServerTest extends PlainTestCase {
     }
 
     protected DfUrlAnalyzer createTarget(String url) {
-        return new DfUrlAnalyzerSQLServer(url);
+        return new DfUrlAnalyzerMySQL(url);
     }
 }
