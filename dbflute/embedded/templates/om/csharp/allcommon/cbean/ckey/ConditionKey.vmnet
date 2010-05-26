@@ -13,14 +13,14 @@ public abstract class ${myClassName} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Mark of replaced value. */
-    public static readonly String MARK_OF_REPLACED_VALUE = "ReplacedValue";
-
     /** The condition key of equal. */
     public static readonly ${myClassName} CK_EQUAL = new ${myClassName}Equal();
 
-    /** The condition key of notEqual. */
-    public static readonly ${myClassName} CK_NOT_EQUAL = new ${myClassName}NotEqual();
+    /** The condition key of notEqual as standard. */
+    public static readonly ${myClassName} CK_NOT_EQUAL_STANDARD = new ${myClassName}NotEqualStandard();
+
+    /** The condition key of notEqual as tradition. */
+    public static readonly ${myClassName} CK_NOT_EQUAL_TRADITION = new ${myClassName}NotEqualTradition();
 
     /** The condition key of greaterThan. */
     public static readonly ${myClassName} CK_GREATER_THAN = new ${myClassName}GreaterThan();

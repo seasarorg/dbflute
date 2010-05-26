@@ -158,9 +158,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     protected void doSet${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
 #if ($database.isShortCharHandlingValid() && $col.isJdbcTypeChar())
-        reg${tmpJavaName}(CK_NE, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
 #else
-        reg${tmpJavaName}(CK_NE, ${tmpUncapitalisedJavaName});
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, ${tmpUncapitalisedJavaName});
 #end
     }
 #end
@@ -608,7 +608,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     protected void doSet${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_NE, ${tmpUncapitalisedJavaName});
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, ${tmpUncapitalisedJavaName});
     }
 #end
 #if (${col.isAvailableNumberGreaterThan()})
@@ -957,7 +957,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_NE, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
 #if (${col.isAvailableDateGreaterThan()})

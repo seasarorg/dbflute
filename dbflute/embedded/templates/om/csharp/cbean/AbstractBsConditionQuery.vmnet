@@ -58,7 +58,7 @@ namespace ${glPackageBaseCQ} {
         }
 #end
 #end
-        protected void DoSet${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
+        protected void DoSet${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, v); }
 #end
 #if (${col.isAvailableStringGreaterThan()})
         public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, fRES(v)); }
@@ -265,7 +265,7 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (${col.isAvailableNumberNotEqual()})
-        ${col.propertySettingModifier} void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
+        ${col.propertySettingModifier} void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, v); }
 #end
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.classificationMapList)
@@ -275,7 +275,7 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
             String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
-            reg${tmpJavaName}(CK_NE, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
+            reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
         }
 #end
 #end
@@ -461,7 +461,7 @@ namespace ${glPackageBaseCQ} {
 
         public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
 #if (${col.isAvailableDateNotEqual()})
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, v); }
 #end
 #if (${col.isAvailableDateGreaterThan()})
         public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, v); }

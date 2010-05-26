@@ -1343,6 +1343,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
     }
 
+    public String getConditionQueryNotEqualDefinitionName() {
+        return getProperties().getLittleAdjustmentProperties().getConditionQueryNotEqualDefinitionName();
+    }
+
     public boolean isMakeDeprecated() {
         return getProperties().getLittleAdjustmentProperties().isMakeDeprecated();
     }

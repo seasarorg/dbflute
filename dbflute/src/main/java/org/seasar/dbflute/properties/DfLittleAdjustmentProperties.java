@@ -103,6 +103,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
 
+    public boolean isMakeConditionQueryNotEqualAsStandard() { // It's closet!
+        // DBFlute has used tradition for a long time
+        // so default value is false here except DBMS that tradition is unsupported
+        final boolean defalutValue = getBasicProperties().isDatabaseAsTraditionNotEqualUnsupported();
+        return isProperty("isMakeConditionQueryNotEqualAsStandard", defalutValue);
+    }
+
+    public String getConditionQueryNotEqualDefinitionName() {
+        // for AbstractConditionQuery's definition name
+        return isMakeConditionQueryNotEqualAsStandard() ? "CK_NES" : "CK_NET";
+    }
+
     // ===================================================================================
     //                                                                     Make Deprecated
     //                                                                     ===============

@@ -8,14 +8,16 @@ using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCKey} {
 
-public class ${myClassName} : ${glConditionKey} {
+public abstract class ${myClassName} : ${glConditionKey} {
 
     private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     public ${myClassName}() {
         _conditionKey = "notEqual";
-        _operand = "!=";
+        _operand = defineOperand();
     }
+
+    protected abstract String defineOperand();
 
     public override bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName) {
         if (value == null) {

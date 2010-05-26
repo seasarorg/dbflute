@@ -715,6 +715,14 @@ $database.info("    parseConditionKey_notEqual")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKey}NotEqual.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_notEqual.${glTemplateFileExtension}",$path ,"", "")
 
+$database.info("    parseConditionKey_notEqualStandard")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKey}NotEqualStandard.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_notEqualStandard.${glTemplateFileExtension}",$path ,"", "")
+
+$database.info("    parseConditionKey_notEqualTradition")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKey}NotEqualTradition.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_notEqualTradition.${glTemplateFileExtension}",$path ,"", "")
+
 $database.info("    parseConditionKey_greaterThan")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKey}GreaterThan.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_greaterThan.${glTemplateFileExtension}",$path ,"", "")

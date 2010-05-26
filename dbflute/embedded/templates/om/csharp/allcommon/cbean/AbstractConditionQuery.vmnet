@@ -22,7 +22,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                                                          Definition
     //                                                                          ==========
     protected static readonly ${glConditionKey} CK_EQ = ${glConditionKey}.CK_EQUAL;
-    protected static readonly ${glConditionKey} CK_NE = ${glConditionKey}.CK_NOT_EQUAL;
+    protected static readonly ${glConditionKey} CK_NES = ${glConditionKey}.CK_NOT_EQUAL_STANDARD;
+    protected static readonly ${glConditionKey} CK_NET = ${glConditionKey}.CK_NOT_EQUAL_TRADITION;
     protected static readonly ${glConditionKey} CK_GE = ${glConditionKey}.CK_GREATER_EQUAL;
     protected static readonly ${glConditionKey} CK_GT = ${glConditionKey}.CK_GREATER_THAN;
     protected static readonly ${glConditionKey} CK_LE = ${glConditionKey}.CK_LESS_EQUAL;
