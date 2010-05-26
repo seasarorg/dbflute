@@ -1,19 +1,15 @@
-package org.seasar.dbflute.properties.assistant;
+package org.seasar.dbflute.properties.assistant.classification;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.seasar.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer.LN_MARK_PLAIN;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 
 /**
  * @author jflute
