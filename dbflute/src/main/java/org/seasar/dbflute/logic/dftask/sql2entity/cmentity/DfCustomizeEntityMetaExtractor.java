@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.cmentity;
+package org.seasar.dbflute.logic.dftask.sql2entity.cmentity;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
