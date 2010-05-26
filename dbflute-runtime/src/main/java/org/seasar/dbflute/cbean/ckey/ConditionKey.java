@@ -36,14 +36,14 @@ public abstract class ConditionKey implements Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Mark of replaced value. */
-    public static final String MARK_OF_REPLACED_VALUE = "ReplacedValue";
-
     /** The condition key of equal. */
     public static final ConditionKey CK_EQUAL = new ConditionKeyEqual();
 
-    /** The condition key of notEqual. */
-    public static final ConditionKey CK_NOT_EQUAL = new ConditionKeyNotEqual();
+    /** The condition key of notEqual as standard. */
+    public static final ConditionKey CK_NOT_EQUAL_STANDARD = new ConditionKeyNotEqualStandard();
+
+    /** The condition key of notEqual as tradition. */
+    public static final ConditionKey CK_NOT_EQUAL_TRADITION = new ConditionKeyNotEqualTradition();
 
     /** The condition key of greaterThan. */
     public static final ConditionKey CK_GREATER_THAN = new ConditionKeyGreaterThan();

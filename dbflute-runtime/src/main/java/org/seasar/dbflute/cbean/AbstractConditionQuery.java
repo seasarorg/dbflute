@@ -58,7 +58,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                          Definition
     //                                                                          ==========
     protected static final ConditionKey CK_EQ = ConditionKey.CK_EQUAL;
-    protected static final ConditionKey CK_NE = ConditionKey.CK_NOT_EQUAL;
+    protected static final ConditionKey CK_NES = ConditionKey.CK_NOT_EQUAL_STANDARD;
+    protected static final ConditionKey CK_NET = ConditionKey.CK_NOT_EQUAL_TRADITION;
     protected static final ConditionKey CK_GE = ConditionKey.CK_GREATER_EQUAL;
     protected static final ConditionKey CK_GT = ConditionKey.CK_GREATER_THAN;
     protected static final ConditionKey CK_LE = ConditionKey.CK_LESS_EQUAL;

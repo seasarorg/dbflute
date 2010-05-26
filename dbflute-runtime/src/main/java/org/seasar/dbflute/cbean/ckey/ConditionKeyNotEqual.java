@@ -26,7 +26,7 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
  * The condition-key of notEqual.
  * @author jflute
  */
-public class ConditionKeyNotEqual extends ConditionKey {
+public abstract class ConditionKeyNotEqual extends ConditionKey {
 
     // ===================================================================================
     //                                                                          Definition
@@ -45,8 +45,10 @@ public class ConditionKeyNotEqual extends ConditionKey {
      */
     protected ConditionKeyNotEqual() {
         _conditionKey = "notEqual";
-        _operand = "!=";
+        _operand = defineOperand();
     }
+
+    protected abstract String defineOperand();
 
     // ===================================================================================
     //                                                                      Implementation
