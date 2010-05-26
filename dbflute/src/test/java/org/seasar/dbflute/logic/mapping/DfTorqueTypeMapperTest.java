@@ -10,7 +10,8 @@ import java.util.Properties;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.junit.Test;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper.Resource;
+import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
+import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
 
 /**
  * @author jflute
