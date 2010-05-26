@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.various;
+package org.seasar.dbflute.logic.propinit;
 
 import java.util.List;
 import java.util.Map;
@@ -21,24 +21,24 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.engine.database.model.Unique;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfAdditionalUniqueKeyProperties;
+import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 
 /**
- * The initializer of additional unique key.
+ * The initializer of additional primary key.
  * @author jflute
- * @since 0.9.5.3 (2009/08/01 Saturday)
+ * @since 0.7.7 (2008/07/30 Wednesday)
  */
-public class DfAdditionalUniqueKeyInitializer {
+public class DfAdditionalPrimaryKeyInitializer {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfAdditionalUniqueKeyInitializer.class);
+    private static final Log _log = LogFactory.getLog(DfAdditionalPrimaryKeyInitializer.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -48,55 +48,59 @@ public class DfAdditionalUniqueKeyInitializer {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfAdditionalUniqueKeyInitializer(Database database) {
+    public DfAdditionalPrimaryKeyInitializer(Database database) {
         _database = database;
     }
 
     // ===================================================================================
-    //                                                                 AdditionalUniqueKey
-    //                                                                 ===================
-    public void initializeAdditionalUniqueKey() {
+    //                                                                AdditionalPrimaryKey
+    //                                                                ====================
+    public void initializeAdditionalPrimaryKey() {
         _log.info("/=======================================");
-        _log.info("...Initializing additional unique keys.");
+        _log.info("...Initializing additional primary keys.");
 
-        final Map<String, Map<String, String>> additionalUniqueKeyMap = getAdditionalUniqueKeyMap();
-        final Set<String> primaryNameKeySet = additionalUniqueKeyMap.keySet();
-        for (String uniqueKeyName : primaryNameKeySet) {
-            final String tableName = getTableName(uniqueKeyName);
+        final Map<String, Map<String, String>> additionalPrimaryKeyMap = getAdditionalPrimaryKeyMap();
+        final Set<String> primaryNameKeySet = additionalPrimaryKeyMap.keySet();
+        for (String primaryKeyName : primaryNameKeySet) {
+            final String tableName = getTableName(primaryKeyName);
             assertTable(tableName);
-            final List<String> columnNameList = getLocalColumnNameList(uniqueKeyName);
+            final List<String> columnNameList = getLocalColumnNameList(primaryKeyName);
             assertColumnList(tableName, columnNameList);
             final Table table = getTable(tableName);
-            final Unique unique = new Unique();
-            unique.setAdditional(true);
-            unique.setName(uniqueKeyName);
-            unique.setTable(table);
-            for (String columnName : columnNameList) {
-                unique.addColumn(columnName);
+            if (table.hasPrimaryKey()) {
+                String msg = "The primary key of the table has already set up: ";
+                msg = msg + " tableName=" + tableName + " existing primaryKey=" + table.getPrimaryKeyDispValueString();
+                msg = msg + " your specified primaryKey=" + columnNameList;
+                _log.info(msg);
+                continue;
             }
-            table.addUnique(unique);
-            showResult(uniqueKeyName, table, columnNameList);
+            for (String columnName : columnNameList) {
+                final Column column = table.getColumn(columnName);
+                column.setPrimaryKey(true);
+                column.setAdditionalPrimaryKey(true);
+            }
+            showResult(primaryKeyName, table, columnNameList);
         }
         _log.info("==========/");
     }
 
-    protected void showResult(String uniqueKeyName, Table table, List<String> columnNameList) {
-        _log.info("  " + uniqueKeyName);
+    protected void showResult(String primaryKeyName, Table table, List<String> columnNameList) {
+        _log.info("  " + primaryKeyName);
         if (columnNameList.size() == 1) {
-            _log.info("    Add unique key " + table.getName() + "." + columnNameList.get(0));
+            _log.info("    Add primary key " + table.getName() + "." + columnNameList.get(0));
         } else {
-            _log.info("    Add unique key " + table.getName() + "." + columnNameList);
+            _log.info("    Add primary key " + table.getName() + "." + columnNameList);
         }
     }
 
-    protected DfAdditionalUniqueKeyProperties getProperties() {
-        return DfBuildProperties.getInstance().getAdditionalUniqueKeyProperties();
+    protected DfAdditionalPrimaryKeyProperties getProperties() {
+        return DfBuildProperties.getInstance().getAdditionalPrimaryKeyProperties();
     }
 
     protected void assertTable(final String tableName) {
         if (getTable(tableName) == null) {
             String msg = "Not found table by the tableName: " + tableName;
-            msg = msg + " additionalUniqueKeyMap=" + getAdditionalUniqueKeyMap();
+            msg = msg + " additionalPrimaryKeyMap=" + getAdditionalPrimaryKeyMap();
             throw new IllegalStateException(msg);
         }
     }
@@ -105,7 +109,7 @@ public class DfAdditionalUniqueKeyInitializer {
         if (!getTable(tableName).containsColumn(columnNameList)) {
             String msg = "Not found column by the columnNames: " + columnNameList;
             msg = msg + " of the table '" + tableName + "'";
-            msg = msg + " additionalUniqueKeyMap=" + getAdditionalUniqueKeyMap();
+            msg = msg + " additionalPrimaryKeyMap=" + getAdditionalPrimaryKeyMap();
             throw new IllegalStateException(msg);
         }
     }
@@ -118,8 +122,8 @@ public class DfAdditionalUniqueKeyInitializer {
         return getProperties().findColumnNameList(primaryKeyName);
     }
 
-    protected Map<String, Map<String, String>> getAdditionalUniqueKeyMap() {
-        return getProperties().getAdditionalUniqueKeyMap();
+    protected Map<String, Map<String, String>> getAdditionalPrimaryKeyMap() {
+        return getProperties().getAdditionalPrimaryKeyMap();
     }
 
     protected Table getTable(String tableName) {
