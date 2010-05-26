@@ -27,10 +27,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
+import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper;
-import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper.Resource;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**

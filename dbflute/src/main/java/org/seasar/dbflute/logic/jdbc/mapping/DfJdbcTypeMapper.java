@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.mapping;
+package org.seasar.dbflute.logic.jdbc.mapping;
 
 import java.sql.Types;
 import java.util.Map;
