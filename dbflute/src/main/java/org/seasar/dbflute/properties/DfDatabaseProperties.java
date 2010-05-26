@@ -17,7 +17,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.factory.DfUrlAnalyzerFactory;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzer;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;

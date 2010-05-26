@@ -1,12 +1,12 @@
 package org.seasar.dbflute.logic.factory;
 
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzer;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerDerby;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerH2;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerMySQL;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerPostgreSQL;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerSQLServer;
-import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerSQLite;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerDerby;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerH2;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerMySQL;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerPostgreSQL;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSQLServer;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSQLite;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
