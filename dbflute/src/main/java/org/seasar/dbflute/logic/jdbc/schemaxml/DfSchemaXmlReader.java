@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.common;
+package org.seasar.dbflute.logic.jdbc.schemaxml;
 
 import org.apache.tools.ant.Project;
 import org.apache.torque.engine.database.model.AppData;
