@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.various;
+package org.seasar.dbflute.logic.dftask.common;
 
 import org.apache.tools.ant.Project;
 import org.apache.torque.engine.database.model.AppData;
