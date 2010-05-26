@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.deletefile;
+package org.seasar.dbflute.logic.dftask.generate.deletefile;
 
 import java.io.File;
 import java.util.HashSet;
