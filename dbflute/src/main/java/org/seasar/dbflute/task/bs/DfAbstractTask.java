@@ -30,7 +30,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
-import org.seasar.dbflute.logic.common.DfAntTaskUtil;
+import org.seasar.dbflute.logic.DfAntTaskUtil;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;

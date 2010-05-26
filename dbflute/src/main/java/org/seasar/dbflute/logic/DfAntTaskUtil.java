@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.common;
+package org.seasar.dbflute.logic;
 
 import java.io.File;
 import java.io.FileInputStream;
