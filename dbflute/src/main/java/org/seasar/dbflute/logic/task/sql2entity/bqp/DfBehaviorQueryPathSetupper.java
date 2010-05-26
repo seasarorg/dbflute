@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.bqp;
+package org.seasar.dbflute.logic.task.sql2entity.bqp;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

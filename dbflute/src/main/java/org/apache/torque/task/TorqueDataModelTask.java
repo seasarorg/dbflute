@@ -60,7 +60,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
+import org.seasar.dbflute.logic.task.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
