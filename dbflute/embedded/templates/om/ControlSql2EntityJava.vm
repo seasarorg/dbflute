@@ -220,6 +220,7 @@ $database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanL
       $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
     #end
     $database.reflectAllExCopyright($path)
+    $database.reflectAllExSerialVersionUID($path)
   #end
 $database.debug("    }")
 $database.debug("}")

@@ -23,7 +23,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
-import org.seasar.dbflute.logic.dftask.common.DfSchemaXmlReader;
+import org.seasar.dbflute.logic.task.common.DfSchemaXmlReader;
 
 /**
  * @author jflute

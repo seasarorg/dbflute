@@ -2,7 +2,7 @@ package org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.logic.task.replaceschema.loaddata.impl.DfSeparatedDataHandlerImpl;
 
 /**
  * @author jflute

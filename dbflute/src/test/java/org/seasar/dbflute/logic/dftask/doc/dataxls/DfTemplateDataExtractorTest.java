@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Date;
 
 import org.junit.Test;
-import org.seasar.dbflute.logic.dftask.doc.dataxls.DfTemplateDataExtractor;
+import org.seasar.dbflute.logic.task.doc.dataxls.DfTemplateDataExtractor;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 

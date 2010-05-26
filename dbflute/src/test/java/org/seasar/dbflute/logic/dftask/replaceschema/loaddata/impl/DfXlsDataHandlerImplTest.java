@@ -14,8 +14,8 @@ import java.util.regex.PatternSyntaxException;
 
 import org.junit.Test;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.dftask.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.task.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 public class DfXlsDataHandlerImplTest extends PlainTestCase {
