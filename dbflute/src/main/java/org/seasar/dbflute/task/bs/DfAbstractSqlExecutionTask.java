@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.task.DfSql2EntityTask;
 
 /**
  * @author jflute
@@ -34,7 +33,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
+    private static final Log _log = LogFactory.getLog(DfAbstractSqlExecutionTask.class);
 
     // ===================================================================================
     //                                                                          DataSource
@@ -76,11 +75,9 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
         return runInfo;
     }
 
-    protected abstract void customizeRunnerInformation(DfRunnerInformation runInfo);
+    protected abstract List<File> getTargetSqlFileList();
 
     protected abstract DfSqlFileRunnerExecute getSqlFileRunner(DfRunnerInformation runInfo);
-
-    protected abstract List<File> getTargetSqlFileList();
 
     protected abstract String getSqlDirectory();
 
@@ -89,6 +86,8 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     protected abstract boolean isErrorContinue();
 
     protected abstract boolean isRollbackOnly();
+
+    protected abstract void customizeRunnerInformation(DfRunnerInformation runInfo);
 
     // ===================================================================================
     //                                                                SQL File Information

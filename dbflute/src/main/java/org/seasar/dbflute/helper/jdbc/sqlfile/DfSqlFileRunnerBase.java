@@ -110,7 +110,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 try {
                     autoCommit = _currentConnection.getAutoCommit();
                 } catch (SQLException continued) {
-                    // Because it it possible that the connection would have already closed.
+                    // Because it is possible that the connection would have already closed.
                     _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
                 }
                 if (autoCommit != null && !autoCommit) {

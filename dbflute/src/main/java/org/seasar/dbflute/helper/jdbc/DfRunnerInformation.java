@@ -27,11 +27,11 @@ public class DfRunnerInformation {
     protected String _url;
     protected String _user;
     protected String _password;
-    protected String _encoding;
     protected String _delimiter = ";";
-    protected boolean _isErrorContinue;
-    protected boolean _isAutoCommit;
-    protected boolean _isRollbackOnly;
+    protected boolean _errorContinue;
+    protected boolean _autoCommit;
+    protected boolean _rollbackOnly;
+    protected String _encoding;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -68,14 +68,6 @@ public class DfRunnerInformation {
         this._password = password;
     }
 
-    public String getEncoding() {
-        return _encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this._encoding = encoding;
-    }
-
     public boolean isEncodingNull() {
         return (_encoding == null);
     }
@@ -84,31 +76,39 @@ public class DfRunnerInformation {
         return _delimiter;
     }
 
-    public void setDelimiter(String _delimiter) {
-        this._delimiter = _delimiter;
+    public void setDelimiter(String delimiter) {
+        this._delimiter = delimiter;
     }
 
     public boolean isErrorContinue() {
-        return _isErrorContinue;
+        return _errorContinue;
     }
 
-    public void setErrorContinue(boolean isErrorContinue) {
-        this._isErrorContinue = isErrorContinue;
+    public void setErrorContinue(boolean errorContinue) {
+        this._errorContinue = errorContinue;
     }
 
     public boolean isAutoCommit() {
-        return _isAutoCommit;
+        return _autoCommit;
     }
 
-    public void setAutoCommit(boolean isAutoCommit) {
-        this._isAutoCommit = isAutoCommit;
+    public void setAutoCommit(boolean autoCommit) {
+        this._autoCommit = autoCommit;
     }
 
     public boolean isRollbackOnly() {
-        return _isRollbackOnly;
+        return _rollbackOnly;
     }
 
-    public void setRollbackOnly(boolean isRollbackOnly) {
-        this._isRollbackOnly = isRollbackOnly;
+    public void setRollbackOnly(boolean rollbackOnly) {
+        this._rollbackOnly = rollbackOnly;
+    }
+
+    public String getEncoding() {
+        return _encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this._encoding = encoding;
     }
 }

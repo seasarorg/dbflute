@@ -522,7 +522,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // -----------------------------------------------------
     //                                           Data Source
     //                                           -----------
-    abstract protected boolean isUseDataSource();
+    protected abstract boolean isUseDataSource();
 
     protected void setupDataSource() throws SQLException {
         _dataSourceCreator.setUserId(_userId);

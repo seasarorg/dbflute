@@ -122,6 +122,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
+        runInfo.setAutoCommit(false);
+        runInfo.setErrorContinue(false);
+        runInfo.setRollbackOnly(true);
         runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
 
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);

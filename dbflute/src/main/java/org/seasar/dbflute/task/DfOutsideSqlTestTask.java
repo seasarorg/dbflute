@@ -41,7 +41,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
+    private static final Log _log = LogFactory.getLog(DfOutsideSqlTestTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -55,11 +55,6 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     @Override
     protected void doExecute() {
         super.doExecute();
-    }
-
-    @Override
-    protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
-        runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
     }
 
     @Override
@@ -213,6 +208,11 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     @Override
     protected boolean isRollbackOnly() {
         return true;
+    }
+
+    @Override
+    protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
+        runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
     }
 
     @Override

@@ -320,7 +320,7 @@ public abstract class DfAbstractTask extends Task {
     // -----------------------------------------------------
     //                                           Data Source
     //                                           -----------
-    abstract protected boolean isUseDataSource();
+    protected abstract boolean isUseDataSource();
 
     protected void setupDataSource() throws SQLException {
         _dataSourceCreator.setUserId(_userId);
