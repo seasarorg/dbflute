@@ -61,9 +61,9 @@ public interface ${myClassName} {
     void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value);
     void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option);
     void registerBaseTableInlineWhereClause(String value);
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClauseInline);
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClauseInline);
-    void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClause);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClause);
+    void registerOuterJoinInlineWhereClause(String aliasName, String clause, bool onClause);
 
     // ===================================================================================
     //                                                                        OrScopeQuery

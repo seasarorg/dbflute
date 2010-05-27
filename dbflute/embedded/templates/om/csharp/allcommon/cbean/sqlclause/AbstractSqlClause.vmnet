@@ -877,32 +877,32 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClause) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
-        String realColumnName = (onClauseInline ? aliasName + "." : "") + columnName;
+        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
+        String realColumnName = (onClause ? aliasName + "." : "") + columnName;
         doRegisterWhereClause(clauseList, realColumnName, key, value);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClause) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
-        String realColumnName = (onClauseInline ? aliasName + "." : "") + columnName;
+        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
+        String realColumnName = (onClause ? aliasName + "." : "") + columnName;
         doRegisterWhereClause(clauseList, realColumnName, key, value, option);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String clause, bool onClause) {
         assertNotYetOuterJoin(aliasName);
-        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
-        doRegisterWhereClause(clauseList, value);
+        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
+        doRegisterWhereClause(clauseList, clause);
     }
 
-    protected List<String> getOuterJoinInlineWhereClauseList4Register(String aliasName, bool onClauseInline) {
+    protected List<String> getOuterJoinInlineWhereClauseList4Register(String aliasName, bool onClause) {
         LeftOuterJoinInfo joinInfo = _outerJoinMap.get(aliasName);
         List<String> clauseList;
-        if (onClauseInline) {
+        if (onClause) {
             if (_orScopeQueryEffective) {
                 clauseList = getTmpOrAdditionalOnClauseList(aliasName);
             } else {

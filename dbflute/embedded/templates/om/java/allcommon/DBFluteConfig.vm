@@ -8,6 +8,7 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
 import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.seasar.dbflute.exception.IllegalDBFluteConfigAccessException;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -434,8 +435,8 @@ public class ${glDBFluteConfig} {
 	    if (!isLocked()) {
 		    return;
 		}
-		String msg = "The configuration of DBFlute is locked! Don't access at this timing!";
-		throw new IllegalStateException(msg);
+		String msg = "The configuration of DBFlute is locked.";
+		throw new IllegalDBFluteConfigAccessException(msg);
 	}
 
     // ===================================================================================

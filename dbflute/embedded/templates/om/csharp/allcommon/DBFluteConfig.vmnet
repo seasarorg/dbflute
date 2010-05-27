@@ -345,7 +345,7 @@ public class ${myClassName} {
 	    if (!IsLocked) {
 		    return;
 		}
-		String msg = "The config of dbflute is locked! Don't access at this timing!";
+		String msg = "The configuration of dbflute is locked.";
 		throw new SystemException(msg);
 	}
 }

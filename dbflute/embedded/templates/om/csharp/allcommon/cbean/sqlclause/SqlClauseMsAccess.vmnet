@@ -21,10 +21,13 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         String fixedCondition = joinOnMap.get(fixedConditionKey);
         if (fixedCondition != null) {
             // because fixed condition for join-on is unsupported at MS Access 
-            registerWhereClause(fixedCondition);
             joinOnMap.remove(fixedConditionKey);
         }
         base.registerOuterJoin(joinTableDbName, aliasName, joinOnMap);
+        if (fixedCondition != null) {
+            String clause = fixedCondition.Replace(aliasName + ".", "");
+            registerOuterJoinInlineWhereClause(aliasName, clause, false);
+        }
     }
 
 	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
