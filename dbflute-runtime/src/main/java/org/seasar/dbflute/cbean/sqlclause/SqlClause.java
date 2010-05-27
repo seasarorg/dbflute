@@ -227,12 +227,12 @@ public interface SqlClause {
     void registerBaseTableInlineWhereClause(String value);
 
     void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
-            ConditionValue value, boolean onClauseInline);
+            ConditionValue value, boolean onClause);
 
     void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
-            ConditionValue value, ConditionOption option, boolean onClauseInline);
+            ConditionValue value, ConditionOption option, boolean onClause);
 
-    void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause);
 
     // ===================================================================================
     //                                                                        OrScopeQuery

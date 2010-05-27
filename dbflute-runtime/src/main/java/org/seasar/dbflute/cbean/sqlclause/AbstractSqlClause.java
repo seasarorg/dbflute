@@ -1059,33 +1059,33 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
-            ConditionValue value, boolean onClauseInline) {
+            ConditionValue value, boolean onClause) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        final List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
-        final String realColumnName = (onClauseInline ? aliasName + "." : "") + columnName;
+        final List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
+        final String realColumnName = (onClause ? aliasName + "." : "") + columnName;
         doRegisterWhereClause(clauseList, realColumnName, key, value);
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
-            ConditionValue value, ConditionOption option, boolean onClauseInline) {
+            ConditionValue value, ConditionOption option, boolean onClause) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        final List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
-        final String realColumnName = (onClauseInline ? aliasName + "." : "") + columnName;
+        final List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
+        final String realColumnName = (onClause ? aliasName + "." : "") + columnName;
         doRegisterWhereClause(clauseList, realColumnName, key, value, option);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause) {
         assertNotYetOuterJoin(aliasName);
-        final List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
-        doRegisterWhereClause(clauseList, value);
+        final List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
+        doRegisterWhereClause(clauseList, clause);
     }
 
-    protected List<String> getOuterJoinInlineWhereClauseList4Register(String aliasName, boolean onClauseInline) {
+    protected List<String> getOuterJoinInlineWhereClauseList4Register(String aliasName, boolean onClause) {
         final LeftOuterJoinInfo joinInfo = _outerJoinMap.get(aliasName);
         final List<String> clauseList;
-        if (onClauseInline) {
+        if (onClause) {
             if (_orScopeQueryEffective) {
                 clauseList = getTmpOrAdditionalOnClauseList(aliasName);
             } else {
