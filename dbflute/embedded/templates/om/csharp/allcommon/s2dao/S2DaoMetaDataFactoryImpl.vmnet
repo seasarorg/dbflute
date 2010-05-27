@@ -54,7 +54,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             _dataReaderFactory = dataReaderFactory;
 
             HandleSqlLogRegistry();
-            if (${glDBFluteConfig}.GetInstance().IsLocked) {
+            if (!${glDBFluteConfig}.GetInstance().IsLocked) {
                 ${glDBFluteConfig}.GetInstance().Lock();
             }
         }
