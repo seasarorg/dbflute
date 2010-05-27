@@ -16,6 +16,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.logic.factory.DfUrlAnalyzerFactory;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -50,14 +51,48 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                            SQL File
-    //                                                                            ========
-    public String getReplaceSchemaSqlFile() {
-        return "./playsql/replace-schema.sql";
+    //                                                                           Directory
+    //                                                                           =========
+    public String getReplaceSchemaPlaySqlDirectory() {
+        return "./playsql";
     }
 
-    public String getTakeFinallySqlFile() {
-        return "./playsql/take-finally.sql";
+    protected String getReplaceSchemaSqlFile() {
+        return getReplaceSchemaPlaySqlDirectory() + "/replace-schema.sql";
+    }
+
+    public String getReplaceSchemaSqlFileNameWithoutExt() {
+        final String sqlFileName = getReplaceSchemaSqlFile();
+        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
+        return tmp.substring(0, tmp.lastIndexOf("."));
+    }
+
+    public String getReplaceSchemaSqlFileExt() {
+        final String sqlFileName = getReplaceSchemaSqlFile();
+        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
+    }
+
+    protected String getTakeFinallySqlFile() {
+        return getReplaceSchemaPlaySqlDirectory() + "/take-finally.sql";
+    }
+
+    public String getTakeFinallySqlFileNameWithoutExt() {
+        final String sqlFileName = getTakeFinallySqlFile();
+        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
+        return tmp.substring(0, tmp.lastIndexOf("."));
+    }
+
+    public String getTakeFinallySqlFileExt() {
+        final String sqlFileName = getTakeFinallySqlFile();
+        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
+    }
+
+    public String getCommonDataDirectoryPath(String dir, String typeName) {
+        return dir + "/data/common/" + typeName;
+    }
+
+    public String getLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
+        return dir + "/data/" + envType + "/" + typeName;
     }
 
     // ===================================================================================
@@ -192,7 +227,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             throw new DfIllegalPropertyTypeException(msg);
         }
         if (obj == null) {
-            _additionalUesrMap = new HashMap<String, Map<String, String>>();
+            _additionalUesrMap = DfCollectionUtil.emptyMap();
         } else {
             @SuppressWarnings("unchecked")
             final Map<String, Map<String, String>> map = (Map<String, Map<String, String>>) obj;
@@ -234,12 +269,19 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                     Additional Drop
     //                                                                     ===============
+    protected List<Map<String, Object>> _additionalDropMapList;
+
     public List<Map<String, Object>> getAdditionalDropMapList() {
+        if (_additionalDropMapList != null) {
+            return _additionalDropMapList;
+        }
         final Object obj = getReplaceSchemaDefinitionMap().get("additionalDropMapList");
         if (obj == null) {
-            return new ArrayList<Map<String, Object>>();
+            _additionalDropMapList = DfCollectionUtil.emptyList();
+        } else {
+            _additionalDropMapList = castToList(obj, "additionalDropMapList");
         }
-        return castToList(obj, "additionalDropMapList");
+        return _additionalDropMapList;
     }
 
     public String getAdditionalDropUrl(Map<String, Object> additionalDropMap) {
@@ -368,6 +410,34 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         info.put("password", password);
         _log.info("...Creating a connection for additional drop");
         return createConnection(driver, url, getAdditionalDropSchema(additionalDropMap), info);
+    }
+
+    // ===================================================================================
+    //                                                                  Additional PlaySql
+    //                                                                  ==================
+    protected List<Map<String, Object>> _additionalPlaySqlMapList;
+
+    public List<Map<String, Object>> getAdditionalPlaySqlMapList() {
+        if (_additionalPlaySqlMapList != null) {
+            return _additionalPlaySqlMapList;
+        }
+        final Object obj = getReplaceSchemaDefinitionMap().get("additionalPlaySqlMapList");
+        if (obj == null) {
+            _additionalPlaySqlMapList = DfCollectionUtil.emptyList();
+        } else {
+            _additionalPlaySqlMapList = castToList(obj, "additionalDropMapList");
+        }
+        return _additionalPlaySqlMapList;
+    }
+
+    public String getAdditionalPlaySqlPath(Map<String, Object> additionalPlaySqlMap) {
+        final Object obj = additionalPlaySqlMap.get("path");
+        if (obj == null) {
+            String msg = "The schema is required:";
+            msg = msg + " additionalPlaySqlMap=" + additionalPlaySqlMap;
+            throw new DfRequiredPropertyNotFoundException(msg);
+        }
+        return castToString(obj, "additionalPlaySqlMapList.path");
     }
 
     // ===================================================================================

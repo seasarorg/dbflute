@@ -37,6 +37,7 @@ import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory.InitializeType;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
@@ -468,24 +469,39 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected List<File> getReplaceSchemaSqlFileList() {
         final List<File> fileList = new ArrayList<File>();
         fileList.addAll(getReplaceSchemaNextSqlFileList());
+        fileList.addAll(getReplaceSchemaNextSqlFileListAdditional());
         return fileList;
     }
 
     protected List<File> getReplaceSchemaNextSqlFileList() {
-        final String replaceSchemaSqlFileDirectoryName = getReplaceSchemaSqlFileDirectoryName();
-        final File baseDir = new File(replaceSchemaSqlFileDirectoryName);
+        final String path = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        return doGetReplaceSchemaSqlFileList(path);
+    }
+
+    protected List<File> getReplaceSchemaNextSqlFileListAdditional() {
+        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
+        final List<File> fileList = new ArrayList<File>();
+        for (Map<String, Object> map : mapList) {
+            final String path = getMyProperties().getAdditionalPlaySqlPath(map);
+            fileList.addAll(doGetReplaceSchemaSqlFileList(path));
+        }
+        return fileList;
+    }
+
+    protected List<File> doGetReplaceSchemaSqlFileList(String directoryPath) {
+        final File baseDir = new File(directoryPath);
+        final String fileNameWithoutExt = getReplaceSchemaSqlFileNameWithoutExt();
+        final String sqlFileExt = getReplaceSchemaSqlFileExt();
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                if (name.startsWith(getReplaceSchemaSqlFileNameWithoutExt())) {
-                    if (name.endsWith("." + getReplaceSchemaSqlFileExt())) {
-                        return true;
-                    }
+                if (name.startsWith(fileNameWithoutExt) && name.endsWith("." + sqlFileExt)) {
+                    return true;
                 }
                 return false;
             }
         };
 
-        // Order by FileName Asc
+        // order by FileName asc
         final Comparator<File> fileNameAscComparator = new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -495,29 +511,21 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
         final String[] targetList = baseDir.list(filter);
         if (targetList == null) {
-            return new ArrayList<File>();
+            return DfCollectionUtil.emptyList();
         }
         for (String targetFileName : targetList) {
-            final String targetFilePath = replaceSchemaSqlFileDirectoryName + "/" + targetFileName;
+            final String targetFilePath = directoryPath + "/" + targetFileName;
             treeSet.add(new File(targetFilePath));
         }
         return new ArrayList<File>(treeSet);
     }
 
-    protected String getReplaceSchemaSqlFileDirectoryName() {
-        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
-        return sqlFileName.substring(0, sqlFileName.lastIndexOf("/"));
-    }
-
     protected String getReplaceSchemaSqlFileNameWithoutExt() {
-        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
-        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
-        return tmp.substring(0, tmp.lastIndexOf("."));
+        return getMyProperties().getReplaceSchemaSqlFileNameWithoutExt();
     }
 
     protected String getReplaceSchemaSqlFileExt() {
-        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
-        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
+        return getMyProperties().getReplaceSchemaSqlFileExt();
     }
 
     protected void destroyChangeUserConnection() {

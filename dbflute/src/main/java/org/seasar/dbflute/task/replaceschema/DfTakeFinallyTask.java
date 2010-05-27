@@ -36,6 +36,7 @@ import org.seasar.dbflute.logic.generate.dataassert.DfDataAssertProvider;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandler;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
@@ -181,23 +182,38 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     protected List<File> getTakeFinallySqlFileList() {
         final List<File> fileList = new ArrayList<File>();
         fileList.addAll(getTakeFinallyNextSqlFileList());
+        fileList.addAll(getTakeFinallyNextSqlFileListAdditional());
         return fileList;
     }
 
     protected List<File> getTakeFinallyNextSqlFileList() {
-        final String replaceSchemaSqlFileDirectoryName = getTakeFinallySqlFileDirectoryName();
-        final File baseDir = new File(replaceSchemaSqlFileDirectoryName);
+        final String path = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        return doGetTakeFinallySqlFileList(path);
+    }
+
+    protected List<File> getTakeFinallyNextSqlFileListAdditional() {
+        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
+        final List<File> fileList = new ArrayList<File>();
+        for (Map<String, Object> map : mapList) {
+            final String path = getMyProperties().getAdditionalPlaySqlPath(map);
+            fileList.addAll(doGetTakeFinallySqlFileList(path));
+        }
+        return fileList;
+    }
+
+    protected List<File> doGetTakeFinallySqlFileList(String directoryPath) {
+        final File baseDir = new File(directoryPath);
+        final String fileNameWithoutExt = getTakeFinallySqlFileNameWithoutExt();
+        final String sqlFileExt = getTakeFinallySqlFileExt();
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                if (name.startsWith(getTakeFinallySqlFileNameWithoutExt())) {
-                    if (name.endsWith("." + getTakeFinallySqlFileExt())) {
-                        return true;
-                    }
+                if (name.startsWith(fileNameWithoutExt) && name.endsWith("." + sqlFileExt)) {
+                    return true;
                 }
                 return false;
             }
         };
-        // Order by FileName Asc
+        // order by FileName asc
         final Comparator<File> fileNameAscComparator = new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -207,29 +223,21 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
         final String[] targetList = baseDir.list(filter);
         if (targetList == null) {
-            return new ArrayList<File>();
+            return DfCollectionUtil.emptyList();
         }
         for (String targetFileName : targetList) {
-            final String targetFilePath = replaceSchemaSqlFileDirectoryName + "/" + targetFileName;
+            final String targetFilePath = directoryPath + "/" + targetFileName;
             treeSet.add(new File(targetFilePath));
         }
         return new ArrayList<File>(treeSet);
     }
 
-    protected String getTakeFinallySqlFileDirectoryName() {
-        final String sqlFileName = getMyProperties().getTakeFinallySqlFile();
-        return sqlFileName.substring(0, sqlFileName.lastIndexOf("/"));
-    }
-
     protected String getTakeFinallySqlFileNameWithoutExt() {
-        final String sqlFileName = getMyProperties().getTakeFinallySqlFile();
-        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
-        return tmp.substring(0, tmp.lastIndexOf("."));
+        return getMyProperties().getTakeFinallySqlFileNameWithoutExt();
     }
 
     protected String getTakeFinallySqlFileExt() {
-        final String sqlFileName = getMyProperties().getTakeFinallySqlFile();
-        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
+        return getMyProperties().getTakeFinallySqlFileExt();
     }
 
     // --------------------------------------------

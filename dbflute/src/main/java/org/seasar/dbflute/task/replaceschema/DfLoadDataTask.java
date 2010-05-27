@@ -1,5 +1,6 @@
 package org.seasar.dbflute.task.replaceschema;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -9,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataSeveralHandlingInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerSQLServer;
@@ -43,10 +45,12 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         writeDbFromSeparatedFileAsCommonData("tsv", "\t");
         writeDbFromSeparatedFileAsCommonData("csv", ",");
         writeDbFromXlsAsCommonData();
+        writeDbFromXlsAsCommonDataAdditional();
 
-        writeDbFromSeparatedFileAsAdditionalData("tsv", "\t");
-        writeDbFromSeparatedFileAsAdditionalData("csv", ",");
-        writeDbFromXlsAsAdditionalData();
+        writeDbFromSeparatedFileAsLoadingTypeData("tsv", "\t");
+        writeDbFromSeparatedFileAsLoadingTypeData("csv", ",");
+        writeDbFromXlsAsLoadingTypeData();
+        writeDbFromXlsAsLoadingTypeDataAdditional();
     }
 
     @Override
@@ -74,15 +78,19 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                               Separated Data
     //                               --------------
     protected void writeDbFromSeparatedFileAsCommonData(String typeName, String delimter) {
-        writeDbFromSeparatedFile(typeName, delimter, getCommonDataDirectoryPath(typeName), "common");
+        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String path = doGetCommonDataDirectoryPath(dir, typeName);
+        writeDbFromSeparatedFile(path, typeName, delimter);
     }
 
-    protected void writeDbFromSeparatedFileAsAdditionalData(String typeName, String delimter) {
-        writeDbFromSeparatedFile(typeName, delimter, getAdditionalDataDirectoryPath(getDataLoadingType(), typeName),
-                getDataLoadingType());
+    protected void writeDbFromSeparatedFileAsLoadingTypeData(String typeName, String delimter) {
+        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String envType = getDataLoadingType();
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, typeName);
+        writeDbFromSeparatedFile(path, typeName, delimter);
     }
 
-    protected void writeDbFromSeparatedFile(String typeName, String delimter, String directoryPath, String location) {
+    protected void writeDbFromSeparatedFile(String directoryPath, String typeName, String delimter) {
         final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setDataSource(getDataSource());
@@ -115,32 +123,43 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
-    protected String getReplaceSchemaSqlFileDirectoryName() {
-        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
-        return sqlFileName.substring(0, sqlFileName.lastIndexOf("/"));
-    }
-
-    protected String getCommonDataDirectoryPath(final String typeName) {
-        return getReplaceSchemaSqlFileDirectoryName() + "/data/common/" + typeName;
-    }
-
-    protected String getAdditionalDataDirectoryPath(final String envType, final String typeName) {
-        return getReplaceSchemaSqlFileDirectoryName() + "/data/" + envType + "/" + typeName;
-    }
-
     // --------------------------------------------
     //                                     Xls Data
     //                                     --------
     protected void writeDbFromXlsAsCommonData() {
-        writeDbFromXls(getCommonDataDirectoryPath("xls"));
+        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String path = doGetCommonDataDirectoryPath(dir, "xls");
+        writeDbFromXls(path);
     }
 
-    protected void writeDbFromXlsAsAdditionalData() {
-        writeDbFromXls(getAdditionalDataDirectoryPath(getDataLoadingType(), "xls"));
+    protected void writeDbFromXlsAsCommonDataAdditional() {
+        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
+        for (Map<String, Object> map : mapList) {
+            final String dir = getMyProperties().getAdditionalPlaySqlPath(map);
+            final String path = doGetCommonDataDirectoryPath(dir, "xls");
+            writeDbFromXls(path);
+        }
+    }
+
+    protected void writeDbFromXlsAsLoadingTypeData() {
+        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String envType = getDataLoadingType();
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, "xls");
+        writeDbFromXls(path);
+    }
+
+    protected void writeDbFromXlsAsLoadingTypeDataAdditional() {
+        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
+        final String envType = getDataLoadingType();
+        for (Map<String, Object> map : mapList) {
+            final String dir = getMyProperties().getAdditionalPlaySqlPath(map);
+            final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, "xls");
+            writeDbFromXls(path);
+        }
     }
 
     protected void writeDbFromXls(String directoryPath) {
-        final DfXlsDataHandlerImpl xlsDataHandler = getXlsDataHandlerImpl();
+        final DfXlsDataHandler xlsDataHandler = getXlsDataHandlerImpl();
         xlsDataHandler.writeSeveralData(directoryPath);
     }
 
@@ -160,6 +179,17 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             xlsDataHandlerImpl = xlsDataHandler;
         }
         return xlsDataHandlerImpl;
+    }
+
+    // --------------------------------------------
+    //                                    Directory
+    //                                    ---------
+    protected String doGetCommonDataDirectoryPath(String dir, String typeName) {
+        return getMyProperties().getCommonDataDirectoryPath(dir, typeName);
+    }
+
+    protected String doGetLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
+        return getMyProperties().getLoadingTypeDataDirectoryPath(dir, envType, typeName);
     }
 
     // ===================================================================================
