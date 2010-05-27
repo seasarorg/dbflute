@@ -157,16 +157,19 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // /- - - - - - - - - - - - - - - - - - - -
     // simple DBMS definition about generating
     // - - - - - - - - - -/
-
-    public boolean isDatabaseAsSchemaCanBeOmitted() {
-        return isDatabaseMySQL() || isDatabaseSQLite();
+    public boolean isDatabaseAsSchemaSpecificationOmittable() {
+        return isDatabaseMySQL() || isDatabaseAsUnifiedSchemaUnsupported();
     }
 
     public boolean isDatabaseAsUnifiedSchemaUnsupported() {
-        return !isDatabase_Supported() || isDatabaseSQLite() || isDatabaseMSAccess();
+        return isDatabaseSQLite() || isDatabaseMSAccess();
     }
 
-    public boolean isDatabaseAsTraditionNotEqualUnsupported() {
+    public boolean isDatabaseAsTraditionalNotEqualUnsupported() {
+        return isDatabaseMSAccess();
+    }
+
+    public boolean isDatabaseAsJoinOnFixedConditionUnsupported() {
         return isDatabaseMSAccess();
     }
 

@@ -336,7 +336,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
-            if (!isDatabaseSchemaCanBeOmitted()) {
+            if (!isDatabaseAsSchemaSpecificationOmittable()) {
                 String msg = "The schema is required:";
                 msg = msg + " additionalDropMap=" + additionalDropMap;
                 throw new DfRequiredPropertyNotFoundException(msg);
@@ -348,8 +348,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return unifiedSchema;
     }
 
-    protected boolean isDatabaseSchemaCanBeOmitted() {
-        return getBasicProperties().isDatabaseAsSchemaCanBeOmitted();
+    protected boolean isDatabaseAsSchemaSpecificationOmittable() {
+        return getBasicProperties().isDatabaseAsSchemaSpecificationOmittable();
     }
 
     public List<String> getAdditionalDropObjectTypeList(Map<String, Object> additionalDropMap) {
