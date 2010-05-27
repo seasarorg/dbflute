@@ -36,6 +36,17 @@ public class WayOfUnknown implements DBWay {
     }
 
     // ===================================================================================
+    //                                                                         SQL Support
+    //                                                                         ===========
+    public boolean isBlockCommentSupported() {
+        return true; // as default for unknown
+    }
+
+    public boolean isLineCommentSupported() {
+        return true; // as default for unknown
+    }
+
+    // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import java.util.Map;
+
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
@@ -46,6 +48,21 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     @Override
     protected boolean isJoinInParentheses() {
         return true; // needs to join in parentheses at MS Access
+    }
+
+    // ===================================================================================
+    //                                                                  OuterJoin Override
+    //                                                                  ==================
+    @Override
+    public void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap) {
+        final String fixedConditionKey = getFixedConditionKey();
+        final String fixedCondition = joinOnMap.get(fixedConditionKey);
+        if (fixedCondition != null) {
+            // because fixed condition for join-on is unsupported at MS Access 
+            registerWhereClause(fixedCondition);
+            joinOnMap.remove(fixedConditionKey);
+        }
+        super.registerOuterJoin(joinTableDbName, aliasName, joinOnMap);
     }
 
     // ===================================================================================

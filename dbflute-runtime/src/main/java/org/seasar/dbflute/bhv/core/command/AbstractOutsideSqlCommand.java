@@ -97,12 +97,13 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     }
 
     protected boolean needsToRemoveBlockComment() {
-        return false;
+        assertOutsideSqlBasic("isCurrentDBDef");
+        return !_currentDBDef.dbway().isBlockCommentSupported();
     }
 
     protected boolean needsToRemoveLineComment() {
         assertOutsideSqlBasic("isCurrentDBDef");
-        return _currentDBDef.equals(DBDef.MSAccess);
+        return !_currentDBDef.dbway().isLineCommentSupported();
     }
 
     // ===================================================================================

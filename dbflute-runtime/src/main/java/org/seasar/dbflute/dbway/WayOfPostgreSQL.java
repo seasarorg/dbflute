@@ -39,6 +39,17 @@ public class WayOfPostgreSQL implements DBWay {
     }
 
     // ===================================================================================
+    //                                                                         SQL Support
+    //                                                                         ===========
+    public boolean isBlockCommentSupported() {
+        return true;
+    }
+
+    public boolean isLineCommentSupported() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {

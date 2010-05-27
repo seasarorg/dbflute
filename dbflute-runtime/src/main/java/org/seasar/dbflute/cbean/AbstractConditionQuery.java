@@ -285,6 +285,40 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
+    //                                                                  Nested SetupSelect
+    //                                                                  ==================
+    public void doNss(NssCall callback) { // very internal
+        String foreignPropertyName = callback.qf().getForeignPropertyName();
+        String foreignTableAliasName = callback.qf().getRealAliasName();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
+                getRelationPath());
+        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
+    }
+
+    public static interface NssCall { // very internal
+        public ConditionQuery qf();
+    }
+
+    // ===================================================================================
+    //                                                                           OuterJoin
+    //                                                                           =========
+    protected String ppFxCd(String fixedCondition, String localAliasName, String foreignAliasName) { // prepareFixedCondition
+        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
+        return fixedCondition;
+    }
+
+    protected String fxcKey() { // getFixedConditionKey()
+        return getSqlClause().getFixedConditionKey();
+    }
+
+    protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
+        getSqlClause().registerOuterJoin(cq.getTableDbName(), cq.getRealAliasName(), joinOnMap);
+    }
+
+    // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
     /** The map parameter-bean of union query. */
@@ -364,8 +398,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
-    //                                                                            Register
-    //                                                                            ========
+    //                                                                      Register Query
+    //                                                                      ==============
     // -----------------------------------------------------
     //                                          Normal Query
     //                                          ------------
@@ -1289,17 +1323,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
-    //                                                                     Fixed Condition
-    //                                                                     ===============
-    protected String ppFxCd(String fixedCondition, String localAliasName, String foreignAliasName) { // prepareFixedCondition
-        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
-        return fixedCondition;
-    }
-
-    // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
     /**
@@ -1518,8 +1541,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                     Condition Value
+    //                                                                     ===============
     protected ConditionValue nCV() {
         return newConditionValue();
     }
@@ -1528,6 +1551,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new ConditionValue();
     }
 
+    // ===================================================================================
+    //                                                                        Filter Value
+    //                                                                        ============
     /**
      * @param value Query-value-string. (Nullable)
      * @return Filtered value. (Nullable)
@@ -1552,6 +1578,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return DfTypeUtil.toDate(date);
     }
 
+    // ===================================================================================
+    //                                                                       Create Option
+    //                                                                       =============
     /**
      * create the option of like search as prefix search.
      * @return The option of like search as prefix search. (NotNull)
@@ -1560,6 +1589,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new LikeSearchOption().likePrefix();
     }
 
+    // ===================================================================================
+    //                                                                       Convert Value
+    //                                                                       =============
     @SuppressWarnings("unchecked")
     protected <PROPERTY extends Number> PROPERTY cTNum(Object obj, Class<PROPERTY> type) { // convert to number
         return (PROPERTY) DfTypeUtil.toNumber(obj, type);
@@ -1628,26 +1660,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return newList;
     }
 
-    public void doNss(NssCall callback) { // Very Internal
-        String foreignPropertyName = callback.qf().getForeignPropertyName();
-        String foreignTableAliasName = callback.qf().getRealAliasName();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
-                getRelationPath());
-        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
-    }
-
-    public static interface NssCall { // Very Internal
-        public ConditionQuery qf();
-    }
-
-    protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
-        getSqlClause().registerOuterJoin(cq.getTableDbName(), cq.getRealAliasName(), joinOnMap);
-    }
-
-    protected String fxcKey() { // getFixedConditionKey()
-        return getSqlClause().getFixedConditionKey();
-    }
-
+    // ===================================================================================
+    //                                                                     Short Character
+    //                                                                     ===============
     // handleShortChar()
     protected String hSC(String columnName, String value, Integer size, String modeCode) {
         ShortCharHandlingMode mode = ShortCharHandlingMode.codeOf(modeCode);

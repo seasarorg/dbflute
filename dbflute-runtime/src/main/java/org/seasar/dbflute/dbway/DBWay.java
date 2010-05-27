@@ -41,6 +41,13 @@ public interface DBWay {
     String getIdentitySelectSql();
 
     // ===================================================================================
+    //                                                                         SQL Support
+    //                                                                         ===========
+    boolean isBlockCommentSupported();
+
+    boolean isLineCommentSupported();
+
+    // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     /**
