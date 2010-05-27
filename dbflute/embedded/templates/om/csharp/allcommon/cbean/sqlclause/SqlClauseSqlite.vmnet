@@ -20,6 +20,13 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         : base(tableName) {}
 
     // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
+	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
+	    return new OrderByNullsSetupperByCaseWhen();
+	}
+
+    // ===================================================================================
     //                                                                 FetchScope Override
     //                                                                 ===================
 	protected override void doFetchFirst() {

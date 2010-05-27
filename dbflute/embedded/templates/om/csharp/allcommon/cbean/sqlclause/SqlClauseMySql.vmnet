@@ -7,16 +7,28 @@ namespace ${glPackageBaseCommonSqlClause} {
 [System.Serializable]
 public class ${myClassName} : ${glAbstractSqlClause} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _fetchScopeSqlSuffix = "";
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public ${myClassName}(String tableName)
         : base(tableName) {}
 
+    // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
 	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
 	    return new OrderByNullsSetupperByCaseWhen();
 	}
-	
+
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     protected override void doFetchFirst() {
         doFetchPage();
     }
@@ -29,11 +41,17 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         _fetchScopeSqlSuffix = "";
     }
 
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     public override ${glSqlClause} lockForUpdate() {
         _lockSqlSuffix = " for update";
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     protected override String createSelectHint() {
         return "";
     }
