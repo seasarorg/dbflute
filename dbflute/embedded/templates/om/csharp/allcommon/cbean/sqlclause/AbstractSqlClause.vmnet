@@ -706,12 +706,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    public virtual void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap) {
+    public virtual void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
         LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
         joinInfo.setAliasName(aliasName);
-        joinInfo.setJoinTableName(joinTableName);
+        joinInfo.setJoinTableName(joinTableDbName);
         joinInfo.setJoinOnMap(joinOnMap);
         _outerJoinMap.put(aliasName, joinInfo);
     }

@@ -169,10 +169,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isDatabaseMSAccess();
     }
 
-    public boolean isDatabaseAsJoinOnFixedConditionUnsupported() {
-        return isDatabaseMSAccess();
-    }
-
     // ===================================================================================
     //                                                                            Language
     //                                                                            ========

@@ -16,7 +16,7 @@ public class ${myClassName} : ${glAbstractSqlClause} {
 	    return true; // needs to join in parentheses at MS Access
 	}
 
-    public override void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap) {
+    public override void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap) {
         String fixedConditionKey = getFixedConditionKey();
         String fixedCondition = joinOnMap.get(fixedConditionKey);
         if (fixedCondition != null) {
