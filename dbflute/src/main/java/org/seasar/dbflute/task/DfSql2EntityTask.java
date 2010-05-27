@@ -34,6 +34,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
@@ -43,13 +44,11 @@ import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
-import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
@@ -229,8 +228,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
-        final DfJdbcDeterminer jdbcDeterminer = createJdbcDeterminer();
         final DfStandardApiPackageResolver packageResolver = new DfStandardApiPackageResolver(getBasicProperties());
+        final DBDef currentDBDef = getBasicProperties().getCurrentDBDef();
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
@@ -244,12 +243,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
              */
             @Override
             protected String filterSql(String sql) {
-                if (!jdbcDeterminer.isBlockCommentValid()) {
+                if (!currentDBDef.dbway().isBlockCommentSupported()) {
                     sql = removeBlockComment(sql);
                 }
+
                 // The line comment is special mark on Sql2Entity
                 // so this timing to do is bad because the special mark is removed.
-                //if (!jdbcDeterminer.isLineCommentValid()) {
+                //if (!currentDBDef.dbway().isLineCommentSupported()) {
                 //    sql = removeLineComment(sql);
                 //}
                 return super.filterSql(sql);
@@ -262,12 +262,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     boolean alreadyIncrementGoodSqlCount = false;
                     if (isTargetEntityMakingSql(sql)) {
                         final String executedActuallySql;
-                        if (!jdbcDeterminer.isLineCommentValid()) { // The timing to remove line comment is here!
+                        if (!currentDBDef.dbway().isLineCommentSupported()) {
+                            // the timing to remove line comment is here
                             executedActuallySql = removeLineComment(sql);
                         } else {
                             executedActuallySql = sql;
                         }
-                        checkStatement(sql);
+                        checkStatement(executedActuallySql);
                         rs = _currentStatement.executeQuery(executedActuallySql);
 
                         _goodSqlCount++;
@@ -1090,13 +1091,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                          ==========
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
         return getProperties().getOutsideSqlProperties();
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected DfJdbcDeterminer createJdbcDeterminer() {
-        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
     }
 
     // ===================================================================================

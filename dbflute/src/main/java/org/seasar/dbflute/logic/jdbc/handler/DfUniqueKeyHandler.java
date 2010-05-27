@@ -70,7 +70,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
         final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
-        if (!isPrimaryKeyExtractingSupported()) {
+        if (isPrimaryKeyExtractingUnsupported()) {
             if (isDatabaseMsAccess()) {
                 return processMSAccess(metaData, unifiedSchema, tableName, info);
             }

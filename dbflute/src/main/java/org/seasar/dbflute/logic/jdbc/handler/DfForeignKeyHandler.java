@@ -86,7 +86,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMetaInfo(DatabaseMetaData dbMeta,
             UnifiedSchema unifiedSchema, String tableName) throws SQLException {
         final Map<String, DfForeignKeyMetaInfo> fkMap = newLinkedHashMap();
-        if (!isForeignKeyExtractingSupported()) {
+        if (isForeignKeyExtractingUnsupported()) {
             return fkMap;
         }
         final Map<String, String> exceptedFKMap = newLinkedHashMap();

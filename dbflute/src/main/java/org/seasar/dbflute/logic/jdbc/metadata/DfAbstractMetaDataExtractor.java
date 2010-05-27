@@ -19,8 +19,6 @@ import java.util.LinkedHashMap;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
-import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.Srl;
@@ -34,8 +32,9 @@ public abstract class DfAbstractMetaDataExtractor {
     //                                                                       Assist Helper
     //                                                                       =============
     protected String filterSchemaName(String schemaName) {
-        // The driver throws the exception if the value is empty string.
-        if (Srl.isTrimmedEmpty(schemaName) && !isSchemaNameEmptyAllowed()) {
+        // a driver may throw the exception if the value is empty string
+        // (For example, MS Access)
+        if (Srl.isTrimmedEmpty(schemaName)) {
             return null;
         }
         return schemaName;
@@ -48,20 +47,12 @@ public abstract class DfAbstractMetaDataExtractor {
     // ===================================================================================
     //                                                        Database Dependency Resolver
     //                                                        ============================
-    protected boolean isSchemaNameEmptyAllowed() {
-        return createJdbcDeterminer().isSchemaNameEmptyAllowed();
+    protected boolean isPrimaryKeyExtractingUnsupported() {
+        return getBasicProperties().isDatabaseAsPrimaryKeyExtractingUnsupported();
     }
 
-    protected boolean isPrimaryKeyExtractingSupported() {
-        return createJdbcDeterminer().isPrimaryKeyExtractingSupported();
-    }
-
-    protected boolean isForeignKeyExtractingSupported() {
-        return createJdbcDeterminer().isForeignKeyExtractingSupported();
-    }
-
-    protected DfJdbcDeterminer createJdbcDeterminer() {
-        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
+    protected boolean isForeignKeyExtractingUnsupported() {
+        return getBasicProperties().isDatabaseAsForeignKeyExtractingUnsupported();
     }
 
     // ===================================================================================

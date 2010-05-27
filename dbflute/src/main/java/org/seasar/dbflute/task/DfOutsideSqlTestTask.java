@@ -21,11 +21,10 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
-import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlChecker;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
@@ -83,20 +82,20 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     @Override
     protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
-        final DfJdbcDeterminer jdbcDeterminer = createJdbcDeterminer();
+        final DBDef currentDBDef = getBasicProperties().getCurrentDBDef();
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
             protected String filterSql(String sql) {
-                // /- - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                // Check parameter comments in the SQL before filtering.
+                // /- - - - - - - - - - - - - - - - - - - - - - - - - - 
+                // check parameter comments in the SQL before filtering
                 // - - - - - - - - - -/
                 checkParameterComment(_sqlFile, sql);
 
-                // Filter comments if it needs.
-                if (!jdbcDeterminer.isBlockCommentValid()) {
+                // filter comments if it needs.
+                if (!currentDBDef.dbway().isBlockCommentSupported()) {
                     sql = removeBlockComment(sql);
                 }
-                if (!jdbcDeterminer.isLineCommentValid()) {
+                if (!currentDBDef.dbway().isLineCommentSupported()) {
                     sql = removeLineComment(sql);
                 }
 
@@ -237,10 +236,6 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected DfJdbcDeterminer createJdbcDeterminer() {
-        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
-    }
-
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
         return getProperties().getOutsideSqlProperties();
     }

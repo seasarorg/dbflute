@@ -165,6 +165,14 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isDatabaseSQLite() || isDatabaseMSAccess();
     }
 
+    public boolean isDatabaseAsPrimaryKeyExtractingUnsupported() {
+        return isDatabaseMSAccess();
+    }
+
+    public boolean isDatabaseAsForeignKeyExtractingUnsupported() {
+        return isDatabaseMSAccess();
+    }
+
     public boolean isDatabaseAsTraditionalNotEqualUnsupported() {
         return isDatabaseMSAccess();
     }
