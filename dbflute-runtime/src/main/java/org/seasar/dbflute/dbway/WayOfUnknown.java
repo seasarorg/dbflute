@@ -50,7 +50,7 @@ public class WayOfUnknown implements DBWay {
     //                                                                        JDBC Support
     //                                                                        ============
     public boolean isScrollableCursorSupported() {
-        return true;
+        return true; // as default for unknown
     }
 
     // ===================================================================================

@@ -39,7 +39,7 @@ public class WayOfMSAccess implements DBWay {
     //                                                                         SQL Support
     //                                                                         ===========
     public boolean isBlockCommentSupported() {
-        return true;
+        return false;
     }
 
     public boolean isLineCommentSupported() {
@@ -57,6 +57,6 @@ public class WayOfMSAccess implements DBWay {
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return false; // Unknown
+        return false; // unknown
     }
 }
