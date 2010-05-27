@@ -185,7 +185,11 @@ public class OutsideSqlPagingExecutor {
             statementConfig = new StatementConfig();
             configure(statementConfig);
         }
-        statementConfig.typeScrollInsensitive();
+        if (_currentDBDef.dbway().isScrollableCursorSupported()) {
+            statementConfig.typeScrollInsensitive();
+        } else {
+            statementConfig.typeForwardOnly();
+        }
     }
 
     /**

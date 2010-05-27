@@ -47,6 +47,13 @@ public class WayOfH2 implements DBWay {
     }
 
     // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    public boolean isScrollableCursorSupported() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {

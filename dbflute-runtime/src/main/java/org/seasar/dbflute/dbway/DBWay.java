@@ -48,6 +48,11 @@ public interface DBWay {
     boolean isLineCommentSupported();
 
     // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    boolean isScrollableCursorSupported();
+    
+    // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     /**

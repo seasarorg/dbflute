@@ -47,6 +47,13 @@ public class WayOfSQLite implements DBWay {
     }
 
     // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    public boolean isScrollableCursorSupported() {
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
