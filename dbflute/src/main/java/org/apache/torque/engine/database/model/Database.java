@@ -481,7 +481,7 @@ public class Database {
             final String name = handler.getPmbMetaDataPropertyRefName(className, propertyName, data);
             final String lineDisp = handler.getPmbMetaDataPropertyRefLineDisp(className, propertyName, data);
             if (name != null && name.trim().length() > 0) {
-                return " :: related to " + alias + name + ": " + lineDisp;
+                return " :: refers to " + alias + name + ": " + lineDisp;
             } else {
                 return "";
             }

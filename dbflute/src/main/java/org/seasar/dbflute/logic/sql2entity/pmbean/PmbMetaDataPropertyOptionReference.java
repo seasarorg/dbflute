@@ -9,7 +9,10 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.DfParameterBeanReferenceColumnNotFoundException;
 import org.seasar.dbflute.exception.DfParameterBeanReferenceTableNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -56,14 +59,15 @@ public class PmbMetaDataPropertyOptionReference {
         if (database == null) {
             return null;
         }
-        final String refPrefix = "ref(";
-        final String refSuffix = ")";
-        String option = getPmbMetaDataPropertyOption();
+        final String refPrefix = OPTION_PREFIX;
+        final String refSuffix = OPTION_SUFFIX;
+        final String option;
         {
-            if (option == null) {
+            final String optionExp = getPmbMetaDataPropertyOption();
+            if (optionExp == null) {
                 return null;
             }
-            final List<String> splitOption = splitOption(option);
+            final List<String> splitOption = splitOption(optionExp);
             String firstOption = null;
             for (String element : splitOption) {
                 element = element.trim();
@@ -77,34 +81,21 @@ public class PmbMetaDataPropertyOptionReference {
             }
             option = firstOption;
         }
-        final int clsIdx = refPrefix.length();
-        final int clsEndIdx = option.length() - refSuffix.length();
-        final String value;
-        try {
-            value = option.substring(refPrefix.length(), option.length() - refSuffix.length()).trim();
-        } catch (StringIndexOutOfBoundsException e) {
-            String msg = "Look the message below:" + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
-            msg = msg + "IndexOutOfBounds ocurred:" + ln();
-            msg = msg + " " + _className + " " + _propertyName;
-            msg = msg + ":" + option + ln();
-            msg = msg + "{" + option + "}.substring(" + clsIdx + ", " + clsEndIdx + ")" + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg, e);
-        }
-        final int delimiterIndex = value.indexOf(".");
+        final ScopeInfo scope = Srl.extractScopeFirst(option, refPrefix, refSuffix);
+        final String content = scope.getContent().trim();
+        final String delimiter = ".";
         final String tableName;
         final String columnName;
-        if (delimiterIndex < 0) {
-            tableName = value;
-            columnName = null;
+        if (content.contains(".")) {
+            tableName = Srl.substringFirstFront(content, delimiter);
+            columnName = Srl.substringFirstRear(content, delimiter);
         } else {
-            tableName = value.substring(0, delimiterIndex);
-            columnName = value.substring(delimiterIndex + ".".length());
+            tableName = content;
+            columnName = null;
         }
         final Table table = database.getTable(tableName);
         if (table == null) {
-            throwParameterBeanReferenceTableNotFoundException(_className, _propertyName, tableName);
+            throwParameterBeanReferenceTableNotFoundException(option, _className, _propertyName, tableName);
         }
         final Column column;
         if (columnName != null) {
@@ -113,46 +104,56 @@ public class PmbMetaDataPropertyOptionReference {
             column = table.getColumn(_propertyName);
         }
         if (column == null) {
-            throwParameterBeanReferenceColumnNotFoundException(_className, _propertyName, tableName, columnName);
+            throwParameterBeanReferenceColumnNotFoundException(option, _className, _propertyName, tableName, columnName);
         }
         return column;
     }
 
-    protected void throwParameterBeanReferenceTableNotFoundException(String className, String propertyName,
-            String tableName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The reference table was not found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the table existence." + ln();
-        msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + className + ln();
-        msg = msg + ln();
-        msg = msg + "[Property]" + ln() + propertyName + ln();
-        msg = msg + ln();
-        msg = msg + "[Not Found Table]" + ln() + tableName + ln();
-        msg = msg + "* * * * * * * * * */";
+    protected void throwParameterBeanReferenceTableNotFoundException(String option, String className,
+            String propertyName, String tableName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The reference table for parameter-bean property was not found!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the table existence.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    -- !!String memberName:ref(NOT_EXIST.MEMBER_NAME)!!");
+        br.addElement("  (o):");
+        br.addElement("    -- !!String memberName:ref(MEMBER.MEMBER_NAME)!!");
+        br.addItem("ParameterBean");
+        br.addElement(className);
+        br.addItem("Property");
+        br.addElement(propertyName);
+        br.addItem("NotFound Table");
+        br.addElement(tableName);
+        br.addItem("Option");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
         throw new DfParameterBeanReferenceTableNotFoundException(msg);
     }
 
-    protected void throwParameterBeanReferenceColumnNotFoundException(String className, String propertyName,
-            String tableName, String columnName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The reference column was not found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the column existence." + ln();
-        msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + className + ln();
-        msg = msg + ln();
-        msg = msg + "[Property]" + ln() + propertyName + ln();
-        msg = msg + ln();
-        msg = msg + "[Table]" + ln() + tableName + ln();
-        msg = msg + ln();
-        msg = msg + "[Column]" + ln() + columnName + ln();
-        msg = msg + "* * * * * * * * * */";
+    protected void throwParameterBeanReferenceColumnNotFoundException(String option, String className,
+            String propertyName, String tableName, String columnName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The reference column for parameter-bean property was not found!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the column existence.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    -- !!String memberName:ref(MEMBER.NOT_EXIST_NAME)!!");
+        br.addElement("  (o):");
+        br.addElement("    -- !!String memberName:ref(MEMBER.MEMBER_NAME)!!");
+        br.addItem("ParameterBean");
+        br.addElement(className);
+        br.addItem("Property");
+        br.addElement(propertyName);
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("NotFound Column");
+        br.addElement(columnName);
+        br.addItem("Option");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
         throw new DfParameterBeanReferenceColumnNotFoundException(msg);
     }
 
