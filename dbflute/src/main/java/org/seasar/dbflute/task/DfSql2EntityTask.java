@@ -40,7 +40,6 @@ import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.exception.DfProcedureSetupFailureException;
-import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
@@ -124,7 +123,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setPassword(_password);
         runInfo.setAutoCommit(false);
         runInfo.setErrorContinue(false);
-        runInfo.setRollbackOnly(true);
+        runInfo.setRollbackOnly(true); // this task does not commit
         runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
 
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
@@ -313,32 +312,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
                     }
                 } catch (SQLException e) {
-                    if (!_runInfo.isErrorContinue()) {
-                        String msg = "Look! Read the message below." + ln();
-                        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-                        msg = msg + "It failed to execute the SQL!" + ln();
-                        msg = msg + ln();
-                        msg = msg + "[SQL File]" + ln() + _sqlFile + ln();
-                        msg = msg + ln();
-                        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-                        msg = msg + ln();
-                        msg = msg + "[SQLState]" + ln() + e.getSQLState() + ln();
-                        msg = msg + ln();
-                        msg = msg + "[ErrorCode]" + ln() + e.getErrorCode() + ln();
-                        msg = msg + ln();
-                        msg = msg + "[SQLException]" + ln() + e.getClass().getName() + ln();
-                        msg = msg + e.getMessage() + ln();
-                        SQLException nextException = e.getNextException();
-                        if (nextException != null) {
-                            msg = msg + ln();
-                            msg = msg + "[NextException]" + ln() + nextException.getClass().getName() + ln();
-                            msg = msg + nextException.getMessage() + ln();
-                        }
-                        msg = msg + "* * * * * * * * * */";
-                        throw new SQLFailureException(msg, e);
+                    if (_runInfo.isErrorContinue()) {
+                        _log.warn("Failed to execute: " + sql, e);
+                        _exceptionInfoMap.put(_sqlFile.getName(), e.getMessage() + ln() + sql);
+                        return;
                     }
-                    _log.warn("Failed to execute: " + sql, e);
-                    _exceptionInfoMap.put(_sqlFile.getName(), e.getMessage() + ln() + sql);
+                    throwSQLFailureException(sql, e);
                 } finally {
                     if (rs != null) {
                         try {

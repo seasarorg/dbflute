@@ -207,7 +207,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     @Override
     protected boolean isRollbackOnly() {
-        return true;
+        return true; // this task does not commit 
     }
 
     @Override

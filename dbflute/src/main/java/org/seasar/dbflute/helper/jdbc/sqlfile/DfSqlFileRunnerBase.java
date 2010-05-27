@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.util.Srl;
 
@@ -110,7 +111,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 try {
                     autoCommit = _currentConnection.getAutoCommit();
                 } catch (SQLException continued) {
-                    // Because it is possible that the connection would have already closed.
+                    // because it is possible that the connection would have already closed
                     _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
                 }
                 if (autoCommit != null && !autoCommit) {
@@ -122,12 +123,12 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 }
             }
         } catch (SQLException e) {
-            String msg = "Transaction#runTransaction() threw the exception:";
-            msg = msg + " currentSql=" + currentSql;
-            throw new SQLFailureException(msg, e);
+            // here is for the exception except executing SQL
+            // so it always does not continue
+            throwSQLFailureException(currentSql, e);
         } finally {
             try {
-                if (_currentConnection != null && !_currentConnection.getAutoCommit()) {
+                if (_currentConnection != null) {
                     _currentConnection.rollback();
                 }
             } catch (SQLException ignored) {
@@ -199,7 +200,11 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         try {
             _currentConnection = _dataSource.getConnection();
-            _currentConnection.setAutoCommit(_runInfo.isAutoCommit());
+
+            final boolean autoCommit = _currentConnection.getAutoCommit();
+            if (autoCommit != _runInfo.isAutoCommit()) { // if different
+                _currentConnection.setAutoCommit(_runInfo.isAutoCommit());
+            }
         } catch (SQLException e) {
             String msg = "DataSource#getConnection() threw the exception:";
             msg = msg + " dataSource=" + _dataSource;
@@ -358,7 +363,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 addSqlToList(sqlList, sql); // for Last SQL
             }
         } catch (IOException e) {
-            throw new RuntimeException("The method 'extractSqlList()' threw the exception!", e);
+            String msg = "The method 'extractSqlList()' threw the IOException!";
+            throw new IllegalStateException(msg, e);
         } finally {
             if (in != null) {
                 try {
@@ -469,13 +475,53 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     // ===================================================================================
+    //                                                                  Exception Handling
+    //                                                                  ==================
+    protected void throwSQLFailureException(String sql, SQLException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to execute the SQL!");
+        br.addItem("SQL File");
+        br.addElement(_sqlFile);
+        br.addItem("Executed SQL");
+        br.addElement(sql);
+        br.addItem("SQLState");
+        br.addElement(e.getSQLState());
+        br.addItem("ErrorCode");
+        br.addElement(e.getErrorCode());
+        br.addItem("SQLException");
+        br.addElement(e.getClass().getName());
+        br.addElement(extractMessage(e));
+        final SQLException nextEx = e.getNextException();
+        if (nextEx != null) {
+            br.addItem("NextException");
+            br.addElement(nextEx.getClass().getName());
+            br.addElement(extractMessage(nextEx));
+            final SQLException nextNextEx = nextEx.getNextException();
+            if (nextNextEx != null) {
+                br.addItem("NextNextException");
+                br.addElement(nextNextEx.getClass().getName());
+                br.addElement(extractMessage(nextNextEx));
+            }
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new SQLFailureException(msg, e);
+    }
+
+    protected String extractMessage(SQLException e) {
+        String message = e.getMessage();
+
+        // Because a message of Oracle contains a line separator.
+        return message != null ? message.trim() : message;
+    }
+
+    // ===================================================================================
     //                                                                        For Override
     //                                                                        ============
     /**
      * Execute the SQL statement.
      * @param sql SQL. (NotNull)
      */
-    abstract protected void execSQL(String sql);
+    protected abstract void execSQL(String sql);
 
     /**
      * @return Determination.

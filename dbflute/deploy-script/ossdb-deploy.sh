@@ -25,4 +25,5 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
-. outside-sql-test.sh
+# unsupported at SQLite
+#. outside-sql-test.sh

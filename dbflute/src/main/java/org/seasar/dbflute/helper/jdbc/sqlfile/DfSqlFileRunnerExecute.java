@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
 /**
@@ -51,8 +50,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     //                                                                         Execute SQL
     //                                                                         ===========
     /**
-     * Execute the SQL statement.
-     * @param sql SQL. (NotNull)
+     * {@inheritDoc}
      */
     protected void execSQL(String sql) {
         boolean lazyConnectFailed = false;
@@ -75,36 +73,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 _result.addErrorContinuedSql(e, sql);
                 return;
             }
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "It failed to execute the SQL!" + ln();
-            msg = msg + ln();
-            msg = msg + "[SQL File]" + ln() + _sqlFile + ln();
-            msg = msg + ln();
-            msg = msg + "[Executed SQL]" + ln() + sql + ln();
-            msg = msg + ln();
-            msg = msg + "[SQLState]" + ln() + e.getSQLState() + ln();
-            msg = msg + ln();
-            msg = msg + "[ErrorCode]" + ln() + e.getErrorCode() + ln();
-            msg = msg + ln();
-            msg = msg + "[SQLException]" + ln() + e.getClass().getName() + ln();
-            msg = msg + extractMessage(e) + ln();
-            SQLException nextEx = e.getNextException();
-            if (nextEx != null) {
-                msg = msg + ln();
-                msg = msg + "[NextException]" + ln();
-                msg = msg + nextEx.getClass().getName() + ln();
-                msg = msg + extractMessage(nextEx) + ln();
-                SQLException nextNextEx = nextEx.getNextException();
-                if (nextNextEx != null) {
-                    msg = msg + ln();
-                    msg = msg + "[NextNextException]" + ln();
-                    msg = msg + nextNextEx.getClass().getName() + ln();
-                    msg = msg + extractMessage(nextNextEx) + ln();
-                }
-            }
-            msg = msg + "* * * * * * * * * */";
-            throw new SQLFailureException(msg, e);
+            throwSQLFailureException(sql, e);
         }
     }
 
