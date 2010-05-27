@@ -48,6 +48,14 @@ public class SqlClauseSqlite extends AbstractSqlClause {
     }
 
     // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
+    @Override
+    protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() {
+        return createOrderByNullsSetupperByCaseWhen();
+    }
+
+    // ===================================================================================
     //                                                                 FetchScope Override
     //                                                                 ===================
     /**
