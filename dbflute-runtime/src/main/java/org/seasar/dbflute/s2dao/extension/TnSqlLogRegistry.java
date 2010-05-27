@@ -18,19 +18,10 @@ package org.seasar.dbflute.s2dao.extension;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * @author jflute
  */
 public class TnSqlLogRegistry {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(TnSqlLogRegistry.class);
 
     // ===================================================================================
     //                                                                          Definition
@@ -74,7 +65,6 @@ public class TnSqlLogRegistry {
         try {
             final Method method = sqlLogRegistryLocatorType.getMethod(NAME_setInstance,
                     new Class[] { sqlLogRegistryType });
-            _log.info("...Setting the sqlLogRegistry to the locator.");
             method.invoke(null, new Object[] { sqlLogRegistryImpl });
             return true;
         } catch (Exception e) {
@@ -142,7 +132,6 @@ public class TnSqlLogRegistry {
         try {
             final Method method = sqlLogRegistryLocatorType.getMethod(NAME_setInstance,
                     new Class[] { sqlLogRegistryType });
-            _log.info("...Closing the sqlLogRegistry.");
             method.invoke(null, new Object[] { null });
         } catch (Exception e) {
             String msg = "InternalSqlLogRegistry.closeRegistration() threw the exception:";
