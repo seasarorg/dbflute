@@ -45,7 +45,7 @@ public class ${glDBFluteInitializer} {
         _log.info("...Initializing DBFlute components!");
         handleSqlLogRegistry();
         loadCoolClasses();
-        ${glDBFluteConfig}.getInstance().lock();
+        lockConfig();
     }
 
     protected void handleSqlLogRegistry() {
@@ -79,7 +79,7 @@ public class ${glDBFluteInitializer} {
     public ${glDBFluteInitializer}(DataSource dataSource) {
         _log.info("...Initializing DBFlute components!");
         setupDataSourceHandler(dataSource);
-        ${glDBFluteConfig}.getInstance().lock();
+        lockConfig();
     }
 
     /**
@@ -131,9 +131,15 @@ public class ${glDBFluteInitializer} {
      */
     public ${glDBFluteInitializer}() {
         _log.info("...Initializing DBFlute components!");
-        ${glDBFluteConfig}.getInstance().lock();
+        lockConfig();
     }
 #end
+
+    protected void lockConfig() {
+        if (!${glDBFluteConfig}.getInstance().isLocked()) {
+            ${glDBFluteConfig}.getInstance().lock();
+        }
+    }
 
     // ===================================================================================
     //                                                                      General Helper
