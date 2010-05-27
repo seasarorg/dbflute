@@ -245,12 +245,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
              */
             @Override
             protected String filterSql(String sql) {
-                if (!currentDBDef.dbway().isBlockCommentSupported()) {
-                    sql = removeBlockComment(sql);
-                }
-
-                // The line comment is special mark on Sql2Entity
+                // the comments are special mark for Sql2Entity
                 // so this timing to do is bad because the special mark is removed.
+                //if (!currentDBDef.dbway().isBlockCommentSupported()) {
+                //    sql = removeBlockComment(sql);
+                //}
                 //if (!currentDBDef.dbway().isLineCommentSupported()) {
                 //    sql = removeLineComment(sql);
                 //}
@@ -264,11 +263,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     boolean alreadyIncrementGoodSqlCount = false;
                     if (isTargetEntityMakingSql(sql)) {
                         final String executedActuallySql;
-                        if (!currentDBDef.dbway().isLineCommentSupported()) {
-                            // the timing to remove line comment is here
-                            executedActuallySql = removeLineComment(sql);
-                        } else {
-                            executedActuallySql = sql;
+                        {
+                            // the timing to remove comments is here
+                            String filtered = sql;
+                            if (!currentDBDef.dbway().isBlockCommentSupported()) {
+                                filtered = removeBlockComment(filtered);
+                            }
+                            if (!currentDBDef.dbway().isLineCommentSupported()) {
+                                filtered = removeLineComment(filtered);
+                            }
+                            executedActuallySql = filtered;
                         }
                         checkStatement(executedActuallySql);
                         rs = _currentStatement.executeQuery(executedActuallySql);
