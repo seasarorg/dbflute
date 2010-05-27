@@ -97,7 +97,9 @@ public class ${glDBFluteConfig} {
 
             // It should treat java.util.Date as time-stamp,
             // because the DATE type of Oracle has seconds.
-            registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP); // override
+            Class<?> keyType = java.util.Date.class;
+            ValueType valueType = TnValueTypes.UTILDATE_AS_TIMESTAMP;
+            TnValueTypes.registerBasicValueType(keyType, valueType); // override
 	    }
     }
 
