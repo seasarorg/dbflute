@@ -32,7 +32,8 @@ public class ContainerNode extends AbstractNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        for (int i = 0; i < getChildSize(); ++i) {
+        final int childSize = getChildSize();
+        for (int i = 0; i < childSize; i++) {
             getChild(i).accept(ctx);
         }
     }

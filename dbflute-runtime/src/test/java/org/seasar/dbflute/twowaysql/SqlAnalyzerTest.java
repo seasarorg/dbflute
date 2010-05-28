@@ -119,6 +119,48 @@ public class SqlAnalyzerTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
+    public void test_parse_BEGIN_for_where_either_true() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = 3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("pmb");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "where  member.MEMBER_NAME = 'TEST'";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_for_where_either_true_or() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = 3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/or member.MEMBER_NAME = 'TEST'/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("pmb");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "where  member.MEMBER_NAME = 'TEST'";
+        assertEquals(expected, ctx.getSql());
+    }
+
     public void test_parse_BEGIN_for_select_all_true() {
         // ## Arrange ##
         String sql = "select /*BEGIN*/";
@@ -158,6 +200,27 @@ public class SqlAnalyzerTest extends PlainTestCase {
         rootNode.accept(ctx);
         log("ctx:" + ctx);
         String expected = "select ";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_for_select_either_true() {
+        // ## Arrange ##
+        String sql = "select /*BEGIN*/";
+        sql = sql + "/*IF pmb.memberId != null*/member.MEMBER_ID as c1/*END*/";
+        sql = sql + "/*IF pmb.memberName != null*/, member.MEMBER_NAME as c2/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "select member.MEMBER_NAME as c2";
         assertEquals(expected, ctx.getSql());
     }
 
@@ -270,11 +333,33 @@ public class SqlAnalyzerTest extends PlainTestCase {
         rootNode.accept(ctx);
         log("ctx:" + ctx);
 
-        // Basically Unsupported!
-        // If all IF comments of parent return false
-        // and nested IF comment in BEGIN comment returns true, 
-        // parent BEGIN manages false. It's strange!!!
-        assertEquals("", ctx.getSql());
+        assertEquals("where  FIXED2 BBB and CCC", ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_that_has_nested_BEGIN_toponly_false_either_true() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/";
+        sql = sql + "FIXED";
+        sql = sql + "/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*BEGIN*/";
+        sql = sql + "FIXED2 /*IF false*/and BBB/*END*/ /*IF true*/and CCC/*END*/";
+        sql = sql + "/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+
+        assertEquals("where  FIXED2  CCC", ctx.getSql());
     }
 
     public void test_parse_BEGIN_that_has_nested_BEGIN_nest_and_adjustment() {
@@ -420,7 +505,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         rootNode.accept(ctx);
         log("ctx:" + ctx);
         String expected = "where 1 = 1 AAA and BBB and CCC and DDD";
-        assertEquals(expected, ctx.getSql());
+        assertEquals(expected, ctx.getSql()); // BEGIN comment does not need in this pattern
     }
 
     public void test_parse_BEGIN_that_has_nested_IFIF_all_false() {
@@ -444,7 +529,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         assertEquals("", ctx.getSql());
     }
 
-    public void test_parse_BEGIN_that_has_nested_IFIF_formal_use_but_basically_nonsense() {
+    public void test_parse_BEGIN_that_has_nested_IFIF_nonsense_all_true() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
         sql = sql + " ";
@@ -464,7 +549,30 @@ public class SqlAnalyzerTest extends PlainTestCase {
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
         log("ctx:" + ctx);
-        assertEquals("where AAA and BBB", ctx.getSql());
+        assertEquals("where AAA and BBB", ctx.getSql()); // basically nonsense
+    }
+
+    public void test_parse_BEGIN_that_has_nested_IFIF_nonsense_nested_false() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberId != null*//*IF false*/and AAA/*END*//*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/and BBB/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberId(3);
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        assertEquals("where  and BBB", ctx.getSql()); // basically nonsense
     }
 
     // -----------------------------------------------------

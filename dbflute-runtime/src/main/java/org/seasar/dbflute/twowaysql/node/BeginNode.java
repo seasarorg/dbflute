@@ -38,6 +38,11 @@ public class BeginNode extends ContainerNode {
         super.accept(childCtx);
         if (childCtx.isEnabled()) {
             ctx.addSql(childCtx.getSql(), childCtx.getBindVariables(), childCtx.getBindVariableTypes());
+            if (ctx.isBeginChildContext()) { // means nested begin-node
+                // to tell parent begin-node whether
+                // nested begin-node is enabled or not
+                ctx.setEnabled(true);
+            }
         }
     }
 }

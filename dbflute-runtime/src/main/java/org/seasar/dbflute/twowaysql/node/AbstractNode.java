@@ -28,7 +28,7 @@ public abstract class AbstractNode implements Node {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private List<Node> children = new ArrayList<Node>();
+    private List<Node> _children = new ArrayList<Node>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -40,15 +40,15 @@ public abstract class AbstractNode implements Node {
     //                                                                      Child Handling
     //                                                                      ==============
     public int getChildSize() {
-        return children.size();
+        return _children.size();
     }
 
     public Node getChild(int index) {
-        return (Node) children.get(index);
+        return (Node) _children.get(index);
     }
 
     public void addChild(Node node) {
-        children.add(node);
+        _children.add(node);
     }
 
     protected boolean isBeginChildContextAndValidCondition(CommandContext ctx, String sql) {
