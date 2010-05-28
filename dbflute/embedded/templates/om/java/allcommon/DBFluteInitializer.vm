@@ -42,7 +42,7 @@ public class ${glDBFluteInitializer} {
      * Constructor. And initialize various components.
      */
     public ${glDBFluteInitializer}() {
-        _log.info("...Initializing DBFlute components!");
+        _log.info("...Initializing DBFlute components");
         handleSqlLogRegistry();
         loadCoolClasses();
         lockConfig();
@@ -54,10 +54,10 @@ public class ${glDBFluteInitializer} {
             sb.append("{SqlLog Information}").append(ln());
             sb.append("  [SqlLogRegistry]").append(ln());
             if (TnSqlLogRegistry.setupSqlLogRegistry()) {
-                sb.append("    ...Setting up sqlLogRegistry(org.seasar.extension.jdbc)!").append(ln());
-                sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
+                sb.append("    ...Setting up sqlLogRegistry(org.seasar.extension.jdbc)").append(ln());
+                sb.append("    because the property 'useSqlLogRegistry' of the config of DBFlute is true");
             } else {
-                sb.append("    The sqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
+                sb.append("    The sqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version");
             }
            _log.info(sb);
         } else {
@@ -77,7 +77,7 @@ public class ${glDBFluteInitializer} {
      * @param dataSource The instance of data source. (NotNull)
      */
     public ${glDBFluteInitializer}(DataSource dataSource) {
-        _log.info("...Initializing DBFlute components!");
+        _log.info("...Initializing DBFlute components");
         setupDataSourceHandler(dataSource);
         lockConfig();
     }
@@ -130,7 +130,7 @@ public class ${glDBFluteInitializer} {
      * Constructor. And initialize various components.
      */
     public ${glDBFluteInitializer}() {
-        _log.info("...Initializing DBFlute components!");
+        _log.info("...Initializing DBFlute components");
         lockConfig();
     }
 #end

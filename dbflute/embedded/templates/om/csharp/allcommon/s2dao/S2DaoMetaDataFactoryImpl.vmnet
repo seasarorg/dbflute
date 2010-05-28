@@ -65,8 +65,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 ${glInternalSqlLogRegistryLocator}.Instance = new ${glInternalSqlLogRegistry}();
                 sb.append("{SqlLog Information}").append(GetLineSeparator());
                 sb.append("  [SqlLogRegistry]").append(GetLineSeparator());
-                sb.append("    ...Setting up SqlLogRegistry!").append(GetLineSeparator());
-                sb.append("    Because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true.");
+                sb.append("    ...Setting up SqlLogRegistry").append(GetLineSeparator());
+                sb.append("    because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true");
                 _log.Info(sb.toString());
             } else {
                 if (${glInternalSqlLogRegistryLocator}.Instance != null) {

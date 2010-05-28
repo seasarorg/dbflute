@@ -329,14 +329,14 @@ public class ${myClassName} {
 	
 	public void Lock() {
 		if (_log.IsInfoEnabled) {
-		    _log.Info("...Locking the config of dbflute!");
+		    _log.Info("...Locking the config of dbflute");
 		}
 	    _locked = true;
 	}
 	
 	public void Unlock() {
 		if (_log.IsInfoEnabled) {
-		    _log.Info("...Unlocking the config of dbflute!");
+		    _log.Info("...Unlocking the config of dbflute");
 		}
 	    _locked = false;
 	}

@@ -36,11 +36,13 @@ namespace ${glPackageBaseCommonBhv} {
 
         protected static void AssertUpdatedEntity(${glEntity} entity, int updatedCount) {
             if (updatedCount == 0) {
-                String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+                String msg = "The entity was not found! it has already been deleted: entity=" + entity;
                 throw new ${glEntityAlreadyDeletedException}(msg);
             }
             if (updatedCount > 1) {
-                String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+                String msg = "The entity was too many! it has been duplicated.";
+                msg = msg + " It should be the only one!";
+                msg = msg + " But the updatedCount=" + updatedCount;
                 msg = msg + ": entity=" + entity;
                 throw new ${glEntityDuplicatedException}(msg);
             }
@@ -214,7 +216,7 @@ namespace ${glPackageBaseCommonBhv} {
                 return;
             }
             if (_log.IsDebugEnabled) {
-                _log.Debug("...Setting up column columns of " + this.TableDbName + " before INSERT!");
+                _log.Debug("...Setting up column columns of " + this.TableDbName + " before INSERT");
             }
 #foreach ($columnName in ${database.commonColumnNameList})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
@@ -270,7 +272,7 @@ namespace ${glPackageBaseCommonBhv} {
                 return;
             }
             if (_log.IsDebugEnabled) {
-                _log.Debug("...Setting up column columns of " + this.TableDbName + " before UPDATE!");
+                _log.Debug("...Setting up column columns of " + this.TableDbName + " before UPDATE");
             }
 #foreach ($columnName in ${database.commonColumnNameList})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
@@ -343,7 +345,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
-            msg = msg + "The value of 'version no' on the entity was Not Found!" + GetLineSeparator() + GetLineSeparator();
+            msg = msg + "The value of 'version no' on the entity was not found!" + GetLineSeparator() + GetLineSeparator();
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm the existence of the value of 'version no' on the entity." + GetLineSeparator();
             msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + GetLineSeparator();
@@ -364,7 +366,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
-            msg = msg + "The value of 'update date' on the entity was Not Found!" + GetLineSeparator() + GetLineSeparator();
+            msg = msg + "The value of 'update date' on the entity was not found!" + GetLineSeparator() + GetLineSeparator();
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm the existence of the value of 'update date' on the entity." + GetLineSeparator();
             msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + GetLineSeparator();

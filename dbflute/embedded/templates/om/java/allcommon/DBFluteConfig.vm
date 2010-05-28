@@ -419,14 +419,14 @@ public class ${glDBFluteConfig} {
 	
 	public void lock() {
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Locking the configuration of DBFlute!");
+		    _log.info("...Locking the configuration of DBFlute");
 		}
 	    _locked = true;
 	}
 	
 	public void unlock() {
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Unlocking the configuration of DBFlute!");
+		    _log.info("...Unlocking the configuration of DBFlute");
 		}
 	    _locked = false;
 	}

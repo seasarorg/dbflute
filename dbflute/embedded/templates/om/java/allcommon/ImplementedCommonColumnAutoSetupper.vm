@@ -154,7 +154,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     //                                                                               =======
     protected void log(${glEntityDefinedCommonColumn} entity, String keyword) {
         if (_log.isDebugEnabled()) {
-            _log.debug("...Setting up column columns of " + entity.getTableDbName() + " before " + keyword + "!");
+            _log.debug("...Setting up column columns of " + entity.getTableDbName() + " before " + keyword);
         }
     }
 }
