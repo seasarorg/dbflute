@@ -28,11 +28,6 @@ import java.util.Map.Entry;
 public class Srl {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    protected static final String[] EMPTY_STRINGS = new String[0];
-
-    // ===================================================================================
     //                                                                        Null & Empty
     //                                                                        ============
     public static final boolean is_Null_or_Empty(final String str) {
@@ -62,35 +57,35 @@ public class Srl {
     // ===================================================================================
     //                                                                                Trim
     //                                                                                ====
-    public static final String trim(String str) {
+    public static final String trim(final String str) {
         return doTrim(str, null);
     }
 
-    public static final String trim(String str, String trimStr) {
+    public static final String trim(final String str, final String trimStr) {
         return doTrim(str, trimStr);
     }
 
-    public static final String ltrim(String str) {
+    public static final String ltrim(final String str) {
         return doLTrim(str, null);
     }
 
-    public static final String ltrim(String str, String trimStr) {
+    public static final String ltrim(final String str, final String trimStr) {
         return doLTrim(str, trimStr);
     }
 
-    public static final String rtrim(String str) {
+    public static final String rtrim(final String str) {
         return doRTrim(str, null);
     }
 
-    public static final String rtrim(String str, String trimStr) {
+    public static final String rtrim(final String str, final String trimStr) {
         return doRTrim(str, trimStr);
     }
 
-    protected static final String doTrim(String str, String trimStr) {
+    protected static final String doTrim(final String str, final String trimStr) {
         return doRTrim(doLTrim(str, trimStr), trimStr);
     }
 
-    protected static final String doLTrim(String str, String trimStr) {
+    protected static final String doLTrim(final String str, final String trimStr) {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
@@ -107,7 +102,7 @@ public class Srl {
         return str.substring(pos);
     }
 
-    protected static final String doRTrim(String str, String trimStr) {
+    protected static final String doRTrim(final String str, final String trimStr) {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
@@ -126,7 +121,17 @@ public class Srl {
     // ===================================================================================
     //                                                                             IndexOf
     //                                                                             =======
-    public static IndexOfInfo indexOfFirstFront(final String str, final String... delimiters) {
+    /**
+     * Get the index of the first-found delimiter.
+     * <pre>
+     * indexOfFirst("foo.bar/baz.qux", ".", "/")
+     * returns the index of ".bar"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The information of index. (NotNull: if delimiter not found, returns argument-plain string)
+     */
+    public static IndexOfInfo indexOfFirst(final String str, final String... delimiters) {
         int minIndex = -1;
         String targetDelimiter = null;
         for (String delimiter : delimiters) {
@@ -146,47 +151,17 @@ public class Srl {
         return info;
     }
 
-    public static IndexOfInfo indexOfFirstRear(final String str, final String... delimiters) {
-        int maxIndex = -1;
-        String targetDelimiter = null;
-        for (String delimiter : delimiters) {
-            final int index = str.indexOf(delimiter);
-            if (index < 0) {
-                continue;
-            }
-            if (maxIndex < 0 || maxIndex < index) {
-                maxIndex = index;
-                targetDelimiter = delimiter;
-            }
-        }
-        final IndexOfInfo info = new IndexOfInfo();
-        info.setBaseString(str);
-        info.setIndex(maxIndex);
-        info.setDelimiter(targetDelimiter);
-        return info;
-    }
-
-    public static IndexOfInfo indexOfLastFront(final String str, final String... delimiters) {
-        int minIndex = -1;
-        String targetDelimiter = null;
-        for (String delimiter : delimiters) {
-            final int index = str.lastIndexOf(delimiter);
-            if (index < 0) {
-                continue;
-            }
-            if (minIndex < 0 || minIndex > index) {
-                minIndex = index;
-                targetDelimiter = delimiter;
-            }
-        }
-        final IndexOfInfo info = new IndexOfInfo();
-        info.setBaseString(str);
-        info.setIndex(minIndex);
-        info.setDelimiter(targetDelimiter);
-        return info;
-    }
-
-    public static IndexOfInfo indexOfLastRear(final String str, final String... delimiters) {
+    /**
+     * Get the index of the last-found delimiter.
+     * <pre>
+     * indexOfLast("foo.bar/baz.qux", ".", "/")
+     * returns the index of ".qux"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The information of index. (NotNull: if delimiter not found, returns argument-plain string)
+     */
+    public static IndexOfInfo indexOfLast(final String str, final String... delimiters) {
         int maxIndex = -1;
         String targetDelimiter = null;
         for (String delimiter : delimiters) {
@@ -240,9 +215,9 @@ public class Srl {
     //                                                                           SubString
     //                                                                           =========
     /**
-     * Extract front sub-string from first index of delimiter.
+     * Extract front sub-string from first-found delimiter.
      * <pre>
-     * substringFirstFront("foo.bar.baz", ".")
+     * substringFirstFront("foo.bar/baz.qux", ".", "/")
      * returns "foo"
      * </pre>
      * @param str The target string. (NotNull)
@@ -251,7 +226,7 @@ public class Srl {
      */
     public static final String substringFirstFront(final String str, final String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfFirstFront(str, delimiters);
+        final IndexOfInfo info = indexOfFirst(str, delimiters);
         final int firstIndex = info.getIndex();
         if (firstIndex < 0) {
             return str;
@@ -260,10 +235,10 @@ public class Srl {
     }
 
     /**
-     * Extract rear sub-string from first index of delimiter.
+     * Extract rear sub-string from first-found delimiter.
      * <pre>
-     * substringFirstRear("foo.bar.baz", ".")
-     * returns "bar.baz"
+     * substringFirstRear("foo.bar/baz.qux", ".", "/")
+     * returns "bar/baz.qux"
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
@@ -271,7 +246,7 @@ public class Srl {
      */
     public static final String substringFirstRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfFirstRear(str, delimiters);
+        final IndexOfInfo info = indexOfFirst(str, delimiters);
         final int firstIndex = info.getIndex();
         if (firstIndex < 0) {
             return str;
@@ -280,10 +255,10 @@ public class Srl {
     }
 
     /**
-     * Extract front sub-string from last index of delimiter.
+     * Extract front sub-string from last-found delimiter.
      * <pre>
-     * substringLastFront("foo.bar.baz", ".")
-     * returns "foo.bar"
+     * substringLastFront("foo.bar/baz.qux", ".", "/")
+     * returns "foo.bar/baz"
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
@@ -291,7 +266,7 @@ public class Srl {
      */
     public static final String substringLastFront(String str, String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfLastFront(str, delimiters);
+        final IndexOfInfo info = indexOfLast(str, delimiters);
         final int lastIndex = info.getIndex();
         if (lastIndex < 0) {
             return str;
@@ -300,10 +275,10 @@ public class Srl {
     }
 
     /**
-     * Extract rear sub-string from rear index of delimiter.
+     * Extract rear sub-string from last-found delimiter.
      * <pre>
-     * substringLastRear("foo.bar.baz", ".")
-     * returns "baz"
+     * substringLastRear("foo.bar/baz.qux", ".", "/")
+     * returns "qux"
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
@@ -311,7 +286,7 @@ public class Srl {
      */
     public static final String substringLastRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfLastRear(str, delimiters);
+        final IndexOfInfo info = indexOfLast(str, delimiters);
         final int lastIndex = info.getIndex();
         if (lastIndex < 0) {
             return str;

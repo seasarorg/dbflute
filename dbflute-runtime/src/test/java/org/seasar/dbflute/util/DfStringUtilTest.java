@@ -8,6 +8,8 @@ import static org.seasar.dbflute.util.Srl.decamelize;
 import static org.seasar.dbflute.util.Srl.extractDelimiterList;
 import static org.seasar.dbflute.util.Srl.extractScopeFirst;
 import static org.seasar.dbflute.util.Srl.extractScopeList;
+import static org.seasar.dbflute.util.Srl.indexOfFirst;
+import static org.seasar.dbflute.util.Srl.indexOfLast;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
 import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.removeBlockComment;
@@ -93,12 +95,26 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                             IndexOf
+    //                                                                             =======
+    public void test_indexOfFirst_basic() {
+        assertEquals(3, indexOfFirst("foo.bar/baz.qux", ".", "/").getIndex());
+        assertEquals(3, indexOfFirst("foo/bar.baz/qux", ".", "/").getIndex());
+    }
+
+    public void test_indexOfLast_basic() {
+        assertEquals(11, indexOfLast("foo.bar/baz.qux", ".", "/").getIndex());
+        assertEquals(11, indexOfLast("foo/bar.baz/qux", ".", "/").getIndex());
+    }
+
+    // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
     public void test_substringFirstFront_basic() {
         assertEquals("foo", substringFirstFront("foo.bar", "."));
         assertEquals("foo", substringFirstFront("foo.bar.don", "."));
         assertEquals("foobar", substringFirstFront("foobar", "."));
+        assertEquals("foo", substringFirstFront("foo.bar/baz.qux", "/", "."));
         assertEquals("foo/bar", substringFirstFront("foo/bar.don.moo", "."));
         assertEquals("foo", substringFirstFront("foo/bar.don.moo", ".", "/"));
         assertEquals("foo", substringFirstFront("foo.bar.don.moo", ".", "/"));
@@ -109,8 +125,9 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("bar", substringFirstRear("foo.bar", "."));
         assertEquals("bar.don", substringFirstRear("foo.bar.don", "."));
         assertEquals("foobar", substringFirstRear("foobar", "."));
+        assertEquals("bar/baz.qux", substringFirstRear("foo.bar/baz.qux", "/", "."));
         assertEquals("don.moo", substringFirstRear("foo/bar.don.moo", "."));
-        assertEquals("don.moo", substringFirstRear("foo/bar.don.moo", ".", "/"));
+        assertEquals("bar.don.moo", substringFirstRear("foo/bar.don.moo", ".", "/"));
         assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", ".", "/"));
         assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", "/", "."));
     }
@@ -119,8 +136,9 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("foo", substringLastFront("foo.bar", "."));
         assertEquals("foo.bar", substringLastFront("foo.bar.don", "."));
         assertEquals("foobar", substringLastFront("foobar", "."));
+        assertEquals("foo.bar/baz", substringLastFront("foo.bar/baz.qux", "/", "."));
         assertEquals("foo.bar", substringLastFront("foo.bar.don/moo", "."));
-        assertEquals("foo.bar", substringLastFront("foo.bar.don/moo", ".", "/"));
+        assertEquals("foo.bar.don", substringLastFront("foo.bar.don/moo", ".", "/"));
         assertEquals("foo.bar.don", substringLastFront("foo.bar.don.moo", ".", "/"));
         assertEquals("foo.bar.don", substringLastFront("foo.bar.don.moo", "/", "."));
 
@@ -130,6 +148,7 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("bar", substringLastRear("foo.bar", "."));
         assertEquals("don", substringLastRear("foo.bar.don", "."));
         assertEquals("foobar", substringLastRear("foobar", "."));
+        assertEquals("qux", substringLastRear("foo.bar/baz.qux", "/", "."));
         assertEquals("don/moo", substringLastRear("foo.bar.don/moo", "."));
         assertEquals("moo", substringLastRear("foo.bar.don/moo", ".", "/"));
         assertEquals("moo", substringLastRear("foo.bar.don.moo", ".", "/"));

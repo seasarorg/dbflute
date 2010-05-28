@@ -51,7 +51,7 @@ public interface DBWay {
     //                                                                        JDBC Support
     //                                                                        ============
     boolean isScrollableCursorSupported();
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
