@@ -15,6 +15,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerSQLServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.util.Srl;
 
 public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
@@ -133,6 +134,9 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     protected void writeDbFromXlsAsCommonDataAdditional() {
         final String dir = getMyProperties().getApplicationPlaySqlDirectory();
+        if (Srl.is_Null_or_TrimmedEmpty(dir)) {
+            return;
+        }
         final String path = doGetCommonDataDirectoryPath(dir, "xls");
         writeDbFromXls(path);
     }
@@ -146,6 +150,9 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     protected void writeDbFromXlsAsLoadingTypeDataAdditional() {
         final String dir = getMyProperties().getApplicationPlaySqlDirectory();
+        if (Srl.is_Null_or_TrimmedEmpty(dir)) {
+            return;
+        }
         final String envType = getDataLoadingType();
         final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, "xls");
         writeDbFromXls(path);

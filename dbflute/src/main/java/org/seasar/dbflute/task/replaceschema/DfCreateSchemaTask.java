@@ -39,6 +39,7 @@ import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitiali
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
@@ -481,6 +482,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected List<File> getReplaceSchemaNextSqlFileListAdditional() {
         final List<File> fileList = new ArrayList<File>();
         final String path = getMyProperties().getApplicationPlaySqlDirectory();
+        if (Srl.is_Null_or_TrimmedEmpty(path)) {
+            return DfCollectionUtil.emptyList();
+        }
         fileList.addAll(doGetReplaceSchemaSqlFileList(path));
         return fileList;
     }
