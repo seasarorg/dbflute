@@ -1,6 +1,5 @@
 package org.seasar.dbflute.task.replaceschema;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -133,12 +132,9 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void writeDbFromXlsAsCommonDataAdditional() {
-        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
-        for (Map<String, Object> map : mapList) {
-            final String dir = getMyProperties().getAdditionalPlaySqlPath(map);
-            final String path = doGetCommonDataDirectoryPath(dir, "xls");
-            writeDbFromXls(path);
-        }
+        final String dir = getMyProperties().getApplicationPlaySqlDirectory();
+        final String path = doGetCommonDataDirectoryPath(dir, "xls");
+        writeDbFromXls(path);
     }
 
     protected void writeDbFromXlsAsLoadingTypeData() {
@@ -149,13 +145,10 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void writeDbFromXlsAsLoadingTypeDataAdditional() {
-        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
+        final String dir = getMyProperties().getApplicationPlaySqlDirectory();
         final String envType = getDataLoadingType();
-        for (Map<String, Object> map : mapList) {
-            final String dir = getMyProperties().getAdditionalPlaySqlPath(map);
-            final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, "xls");
-            writeDbFromXls(path);
-        }
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, "xls");
+        writeDbFromXls(path);
     }
 
     protected void writeDbFromXls(String directoryPath) {

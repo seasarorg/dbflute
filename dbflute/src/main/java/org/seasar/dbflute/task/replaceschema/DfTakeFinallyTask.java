@@ -192,12 +192,9 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected List<File> getTakeFinallyNextSqlFileListAdditional() {
-        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
         final List<File> fileList = new ArrayList<File>();
-        for (Map<String, Object> map : mapList) {
-            final String path = getMyProperties().getAdditionalPlaySqlPath(map);
-            fileList.addAll(doGetTakeFinallySqlFileList(path));
-        }
+        final String path = getMyProperties().getApplicationPlaySqlDirectory();
+        fileList.addAll(doGetTakeFinallySqlFileList(path));
         return fileList;
     }
 

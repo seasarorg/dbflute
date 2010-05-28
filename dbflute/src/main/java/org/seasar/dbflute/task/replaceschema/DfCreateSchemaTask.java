@@ -479,12 +479,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected List<File> getReplaceSchemaNextSqlFileListAdditional() {
-        final List<Map<String, Object>> mapList = getMyProperties().getAdditionalPlaySqlMapList();
         final List<File> fileList = new ArrayList<File>();
-        for (Map<String, Object> map : mapList) {
-            final String path = getMyProperties().getAdditionalPlaySqlPath(map);
-            fileList.addAll(doGetReplaceSchemaSqlFileList(path));
-        }
+        final String path = getMyProperties().getApplicationPlaySqlDirectory();
+        fileList.addAll(doGetReplaceSchemaSqlFileList(path));
         return fileList;
     }
 

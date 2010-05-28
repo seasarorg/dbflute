@@ -413,31 +413,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                  Additional PlaySql
-    //                                                                  ==================
-    protected List<Map<String, Object>> _additionalPlaySqlMapList;
-
-    public List<Map<String, Object>> getAdditionalPlaySqlMapList() {
-        if (_additionalPlaySqlMapList != null) {
-            return _additionalPlaySqlMapList;
-        }
-        final Object obj = getReplaceSchemaDefinitionMap().get("additionalPlaySqlMapList");
-        if (obj == null) {
-            _additionalPlaySqlMapList = DfCollectionUtil.emptyList();
-        } else {
-            _additionalPlaySqlMapList = castToList(obj, "additionalDropMapList");
-        }
-        return _additionalPlaySqlMapList;
-    }
-
-    public String getAdditionalPlaySqlPath(Map<String, Object> additionalPlaySqlMap) {
-        final Object obj = additionalPlaySqlMap.get("path");
-        if (obj == null) {
-            String msg = "The schema is required:";
-            msg = msg + " additionalPlaySqlMap=" + additionalPlaySqlMap;
-            throw new DfRequiredPropertyNotFoundException(msg);
-        }
-        return castToString(obj, "additionalPlaySqlMapList.path");
+    //                                                                 Application PlaySql
+    //                                                                 ===================
+    public String getApplicationPlaySqlDirectory() {
+        return getProperty("applicationPlaySqlDirectory", null, getReplaceSchemaDefinitionMap());
     }
 
     // ===================================================================================

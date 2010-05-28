@@ -14,7 +14,7 @@
 # o filterVariablesMap: (NotRequired - Default map:{})
 # o additionalUserMap: (NotRequired - Default map:{})
 # o additionalDropMapList: (NotRequired - Default list:{})
-# o additionalPlaySqlMapList: (NotRequired - Default list:{})
+# o applicationPlaySqlDirectory: (NotRequired - Default '')
 # o isSuppressTruncateTable: (NotRequired - Default false)
 # o isSuppressDropForeignKey: (NotRequired - Default false)
 # o isSuppressDropTable: (NotRequired - Default false)
@@ -146,16 +146,10 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o additionalPlaySqlMapList: (NotRequired - Default list:{})
-    #  You can drop additional other schemas.
-    #  Elements of this map are as below:
-    #   o path: The path of additional playsql directory (Required)
+    # o applicationPlaySqlDirectory: (NotRequired - Default '')
+    #  This property is relative path to Application PlaySql directory.
     #
-    #; additionalPlaySqlMapList = list:{
-    #    ; map:{
-    #        ; path = ../../foo/playsql
-    #    }
-    #}
+    #; applicationPlaySqlDirectory = ../../foo-project/dbflute_apbranch/playsql
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
