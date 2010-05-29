@@ -29,6 +29,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -664,22 +665,21 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         try {
             return method.invoke(target, args);
         } catch (RuntimeException e) {
-            final String lineSeparator = System.getProperty("line.separator");
+            final String ln = DfSystemUtil.getLineSeparator();
             final Class<?>[] parameterTypes = method.getParameterTypes();
-            String msg = "Invoking method threw the exception:" + lineSeparator;
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
-            msg = msg + "[" + DfTypeUtil.toClassTitle(method.getDeclaringClass()) + "." + method.getName() + "()]"
-                    + lineSeparator;
-            msg = msg + " methodArgTypes     = {" + createTypeViewFromTypeArray(parameterTypes) + "}" + lineSeparator;
-            msg = msg + " specifiedArgValues = {" + createValueViewFromValueArray(args) + "}" + lineSeparator;
-            msg = msg + " specifiedArgTypes  = {" + createTypeViewFromValueArray(args) + "}" + lineSeparator;
+            String msg = "Invoking method threw the exception:" + ln;
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
+            msg = msg + "[" + DfTypeUtil.toClassTitle(method.getDeclaringClass()) + "." + method.getName() + "()]" + ln;
+            msg = msg + " methodArgTypes     = {" + createTypeViewFromTypeArray(parameterTypes) + "}" + ln;
+            msg = msg + " specifiedArgValues = {" + createValueViewFromValueArray(args) + "}" + ln;
+            msg = msg + " specifiedArgTypes  = {" + createTypeViewFromValueArray(args) + "}" + ln;
             if (parameterTypes.length > 0 && args.length > 0 && args[0] != null
                     && !parameterTypes[0].equals(args[0].getClass())) {
-                msg = msg + " " + lineSeparator;
+                msg = msg + " " + ln;
                 final String compareString = "{" + parameterTypes[0] + " -- " + args[0].getClass() + "}";
-                msg = msg + " *Warning! The argType is ummatched: " + compareString + lineSeparator;
+                msg = msg + " *Warning! The argType is ummatched: " + compareString + ln;
             }
-            msg = msg + "* * * * * * * * * */" + lineSeparator;
+            msg = msg + "* * * * * * * * * */" + ln;
             throw new RuntimeException(msg, e);
         } catch (java.lang.reflect.InvocationTargetException ex) {
             Throwable t = ex.getCause();
