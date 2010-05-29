@@ -28,7 +28,6 @@ import org.seasar.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.twowaysql.node.BeginNode;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
-import org.seasar.dbflute.twowaysql.node.ContainerNode;
 import org.seasar.dbflute.twowaysql.node.ElseNode;
 import org.seasar.dbflute.twowaysql.node.EmbeddedVariableNode;
 import org.seasar.dbflute.twowaysql.node.ForNode;
@@ -38,6 +37,7 @@ import org.seasar.dbflute.twowaysql.node.LoopFirstNode;
 import org.seasar.dbflute.twowaysql.node.LoopLastNode;
 import org.seasar.dbflute.twowaysql.node.LoopNextNode;
 import org.seasar.dbflute.twowaysql.node.Node;
+import org.seasar.dbflute.twowaysql.node.RootNode;
 import org.seasar.dbflute.twowaysql.node.SqlConnectorNode;
 import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
 import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
@@ -78,11 +78,15 @@ public class SqlAnalyzer {
     //                                                                             Analyze
     //                                                                             =======
     public Node analyze() {
-        push(new ContainerNode());
+        push(createRootNode());
         while (SqlTokenizer.EOF != _tokenizer.next()) {
             parseToken();
         }
         return pop();
+    }
+
+    protected RootNode createRootNode() {
+        return new RootNode();
     }
 
     protected void parseToken() {

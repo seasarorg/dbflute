@@ -240,6 +240,46 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals("%baz%", ctx.getBindVariables()[2]);
     }
 
+    public void test_accept_nested_BEGIN_in_loop() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("     /*BEGIN*/where").append(ln());
+        sb.append("     /*IF false*/").append(ln());
+        sb.append("     MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("     /*END*/").append(ln());
+        sb.append("     /*IF true*/").append(ln());
+        sb.append("     and MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("     /*END*/").append(ln());
+        sb.append("     /*END*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains(" and MEMBER_NAME like ? escape '|'"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 3);
+        assertEquals(3, ctx.getBindVariables().length);
+        assertEquals("foo%", ctx.getBindVariables()[0]);
+        assertEquals("bar%", ctx.getBindVariables()[1]);
+        assertEquals("baz%", ctx.getBindVariables()[2]);
+    }
+
     public void test_accept_allStars_all_true() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();

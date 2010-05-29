@@ -62,7 +62,6 @@ public class ForNode extends ContainerNode {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    @Override
     public void accept(CommandContext ctx) {
         final String firstName = _nameList.get(0);
         assertFirstName(ctx, firstName);
@@ -79,21 +78,13 @@ public class ForNode extends ContainerNode {
         assertParameterList(targetValue);
         final List<?> parameterList = (List<?>) targetValue;
         final int loopSize = parameterList.size();
-        final int childSize = getChildSize();
         final LoopInfo loopInfo = new LoopInfo();
         loopInfo.setParameterList(parameterList);
         loopInfo.setLoopSize(loopSize);
         loopInfo.setLikeSearchOption(valueAndType.getLikeSearchOption());
         for (int loopIndex = 0; loopIndex < loopSize; loopIndex++) {
             loopInfo.setLoopIndex(loopIndex);
-            for (int childIndex = 0; childIndex < childSize; childIndex++) {
-                final Node child = getChild(childIndex);
-                if (child instanceof LoopAcceptable) {
-                    ((LoopAcceptable) child).accept(ctx, loopInfo);
-                } else {
-                    child.accept(ctx);
-                }
-            }
+            processChildNode(ctx, loopInfo);
         }
         if (loopSize > 0) {
             ctx.setEnabled(true);

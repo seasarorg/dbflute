@@ -48,7 +48,6 @@ public abstract class LoopAbstractNode extends ContainerNode implements LoopAcce
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    @Override
     public void accept(CommandContext ctx) {
         final LoopVariableType type = getLoopVariableType();
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -80,7 +79,7 @@ public abstract class LoopAbstractNode extends ContainerNode implements LoopAcce
             return;
         }
         acceptFrontPrefix(ctx);
-        super.accept(ctx);
+        processChildNode(ctx, loopInfo);
     }
 
     protected abstract boolean isValid(int loopSize, int loopIndex);

@@ -71,7 +71,7 @@ public class CommandContextImpl implements CommandContext {
      * Create the implementation of command context as root.
      * @return The implementation of command context as root. (NotNull)
      */
-    public static CommandContextImpl createCommandContextImplAsRoot() {
+    public static CommandContextImpl createCommandContextImplAsRoot() { // basically for creator
         return new CommandContextImpl();
     }
 

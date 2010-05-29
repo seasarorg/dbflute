@@ -20,19 +20,21 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 /**
  * @author jflute
  */
-public class ElseNode extends ContainerNode {
+public class RootNode extends AbstractNode {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ElseNode() {
+    public RootNode() {
     }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        processChildNode(ctx);
-        ctx.setEnabled(true);
+        final int childSize = getChildSize();
+        for (int i = 0; i < childSize; i++) {
+            getChild(i).accept(ctx);
+        }
     }
 }

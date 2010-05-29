@@ -47,7 +47,6 @@ public class IfNode extends ContainerNode implements LoopAcceptable {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    @Override
     public void accept(CommandContext ctx) {
         doAcceptByEvaluator(ctx, null);
     }
@@ -60,19 +59,7 @@ public class IfNode extends ContainerNode implements LoopAcceptable {
         final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx);
         final boolean result = evaluator.evaluate();
         if (result) {
-            final int childSize = getChildSize();
-            for (int i = 0; i < childSize; i++) {
-                final Node child = getChild(i);
-                if (loopInfo != null) {
-                    if (child instanceof LoopAcceptable) {
-                        ((LoopAcceptable) child).accept(ctx, loopInfo);
-                    } else {
-                        child.accept(ctx);
-                    }
-                } else {
-                    child.accept(ctx);
-                }
-            }
+            processChildNode(ctx, loopInfo);
             ctx.setEnabled(true);
         } else if (_elseNode != null) {
             _elseNode.accept(ctx);
