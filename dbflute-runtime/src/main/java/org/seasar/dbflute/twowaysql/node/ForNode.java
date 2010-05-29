@@ -35,7 +35,7 @@ import org.seasar.dbflute.util.Srl;
  * so it is not related to container node.
  * @author jflute
  */
-public class ForNode extends ScopeNode {
+public class ForNode extends ScopeNode implements SqlConnectorAdjustable {
 
     // ===================================================================================
     //                                                                          Definition

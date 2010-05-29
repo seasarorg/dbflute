@@ -297,6 +297,7 @@ public class OutsideSqlPagingExecutor {
      * Set up dynamic-binding for this outside-SQL. <br />
      * You can use bind variable in embedded variable by this.
      * @return this. (NotNull)
+     * @deprecated You does not need to call this to set bind variable in embedded variable.
      */
     public OutsideSqlPagingExecutor dynamicBinding() {
         _outsideSqlOption.dynamicBinding();

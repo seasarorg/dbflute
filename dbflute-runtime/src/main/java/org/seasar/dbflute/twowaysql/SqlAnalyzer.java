@@ -38,6 +38,7 @@ import org.seasar.dbflute.twowaysql.node.LoopLastNode;
 import org.seasar.dbflute.twowaysql.node.LoopNextNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.twowaysql.node.RootNode;
+import org.seasar.dbflute.twowaysql.node.SqlConnectorAdjustable;
 import org.seasar.dbflute.twowaysql.node.SqlConnectorNode;
 import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
 import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
@@ -116,7 +117,7 @@ public class SqlAnalyzer {
             sql = token;
         }
         final Node node = peek();
-        if (isSqlConnectorAdjustmentTarget(node)) {
+        if (isSqlConnectorAdjustable(node)) {
             final SqlTokenizer st = new SqlTokenizer(sql);
             st.skipWhitespace();
             final String token = st.skipToken();
@@ -137,12 +138,11 @@ public class SqlAnalyzer {
         }
     }
 
-    protected boolean isSqlConnectorAdjustmentTarget(Node node) {
+    protected boolean isSqlConnectorAdjustable(Node node) {
         if (node.getChildSize() > 0) {
             return false;
         }
-        return node instanceof IfNode || node instanceof ElseNode || node instanceof ForNode
-                || node instanceof LoopFirstNode || node instanceof BeginNode;
+        return node instanceof SqlConnectorAdjustable;
     }
 
     protected void parseComment() {

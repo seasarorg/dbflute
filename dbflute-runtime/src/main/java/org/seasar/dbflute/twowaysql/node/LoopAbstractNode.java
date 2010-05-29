@@ -40,7 +40,7 @@ public abstract class LoopAbstractNode extends ScopeNode implements LoopAcceptab
     //                                                                         ===========
     public LoopAbstractNode(String expression, String specifiedSql) {
         this._expression = expression;
-        final ScopeInfo scope = Srl.extractScopeFirst(_expression, "'", "'");
+        final ScopeInfo scope = Srl.extractScopeWide(_expression, "'", "'");
         _replacement = scope != null ? scope.getContent() : null;
         this._specifiedSql = specifiedSql;
     }

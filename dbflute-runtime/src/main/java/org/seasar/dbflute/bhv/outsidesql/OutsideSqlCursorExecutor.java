@@ -133,6 +133,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * Set up dynamic-binding for this outside-SQL. <br />
      * You can use bind variable in embedded variable by this.
      * @return this. (NotNull)
+     * @deprecated You does not need to call this to set bind variable in embedded variable.
      */
     public OutsideSqlCursorExecutor<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();

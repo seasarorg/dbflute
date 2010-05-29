@@ -8,6 +8,7 @@ import static org.seasar.dbflute.util.Srl.decamelize;
 import static org.seasar.dbflute.util.Srl.extractDelimiterList;
 import static org.seasar.dbflute.util.Srl.extractScopeFirst;
 import static org.seasar.dbflute.util.Srl.extractScopeList;
+import static org.seasar.dbflute.util.Srl.extractScopeWide;
 import static org.seasar.dbflute.util.Srl.indexOfFirst;
 import static org.seasar.dbflute.util.Srl.indexOfLast;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
@@ -468,6 +469,22 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("member...", list.get(2).substringInterspaceToNext());
         assertEquals("", list.get(3).substringInterspaceToNext());
         assertEquals("bar", list.get(4).substringInterspaceToNext());
+    }
+
+    public void test_extractScopeWide_content() {
+        assertEquals("BAR", extractScopeWide("FOObeginBARendDODO", "begin", "end").getContent());
+        assertEquals("BAR", extractScopeWide("FOObeginBARend", "begin", "end").getContent());
+        assertEquals("BAR", extractScopeWide("beginBARendDODO", "begin", "end").getContent());
+        assertEquals(null, extractScopeWide("beginBARedDODO", "begin", "end"));
+        assertEquals(null, extractScopeWide("begnBARendDODO", "begin", "end"));
+        assertEquals(null, extractScopeWide("begnBARedDODO", "begin", "end"));
+        assertEquals("9", extractScopeWide("get(9)", "get(", ")").getContent());
+        assertEquals("99", extractScopeWide("get(99)", "get(", ")").getContent());
+        assertEquals(" 99 ", extractScopeWide("get( 99 )", "get(", ")").getContent()); // not trimmed
+        assertEquals("foo)-get(bar", extractScopeWide("get(foo)-get(bar)", "get(", ")").getContent());
+        assertEquals("foo@-get@bar", extractScopeWide("@foo@-get@bar@", "@", "@").getContent());
+        assertEquals("foo", extractScopeWide("FIRST 'foo'", "'", "'").getContent());
+        assertEquals("f'o'o", extractScopeWide("FIRST 'f'o'o'", "'", "'").getContent());
     }
 
     // ===================================================================================

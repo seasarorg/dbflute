@@ -20,7 +20,7 @@ import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
 /**
  * @author jflute
  */
-public class LoopFirstNode extends LoopAbstractNode {
+public class LoopFirstNode extends LoopAbstractNode implements SqlConnectorAdjustable {
 
     // ===================================================================================
     //                                                                          Definition

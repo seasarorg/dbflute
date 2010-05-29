@@ -337,6 +337,7 @@ public class OutsideSqlBasicExecutor {
      * Set up dynamic-binding for this outside-SQL. <br />
      * You can use bind variable comment in embedded variable comment by this.
      * @return this. (NotNull)
+     * @deprecated You does not need to call this to set bind variable in embedded variable.
      */
     public OutsideSqlBasicExecutor dynamicBinding() {
         _dynamicBinding = true;

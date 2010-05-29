@@ -20,7 +20,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 /**
  * @author jflute
  */
-public class ElseNode extends ScopeNode implements LoopAcceptable {
+public class ElseNode extends ScopeNode implements LoopAcceptable, SqlConnectorAdjustable {
 
     // ===================================================================================
     //                                                                         Constructor

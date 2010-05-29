@@ -129,7 +129,7 @@ public class Srl {
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
-     * @return The information of index. (NotNull: if delimiter not found, returns argument-plain string)
+     * @return The information of index. (Nullable: if delimiter not found)
      */
     public static IndexOfInfo indexOfFirst(final String str, final String... delimiters) {
         int minIndex = -1;
@@ -143,6 +143,9 @@ public class Srl {
                 minIndex = index;
                 targetDelimiter = delimiter;
             }
+        }
+        if (minIndex < 0) {
+            return null;
         }
         final IndexOfInfo info = new IndexOfInfo();
         info.setBaseString(str);
@@ -159,7 +162,7 @@ public class Srl {
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
-     * @return The information of index. (NotNull: if delimiter not found, returns argument-plain string)
+     * @return The information of index. (Nullable: if delimiter not found)
      */
     public static IndexOfInfo indexOfLast(final String str, final String... delimiters) {
         int maxIndex = -1;
@@ -173,6 +176,9 @@ public class Srl {
                 maxIndex = index;
                 targetDelimiter = delimiter;
             }
+        }
+        if (maxIndex < 0) {
+            return null;
         }
         final IndexOfInfo info = new IndexOfInfo();
         info.setBaseString(str);
@@ -227,11 +233,10 @@ public class Srl {
     public static final String substringFirstFront(final String str, final String... delimiters) {
         assertStringNotNull(str);
         final IndexOfInfo info = indexOfFirst(str, delimiters);
-        final int firstIndex = info.getIndex();
-        if (firstIndex < 0) {
+        if (info == null) {
             return str;
         }
-        return str.substring(0, firstIndex);
+        return str.substring(0, info.getIndex());
     }
 
     /**
@@ -247,11 +252,10 @@ public class Srl {
     public static final String substringFirstRear(String str, String... delimiters) {
         assertStringNotNull(str);
         final IndexOfInfo info = indexOfFirst(str, delimiters);
-        final int firstIndex = info.getIndex();
-        if (firstIndex < 0) {
+        if (info == null) {
             return str;
         }
-        return str.substring(firstIndex + info.getDelimiter().length());
+        return str.substring(info.getIndex() + info.getDelimiter().length());
     }
 
     /**
@@ -267,11 +271,10 @@ public class Srl {
     public static final String substringLastFront(String str, String... delimiters) {
         assertStringNotNull(str);
         final IndexOfInfo info = indexOfLast(str, delimiters);
-        final int lastIndex = info.getIndex();
-        if (lastIndex < 0) {
+        if (info == null) {
             return str;
         }
-        return str.substring(0, lastIndex);
+        return str.substring(0, info.getIndex());
     }
 
     /**
@@ -287,11 +290,10 @@ public class Srl {
     public static final String substringLastRear(String str, String... delimiters) {
         assertStringNotNull(str);
         final IndexOfInfo info = indexOfLast(str, delimiters);
-        final int lastIndex = info.getIndex();
-        if (lastIndex < 0) {
+        if (info == null) {
             return str;
         }
-        return str.substring(lastIndex + info.getDelimiter().length());
+        return str.substring(info.getIndex() + info.getDelimiter().length());
     }
 
     // ===================================================================================
@@ -674,6 +676,30 @@ public class Srl {
             rear = str.substring(info.getEndIndex());
         }
         return resultList;
+    }
+
+    public static final ScopeInfo extractScopeWide(final String str, final String beginMark, final String endMark) {
+        assertStringNotNull(str);
+        assertBeginMarkNotNull(beginMark);
+        assertEndMarkNotNull(endMark);
+        final IndexOfInfo first = indexOfFirst(str, beginMark);
+        if (first == null) {
+            return null;
+        }
+        final IndexOfInfo last = indexOfLast(str, endMark);
+        if (last == null) {
+            return null;
+        }
+        final String content = str.substring(first.getIndex() + first.getDelimiter().length(), last.getIndex());
+        final ScopeInfo info = new ScopeInfo();
+        info.setBaseString(str);
+        info.setBeginIndex(first.getIndex());
+        info.setEndIndex(last.getIndex());
+        info.setBeginMark(beginMark);
+        info.setEndMark(endMark);
+        info.setContent(content);
+        info.setScope(beginMark + content + endMark);
+        return info;
     }
 
     public static class ScopeInfo {

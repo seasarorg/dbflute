@@ -22,7 +22,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class IfNode extends ScopeNode implements LoopAcceptable {
+public class IfNode extends ScopeNode implements LoopAcceptable, SqlConnectorAdjustable {
 
     // ===================================================================================
     //                                                                          Definition
