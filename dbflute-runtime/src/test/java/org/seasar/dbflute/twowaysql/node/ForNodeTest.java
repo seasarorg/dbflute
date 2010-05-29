@@ -459,7 +459,7 @@ public class ForNodeTest extends PlainTestCase {
     public void test_accept_allStars_embedded_either_true() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
-        pmb.setMemberNameList(DfCollectionUtil.newArrayList("'foo'", "'bar'", "'baz'"));
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
         pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
         StringBuilder sb = new StringBuilder();
         sb.append("select * from MEMBER").append(ln());
@@ -483,9 +483,9 @@ public class ForNodeTest extends PlainTestCase {
         log(ln() + actual);
         assertTrue(actual.contains("  ("));
         // unsupported embedded comment with like search option
-        assertTrue(actual.contains("  MEMBER_NAME like 'foo'% escape '|'"));
-        assertTrue(actual.contains(" or MEMBER_NAME like 'bar'% escape '|'"));
-        assertTrue(actual.contains(" or MEMBER_NAME like 'baz'% escape '|'"));
+        assertTrue(actual.contains("  MEMBER_NAME like foo"));
+        assertTrue(actual.contains(" or MEMBER_NAME like bar"));
+        assertTrue(actual.contains(" or MEMBER_NAME like baz"));
         assertTrue(Srl.count(actual, "MEMBER_NAME") == 3);
         assertTrue(actual.contains(" )"));
         assertEquals(0, ctx.getBindVariables().length);

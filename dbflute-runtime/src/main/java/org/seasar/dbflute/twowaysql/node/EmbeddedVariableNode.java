@@ -18,7 +18,6 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
@@ -70,62 +69,50 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
         final String firstName = _nameList.get(0);
         if (firstName.equals(ForNode.ELEMENT)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
-            final LikeSearchOption option = loopInfo.getLikeSearchOption();
-            doAccept(ctx, parameter, parameter.getClass(), option);
+            doAccept(ctx, parameter, parameter.getClass());
 
         } else { // normal
             accept(ctx);
         }
     }
 
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType) {
-        doAccept(ctx, firstValue, firstType, null);
-    }
+    // *like-search option is unsupported in embedded comment
 
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LikeSearchOption outerOption) {
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType) {
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(firstValue);
         valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
-        if (outerOption != null) {
-            valueAndType.setLikeSearchOption(outerOption); // inherit
-        }
-        valueAndType.filterValueByOptionIfNeeds();
 
-        if (_blockNullParameter && valueAndType.getTargetValue() == null) {
-            throwBindOrEmbeddedParameterNullValueException(valueAndType);
+        final Object targetValue = valueAndType.getTargetValue();
+        if (targetValue == null) {
+            if (_blockNullParameter) {
+                throwBindOrEmbeddedParameterNullValueException(valueAndType);
+            }
+            return;
         }
+        final String embeddedString = targetValue.toString();
         if (!isInScope()) {
-            // Main Root
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // [UnderReview]: Should I make an original exception instead of this exception?
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
+            // main root
+            if (embeddedString.indexOf("?") > -1) {
                 String msg = "The value of expression for embedded comment should not contain a question mark '?':";
                 msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
                 throw new IllegalStateException(msg);
             }
-            ctx.addSql(valueAndType.getTargetValue().toString());
+            ctx.addSql(embeddedString);
         } else {
             if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
                 embedArray(ctx, ((List<?>) valueAndType.getTargetValue()).toArray());
             } else if (valueAndType.getTargetType().isArray()) {
                 embedArray(ctx, valueAndType.getTargetValue());
             } else {
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                // [UnderReview]: Should I make an original exception instead of this exception?
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
+                if (embeddedString.indexOf("?") > -1) {
                     String msg = "The value of expression for embedded comment should not contain a question mark '?':";
                     msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
                     throw new IllegalStateException(msg);
                 }
-                ctx.addSql(valueAndType.getTargetValue().toString());
+                ctx.addSql(embeddedString.toString());
             }
-        }
-        final String rearOption = valueAndType.buildRearOptionOnSql();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
-            ctx.addSql(rearOption);
         }
     }
 
