@@ -28,5 +28,9 @@ public interface Node {
 
     void addChild(Node node);
 
+    /**
+     * Accept context.
+     * @param ctx The context of command. (NotNull)
+     */
     void accept(CommandContext ctx);
 }

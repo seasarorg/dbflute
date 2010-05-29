@@ -17,6 +17,7 @@ package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.impl.CommandContextImpl;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -49,5 +50,13 @@ public class BeginNode extends ContainerNode {
                 ctx.setEnabled(true);
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return DfTypeUtil.toClassTitle(this) + ":{}";
     }
 }

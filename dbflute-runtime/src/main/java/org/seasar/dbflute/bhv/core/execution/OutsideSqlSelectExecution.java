@@ -94,9 +94,11 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
      * @return Result. (Nullable)
      */
     protected Object executeOutsideSqlAsDynamic(Object[] args, OutsideSqlContext outsideSqlContext) {
+        // *It will be deleted at the future because of deprecated
         final Object pmb = args[0];
         String dynamicSql = getSql();
         if (pmb != null) {
+            // *embedded comment has get dynamic binding independently
             dynamicSql = resolveDynamicEmbedded(pmb, dynamicSql);
         }
         final OutsideSqlSelectExecution dynamicSqlFactory = createDynamicSqlFactory();

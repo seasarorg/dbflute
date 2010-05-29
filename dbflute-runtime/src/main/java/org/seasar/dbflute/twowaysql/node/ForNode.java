@@ -26,6 +26,7 @@ import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNotListExceptio
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -45,15 +46,8 @@ public class ForNode extends ContainerNode {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Object _pmb;
-    protected String _dynamicSql;
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
     protected String _expression;
     protected List<String> _nameList;
-    protected ElseNode _elseNode;
     protected String _specifiedSql;
 
     // ===================================================================================
@@ -215,5 +209,13 @@ public class ForNode extends ContainerNode {
 
     public interface LoopVariableNodeFactory {
         LoopAbstractNode create(String expression, String specifiedSql);
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return DfTypeUtil.toClassTitle(this) + ":{" + _expression + "}";
     }
 }

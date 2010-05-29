@@ -16,6 +16,7 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -89,6 +90,14 @@ public class IfNode extends ContainerNode implements LoopAcceptable {
 
     protected String replace(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return DfTypeUtil.toClassTitle(this) + ":{" + _expression + ", " + _elseNode + "}";
     }
 
     // ===================================================================================

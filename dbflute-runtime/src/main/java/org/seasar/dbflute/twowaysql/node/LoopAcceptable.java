@@ -8,5 +8,10 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  */
 public interface LoopAcceptable {
 
+    /**
+     * Accept context with loop information.
+     * @param ctx The context of command. (NotNull)
+     * @param loopInfo The information of loop. (NotNull)
+     */
     void accept(CommandContext ctx, LoopInfo loopInfo);
 }
