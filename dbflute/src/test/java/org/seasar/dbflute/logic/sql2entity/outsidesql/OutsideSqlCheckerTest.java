@@ -5,9 +5,8 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfParameterBeanMarkInvalidException;
-import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlChecker;
 import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
-import org.seasar.dbflute.twowaysql.exception.IfCommentConditionNotFoundException;
+import org.seasar.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.unit.PlainTestCase;
 
@@ -125,11 +124,11 @@ public class OutsideSqlCheckerTest extends PlainTestCase {
         }
         // ## Act ##
         try {
-            ker.check(fn, "-- #df:entity#\n-- !df:pmb!\nfoo /*IF*/bar/*END*/");
+            ker.check(fn, "-- #df:entity#\n-- !df:pmb!\nfoo /*IF */bar/*END*/");
 
             // ## Assert ##
             fail();
-        } catch (IfCommentConditionNotFoundException e) {
+        } catch (IfCommentConditionEmptyException e) {
             // OK
             log(e.getMessage());
         }

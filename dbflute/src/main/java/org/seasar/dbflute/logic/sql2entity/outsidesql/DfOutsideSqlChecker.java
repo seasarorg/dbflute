@@ -69,7 +69,7 @@ public class DfOutsideSqlChecker {
                 public Object find(String name) {
                     return null;
                 }
-            }, expr, sql);
+            }, expr, sql, null);
             evaluator.assertExpression();
         }
     }
