@@ -6,6 +6,7 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
+import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -681,6 +682,59 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals("%baz%", ctx.getBindVariables()[6]);
         assertEquals("ab%c", ctx.getBindVariables()[7]);
         assertEquals("%def", ctx.getBindVariables()[8]);
+    }
+
+    // ===================================================================================
+    //                                                                           Exception
+    //                                                                           =========
+    public void test_accept_endNotFound() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likeContain());
+        pmb.setMemberAccountList(DfCollectionUtil.newArrayList("ab%c", "%def"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("   /*LAST*/)/*END*/").append(ln());
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+
+        // ## Act ##
+        try {
+            analyzer.analyze();
+
+            // ## Assert ##
+            fail();
+        } catch (EndCommentNotFoundException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_accept_FIRST_endNotFound() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likeContain());
+        pmb.setMemberAccountList(DfCollectionUtil.newArrayList("ab%c", "%def"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+
+        // ## Act ##
+        try {
+            analyzer.analyze();
+
+            // ## Assert ##
+            fail();
+        } catch (EndCommentNotFoundException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     // ===================================================================================

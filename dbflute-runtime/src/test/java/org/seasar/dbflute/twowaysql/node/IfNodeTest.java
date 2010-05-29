@@ -1,8 +1,11 @@
 package org.seasar.dbflute.twowaysql.node;
 
+import org.seasar.dbflute.exception.CommentTerminatorNotFoundException;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
+import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
+import org.seasar.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -12,8 +15,8 @@ import org.seasar.dbflute.unit.PlainTestCase;
 public class IfNodeTest extends PlainTestCase {
 
     // ===================================================================================
-    //                                                                          IF comment
-    //                                                                          ==========
+    //                                                                               Basic
+    //                                                                               =====
     public void test_parse_IF_true() {
         // ## Arrange ##
         String sql = "/*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
@@ -68,6 +71,9 @@ public class IfNodeTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
+    // ===================================================================================
+    //                                                                                Else
+    //                                                                                ====
     public void test_parse_IF_Else_elseValid() {
         // ## Arrange ##
         String sql = "where";
@@ -134,6 +140,67 @@ public class IfNodeTest extends PlainTestCase {
         log("ctx:" + ctx);
         String expected = "where select count(*)  ";
         assertEquals(expected, ctx.getSql());
+    }
+
+    // ===================================================================================
+    //                                                                           Exception
+    //                                                                           =========
+    public void test_parse_IF_terminatorNotFound() {
+        // ## Arrange ##
+        String sql = "where";
+        sql = sql + " /*IF pmb.memberId*";
+        sql = sql + " select foo";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        try {
+            analyzer.analyze();
+
+            // ## Assert ##
+            fail();
+        } catch (CommentTerminatorNotFoundException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_parse_IF_emptyCondition() {
+        // ## Arrange ##
+        String sql = "where";
+        sql = sql + " /*IF */";
+        sql = sql + " select foo";
+        sql = sql + " /*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        try {
+            analyzer.analyze();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentConditionEmptyException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_parse_IF_endNotFound() {
+        // ## Arrange ##
+        String sql = "where";
+        sql = sql + " /*IF pmb.memberId != null*/";
+        sql = sql + " select foo";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        try {
+            analyzer.analyze();
+
+            // ## Assert ##
+            fail();
+        } catch (EndCommentNotFoundException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     // ===================================================================================
