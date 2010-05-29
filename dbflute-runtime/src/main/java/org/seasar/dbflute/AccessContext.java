@@ -175,7 +175,7 @@ public class AccessContext {
                 return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
             }
         }
-        return new Timestamp(System.currentTimeMillis());
+        return new Timestamp(DfSystemUtil.currentTimeMillis());
     }
 
     /**

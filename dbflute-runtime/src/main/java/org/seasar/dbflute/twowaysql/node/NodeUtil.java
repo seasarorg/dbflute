@@ -72,29 +72,43 @@ public class NodeUtil {
 
     public static void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(String expression,
             String specifiedSql, boolean bind) {
-        String name = (bind ? "bind variable" : "embedded variable");
-        String emmark = (bind ? "" : "$");
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The " + name + " comment had the illegal parameter-bean specification!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your comment." + ln();
-        msg = msg + "For example:" + ln();
-        msg = msg + "  (x) - /*" + emmark + "pmb,memberId*/" + ln();
-        msg = msg + "  (x) - /*" + emmark + "p mb.memberId*/" + ln();
-        msg = msg + "  (x) - /*" + emmark + "pmb:memberId*/" + ln();
-        msg = msg + "  (x) - /*" + emmark + "pnb.memberId*/" + ln();
-        msg = msg + "  (o) - /*" + emmark + "pmb.memberId*/" + ln();
-        msg = msg + ln();
-        msg = msg + "[Comment Expression]" + ln() + expression + ln();
-        msg = msg + ln();
+        final String name = (bind ? "bind variable" : "embedded variable");
+        final String emmark = (bind ? "" : "$");
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The " + name + " comment had the illegal parameter-bean specification!");
+        br.addItem("Advice");
+        br.addElement("At first, is it really " + name + " comment?");
+        br.addElement("Have you had a spell miss?");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*IE pmb...*/");
+        br.addElement("    /*FUOR pmb...*/");
+        br.addElement("    /*BIGAN*/");
+        br.addElement("  (o):");
+        br.addElement("    /*IF pmb...*/");
+        br.addElement("    /*FOR pmb...*/");
+        br.addElement("    /*BEGIN*/");
+        br.addElement("");
+        br.addElement("If you want to set " + name + "comment,");
+        br.addElement("confirm the spell of parameter-bean expression.");
+        br.addElement("(using parameter-bean, it should be named 'pmb')");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*" + emmark + "pmb,memberId*/");
+        br.addElement("    /*" + emmark + "p mb.memberId*/");
+        br.addElement("    /*" + emmark + "pmb:memberId*/");
+        br.addElement("    /*" + emmark + "pnb.memberId*/");
+        br.addElement("  (o):");
+        br.addElement("    /*" + emmark + "pmb.memberId*/");
+        br.addItem("Comment Expression");
+        br.addElement(expression);
         // *debug to this exception does not need contents of the parameter-bean
         //  (and for security to application data)
-        //msg = msg + "[ParameterBean]" + ln() + pmb + ln();
-        //msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
+        //br.addItem("ParameterBean");
+        //br.addElement(pmb);
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
         if (bind) {
             throw new BindVariableCommentIllegalParameterBeanSpecificationException(msg);
         } else {
@@ -158,7 +172,7 @@ public class NodeUtil {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Loop's current variable was out of FOR comment scope!");
         br.addItem("Advice");
-        br.addElement("Loop's current variables are allowed in FOR comment scope.");
+        br.addElement("Loop's current variables should be in FOR comment scope.");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*#current*/");

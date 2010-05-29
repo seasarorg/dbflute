@@ -743,6 +743,8 @@ public final class DfTypeUtil {
             return ((Calendar) obj).getTime();
         } else if (obj instanceof byte[]) {
             return toDate(toSerializable((byte[]) obj)); // recursive
+        } else if (obj instanceof Long) {
+            return new Date((Long) obj);
         } else {
             return toDateFromString(obj.toString(), pattern);
         }
@@ -1114,6 +1116,8 @@ public final class DfTypeUtil {
             return new Timestamp(((Calendar) obj).getTime().getTime());
         } else if (obj instanceof byte[]) {
             return toTimestamp(toSerializable((byte[]) obj)); // recursive
+        } else if (obj instanceof Long) {
+            return new Timestamp((Long) obj);
         } else {
             return toTimestampFromString(obj.toString(), pattern);
         }
@@ -1246,6 +1250,8 @@ public final class DfTypeUtil {
             return new Time(cal.getTimeInMillis());
         } else if (obj instanceof byte[]) {
             return toTime(toSerializable((byte[]) obj)); // recursive
+        } else if (obj instanceof Long) {
+            return toTime(toDate((Long) obj));
         } else {
             return toTimeFromString(obj.toString(), pattern);
         }

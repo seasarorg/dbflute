@@ -32,4 +32,18 @@ public class DfSystemUtil {
         // return System.getProperty("line.separator");
         // - - - - - - - - - -/
     }
+
+    // ===================================================================================
+    //                                                                        Current Time
+    //                                                                        ============
+    public static long currentTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
+    // ===================================================================================
+    //                                                                          Array Copy
+    //                                                                          ==========
+    public static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length) {
+        System.arraycopy(src, srcPos, dest, destPos, length);
+    }
 }

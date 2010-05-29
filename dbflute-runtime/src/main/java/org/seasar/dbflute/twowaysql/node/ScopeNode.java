@@ -31,6 +31,10 @@ public abstract class ScopeNode extends AbstractNode {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
+    /**
+     * @param ctx The context of command. (NotNull)
+     * @param loopInfo The information of loop which have not-null current parameter. (NotNull)
+     */
     protected void processAcceptingChildren(CommandContext ctx, LoopInfo loopInfo) {
         final int childSize = getChildSize();
         for (int i = 0; i < childSize; i++) {

@@ -6,7 +6,11 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
+import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
+import org.seasar.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -797,10 +801,106 @@ public class ForNodeTest extends PlainTestCase {
         }
     }
 
+    public void test_accept_currentParameter_in_Bind_null() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberId(3);
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", null, "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   and MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        try {
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (ForCommentParameterNullElementException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_accept_currentParameter_outOfForComment() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberId(3);
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*#current*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   and MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        try {
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (LoopCurrentVariableOutOfForCommentException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_accept_FOR_spellMiss() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberId(3);
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FAR pmb.memberNameList*/").append(ln());
+        sb.append("   and MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        try {
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (BindVariableCommentIllegalParameterBeanSpecificationException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
-    protected static class MockPmb {
+    protected static class MockPmb implements ParameterBean {
         protected Integer _memberId;
         protected List<String> _memberNameList;
         protected LikeSearchOption _memberNameListInternalLikeSearchOption;

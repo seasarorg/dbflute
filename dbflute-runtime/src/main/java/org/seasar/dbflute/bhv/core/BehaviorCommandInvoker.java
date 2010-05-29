@@ -218,7 +218,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected long systemTime() {
-        return System.currentTimeMillis(); // for calculating performance
+        return DfSystemUtil.currentTimeMillis(); // for calculating performance
     }
 
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,

@@ -216,6 +216,18 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008/12/30 12:34:56.789", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
     }
 
+    public void test_toDate_long_basic() {
+        // ## Arrange ##
+        DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        Date actual = DfTypeUtil.toDate(date.getTime());
+
+        // ## Assert ##
+        assertEquals(dfmil.format(date), dfmil.format(actual));
+    }
+
     public void test_toDate_illegal() {
         try {
             DfTypeUtil.toDate("2009-12");
@@ -442,6 +454,18 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2007/01/01 02:04:06.123", df.format(DfTypeUtil.toTimestamp("-2008-13-01 02:04:06.123")));
     }
 
+    public void test_toTimestamp_long_basic() {
+        // ## Arrange ##
+        DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        Date actual = DfTypeUtil.toTimestamp(date.getTime());
+
+        // ## Assert ##
+        assertEquals(dfmil.format(date), dfmil.format(actual));
+    }
+
     public void test_toTimestamp_illegal() {
         try {
             DfTypeUtil.toTimestamp("2009-12");
@@ -554,6 +578,18 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertNull(DfTypeUtil.toTime(null));
         assertNull(DfTypeUtil.toTime(""));
         assertEquals("1970/01/01 12:34:56.789", df.format(DfTypeUtil.toTime(date)));
+    }
+
+    public void test_toTime_long_basic() {
+        // ## Arrange ##
+        DateFormat dfmil = DfTypeUtil.createDateFormat("HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        Date actual = DfTypeUtil.toTime(date.getTime());
+
+        // ## Assert ##
+        assertEquals(dfmil.format(date), dfmil.format(actual));
     }
 
     public void test_toTime_various() {

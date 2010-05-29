@@ -25,6 +25,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import org.seasar.dbflute.util.DfSystemUtil;
+
 /**
  * The value type of bytes OID. (for PostgreSQL) <br />
  * {Refers to Seasar and Extends its class}
@@ -104,8 +106,8 @@ public class TnBytesOidType extends BytesType {
             if (length == bytes.length) {
                 return bytes;
             }
-            byte[] result = new byte[length];
-            System.arraycopy(bytes, 0, result, 0, length);
+            final byte[] result = new byte[length];
+            DfSystemUtil.arraycopy(bytes, 0, result, 0, length);
             return result;
         }
 

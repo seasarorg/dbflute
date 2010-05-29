@@ -23,6 +23,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.exception.ForCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNotListException;
+import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -96,6 +97,7 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
         loopInfo.setLikeSearchOption(valueAndType.getLikeSearchOption());
         for (int loopIndex = 0; loopIndex < loopSize; loopIndex++) {
             loopInfo.setLoopIndex(loopIndex);
+            assertCurrentParameter(loopInfo);
             processAcceptingChildren(ctx, loopInfo);
         }
         if (loopSize > 0) {
@@ -122,11 +124,13 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
         br.addItem("Advice");
         br.addElement("Please confirm your FOR comment.");
         br.addElement("For example:");
-        br.addElement("  (x) - /*FOR pmb,memberId*/");
-        br.addElement("  (x) - /*FOR p mb,memberId*/");
-        br.addElement("  (x) - /*FOR pmb:memberId*/");
-        br.addElement("  (x) - /*FOR pmb,memberId*/");
-        br.addElement("  (o) - /*FOR pmb,memberId*/");
+        br.addElement("  (x):");
+        br.addElement("    /*FOR pmb,memberId*/");
+        br.addElement("    /*FOR p mb,memberId*/");
+        br.addElement("    /*FOR pmb:memberId*/");
+        br.addElement("    /*FOR pmb,memberId*/");
+        br.addElement("  (o):");
+        br.addElement("    /*FOR pmb.memberId*/");
         br.addItem("FOR Comment Expression");
         br.addElement(_expression);
         // *debug to this exception does not need contents of the parameter-bean
@@ -149,8 +153,8 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
         if (!List.class.isInstance(targetValue)) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("The parameter for FOR coment was not list.");
-            br.addItem("FOR Comment");
-            br.addElement("/*FOR " + _expression + "*/");
+            br.addItem("FOR Comment Expression");
+            br.addElement(_expression);
             br.addItem("Parameter");
             br.addElement(targetValue.getClass());
             br.addElement(targetValue);
@@ -158,6 +162,24 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
             br.addElement(_specifiedSql);
             String msg = br.buildExceptionMessage();
             throw new ForCommentParameterNotListException(msg);
+        }
+    }
+
+    protected void assertCurrentParameter(LoopInfo loopInfo) {
+        final Object currentParameter = loopInfo.getCurrentParameter();
+        if (currentParameter == null) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The list of parameter had a null element.");
+            br.addItem("Parameter List");
+            br.addElement(loopInfo.getParameterList());
+            br.addItem("Current Index");
+            br.addElement(loopInfo.getLoopIndex());
+            br.addItem("FOR Comment Expression");
+            br.addElement(_expression);
+            br.addItem("Specified SQL");
+            br.addElement(_specifiedSql);
+            String msg = br.buildExceptionMessage();
+            throw new ForCommentParameterNullElementException(msg);
         }
     }
 
