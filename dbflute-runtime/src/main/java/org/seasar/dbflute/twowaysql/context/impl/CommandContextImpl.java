@@ -42,7 +42,7 @@ public class CommandContextImpl implements CommandContext {
 
     private boolean _enabled;
     private boolean _beginChild;
-    private boolean _alreadySkippedPrefix;
+    private boolean _alreadySkippedConnector;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -168,7 +168,7 @@ public class CommandContextImpl implements CommandContext {
         sb.append(_sqlSb).append(", ");
         sb.append(_enabled).append(", ");
         sb.append(_beginChild).append(", ");
-        sb.append(_alreadySkippedPrefix).append(", ");
+        sb.append(_alreadySkippedConnector).append(", ");
         sb.append("parent=").append(_parent);
         sb.append("}@").append(Integer.toHexString(hashCode()));
         return sb.toString();
@@ -189,11 +189,11 @@ public class CommandContextImpl implements CommandContext {
         return _beginChild;
     }
 
-    public boolean isAlreadySkippedPrefix() {
-        return _alreadySkippedPrefix;
+    public boolean isAlreadySkippedConnector() {
+        return _alreadySkippedConnector;
     }
 
-    public void setAlreadySkippedPrefix(boolean alreadySkippedPrefix) {
-        this._alreadySkippedPrefix = alreadySkippedPrefix;
+    public void setAlreadySkippedConnector(boolean alreadySkippedConnector) {
+        this._alreadySkippedConnector = alreadySkippedConnector;
     }
 }

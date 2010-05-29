@@ -19,37 +19,36 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The if-else child node of prefix SQL.
  * @author jflute
  */
-public class PrefixSqlNode extends AbstractNode {
+public class SqlConnectorNode extends AbstractNode {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String _prefix;
-    private String _sql;
+    private String _connector;
+    private String _sqlParts;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public PrefixSqlNode(String prefix, String sql) {
-        this._prefix = prefix;
-        this._sql = sql;
+    public SqlConnectorNode(String connector, String sqlParts) {
+        this._connector = connector;
+        this._sqlParts = sqlParts;
     }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        if (ctx.isEnabled() || ctx.isAlreadySkippedPrefix()) {
-            ctx.addSql(_prefix);
-        } else if (isBeginChildAndValidSql(ctx, _sql)) {
+        if (ctx.isEnabled() || ctx.isAlreadySkippedConnector()) {
+            ctx.addSql(_connector);
+        } else if (isBeginChildAndValidSql(ctx, _sqlParts)) {
             // To skip prefix should be done only once
             // so it marks that a prefix already skipped.
-            ctx.setAlreadySkippedPrefix(true);
+            ctx.setAlreadySkippedConnector(true);
         }
-        ctx.addSql(_sql);
+        ctx.addSql(_sqlParts);
     }
 
     // ===================================================================================
@@ -57,17 +56,17 @@ public class PrefixSqlNode extends AbstractNode {
     //                                                                      ==============
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{" + _prefix + ", " + _sql + "}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + _connector + ", " + _sqlParts + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getPrefix() {
-        return _prefix;
+    public String getConnector() {
+        return _connector;
     }
 
-    public String getSql() {
-        return _sql;
+    public String getSqlParts() {
+        return _sqlParts;
     }
 }

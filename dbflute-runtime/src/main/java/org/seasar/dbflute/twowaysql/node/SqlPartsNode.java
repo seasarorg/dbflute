@@ -27,7 +27,7 @@ public class SqlPartsNode extends AbstractNode {
     //                                                                           Attribute
     //                                                                           =========
     private String _sqlParts;
-    private boolean _skipPrefix;
+    private boolean _skipConnector;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -39,16 +39,16 @@ public class SqlPartsNode extends AbstractNode {
     // -----------------------------------------------------
     //                                               Factory
     //                                               -------
-    public static SqlPartsNode createSqlNode(String sqlParts) {
+    public static SqlPartsNode createSqlPartsNode(String sqlParts) {
         return new SqlPartsNode(sqlParts);
     }
 
-    public static SqlPartsNode createSqlNodeAsSkipPrefix(String sqlParts) {
-        return new SqlPartsNode(sqlParts).asSkipPrefix();
+    public static SqlPartsNode createSqlPartsNodeAsSkipConnector(String sqlParts) {
+        return new SqlPartsNode(sqlParts).asSkipConnector();
     }
 
-    private SqlPartsNode asSkipPrefix() {
-        _skipPrefix = true;
+    private SqlPartsNode asSkipConnector() {
+        _skipConnector = true;
         return this;
     }
 
@@ -57,9 +57,9 @@ public class SqlPartsNode extends AbstractNode {
     //                                                                              ======
     public void accept(CommandContext ctx) {
         ctx.addSql(_sqlParts);
-        if (_skipPrefix && isBeginChildAndValidSql(ctx, _sqlParts)) {
+        if (_skipConnector && isBeginChildAndValidSql(ctx, _sqlParts)) {
             // It does not skipped actually but it has not already needed to skip.
-            ctx.setAlreadySkippedPrefix(true);
+            ctx.setAlreadySkippedConnector(true);
         }
     }
 

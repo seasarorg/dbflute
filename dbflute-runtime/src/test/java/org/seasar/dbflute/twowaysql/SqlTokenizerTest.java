@@ -1,6 +1,6 @@
 package org.seasar.dbflute.twowaysql;
 
-import org.seasar.dbflute.exception.CommentEndNotFoundException;
+import org.seasar.dbflute.exception.CommentTerminatorNotFoundException;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -295,7 +295,7 @@ public class SqlTokenizerTest extends PlainTestCase {
 
             // ## Assert ##
             fail();
-        } catch (CommentEndNotFoundException e) {
+        } catch (CommentTerminatorNotFoundException e) {
             // OK
             log(e.getMessage());
         }

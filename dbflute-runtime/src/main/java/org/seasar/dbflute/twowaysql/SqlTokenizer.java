@@ -15,7 +15,8 @@
  */
 package org.seasar.dbflute.twowaysql;
 
-import org.seasar.dbflute.exception.CommentEndNotFoundException;
+import org.seasar.dbflute.exception.CommentTerminatorNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -147,7 +148,7 @@ public class SqlTokenizer {
             commentEndPos = commentEndPos2;
         }
         if (commentEndPos < 0) {
-            throwEndCommentNotFoundException(sql.substring(position));
+            throwCommentTerminatorNotFoundException(sql.substring(position));
         }
         token = sql.substring(position, commentEndPos);
         nextTokenType = SQL;
@@ -155,23 +156,21 @@ public class SqlTokenizer {
         tokenType = COMMENT;
     }
 
-    protected void throwEndCommentNotFoundException(String expression) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The comment end was NOT found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the SQL comment writing." + ln();
-        msg = msg + "It may exist the comment that DOESN'T have a comment end." + ln();
-        msg = msg + "For example:" + ln();
-        msg = msg + "  (x) -- /*pmb.xxxId3" + ln();
-        msg = msg + "  (o) -- /*pmb.xxxId*/3" + ln();
-        msg = msg + ln();
-        msg = msg + "[Comment End Expected Place]" + ln() + expression + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + sql + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new CommentEndNotFoundException(msg);
+    protected void throwCommentTerminatorNotFoundException(String expression) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The comment end was NOT found!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the SQL comment writing.");
+        br.addElement("Any comments DOESN'T have a comment end.");
+        br.addElement("For example:");
+        br.addElement("  (x) -- /*pmb.xxxId3");
+        br.addElement("  (o) -- /*pmb.xxxId*/3");
+        br.addItem("Specified SQL");
+        br.addElement(expression);
+        br.addItem("Comment Expression");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new CommentTerminatorNotFoundException(msg);
     }
 
     protected void parseBindVariable() {

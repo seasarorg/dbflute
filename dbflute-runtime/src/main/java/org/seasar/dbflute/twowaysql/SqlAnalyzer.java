@@ -38,7 +38,7 @@ import org.seasar.dbflute.twowaysql.node.LoopFirstNode;
 import org.seasar.dbflute.twowaysql.node.LoopLastNode;
 import org.seasar.dbflute.twowaysql.node.LoopNextNode;
 import org.seasar.dbflute.twowaysql.node.Node;
-import org.seasar.dbflute.twowaysql.node.PrefixSqlNode;
+import org.seasar.dbflute.twowaysql.node.SqlConnectorNode;
 import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
 import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -112,28 +112,28 @@ public class SqlAnalyzer {
             sql = token;
         }
         final Node node = peek();
-        if (isPrefixSqlTarget(node)) {
+        if (isSqlConnectorAdjustmentTarget(node)) {
             final SqlTokenizer st = new SqlTokenizer(sql);
             st.skipWhitespace();
             final String token = st.skipToken();
             st.skipWhitespace();
-            if (sql.startsWith(",")) { // is prefix
+            if (sql.startsWith(",")) { // is connector
                 if (sql.startsWith(", ")) {
-                    node.addChild(createPrefixSqlNode(", ", sql.substring(2)));
+                    node.addChild(createSqlConnectorNode(", ", sql.substring(2)));
                 } else {
-                    node.addChild(createPrefixSqlNode(",", sql.substring(1)));
+                    node.addChild(createSqlConnectorNode(",", sql.substring(1)));
                 }
-            } else if ("and".equalsIgnoreCase(token) || "or".equalsIgnoreCase(token)) { // is prefix
-                node.addChild(createPrefixSqlNode(st.getBefore(), st.getAfter()));
-            } else { // is not prefix
-                node.addChild(createSqlNodeAsIfElseChildNode(sql));
+            } else if ("and".equalsIgnoreCase(token) || "or".equalsIgnoreCase(token)) { // is connector
+                node.addChild(createSqlConnectorNode(st.getBefore(), st.getAfter()));
+            } else { // is not connector
+                node.addChild(createSqlPartsNodeAsIfElseChildNode(sql));
             }
         } else {
-            node.addChild(createSqlNode(sql));
+            node.addChild(createSqlPartsNode(sql));
         }
     }
 
-    protected boolean isPrefixSqlTarget(Node node) {
+    protected boolean isSqlConnectorAdjustmentTarget(Node node) {
         if (node.getChildSize() > 0) {
             return false;
         }
@@ -159,7 +159,7 @@ public class SqlAnalyzer {
             }
         } else if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
             final String before = _tokenizer.getBefore();
-            peek().addChild(createSqlNode(before.substring(before.lastIndexOf("/*"))));
+            peek().addChild(createSqlPartsNode(before.substring(before.lastIndexOf("/*"))));
         }
     }
 
@@ -387,16 +387,16 @@ public class SqlAnalyzer {
     // -----------------------------------------------------
     //                                          Various Node
     //                                          ------------
-    protected PrefixSqlNode createPrefixSqlNode(String prefix, String sql) {
-        return new PrefixSqlNode(prefix, sql);
+    protected SqlConnectorNode createSqlConnectorNode(String prefix, String sql) {
+        return new SqlConnectorNode(prefix, sql);
     }
 
-    protected SqlPartsNode createSqlNode(String sql) {
-        return SqlPartsNode.createSqlNode(sql);
+    protected SqlPartsNode createSqlPartsNode(String sql) {
+        return SqlPartsNode.createSqlPartsNode(sql);
     }
 
-    protected SqlPartsNode createSqlNodeAsIfElseChildNode(String sql) {
-        return SqlPartsNode.createSqlNodeAsSkipPrefix(sql);
+    protected SqlPartsNode createSqlPartsNodeAsIfElseChildNode(String sql) {
+        return SqlPartsNode.createSqlPartsNodeAsSkipConnector(sql);
     }
 
     // -----------------------------------------------------

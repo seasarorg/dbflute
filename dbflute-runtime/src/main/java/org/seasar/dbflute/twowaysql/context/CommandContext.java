@@ -44,7 +44,7 @@ public interface CommandContext {
 
     boolean isBeginChild();
 
-    boolean isAlreadySkippedPrefix();
+    boolean isAlreadySkippedConnector();
 
-    void setAlreadySkippedPrefix(boolean alreadySkippedPrefix);
+    void setAlreadySkippedConnector(boolean alreadySkippedConnector);
 }

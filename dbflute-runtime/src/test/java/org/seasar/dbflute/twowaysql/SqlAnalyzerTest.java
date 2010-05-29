@@ -14,7 +14,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer("foobar", false);
 
         // ## Act ##
-        SqlPartsNode node = analyzer.createSqlNode("foo");
+        SqlPartsNode node = analyzer.createSqlPartsNode("foo");
 
         // ## Assert ##
         assertEquals("foo", node.getSqlParts());
