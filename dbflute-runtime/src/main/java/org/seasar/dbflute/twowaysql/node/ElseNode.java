@@ -20,7 +20,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 /**
  * @author jflute
  */
-public class ElseNode extends ContainerNode {
+public class ElseNode extends ScopeNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -32,7 +32,15 @@ public class ElseNode extends ContainerNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        processChildNode(ctx);
+        doAccept(ctx, null);
+    }
+
+    public void accept(CommandContext ctx, LoopInfo loopInfo) {
+        doAccept(ctx, loopInfo);
+    }
+
+    public void doAccept(CommandContext ctx, LoopInfo loopInfo) {
+        processAcceptingChildren(ctx, loopInfo);
         ctx.setEnabled(true);
     }
 }

@@ -35,7 +35,7 @@ import org.seasar.dbflute.util.Srl;
  * so it is not related to container node.
  * @author jflute
  */
-public class ForNode extends ContainerNode {
+public class ForNode extends ScopeNode {
 
     // ===================================================================================
     //                                                                          Definition
@@ -84,7 +84,7 @@ public class ForNode extends ContainerNode {
         loopInfo.setLikeSearchOption(valueAndType.getLikeSearchOption());
         for (int loopIndex = 0; loopIndex < loopSize; loopIndex++) {
             loopInfo.setLoopIndex(loopIndex);
-            processChildNode(ctx, loopInfo);
+            processAcceptingChildren(ctx, loopInfo);
         }
         if (loopSize > 0) {
             ctx.setEnabled(true);

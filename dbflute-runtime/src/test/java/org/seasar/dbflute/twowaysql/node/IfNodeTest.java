@@ -68,6 +68,74 @@ public class IfNodeTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
+    public void test_parse_IF_Else_elseValid() {
+        // ## Arrange ##
+        String sql = "where";
+        sql = sql + " /*IF pmb.memberId != null*/";
+        sql = sql + " select foo";
+        sql = sql + "  -- ELSE select count(*)";
+        sql = sql + " /*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "where select count(*) ";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_IF_Else_ifValid_in_BEGIN() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/";
+        sql = sql + " select foo";
+        sql = sql + "  -- ELSE select count(*)";
+        sql = sql + " /*END*/";
+        sql = sql + " /*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberId(3);
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "where  select foo   ";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_IF_Else_elseValid_in_BEGIN() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/";
+        sql = sql + " select foo";
+        sql = sql + "  -- ELSE select count(*)";
+        sql = sql + " /*END*/";
+        sql = sql + " /*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "where select count(*)  ";
+        assertEquals(expected, ctx.getSql());
+    }
+
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========

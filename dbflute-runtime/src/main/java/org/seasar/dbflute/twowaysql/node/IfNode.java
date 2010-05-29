@@ -22,7 +22,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class IfNode extends ContainerNode implements LoopAcceptable {
+public class IfNode extends ScopeNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -59,11 +59,14 @@ public class IfNode extends ContainerNode implements LoopAcceptable {
         final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx);
         final boolean result = evaluator.evaluate();
         if (result) {
-            processChildNode(ctx, loopInfo);
+            processAcceptingChildren(ctx, loopInfo);
             ctx.setEnabled(true);
         } else if (_elseNode != null) {
-            _elseNode.accept(ctx);
-            ctx.setEnabled(true);
+            if (loopInfo != null) {
+                _elseNode.accept(ctx, loopInfo);
+            } else {
+                _elseNode.accept(ctx);
+            }
         }
     }
 

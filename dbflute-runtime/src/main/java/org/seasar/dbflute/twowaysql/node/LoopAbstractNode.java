@@ -26,7 +26,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
 /**
  * @author jflute
  */
-public abstract class LoopAbstractNode extends ContainerNode implements LoopAcceptable {
+public abstract class LoopAbstractNode extends ScopeNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -79,7 +79,7 @@ public abstract class LoopAbstractNode extends ContainerNode implements LoopAcce
             return;
         }
         acceptFrontPrefix(ctx);
-        processChildNode(ctx, loopInfo);
+        processAcceptingChildren(ctx, loopInfo);
     }
 
     protected abstract boolean isValid(int loopSize, int loopIndex);

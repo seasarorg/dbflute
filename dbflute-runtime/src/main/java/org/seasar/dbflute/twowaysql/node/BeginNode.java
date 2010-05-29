@@ -22,7 +22,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class BeginNode extends ContainerNode implements LoopAcceptable {
+public class BeginNode extends ScopeNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -48,7 +48,7 @@ public class BeginNode extends ContainerNode implements LoopAcceptable {
 
     public void doAccept(CommandContext ctx, LoopInfo loopInfo) {
         final CommandContext childCtx = CommandContextImpl.createCommandContextImplAsBeginChild(ctx);
-        processChildNode(childCtx, loopInfo);
+        processAcceptingChildren(childCtx, loopInfo);
         if (childCtx.isEnabled()) {
             ctx.addSql(childCtx.getSql(), childCtx.getBindVariables(), childCtx.getBindVariableTypes());
             if (ctx.isBeginChild()) { // means nested begin-node
