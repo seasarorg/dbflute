@@ -21,33 +21,33 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class SqlNode extends AbstractNode {
+public class SqlPartsNode extends AbstractNode {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String _sql;
+    private String _sqlParts;
     private boolean _skipPrefix;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    private SqlNode(String sql) {
-        this._sql = sql;
+    private SqlPartsNode(String sqlParts) {
+        this._sqlParts = sqlParts;
     }
 
     // -----------------------------------------------------
     //                                               Factory
     //                                               -------
-    public static SqlNode createSqlNode(String sql) {
-        return new SqlNode(sql);
+    public static SqlPartsNode createSqlNode(String sqlParts) {
+        return new SqlPartsNode(sqlParts);
     }
 
-    public static SqlNode createSqlNodeAsSkipPrefix(String sql) {
-        return new SqlNode(sql).asSkipPrefix();
+    public static SqlPartsNode createSqlNodeAsSkipPrefix(String sqlParts) {
+        return new SqlPartsNode(sqlParts).asSkipPrefix();
     }
 
-    private SqlNode asSkipPrefix() {
+    private SqlPartsNode asSkipPrefix() {
         _skipPrefix = true;
         return this;
     }
@@ -56,8 +56,8 @@ public class SqlNode extends AbstractNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        ctx.addSql(_sql);
-        if (_skipPrefix && isBeginChildAndValidSql(ctx, _sql)) {
+        ctx.addSql(_sqlParts);
+        if (_skipPrefix && isBeginChildAndValidSql(ctx, _sqlParts)) {
             // It does not skipped actually but it has not already needed to skip.
             ctx.setAlreadySkippedPrefix(true);
         }
@@ -68,13 +68,13 @@ public class SqlNode extends AbstractNode {
     //                                                                      ==============
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{" + _sql + "}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + _sqlParts + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getSql() {
-        return _sql;
+    public String getSqlParts() {
+        return _sqlParts;
     }
 }

@@ -1,6 +1,6 @@
 package org.seasar.dbflute.twowaysql;
 
-import org.seasar.dbflute.twowaysql.node.SqlNode;
+import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -14,10 +14,10 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer("foobar", false);
 
         // ## Act ##
-        SqlNode node = analyzer.createSqlNode("foo");
+        SqlPartsNode node = analyzer.createSqlNode("foo");
 
         // ## Assert ##
-        assertEquals("foo", node.getSql());
+        assertEquals("foo", node.getSqlParts());
     }
 
     // *detail tests for analyze() are moved to node tests

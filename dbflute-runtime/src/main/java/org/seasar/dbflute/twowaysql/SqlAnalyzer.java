@@ -39,7 +39,7 @@ import org.seasar.dbflute.twowaysql.node.LoopLastNode;
 import org.seasar.dbflute.twowaysql.node.LoopNextNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.twowaysql.node.PrefixSqlNode;
-import org.seasar.dbflute.twowaysql.node.SqlNode;
+import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
 import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
@@ -391,12 +391,12 @@ public class SqlAnalyzer {
         return new PrefixSqlNode(prefix, sql);
     }
 
-    protected SqlNode createSqlNode(String sql) {
-        return SqlNode.createSqlNode(sql);
+    protected SqlPartsNode createSqlNode(String sql) {
+        return SqlPartsNode.createSqlNode(sql);
     }
 
-    protected SqlNode createSqlNodeAsIfElseChildNode(String sql) {
-        return SqlNode.createSqlNodeAsSkipPrefix(sql);
+    protected SqlPartsNode createSqlNodeAsIfElseChildNode(String sql) {
+        return SqlPartsNode.createSqlNodeAsSkipPrefix(sql);
     }
 
     // -----------------------------------------------------
