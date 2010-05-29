@@ -123,14 +123,14 @@ public class SqlAnalyzer {
             st.skipWhitespace();
             if (sql.startsWith(",")) { // is connector
                 if (sql.startsWith(", ")) {
-                    node.addChild(createSqlConnectorNode(", ", sql.substring(2)));
+                    node.addChild(createSqlConnectorNode(node, ", ", sql.substring(2)));
                 } else {
-                    node.addChild(createSqlConnectorNode(",", sql.substring(1)));
+                    node.addChild(createSqlConnectorNode(node, ",", sql.substring(1)));
                 }
             } else if ("and".equalsIgnoreCase(token) || "or".equalsIgnoreCase(token)) { // is connector
-                node.addChild(createSqlConnectorNode(st.getBefore(), st.getAfter()));
+                node.addChild(createSqlConnectorNode(node, st.getBefore(), st.getAfter()));
             } else { // is not connector
-                node.addChild(createSqlPartsNodeAsIfElseChildNode(sql));
+                node.addChild(createSqlPartsNodeAfterConnector(node, sql));
             }
         } else {
             node.addChild(createSqlPartsNode(sql));
@@ -142,7 +142,7 @@ public class SqlAnalyzer {
             return false;
         }
         return node instanceof IfNode || node instanceof ElseNode || node instanceof ForNode
-                || node instanceof LoopFirstNode;
+                || node instanceof LoopFirstNode || node instanceof BeginNode;
     }
 
     protected void parseComment() {
@@ -391,16 +391,24 @@ public class SqlAnalyzer {
     // -----------------------------------------------------
     //                                          Various Node
     //                                          ------------
-    protected SqlConnectorNode createSqlConnectorNode(String prefix, String sql) {
-        return new SqlConnectorNode(prefix, sql);
+    protected SqlConnectorNode createSqlConnectorNode(Node node, String connector, String sqlParts) {
+        if (node instanceof BeginNode) { // connector adjustment of BEGIN is independent 
+            return SqlConnectorNode.createSqlConnectorNodeAsIndependent(connector, sqlParts);
+        } else {
+            return SqlConnectorNode.createSqlConnectorNode(connector, sqlParts);
+        }
     }
 
-    protected SqlPartsNode createSqlPartsNode(String sql) {
-        return SqlPartsNode.createSqlPartsNode(sql);
+    protected SqlPartsNode createSqlPartsNode(String sqlParts) {
+        return SqlPartsNode.createSqlPartsNode(sqlParts);
     }
 
-    protected SqlPartsNode createSqlPartsNodeAsIfElseChildNode(String sql) {
-        return SqlPartsNode.createSqlPartsNodeAsSkipConnector(sql);
+    protected SqlPartsNode createSqlPartsNodeAfterConnector(Node node, String sqlParts) {
+        if (node instanceof BeginNode) { // connector adjustment of BEGIN is independent
+            return SqlPartsNode.createSqlPartsNodeAsIndependent(sqlParts);
+        } else {
+            return SqlPartsNode.createSqlPartsNode(sqlParts);
+        }
     }
 
     // -----------------------------------------------------

@@ -28,13 +28,30 @@ public class SqlConnectorNode extends AbstractNode {
     //                                                                           =========
     private String _connector;
     private String _sqlParts;
+    private boolean _independent;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlConnectorNode(String connector, String sqlParts) {
+    private SqlConnectorNode(String connector, String sqlParts) {
         this._connector = connector;
         this._sqlParts = sqlParts;
+    }
+
+    // -----------------------------------------------------
+    //                                               Factory
+    //                                               -------
+    public static SqlConnectorNode createSqlConnectorNode(String connector, String sqlParts) {
+        return new SqlConnectorNode(connector, sqlParts);
+    }
+
+    public static SqlConnectorNode createSqlConnectorNodeAsIndependent(String connector, String sqlParts) {
+        return new SqlConnectorNode(connector, sqlParts).asIndependent(); // means it does not mark already-skipped
+    }
+
+    private SqlConnectorNode asIndependent() {
+        _independent = true;
+        return this;
     }
 
     // ===================================================================================
@@ -43,7 +60,7 @@ public class SqlConnectorNode extends AbstractNode {
     public void accept(CommandContext ctx) {
         if (ctx.isEnabled() || ctx.isAlreadySkippedConnector()) {
             ctx.addSql(_connector);
-        } else if (isBeginChildAndValidSql(ctx, _sqlParts)) {
+        } else if (isMarkAlreadySkipped(ctx)) {
             // To skip prefix should be done only once
             // so it marks that a prefix already skipped.
             ctx.setAlreadySkippedConnector(true);
@@ -51,12 +68,16 @@ public class SqlConnectorNode extends AbstractNode {
         ctx.addSql(_sqlParts);
     }
 
+    protected boolean isMarkAlreadySkipped(CommandContext ctx) {
+        return !_independent && isBeginChildAndValidSql(ctx, _sqlParts);
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{" + _connector + ", " + _sqlParts + "}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + _connector + ", " + _sqlParts + ", " + _independent + "}";
     }
 
     // ===================================================================================

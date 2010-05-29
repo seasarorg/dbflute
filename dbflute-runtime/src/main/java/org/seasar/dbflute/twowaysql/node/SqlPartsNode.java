@@ -27,7 +27,7 @@ public class SqlPartsNode extends AbstractNode {
     //                                                                           Attribute
     //                                                                           =========
     private String _sqlParts;
-    private boolean _skipConnector;
+    private boolean _independent;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -43,12 +43,12 @@ public class SqlPartsNode extends AbstractNode {
         return new SqlPartsNode(sqlParts);
     }
 
-    public static SqlPartsNode createSqlPartsNodeAsSkipConnector(String sqlParts) {
-        return new SqlPartsNode(sqlParts).asSkipConnector();
+    public static SqlPartsNode createSqlPartsNodeAsIndependent(String sqlParts) {
+        return new SqlPartsNode(sqlParts).asIndependent(); // means it does not mark already-skipped 
     }
 
-    private SqlPartsNode asSkipConnector() {
-        _skipConnector = true;
+    private SqlPartsNode asIndependent() {
+        _independent = true;
         return this;
     }
 
@@ -57,10 +57,14 @@ public class SqlPartsNode extends AbstractNode {
     //                                                                              ======
     public void accept(CommandContext ctx) {
         ctx.addSql(_sqlParts);
-        if (_skipConnector && isBeginChildAndValidSql(ctx, _sqlParts)) {
+        if (isMarkAlreadySkipped(ctx)) {
             // It does not skipped actually but it has not already needed to skip.
             ctx.setAlreadySkippedConnector(true);
         }
+    }
+
+    protected boolean isMarkAlreadySkipped(CommandContext ctx) {
+        return !_independent && isBeginChildAndValidSql(ctx, _sqlParts);
     }
 
     // ===================================================================================

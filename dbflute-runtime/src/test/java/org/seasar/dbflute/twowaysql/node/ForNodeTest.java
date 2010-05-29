@@ -251,16 +251,19 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   /*IF pmb.memberId != null*/").append(ln());
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
-        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
         sb.append("     /*BEGIN*/where").append(ln());
         sb.append("     /*IF false*/").append(ln());
         sb.append("     MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("     /*END*/").append(ln());
         sb.append("     /*IF true*/").append(ln());
-        sb.append("     and MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("     or MEMBER_ACCOUNT like /*#current*/'foo%'").append(ln());
+        sb.append("     /*END*/").append(ln());
+        sb.append("     /*IF true*/").append(ln());
+        sb.append("     or MEMBER_ACCOUNT like /*#current*/'foo%'").append(ln());
         sb.append("     /*END*/").append(ln());
         sb.append("     /*END*/").append(ln());
-        sb.append("   /*END*/").append(ln());
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
         Node rootNode = analyzer.analyze();
@@ -272,12 +275,16 @@ public class ForNodeTest extends PlainTestCase {
         // ## Assert ##
         String actual = ctx.getSql();
         log(ln() + actual);
-        assertTrue(actual.contains(" and MEMBER_NAME like ? escape '|'"));
-        assertTrue(Srl.count(actual, "MEMBER_NAME") == 3);
-        assertEquals(3, ctx.getBindVariables().length);
+        assertTrue(actual.contains(" MEMBER_ACCOUNT like ? escape '|'"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 0);
+        assertTrue(Srl.count(actual, "MEMBER_ACCOUNT") == 6);
+        assertEquals(6, ctx.getBindVariables().length);
         assertEquals("foo%", ctx.getBindVariables()[0]);
-        assertEquals("bar%", ctx.getBindVariables()[1]);
-        assertEquals("baz%", ctx.getBindVariables()[2]);
+        assertEquals("foo%", ctx.getBindVariables()[1]);
+        assertEquals("bar%", ctx.getBindVariables()[2]);
+        assertEquals("bar%", ctx.getBindVariables()[3]);
+        assertEquals("baz%", ctx.getBindVariables()[4]);
+        assertEquals("baz%", ctx.getBindVariables()[5]);
     }
 
     public void test_accept_allStars_all_true() throws Exception {
