@@ -24,7 +24,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   and MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("   and MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
         Node rootNode = analyzer.analyze();
@@ -59,7 +59,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   /*FIRST*/and /*END*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("   /*FIRST*/and /*END*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
         Node rootNode = analyzer.analyze();
@@ -88,7 +88,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   /*NEXT 'and '*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("   /*NEXT 'and '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
         Node rootNode = analyzer.analyze();
@@ -117,7 +117,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("select * from MEMBER").append(ln());
         sb.append(" where").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   /*LAST*/and /*END*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("   /*LAST*/and /*END*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
         Node rootNode = analyzer.analyze();
@@ -149,7 +149,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   and MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("   and MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -183,7 +183,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*/").append(ln());
-        sb.append("   and MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("   and MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -217,7 +217,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*//*IF true*//*FIRST*/and (/*END*//*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -253,7 +253,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -290,7 +290,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -325,7 +325,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/");
         sb.append("   /*END*/");
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/");
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'");
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'");
         sb.append("   /*LAST*/)/*END*//*END*/");
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -360,7 +360,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*//*LAST '@'*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -398,7 +398,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/");
         sb.append("   /*END*/");
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/");
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'");
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'");
         sb.append("   /*LAST*/)/*END*//*END*/");
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -433,7 +433,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/");
         sb.append("   /*END*/");
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/");
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'");
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'");
         sb.append("   /*LAST*/)/*END*//*END*/");
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -468,7 +468,7 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*$#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*$#current*/'foo%'").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -504,10 +504,10 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append("   /*FOR pmb.memberAccountList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_ACCOUNT like /*#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_ACCOUNT like /*#current*/'foo%'").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
@@ -550,9 +550,9 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#element*/'foo%'").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
         sb.append("     /*FOR pmb.memberAccountList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("       /*NEXT 'or '*/MEMBER_ACCOUNT like /*#element*/'foo%'").append(ln());
+        sb.append("       /*NEXT 'or '*/MEMBER_ACCOUNT like /*#current*/'foo%'").append(ln());
         sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
@@ -590,10 +590,6 @@ public class ForNodeTest extends PlainTestCase {
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
-    protected ForNode createTarget(Object pmb, String dynamicSql) {
-        return new ForNode(pmb, dynamicSql);
-    }
-
     protected static class MockPmb {
         protected Integer _memberId;
         protected List<String> _memberNameList;

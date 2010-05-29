@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.node.ForNode.LoopInfo;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
@@ -29,7 +28,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class BindVariableNode extends AbstractNode {
+public class BindVariableNode extends AbstractNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                           Attribute

@@ -26,7 +26,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
 /**
  * @author jflute
  */
-public abstract class LoopAbstractNode extends ContainerNode {
+public abstract class LoopAbstractNode extends ContainerNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -73,7 +73,9 @@ public abstract class LoopAbstractNode extends ContainerNode {
 
     protected abstract LoopVariableType getLoopVariableType();
 
-    public void accept(CommandContext ctx, int loopSize, int loopIndex) {
+    public void accept(CommandContext ctx, LoopInfo loopInfo) {
+        final int loopSize = loopInfo.getLoopSize();
+        final int loopIndex = loopInfo.getLoopIndex();
         if (!isValid(loopSize, loopIndex)) {
             return;
         }

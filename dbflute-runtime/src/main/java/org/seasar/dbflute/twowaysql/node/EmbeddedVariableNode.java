@@ -28,7 +28,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class EmbeddedVariableNode extends AbstractNode {
+public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -66,12 +66,12 @@ public class EmbeddedVariableNode extends AbstractNode {
         doAccept(ctx, firstValue, firstType);
     }
 
-    public void accept(CommandContext ctx, Object element, LikeSearchOption outerOption) { // for FOR comment
+    public void accept(CommandContext ctx, LoopInfo loopInfo) { // for FOR comment
         final String firstName = _nameList.get(0);
         if (firstName.equals(ForNode.ELEMENT)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
             final LikeSearchOption option = loopInfo.getLikeSearchOption();
-            doAccept(ctx, element, element.getClass(), outerOption);
+            doAccept(ctx, parameter, parameter.getClass(), option);
 
         } else { // normal
             accept(ctx);

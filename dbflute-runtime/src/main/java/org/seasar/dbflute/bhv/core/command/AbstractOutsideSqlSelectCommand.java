@@ -157,15 +157,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
         cmd.setSql(sql);
-
-        // if FOR comment exists, it always uses dynamic binding
-        // (dynamic binding is supported in select statement only)
-        cmd.setForcedDynamicBinding(containsForComment(sql));
         return cmd;
-    }
-
-    protected boolean containsForComment(String sql) {
-        return sql.contains("/*END FOR*/");
     }
 
     public Object[] getSqlExecutionArgument() {

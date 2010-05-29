@@ -28,7 +28,6 @@ import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.node.ForNode;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -41,9 +40,6 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
     //                                                                           =========
     /** The handler of resultSet. */
     protected TnResultSetHandler _resultSetHandler;
-
-    /** Is it forced to enable the dynamic binding? */
-    protected boolean _forcedDynamicBinding;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -80,12 +76,12 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
 
     protected void logDynamicBinding() {
         if (XLog.isLogEnabled()) {
-            XLog.log("...Executing as dynamic binding" + (isForcedDynamicBinding() ? " (forced)" : ""));
+            XLog.log("...Executing as dynamic binding");
         }
     }
 
     protected boolean isDynamicBinding(OutsideSqlContext outsideSqlContext) {
-        return isForcedDynamicBinding() || outsideSqlContext.isDynamicBinding();
+        return outsideSqlContext.isDynamicBinding();
     }
 
     // -----------------------------------------------------
@@ -101,7 +97,6 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
         final Object pmb = args[0];
         String dynamicSql = getSql();
         if (pmb != null) {
-            dynamicSql = resolveDynamicForComment(pmb, dynamicSql);
             dynamicSql = resolveDynamicEmbedded(pmb, dynamicSql);
         }
         final OutsideSqlSelectExecution dynamicSqlFactory = createDynamicSqlFactory();
@@ -110,14 +105,6 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
         dynamicSqlFactory.setSql(dynamicSql);
         final CommandContext ctx = dynamicSqlFactory.apply(args);
         return doExecuteOutsideSql(ctx);
-    }
-
-    protected String resolveDynamicForComment(Object pmb, String dynamicSql) {
-        if (pmb == null) {
-            return dynamicSql;
-        }
-        final ForNode node = new ForNode(pmb, dynamicSql);
-        return node.resolveDynamicForComment();
     }
 
     protected String resolveDynamicEmbedded(Object pmb, String dynamicSql) {
@@ -190,16 +177,5 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
     //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean isForcedDynamicBinding() {
-        return _forcedDynamicBinding;
-    }
-
-    public void setForcedDynamicBinding(boolean forcedDynamicBinding) {
-        this._forcedDynamicBinding = forcedDynamicBinding;
     }
 }

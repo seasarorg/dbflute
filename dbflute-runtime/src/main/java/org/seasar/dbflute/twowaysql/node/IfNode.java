@@ -15,14 +15,13 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
-import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class IfNode extends ContainerNode {
+public class IfNode extends ContainerNode implements LoopAcceptable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -49,32 +48,28 @@ public class IfNode extends ContainerNode {
     //                                                                              ======
     @Override
     public void accept(CommandContext ctx) {
-        doAcceptByEvaluator(ctx, null, 0, 0);
+        doAcceptByEvaluator(ctx, null);
     }
 
-    public void accept(CommandContext ctx, Object element, int loopSize, int loopIndex) {
-        doAcceptByEvaluator(ctx, element, loopSize, loopIndex);
+    public void accept(CommandContext ctx, LoopInfo loopInfo) {
+        doAcceptByEvaluator(ctx, loopInfo);
     }
 
-    protected void doAcceptByEvaluator(CommandContext ctx, Object element, int loopSize, int loopIndex) {
+    protected void doAcceptByEvaluator(CommandContext ctx, LoopInfo loopInfo) {
         final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx);
         final boolean result = evaluator.evaluate();
         if (result) {
             final int childSize = getChildSize();
             for (int i = 0; i < childSize; i++) {
                 final Node child = getChild(i);
-                if (element != null) {
-                    if (child instanceof LoopAbstractNode) {
-                        ((LoopAbstractNode) child).accept(ctx, loopSize, loopIndex);
-                    } else if (child instanceof BindVariableNode) {
-                        final LikeSearchOption option = valueAndType.getLikeSearchOption();
-                        ((BindVariableNode) child).accept(ctx, element, option);
-                    } else if (child instanceof EmbeddedVariableNode) {
-                        final LikeSearchOption option = valueAndType.getLikeSearchOption();
-                        ((EmbeddedVariableNode) child).accept(ctx, element, option);
+                if (loopInfo != null) {
+                    if (child instanceof LoopAcceptable) {
+                        ((LoopAcceptable) child).accept(ctx, loopInfo);
+                    } else {
+                        child.accept(ctx);
                     }
                 } else {
-                    getChild(i).accept(ctx);
+                    child.accept(ctx);
                 }
             }
             ctx.setEnabled(true);
