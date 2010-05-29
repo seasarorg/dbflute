@@ -15,11 +15,11 @@
  */
 package org.seasar.dbflute.twowaysql.context.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -30,14 +30,14 @@ public class CommandContextImpl implements CommandContext {
     //                                                                           Attribute
     //                                                                           =========
     /** The arguments. it should be allowed null value. */
-    private StringKeyMap<Object> _args = StringKeyMap.createAsCaseInsensitive();
+    private final StringKeyMap<Object> _args = StringKeyMap.createAsCaseInsensitive();
 
     /** The types of argument. it should be allowed null value. */
-    private StringKeyMap<Class<?>> _argTypes = StringKeyMap.createAsCaseInsensitive();
+    private final StringKeyMap<Class<?>> _argTypes = StringKeyMap.createAsCaseInsensitive();
 
-    private StringBuilder _sqlSb = new StringBuilder(100);
-    private List<Object> _bindVariables = new ArrayList<Object>();
-    private List<Class<?>> _bindVariableTypes = new ArrayList<Class<?>>();
+    private final StringBuilder _sqlSb = new StringBuilder(100);
+    private final List<Object> _bindVariables = DfCollectionUtil.newArrayList();
+    private final List<Class<?>> _bindVariableTypes = DfCollectionUtil.newArrayList();
     private final CommandContext _parent;
 
     private boolean _enabled;
@@ -64,6 +64,9 @@ public class CommandContextImpl implements CommandContext {
         _enabled = false; // changing depends on child elements
     }
 
+    // -----------------------------------------------------
+    //                                               Factory
+    //                                               -------
     /**
      * Create the implementation of command context as root.
      * @return The implementation of command context as root. (NotNull)
@@ -73,9 +76,9 @@ public class CommandContextImpl implements CommandContext {
     }
 
     /**
-     * Create the implementation of command context as begin-child.
+     * Create the implementation of command context as BEGIN child.
      * @param parent The parent context. (NotNull)
-     * @return The implementation of command context as begin-child. (NotNull)
+     * @return The implementation of command context as BEGIN child. (NotNull)
      */
     public static CommandContextImpl createCommandContextImplAsBeginChild(CommandContext parent) {
         return new CommandContextImpl(parent).asBeginChild();
@@ -164,6 +167,7 @@ public class CommandContextImpl implements CommandContext {
         sb.append("{");
         sb.append(_sqlSb).append(", ");
         sb.append(_enabled).append(", ");
+        sb.append(_beginChild).append(", ");
         sb.append(_alreadySkippedPrefix).append(", ");
         sb.append("parent=").append(_parent);
         sb.append("}@").append(Integer.toHexString(hashCode()));
@@ -181,7 +185,7 @@ public class CommandContextImpl implements CommandContext {
         this._enabled = enabled;
     }
 
-    public boolean isBeginChildContext() {
+    public boolean isBeginChild() {
         return _beginChild;
     }
 

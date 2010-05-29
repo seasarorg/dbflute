@@ -17,6 +17,7 @@ package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -96,7 +97,7 @@ public class NodeUtil {
         if (bind) {
             throw new BindVariableCommentIllegalParameterBeanSpecificationException(msg);
         } else {
-            throw new EmbeddedVariableCommentParameterNullValueException(msg);
+            throw new EmbeddedVariableCommentIllegalParameterBeanSpecificationException(msg);
         }
     }
 

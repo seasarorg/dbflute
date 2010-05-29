@@ -15,10 +15,11 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -28,7 +29,7 @@ public abstract class AbstractNode implements Node {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private List<Node> _children = new ArrayList<Node>();
+    private List<Node> _children = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -51,7 +52,7 @@ public abstract class AbstractNode implements Node {
         _children.add(node);
     }
 
-    protected boolean isBeginChildContextAndValidCondition(CommandContext ctx, String sql) {
-        return ctx.isBeginChildContext() && sql != null && sql.trim().length() > 0;
+    protected boolean isBeginChildAndValidSql(CommandContext ctx, String sql) {
+        return ctx.isBeginChild() && Srl.is_NotNull_and_NotTrimmedEmpty(sql);
     }
 }

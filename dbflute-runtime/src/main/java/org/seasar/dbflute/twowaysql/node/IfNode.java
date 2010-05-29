@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.Srl;
 
@@ -22,6 +23,11 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class IfNode extends ContainerNode {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String PREFIX = "IF ";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -43,14 +49,34 @@ public class IfNode extends ContainerNode {
     //                                                                              ======
     @Override
     public void accept(CommandContext ctx) {
-        doAcceptByEvaluator(ctx);
+        doAcceptByEvaluator(ctx, null, 0, 0);
     }
 
-    protected void doAcceptByEvaluator(CommandContext ctx) {
-        final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx, _expression);
+    public void accept(CommandContext ctx, Object element, int loopSize, int loopIndex) {
+        doAcceptByEvaluator(ctx, element, loopSize, loopIndex);
+    }
+
+    protected void doAcceptByEvaluator(CommandContext ctx, Object element, int loopSize, int loopIndex) {
+        final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx);
         final boolean result = evaluator.evaluate();
         if (result) {
-            super.accept(ctx);
+            final int childSize = getChildSize();
+            for (int i = 0; i < childSize; i++) {
+                final Node child = getChild(i);
+                if (element != null) {
+                    if (child instanceof LoopAbstractNode) {
+                        ((LoopAbstractNode) child).accept(ctx, loopSize, loopIndex);
+                    } else if (child instanceof BindVariableNode) {
+                        final LikeSearchOption option = valueAndType.getLikeSearchOption();
+                        ((BindVariableNode) child).accept(ctx, element, option);
+                    } else if (child instanceof EmbeddedVariableNode) {
+                        final LikeSearchOption option = valueAndType.getLikeSearchOption();
+                        ((EmbeddedVariableNode) child).accept(ctx, element, option);
+                    }
+                } else {
+                    getChild(i).accept(ctx);
+                }
+            }
             ctx.setEnabled(true);
         } else if (_elseNode != null) {
             _elseNode.accept(ctx);
@@ -58,12 +84,12 @@ public class IfNode extends ContainerNode {
         }
     }
 
-    protected IfCommentEvaluator createIfCommentEvaluator(final CommandContext ctx, String expression) {
+    protected IfCommentEvaluator createIfCommentEvaluator(final CommandContext ctx) {
         return new IfCommentEvaluator(new ParameterFinder() {
             public Object find(String name) {
                 return ctx.getArg(name);
             }
-        }, expression, _specifiedSql);
+        }, _expression, _specifiedSql);
     }
 
     protected String replace(String text, String fromText, String toText) {

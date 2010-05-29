@@ -16,6 +16,7 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The if-else child node of prefix SQL.
@@ -26,15 +27,15 @@ public class PrefixSqlNode extends AbstractNode {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String prefix;
-    private String sql;
+    private String _prefix;
+    private String _sql;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public PrefixSqlNode(String prefix, String sql) {
-        this.prefix = prefix;
-        this.sql = sql;
+        this._prefix = prefix;
+        this._sql = sql;
     }
 
     // ===================================================================================
@@ -42,23 +43,31 @@ public class PrefixSqlNode extends AbstractNode {
     //                                                                              ======
     public void accept(CommandContext ctx) {
         if (ctx.isEnabled() || ctx.isAlreadySkippedPrefix()) {
-            ctx.addSql(prefix);
-        } else if (isBeginChildContextAndValidCondition(ctx, sql)) {
+            ctx.addSql(_prefix);
+        } else if (isBeginChildAndValidSql(ctx, _sql)) {
             // To skip prefix should be done only once
             // so it marks that a prefix already skipped.
             ctx.setAlreadySkippedPrefix(true);
         }
-        ctx.addSql(sql);
+        ctx.addSql(_sql);
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return DfTypeUtil.toClassTitle(this) + ":{" + _prefix + ", " + _sql + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getPrefix() {
-        return prefix;
+        return _prefix;
     }
 
     public String getSql() {
-        return sql;
+        return _sql;
     }
 }

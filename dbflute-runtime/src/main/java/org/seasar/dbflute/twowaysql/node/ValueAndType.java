@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+
 /**
  * @author jflute
  */
@@ -25,17 +27,30 @@ public class ValueAndType {
     //                                                                           =========
     protected Object _targetValue;
     protected Class<?> _targetType;
-    protected String _rearOption;
+    protected LikeSearchOption _likeSearchOption;
 
     // ===================================================================================
     //                                                                         Rear Option
     //                                                                         ===========
-    public boolean isValidRearOption() {
-        return _targetValue != null && _rearOption != null && _rearOption.trim().length() > 0;
+    public void filterValueByOptionIfNeeds() {
+        if (_likeSearchOption == null) {
+            return;
+        }
+        if (_targetValue instanceof String) {
+            _targetValue = _likeSearchOption.generateRealValue((String) _targetValue);
+        } else { // no way
+            String msg = "The target value should be string:";
+            msg = msg + " " + _targetValue + ", " + _targetType;
+            throw new IllegalStateException(msg);
+        }
     }
 
     public String buildRearOptionOnSql() {
-        return " " + _rearOption.trim() + " ";
+        if (_likeSearchOption == null) {
+            return null;
+        }
+        final String rearOption = _likeSearchOption.getRearOption();
+        return " " + rearOption.trim() + " ";
     }
 
     // ===================================================================================
@@ -57,11 +72,11 @@ public class ValueAndType {
         this._targetType = targetType;
     }
 
-    public String getRearOption() {
-        return _rearOption;
+    public LikeSearchOption getLikeSearchOption() {
+        return _likeSearchOption;
     }
 
-    public void setRearOption(String rearOption) {
-        this._rearOption = rearOption;
+    public void setLikeSearchOption(LikeSearchOption likeSearchOption) {
+        this._likeSearchOption = likeSearchOption;
     }
 }

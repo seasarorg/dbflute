@@ -15,39 +15,35 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
-import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.context.impl.CommandContextImpl;
+import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
 
 /**
  * @author jflute
  */
-public class BeginNode extends ContainerNode {
+public class LoopFirstNode extends LoopAbstractNode {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String MARK = "BEGIN";
+    public static final String MARK = "FIRST";
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public BeginNode() {
+    public LoopFirstNode(String expression, String specifiedSql) {
+        super(expression, specifiedSql);
     }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     @Override
-    public void accept(CommandContext ctx) {
-        final CommandContext childCtx = CommandContextImpl.createCommandContextImplAsBeginChild(ctx);
-        super.accept(childCtx);
-        if (childCtx.isEnabled()) {
-            ctx.addSql(childCtx.getSql(), childCtx.getBindVariables(), childCtx.getBindVariableTypes());
-            if (ctx.isBeginChild()) { // means nested begin-node
-                // to tell parent begin-node whether
-                // nested begin-node is enabled or not
-                ctx.setEnabled(true);
-            }
-        }
+    protected LoopVariableType getLoopVariableType() {
+        return LoopVariableType.FIRST;
+    }
+
+    @Override
+    protected boolean isValid(int loopSize, int loopIndex) {
+        return loopIndex == 0;
     }
 }

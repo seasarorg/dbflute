@@ -19,10 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
-import org.seasar.dbflute.twowaysql.exception.IfCommentConditionNotFoundException;
+import org.seasar.dbflute.twowaysql.exception.ForCommentExpressionEmptyException;
+import org.seasar.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.twowaysql.node.BeginNode;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
@@ -31,9 +33,14 @@ import org.seasar.dbflute.twowaysql.node.ElseNode;
 import org.seasar.dbflute.twowaysql.node.EmbeddedVariableNode;
 import org.seasar.dbflute.twowaysql.node.ForNode;
 import org.seasar.dbflute.twowaysql.node.IfNode;
+import org.seasar.dbflute.twowaysql.node.LoopAbstractNode;
+import org.seasar.dbflute.twowaysql.node.LoopFirstNode;
+import org.seasar.dbflute.twowaysql.node.LoopLastNode;
+import org.seasar.dbflute.twowaysql.node.LoopNextNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.twowaysql.node.PrefixSqlNode;
 import org.seasar.dbflute.twowaysql.node.SqlNode;
+import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -50,6 +57,7 @@ public class SqlAnalyzer {
     protected SqlTokenizer _tokenizer;
     protected Stack<Node> _nodeStack = new Stack<Node>();
     protected List<String> _researchIfCommentList;
+    protected List<String> _researchForCommentList;
     protected List<String> _researchBindVariableCommentList;
     protected List<String> _researchEmbeddedVariableCommentList;
 
@@ -95,15 +103,19 @@ public class SqlAnalyzer {
     }
 
     protected void parseSql() {
-        String sql = _tokenizer.getToken();
-        if (isElseMode()) {
-            sql = replaceString(sql, "--", "");
+        final String sql;
+        {
+            String token = _tokenizer.getToken();
+            if (isElseMode()) {
+                token = replaceString(token, "--", "");
+            }
+            sql = token;
         }
-        Node node = peek();
-        if ((node instanceof IfNode || node instanceof ElseNode) && node.getChildSize() == 0) {
-            SqlTokenizer st = new SqlTokenizer(sql);
+        final Node node = peek();
+        if (isPrefixSqlTarget(node)) {
+            final SqlTokenizer st = new SqlTokenizer(sql);
             st.skipWhitespace();
-            String token = st.skipToken();
+            final String token = st.skipToken();
             st.skipWhitespace();
             if (sql.startsWith(",")) { // is prefix
                 if (sql.startsWith(", ")) {
@@ -121,30 +133,78 @@ public class SqlAnalyzer {
         }
     }
 
+    protected boolean isPrefixSqlTarget(Node node) {
+        if (node.getChildSize() > 0) {
+            return false;
+        }
+        return node instanceof IfNode || node instanceof ElseNode || node instanceof ForNode
+                || node instanceof LoopFirstNode;
+    }
+
     protected void parseComment() {
         final String comment = _tokenizer.getToken();
         if (isTargetComment(comment)) {
-            if (isIfComment(comment)) {
-                parseIf();
-            } else if (isBeginComment(comment)) {
+            if (isBeginComment(comment)) {
                 parseBegin();
+            } else if (isIfComment(comment)) {
+                parseIf();
+            } else if (isForComment(comment)) {
+                parseFor();
+            } else if (isLoopVariableComment(comment)) {
+                parseLoopVariable();
             } else if (isEndComment(comment)) {
                 return;
             } else {
                 parseCommentBindVariable();
             }
         } else if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
-            // general comment and FOR comment (elements) here
-            String before = _tokenizer.getBefore();
+            final String before = _tokenizer.getBefore();
             peek().addChild(createSqlNode(before.substring(before.lastIndexOf("/*"))));
         }
     }
 
+    protected static boolean isTargetComment(String comment) {
+        if (Srl.is_Null_or_TrimmedEmpty(comment)) {
+            return false;
+        }
+        if (!comment.startsWith(ForNode.ELEMENT)) {
+            if (!Character.isJavaIdentifierStart(comment.charAt(0))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // -----------------------------------------------------
+    //                                                 BEGIN
+    //                                                 -----
+    protected static boolean isBeginComment(String comment) {
+        return BeginNode.MARK.equals(comment);
+    }
+
+    protected void parseBegin() {
+        final BeginNode beginNode = createBeginNode();
+        peek().addChild(beginNode);
+        push(beginNode);
+        parseEnd();
+    }
+
+    protected BeginNode createBeginNode() {
+        return new BeginNode();
+    }
+
+    // -----------------------------------------------------
+    //                                                    IF
+    //                                                    --
+    private static boolean isIfComment(String comment) {
+        return comment.startsWith(IfNode.PREFIX);
+    }
+
     protected void parseIf() {
         final String comment = _tokenizer.getToken();
-        final String condition = comment.substring("IF".length()).trim();
+        final String condition = comment.substring(IfNode.PREFIX.length()).trim();
         if (Srl.is_Null_or_TrimmedEmpty(condition)) {
-            throwIfCommentConditionNotFoundException();
+            throwIfCommentConditionEmptyException();
         }
         final IfNode ifNode = createIfNode(condition);
         peek().addChild(ifNode);
@@ -152,30 +212,119 @@ public class SqlAnalyzer {
         parseEnd();
     }
 
-    protected void throwIfCommentConditionNotFoundException() {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The condition of IF comment was not found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the IF comment expression." + ln();
-        msg = msg + "It may exist the IF comment that DOESN'T have a condition." + ln();
-        msg = msg + "For example:" + ln();
-        msg = msg + "  (x) - /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
-        msg = msg + "  (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
-        msg = msg + ln();
-        msg = msg + "[IF Comment Expression]" + ln() + _tokenizer.getToken() + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new IfCommentConditionNotFoundException(msg);
+    protected IfNode createIfNode(String expr) {
+        researchIfNeeds(_researchIfCommentList, expr); // for research
+        return new IfNode(expr, _specifiedSql);
     }
 
-    protected void parseBegin() {
-        BeginNode beginNode = createBeginNode();
-        peek().addChild(beginNode);
-        push(beginNode);
+    protected void throwIfCommentConditionEmptyException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The condition of IF comment was empty!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the IF comment expression.");
+        br.addElement("Your IF comment might not have a condition.");
+        br.addElement("For example:");
+        br.addElement("  (x) - /*IF */XXX_ID = /*pmb.xxxId*/3/*END*/");
+        br.addElement("  (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/");
+        br.addItem("IF Comment");
+        br.addElement(_tokenizer.getToken());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new IfCommentConditionEmptyException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                                  ELSE
+    //                                                  ----
+    protected void parseElse() {
+        final Node parent = peek();
+        if (!(parent instanceof IfNode)) {
+            return;
+        }
+        final IfNode ifNode = (IfNode) pop();
+        final ElseNode elseNode = new ElseNode();
+        ifNode.setElseNode(elseNode);
+        push(elseNode);
+        _tokenizer.skipWhitespace();
+    }
+
+    // -----------------------------------------------------
+    //                                                   FOR
+    //                                                   ---
+    private static boolean isForComment(String comment) {
+        return comment.startsWith(ForNode.PREFIX);
+    }
+
+    protected void parseFor() {
+        final String comment = _tokenizer.getToken();
+        final String condition = comment.substring(ForNode.PREFIX.length()).trim();
+        if (Srl.is_Null_or_TrimmedEmpty(condition)) {
+            throwForCommentExpressionEmptyException();
+        }
+        final ForNode forNode = createForNode(condition);
+        peek().addChild(forNode);
+        push(forNode);
         parseEnd();
+    }
+
+    protected ForNode createForNode(String expr) {
+        researchIfNeeds(_researchForCommentList, expr); // for research
+        return new ForNode(expr, _specifiedSql);
+    }
+
+    private static boolean isLoopVariableComment(String comment) {
+        return comment.startsWith(LoopFirstNode.MARK) || comment.startsWith(LoopNextNode.MARK)
+                || comment.startsWith(LoopLastNode.MARK);
+    }
+
+    protected void parseLoopVariable() { // should be in FOR comment scope
+        final String comment = _tokenizer.getToken();
+        final String code = Srl.substringFirstFront(comment, " ");
+        if (Srl.is_Null_or_TrimmedEmpty(code)) { // no way
+            String msg = "Unknown loop variable comment: " + comment;
+            throw new IllegalStateException(msg);
+        }
+        final LoopVariableType type = LoopVariableType.codeOf(code);
+        if (type == null) { // no way
+            String msg = "Unknown loop variable comment: " + comment;
+            throw new IllegalStateException(msg);
+        }
+        final String condition = comment.substring(type.name().length()).trim();
+        final LoopAbstractNode loopFirstNode = createLoopFirstNode(condition, type);
+        peek().addChild(loopFirstNode);
+        if (Srl.count(condition, "'") < 2) {
+            push(loopFirstNode);
+            parseEnd();
+        }
+    }
+
+    protected LoopAbstractNode createLoopFirstNode(String expr, LoopVariableType type) {
+        return type.createNode(expr, _specifiedSql);
+    }
+
+    protected void throwForCommentExpressionEmptyException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The expression of FOR comment was empty!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the FOR comment expression.");
+        br.addElement("Your FOR comment might not have an expression.");
+        br.addElement("For example:");
+        br.addElement("  (x) - /*FOR */XXX_ID = /*#element*/3/*END*/");
+        br.addElement("  (o) - /*FOR pmb.xxxList*/XXX_ID = /*#element*/3/*END*/");
+        br.addItem("FOR Comment");
+        br.addElement(_tokenizer.getToken());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new ForCommentExpressionEmptyException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                                   END
+    //                                                   ---
+    private static boolean isEndComment(String content) {
+        return content != null && "END".equals(content);
     }
 
     protected void parseEnd() {
@@ -206,23 +355,15 @@ public class SqlAnalyzer {
         throw new EndCommentNotFoundException(msg);
     }
 
-    protected void parseElse() {
-        final Node parent = peek();
-        if (!(parent instanceof IfNode)) {
-            return;
-        }
-        final IfNode ifNode = (IfNode) pop();
-        final ElseNode elseNode = new ElseNode();
-        ifNode.setElseNode(elseNode);
-        push(elseNode);
-        _tokenizer.skipWhitespace();
-    }
-
+    // -----------------------------------------------------
+    //                                      Bind or Embedded
+    //                                      ----------------
     protected void parseCommentBindVariable() {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
-        if (expr.startsWith("$")) {
-            peek().addChild(createEmbeddedVariableNode(expr.substring(1), testValue));
+        if (expr.startsWith(EmbeddedVariableNode.PREFIX)) {
+            final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX.length());
+            peek().addChild(createEmbeddedVariableNode(realExpr, testValue));
         } else {
             peek().addChild(createBindVariableNode(expr, testValue));
         }
@@ -233,6 +374,34 @@ public class SqlAnalyzer {
         peek().addChild(createBindVariableNode(expr, null));
     }
 
+    protected BindVariableNode createBindVariableNode(String expr, String testValue) {
+        researchIfNeeds(_researchBindVariableCommentList, expr); // for research
+        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
+    }
+
+    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue) {
+        researchIfNeeds(_researchEmbeddedVariableCommentList, expr); // for research
+        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
+    }
+
+    // -----------------------------------------------------
+    //                                          Various Node
+    //                                          ------------
+    protected PrefixSqlNode createPrefixSqlNode(String prefix, String sql) {
+        return new PrefixSqlNode(prefix, sql);
+    }
+
+    protected SqlNode createSqlNode(String sql) {
+        return SqlNode.createSqlNode(sql);
+    }
+
+    protected SqlNode createSqlNodeAsIfElseChildNode(String sql) {
+        return SqlNode.createSqlNodeAsSkipPrefix(sql);
+    }
+
+    // -----------------------------------------------------
+    //                                            Node Stack
+    //                                            ----------
     protected Node pop() {
         return (Node) _nodeStack.pop();
     }
@@ -252,64 +421,6 @@ public class SqlAnalyzer {
             }
         }
         return false;
-    }
-
-    private static boolean isTargetComment(String comment) {
-        if (Srl.is_Null_or_TrimmedEmpty(comment)) {
-            return false;
-        }
-        if (ForNode.isForCommentElement(comment)) {
-            return false;
-        }
-        // basically check for bind variable
-        // (embedded variable has fixed mark which is identifier)
-        if (!Character.isJavaIdentifierStart(comment.charAt(0))) {
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean isIfComment(String comment) {
-        return comment.startsWith("IF");
-    }
-
-    private static boolean isBeginComment(String content) {
-        return content != null && "BEGIN".equals(content);
-    }
-
-    private static boolean isEndComment(String content) {
-        return content != null && "END".equals(content);
-    }
-
-    protected BeginNode createBeginNode() {
-        return new BeginNode();
-    }
-
-    protected IfNode createIfNode(String expr) {
-        researchIfNeed(_researchIfCommentList, expr); // for research
-        return new IfNode(expr, _specifiedSql);
-    }
-
-    protected BindVariableNode createBindVariableNode(String expr, String testValue) {
-        researchIfNeed(_researchBindVariableCommentList, expr); // for research
-        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
-    }
-
-    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue) {
-        researchIfNeed(_researchEmbeddedVariableCommentList, expr); // for research
-        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
-    }
-
-    protected SqlNode createSqlNode(String sql) {
-        return SqlNode.createSqlNode(sql);
-    }
-
-    protected SqlNode createSqlNodeAsIfElseChildNode(String sql) {
-        return SqlNode.createSqlNodeAsIfElseChild(sql);
-    }
-
-    protected PrefixSqlNode createPrefixSqlNode(String prefix, String sql) {
-        return new PrefixSqlNode(prefix, sql);
     }
 
     // ===================================================================================
@@ -351,7 +462,7 @@ public class SqlAnalyzer {
         return resultList;
     }
 
-    protected void researchIfNeed(List<String> researchList, String expr) {
+    protected void researchIfNeeds(List<String> researchList, String expr) {
         if (researchList != null) {
             researchList.add(expr);
         }

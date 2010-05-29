@@ -18,6 +18,7 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
@@ -28,6 +29,11 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class EmbeddedVariableNode extends AbstractNode {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String PREFIX = "$";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -55,12 +61,36 @@ public class EmbeddedVariableNode extends AbstractNode {
     public void accept(CommandContext ctx) {
         final String firstName = _nameList.get(0);
         assertFirstName(ctx, firstName);
-        final Object value = ctx.getArg(firstName);
-        final Class<?> clazz = ctx.getArgType(firstName);
+        final Object firstValue = ctx.getArg(firstName);
+        final Class<?> firstType = ctx.getArgType(firstName);
+        doAccept(ctx, firstValue, firstType);
+    }
+
+    public void accept(CommandContext ctx, Object element, LikeSearchOption outerOption) { // for FOR comment
+        final String firstName = _nameList.get(0);
+        if (firstName.equals(ForNode.ELEMENT)) { // use loop element
+            final Object parameter = loopInfo.getCurrentParameter();
+            final LikeSearchOption option = loopInfo.getLikeSearchOption();
+            doAccept(ctx, element, element.getClass(), outerOption);
+
+        } else { // normal
+            accept(ctx);
+        }
+    }
+
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType) {
+        doAccept(ctx, firstValue, firstType, null);
+    }
+
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LikeSearchOption outerOption) {
         final ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setTargetValue(value);
-        valueAndType.setTargetType(clazz);
+        valueAndType.setTargetValue(firstValue);
+        valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
+        if (outerOption != null) {
+            valueAndType.setLikeSearchOption(outerOption); // inherit
+        }
+        valueAndType.filterValueByOptionIfNeeds();
 
         if (_blockNullParameter && valueAndType.getTargetValue() == null) {
             throwBindOrEmbeddedParameterNullValueException(valueAndType);
@@ -93,8 +123,9 @@ public class EmbeddedVariableNode extends AbstractNode {
                 ctx.addSql(valueAndType.getTargetValue().toString());
             }
         }
-        if (valueAndType.isValidRearOption()) {
-            ctx.addSql(valueAndType.buildRearOptionOnSql());
+        final String rearOption = valueAndType.buildRearOptionOnSql();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
+            ctx.addSql(rearOption);
         }
     }
 

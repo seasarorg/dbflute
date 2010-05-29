@@ -42,7 +42,7 @@ public interface CommandContext {
 
     void setEnabled(boolean enabled);
 
-    boolean isBeginChildContext();
+    boolean isBeginChild();
 
     boolean isAlreadySkippedPrefix();
 

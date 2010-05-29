@@ -36,7 +36,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         // ## Assert ##
         assertEquals(3, valueAndType.getTargetValue());
         assertEquals(Integer.class, valueAndType.getTargetType());
-        assertNull(valueAndType.getRearOption());
+        assertNull(valueAndType.getLikeSearchOption());
     }
 
     public void test_setupValueAndType_bean_likeSearch() {
@@ -49,11 +49,12 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
         // ## Act ##
         setupper.setupValueAndType(valueAndType);
+        valueAndType.filterValueByOptionIfNeeds();
 
         // ## Assert ##
         assertEquals("f||o|%o%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
-        assertEquals(" escape '|'", valueAndType.getRearOption());
+        assertEquals(" escape '|'", valueAndType.getLikeSearchOption().getRearOption());
     }
 
     public void test_setupValueAndType_bean_likeSearch_notFound() {
@@ -82,6 +83,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
         // ## Act ##
         setupper.setupValueAndType(valueAndType); // no check here
+        valueAndType.filterValueByOptionIfNeeds();
 
         // ## Assert ##
         assertEquals("f||o|%o%", valueAndType.getTargetValue());
@@ -103,7 +105,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         // ## Assert ##
         assertEquals(3, valueAndType.getTargetValue());
         assertEquals(Integer.class, valueAndType.getTargetType());
-        assertNull(valueAndType.getRearOption());
+        assertNull(valueAndType.getLikeSearchOption());
     }
 
     public void test_setupValueAndType_bean_nest_likeSearch() {
@@ -118,11 +120,12 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
         // ## Act ##
         setupper.setupValueAndType(valueAndType);
+        valueAndType.filterValueByOptionIfNeeds();
 
         // ## Assert ##
         assertEquals("f||o|%o%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
-        assertEquals(" escape '|'", valueAndType.getRearOption());
+        assertEquals(" escape '|'", valueAndType.getLikeSearchOption().getRearOption());
     }
 
     public void test_setupValueAndType_bean_propertyReadFailure() {
@@ -181,11 +184,12 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
         // ## Act ##
         setupper.setupValueAndType(valueAndType);
+        valueAndType.filterValueByOptionIfNeeds();
 
         // ## Assert ##
         assertEquals("ba|%r%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
-        assertEquals(" escape '|'", valueAndType.getRearOption());
+        assertEquals(" escape '|'", valueAndType.getLikeSearchOption().getRearOption());
     }
 
     public void test_setupValueAndType_list_notNumber() {
@@ -244,7 +248,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         // ## Assert ##
         assertEquals(3, valueAndType.getTargetValue());
         assertEquals(Integer.class, valueAndType.getTargetType());
-        assertNull(valueAndType.getRearOption());
+        assertNull(valueAndType.getLikeSearchOption());
     }
 
     public void test_setupValueAndType_mappmb_likeSearch() {
@@ -258,11 +262,12 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
         // ## Act ##
         setupper.setupValueAndType(valueAndType);
+        valueAndType.filterValueByOptionIfNeeds();
 
         // ## Assert ##
         assertEquals("f||o|%o%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
-        assertEquals(" escape '|'", valueAndType.getRearOption());
+        assertEquals(" escape '|'", valueAndType.getLikeSearchOption().getRearOption());
     }
 
     public void test_setupValueAndType_mappmb_notKey() {
@@ -299,7 +304,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         // ## Assert ##
         assertEquals(3, valueAndType.getTargetValue());
         assertEquals(Integer.class, valueAndType.getTargetType());
-        assertNull(valueAndType.getRearOption());
+        assertNull(valueAndType.getLikeSearchOption());
     }
 
     public void test_setupValueAndType_map_likeSearch() {
@@ -313,11 +318,12 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
         // ## Act ##
         setupper.setupValueAndType(valueAndType);
+        valueAndType.filterValueByOptionIfNeeds();
 
         // ## Assert ##
         assertEquals("f||o|%o%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
-        assertEquals(" escape '|'", valueAndType.getRearOption());
+        assertEquals(" escape '|'", valueAndType.getLikeSearchOption().getRearOption());
     }
 
     public void test_setupValueAndType_map_notKey() {
@@ -332,7 +338,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         // ## Assert ##
         assertEquals(null, valueAndType.getTargetValue());
         assertEquals(null, valueAndType.getTargetType());
-        assertNull(valueAndType.getRearOption());
+        assertNull(valueAndType.getLikeSearchOption());
     }
 
     // ===================================================================================

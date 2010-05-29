@@ -16,10 +16,10 @@
 package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the condition of IF comment is not found about outsideSql.
+ * The exception of when the FOR comment has illegal parameter-bean specification.
  * @author jflute
  */
-public class IfCommentConditionNotFoundException extends IfCommentWrongExpressionException {
+public class ForCommentIllegalParameterBeanSpecificationException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class IfCommentConditionNotFoundException extends IfCommentWrongExpressio
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IfCommentConditionNotFoundException(String msg) {
+    public ForCommentIllegalParameterBeanSpecificationException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public ForCommentIllegalParameterBeanSpecificationException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

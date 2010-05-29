@@ -109,7 +109,6 @@ public class ValueAndTypeSetupper {
 
         // LikeSearchOption handling here is for OutsideSql.
         LikeSearchOption likeSearchOption = null;
-        String rearOption = null;
 
         for (int pos = 1; pos < _nameList.size(); pos++) {
             if (value == null) {
@@ -126,10 +125,6 @@ public class ValueAndTypeSetupper {
             if (beanDesc.hasPropertyDesc(currentName)) { // main case
                 final DfPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                 value = getPropertyValue(clazz, value, currentName, pd);
-                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                    value = likeSearchOption.generateRealValue((String) value);
-                    rearOption = likeSearchOption.getRearOption();
-                }
                 clazz = (value != null ? value.getClass() : pd.getPropertyType());
                 continue;
             }
@@ -145,10 +140,6 @@ public class ValueAndTypeSetupper {
                     } catch (IndexOutOfBoundsException e) {
                         throwListIndexOutOfBoundsException(exp, e);
                     }
-                    if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                        value = likeSearchOption.generateRealValue((String) value);
-                        rearOption = likeSearchOption.getRearOption();
-                    }
                     clazz = (value != null ? value.getClass() : null);
                     continue;
                 }
@@ -159,10 +150,6 @@ public class ValueAndTypeSetupper {
                 // (different specification with Map)
                 if (map.containsKey(currentName)) {
                     value = map.get(currentName);
-                    if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                        value = likeSearchOption.generateRealValue((String) value);
-                        rearOption = likeSearchOption.getRearOption();
-                    }
                     clazz = (value != null ? value.getClass() : null);
                     continue;
                 }
@@ -171,10 +158,6 @@ public class ValueAndTypeSetupper {
                 final Map<?, ?> map = (Map<?, ?>) value;
                 // if the key does not exist, treated same as a null value
                 value = map.get(currentName);
-                if (isLastLoopAndValidLikeSearch(pos, likeSearchOption, value)) {
-                    value = likeSearchOption.generateRealValue((String) value);
-                    rearOption = likeSearchOption.getRearOption();
-                }
                 clazz = (value != null ? value.getClass() : null);
                 continue;
             }
@@ -182,7 +165,7 @@ public class ValueAndTypeSetupper {
         }
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
-        valueAndType.setRearOption(rearOption);
+        valueAndType.setLikeSearchOption(likeSearchOption);
     }
 
     // -----------------------------------------------------
@@ -224,10 +207,6 @@ public class ValueAndTypeSetupper {
 
     protected String buildLikeSearchPropertyName(String resourceName) {
         return resourceName + LIKE_SEARCH_OPTION_SUFFIX;
-    }
-
-    protected boolean isLastLoopAndValidLikeSearch(int pos, LikeSearchOption option, Object value) {
-        return isLastLoop(pos) && option != null && value != null && value instanceof String;
     }
 
     // -----------------------------------------------------

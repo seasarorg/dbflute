@@ -18,7 +18,9 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.twowaysql.node.ForNode.LoopInfo;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
@@ -55,18 +57,41 @@ public class BindVariableNode extends AbstractNode {
     public void accept(CommandContext ctx) {
         final String firstName = _nameList.get(0);
         assertFirstName(ctx, firstName);
-        final Object value = ctx.getArg(firstName);
-        final Class<?> clazz = ctx.getArgType(firstName);
+        final Object firstValue = ctx.getArg(firstName);
+        final Class<?> firstType = ctx.getArgType(firstName);
+        doAccept(ctx, firstValue, firstType);
+    }
+
+    public void accept(CommandContext ctx, LoopInfo loopInfo) { // for FOR comment
+        final String firstName = _nameList.get(0);
+        if (firstName.equals(ForNode.ELEMENT)) { // use loop element
+            final Object parameter = loopInfo.getCurrentParameter();
+            final LikeSearchOption option = loopInfo.getLikeSearchOption();
+            doAccept(ctx, parameter, parameter.getClass(), option);
+        } else { // normal
+            accept(ctx);
+        }
+    }
+
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType) {
+        doAccept(ctx, firstValue, firstType, null);
+    }
+
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LikeSearchOption outerOption) {
         final ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setTargetValue(value);
-        valueAndType.setTargetType(clazz);
+        valueAndType.setTargetValue(firstValue);
+        valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
+        if (outerOption != null) {
+            valueAndType.setLikeSearchOption(outerOption); // inherit
+        }
+        valueAndType.filterValueByOptionIfNeeds();
 
         if (_blockNullParameter && valueAndType.getTargetValue() == null) {
             throwBindOrEmbeddedParameterNullValueException(valueAndType);
         }
         if (!isInScope()) {
-            // Main Root
+            // main root
             ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
         } else {
             if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
@@ -77,8 +102,9 @@ public class BindVariableNode extends AbstractNode {
                 ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
             }
         }
-        if (valueAndType.isValidRearOption()) {
-            ctx.addSql(valueAndType.buildRearOptionOnSql());
+        final String rearOption = valueAndType.buildRearOptionOnSql();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
+            ctx.addSql(rearOption);
         }
     }
 
@@ -101,8 +127,8 @@ public class BindVariableNode extends AbstractNode {
     }
 
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, valueAndType.getTargetType(),
-                _specifiedSql, true);
+        final Class<?> targetType = valueAndType.getTargetType();
+        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, true);
     }
 
     protected boolean isInScope() {
