@@ -348,18 +348,6 @@ public class IfCommentEvaluator {
         return not ? !result : result;
     }
 
-    protected Object findBaseObject(String firstName) {
-        if (isLoopCurrentVariable(firstName)) {
-            return _loopInfo.getCurrentParameter();
-        } else {
-            return _finder.find(firstName);
-        }
-    }
-
-    protected boolean isLoopCurrentVariable(String firstName) {
-        return _loopInfo != null && ForNode.CURRENT_VARIABLE.equals(firstName);
-    }
-
     protected boolean startsWithParameterBean(String piece) {
         return piece.startsWith("pmb");
     }
@@ -388,7 +376,7 @@ public class IfCommentEvaluator {
         if (isLoopCurrentVariable(firstName)) {
             return;
         }
-        if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
+        if (NodeUtil.isCurrentVariableOutOfScope(firstName, isInLoop())) {
             throwLoopCurrentVariableOutOfForCommentException();
         }
         final Object firstArg = _finder.find(firstName); // get from plain context
@@ -459,6 +447,28 @@ public class IfCommentEvaluator {
         }
         throwIfCommentNotFoundPropertyException(baseObject, property);
         return null; // unreachable
+    }
+
+    // ===================================================================================
+    //                                                                         Base Object
+    //                                                                         ===========
+    protected Object findBaseObject(String firstName) {
+        if (isLoopCurrentVariable(firstName)) {
+            return _loopInfo.getCurrentParameter();
+        } else {
+            return _finder.find(firstName);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                           Loop Info
+    //                                                                           =========
+    protected boolean isInLoop() {
+        return _loopInfo != null;
+    }
+
+    protected boolean isLoopCurrentVariable(String firstName) {
+        return isInLoop() && ForNode.CURRENT_VARIABLE.equals(firstName);
     }
 
     // ===================================================================================
