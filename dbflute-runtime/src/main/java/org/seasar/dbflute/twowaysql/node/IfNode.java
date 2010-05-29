@@ -33,8 +33,8 @@ public class IfNode extends ScopeNode implements LoopAcceptable {
     //                                                                           Attribute
     //                                                                           =========
     protected String _expression;
-    protected ElseNode _elseNode;
     protected String _specifiedSql;
+    protected ElseNode _elseNode;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -56,7 +56,7 @@ public class IfNode extends ScopeNode implements LoopAcceptable {
     }
 
     protected void doAcceptByEvaluator(CommandContext ctx, LoopInfo loopInfo) {
-        final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx);
+        final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx, loopInfo);
         final boolean result = evaluator.evaluate();
         if (result) {
             processAcceptingChildren(ctx, loopInfo);
@@ -70,10 +70,14 @@ public class IfNode extends ScopeNode implements LoopAcceptable {
         }
     }
 
-    protected IfCommentEvaluator createIfCommentEvaluator(final CommandContext ctx) {
+    protected IfCommentEvaluator createIfCommentEvaluator(final CommandContext ctx, final LoopInfo loopInfo) {
         return new IfCommentEvaluator(new ParameterFinder() {
             public Object find(String name) {
-                return ctx.getArg(name);
+                if (loopInfo != null && ForNode.CURRENT_PARAMETER.equals(name)) {
+                    return loopInfo.getCurrentParameter();
+                } else {
+                    return ctx.getArg(name);
+                }
             }
         }, _expression, _specifiedSql);
     }

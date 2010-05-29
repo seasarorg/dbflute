@@ -205,6 +205,55 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals("baz%", ctx.getBindVariables()[3]);
     }
 
+    public void test_accept_currentParameter_in_IF() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "bazzzz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likeContain());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("     /*IF #current == 'foo'*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("     /*END*/");
+        sb.append("     /*IF #current == 'bar'*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_ACCOUNT like /*#current*/'foo%'").append(ln());
+        sb.append("     /*END*/");
+        sb.append("     /*IF #current.length() == 6*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_BAZ like /*#current*/'foo%'").append(ln());
+        sb.append("     /*END*/");
+        sb.append("     /*IF #current.length() == 99*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_BAZ like /*#current*/'foo%'").append(ln());
+        sb.append("     /*END*/");
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains("  ("));
+        assertTrue(actual.contains("  MEMBER_NAME like ? escape '|'"));
+        assertTrue(actual.contains(" or MEMBER_ACCOUNT like ? escape '|'"));
+        assertTrue(actual.contains(" or MEMBER_BAZ like ? escape '|'"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 1);
+        assertTrue(Srl.count(actual, "MEMBER_ACCOUNT") == 1);
+        assertTrue(Srl.count(actual, "MEMBER_BAZ") == 1);
+        assertTrue(actual.contains(" )"));
+        assertEquals("%foo%", ctx.getBindVariables()[0]);
+        assertEquals("%bar%", ctx.getBindVariables()[1]);
+        assertEquals("%bazzzz%", ctx.getBindVariables()[2]);
+    }
+
     public void test_accept_loopVariable_in_IF() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();

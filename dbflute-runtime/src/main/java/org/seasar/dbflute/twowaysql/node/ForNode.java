@@ -41,7 +41,7 @@ public class ForNode extends ScopeNode {
     //                                                                          Definition
     //                                                                          ==========
     public static final String PREFIX = "FOR ";
-    public static final String ELEMENT = "#current";
+    public static final String CURRENT_PARAMETER = "#current";
 
     // ===================================================================================
     //                                                                           Attribute

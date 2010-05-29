@@ -70,7 +70,7 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
 
     public void accept(CommandContext ctx, LoopInfo loopInfo) { // for FOR comment
         final String firstName = _nameList.get(0);
-        if (firstName.equals(ForNode.ELEMENT)) { // use loop element
+        if (firstName.equals(ForNode.CURRENT_PARAMETER)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
             doAccept(ctx, parameter, parameter.getClass());
 

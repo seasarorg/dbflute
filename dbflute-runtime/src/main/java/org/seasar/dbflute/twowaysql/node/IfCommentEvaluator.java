@@ -352,15 +352,22 @@ public class IfCommentEvaluator {
         return piece.startsWith("pmb");
     }
 
-    protected String setupPropertyList(String piece, List<String> emptyPropertyList) {
+    /**
+     * @param piece The piece of condition. (NotNull)
+     * @param propertyList The list of property except first property. (NotNull, FirstEmpty)
+     * @return The first property. (NotNull)
+     */
+    protected String setupPropertyList(String piece, List<String> propertyList) {
         final List<String> splitList = splitList(piece, ".");
         String firstName = null;
         for (int i = 0; i < splitList.size(); i++) {
+            final String token = splitList.get(i);
             if (i == 0) {
-                assertFirstName(splitList.get(i));
+                assertFirstName(token);
+                firstName = token;
                 continue;
             }
-            emptyPropertyList.add(splitList.get(i));
+            propertyList.add(token);
         }
         return firstName;
     }
@@ -373,9 +380,9 @@ public class IfCommentEvaluator {
         });
     }
 
-    protected Object processOneProperty(Object baseObject, String preProperty, String property) {
+    protected Object processOneProperty(Object baseObject, String firstProperty, String property) {
         if (baseObject == null) {
-            throwIfCommentNullPointerException(preProperty);
+            throwIfCommentNullPointerException(firstProperty);
         }
         final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(baseObject.getClass());
         if (beanDesc.hasPropertyDesc(property)) { // main case

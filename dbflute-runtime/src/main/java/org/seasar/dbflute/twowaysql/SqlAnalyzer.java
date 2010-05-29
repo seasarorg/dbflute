@@ -171,7 +171,7 @@ public class SqlAnalyzer {
         if (Srl.is_Null_or_TrimmedEmpty(comment)) {
             return false;
         }
-        if (!comment.startsWith(ForNode.ELEMENT)) {
+        if (!comment.startsWith(ForNode.CURRENT_PARAMETER)) {
             if (!Character.isJavaIdentifierStart(comment.charAt(0))) {
                 return false;
             }
