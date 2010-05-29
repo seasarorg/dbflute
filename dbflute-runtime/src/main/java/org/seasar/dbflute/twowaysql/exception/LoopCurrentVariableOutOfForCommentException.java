@@ -16,10 +16,10 @@
 package org.seasar.dbflute.twowaysql.exception;
 
 /**
- * The exception of when the loop variable comment is out of FOR comment scope.
+ * The exception of when the loop's current variable is out of FOR comment scope.
  * @author jflute
  */
-public class LoopVariableCommentOutOfForCommentException extends RuntimeException {
+public class LoopCurrentVariableOutOfForCommentException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class LoopVariableCommentOutOfForCommentException extends RuntimeExceptio
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public LoopVariableCommentOutOfForCommentException(String msg) {
+    public LoopCurrentVariableOutOfForCommentException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class LoopVariableCommentOutOfForCommentException extends RuntimeExceptio
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public LoopVariableCommentOutOfForCommentException(String msg, Throwable cause) {
+    public LoopCurrentVariableOutOfForCommentException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

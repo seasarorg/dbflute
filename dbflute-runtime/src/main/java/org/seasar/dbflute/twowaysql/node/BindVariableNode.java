@@ -20,9 +20,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
-import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -55,7 +53,7 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
     //                                                                              ======
     public void accept(CommandContext ctx) {
         final String firstName = _nameList.get(0);
-        assertFirstName(ctx, firstName);
+        assertFirstNameAsNormal(ctx, firstName);
         final Object firstValue = ctx.getArg(firstName);
         final Class<?> firstType = ctx.getArgType(firstName);
         doAccept(ctx, firstValue, firstType);
@@ -107,16 +105,17 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         }
     }
 
-    protected void assertFirstName(final CommandContext ctx, String firstName) {
-        NodeUtil.assertParameterBeanName(firstName, new ParameterFinder() {
-            public Object find(String name) {
-                return ctx.getArg(name);
-            }
-        }, new IllegalParameterBeanHandler() {
-            public void handle(ParameterBean pmb) {
-                throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(pmb);
-            }
-        });
+    protected void assertFirstNameAsNormal(CommandContext ctx, String firstName) {
+        if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
+            throwLoopCurrentVariableOutOfForCommentException();
+        }
+        if (NodeUtil.isWrongParameterBeanName(firstName, ctx)) {
+            throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException();
+        }
+    }
+
+    protected void throwLoopCurrentVariableOutOfForCommentException() {
+        NodeUtil.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
     }
 
     protected void setupValueAndType(ValueAndType valueAndType) {
@@ -169,9 +168,8 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         ctx.addSql(")");
     }
 
-    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(ParameterBean pmb) {
-        NodeUtil.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql, true,
-                pmb);
+    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
+        NodeUtil.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql, true);
     }
 
     protected void throwBindOrEmbeddedParameterEmptyListException() {

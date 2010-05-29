@@ -23,9 +23,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.exception.ForCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNotListException;
-import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
-import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -35,7 +33,7 @@ import org.seasar.dbflute.util.Srl;
  * so it is not related to container node.
  * @author jflute
  */
-public class ForNode extends ScopeNode implements SqlConnectorAdjustable {
+public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAcceptable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -64,9 +62,23 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable {
     //                                                                              ======
     public void accept(CommandContext ctx) {
         final String firstName = _nameList.get(0);
-        assertFirstName(ctx, firstName);
+        assertFirstNameAsNormal(ctx, firstName);
         final Object value = ctx.getArg(firstName);
         final Class<?> clazz = ctx.getArgType(firstName);
+        doAccept(ctx, value, clazz);
+    }
+
+    public void accept(CommandContext ctx, LoopInfo loopInfo) {
+        final String firstName = _nameList.get(0);
+        if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
+            final Object parameter = loopInfo.getCurrentParameter();
+            doAccept(ctx, parameter, parameter.getClass());
+        } else { // normal
+            accept(ctx);
+        }
+    }
+
+    public void doAccept(CommandContext ctx, Object value, Class<?> clazz) {
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
@@ -91,19 +103,20 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable {
         }
     }
 
-    protected void assertFirstName(final CommandContext ctx, String firstName) {
-        NodeUtil.assertParameterBeanName(firstName, new ParameterFinder() {
-            public Object find(String name) {
-                return ctx.getArg(name);
-            }
-        }, new IllegalParameterBeanHandler() {
-            public void handle(ParameterBean pmb) {
-                throwForCommentIllegalParameterBeanSpecificationException(pmb);
-            }
-        });
+    protected void assertFirstNameAsNormal(CommandContext ctx, String firstName) {
+        if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
+            throwLoopCurrentVariableOutOfForCommentException();
+        }
+        if (NodeUtil.isWrongParameterBeanName(firstName, ctx)) {
+            throwForCommentIllegalParameterBeanSpecificationException();
+        }
     }
 
-    protected void throwForCommentIllegalParameterBeanSpecificationException(ParameterBean pmb) {
+    protected void throwLoopCurrentVariableOutOfForCommentException() {
+        NodeUtil.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
+    }
+
+    protected void throwForCommentIllegalParameterBeanSpecificationException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The FOR comment had the illegal parameter-bean specification!");
         br.addItem("Advice");

@@ -684,6 +684,66 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals("%def", ctx.getBindVariables()[8]);
     }
 
+    public void test_accept_allStars_nested_current_in_FOR() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        List<MockPmb> nestPmbList = DfCollectionUtil.newArrayList();
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(3);
+            element.setMemberNameList(DfCollectionUtil.newArrayList("fo%o", "b|ar"));
+            element.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+            nestPmbList.add(element);
+        }
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(4);
+            element.setMemberNameList(DfCollectionUtil.newArrayList("ba%z", "qu_x"));
+            //element.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+            nestPmbList.add(element);
+        }
+        pmb.setNestPmbList(nestPmbList);
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_ID = /*#current.memberId*/99").append(ln());
+        sb.append("     /*FOR #current.memberNameList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("       /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains("  ("));
+        assertTrue(actual.contains("  MEMBER_ID = ?"));
+        assertTrue(actual.contains("  MEMBER_ID = ?"));
+        assertTrue(actual.contains("  MEMBER_NAME like ?"));
+        assertTrue(actual.contains(" or MEMBER_NAME like ?"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 4);
+        assertTrue(actual.contains(" and ("));
+        assertTrue(Srl.count(actual, " and (") == 2);
+        assertTrue(actual.contains(" )"));
+        assertTrue(Srl.count(actual, " )") == 3);
+        assertEquals(3, ctx.getBindVariables()[0]);
+        assertEquals("fo|%o%", ctx.getBindVariables()[1]);
+        assertEquals("b||ar%", ctx.getBindVariables()[2]);
+        assertEquals(4, ctx.getBindVariables()[3]);
+        assertEquals("ba%z", ctx.getBindVariables()[4]);
+        assertEquals("qu_x", ctx.getBindVariables()[5]);
+    }
+
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
@@ -748,6 +808,7 @@ public class ForNodeTest extends PlainTestCase {
         protected MockPmb _nestPmb;
         protected MockPmb _nestLikePmb;
         protected LikeSearchOption _nestLikePmbInternalLikeSearchOption;
+        protected List<MockPmb> _nestPmbList;
 
         public Integer getMemberId() {
             return _memberId;
@@ -803,6 +864,14 @@ public class ForNodeTest extends PlainTestCase {
 
         public void setNestLikePmbInternalLikeSearchOption(LikeSearchOption nestLikePmbInternalLikeSearchOption) {
             this._nestLikePmbInternalLikeSearchOption = nestLikePmbInternalLikeSearchOption;
+        }
+
+        public List<MockPmb> getNestPmbList() {
+            return _nestPmbList;
+        }
+
+        public void setNestPmbList(List<MockPmb> nestPmbList) {
+            this._nestPmbList = nestPmbList;
         }
     }
 

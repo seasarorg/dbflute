@@ -934,7 +934,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
             public Object find(String name) {
                 return pmb;
             }
-        }, expression, "select foo from bar");
+        }, expression, "select foo from bar", null);
     }
 
     protected static class BasePmb implements ParameterBean {

@@ -15,10 +15,13 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -27,19 +30,17 @@ import org.seasar.dbflute.util.DfSystemUtil;
  */
 public class NodeUtil {
 
-    public static void assertParameterBeanName(String firstName, ParameterFinder finder,
-            IllegalParameterBeanHandler handler) {
-        final Object arg = finder.find("df:noway");
-        if (arg == null) {
-            return; // Because the argument has several elements.
-        }
-        if ((arg instanceof ParameterBean) && !firstName.equals("pmb")) {
-            handler.handle((ParameterBean) arg);
-        }
+    public static boolean isCurrentVariableOutOfScope(String firstName, boolean inLoop) {
+        return !inLoop && firstName.equals(ForNode.CURRENT_VARIABLE);
     }
 
-    public static interface IllegalParameterBeanHandler {
-        void handle(ParameterBean pmb);
+    public static boolean isWrongParameterBeanName(String firstName, CommandContext ctx) {
+        final Object firstArg = ctx.getArg(firstName);
+        return isWrongParameterBeanName(firstName, firstArg);
+    }
+
+    public static boolean isWrongParameterBeanName(String firstName, Object firstArg) {
+        return firstArg instanceof ParameterBean && !"pmb".equals(firstName);
     }
 
     public static void throwBindOrEmbeddedCommentParameterNullValueException(String expression, Class<?> targetType,
@@ -70,7 +71,7 @@ public class NodeUtil {
     }
 
     public static void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(String expression,
-            String specifiedSql, boolean bind, ParameterBean pmb) {
+            String specifiedSql, boolean bind) {
         String name = (bind ? "bind variable" : "embedded variable");
         String emmark = (bind ? "" : "$");
         String msg = "Look! Read the message below." + ln();
@@ -151,6 +152,27 @@ public class NodeUtil {
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalStateException(msg);
+    }
+
+    public static void throwLoopCurrentVariableOutOfForCommentException(String expression, String specifiedSql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Loop's current variable was out of FOR comment scope!");
+        br.addItem("Advice");
+        br.addElement("Loop's current variables are allowed in FOR comment scope.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*#current*/");
+        br.addElement("    /*FOR*/.../*END*/");
+        br.addElement("  (o):");
+        br.addElement("    /*FOR*/");
+        br.addElement("    /*#current*/");
+        br.addElement("    /*END*/");
+        br.addItem("Comment Expression");
+        br.addElement(expression);
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new LoopCurrentVariableOutOfForCommentException(msg);
     }
 
     protected static String ln() {

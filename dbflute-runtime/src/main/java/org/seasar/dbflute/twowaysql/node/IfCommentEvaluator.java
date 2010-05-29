@@ -41,9 +41,7 @@ import org.seasar.dbflute.twowaysql.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
-import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
-import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -76,14 +74,16 @@ public class IfCommentEvaluator {
     private ParameterFinder _finder;
     private String _expression;
     private String _specifiedSql;
+    private LoopInfo _loopInfo;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public IfCommentEvaluator(ParameterFinder finder, String expression, String specifiedSql) {
+    public IfCommentEvaluator(ParameterFinder finder, String expression, String specifiedSql, LoopInfo loopInfo) {
         this._finder = finder;
         this._expression = expression;
         this._specifiedSql = specifiedSql;
+        this._loopInfo = loopInfo;
     }
 
     // ===================================================================================
@@ -311,7 +311,7 @@ public class IfCommentEvaluator {
         }
         final List<String> propertyList = new ArrayList<String>();
         String preProperty = setupPropertyList(piece, propertyList);
-        Object baseObject = _finder.find(preProperty);
+        Object baseObject = findBaseObject(preProperty);
         for (String property : propertyList) {
             baseObject = processOneProperty(baseObject, preProperty, property);
             preProperty = property;
@@ -336,7 +336,7 @@ public class IfCommentEvaluator {
         }
         final List<String> propertyList = new ArrayList<String>();
         String preProperty = setupPropertyList(piece, propertyList);
-        Object baseObject = _finder.find(preProperty);
+        Object baseObject = findBaseObject(preProperty);
         for (String property : propertyList) {
             baseObject = processOneProperty(baseObject, preProperty, property);
             preProperty = property;
@@ -346,6 +346,18 @@ public class IfCommentEvaluator {
         }
         final boolean result = Boolean.valueOf(baseObject.toString());
         return not ? !result : result;
+    }
+
+    protected Object findBaseObject(String firstName) {
+        if (isLoopCurrentVariable(firstName)) {
+            return _loopInfo.getCurrentParameter();
+        } else {
+            return _finder.find(firstName);
+        }
+    }
+
+    protected boolean isLoopCurrentVariable(String firstName) {
+        return _loopInfo != null && ForNode.CURRENT_VARIABLE.equals(firstName);
     }
 
     protected boolean startsWithParameterBean(String piece) {
@@ -373,11 +385,20 @@ public class IfCommentEvaluator {
     }
 
     protected void assertFirstName(String firstName) {
-        NodeUtil.assertParameterBeanName(firstName, _finder, new IllegalParameterBeanHandler() {
-            public void handle(ParameterBean pmb) {
-                throwIfCommentIllegalParameterBeanSpecificationException();
-            }
-        });
+        if (isLoopCurrentVariable(firstName)) {
+            return;
+        }
+        if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
+            throwLoopCurrentVariableOutOfForCommentException();
+        }
+        final Object firstArg = _finder.find(firstName); // get from plain context
+        if (NodeUtil.isWrongParameterBeanName(firstName, firstArg)) {
+            throwIfCommentIllegalParameterBeanSpecificationException();
+        }
+    }
+
+    protected void throwLoopCurrentVariableOutOfForCommentException() {
+        NodeUtil.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
     }
 
     protected Object processOneProperty(Object baseObject, String firstProperty, String property) {
@@ -765,7 +786,7 @@ public class IfCommentEvaluator {
     protected Object getDisplayParameterBean() {
         // basically these exceptions are for debug,
         // so it can show the values of parameter-bean
-        return _finder.find("pmb");
+        return findBaseObject("pmb");
     }
 
     // ===================================================================================
