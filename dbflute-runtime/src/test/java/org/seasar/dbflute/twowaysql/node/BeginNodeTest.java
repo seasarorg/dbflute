@@ -187,7 +187,7 @@ public class BeginNodeTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
-    public void test_parse_BEGIN_independent_connector() {
+    public void test_parse_BEGIN_not_adjustConnector() {
         // ## Arrange ##
         String sql = "select /*BEGIN*/, ";
         sql = sql + "/*IF pmb.memberId != null*/member.MEMBER_ID as c1/*END*/";
@@ -204,7 +204,7 @@ public class BeginNodeTest extends PlainTestCase {
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
         log("ctx:" + ctx);
-        String expected = "select member.MEMBER_NAME as c2";
+        String expected = "select , member.MEMBER_NAME as c2";
         assertEquals(expected, ctx.getSql());
     }
 

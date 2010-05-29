@@ -30,9 +30,15 @@ public class BeginNode extends ScopeNode implements LoopAcceptable, SqlConnector
     public static final String MARK = "BEGIN";
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _nested;
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public BeginNode() {
+    public BeginNode(boolean nested) {
+        _nested = nested;
     }
 
     // ===================================================================================
@@ -64,6 +70,13 @@ public class BeginNode extends ScopeNode implements LoopAcceptable, SqlConnector
     //                                                                      ==============
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + _nested + "}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isNested() {
+        return _nested;
     }
 }

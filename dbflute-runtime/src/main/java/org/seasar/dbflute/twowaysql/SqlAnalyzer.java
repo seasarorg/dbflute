@@ -57,6 +57,7 @@ public class SqlAnalyzer {
     protected boolean _blockNullParameter;
     protected SqlTokenizer _tokenizer;
     protected Stack<Node> _nodeStack = new Stack<Node>();
+    protected boolean _inBeginScope;
     protected List<String> _researchIfCommentList;
     protected List<String> _researchForCommentList;
     protected List<String> _researchBindVariableCommentList;
@@ -79,7 +80,7 @@ public class SqlAnalyzer {
     //                                                                             Analyze
     //                                                                             =======
     public Node analyze() {
-        push(createRootNode());
+        push(createRootNode()); // root node of all
         while (SqlTokenizer.EOF != _tokenizer.next()) {
             parseToken();
         }
@@ -107,6 +108,9 @@ public class SqlAnalyzer {
         }
     }
 
+    // -----------------------------------------------------
+    //                                             SQL Parts
+    //                                             ---------
     protected void parseSql() {
         final String sql;
         {
@@ -118,23 +122,27 @@ public class SqlAnalyzer {
         }
         final Node node = peek();
         if (isSqlConnectorAdjustable(node)) {
-            final SqlTokenizer st = new SqlTokenizer(sql);
-            st.skipWhitespace();
-            final String token = st.skipToken();
-            st.skipWhitespace();
-            if (sql.startsWith(",")) { // is connector
-                if (sql.startsWith(", ")) {
-                    node.addChild(createSqlConnectorNode(node, ", ", sql.substring(2)));
-                } else {
-                    node.addChild(createSqlConnectorNode(node, ",", sql.substring(1)));
-                }
-            } else if ("and".equalsIgnoreCase(token) || "or".equalsIgnoreCase(token)) { // is connector
-                node.addChild(createSqlConnectorNode(node, st.getBefore(), st.getAfter()));
-            } else { // is not connector
-                node.addChild(createSqlPartsNodeAfterConnector(node, sql));
-            }
+            processSqlConnectorAdjustable(node, sql);
         } else {
-            node.addChild(createSqlPartsNode(sql));
+            node.addChild(createSqlPartsNodeOutOfConnector(node, sql));
+        }
+    }
+
+    protected void processSqlConnectorAdjustable(Node node, String sql) {
+        final SqlTokenizer st = new SqlTokenizer(sql);
+        st.skipWhitespace();
+        final String token = st.skipToken();
+        st.skipWhitespace();
+        if (sql.startsWith(",")) { // is connector
+            if (sql.startsWith(", ")) {
+                node.addChild(createSqlConnectorNode(node, ", ", sql.substring(2)));
+            } else {
+                node.addChild(createSqlConnectorNode(node, ",", sql.substring(1)));
+            }
+        } else if ("and".equalsIgnoreCase(token) || "or".equalsIgnoreCase(token)) { // is connector
+            node.addChild(createSqlConnectorNode(node, st.getBefore(), st.getAfter()));
+        } else { // is not connector
+            node.addChild(createSqlPartsNodeThroughConnector(node, sql));
         }
     }
 
@@ -142,12 +150,15 @@ public class SqlAnalyzer {
         if (node.getChildSize() > 0) {
             return false;
         }
-        return node instanceof SqlConnectorAdjustable;
+        return (node instanceof SqlConnectorAdjustable) && !isTopBegin(node);
     }
 
+    // -----------------------------------------------------
+    //                                               Comment
+    //                                               -------
     protected void parseComment() {
         final String comment = _tokenizer.getToken();
-        if (isTargetComment(comment)) {
+        if (isTargetComment(comment)) { // parameter comment
             if (isBeginComment(comment)) {
                 parseBegin();
             } else if (isIfComment(comment)) {
@@ -161,9 +172,10 @@ public class SqlAnalyzer {
             } else {
                 parseCommentBindVariable();
             }
-        } else if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+        } else if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) { // plain comment
             final String before = _tokenizer.getBefore();
-            peek().addChild(createSqlPartsNode(before.substring(before.lastIndexOf("/*"))));
+            final String content = before.substring(before.lastIndexOf("/*"));
+            peek().addChild(createSqlPartsNode(content));
         }
     }
 
@@ -171,7 +183,7 @@ public class SqlAnalyzer {
         if (Srl.is_Null_or_TrimmedEmpty(comment)) {
             return false;
         }
-        if (!comment.startsWith(ForNode.CURRENT_PARAMETER)) {
+        if (!comment.startsWith(ForNode.CURRENT_VARIABLE)) { // except current variable from check
             if (!Character.isJavaIdentifierStart(comment.charAt(0))) {
                 return false;
             }
@@ -188,13 +200,32 @@ public class SqlAnalyzer {
 
     protected void parseBegin() {
         final BeginNode beginNode = createBeginNode();
-        peek().addChild(beginNode);
-        push(beginNode);
-        parseEnd();
+        try {
+            _inBeginScope = true;
+            peek().addChild(beginNode);
+            push(beginNode);
+            parseEnd();
+        } finally {
+            _inBeginScope = false;
+        }
     }
 
     protected BeginNode createBeginNode() {
-        return new BeginNode();
+        return new BeginNode(_inBeginScope);
+    }
+
+    protected boolean isTopBegin(Node node) {
+        if (!(node instanceof BeginNode)) {
+            return false;
+        }
+        return !((BeginNode) node).isNested();
+    }
+
+    protected boolean isNestedBegin(Node node) {
+        if (!(node instanceof BeginNode)) {
+            return false;
+        }
+        return ((BeginNode) node).isNested();
     }
 
     // -----------------------------------------------------
@@ -332,8 +363,9 @@ public class SqlAnalyzer {
     }
 
     protected void parseEnd() {
+        final int commentType = SqlTokenizer.COMMENT;
         while (SqlTokenizer.EOF != _tokenizer.next()) {
-            if (_tokenizer.getTokenType() == SqlTokenizer.COMMENT && isEndComment(_tokenizer.getToken())) {
+            if (_tokenizer.getTokenType() == commentType && isEndComment(_tokenizer.getToken())) {
                 pop();
                 return;
             }
@@ -392,23 +424,33 @@ public class SqlAnalyzer {
     //                                          Various Node
     //                                          ------------
     protected SqlConnectorNode createSqlConnectorNode(Node node, String connector, String sqlParts) {
-        if (node instanceof BeginNode) { // connector adjustment of BEGIN is independent 
+        if (isNestedBegin(node)) { // basically nested if BEGIN node because checked before
+            // connector adjustment of BEGIN is independent 
             return SqlConnectorNode.createSqlConnectorNodeAsIndependent(connector, sqlParts);
         } else {
             return SqlConnectorNode.createSqlConnectorNode(connector, sqlParts);
         }
     }
 
-    protected SqlPartsNode createSqlPartsNode(String sqlParts) {
-        return SqlPartsNode.createSqlPartsNode(sqlParts);
-    }
-
-    protected SqlPartsNode createSqlPartsNodeAfterConnector(Node node, String sqlParts) {
-        if (node instanceof BeginNode) { // connector adjustment of BEGIN is independent
+    protected SqlPartsNode createSqlPartsNodeOutOfConnector(Node node, String sqlParts) {
+        if (isTopBegin(node)) { // top BEGIN only (nested goes 'else' statement)
             return SqlPartsNode.createSqlPartsNodeAsIndependent(sqlParts);
         } else {
-            return SqlPartsNode.createSqlPartsNode(sqlParts);
+            return createSqlPartsNode(sqlParts);
         }
+    }
+
+    protected SqlPartsNode createSqlPartsNodeThroughConnector(Node node, String sqlParts) {
+        if (isNestedBegin(node)) { // basically nested if BEGIN node because checked before
+            // connector adjustment of BEGIN is independent
+            return SqlPartsNode.createSqlPartsNodeAsIndependent(sqlParts);
+        } else {
+            return createSqlPartsNode(sqlParts);
+        }
+    }
+
+    protected SqlPartsNode createSqlPartsNode(String sqlParts) { // as plain
+        return SqlPartsNode.createSqlPartsNode(sqlParts);
     }
 
     // -----------------------------------------------------

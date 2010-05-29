@@ -41,7 +41,7 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable {
     //                                                                          Definition
     //                                                                          ==========
     public static final String PREFIX = "FOR ";
-    public static final String CURRENT_PARAMETER = "#current";
+    public static final String CURRENT_VARIABLE = "#current";
 
     // ===================================================================================
     //                                                                           Attribute

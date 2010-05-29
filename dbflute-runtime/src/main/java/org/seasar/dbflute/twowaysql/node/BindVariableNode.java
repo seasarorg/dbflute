@@ -63,7 +63,7 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
 
     public void accept(CommandContext ctx, LoopInfo loopInfo) { // for FOR comment
         final String firstName = _nameList.get(0);
-        if (firstName.equals(ForNode.CURRENT_PARAMETER)) { // use loop element
+        if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
             final LikeSearchOption option = loopInfo.getLikeSearchOption();
             doAccept(ctx, parameter, parameter.getClass(), option);

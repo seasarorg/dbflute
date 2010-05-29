@@ -73,7 +73,7 @@ public class IfNode extends ScopeNode implements LoopAcceptable, SqlConnectorAdj
     protected IfCommentEvaluator createIfCommentEvaluator(final CommandContext ctx, final LoopInfo loopInfo) {
         return new IfCommentEvaluator(new ParameterFinder() {
             public Object find(String name) {
-                if (loopInfo != null && ForNode.CURRENT_PARAMETER.equals(name)) {
+                if (loopInfo != null && ForNode.CURRENT_VARIABLE.equals(name)) {
                     return loopInfo.getCurrentParameter();
                 } else {
                     return ctx.getArg(name);
