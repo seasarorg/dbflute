@@ -18,11 +18,14 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -92,6 +95,9 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
             return;
         }
         final String embeddedString = targetValue.toString();
+        if (processDynamicBinding(ctx, firstValue, firstType, embeddedString)) {
+            return;
+        }
         if (!isInScope()) {
             // main root
             if (embeddedString.indexOf("?") > -1) {
@@ -137,6 +143,23 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
         NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, valueAndType.getTargetType(),
                 _specifiedSql, false);
+    }
+
+    protected boolean processDynamicBinding(CommandContext ctx, Object firstValue, Class<?> firstType,
+            String embeddedString) {
+        final ScopeInfo first = Srl.extractScopeFirst(embeddedString, "/*", "*/");
+        if (first == null) {
+            return false;
+        }
+        final SqlAnalyzer analyzer = new SqlAnalyzer(embeddedString, _blockNullParameter);
+        final Node rootNode = analyzer.analyze();
+        final CommandContextCreator creator = new CommandContextCreator(new String[] { "pmb" },
+                new Class<?>[] { firstType });
+        final CommandContext rootCtx = creator.createCommandContext(new Object[] { firstValue });
+        rootNode.accept(rootCtx);
+        final String sql = rootCtx.getSql();
+        ctx.addSql(sql, rootCtx.getBindVariables(), rootCtx.getBindVariableTypes());
+        return true;
     }
 
     protected boolean isInScope() {

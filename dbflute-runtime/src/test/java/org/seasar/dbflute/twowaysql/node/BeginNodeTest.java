@@ -13,11 +13,8 @@ import org.seasar.dbflute.unit.PlainTestCase;
 public class BeginNodeTest extends PlainTestCase {
 
     // ===================================================================================
-    //                                                                       BEGIN comment
-    //                                                                       =============
-    // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
+    //                                                                               Basic
+    //                                                                               =====
     public void test_parse_BEGIN_for_where_all_true() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
@@ -190,9 +187,9 @@ public class BeginNodeTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
-    // -----------------------------------------------------
-    //                                                Nested
-    //                                                ------
+    // ===================================================================================
+    //                                                                              Nested
+    //                                                                              ======
     public void test_parse_BEGIN_that_has_nested_BEGIN_true() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
@@ -383,9 +380,9 @@ public class BeginNodeTest extends PlainTestCase {
         assertEquals("where  FIXED2  CCC", ctx.getSql());
     }
 
-    // -----------------------------------------------------
-    //                                             IF Nested
-    //                                             ---------
+    // ===================================================================================
+    //                                                                           IF Nested
+    //                                                                           =========
     public void test_parse_BEGIN_that_has_nested_IFIF_root_has_and() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
@@ -568,9 +565,9 @@ public class BeginNodeTest extends PlainTestCase {
         assertEquals("where  and BBB", ctx.getSql()); // basically nonsense
     }
 
-    // -----------------------------------------------------
-    //                                             UpperCase
-    //                                             ---------
+    // ===================================================================================
+    //                                                                           UpperCase
+    //                                                                           =========
     public void test_parse_BEGIN_where_upperCase_that_has_nested_IFIF_root_has_and() {
         // ## Arrange ##
         String sql = "/*BEGIN*/WHERE";
@@ -598,9 +595,9 @@ public class BeginNodeTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
-    // -----------------------------------------------------
-    //                                                    OR
-    //                                                    --
+    // ===================================================================================
+    //                                                                                  OR
+    //                                                                                  ==
     public void test_parse_BEGIN_where_upperCase_that_has_nested_IFIF_root_has_or() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
@@ -628,9 +625,9 @@ public class BeginNodeTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
-    // -----------------------------------------------------
-    //                                     NotFound Property
-    //                                     -----------------
+    // ===================================================================================
+    //                                                                   NotFound Property
+    //                                                                   =================
     public void test_parse_BEGIN_IF_notFoundProperty_basic() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
