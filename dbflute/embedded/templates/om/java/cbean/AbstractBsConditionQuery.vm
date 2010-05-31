@@ -1377,11 +1377,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     // ===================================================================================
     //                                                                       Very Internal
     //                                                                       =============
-    // Very Internal (for Suppressing Warn about 'Not Use Import')
-    String xCB() { return ${myConditionBeanClassName}.class.getName(); }
-    String xCQ() { return ${myConditionQueryClassName}.class.getName(); }
-    String xLSO() { return LikeSearchOption.class.getName(); }
-    String xSSQS() { return HpSSQSetupper.class.getName(); }
+    // very internal (for suppressing warn about 'Not Use Import')
+    protected String xabCB() { return ${myConditionBeanClassName}.class.getName(); }
+    protected String xabCQ() { return ${myConditionQueryClassName}.class.getName(); }
+    protected String xabLSO() { return LikeSearchOption.class.getName(); }
+    protected String xabSSQS() { return HpSSQSetupper.class.getName(); }
 #if ($database.isDatabaseMSAccess())
     @Override
     protected boolean xsuppressEscape() { return true; } // bacause MS-Access does not support escape

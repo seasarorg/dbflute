@@ -64,7 +64,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
             String msg = "Sorry! InScopeRelation of OnClause is unavailable";
             throw new IllegalConditionBeanOperationException(msg);
         }
-        return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
+        return columnName;
+        //return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
     }
 
     @Override
@@ -300,7 +301,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                       Very Internal
     //                                                                       =============
-    // Very Internal (for Suppressing Warn about 'Not Use Import')
-    String xiCB() { return ${myConditionBeanClassName}.class.getName(); }
-    String xiCQ() { return ${myConditionQueryClassName}.class.getName(); }
+    // very internal (for suppressing warn about 'Not Use Import')
+    protected String xinCB() { return ${myConditionBeanClassName}.class.getName(); }
+    protected String xinCQ() { return ${myConditionQueryClassName}.class.getName(); }
 }

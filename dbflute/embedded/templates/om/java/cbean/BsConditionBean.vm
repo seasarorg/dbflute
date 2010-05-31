@@ -636,7 +636,7 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                            Internal
     //                                                                            ========
-    // Very Internal (for Suppressing Warn about 'Not Use Import')
+    // very internal (for suppressing warn about 'Not Use Import')
     protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
     protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
     protected String getSubQueryClassNameInternally() { return SubQuery.class.getName(); }
