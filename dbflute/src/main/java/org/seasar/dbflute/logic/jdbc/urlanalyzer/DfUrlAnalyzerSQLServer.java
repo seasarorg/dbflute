@@ -14,8 +14,17 @@ public class DfUrlAnalyzerSQLServer extends DfUrlAnalyzerBase {
 
     protected String doExtractCatalog() {
         final String pureUrl = Srl.substringFirstRear(_url, "?");
-        final String rear = Srl.substringFirstRear(pureUrl, "DatabaseName=");
-        final String catalog = Srl.substringFirstFront(rear, ";");
-        return !catalog.equals(pureUrl) ? catalog : null;
+
+        // because the JDBC driver for SQLServer
+        // treats a URL as case insensitive 
+        final String lowerUrl = pureUrl.toLowerCase();
+
+        final String key = "databasename=";
+        if (lowerUrl.contains(key)) {
+            final String rear = Srl.substringFirstRear(lowerUrl, key);
+            return Srl.substringFirstFront(rear, ";");
+        } else {
+            return null;
+        }
     }
 }
