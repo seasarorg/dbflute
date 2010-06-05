@@ -65,7 +65,7 @@ public class BindVariableNode extends VariableNode {
                 throwBindOrEmbeddedCommentInScopeNotListException(valueAndType);
             }
         } else {
-            ctx.addSql("?", finalValue, finalType);
+            ctx.addSql("?", finalValue, finalType); // if null, bind as null
         }
         if (isAcceptableLike()) {
             final String rearOption = valueAndType.buildRearOptionOnSql();

@@ -40,7 +40,7 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
         assertEquals(0, ctx.getBindVariables().length);
     }
 
-    public void test_accept_string() {
+    public void test_accept_string_basic() {
         // ## Arrange ##
         String sql = "= /*$pmb.memberName*/'foo'";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -58,7 +58,25 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
         assertEquals(0, ctx.getBindVariables().length);
     }
 
-    public void test_accept_number() {
+    public void test_accept_string_notQuoted() {
+        // ## Arrange ##
+        String sql = "= /*$pmb.memberName*/foo";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberName("bar");
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("= bar", ctx.getSql());
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_accept_number_basic() {
         // ## Arrange ##
         String sql = "= /*$pmb.memberId*/8";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -76,6 +94,24 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
         assertEquals(0, ctx.getBindVariables().length);
     }
 
+    public void test_accept_number_quoted() {
+        // ## Arrange ##
+        String sql = "= /*$pmb.memberId*/'8'";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberId(3);
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("= '3'", ctx.getSql());
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
     public void test_accept_null_allowed() {
         // ## Arrange ##
         String sql = "= /*$pmb.memberId*/8";
@@ -89,7 +125,7 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
 
         // ## Assert ##
         log("ctx:" + ctx);
-        assertEquals("= ", ctx.getSql());
+        assertEquals("= null", ctx.getSql());
         assertEquals(0, ctx.getBindVariables().length);
     }
 
@@ -116,7 +152,7 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
     // ===================================================================================
     //                                                                             InScope
     //                                                                             =======
-    public void test_accept_inScope_list_quoted() {
+    public void test_accept_inScope_list_string_basic() {
         // ## Arrange ##
         String sql = "in /*$pmb.memberNameList*/('foo', 'bar')";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -134,7 +170,7 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
         assertEquals(0, ctx.getBindVariables().length);
     }
 
-    public void test_accept_inScope_list_notQuoted() {
+    public void test_accept_inScope_list_string_notQuoted() {
         // ## Arrange ##
         String sql = "in /*$pmb.memberNameList*/(foo, bar)";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -149,6 +185,42 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
         // ## Assert ##
         log("ctx:" + ctx);
         assertEquals("in (baz, qux)", ctx.getSql());
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_accept_inScope_list_integer_basic() {
+        // ## Arrange ##
+        String sql = "in /*$pmb.memberIdList*/(56, 88)";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberIdList(DfCollectionUtil.newArrayList(123, 456));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("in (123, 456)", ctx.getSql());
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_accept_inScope_list_integer_quoted() {
+        // ## Arrange ##
+        String sql = "in /*$pmb.memberIdList*/('56', '88')";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberIdList(DfCollectionUtil.newArrayList(123, 456));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("in ('123', '456')", ctx.getSql());
         assertEquals(0, ctx.getBindVariables().length);
     }
 

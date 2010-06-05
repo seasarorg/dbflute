@@ -57,13 +57,14 @@ public class EmbeddedVariableNode extends VariableNode {
 
         final Object finalValue = valueAndType.getTargetValue();
         final Class<?> finalType = valueAndType.getTargetType();
-        if (finalValue == null) {
-            if (_blockNullParameter) {
-                throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
-            }
+        if (_blockNullParameter && finalValue == null) {
+            throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
             return;
         }
         if (isInScope()) {
+            if (finalValue == null) { // in-scope does not allow null value
+                throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
+            }
             if (List.class.isAssignableFrom(finalType)) {
                 embedArray(ctx, ((List<?>) finalValue).toArray());
             } else if (finalType.isArray()) {
@@ -72,14 +73,27 @@ public class EmbeddedVariableNode extends VariableNode {
                 throwBindOrEmbeddedCommentInScopeNotListException(valueAndType);
             }
         } else {
-            final String embeddedString = finalValue.toString();
+            if (finalValue == null) {
+                ctx.addSql("null");
+                return;
+            }
+            if (!(finalValue instanceof String)) {
+                if (isQuotedScalar()) { // basically for condition value
+                    ctx.addSql(quote(finalValue.toString()));
+                } else { // basically for not-bind-able condition (for example, paging)
+                    ctx.addSql(finalValue.toString());
+                }
+                return;
+            }
+            // here String only
+            final String embeddedString = (String) finalValue;
             if (embeddedString.indexOf("?") > -1) {
                 String msg = "The value of expression for embedded comment should not contain a question mark '?':";
-                msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
+                msg = msg + " value=" + embeddedString + " expression=" + _expression;
                 throw new IllegalStateException(msg);
             }
-            if (isQuotedScalar()) {
-                ctx.addSql("'" + embeddedString + "'");
+            if (isQuotedScalar()) { // basically for condition value
+                ctx.addSql(quote(embeddedString));
                 if (isAcceptableLike()) {
                     final String rearOption = valueAndType.buildRearOptionOnSql();
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
@@ -103,16 +117,20 @@ public class EmbeddedVariableNode extends VariableNode {
         if (length == 0) {
             throwBindOrEmbeddedCommentParameterEmptyListException();
         }
-        final String quote = isQuotedInScope() ? "'" : "";
+        final boolean quotedInScope = isQuotedInScope();
         ctx.addSql("(");
         int validCount = 0;
         for (int i = 0; i < length; ++i) {
             final Object currentElement = Array.get(array, i);
             if (currentElement != null) {
-                if (validCount == 0) {
-                    ctx.addSql(quote + currentElement + quote);
+                if (validCount > 0) {
+                    ctx.addSql(", ");
+                }
+                final String currentStr = currentElement.toString();
+                if (quotedInScope) {
+                    ctx.addSql(quote(currentStr));
                 } else {
-                    ctx.addSql(", " + quote + currentElement + quote);
+                    ctx.addSql(currentStr);
                 }
                 ++validCount;
             }
@@ -121,6 +139,10 @@ public class EmbeddedVariableNode extends VariableNode {
             throwBindOrEmbeddedCommentParameterNullOnlyListException();
         }
         ctx.addSql(")");
+    }
+
+    protected String quote(String value) {
+        return "'" + value + "'";
     }
 
     protected boolean isQuotedScalar() {

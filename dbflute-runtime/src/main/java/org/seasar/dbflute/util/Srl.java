@@ -618,7 +618,7 @@ public class Srl {
     //                                                                      ==============
     public static final ScopeInfo extractScopeFirst(final String str, final String beginMark, final String endMark) {
         final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, true);
-        if (scopeList.isEmpty()) {
+        if (scopeList == null || scopeList.isEmpty()) {
             return null;
         }
         if (scopeList.size() > 1) {
@@ -629,15 +629,16 @@ public class Srl {
     }
 
     public static final List<ScopeInfo> extractScopeList(final String str, final String beginMark, final String endMark) {
-        return doExtractScopeList(str, beginMark, endMark, false);
+        final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, false);
+        return scopeList != null ? scopeList : new ArrayList<ScopeInfo>();
     }
 
-    public static final List<ScopeInfo> doExtractScopeList(final String str, final String beginMark,
+    protected static final List<ScopeInfo> doExtractScopeList(final String str, final String beginMark,
             final String endMark, final boolean firstOnly) {
         assertStringNotNull(str);
         assertBeginMarkNotNull(beginMark);
         assertEndMarkNotNull(endMark);
-        final List<ScopeInfo> resultList = new ArrayList<ScopeInfo>();
+        List<ScopeInfo> resultList = null;
         ScopeInfo previous = null;
         String rear = str;
         while (true) {
@@ -668,6 +669,9 @@ public class Srl {
                 info.setPrevious(previous);
                 previous.setNext(info);
             }
+            if (resultList == null) {
+                resultList = new ArrayList<ScopeInfo>(); // lazy load
+            }
             resultList.add(info);
             if (previous == null && firstOnly) {
                 break;
@@ -675,7 +679,7 @@ public class Srl {
             previous = info;
             rear = str.substring(info.getEndIndex());
         }
-        return resultList;
+        return resultList; // nullable if not found to suppress unneeded ArrayList creation
     }
 
     public static final ScopeInfo extractScopeWide(final String str, final String beginMark, final String endMark) {

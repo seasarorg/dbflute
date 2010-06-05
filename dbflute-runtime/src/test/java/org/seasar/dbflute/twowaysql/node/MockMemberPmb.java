@@ -7,31 +7,40 @@ import java.util.List;
  */
 public class MockMemberPmb {
 
-    protected Integer memberId;
-    protected String memberName;
-    protected List<String> memberNameList;
+    protected Integer _memberId;
+    protected String _memberName;
+    protected List<Integer> _memberIdList;
+    protected List<String> _memberNameList;
 
     public Integer getMemberId() {
-        return memberId;
+        return _memberId;
     }
 
     public void setMemberId(Integer memberId) {
-        this.memberId = memberId;
+        this._memberId = memberId;
     }
 
     public String getMemberName() {
-        return memberName;
+        return _memberName;
     }
 
     public void setMemberName(String memberName) {
-        this.memberName = memberName;
+        this._memberName = memberName;
+    }
+
+    public List<Integer> getMemberIdList() {
+        return _memberIdList;
+    }
+
+    public void setMemberIdList(List<Integer> memberIdList) {
+        this._memberIdList = memberIdList;
     }
 
     public List<String> getMemberNameList() {
-        return memberNameList;
+        return _memberNameList;
     }
 
     public void setMemberNameList(List<String> memberNameList) {
-        this.memberNameList = memberNameList;
+        this._memberNameList = memberNameList;
     }
 }
