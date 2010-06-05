@@ -32,7 +32,7 @@ public class BeginNode extends ScopeNode implements LoopAcceptable, SqlConnector
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _nested;
+    protected final boolean _nested;
 
     // ===================================================================================
     //                                                                         Constructor

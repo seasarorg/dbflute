@@ -28,7 +28,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
 /**
  * @author jflute
  */
-public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable {
+public class EmbeddedVariableNode extends VariableNode {
 
     // ===================================================================================
     //                                                                          Definition
@@ -36,60 +36,30 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
     public static final String PREFIX = "$";
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected String _expression;
-    protected String _testValue;
-    protected List<String> _nameList;
-    protected String _specifiedSql;
-    protected boolean _blockNullParameter; // for dynamic binding
-
-    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public EmbeddedVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
-        this._expression = expression;
-        this._testValue = testValue;
-        this._nameList = Srl.splitList(expression, ".");
-        this._specifiedSql = specifiedSql;
-        this._blockNullParameter = blockNullParameter;
+        super(expression, testValue, specifiedSql, blockNullParameter);
     }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void accept(CommandContext ctx) {
-        final String firstName = _nameList.get(0);
-        assertFirstNameAsNormal(ctx, firstName);
-        final Object firstValue = ctx.getArg(firstName);
-        final Class<?> firstType = ctx.getArgType(firstName);
-        doAccept(ctx, firstValue, firstType);
-    }
-
-    public void accept(CommandContext ctx, LoopInfo loopInfo) { // for FOR comment
-        final String firstName = _nameList.get(0);
-        if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
-            final Object parameter = loopInfo.getCurrentParameter();
-            final Class<?> parameterType = loopInfo.getCurrentParameterType();
-            doAccept(ctx, parameter, parameterType);
-        } else { // normal
-            accept(ctx);
-        }
-    }
-
-    // *like-search option is unsupported in embedded comment
-
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType) {
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo) {
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(firstValue);
         valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
+        if (isQuote() && isAcceptableLike()) {
+            valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
+            valueAndType.filterValueByOptionIfNeeds();
+        }
 
         final Object finalValue = valueAndType.getTargetValue();
         final Class<?> finalType = valueAndType.getTargetType();
         if (finalValue == null) {
             if (_blockNullParameter) {
-                throwBindOrEmbeddedParameterNullValueException(valueAndType);
+                throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
             }
             return;
         }
@@ -110,6 +80,12 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
             }
             if (isQuote()) {
                 ctx.addSql("'" + embeddedString + "'");
+                if (isAcceptableLike()) {
+                    final String rearOption = valueAndType.buildRearOptionOnSql();
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
+                        ctx.addSql(rearOption);
+                    }
+                }
                 return;
             }
             if (processDynamicBinding(ctx, firstValue, firstType, embeddedString)) {
@@ -117,56 +93,6 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
             }
             ctx.addSql(embeddedString);
         }
-    }
-
-    protected void assertFirstNameAsNormal(CommandContext ctx, String firstName) {
-        if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
-            throwLoopCurrentVariableOutOfForCommentException();
-        }
-        if (NodeUtil.isWrongParameterBeanName(firstName, ctx)) {
-            throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException();
-        }
-    }
-
-    protected void throwLoopCurrentVariableOutOfForCommentException() {
-        NodeUtil.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
-    }
-
-    protected void setupValueAndType(ValueAndType valueAndType) {
-        final CommentType type = CommentType.EMBEDDED;
-        final ValueAndTypeSetupper setupper = new ValueAndTypeSetupper(_nameList, _expression, _specifiedSql, type);
-        setupper.setupValueAndType(valueAndType);
-    }
-
-    protected boolean processDynamicBinding(CommandContext ctx, Object firstValue, Class<?> firstType,
-            String embeddedString) {
-        final ScopeInfo first = Srl.extractScopeFirst(embeddedString, "/*", "*/");
-        if (first == null) {
-            return false;
-        }
-        final SqlAnalyzer analyzer = new SqlAnalyzer(embeddedString, _blockNullParameter);
-        final Node rootNode = analyzer.analyze();
-        final CommandContextCreator creator = new CommandContextCreator(new String[] { "pmb" },
-                new Class<?>[] { firstType });
-        final CommandContext rootCtx = creator.createCommandContext(new Object[] { firstValue });
-        rootNode.accept(rootCtx);
-        final String sql = rootCtx.getSql();
-        ctx.addSql(sql, rootCtx.getBindVariables(), rootCtx.getBindVariableTypes());
-        return true;
-    }
-
-    protected boolean isInScope() {
-        if (_testValue == null) {
-            return false;
-        }
-        return _testValue.startsWith("(") && _testValue.endsWith(")");
-    }
-
-    protected boolean isQuote() {
-        if (_testValue == null) {
-            return false;
-        }
-        return Srl.count(_testValue, "'") > 1 && _testValue.startsWith("'") && _testValue.endsWith("'");
     }
 
     protected void embedArray(CommandContext ctx, Object array) {
@@ -204,29 +130,35 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
         ctx.addSql(")");
     }
 
+    protected boolean isQuote() {
+        if (_testValue == null) {
+            return false;
+        }
+        return Srl.count(_testValue, "'") > 1 && _testValue.startsWith("'") && _testValue.endsWith("'");
+    }
+
+    protected boolean processDynamicBinding(CommandContext ctx, Object firstValue, Class<?> firstType,
+            String embeddedString) {
+        final ScopeInfo first = Srl.extractScopeFirst(embeddedString, "/*", "*/");
+        if (first == null) {
+            return false;
+        }
+        final SqlAnalyzer analyzer = new SqlAnalyzer(embeddedString, _blockNullParameter);
+        final Node rootNode = analyzer.analyze();
+        final CommandContextCreator creator = new CommandContextCreator(new String[] { "pmb" },
+                new Class<?>[] { firstType });
+        final CommandContext rootCtx = creator.createCommandContext(new Object[] { firstValue });
+        rootNode.accept(rootCtx);
+        final String sql = rootCtx.getSql();
+        ctx.addSql(sql, rootCtx.getBindVariables(), rootCtx.getBindVariableTypes());
+        return true;
+    }
+
     // ===================================================================================
-    //                                                                           Exception
-    //                                                                           =========
-    protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        final Class<?> targetType = valueAndType.getTargetType();
-        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, false);
-    }
-
-    protected void throwBindOrEmbeddedCommentInScopeNotListException(ValueAndType valueAndType) {
-        final Class<?> targetType = valueAndType.getTargetType();
-        NodeUtil.throwBindOrEmbeddedCommentInScopeNotListException(_expression, targetType, _specifiedSql, false);
-    }
-
-    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
-        NodeUtil
-                .throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql, false);
-    }
-
-    protected void throwBindOrEmbeddedCommentParameterEmptyListException() {
-        NodeUtil.throwBindOrEmbeddedCommentParameterEmptyListException(_expression, _specifiedSql, false);
-    }
-
-    protected void throwBindOrEmbeddedCommentParameterNullOnlyListException() {
-        NodeUtil.throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, false);
+    //                                                                      Implementation
+    //                                                                      ==============
+    @Override
+    protected CommentType getCommentType() {
+        return CommentType.EMBEDDED;
     }
 }

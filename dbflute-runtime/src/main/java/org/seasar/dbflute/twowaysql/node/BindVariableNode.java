@@ -25,70 +25,37 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class BindVariableNode extends AbstractNode implements LoopAcceptable {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected String _expression;
-    protected String _testValue;
-    protected List<String> _nameList;
-    protected String _specifiedSql;
-    protected boolean _blockNullParameter;
+public class BindVariableNode extends VariableNode {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public BindVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
-        this._expression = expression;
-        this._testValue = testValue;
-        this._nameList = Srl.splitList(expression, ".");
-        this._specifiedSql = specifiedSql;
-        this._blockNullParameter = blockNullParameter;
+        super(expression, testValue, specifiedSql, blockNullParameter);
     }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void accept(CommandContext ctx) {
-        final String firstName = _nameList.get(0);
-        assertFirstNameAsNormal(ctx, firstName);
-        final Object firstValue = ctx.getArg(firstName);
-        final Class<?> firstType = ctx.getArgType(firstName);
-        doAccept(ctx, firstValue, firstType);
-    }
-
-    public void accept(CommandContext ctx, LoopInfo loopInfo) { // for FOR comment
-        final String firstName = _nameList.get(0);
-        if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
-            final Object parameter = loopInfo.getCurrentParameter();
-            final Class<?> parameterType = loopInfo.getCurrentParameterType();
-            doAccept(ctx, parameter, parameterType, loopInfo);
-        } else { // normal
-            accept(ctx);
-        }
-    }
-
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType) {
-        doAccept(ctx, firstValue, firstType, null);
-    }
-
+    @Override
     protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo) {
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(firstValue);
         valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
-        valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
-        valueAndType.filterValueByOptionIfNeeds();
+        if (isAcceptableLike()) {
+            valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
+            valueAndType.filterValueByOptionIfNeeds();
+        }
 
         final Object finalValue = valueAndType.getTargetValue();
         final Class<?> finalType = valueAndType.getTargetType();
         if (_blockNullParameter && finalValue == null) {
-            throwBindOrEmbeddedParameterNullValueException(valueAndType);
+            throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
         }
         if (isInScope()) {
             if (finalValue == null) { // in-scope does not allow null value
-                throwBindOrEmbeddedParameterNullValueException(valueAndType);
+                throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
             }
             if (List.class.isAssignableFrom(finalType)) {
                 bindArray(ctx, ((List<?>) finalValue).toArray());
@@ -100,33 +67,12 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         } else {
             ctx.addSql("?", finalValue, finalType);
         }
-        final String rearOption = valueAndType.buildRearOptionOnSql();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
-            ctx.addSql(rearOption);
+        if (isAcceptableLike()) {
+            final String rearOption = valueAndType.buildRearOptionOnSql();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
+                ctx.addSql(rearOption);
+            }
         }
-    }
-
-    protected void assertFirstNameAsNormal(CommandContext ctx, String firstName) {
-        if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
-            throwLoopCurrentVariableOutOfForCommentException();
-        }
-        if (NodeUtil.isWrongParameterBeanName(firstName, ctx)) {
-            throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException();
-        }
-    }
-
-    protected void throwLoopCurrentVariableOutOfForCommentException() {
-        NodeUtil.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
-    }
-
-    protected void setupValueAndType(ValueAndType valueAndType) {
-        final CommentType type = CommentType.BIND;
-        final ValueAndTypeSetupper setuper = new ValueAndTypeSetupper(_nameList, _expression, _specifiedSql, type);
-        setuper.setupValueAndType(valueAndType);
-    }
-
-    protected boolean isInScope() {
-        return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
     }
 
     protected void bindArray(CommandContext ctx, Object array) {
@@ -135,7 +81,7 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         }
         final int length = Array.getLength(array);
         if (length == 0) {
-            throwBindOrEmbeddedParameterEmptyListException();
+            throwBindOrEmbeddedCommentParameterEmptyListException();
         }
         Class<?> clazz = null;
         for (int i = 0; i < length; ++i) {
@@ -146,7 +92,7 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
             }
         }
         if (clazz == null) {
-            throwBindOrEmbeddedParameterNullOnlyListException();
+            throwBindOrEmbeddedCommentParameterNullOnlyListException();
         }
         boolean existsValidElements = false;
         ctx.addSql("(");
@@ -165,34 +111,10 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
     }
 
     // ===================================================================================
-    //                                                                           Exception
-    //                                                                           =========
-    protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        final Class<?> targetType = valueAndType.getTargetType();
-        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, true);
-    }
-
-    protected void throwBindOrEmbeddedCommentInScopeNotListException(ValueAndType valueAndType) {
-        final Class<?> targetType = valueAndType.getTargetType();
-        NodeUtil.throwBindOrEmbeddedCommentInScopeNotListException(_expression, targetType, _specifiedSql, true);
-    }
-
-    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
-        NodeUtil.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql, true);
-    }
-
-    protected void throwBindOrEmbeddedParameterEmptyListException() {
-        NodeUtil.throwBindOrEmbeddedCommentParameterEmptyListException(_expression, _specifiedSql, true);
-    }
-
-    protected void throwBindOrEmbeddedParameterNullOnlyListException() {
-        NodeUtil.throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, true);
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean isBlockNullParameter() {
-        return _blockNullParameter;
+    //                                                                      Implementation
+    //                                                                      ==============
+    @Override
+    protected CommentType getCommentType() {
+        return CommentType.BIND;
     }
 }

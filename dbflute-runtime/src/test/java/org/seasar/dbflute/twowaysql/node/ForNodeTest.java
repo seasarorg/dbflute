@@ -625,10 +625,9 @@ public class ForNodeTest extends PlainTestCase {
         String actual = ctx.getSql();
         log(ln() + actual);
         assertTrue(actual.contains("  ("));
-        // unsupported embedded comment with like search option
-        assertTrue(actual.contains("  MEMBER_NAME like 'foo'"));
-        assertTrue(actual.contains(" or MEMBER_NAME like 'bar'"));
-        assertTrue(actual.contains(" or MEMBER_NAME like 'baz'"));
+        assertTrue(actual.contains("  MEMBER_NAME like 'foo%' escape '|'"));
+        assertTrue(actual.contains(" or MEMBER_NAME like 'bar%' escape '|'"));
+        assertTrue(actual.contains(" or MEMBER_NAME like 'baz%' escape '|'"));
         assertTrue(Srl.count(actual, "MEMBER_NAME") == 3);
         assertTrue(actual.contains(" )"));
         assertEquals(0, ctx.getBindVariables().length);
@@ -922,20 +921,193 @@ public class ForNodeTest extends PlainTestCase {
         String actual = ctx.getSql();
         log(ln() + actual);
         assertTrue(actual.contains("  ("));
-        assertTrue(actual.contains("  MEMBER_STATUS_CODE = ?"));
-        assertTrue(actual.contains("  MEMBER_NAME like ?"));
-        assertTrue(actual.contains(" or MEMBER_NAME like ?"));
+        assertTrue(actual.contains("  MEMBER_STATUS_CODE = ? escape '|'"));
+        assertTrue(actual.contains("  MEMBER_NAME like ? escape '|'"));
+        assertTrue(actual.contains(" or MEMBER_NAME like ? escape '|'"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 4);
+        assertTrue(actual.contains(" and ("));
+        assertTrue(Srl.count(actual, " and (") == 2);
+        assertTrue(actual.contains(" )"));
+        assertTrue(Srl.count(actual, " )") == 3);
+        assertEquals("FML%", ctx.getBindVariables()[0]); // because of not using notLike option
+        assertEquals("foo%", ctx.getBindVariables()[1]);
+        assertEquals("foo%", ctx.getBindVariables()[2]);
+        assertEquals("WDL%", ctx.getBindVariables()[3]); // because of not using notLike option
+        assertEquals("bar%", ctx.getBindVariables()[4]);
+        assertEquals("bar%", ctx.getBindVariables()[5]);
+    }
+
+    public void test_accept_nested_notLike_bind_in_FOR() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberName("parent"); // unused
+        List<MockPmb> nestPmbList = DfCollectionUtil.newArrayList();
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(3);
+            element.setMemberName("fo%o");
+            element.setMemberStatusCode("FML");
+            List<MockPmb> nestNestPmbList = DfCollectionUtil.newArrayList();
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("baz");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("baz");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            element.setNestPmbList(nestNestPmbList);
+            nestPmbList.add(element);
+        }
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(4);
+            element.setMemberName("b|ar");
+            element.setMemberStatusCode("WDL");
+            List<MockPmb> nestNestPmbList = DfCollectionUtil.newArrayList();
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("qux");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("qux");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            element.setNestPmbList(nestNestPmbList);
+            nestPmbList.add(element);
+        }
+        pmb.setNestPmbList(nestPmbList);
+        pmb.setNestPmbListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_STATUS_CODE = /*#current.memberStatusCode:notLike*/'test'").append(ln());
+        sb.append("     /*FOR #current.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("       /*NEXT 'or '*/MEMBER_NAME like /*#current.parentPmb.memberName*/'foo%'").append(ln());
+        sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains("  ("));
+        assertTrue(actual.contains("  MEMBER_STATUS_CODE = ?\n"));
+        assertTrue(actual.contains("  MEMBER_NAME like ? escape '|'"));
+        assertTrue(actual.contains(" or MEMBER_NAME like ? escape '|'"));
         assertTrue(Srl.count(actual, "MEMBER_NAME") == 4);
         assertTrue(actual.contains(" and ("));
         assertTrue(Srl.count(actual, " and (") == 2);
         assertTrue(actual.contains(" )"));
         assertTrue(Srl.count(actual, " )") == 3);
         assertEquals("FML", ctx.getBindVariables()[0]);
-        assertEquals("foo%", ctx.getBindVariables()[1]);
-        assertEquals("foo%", ctx.getBindVariables()[2]);
+        assertEquals("fo|%o%", ctx.getBindVariables()[1]);
+        assertEquals("fo|%o%", ctx.getBindVariables()[2]);
         assertEquals("WDL", ctx.getBindVariables()[3]);
-        assertEquals("bar%", ctx.getBindVariables()[4]);
-        assertEquals("bar%", ctx.getBindVariables()[5]);
+        assertEquals("b||ar%", ctx.getBindVariables()[4]);
+        assertEquals("b||ar%", ctx.getBindVariables()[5]);
+    }
+
+    public void test_accept_nested_notLike_embedded_in_FOR() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberName("parent"); // unused
+        List<MockPmb> nestPmbList = DfCollectionUtil.newArrayList();
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(3);
+            element.setMemberName("fo%o");
+            element.setMemberStatusCode("FML");
+            List<MockPmb> nestNestPmbList = DfCollectionUtil.newArrayList();
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("baz");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("baz");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            element.setNestPmbList(nestNestPmbList);
+            nestPmbList.add(element);
+        }
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(4);
+            element.setMemberName("b|ar");
+            element.setMemberStatusCode("WDL");
+            List<MockPmb> nestNestPmbList = DfCollectionUtil.newArrayList();
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("qux");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("qux");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            element.setNestPmbList(nestNestPmbList);
+            nestPmbList.add(element);
+        }
+        pmb.setNestPmbList(nestPmbList);
+        pmb.setNestPmbListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_STATUS_CODE = /*$#current.memberStatusCode:notLike*/'test'").append(ln());
+        sb.append("     /*FOR #current.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("       /*NEXT 'or '*/MEMBER_NAME like /*$#current.parentPmb.memberName*/'foo%'").append(ln());
+        sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains("  ("));
+        assertTrue(actual.contains("  MEMBER_STATUS_CODE = 'FML'\n"));
+        assertTrue(actual.contains("  MEMBER_NAME like 'fo|%o%' escape '|'"));
+        assertTrue(actual.contains(" or MEMBER_NAME like 'b||ar%' escape '|'"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 4);
+        assertTrue(actual.contains(" and ("));
+        assertTrue(Srl.count(actual, " and (") == 2);
+        assertTrue(actual.contains(" )"));
+        assertTrue(Srl.count(actual, " )") == 3);
+        assertEquals(0, ctx.getBindVariables().length);
     }
 
     // ===================================================================================

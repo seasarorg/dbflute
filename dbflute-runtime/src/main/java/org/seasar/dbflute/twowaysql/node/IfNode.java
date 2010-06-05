@@ -32,9 +32,9 @@ public class IfNode extends ScopeNode implements LoopAcceptable, SqlConnectorAdj
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _expression;
-    protected String _specifiedSql;
-    protected ElseNode _elseNode;
+    protected final String _expression;
+    protected final String _specifiedSql;
+    protected ElseNode _elseNode; // lazy setting
 
     // ===================================================================================
     //                                                                         Constructor

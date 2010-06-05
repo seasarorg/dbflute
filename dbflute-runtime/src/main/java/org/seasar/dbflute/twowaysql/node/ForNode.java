@@ -44,9 +44,9 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _expression;
-    protected List<String> _nameList;
-    protected String _specifiedSql;
+    protected final String _expression;
+    protected final List<String> _nameList;
+    protected final String _specifiedSql;
 
     // ===================================================================================
     //                                                                         Constructor
