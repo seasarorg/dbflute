@@ -116,13 +116,22 @@ public class DfTableMetaInfo {
     public String toString() {
         String comment = "";
         if (_tableComment != null) {
-            final int indexOf = _tableComment.indexOf(DfSystemUtil.getLineSeparator());
+            final int indexOf = _tableComment.indexOf(ln());
             if (indexOf > 0) { // not contain 0 because ignore first line separator
-                comment = _tableComment.substring(0, indexOf) + "...";
+                comment = _tableComment.substring(0, indexOf) + "..."; // until line separator
+            } else {
+                comment = _tableComment;
             }
         }
         return buildTableFullQualifiedName() + "(" + _tableType + ")"
                 + (comment.trim().length() > 0 ? " // " + comment : "");
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
