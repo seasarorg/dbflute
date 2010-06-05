@@ -5,6 +5,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.exception.InLoopOptionOutOfLoopException;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -219,6 +220,51 @@ public class BindVariableNodeTest extends PlainTestCase {
         assertEquals(2, ctx.getBindVariables().length);
         assertEquals("baz", ctx.getBindVariables()[0]);
         assertEquals("q?ux", ctx.getBindVariables()[1]);
+    }
+
+    // ===================================================================================
+    //                                                                      In-Loop Option
+    //                                                                      ==============
+    public void test_accept_inLoopOption_basic() {
+        // ## Arrange ##
+        String sql = "= /*FOR pmb.memberNameList*//*#current:likePrefix*/'foo'/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("= ? escape '|' ? escape '|' ? escape '|' ", ctx.getSql());
+        assertEquals(3, ctx.getBindVariables().length);
+        assertEquals("foo%", ctx.getBindVariables()[0]);
+        assertEquals("bar%", ctx.getBindVariables()[1]);
+        assertEquals("baz%", ctx.getBindVariables()[2]);
+    }
+
+    public void test_accept_inLoopOption_outOfLoop() {
+        // ## Arrange ##
+        String sql = "= /*pmb.memberName:notLike*/'foo'";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberName("bar");
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        try {
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (InLoopOptionOutOfLoopException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     // ===================================================================================

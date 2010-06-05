@@ -23,6 +23,7 @@ import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullVa
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentInScopeNotListException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.exception.InLoopOptionOutOfLoopException;
 import org.seasar.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -192,6 +193,30 @@ public class NodeUtil {
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalStateException(msg);
+    }
+
+    public static void throwInLoopOptionOutOfLoopException(String expression, String specifiedSql, String option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The in-loop option of variable comment was out of loop.");
+        br.addItem("Advice");
+        br.addElement("The in-loop options are supported in loop only.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*pmb.memberName:notLike*/");
+        br.addElement("    /*FOR ...*/");
+        br.addElement("    /*END*/");
+        br.addElement("  (o):");
+        br.addElement("    /*FOR ...*/");
+        br.addElement("    /*pmb.memberName:notLike*/");
+        br.addElement("    /*END*/");
+        br.addItem("Comment Expression");
+        br.addElement(expression);
+        br.addItem("In-Loop Option");
+        br.addElement(option);
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new InLoopOptionOutOfLoopException(msg);
     }
 
     public static void throwLoopCurrentVariableOutOfForCommentException(String expression, String specifiedSql) {

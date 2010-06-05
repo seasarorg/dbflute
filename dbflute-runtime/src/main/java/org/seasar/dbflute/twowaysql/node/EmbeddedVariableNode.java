@@ -76,7 +76,7 @@ public class EmbeddedVariableNode extends VariableNode {
                 }
                 return;
             }
-            // here String only
+            // string type here
             final String embeddedString = (String) finalValue;
             assertNotContainBindSymbol(embeddedString);
             if (isQuotedScalar()) { // basically for condition value

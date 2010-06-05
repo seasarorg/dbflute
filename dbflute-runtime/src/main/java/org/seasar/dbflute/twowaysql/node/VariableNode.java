@@ -17,6 +17,7 @@ package org.seasar.dbflute.twowaysql.node;
 
 import java.util.List;
 
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.Srl;
@@ -81,13 +82,19 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
 
     protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo,
             boolean inheritLoop) {
+        assertInLoopOption(loopInfo);
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setFirstValue(firstValue);
         valueAndType.setFirstType(firstType);
         setupValueAndType(valueAndType);
         if (isAcceptableLike()) {
-            if (inheritLoop) {
-                valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
+            final LikeSearchOption inLoopLikeSearchOption = getInLoopLikeSearchOption();
+            if (inLoopLikeSearchOption != null) { // forced option
+                valueAndType.setLikeSearchOption(inLoopLikeSearchOption);
+            } else {
+                if (inheritLoop) {
+                    valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
+                }
             }
             valueAndType.filterValueByOptionIfNeeds();
         }
@@ -120,6 +127,15 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
 
     protected abstract CommentType getCommentType();
 
+    // ===================================================================================
+    //                                                                   LikeSearch Helper
+    //                                                                   =================
+    protected void assertInLoopOption(LoopInfo loopInfo) {
+        if (loopInfo == null && Srl.is_NotNull_and_NotTrimmedEmpty(_option)) {
+            throwInLoopOptionOutOfLoopException();
+        }
+    }
+
     protected boolean isAcceptableLike() { // basically true
         if (Srl.is_Null_or_TrimmedEmpty(_option)) {
             return true;
@@ -133,6 +149,23 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         return true;
     }
 
+    protected LikeSearchOption getInLoopLikeSearchOption() {
+        if (Srl.is_Null_or_TrimmedEmpty(_option)) {
+            return null;
+        }
+        final List<String> optionList = Srl.splitListTrimmed(_option, "|");
+        for (String option : optionList) {
+            if (option.equals("likePrefix")) {
+                return new LikeSearchOption().likePrefix();
+            } else if (option.equals("likeContain")) {
+                return new LikeSearchOption().likeContain();
+            } else if (option.equals("likeSuffix")) {
+                return new LikeSearchOption().likeSuffix();
+            }
+        }
+        return null;
+    }
+
     protected void setupRearOption(CommandContext ctx, ValueAndType valueAndType) {
         final String rearOption = valueAndType.buildRearOptionOnSql();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
@@ -140,6 +173,9 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         }
     }
 
+    // ===================================================================================
+    //                                                                      InScope Helper
+    //                                                                      ==============
     protected boolean isInScope() {
         if (_testValue == null) {
             return false;
@@ -172,6 +208,10 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
 
     protected void throwBindOrEmbeddedCommentParameterNullOnlyListException() {
         NodeUtil.throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, isBind());
+    }
+
+    protected void throwInLoopOptionOutOfLoopException() {
+        NodeUtil.throwInLoopOptionOutOfLoopException(_expression, _specifiedSql, _option);
     }
 
     protected boolean isBind() {
