@@ -118,6 +118,25 @@ public class BindVariableNodeTest extends PlainTestCase {
         }
     }
 
+    public void test_accept_bindSymbol() {
+        // ## Arrange ##
+        String sql = "= /*pmb.memberName*/'foo'";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberName("ba?r");
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("= ?", ctx.getSql());
+        assertEquals(1, ctx.getBindVariables().length);
+        assertEquals("ba?r", ctx.getBindVariables()[0]);
+    }
+
     // ===================================================================================
     //                                                                             InScope
     //                                                                             =======
