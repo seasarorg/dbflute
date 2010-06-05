@@ -8,12 +8,12 @@ import org.seasar.dbflute.unit.PlainTestCase;
 /**
  * @author jflute
  */
-public class DfStandardApiPackageResolverTest extends PlainTestCase {
+public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     @Test
     public void test_doResolvePackageName_Java_Date_basic() throws Exception {
         // ## Arrange ##
-        DfStandardApiPackageResolver resolver = createJavaTarget();
+        DfPropertyTypePackageResolver resolver = createJavaTarget();
 
         // ## Act & Assert ##
         assertEquals("java.util.Date", resolver.doResolvePackageName("Date", false));
@@ -23,7 +23,7 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
     @Test
     public void test_doResolvePackageName_Java_List_basic() throws Exception {
         // ## Arrange ##
-        DfStandardApiPackageResolver resolver = createJavaTarget();
+        DfPropertyTypePackageResolver resolver = createJavaTarget();
 
         // ## Act & Assert ##
         assertEquals("java.util.List<String>", resolver.doResolvePackageName("List<String>", false));
@@ -33,7 +33,7 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
     @Test
     public void test_doResolvePackageName_Java_List_nest() throws Exception {
         // ## Arrange ##
-        DfStandardApiPackageResolver resolver = createJavaTarget();
+        DfPropertyTypePackageResolver resolver = createJavaTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("List<List<Date>>", false);
@@ -45,7 +45,7 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
     @Test
     public void test_doResolvePackageName_Java_List_nest_Map() throws Exception {
         // ## Arrange ##
-        DfStandardApiPackageResolver resolver = createJavaTarget();
+        DfPropertyTypePackageResolver resolver = createJavaTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("List<List<Map<Date, Date>>>", false);
@@ -58,7 +58,7 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
     @Test
     public void test_doResolvePackageName_Java_Map_basic() throws Exception {
         // ## Arrange ##
-        DfStandardApiPackageResolver resolver = createJavaTarget();
+        DfPropertyTypePackageResolver resolver = createJavaTarget();
 
         // ## Act & Assert ##
         assertEquals("java.util.Map<String, String>", resolver.doResolvePackageName("Map<String, String>", false));
@@ -68,7 +68,7 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
     @Test
     public void test_doResolvePackageName_Java_Map_nest() throws Exception {
         // ## Arrange ##
-        DfStandardApiPackageResolver resolver = createJavaTarget();
+        DfPropertyTypePackageResolver resolver = createJavaTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("Map<Date, List<Map<Date, Date>>>", false);
@@ -81,7 +81,7 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
     @Test
     public void test_doResolvePackageName_CSharp_List_nest_Map() throws Exception {
         // ## Arrange ##
-        DfStandardApiPackageResolver resolver = createCSharpTarget();
+        DfPropertyTypePackageResolver resolver = createCSharpTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("IList<IList<IDictionary<Date, Date>>>", false);
@@ -93,8 +93,8 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
                 actual);
     }
 
-    protected DfStandardApiPackageResolver createJavaTarget() {
-        return new DfStandardApiPackageResolver(null) {
+    protected DfPropertyTypePackageResolver createJavaTarget() {
+        return new DfPropertyTypePackageResolver() {
             @Override
             protected boolean isTargetLanguageJava() {
                 return true;
@@ -107,8 +107,8 @@ public class DfStandardApiPackageResolverTest extends PlainTestCase {
         };
     }
 
-    protected DfStandardApiPackageResolver createCSharpTarget() {
-        return new DfStandardApiPackageResolver(null) {
+    protected DfPropertyTypePackageResolver createCSharpTarget() {
+        return new DfPropertyTypePackageResolver() {
             @Override
             protected boolean isTargetLanguageJava() {
                 return false;

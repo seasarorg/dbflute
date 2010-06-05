@@ -68,7 +68,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfStandardApiPackageResolver;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
@@ -982,8 +982,7 @@ public class ForeignKey {
     }
 
     protected String filterDynamicFixedConditionParameterType(String parameterType) {
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        final DfStandardApiPackageResolver packageResolver = new DfStandardApiPackageResolver(basicProperties);
+        final DfPropertyTypePackageResolver packageResolver = new DfPropertyTypePackageResolver();
         return packageResolver.resolvePackageName(parameterType);
     }
 

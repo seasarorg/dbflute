@@ -496,7 +496,7 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                            Other Property Entry
     //                                                            ====================
-    protected DfPropertiesHandler handler() {
+    public DfPropertiesHandler handler() {
         return DfPropertiesHandler.getInstance();
     }
 

@@ -64,7 +64,7 @@ import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtract
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfParameterBeanMetaData;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfStandardApiPackageResolver;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -230,7 +230,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
-        final DfStandardApiPackageResolver packageResolver = new DfStandardApiPackageResolver(getBasicProperties());
+        final DfPropertyTypePackageResolver packageResolver = new DfPropertyTypePackageResolver();
         final DBDef currentDBDef = getBasicProperties().getCurrentDBDef();
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
