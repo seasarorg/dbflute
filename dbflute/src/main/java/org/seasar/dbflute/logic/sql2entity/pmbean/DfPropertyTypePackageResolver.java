@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.sql2entity.pmbean;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
@@ -16,7 +17,9 @@ public class DfPropertyTypePackageResolver {
     //                                                                          Definition
     //                                                                          ==========
     public static final String VAR_CDEF = "$$CDef$$";
-    public static final String VAR_ENTITY = "$$Entity$$";
+    public static final String VAR_DOMAIN = "$$Domain$$";
+    public static final String VAR_CUSTOMIZE = "$$Customize$$";
+    public static final String VAR_PMB = "$$Pmb$$";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -57,10 +60,20 @@ public class DfPropertyTypePackageResolver {
             typeName = DfStringUtil.replace(typeName, VAR_CDEF, pkg + "." + prefix + "CDef");
             return typeName;
         }
-        if (typeName.startsWith(VAR_ENTITY + ".")) { // as domain entity
+        if (typeName.startsWith(VAR_DOMAIN + ".")) { // as domain entity
             final DfBasicProperties prop = getBasicProperties();
             final String pkg = prop.getExtendedEntityPackage();
-            typeName = Srl.replace(typeName, VAR_ENTITY + ".", pkg + ".");
+            typeName = Srl.replace(typeName, VAR_DOMAIN + ".", pkg + ".");
+        }
+        if (typeName.startsWith(VAR_CUSTOMIZE + ".")) { // as customize entity
+            final DfOutsideSqlProperties prop = getOutsideSqlProperties();
+            final String pkg = prop.getExtendedEntityPackage();
+            typeName = Srl.replace(typeName, VAR_CUSTOMIZE + ".", pkg + ".");
+        }
+        if (typeName.startsWith(VAR_PMB + ".")) { // as parameter-bean
+            final DfOutsideSqlProperties prop = getOutsideSqlProperties();
+            final String pkg = prop.getExtendedParameterBeanPackage();
+            typeName = Srl.replace(typeName, VAR_PMB + ".", pkg + ".");
         }
         return typeName;
     }
@@ -143,5 +156,9 @@ public class DfPropertyTypePackageResolver {
 
     protected DfBasicProperties getBasicProperties() {
         return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return DfBuildProperties.getInstance().getOutsideSqlProperties();
     }
 }
