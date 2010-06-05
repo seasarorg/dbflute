@@ -50,8 +50,15 @@ public class ValueAndType {
         if (_likeSearchOption == null) {
             return null;
         }
-        final String rearOption = _likeSearchOption.getRearOption();
-        return " " + rearOption.trim() + " ";
+        if (_targetValue == null) {
+            return null;
+        }
+        if (_targetValue instanceof String) {
+            final String rearOption = _likeSearchOption.getRearOption();
+            return " " + rearOption.trim() + " ";
+        } else {
+            return null;
+        }
     }
 
     protected void inheritLikeSearchOptionIfNeeds(LoopInfo loopInfo) {

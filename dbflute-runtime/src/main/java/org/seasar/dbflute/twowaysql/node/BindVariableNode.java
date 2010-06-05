@@ -53,7 +53,7 @@ public class BindVariableNode extends VariableNode {
             }
         } else {
             ctx.addSql("?", finalValue, finalType); // if null, bind as null
-            if (finalValue != null && String.class.isInstance(finalValue) && isAcceptableLike()) {
+            if (isAcceptableLike()) {
                 setupRearOption(ctx, valueAndType);
             }
         }
