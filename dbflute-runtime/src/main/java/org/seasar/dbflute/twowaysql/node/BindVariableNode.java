@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -38,21 +37,9 @@ public class BindVariableNode extends VariableNode {
     //                                                                              Accept
     //                                                                              ======
     @Override
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo) {
-        final ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setTargetValue(firstValue);
-        valueAndType.setTargetType(firstType);
-        setupValueAndType(valueAndType);
-        if (isAcceptableLike()) {
-            valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
-            valueAndType.filterValueByOptionIfNeeds();
-        }
-
+    protected void doProcess(CommandContext ctx, ValueAndType valueAndType) {
         final Object finalValue = valueAndType.getTargetValue();
         final Class<?> finalType = valueAndType.getTargetType();
-        if (_blockNullParameter && finalValue == null) {
-            throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
-        }
         if (isInScope()) {
             if (finalValue == null) { // in-scope does not allow null value
                 throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
@@ -66,11 +53,8 @@ public class BindVariableNode extends VariableNode {
             }
         } else {
             ctx.addSql("?", finalValue, finalType); // if null, bind as null
-        }
-        if (isAcceptableLike()) {
-            final String rearOption = valueAndType.buildRearOptionOnSql();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
-                ctx.addSql(rearOption);
+            if (finalValue != null && String.class.isInstance(finalValue) && isAcceptableLike()) {
+                setupRearOption(ctx, valueAndType);
             }
         }
     }
@@ -94,17 +78,16 @@ public class BindVariableNode extends VariableNode {
         if (clazz == null) {
             throwBindOrEmbeddedCommentParameterNullOnlyListException();
         }
-        boolean existsValidElements = false;
         ctx.addSql("(");
+        int validCount = 0;
         for (int i = 0; i < length; ++i) {
             final Object currentElement = Array.get(array, i);
             if (currentElement != null) {
-                if (!existsValidElements) {
-                    ctx.addSql("?", currentElement, clazz);
-                    existsValidElements = true;
-                } else {
-                    ctx.addSql(", ?", currentElement, clazz);
+                if (validCount > 0) {
+                    ctx.addSql(", ");
                 }
+                ctx.addSql("?", currentElement, clazz);
+                ++validCount;
             }
         }
         ctx.addSql(")");

@@ -25,6 +25,8 @@ public class ValueAndType {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected Object _firstValue;
+    protected Class<?> _firstType;
     protected Object _targetValue;
     protected Class<?> _targetType;
     protected LikeSearchOption _likeSearchOption;
@@ -69,6 +71,22 @@ public class ValueAndType {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public Object getFirstValue() {
+        return _firstValue;
+    }
+
+    public void setFirstValue(Object firstValue) {
+        this._firstValue = firstValue;
+    }
+
+    public Class<?> getFirstType() {
+        return _firstType;
+    }
+
+    public void setFirstType(Class<?> firstType) {
+        this._firstType = firstType;
+    }
+
     public Object getTargetValue() {
         return _targetValue;
     }

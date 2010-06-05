@@ -47,22 +47,10 @@ public class EmbeddedVariableNode extends VariableNode {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo) {
-        final ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setTargetValue(firstValue);
-        valueAndType.setTargetType(firstType);
-        setupValueAndType(valueAndType);
-        if (isQuotedScalar() && isAcceptableLike()) {
-            valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
-            valueAndType.filterValueByOptionIfNeeds();
-        }
-
+    @Override
+    protected void doProcess(CommandContext ctx, ValueAndType valueAndType) {
         final Object finalValue = valueAndType.getTargetValue();
         final Class<?> finalType = valueAndType.getTargetType();
-        if (_blockNullParameter && finalValue == null) {
-            throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
-            return;
-        }
         if (isInScope()) {
             if (finalValue == null) { // in-scope does not allow null value
                 throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
@@ -94,13 +82,12 @@ public class EmbeddedVariableNode extends VariableNode {
             if (isQuotedScalar()) { // basically for condition value
                 ctx.addSql(quote(embeddedString));
                 if (isAcceptableLike()) {
-                    final String rearOption = valueAndType.buildRearOptionOnSql();
-                    if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
-                        ctx.addSql(rearOption);
-                    }
+                    setupRearOption(ctx, valueAndType);
                 }
                 return;
             }
+            final Object firstValue = valueAndType.getFirstValue();
+            final Class<?> firstType = valueAndType.getFirstType();
             if (processDynamicBinding(ctx, firstValue, firstType, embeddedString)) {
                 return;
             }

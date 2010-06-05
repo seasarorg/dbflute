@@ -89,8 +89,8 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
             return; // if base object is null, do nothing at FOR comment
         }
         final ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setTargetValue(firstValue);
-        valueAndType.setTargetType(firstType);
+        valueAndType.setFirstValue(firstValue);
+        valueAndType.setFirstType(firstType);
         setupValueAndType(valueAndType);
         if (inheritLoop) {
             valueAndType.inheritLikeSearchOptionIfNeeds(parentLoop);

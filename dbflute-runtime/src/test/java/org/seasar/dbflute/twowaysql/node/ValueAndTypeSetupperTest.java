@@ -108,7 +108,7 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
         assertNull(valueAndType.getLikeSearchOption());
     }
 
-    public void test_setupValueAndType_bean_nest_likeSearch() {
+    public void test_setupValueAndType_bean_nest_likeSearch_basic() {
         // ## Arrange ##
         ValueAndTypeSetupper setupper = createTargetAsBind("pmb.nestLikePmb.memberName");
         MockPmb nestLikePmb = new MockPmb();
@@ -124,6 +124,27 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
         // ## Assert ##
         assertEquals("f||o|%o%", valueAndType.getTargetValue());
+        assertEquals(String.class, valueAndType.getTargetType());
+        assertEquals(" escape '|'", valueAndType.getLikeSearchOption().getRearOption());
+    }
+
+    public void test_setupValueAndType_bean_nest_likeSearch_override() {
+        // ## Arrange ##
+        ValueAndTypeSetupper setupper = createTargetAsBind("pmb.nestLikePmb.memberName");
+        MockPmb nestLikePmb = new MockPmb();
+        nestLikePmb.setMemberName("f|o%o");
+        nestLikePmb.setMemberNameInternalLikeSearchOption(new LikeSearchOption().likeContain());
+        MockPmb pmb = new MockPmb();
+        pmb.setNestLikePmb(nestLikePmb);
+        pmb.setNestLikePmbInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        ValueAndType valueAndType = createTargetAndType(pmb);
+
+        // ## Act ##
+        setupper.setupValueAndType(valueAndType);
+        valueAndType.filterValueByOptionIfNeeds();
+
+        // ## Assert ##
+        assertEquals("%f||o|%o%", valueAndType.getTargetValue());
         assertEquals(String.class, valueAndType.getTargetType());
         assertEquals(" escape '|'", valueAndType.getLikeSearchOption().getRearOption());
     }
@@ -356,8 +377,8 @@ public class ValueAndTypeSetupperTest extends PlainTestCase {
 
     protected ValueAndType createTargetAndType(Object value) {
         ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setTargetValue(value);
-        valueAndType.setTargetType(value.getClass());
+        valueAndType.setFirstValue(value);
+        valueAndType.setFirstType(value.getClass());
         return valueAndType;
     }
 

@@ -104,11 +104,11 @@ public class ValueAndTypeSetupper {
     //                                                                              Set up
     //                                                                              ======
     public void setupValueAndType(ValueAndType valueAndType) {
-        Object value = valueAndType.getTargetValue();
+        Object value = valueAndType.getFirstValue();
         if (value == null) { // if null, do nothing
             return;
         }
-        Class<?> clazz = valueAndType.getTargetType(); // if value is not null, required 
+        Class<?> clazz = valueAndType.getFirstType(); // if value is not null, required 
 
         // LikeSearchOption handling here is for OutsideSql.
         LikeSearchOption likeSearchOption = null;
@@ -119,9 +119,10 @@ public class ValueAndTypeSetupper {
             }
             final String currentName = _nameList.get(pos);
             final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
-            if (pos == 1) { // at the first Loop
-                if (hasLikeSearchProperty(beanDesc, currentName, value)) {
-                    likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
+            if (hasLikeSearchProperty(beanDesc, currentName, value)) {
+                final LikeSearchOption currentOption = getLikeSearchOption(beanDesc, currentName, value);
+                if (currentOption != null) { // if exists, override option
+                    likeSearchOption = currentOption;
                 }
             }
             if (beanDesc.hasPropertyDesc(currentName)) { // main case

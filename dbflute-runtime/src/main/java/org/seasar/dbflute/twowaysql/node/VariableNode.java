@@ -57,11 +57,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        final String firstName = _nameList.get(0);
-        assertFirstNameAsNormal(ctx, firstName);
-        final Object firstValue = ctx.getArg(firstName);
-        final Class<?> firstType = ctx.getArgType(firstName);
-        doAccept(ctx, firstValue, firstType);
+        doAccept(ctx, null);
     }
 
     public void accept(CommandContext ctx, LoopInfo loopInfo) { // for FOR comment
@@ -69,17 +65,39 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
             final Class<?> parameterType = loopInfo.getCurrentParameterType();
-            doAccept(ctx, parameter, parameterType, loopInfo);
+            doAccept(ctx, parameter, parameterType, loopInfo, true);
         } else { // normal
-            accept(ctx);
+            doAccept(ctx, loopInfo);
         }
     }
 
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType) {
-        doAccept(ctx, firstValue, firstType, null);
+    protected void doAccept(CommandContext ctx, LoopInfo loopInfo) {
+        final String firstName = _nameList.get(0);
+        assertFirstNameAsNormal(ctx, firstName);
+        final Object firstValue = ctx.getArg(firstName);
+        final Class<?> firstType = ctx.getArgType(firstName);
+        doAccept(ctx, firstValue, firstType, loopInfo, false);
     }
 
-    protected abstract void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo);
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo,
+            boolean inheritLoop) {
+        final ValueAndType valueAndType = new ValueAndType();
+        valueAndType.setFirstValue(firstValue);
+        valueAndType.setFirstType(firstType);
+        setupValueAndType(valueAndType);
+        if (isAcceptableLike()) {
+            if (inheritLoop) {
+                valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
+            }
+            valueAndType.filterValueByOptionIfNeeds();
+        }
+        if (_blockNullParameter && valueAndType.getTargetValue() == null) {
+            throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
+        }
+        doProcess(ctx, valueAndType);
+    }
+
+    protected abstract void doProcess(CommandContext ctx, ValueAndType valueAndType);
 
     protected void assertFirstNameAsNormal(CommandContext ctx, String firstName) {
         if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
@@ -113,6 +131,13 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
             }
         }
         return true;
+    }
+
+    protected void setupRearOption(CommandContext ctx, ValueAndType valueAndType) {
+        final String rearOption = valueAndType.buildRearOptionOnSql();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
+            ctx.addSql(rearOption);
+        }
     }
 
     protected boolean isInScope() {
