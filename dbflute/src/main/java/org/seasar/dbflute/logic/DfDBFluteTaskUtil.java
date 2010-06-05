@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -317,9 +318,10 @@ public final class DfDBFluteTaskUtil {
             return;
         }
         final String shutdownUrl = "jdbc:derby:;shutdown=true";
+        Connection conn = null;
         try {
             _log.info("...Shutting down the connection to Derby");
-            DriverManager.getConnection(shutdownUrl);
+            conn = DriverManager.getConnection(shutdownUrl);
         } catch (SQLException e) {
             if ("XJ015".equals(e.getSQLState())) {
                 _log.info(" --> success: " + e.getMessage());
@@ -327,6 +329,10 @@ public final class DfDBFluteTaskUtil {
                 String msg = "Failed to shut down the connection to Derby:";
                 msg = msg + " shutdownUrl=" + shutdownUrl;
                 throw new DfJDBCException(msg, e);
+            }
+        } finally {
+            if (conn != null) {
+                conn.close();
             }
         }
     }
