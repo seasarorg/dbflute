@@ -30,7 +30,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
-import org.seasar.dbflute.logic.DfAntTaskUtil;
+import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -140,11 +140,11 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void logException(Exception e) {
-        DfAntTaskUtil.logException(e, getDisplayTaskName());
+        DfDBFluteTaskUtil.logException(e, getDisplayTaskName());
     }
 
     protected void logError(Error e) {
-        DfAntTaskUtil.logError(e, getDisplayTaskName());
+        DfDBFluteTaskUtil.logError(e, getDisplayTaskName());
     }
 
     protected boolean isValidTaskEndInformation() {
@@ -251,7 +251,7 @@ public abstract class DfAbstractTask extends Task {
 
     protected String getDisplayTaskName() {
         final String taskName = getTaskName();
-        return DfAntTaskUtil.getDisplayTaskName(taskName);
+        return DfDBFluteTaskUtil.getDisplayTaskName(taskName);
     }
 
     protected String getFinalInformation() {
@@ -259,7 +259,7 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void throwTaskFailure() {
-        DfAntTaskUtil.throwTaskFailure(getDisplayTaskName());
+        DfDBFluteTaskUtil.throwTaskFailure(getDisplayTaskName());
     }
 
     protected void initializeDatabaseInfo() {
@@ -342,7 +342,7 @@ public abstract class DfAbstractTask extends Task {
 
         if (getBasicProperties().isDatabaseDerby()) {
             // Derby(Embedded) needs an original shutdown for destroying a connection
-            DfAntTaskUtil.shutdownIfDerbyEmbedded(_driver);
+            DfDBFluteTaskUtil.shutdownIfDerbyEmbedded(_driver);
         }
     }
 
@@ -360,7 +360,7 @@ public abstract class DfAbstractTask extends Task {
     //                                    ------------------
     public void setContextProperties(String file) { // called by ANT
         try {
-            final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
+            final Properties prop = DfDBFluteTaskUtil.getBuildProperties(file, getProject());
             DfBuildProperties.getInstance().setProperties(prop);
         } catch (RuntimeException e) {
             String msg = "Failed to set context properties:";

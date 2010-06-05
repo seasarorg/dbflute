@@ -32,6 +32,7 @@ import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -41,13 +42,13 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * Ant task utility.
  * @author jflute
  */
-public final class DfAntTaskUtil {
+public final class DfDBFluteTaskUtil {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(DfAntTaskUtil.class);
+    private static final Log _log = LogFactory.getLog(DfDBFluteTaskUtil.class);
 
     // ===================================================================================
     //                                                             Build-Properties Set up
@@ -145,14 +146,126 @@ public final class DfAntTaskUtil {
     //                                                                             Logging
     //                                                                             =======
     public static void logException(Exception e, String taskName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Exception]" + ln();
-        msg = msg + "exception class   = " + e.getClass() + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to execute DBFlute Task '" + taskName + "'.");
+        if (e instanceof SQLException) {
+            final SQLException sqlEx = (SQLException) e;
+            final String sqlState = extractSQLState(sqlEx);
+            br.addItem("SQLState");
+            br.addElement(sqlState);
+            final Integer errorCode = extractErrorCode(sqlEx);
+            br.addItem("ErrorCode");
+            br.addElement(errorCode);
+            br.addItem("SQLException");
+            br.addElement(sqlEx.getClass().getName());
+            br.addElement(extractMessage(sqlEx));
+            final SQLException nextEx = sqlEx.getNextException();
+            if (nextEx != null) {
+                br.addItem("NextException");
+                br.addElement(nextEx.getClass().getName());
+                br.addElement(extractMessage(nextEx));
+                final SQLException nextNextEx = nextEx.getNextException();
+                if (nextNextEx != null) {
+                    br.addItem("NextNextException");
+                    br.addElement(nextNextEx.getClass().getName());
+                    br.addElement(extractMessage(nextNextEx));
+                }
+            }
+        } else {
+            br.addItem("Exception");
+            br.addElement(e.getClass().getName());
+        }
+        final String msg = br.buildExceptionMessage();
         _log.error(msg, e);
+    }
+
+    protected static String extractMessage(SQLException e) {
+        String message = e.getMessage();
+
+        // Because a message of Oracle contains a line separator.
+        return message != null ? message.trim() : message;
+    }
+
+    protected static String extractSQLState(SQLException e) {
+        String sqlState = e.getSQLState();
+        if (sqlState != null) {
+            return sqlState;
+        }
+
+        // Next
+        SQLException nextEx = e.getNextException();
+        if (nextEx == null) {
+            return null;
+        }
+        sqlState = nextEx.getSQLState();
+        if (sqlState != null) {
+            return sqlState;
+        }
+
+        // Next Next
+        SQLException nextNextEx = nextEx.getNextException();
+        if (nextNextEx == null) {
+            return null;
+        }
+        sqlState = nextNextEx.getSQLState();
+        if (sqlState != null) {
+            return sqlState;
+        }
+
+        // Next Next Next
+        SQLException nextNextNextEx = nextNextEx.getNextException();
+        if (nextNextNextEx == null) {
+            return null;
+        }
+        sqlState = nextNextNextEx.getSQLState();
+        if (sqlState != null) {
+            return sqlState;
+        }
+
+        // It doesn't use recursive call by design because JDBC is unpredictable fellow.
+        return null;
+    }
+
+    protected static Integer extractErrorCode(SQLException e) {
+        // this SQLException may be DBFlute's original exception
+        final int nullErrorCode = DfJDBCException.NULL_ERROR_CODE;
+        int errorCode = e.getErrorCode();
+        if (errorCode != nullErrorCode) {
+            return errorCode;
+        }
+
+        // Next
+        SQLException nextEx = e.getNextException();
+        if (nextEx == null) {
+            return null;
+        }
+        errorCode = nextEx.getErrorCode();
+        if (errorCode != nullErrorCode) {
+            return errorCode;
+        }
+
+        // Next Next
+        SQLException nextNextEx = nextEx.getNextException();
+        if (nextNextEx == null) {
+            return null;
+        }
+        errorCode = nextNextEx.getErrorCode();
+        if (errorCode != nullErrorCode) {
+            return errorCode;
+        }
+
+        // Next Next Next
+        SQLException nextNextNextEx = nextNextEx.getNextException();
+        if (nextNextNextEx == null) {
+            return null;
+        }
+        errorCode = nextNextNextEx.getErrorCode();
+        if (errorCode != nullErrorCode) {
+            return errorCode;
+        }
+
+        // It doesn't use recursive call by design because JDBC is unpredictable fellow.
+        return null;
     }
 
     public static void logError(Error e, String taskName) {
