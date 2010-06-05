@@ -3,6 +3,7 @@ package org.seasar.dbflute.twowaysql.node;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
+import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentContainsBindSymbolException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentInScopeNotListException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
 import org.seasar.dbflute.unit.PlainTestCase;
@@ -149,6 +150,27 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
         }
     }
 
+    public void test_accept_contains_bindSymbol() {
+        // ## Arrange ##
+        String sql = "in /*$pmb.memberName*/'foo'";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberName("fo?o");
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        try {
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (EmbeddedVariableCommentContainsBindSymbolException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
     // ===================================================================================
     //                                                                             InScope
     //                                                                             =======
@@ -258,6 +280,45 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
             // ## Assert ##
             fail();
         } catch (EmbeddedVariableCommentInScopeNotListException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_accept_inScope_array_string_basic() {
+        // ## Arrange ##
+        String sql = "in /*$pmb.memberNames*/('foo', 'bar')";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNames(new String[] { "baz", "qux" });
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("in ('baz', 'qux')", ctx.getSql());
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_accept_inScope_bindSymbol() {
+        // ## Arrange ##
+        String sql = "in /*$pmb.memberNameList*/('foo', 'bar')";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("baz", "q?ux"));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        try {
+            rootNode.accept(ctx);
+
+            // ## Assert ##
+            fail();
+        } catch (EmbeddedVariableCommentContainsBindSymbolException e) {
             // OK
             log(e.getMessage());
         }

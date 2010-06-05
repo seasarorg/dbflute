@@ -162,6 +162,46 @@ public class BindVariableNodeTest extends PlainTestCase {
         }
     }
 
+    public void test_accept_inScope_array_string_basic() {
+        // ## Arrange ##
+        String sql = "in /*pmb.memberNames*/('foo', 'bar')";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNames(new String[] { "baz", "qux" });
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("in (?, ?)", ctx.getSql());
+        assertEquals(2, ctx.getBindVariables().length);
+        assertEquals("baz", ctx.getBindVariables()[0]);
+        assertEquals("qux", ctx.getBindVariables()[1]);
+    }
+
+    public void test_accept_inScope_bindSymbol() {
+        // ## Arrange ##
+        String sql = "in /*pmb.memberNameList*/('foo', 'bar')";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("baz", "q?ux"));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("in (?, ?)", ctx.getSql());
+        assertEquals(2, ctx.getBindVariables().length);
+        assertEquals("baz", ctx.getBindVariables()[0]);
+        assertEquals("q?ux", ctx.getBindVariables()[1]);
+    }
+
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========

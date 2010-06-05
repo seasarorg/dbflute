@@ -18,9 +18,11 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
+import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentContainsBindSymbolException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
@@ -78,20 +80,17 @@ public class EmbeddedVariableNode extends VariableNode {
                 return;
             }
             if (!(finalValue instanceof String)) {
+                final String embeddedValue = finalValue.toString();
                 if (isQuotedScalar()) { // basically for condition value
-                    ctx.addSql(quote(finalValue.toString()));
-                } else { // basically for not-bind-able condition (for example, paging)
-                    ctx.addSql(finalValue.toString());
+                    ctx.addSql(quote(embeddedValue));
+                } else { // basically for cannot-bound condition (for example, paging)
+                    ctx.addSql(embeddedValue);
                 }
                 return;
             }
             // here String only
             final String embeddedString = (String) finalValue;
-            if (embeddedString.indexOf("?") > -1) {
-                String msg = "The value of expression for embedded comment should not contain a question mark '?':";
-                msg = msg + " value=" + embeddedString + " expression=" + _expression;
-                throw new IllegalStateException(msg);
-            }
+            assertNotContainBindSymbol(embeddedString);
             if (isQuotedScalar()) { // basically for condition value
                 ctx.addSql(quote(embeddedString));
                 if (isAcceptableLike()) {
@@ -127,6 +126,7 @@ public class EmbeddedVariableNode extends VariableNode {
                     ctx.addSql(", ");
                 }
                 final String currentStr = currentElement.toString();
+                assertNotContainBindSymbol(currentStr);
                 if (quotedInScope) {
                     ctx.addSql(quote(currentStr));
                 } else {
@@ -139,6 +139,26 @@ public class EmbeddedVariableNode extends VariableNode {
             throwBindOrEmbeddedCommentParameterNullOnlyListException();
         }
         ctx.addSql(")");
+    }
+
+    protected void assertNotContainBindSymbol(String value) {
+        if (containsBindSymbol(value)) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The value of embedded comment contained bind symbols.");
+            br.addItem("Advice");
+            br.addElement("The value of embedded comment should not contain bind symbols.");
+            br.addElement("For example, a question mark '?'.");
+            br.addItem("Comment Expression");
+            br.addElement(_expression);
+            br.addItem("Embedded Value");
+            br.addElement(value);
+            final String msg = br.buildExceptionMessage();
+            throw new EmbeddedVariableCommentContainsBindSymbolException(msg);
+        }
+    }
+
+    protected boolean containsBindSymbol(String value) {
+        return value.indexOf("?") > -1;
     }
 
     protected String quote(String value) {

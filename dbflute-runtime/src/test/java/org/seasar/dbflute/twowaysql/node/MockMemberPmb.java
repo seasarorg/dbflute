@@ -11,6 +11,7 @@ public class MockMemberPmb {
     protected String _memberName;
     protected List<Integer> _memberIdList;
     protected List<String> _memberNameList;
+    protected String[] _memberNames;
 
     public Integer getMemberId() {
         return _memberId;
@@ -42,5 +43,13 @@ public class MockMemberPmb {
 
     public void setMemberNameList(List<String> memberNameList) {
         this._memberNameList = memberNameList;
+    }
+
+    public String[] getMemberNames() {
+        return _memberNames;
+    }
+
+    public void setMemberNames(String[] emberNames) {
+        this._memberNames = emberNames;
     }
 }
