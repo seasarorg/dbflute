@@ -19,7 +19,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +65,9 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
-            _log.info("...Getting tables: schema=" + unifiedSchema + " objectTypes=" + Arrays.asList(objectTypes));
+            _log.info("...Getting tables:");
+            _log.info("  schema = " + unifiedSchema);
+            _log.info("  types  = " + DfCollectionUtil.newArrayList(objectTypes));
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
             resultSet = metaData.getTables(catalogName, schemaName, "%", objectTypes);

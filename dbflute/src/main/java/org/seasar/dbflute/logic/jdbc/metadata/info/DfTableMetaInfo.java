@@ -83,10 +83,6 @@ public class DfTableMetaInfo {
         return _unifiedSchema.buildSqlName(quotedName);
     }
 
-    public String buildTableDisplayName() {
-        return buildTableFullQualifiedName();
-    }
-
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
@@ -106,30 +102,27 @@ public class DfTableMetaInfo {
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof DfTableMetaInfo) {
-            return getTableName().equals(((DfTableMetaInfo) obj).getTableName());
+            return buildTableFullQualifiedName().equals(((DfTableMetaInfo) obj).buildTableFullQualifiedName());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return getTableName().hashCode();
+        return buildTableFullQualifiedName().hashCode();
     }
 
     @Override
     public String toString() {
         String comment = "";
         if (_tableComment != null) {
-            final String ln = DfSystemUtil.getLineSeparator();
-            final int indexOf = _tableComment.indexOf(ln);
+            final int indexOf = _tableComment.indexOf(DfSystemUtil.getLineSeparator());
             if (indexOf > 0) { // not contain 0 because ignore first line separator
                 comment = _tableComment.substring(0, indexOf) + "...";
-            } else {
-                comment = _tableComment;
             }
         }
-        return _unifiedSchema.buildFullQualifiedName(_tableName) + "(" + _tableType + ")"
-                + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
+        return buildTableFullQualifiedName() + "(" + _tableType + ")"
+                + (comment.trim().length() > 0 ? " // " + comment : "");
     }
 
     // ===================================================================================

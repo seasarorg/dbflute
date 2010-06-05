@@ -147,12 +147,12 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         try {
             conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
-            String msg = "Failed to connect to URL:";
+            String msg = "Failed to connect:";
             msg = msg + " url=" + _url + " user=" + _userId;
             throw new DfJDBCException(msg, e);
         }
         if (conn == null) {
-            String msg = "The driver didn't understand the URL: _url=" + _url;
+            String msg = "The driver didn't understand the URL: " + _url;
             throw new DfJDBCException(msg);
         }
         try {
