@@ -36,12 +36,11 @@ public class ValueAndType {
         if (_likeSearchOption == null) {
             return;
         }
+        if (_targetValue == null) {
+            return;
+        }
         if (_targetValue instanceof String) {
             _targetValue = _likeSearchOption.generateRealValue((String) _targetValue);
-        } else { // no way
-            String msg = "The target value should be string:";
-            msg = msg + " " + _targetValue + ", " + _targetType;
-            throw new IllegalStateException(msg);
         }
     }
 
@@ -51,6 +50,20 @@ public class ValueAndType {
         }
         final String rearOption = _likeSearchOption.getRearOption();
         return " " + rearOption.trim() + " ";
+    }
+
+    protected void inheritLikeSearchOptionIfNeeds(LoopInfo loopInfo) {
+        if (loopInfo == null) {
+            return;
+        }
+        final LikeSearchOption current = getLikeSearchOption();
+        if (current != null) {
+            return;
+        }
+        final LikeSearchOption parent = loopInfo.getLikeSearchOption();
+        if (parent != null) {
+            setLikeSearchOption(parent); // inherit
+        }
     }
 
     // ===================================================================================

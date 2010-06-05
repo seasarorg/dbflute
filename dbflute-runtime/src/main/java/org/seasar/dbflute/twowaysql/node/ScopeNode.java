@@ -15,7 +15,9 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 
 /**
  * @author jflute
@@ -39,14 +41,38 @@ public abstract class ScopeNode extends AbstractNode {
         final int childSize = getChildSize();
         for (int i = 0; i < childSize; i++) {
             final Node child = getChild(i);
-            if (loopInfo != null) {
-                if (child instanceof LoopAcceptable) {
+            if (loopInfo != null) { // in loop
+                if (child instanceof LoopAcceptable) { // accepting loop
+                    handleLoopElementNullParameter(child, loopInfo);
                     ((LoopAcceptable) child).accept(ctx, loopInfo);
                 } else {
                     child.accept(ctx);
                 }
             } else {
                 child.accept(ctx);
+            }
+        }
+    }
+
+    protected void handleLoopElementNullParameter(Node child, LoopInfo loopInfo) {
+        if (child instanceof BindVariableNode && ((BindVariableNode) child).isBlockNullParameter()) {
+            final Object parameter = loopInfo.getCurrentParameter();
+            if (parameter == null) {
+                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                br.addNotice("The parameter in list for bind variable was null.");
+                br.addItem("Advice");
+                br.addElement("Bind variable for select does not allow null value.");
+                br.addElement("Confirm your target parameter in the list.");
+                br.addItem("Parameter List");
+                br.addElement(loopInfo.getParameterList());
+                br.addItem("Current Index");
+                br.addElement(loopInfo.getLoopIndex());
+                br.addItem("FOR Comment Expression");
+                br.addElement(loopInfo.getExpression());
+                br.addItem("Specified SQL");
+                br.addElement(loopInfo.getSpecifiedSql());
+                String msg = br.buildExceptionMessage();
+                throw new ForCommentParameterNullElementException(msg);
             }
         }
     }

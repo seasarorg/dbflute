@@ -20,6 +20,9 @@ import org.seasar.dbflute.util.Srl;
  */
 public class ForNodeTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
     public void test_accept_basic() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
@@ -557,6 +560,45 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals(0, ctx.getBindVariables().length);
     }
 
+    public void test_accept_nullElement_in_IF() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", null, "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER");
+        sb.append(" /*BEGIN*/where");
+        sb.append("   /*IF pmb.memberId != null*/");
+        sb.append("   MEMBER_ID = /*pmb.memberId*/");
+        sb.append("   /*END*/");
+        sb.append("   /*FOR pmb.memberNameList*//*FIRST*/and (/*END*/");
+        sb.append("   /*IF #current != null*/");
+        sb.append("     /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'");
+        sb.append("   /*END*/");
+        sb.append("   /*LAST*/)/*END*//*END*/");
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), true);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains("select * from MEMBER "));
+        assertTrue(actual.contains("where"));
+        assertTrue(actual.contains("  ("));
+        assertTrue(actual.contains("  MEMBER_NAME like ?"));
+        assertTrue(actual.contains(" or MEMBER_NAME like ?"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 2);
+        assertTrue(actual.contains(" )"));
+        assertEquals(2, ctx.getBindVariables().length);
+        assertEquals("foo%", ctx.getBindVariables()[0]);
+        assertEquals("baz%", ctx.getBindVariables()[1]);
+    }
+
     public void test_accept_allStars_embedded_either_true() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
@@ -584,9 +626,9 @@ public class ForNodeTest extends PlainTestCase {
         log(ln() + actual);
         assertTrue(actual.contains("  ("));
         // unsupported embedded comment with like search option
-        assertTrue(actual.contains("  MEMBER_NAME like foo"));
-        assertTrue(actual.contains(" or MEMBER_NAME like bar"));
-        assertTrue(actual.contains(" or MEMBER_NAME like baz"));
+        assertTrue(actual.contains("  MEMBER_NAME like 'foo'"));
+        assertTrue(actual.contains(" or MEMBER_NAME like 'bar'"));
+        assertTrue(actual.contains(" or MEMBER_NAME like 'baz'"));
         assertTrue(Srl.count(actual, "MEMBER_NAME") == 3);
         assertTrue(actual.contains(" )"));
         assertEquals(0, ctx.getBindVariables().length);
@@ -638,7 +680,10 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals("%def", ctx.getBindVariables()[4]);
     }
 
-    public void test_accept_allStars_nested_basic() throws Exception {
+    // ===================================================================================
+    //                                                                              Nested
+    //                                                                              ======
+    public void test_accept_nested_basic() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
         pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
@@ -688,7 +733,7 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals("%def", ctx.getBindVariables()[8]);
     }
 
-    public void test_accept_allStars_nested_current_in_FOR() throws Exception {
+    public void test_accept_nested_current_in_FOR() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
         List<MockPmb> nestPmbList = DfCollectionUtil.newArrayList();
@@ -748,6 +793,151 @@ public class ForNodeTest extends PlainTestCase {
         assertEquals("qu_x", ctx.getBindVariables()[5]);
     }
 
+    public void test_accept_nested_current_in_FOR_nullElement() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        List<MockPmb> nestPmbList = DfCollectionUtil.newArrayList();
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(3);
+            element.setMemberNameList(DfCollectionUtil.newArrayList("fo%o", "b|ar"));
+            element.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+            nestPmbList.add(element);
+        }
+        nestPmbList.add(null);
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(4);
+            element.setMemberNameList(DfCollectionUtil.newArrayList("ba%z", "qu_x"));
+            //element.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+            nestPmbList.add(element);
+        }
+        pmb.setNestPmbList(nestPmbList);
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("     /*FOR #current.memberNameList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("       /*NEXT 'or '*/MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), true);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains("  ("));
+        assertTrue(actual.contains("  MEMBER_NAME like ?"));
+        assertTrue(actual.contains(" or MEMBER_NAME like ?"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 4);
+        assertTrue(actual.contains(" and ("));
+        assertTrue(Srl.count(actual, " and (") == 2);
+        assertTrue(actual.contains(" )"));
+        assertTrue(Srl.count(actual, " )") == 3);
+        assertEquals("fo|%o%", ctx.getBindVariables()[0]);
+        assertEquals("b||ar%", ctx.getBindVariables()[1]);
+        assertEquals("ba%z", ctx.getBindVariables()[2]);
+        assertEquals("qu_x", ctx.getBindVariables()[3]);
+    }
+
+    public void test_accept_nested_parent_in_FOR() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberName("parent"); // unused
+        List<MockPmb> nestPmbList = DfCollectionUtil.newArrayList();
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(3);
+            element.setMemberName("foo");
+            element.setMemberStatusCode("FML");
+            List<MockPmb> nestNestPmbList = DfCollectionUtil.newArrayList();
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("baz");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("baz");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            element.setNestPmbList(nestNestPmbList);
+            nestPmbList.add(element);
+        }
+        {
+            MockPmb element = new MockPmb();
+            element.setMemberId(4);
+            element.setMemberName("bar");
+            element.setMemberStatusCode("WDL");
+            List<MockPmb> nestNestPmbList = DfCollectionUtil.newArrayList();
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("qux");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            {
+                MockPmb nestElement = new MockPmb();
+                nestElement.setMemberName("qux");
+                nestElement.setParentPmb(element);
+                nestNestPmbList.add(nestElement);
+            }
+            element.setNestPmbList(nestNestPmbList);
+            nestPmbList.add(element);
+        }
+        pmb.setNestPmbList(nestPmbList);
+        pmb.setNestPmbListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_STATUS_CODE = /*#current.memberStatusCode*/'test'").append(ln());
+        sb.append("     /*FOR #current.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
+        sb.append("       /*NEXT 'or '*/MEMBER_NAME like /*#current.parentPmb.memberName*/'foo%'").append(ln());
+        sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(actual.contains("  ("));
+        assertTrue(actual.contains("  MEMBER_STATUS_CODE = ?"));
+        assertTrue(actual.contains("  MEMBER_NAME like ?"));
+        assertTrue(actual.contains(" or MEMBER_NAME like ?"));
+        assertTrue(Srl.count(actual, "MEMBER_NAME") == 4);
+        assertTrue(actual.contains(" and ("));
+        assertTrue(Srl.count(actual, " and (") == 2);
+        assertTrue(actual.contains(" )"));
+        assertTrue(Srl.count(actual, " )") == 3);
+        assertEquals("FML", ctx.getBindVariables()[0]);
+        assertEquals("foo%", ctx.getBindVariables()[1]);
+        assertEquals("foo%", ctx.getBindVariables()[2]);
+        assertEquals("WDL", ctx.getBindVariables()[3]);
+        assertEquals("bar%", ctx.getBindVariables()[4]);
+        assertEquals("bar%", ctx.getBindVariables()[5]);
+    }
+
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
@@ -801,7 +991,7 @@ public class ForNodeTest extends PlainTestCase {
         }
     }
 
-    public void test_accept_currentParameter_in_Bind_null() throws Exception {
+    public void test_accept_currentParameter_in_Bind_null_allowed() throws Exception {
         // ## Arrange ##
         MockPmb pmb = new MockPmb();
         pmb.setMemberId(3);
@@ -818,6 +1008,40 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("   /*END*/").append(ln());
         sb.append(" /*END*/");
         SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        Node rootNode = analyzer.analyze();
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx); // expect no exception
+
+        // ## Assert ##
+        String actual = ctx.getSql();
+        log(ln() + actual);
+        assertTrue(Srl.count(actual, "and MEMBER_NAME like ? escape '|' ") == 3);
+        assertEquals(4, ctx.getBindVariables().length);
+        assertEquals(3, ctx.getBindVariables()[0]);
+        assertEquals("foo%", ctx.getBindVariables()[1]);
+        assertEquals(null, ctx.getBindVariables()[2]);
+        assertEquals("baz%", ctx.getBindVariables()[3]);
+    }
+
+    public void test_accept_currentParameter_in_Bind_null_notAllowed() throws Exception {
+        // ## Arrange ##
+        MockPmb pmb = new MockPmb();
+        pmb.setMemberId(3);
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", null, "baz"));
+        pmb.setMemberNameListInternalLikeSearchOption(new LikeSearchOption().likePrefix());
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from MEMBER").append(ln());
+        sb.append(" /*BEGIN*/where").append(ln());
+        sb.append("   /*IF pmb.memberId != null*/").append(ln());
+        sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append("   /*FOR pmb.memberNameList*/").append(ln());
+        sb.append("   and MEMBER_NAME like /*#current*/'foo%'").append(ln());
+        sb.append("   /*END*/").append(ln());
+        sb.append(" /*END*/");
+        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), true);
         Node rootNode = analyzer.analyze();
         CommandContext ctx = createCtx(pmb);
 
@@ -902,6 +1126,9 @@ public class ForNodeTest extends PlainTestCase {
     //                                                                         ===========
     protected static class MockPmb implements ParameterBean {
         protected Integer _memberId;
+        protected String _memberName;
+        protected String _memberStatusCode;
+        protected LikeSearchOption _memberNameInternalLikeSearchOption;
         protected List<String> _memberNameList;
         protected LikeSearchOption _memberNameListInternalLikeSearchOption;
         protected List<String> _memberAccountList;
@@ -909,6 +1136,8 @@ public class ForNodeTest extends PlainTestCase {
         protected MockPmb _nestLikePmb;
         protected LikeSearchOption _nestLikePmbInternalLikeSearchOption;
         protected List<MockPmb> _nestPmbList;
+        protected LikeSearchOption _nestPmbListInternalLikeSearchOption;
+        protected MockPmb _parentPmb;
 
         public Integer getMemberId() {
             return _memberId;
@@ -916,6 +1145,30 @@ public class ForNodeTest extends PlainTestCase {
 
         public void setMemberId(Integer memberId) {
             this._memberId = memberId;
+        }
+
+        public String getMemberName() {
+            return _memberName;
+        }
+
+        public void setMemberName(String memberName) {
+            this._memberName = memberName;
+        }
+
+        public LikeSearchOption getMemberNameInternalLikeSearchOption() {
+            return _memberNameInternalLikeSearchOption;
+        }
+
+        public void setMemberNameInternalLikeSearchOption(LikeSearchOption memberNameInternalLikeSearchOption) {
+            this._memberNameInternalLikeSearchOption = memberNameInternalLikeSearchOption;
+        }
+
+        public String getMemberStatusCode() {
+            return _memberStatusCode;
+        }
+
+        public void setMemberStatusCode(String memberStatusCode) {
+            this._memberStatusCode = memberStatusCode;
         }
 
         public List<String> getMemberNameList() {
@@ -930,8 +1183,8 @@ public class ForNodeTest extends PlainTestCase {
             return _memberNameListInternalLikeSearchOption;
         }
 
-        public void setMemberNameListInternalLikeSearchOption(LikeSearchOption memberNameInternalLikeSearchOption) {
-            this._memberNameListInternalLikeSearchOption = memberNameInternalLikeSearchOption;
+        public void setMemberNameListInternalLikeSearchOption(LikeSearchOption memberNameListInternalLikeSearchOption) {
+            this._memberNameListInternalLikeSearchOption = memberNameListInternalLikeSearchOption;
         }
 
         public List<String> getMemberAccountList() {
@@ -972,6 +1225,22 @@ public class ForNodeTest extends PlainTestCase {
 
         public void setNestPmbList(List<MockPmb> nestPmbList) {
             this._nestPmbList = nestPmbList;
+        }
+
+        public LikeSearchOption getNestPmbListInternalLikeSearchOption() {
+            return _nestPmbListInternalLikeSearchOption;
+        }
+
+        public void setNestPmbListInternalLikeSearchOption(LikeSearchOption nestPmbListInternalLikeSearchOption) {
+            this._nestPmbListInternalLikeSearchOption = nestPmbListInternalLikeSearchOption;
+        }
+
+        public MockPmb getParentPmb() {
+            return _parentPmb;
+        }
+
+        public void setParentPmb(MockPmb parentPmb) {
+            this._parentPmb = parentPmb;
         }
     }
 

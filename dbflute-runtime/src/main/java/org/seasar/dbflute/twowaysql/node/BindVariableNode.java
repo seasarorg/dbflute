@@ -18,7 +18,6 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.Srl;
@@ -63,8 +62,8 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         final String firstName = _nameList.get(0);
         if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
-            final LikeSearchOption option = loopInfo.getLikeSearchOption();
-            doAccept(ctx, parameter, parameter.getClass(), option);
+            final Class<?> parameterType = loopInfo.getCurrentParameterType();
+            doAccept(ctx, parameter, parameterType, loopInfo);
         } else { // normal
             accept(ctx);
         }
@@ -74,30 +73,32 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         doAccept(ctx, firstValue, firstType, null);
     }
 
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LikeSearchOption outerOption) {
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo) {
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(firstValue);
         valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
-        if (outerOption != null) {
-            valueAndType.setLikeSearchOption(outerOption); // inherit
-        }
+        valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
         valueAndType.filterValueByOptionIfNeeds();
 
-        if (_blockNullParameter && valueAndType.getTargetValue() == null) {
+        final Object finalValue = valueAndType.getTargetValue();
+        final Class<?> finalType = valueAndType.getTargetType();
+        if (_blockNullParameter && finalValue == null) {
             throwBindOrEmbeddedParameterNullValueException(valueAndType);
         }
-        if (!isInScope()) {
-            // main root
-            ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
-        } else {
-            if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
-                bindArray(ctx, ((List<?>) valueAndType.getTargetValue()).toArray());
-            } else if (valueAndType.getTargetType().isArray()) {
-                bindArray(ctx, valueAndType.getTargetValue());
-            } else {
-                ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
+        if (isInScope()) {
+            if (finalValue == null) { // in-scope does not allow null value
+                throwBindOrEmbeddedParameterNullValueException(valueAndType);
             }
+            if (List.class.isAssignableFrom(finalType)) {
+                bindArray(ctx, ((List<?>) finalValue).toArray());
+            } else if (finalType.isArray()) {
+                bindArray(ctx, finalValue);
+            } else {
+                throwBindOrEmbeddedCommentInScopeNotListException(valueAndType);
+            }
+        } else {
+            ctx.addSql("?", finalValue, finalType);
         }
         final String rearOption = valueAndType.buildRearOptionOnSql();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
@@ -122,11 +123,6 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         final CommentType type = CommentType.BIND;
         final ValueAndTypeSetupper setuper = new ValueAndTypeSetupper(_nameList, _expression, _specifiedSql, type);
         setuper.setupValueAndType(valueAndType);
-    }
-
-    protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        final Class<?> targetType = valueAndType.getTargetType();
-        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, true);
     }
 
     protected boolean isInScope() {
@@ -168,6 +164,19 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
         ctx.addSql(")");
     }
 
+    // ===================================================================================
+    //                                                                           Exception
+    //                                                                           =========
+    protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
+        final Class<?> targetType = valueAndType.getTargetType();
+        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, true);
+    }
+
+    protected void throwBindOrEmbeddedCommentInScopeNotListException(ValueAndType valueAndType) {
+        final Class<?> targetType = valueAndType.getTargetType();
+        NodeUtil.throwBindOrEmbeddedCommentInScopeNotListException(_expression, targetType, _specifiedSql, true);
+    }
+
     protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
         NodeUtil.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql, true);
     }
@@ -178,5 +187,12 @@ public class BindVariableNode extends AbstractNode implements LoopAcceptable {
 
     protected void throwBindOrEmbeddedParameterNullOnlyListException() {
         NodeUtil.throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, true);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isBlockNullParameter() {
+        return _blockNullParameter;
     }
 }

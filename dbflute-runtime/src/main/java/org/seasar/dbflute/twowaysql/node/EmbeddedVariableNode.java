@@ -42,7 +42,7 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
     protected String _testValue;
     protected List<String> _nameList;
     protected String _specifiedSql;
-    protected boolean _blockNullParameter;
+    protected boolean _blockNullParameter; // for dynamic binding
 
     // ===================================================================================
     //                                                                         Constructor
@@ -70,7 +70,8 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
         final String firstName = _nameList.get(0);
         if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
-            doAccept(ctx, parameter, parameter.getClass());
+            final Class<?> parameterType = loopInfo.getCurrentParameterType();
+            doAccept(ctx, parameter, parameterType);
         } else { // normal
             accept(ctx);
         }
@@ -84,38 +85,37 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
         valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
 
-        final Object targetValue = valueAndType.getTargetValue();
-        if (targetValue == null) {
+        final Object finalValue = valueAndType.getTargetValue();
+        final Class<?> finalType = valueAndType.getTargetType();
+        if (finalValue == null) {
             if (_blockNullParameter) {
                 throwBindOrEmbeddedParameterNullValueException(valueAndType);
             }
             return;
         }
-        final String embeddedString = targetValue.toString();
-        if (processDynamicBinding(ctx, firstValue, firstType, embeddedString)) {
-            return;
-        }
-        if (!isInScope()) {
-            // main root
+        if (isInScope()) {
+            if (List.class.isAssignableFrom(finalType)) {
+                embedArray(ctx, ((List<?>) finalValue).toArray());
+            } else if (finalType.isArray()) {
+                embedArray(ctx, finalValue);
+            } else {
+                throwBindOrEmbeddedCommentInScopeNotListException(valueAndType);
+            }
+        } else {
+            final String embeddedString = finalValue.toString();
             if (embeddedString.indexOf("?") > -1) {
                 String msg = "The value of expression for embedded comment should not contain a question mark '?':";
                 msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
                 throw new IllegalStateException(msg);
             }
-            ctx.addSql(embeddedString);
-        } else {
-            if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
-                embedArray(ctx, ((List<?>) valueAndType.getTargetValue()).toArray());
-            } else if (valueAndType.getTargetType().isArray()) {
-                embedArray(ctx, valueAndType.getTargetValue());
-            } else {
-                if (embeddedString.indexOf("?") > -1) {
-                    String msg = "The value of expression for embedded comment should not contain a question mark '?':";
-                    msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
-                    throw new IllegalStateException(msg);
-                }
-                ctx.addSql(embeddedString.toString());
+            if (isQuote()) {
+                ctx.addSql("'" + embeddedString + "'");
+                return;
             }
+            if (processDynamicBinding(ctx, firstValue, firstType, embeddedString)) {
+                return;
+            }
+            ctx.addSql(embeddedString);
         }
     }
 
@@ -138,11 +138,6 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
         setupper.setupValueAndType(valueAndType);
     }
 
-    protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, valueAndType.getTargetType(),
-                _specifiedSql, false);
-    }
-
     protected boolean processDynamicBinding(CommandContext ctx, Object firstValue, Class<?> firstType,
             String embeddedString) {
         final ScopeInfo first = Srl.extractScopeFirst(embeddedString, "/*", "*/");
@@ -161,7 +156,17 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
     }
 
     protected boolean isInScope() {
-        return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
+        if (_testValue == null) {
+            return false;
+        }
+        return _testValue.startsWith("(") && _testValue.endsWith(")");
+    }
+
+    protected boolean isQuote() {
+        if (_testValue == null) {
+            return false;
+        }
+        return Srl.count(_testValue, "'") > 1 && _testValue.startsWith("'") && _testValue.endsWith("'");
     }
 
     protected void embedArray(CommandContext ctx, Object array) {
@@ -197,6 +202,19 @@ public class EmbeddedVariableNode extends AbstractNode implements LoopAcceptable
             }
         }
         ctx.addSql(")");
+    }
+
+    // ===================================================================================
+    //                                                                           Exception
+    //                                                                           =========
+    protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
+        final Class<?> targetType = valueAndType.getTargetType();
+        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, false);
+    }
+
+    protected void throwBindOrEmbeddedCommentInScopeNotListException(ValueAndType valueAndType) {
+        final Class<?> targetType = valueAndType.getTargetType();
+        NodeUtil.throwBindOrEmbeddedCommentInScopeNotListException(_expression, targetType, _specifiedSql, false);
     }
 
     protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {

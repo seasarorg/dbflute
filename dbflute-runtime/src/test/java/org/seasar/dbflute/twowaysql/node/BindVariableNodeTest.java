@@ -3,16 +3,16 @@ package org.seasar.dbflute.twowaysql.node;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
-import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentInScopeNotListException;
-import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
- * @since 0.9.7.0 (2010/05/29 Saturday)
+ * @since 0.9.7.1 (2010/06/05 Saturday)
  */
-public class EmbeddedVariableNodeTest extends PlainTestCase {
+public class BindVariableNodeTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                               Basic
@@ -20,8 +20,8 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
     public void test_analyze_basic() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
-        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = /*$pmb.memberId*//*END*/";
-        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = /*$pmb.memberName*/'TEST'/*END*/";
+        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = /*pmb.memberId*//*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = /*pmb.memberName*/'TEST'/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
@@ -35,14 +35,16 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
         log("ctx:" + ctx);
-        String expected = "where member.MEMBER_ID = 12 and member.MEMBER_NAME = 'foo'";
+        String expected = "where member.MEMBER_ID = ? and member.MEMBER_NAME = ?";
         assertEquals(expected, ctx.getSql());
-        assertEquals(0, ctx.getBindVariables().length);
+        assertEquals(2, ctx.getBindVariables().length);
+        assertEquals(12, ctx.getBindVariables()[0]);
+        assertEquals("foo", ctx.getBindVariables()[1]);
     }
 
     public void test_accept_string() {
         // ## Arrange ##
-        String sql = "= /*$pmb.memberName*/'foo'";
+        String sql = "= /*pmb.memberName*/'foo'";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();
@@ -54,13 +56,14 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
 
         // ## Assert ##
         log("ctx:" + ctx);
-        assertEquals("= 'bar'", ctx.getSql());
-        assertEquals(0, ctx.getBindVariables().length);
+        assertEquals("= ?", ctx.getSql());
+        assertEquals(1, ctx.getBindVariables().length);
+        assertEquals("bar", ctx.getBindVariables()[0]);
     }
 
     public void test_accept_number() {
         // ## Arrange ##
-        String sql = "= /*$pmb.memberId*/8";
+        String sql = "= /*pmb.memberId*/8";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();
@@ -72,13 +75,14 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
 
         // ## Assert ##
         log("ctx:" + ctx);
-        assertEquals("= 3", ctx.getSql());
-        assertEquals(0, ctx.getBindVariables().length);
+        assertEquals("= ?", ctx.getSql());
+        assertEquals(1, ctx.getBindVariables().length);
+        assertEquals(3, ctx.getBindVariables()[0]);
     }
 
     public void test_accept_null_allowed() {
         // ## Arrange ##
-        String sql = "= /*$pmb.memberId*/8";
+        String sql = "= /*pmb.memberId*/8";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();
@@ -89,13 +93,14 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
 
         // ## Assert ##
         log("ctx:" + ctx);
-        assertEquals("= ", ctx.getSql());
-        assertEquals(0, ctx.getBindVariables().length);
+        assertEquals("= ?", ctx.getSql());
+        assertEquals(1, ctx.getBindVariables().length);
+        assertEquals(null, ctx.getBindVariables()[0]);
     }
 
     public void test_accept_null_notAllowed() {
         // ## Arrange ##
-        String sql = "= /*$pmb.memberId*/8";
+        String sql = "= /*pmb.memberId*/8";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, true);
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();
@@ -107,7 +112,7 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
 
             // ## Assert ##
             fail();
-        } catch (EmbeddedVariableCommentParameterNullValueException e) {
+        } catch (BindVariableCommentParameterNullValueException e) {
             // OK
             log(e.getMessage());
         }
@@ -118,7 +123,7 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
     //                                                                             =======
     public void test_accept_inScope_list() {
         // ## Arrange ##
-        String sql = "in /*$pmb.memberNameList*/('foo', 'bar')";
+        String sql = "in /*pmb.memberNameList*/('foo', 'bar')";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();
@@ -130,13 +135,15 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
 
         // ## Assert ##
         log("ctx:" + ctx);
-        assertEquals("in ('baz', 'qux')", ctx.getSql());
-        assertEquals(0, ctx.getBindVariables().length);
+        assertEquals("in (?, ?)", ctx.getSql());
+        assertEquals(2, ctx.getBindVariables().length);
+        assertEquals("baz", ctx.getBindVariables()[0]);
+        assertEquals("qux", ctx.getBindVariables()[1]);
     }
 
     public void test_accept_inScope_notList() {
         // ## Arrange ##
-        String sql = "in /*$pmb.memberName*/('foo', 'bar')";
+        String sql = "in /*pmb.memberName*/('foo', 'bar')";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();
@@ -149,59 +156,10 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
 
             // ## Assert ##
             fail();
-        } catch (EmbeddedVariableCommentInScopeNotListException e) {
+        } catch (BindVariableCommentInScopeNotListException e) {
             // OK
             log(e.getMessage());
         }
-    }
-
-    // ===================================================================================
-    //                                                                     Dynamic Binding
-    //                                                                     ===============
-    public void test_analyze_dynamicBinding() {
-        // ## Arrange ##
-        String sql = "/*BEGIN*/where";
-        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID /*$pmb.memberName*//*END*/";
-        sql = sql + "/*END*/";
-        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
-
-        // ## Act ##
-        Node rootNode = analyzer.analyze();
-
-        // ## Assert ##
-        MockMemberPmb pmb = new MockMemberPmb();
-        pmb.setMemberId(12);
-        pmb.setMemberName("= /*pmb.memberId*/99");
-        CommandContext ctx = createCtx(pmb);
-        rootNode.accept(ctx);
-        log("ctx:" + ctx);
-        String expected = "where member.MEMBER_ID = ?";
-        assertEquals(expected, ctx.getSql());
-        assertEquals(1, ctx.getBindVariables().length);
-        assertEquals(12, ctx.getBindVariables()[0]);
-    }
-
-    public void test_analyze_dynamicBinding_IF() {
-        // ## Arrange ##
-        String sql = "/*BEGIN*/where";
-        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID /*$pmb.memberName*//*END*/";
-        sql = sql + "/*END*/";
-        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
-
-        // ## Act ##
-        Node rootNode = analyzer.analyze();
-
-        // ## Assert ##
-        MockMemberPmb pmb = new MockMemberPmb();
-        pmb.setMemberId(12);
-        pmb.setMemberName("= /*IF pmb.memberId != null*/foo/*pmb.memberId*/99 bar/*END*/");
-        CommandContext ctx = createCtx(pmb);
-        rootNode.accept(ctx);
-        log("ctx:" + ctx);
-        String expected = "where member.MEMBER_ID = foo? bar";
-        assertEquals(expected, ctx.getSql());
-        assertEquals(1, ctx.getBindVariables().length);
-        assertEquals(12, ctx.getBindVariables()[0]);
     }
 
     // ===================================================================================

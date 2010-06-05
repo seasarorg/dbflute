@@ -105,7 +105,10 @@ public class ValueAndTypeSetupper {
     //                                                                              ======
     public void setupValueAndType(ValueAndType valueAndType) {
         Object value = valueAndType.getTargetValue();
-        Class<?> clazz = valueAndType.getTargetType();
+        if (value == null) { // if null, do nothing
+            return;
+        }
+        Class<?> clazz = valueAndType.getTargetType(); // if value is not null, required 
 
         // LikeSearchOption handling here is for OutsideSql.
         LikeSearchOption likeSearchOption = null;
@@ -115,36 +118,19 @@ public class ValueAndTypeSetupper {
                 break;
             }
             final String currentName = _nameList.get(pos);
+            final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
             if (pos == 1) { // at the first Loop
-                final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
                 if (hasLikeSearchProperty(beanDesc, currentName, value)) {
                     likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
                 }
             }
-            final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
             if (beanDesc.hasPropertyDesc(currentName)) { // main case
                 final DfPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                 value = getPropertyValue(clazz, value, currentName, pd);
                 clazz = (value != null ? value.getClass() : pd.getPropertyType());
                 continue;
             }
-            if (List.class.isInstance(value)) { // used by FOR comment
-                if (currentName.startsWith("get(") && currentName.endsWith(")")) {
-                    final List<?> list = (List<?>) value;
-                    final String exp = Srl.extractScopeFirst(currentName, "get(", ")").getContent();
-                    try {
-                        final Integer index = DfTypeUtil.toInteger(exp);
-                        value = list.get(index);
-                    } catch (NumberFormatException e) {
-                        throwListIndexNotNumberException(exp, e);
-                    } catch (IndexOutOfBoundsException e) {
-                        throwListIndexOutOfBoundsException(exp, e);
-                    }
-                    clazz = (value != null ? value.getClass() : null);
-                    continue;
-                }
-            }
-            if (MapParameterBean.class.isAssignableFrom(clazz)) { // used by union-query internally
+            if (MapParameterBean.class.isInstance(value)) { // used by union-query internally
                 final Map<?, ?> map = ((MapParameterBean<?>) value).getParameterMap();
                 // if the key does not exist, it does not process
                 // (different specification with Map)
@@ -160,6 +146,22 @@ public class ValueAndTypeSetupper {
                 value = map.get(currentName);
                 clazz = (value != null ? value.getClass() : null);
                 continue;
+            }
+            if (List.class.isInstance(value)) {
+                if (currentName.startsWith("get(") && currentName.endsWith(")")) {
+                    final List<?> list = (List<?>) value;
+                    final String exp = Srl.extractScopeFirst(currentName, "get(", ")").getContent();
+                    try {
+                        final Integer index = DfTypeUtil.toInteger(exp);
+                        value = list.get(index);
+                    } catch (NumberFormatException e) {
+                        throwListIndexNotNumberException(exp, e);
+                    } catch (IndexOutOfBoundsException e) {
+                        throwListIndexOutOfBoundsException(exp, e);
+                    }
+                    clazz = (value != null ? value.getClass() : null);
+                    continue;
+                }
             }
             throwNotFoundPropertyException(clazz, currentName);
         }

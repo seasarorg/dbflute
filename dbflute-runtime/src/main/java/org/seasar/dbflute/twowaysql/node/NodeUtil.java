@@ -18,8 +18,10 @@ package org.seasar.dbflute.twowaysql.node;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
+import org.seasar.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentIllegalParameterBeanSpecificationException;
+import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentInScopeNotListException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
 import org.seasar.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
@@ -45,28 +47,52 @@ public class NodeUtil {
 
     public static void throwBindOrEmbeddedCommentParameterNullValueException(String expression, Class<?> targetType,
             String specifiedSql, boolean bind) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The value of " + (bind ? "bind" : "embedded") + " variable was null!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Is it within the scope of your assumption?" + ln();
-        msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + ln();
-        msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + ln();
-        msg = msg + "For example:" + ln();
-        msg = msg + "  (x) - XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "  (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
-        msg = msg + ln();
-        msg = msg + "[Comment Expression]" + ln() + expression + ln();
-        msg = msg + ln();
-        msg = msg + "[Parameter Property Type]" + ln() + targetType + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
+        final String name = (bind ? "bind variable" : "embedded variable");
+        final String emmark = (bind ? "" : "$");
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The value of " + name + " was null!");
+        br.addItem("Advice");
+        br.addElement("Is it within the scope of your assumption?");
+        br.addElement("If the answer is YES, please confirm your application logic about the parameter.");
+        br.addElement("If the answer is NO, please confirm the logic of parameter comment(especially IF comment).");
+        br.addElement("For example:");
+        br.addElement("  (x) - XXX_ID = /*" + emmark + "pmb.xxxId*/3");
+        br.addElement("  (o) - /*IF pmb.xxxId != null*/XXX_ID = /*" + emmark + "pmb.xxxId*/3/*END*/");
+        br.addItem("Comment Expression");
+        br.addElement(expression);
+        br.addItem("Parameter Type");
+        br.addElement(targetType);
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
         if (bind) {
             throw new BindVariableCommentParameterNullValueException(msg);
         } else {
             throw new EmbeddedVariableCommentParameterNullValueException(msg);
+        }
+    }
+
+    public static void throwBindOrEmbeddedCommentInScopeNotListException(String expression, Class<?> targetType,
+            String specifiedSql, boolean bind) {
+        final String emmark = (bind ? "" : "$");
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The parameter for in-scope condition was not list or array!");
+        br.addItem("Advice");
+        br.addElement("If a style of a test value is '(...)', parameter should be list or array for in-scope.");
+        br.addElement("For example:");
+        br.addElement("  (x) - MEMBER_ID in /*" + emmark + "pmb.memberId*/('foo', 'bar')");
+        br.addElement("  (o) - MEMBER_ID in /*" + emmark + "pmb.memberIdList*/('foo', 'bar')");
+        br.addItem("Comment Expression");
+        br.addElement(expression);
+        br.addItem("Parameter Type");
+        br.addElement(targetType);
+        br.addItem("Specified SQL");
+        br.addElement(specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        if (bind) {
+            throw new BindVariableCommentInScopeNotListException(msg);
+        } else {
+            throw new EmbeddedVariableCommentInScopeNotListException(msg);
         }
     }
 

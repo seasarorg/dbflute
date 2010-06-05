@@ -23,7 +23,6 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.exception.ForCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNotListException;
-import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -62,42 +61,56 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        final String firstName = _nameList.get(0);
-        assertFirstNameAsNormal(ctx, firstName);
-        final Object value = ctx.getArg(firstName);
-        final Class<?> clazz = ctx.getArgType(firstName);
-        doAccept(ctx, value, clazz);
+        doAccept(ctx, null);
     }
 
     public void accept(CommandContext ctx, LoopInfo loopInfo) {
         final String firstName = _nameList.get(0);
         if (firstName.equals(ForNode.CURRENT_VARIABLE)) { // use loop element
             final Object parameter = loopInfo.getCurrentParameter();
-            doAccept(ctx, parameter, parameter.getClass());
+            final Class<?> parameterType = loopInfo.getCurrentParameterType();
+            doAccept(ctx, parameter, parameterType, loopInfo, true);
         } else { // normal
-            accept(ctx);
+            doAccept(ctx, loopInfo);
         }
     }
 
-    public void doAccept(CommandContext ctx, Object value, Class<?> clazz) {
+    public void doAccept(CommandContext ctx, LoopInfo parentLoop) {
+        final String firstName = _nameList.get(0);
+        assertFirstNameAsNormal(ctx, firstName);
+        final Object value = ctx.getArg(firstName);
+        final Class<?> clazz = ctx.getArgType(firstName);
+        doAccept(ctx, value, clazz, parentLoop, false);
+    }
+
+    public void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo parentLoop,
+            boolean inheritLoop) {
+        if (firstValue == null) {
+            return; // if base object is null, do nothing at FOR comment
+        }
         final ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setTargetValue(value);
-        valueAndType.setTargetType(clazz);
+        valueAndType.setTargetValue(firstValue);
+        valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
+        if (inheritLoop) {
+            valueAndType.inheritLikeSearchOptionIfNeeds(parentLoop);
+        }
         final Object targetValue = valueAndType.getTargetValue();
         if (targetValue == null) {
-            return;
+            return; // if target value is null, do nothing at FOR comment
         }
         assertParameterList(targetValue);
         final List<?> parameterList = (List<?>) targetValue;
         final int loopSize = parameterList.size();
         final LoopInfo loopInfo = new LoopInfo();
+        loopInfo.setParentLoop(parentLoop);
+        loopInfo.setExpression(_expression);
+        loopInfo.setSpecifiedSql(_specifiedSql);
         loopInfo.setParameterList(parameterList);
         loopInfo.setLoopSize(loopSize);
         loopInfo.setLikeSearchOption(valueAndType.getLikeSearchOption());
         for (int loopIndex = 0; loopIndex < loopSize; loopIndex++) {
             loopInfo.setLoopIndex(loopIndex);
-            assertCurrentParameter(loopInfo);
             processAcceptingChildren(ctx, loopInfo);
         }
         if (loopSize > 0) {
@@ -162,24 +175,6 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
             br.addElement(_specifiedSql);
             String msg = br.buildExceptionMessage();
             throw new ForCommentParameterNotListException(msg);
-        }
-    }
-
-    protected void assertCurrentParameter(LoopInfo loopInfo) {
-        final Object currentParameter = loopInfo.getCurrentParameter();
-        if (currentParameter == null) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("The list of parameter had a null element.");
-            br.addItem("Parameter List");
-            br.addElement(loopInfo.getParameterList());
-            br.addItem("Current Index");
-            br.addElement(loopInfo.getLoopIndex());
-            br.addItem("FOR Comment Expression");
-            br.addElement(_expression);
-            br.addItem("Specified SQL");
-            br.addElement(_specifiedSql);
-            String msg = br.buildExceptionMessage();
-            throw new ForCommentParameterNullElementException(msg);
         }
     }
 

@@ -14,10 +14,13 @@ public class LoopInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected String _expression; // as loop meta information
+    protected String _specifiedSql; // as loop meta information
     protected List<?> _parameterList;
     protected int _loopSize;
     protected LikeSearchOption _likeSearchOption;
     protected int _loopIndex;
+    protected LoopInfo _parentLoop;
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -30,6 +33,22 @@ public class LoopInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getExpression() {
+        return _expression;
+    }
+
+    public void setExpression(String expression) {
+        this._expression = expression;
+    }
+
+    public String getSpecifiedSql() {
+        return _specifiedSql;
+    }
+
+    public void setSpecifiedSql(String specifiedSql) {
+        this._specifiedSql = specifiedSql;
+    }
+
     public List<?> getParameterList() {
         return _parameterList;
     }
@@ -62,7 +81,20 @@ public class LoopInfo {
         this._loopIndex = loopIndex;
     }
 
+    public LoopInfo getParentLoop() {
+        return _parentLoop;
+    }
+
+    public void setParentLoop(LoopInfo parentLoop) {
+        this._parentLoop = parentLoop;
+    }
+
     public Object getCurrentParameter() {
         return _parameterList.get(_loopIndex);
+    }
+
+    public Class<?> getCurrentParameterType() {
+        final Object parameter = getCurrentParameter();
+        return parameter != null ? parameter.getClass() : null;
     }
 }

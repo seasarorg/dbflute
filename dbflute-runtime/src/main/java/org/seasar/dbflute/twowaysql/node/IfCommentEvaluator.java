@@ -416,7 +416,20 @@ public class IfCommentEvaluator {
                 return null; // unreachable
             }
         }
-        if (List.class.isInstance(baseObject)) { // used by FOR comment
+        if (MapParameterBean.class.isInstance(baseObject)) { // used by union-query internally
+            // if the key does not exist, it does not process
+            // (different specification with Map)
+            final Map<?, ?> map = ((MapParameterBean<?>) baseObject).getParameterMap();
+            if (map.containsKey(property)) {
+                return map.get(property);
+            }
+        }
+        if (Map.class.isInstance(baseObject)) {
+            // if the key does not exist, treated same as a null value
+            final Map<?, ?> map = (Map<?, ?>) baseObject;
+            return map.get(property);
+        }
+        if (List.class.isInstance(baseObject)) {
             if (property.startsWith("get(") && property.endsWith(")")) {
                 final List<?> list = (List<?>) baseObject;
                 final String exp = Srl.extractScopeFirst(property, "get(", ")").getContent();
@@ -431,19 +444,6 @@ public class IfCommentEvaluator {
                     return null; // unreachable
                 }
             }
-        }
-        if (MapParameterBean.class.isInstance(baseObject)) { // used by union-query internally
-            // if the key does not exist, it does not process
-            // (different specification with Map)
-            final Map<?, ?> map = ((MapParameterBean<?>) baseObject).getParameterMap();
-            if (map.containsKey(property)) {
-                return map.get(property);
-            }
-        }
-        if (Map.class.isInstance(baseObject)) {
-            // if the key does not exist, treated same as a null value
-            final Map<?, ?> map = (Map<?, ?>) baseObject;
-            return map.get(property);
         }
         throwIfCommentNotFoundPropertyException(baseObject, property);
         return null; // unreachable
