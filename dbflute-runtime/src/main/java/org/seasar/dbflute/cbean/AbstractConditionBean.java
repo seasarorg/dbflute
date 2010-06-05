@@ -153,10 +153,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * If the same-name-columns exist in your conditions, both are embedded.
      * @param embeddedColumnInfoSet The set of embedded target column information. (NotNull)
      * @param quote Should the conditions value be quoted?
+     * @deprecated You should not use this easily. It's a dangerous function.
      */
     public void embedCondition(Set<ColumnInfo> embeddedColumnInfoSet, boolean quote) {
         if (embeddedColumnInfoSet == null) {
-            String msg = "The argument[embeddedColumnInfoSet] should not be null.";
+            String msg = "The argument[embedCondition] should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (quote) {

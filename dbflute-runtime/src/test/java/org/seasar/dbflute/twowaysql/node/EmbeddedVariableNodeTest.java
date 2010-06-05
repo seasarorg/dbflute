@@ -116,9 +116,45 @@ public class EmbeddedVariableNodeTest extends PlainTestCase {
     // ===================================================================================
     //                                                                             InScope
     //                                                                             =======
-    public void test_accept_inScope_list() {
+    public void test_accept_inScope_list_quoted() {
         // ## Arrange ##
         String sql = "in /*$pmb.memberNameList*/('foo', 'bar')";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("baz", "qux"));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("in ('baz', 'qux')", ctx.getSql());
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_accept_inScope_list_notQuoted() {
+        // ## Arrange ##
+        String sql = "in /*$pmb.memberNameList*/(foo, bar)";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("baz", "qux"));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        log("ctx:" + ctx);
+        assertEquals("in (baz, qux)", ctx.getSql());
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_accept_inScope_list_eitherQuoted() {
+        // ## Arrange ##
+        String sql = "in /*$pmb.memberNameList*/(foo, 'bar')";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();

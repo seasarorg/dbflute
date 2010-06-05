@@ -50,7 +50,7 @@ public class EmbeddedVariableNode extends VariableNode {
         valueAndType.setTargetValue(firstValue);
         valueAndType.setTargetType(firstType);
         setupValueAndType(valueAndType);
-        if (isQuote() && isAcceptableLike()) {
+        if (isQuotedScalar() && isAcceptableLike()) {
             valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
             valueAndType.filterValueByOptionIfNeeds();
         }
@@ -78,7 +78,7 @@ public class EmbeddedVariableNode extends VariableNode {
                 msg = msg + " value=" + valueAndType.getTargetValue() + " expression=" + _expression;
                 throw new IllegalStateException(msg);
             }
-            if (isQuote()) {
+            if (isQuotedScalar()) {
                 ctx.addSql("'" + embeddedString + "'");
                 if (isAcceptableLike()) {
                     final String rearOption = valueAndType.buildRearOptionOnSql();
@@ -103,38 +103,38 @@ public class EmbeddedVariableNode extends VariableNode {
         if (length == 0) {
             throwBindOrEmbeddedCommentParameterEmptyListException();
         }
-        String quote = null;
-        for (int i = 0; i < length; ++i) {
-            final Object currentElement = Array.get(array, i);
-            if (currentElement != null) {
-                quote = !(currentElement instanceof Number) ? "'" : "";
-                break;
-            }
-        }
-        if (quote == null) {
-            throwBindOrEmbeddedCommentParameterNullOnlyListException();
-        }
-        boolean existsValidElements = false;
+        final String quote = isQuotedInScope() ? "'" : "";
         ctx.addSql("(");
+        int validCount = 0;
         for (int i = 0; i < length; ++i) {
             final Object currentElement = Array.get(array, i);
             if (currentElement != null) {
-                if (!existsValidElements) {
+                if (validCount == 0) {
                     ctx.addSql(quote + currentElement + quote);
-                    existsValidElements = true;
                 } else {
                     ctx.addSql(", " + quote + currentElement + quote);
                 }
+                ++validCount;
             }
+        }
+        if (validCount == 0) {
+            throwBindOrEmbeddedCommentParameterNullOnlyListException();
         }
         ctx.addSql(")");
     }
 
-    protected boolean isQuote() {
+    protected boolean isQuotedScalar() {
         if (_testValue == null) {
             return false;
         }
         return Srl.count(_testValue, "'") > 1 && _testValue.startsWith("'") && _testValue.endsWith("'");
+    }
+
+    protected boolean isQuotedInScope() {
+        if (!isInScope()) {
+            return false;
+        }
+        return Srl.count(_testValue, "'") > 1;
     }
 
     protected boolean processDynamicBinding(CommandContext ctx, Object firstValue, Class<?> firstType,
