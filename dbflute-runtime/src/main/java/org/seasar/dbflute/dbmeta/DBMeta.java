@@ -26,7 +26,7 @@ import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
+import org.seasar.dbflute.helper.mapstring.ColumnValueMapStringBuilder;
 
 /**
  * The interface of DB meta.
@@ -526,7 +526,7 @@ public interface DBMeta {
      * Create map string builder that is prepared. (for INTERNAL)
      * @return Map string builder that is prepared. (NotNull)
      */
-    MapStringBuilder createMapStringBuilder();
+    ColumnValueMapStringBuilder createMapStringBuilder();
 
     // ===================================================================================
     //                                                               Entity Property Setup

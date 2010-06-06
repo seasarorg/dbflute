@@ -46,8 +46,7 @@ import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
-import org.seasar.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
+import org.seasar.dbflute.helper.mapstring.impl.ColumnValueMapStringBuilderImpl;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.FileTokenizingCallback;
 import org.seasar.dbflute.helper.token.file.FileTokenizingHeaderInfo;
@@ -515,7 +514,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
         protected Entity createEntityByStringValueList(java.util.List<String> columnNameList,
                 java.util.List<String> valueList) {
-            final MapStringBuilder builder = new MapStringBuilderImpl();
+            final ColumnValueMapStringBuilderImpl builder = new ColumnValueMapStringBuilderImpl();
             builder.setMsMapMark(MAP_STRING_MAP_MARK);
             builder.setMsStartBrace(MAP_STRING_START_BRACE);
             builder.setMsEndBrace(MAP_STRING_END_BRACE);

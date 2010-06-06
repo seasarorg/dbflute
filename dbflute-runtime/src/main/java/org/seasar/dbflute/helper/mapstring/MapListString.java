@@ -67,43 +67,4 @@ public interface MapListString {
      * @return Generated list. (NotNull)
      */
     List<Object> generateList(String listString);
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    /**
-     * Set map-mark.
-     * @param mapMark Map-mark. (NotNull)
-     */
-    void setMapMark(String mapMark);
-
-    /**
-     * Set list-mark.
-     * @param listMark List-mark. (NotNull)
-     */
-    void setListMark(String listMark);
-
-    /**
-     * Set start brace.
-     * @param startBrace Start brace. (NotNull)
-     */
-    void setStartBrace(String startBrace);
-
-    /**
-     * Set end brace.
-     * @param endBrace End brace. (NotNull)
-     */
-    void setEndBrace(String endBrace);
-
-    /**
-     * Set delimiter.
-     * @param delimiter Delimiter. (NotNull)
-     */
-    void setDelimiter(String delimiter);
-
-    /**
-     * Set equal.
-     * @param equal Equal. (NotNull)
-     */
-    void setEqual(String equal);
 }

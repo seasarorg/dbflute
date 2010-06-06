@@ -18,35 +18,32 @@ package org.seasar.dbflute.helper.mapstring.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.mapstring.ColumnValueMapStringBuilder;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The implementation of map-string builder.
  * @author jflute
  */
-public class MapStringBuilderImpl implements MapStringBuilder {
+public class ColumnValueMapStringBuilderImpl implements ColumnValueMapStringBuilder {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected List<String> _columnNameList;
-
     protected String _msMapMark;
-
     protected String _msStartBrace;
-
     protected String _msEndBrace;
-
     protected String _msDelimiter;
-
     protected String _msEqual;
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                               Build
+    //                                                                               =====
     public String buildByDelimiter(String values, String delimiter) {
         if (values == null) {
             String msg = "The argument[values] should not be null.";
@@ -57,19 +54,8 @@ public class MapStringBuilderImpl implements MapStringBuilder {
             throw new IllegalArgumentException(msg);
         }
         assertStringComponent();
-
-        final java.util.List<String> valueList = tokenize(values, delimiter);
-        assertColumnValueList(_columnNameList, valueList);
-
-        final StringBuffer sb = new StringBuffer();
-        sb.append(_msMapMark).append(_msStartBrace);
-        for (int i = 0; i < _columnNameList.size(); i++) {
-            sb.append(_columnNameList.get(i)).append(_msEqual).append(valueList.get(i)).append(_msDelimiter);
-        }
-
-        sb.delete(sb.length() - _msDelimiter.length(), sb.length());
-        sb.append(_msEndBrace);
-        return sb.toString();
+        final List<String> valueList = tokenize(values, delimiter);
+        return buildFromList(valueList);
     }
 
     public String buildFromList(List<String> valueList) {
@@ -80,10 +66,12 @@ public class MapStringBuilderImpl implements MapStringBuilder {
         assertStringComponent();
         assertColumnValueList(_columnNameList, valueList);
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append(_msMapMark).append(_msStartBrace);
         for (int i = 0; i < _columnNameList.size(); i++) {
-            sb.append(_columnNameList.get(i)).append(_msEqual).append(valueList.get(i)).append(_msDelimiter);
+            final String columnName = _columnNameList.get(i);
+            final String value = valueList.get(i);
+            sb.append(columnName).append(_msEqual).append(value).append(_msDelimiter);
         }
 
         sb.delete(sb.length() - _msDelimiter.length(), sb.length());
@@ -98,6 +86,9 @@ public class MapStringBuilderImpl implements MapStringBuilder {
         return lineToken.tokenize(value, lineTokenizingOption);
     }
 
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
     protected void assertStringComponent() {
         if (_columnNameList == null) {
             String msg = "The columnNameList should not be null.";
@@ -131,36 +122,24 @@ public class MapStringBuilderImpl implements MapStringBuilder {
 
     protected void assertColumnValueList(List<String> columnNameList, List<String> valueList) {
         if (columnNameList.size() != valueList.size()) {
-            String msg = "The length of columnNameList and valueList are difference. (" + columnNameList.size() + ", "
-                    + valueList.size() + ")";
-            msg = msg + " columnNameList=" + columnNameList;
-            msg = msg + " valueList=" + valueList;
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The length of columnNameList and valueList are different.");
+            br.addItem("Column Name List");
+            br.addElement(columnNameList.size());
+            br.addElement(columnNameList.toString());
+            br.addItem("Value List");
+            br.addElement(valueList.size());
+            br.addElement(valueList.toString());
+            final String msg = br.buildExceptionMessage();
             throw new DifferentDelimiterCountException(msg, columnNameList, valueList);
         }
     }
 
-    protected static final String replace(String text, String fromText, String toText) {
-        if (text == null || fromText == null || toText == null) {
-            return null;
-        }
-        final StringBuffer buf = new StringBuffer(100);
-        int pos = 0;
-        int pos2 = 0;
-        while (true) {
-            pos = text.indexOf(fromText, pos2);
-            if (pos == 0) {
-                buf.append(toText);
-                pos2 = fromText.length();
-            } else if (pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                buf.append(text.substring(pos2));
-                break;
-            }
-        }
-        return buf.toString();
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected final String replace(String str, String fromStr, String toStr) {
+        return Srl.replace(str, fromStr, toStr);
     }
 
     // ===================================================================================

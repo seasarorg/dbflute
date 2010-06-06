@@ -51,27 +51,6 @@ import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 public abstract class AbstractConditionBean implements ConditionBean {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Map-string map-mark. */
-    private static final String MAP_STRING_MAP_MARK = "map:";
-
-    /** Map-string list-mark. */
-    private static final String MAP_STRING_LIST_MARK = "list:";
-
-    /** Map-string start-brace. */
-    private static final String MAP_STRING_START_BRACE = "@{";
-
-    /** Map-string end-brace. */
-    private static final String MAP_STRING_END_BRACE = "@}";
-
-    /** Map-string delimiter. */
-    private static final String MAP_STRING_DELIMITER = "@;";
-
-    /** Map-string equal. */
-    private static final String MAP_STRING_EQUAL = "@=";
-
-    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** SQL clause instance. */
@@ -190,22 +169,27 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "The argument[primaryKeyMapString] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
-        final String suffix = MAP_STRING_END_BRACE;
+        final String prefix = DBMeta.MAP_STRING_MAP_MARK + DBMeta.MAP_STRING_START_BRACE;
+        final String suffix = DBMeta.MAP_STRING_END_BRACE;
         if (!primaryKeyMapString.trim().startsWith(prefix)) {
             primaryKeyMapString = prefix + primaryKeyMapString;
         }
         if (!primaryKeyMapString.trim().endsWith(suffix)) {
             primaryKeyMapString = primaryKeyMapString + suffix;
         }
-        MapListString mapListString = new MapListStringImpl();
-        mapListString.setMapMark(MAP_STRING_MAP_MARK);
-        mapListString.setListMark(MAP_STRING_LIST_MARK);
-        mapListString.setDelimiter(MAP_STRING_DELIMITER);
-        mapListString.setStartBrace(MAP_STRING_START_BRACE);
-        mapListString.setEndBrace(MAP_STRING_END_BRACE);
-        mapListString.setEqual(MAP_STRING_EQUAL);
+        final MapListString mapListString = xcreateMapListString();
         acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+    }
+
+    protected MapListString xcreateMapListString() {
+        final MapListStringImpl impl = new MapListStringImpl();
+        impl.setMapMark(DBMeta.MAP_STRING_MAP_MARK);
+        impl.setListMark(DBMeta.MAP_STRING_LIST_MARK);
+        impl.setDelimiter(DBMeta.MAP_STRING_DELIMITER);
+        impl.setStartBrace(DBMeta.MAP_STRING_START_BRACE);
+        impl.setEndBrace(DBMeta.MAP_STRING_END_BRACE);
+        impl.setEqual(DBMeta.MAP_STRING_EQUAL);
+        return impl;
     }
 
     protected void xcheckTypeString(Object value, String propertyName, Class<?> type) {

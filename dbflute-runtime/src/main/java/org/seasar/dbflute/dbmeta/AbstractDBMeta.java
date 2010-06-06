@@ -43,9 +43,9 @@ import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
+import org.seasar.dbflute.helper.mapstring.ColumnValueMapStringBuilder;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
-import org.seasar.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
+import org.seasar.dbflute.helper.mapstring.impl.ColumnValueMapStringBuilderImpl;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
@@ -585,7 +585,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * {@inheritDoc}
      */
-    public MapStringBuilder createMapStringBuilder() {
+    public ColumnValueMapStringBuilder createMapStringBuilder() {
         final List<String> columnDbNameList = new ArrayList<String>();
         for (final Iterator<ColumnInfo> ite = getColumnInfoList().iterator(); ite.hasNext();) {
             final ColumnInfo columnInfo = (ColumnInfo) ite.next();
@@ -1040,25 +1040,25 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
 
         public static MapListString createMapListString() {
-            final MapListString mapListString = new MapListStringImpl();
-            mapListString.setMapMark(MAP_STRING_MAP_MARK);
-            mapListString.setListMark(MAP_STRING_LIST_MARK);
-            mapListString.setStartBrace(MAP_STRING_START_BRACE);
-            mapListString.setEndBrace(MAP_STRING_END_BRACE);
-            mapListString.setEqual(MAP_STRING_EQUAL);
-            mapListString.setDelimiter(MAP_STRING_DELIMITER);
-            return mapListString;
+            final MapListStringImpl impl = new MapListStringImpl();
+            impl.setMapMark(MAP_STRING_MAP_MARK);
+            impl.setListMark(MAP_STRING_LIST_MARK);
+            impl.setStartBrace(MAP_STRING_START_BRACE);
+            impl.setEndBrace(MAP_STRING_END_BRACE);
+            impl.setEqual(MAP_STRING_EQUAL);
+            impl.setDelimiter(MAP_STRING_DELIMITER);
+            return impl;
         }
 
-        public static MapStringBuilder createMapStringBuilder(List<String> columnNameList) {
-            MapStringBuilder mapStringBuilder = new MapStringBuilderImpl();
-            mapStringBuilder.setMsMapMark(MAP_STRING_MAP_MARK);
-            mapStringBuilder.setMsStartBrace(MAP_STRING_START_BRACE);
-            mapStringBuilder.setMsEndBrace(MAP_STRING_END_BRACE);
-            mapStringBuilder.setMsEqual(MAP_STRING_EQUAL);
-            mapStringBuilder.setMsDelimiter(MAP_STRING_DELIMITER);
-            mapStringBuilder.setColumnNameList(columnNameList);
-            return mapStringBuilder;
+        public static ColumnValueMapStringBuilder createMapStringBuilder(List<String> columnNameList) {
+            ColumnValueMapStringBuilderImpl impl = new ColumnValueMapStringBuilderImpl();
+            impl.setMsMapMark(MAP_STRING_MAP_MARK);
+            impl.setMsStartBrace(MAP_STRING_START_BRACE);
+            impl.setMsEndBrace(MAP_STRING_END_BRACE);
+            impl.setMsEqual(MAP_STRING_EQUAL);
+            impl.setMsDelimiter(MAP_STRING_DELIMITER);
+            impl.setColumnNameList(columnNameList);
+            return impl;
         }
     }
 
