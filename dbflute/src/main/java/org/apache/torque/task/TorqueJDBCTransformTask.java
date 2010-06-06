@@ -163,9 +163,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected Map<String, DfTableMetaInfo> _generatedTableMap;
 
     // -----------------------------------------------------
-    //                                           Diff Object
+    //                                           Schema Diff
     //                                           -----------
-    protected DfSchemaDiff _schemaDiff = new DfSchemaDiff();
+    protected final DfSchemaDiff _schemaDiff = new DfSchemaDiff();
 
     // ===================================================================================
     //                                                                             Execute
@@ -187,7 +187,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             generateXML();
 
             _log.info("...Serializing XML:");
-            _log.info("  path     = " + filePath);
+            _log.info("  filePath = " + filePath);
             _log.info("  encoding = " + encoding);
             final XMLSerializer xmlSerializer;
             {
@@ -992,7 +992,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             try {
                 _log.info("*different from previous");
                 _log.info("...Serializing schema-diff:");
-                _log.info("  path = " + _schemaDiff.getDiffMapFilePath());
+                _log.info("  filePath = " + _schemaDiff.getDiffMapFilePath());
                 _schemaDiff.serializeSchemaDiff();
             } catch (IOException e) {
                 String msg = "*Failed to serialize schema-diff";

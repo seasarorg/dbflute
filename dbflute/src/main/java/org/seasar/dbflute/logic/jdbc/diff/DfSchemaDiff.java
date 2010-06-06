@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.Column;
@@ -33,6 +35,7 @@ public class DfSchemaDiff {
     //                                                                          ==========
     protected static final String DIFF_DATE_KEY = "$$DiffDate$$";
     protected static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    protected static final String TABLE_COUNT_KEY = "$$TableCountDiff$$";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -73,15 +76,6 @@ public class DfSchemaDiff {
     }
 
     public void loadPreviousSchema() { // before loading next schema
-        try {
-            doLoadPreviousSchema();
-        } catch (RuntimeException e) {
-            _loadingFailure = true;
-            throw e;
-        }
-    }
-
-    public void doLoadPreviousSchema() {
         final DfSchemaXmlReader reader = createSchemaXmlReader();
         try {
             reader.read();
@@ -89,11 +83,13 @@ public class DfSchemaDiff {
             _firstTime = true;
             return;
         } catch (IOException e) {
+            _loadingFailure = true;
             handleException(e);
         }
         try {
             _previousDb = reader.getSchemaData().getDatabase();
         } catch (EngineException e) {
+            _loadingFailure = true;
             handleException(e);
         }
     }
@@ -290,11 +286,13 @@ public class DfSchemaDiff {
     public Map<String, Object> createDiffMap() {
         final Map<String, Object> tableDiffMap = DfCollectionUtil.newLinkedHashMap();
         tableDiffMap.put(DIFF_DATE_KEY, DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN));
-        tableDiffMap.put("$$NextTableCount$$", _nextDb.getTableList().size());
-        tableDiffMap.put("$$PreviousTableCount$$", _previousDb.getTableList().size());
-        tableDiffMap.put("$$AddedTableCount$$", _addedTableList.size());
-        tableDiffMap.put("$$ChangedTableCount$$", _changedTableList.size());
-        tableDiffMap.put("$$DeletedTableCount$$", _deletedTableList.size());
+        final Map<String, Object> tableCountMap = DfCollectionUtil.newLinkedHashMap();
+        tableCountMap.put("next", _nextDb.getTableList().size());
+        tableCountMap.put("previous", _previousDb.getTableList().size());
+        tableCountMap.put("added", _addedTableList.size());
+        tableCountMap.put("changed", _changedTableList.size());
+        tableCountMap.put("deleted", _deletedTableList.size());
+        tableDiffMap.put(TABLE_COUNT_KEY, tableCountMap);
         for (DfTableDiff diff : _addedTableList) {
             if (diff.hasDiff()) {
                 tableDiffMap.put(diff.getTableName(), diff.createDiffMap());
@@ -328,7 +326,17 @@ public class DfSchemaDiff {
             try {
                 ins = new FileInputStream(file);
                 final Map<String, Object> existingMap = diffFile.readMap(ins);
-                serializedMap.putAll(existingMap);
+                final Set<Entry<String, Object>> entrySet = existingMap.entrySet();
+                int count = 0;
+                final int historyLimit = getHistoryLimit();
+                final boolean historyLimitValid = historyLimit >= 0;
+                for (Entry<String, Object> entry : entrySet) {
+                    if (historyLimitValid && count >= historyLimit) {
+                        break;
+                    }
+                    serializedMap.put(entry.getKey(), entry.getValue());
+                    ++count;
+                }
             } finally {
                 if (ins != null) {
                     ins.close();
@@ -347,6 +355,10 @@ public class DfSchemaDiff {
                 ous.close();
             }
         }
+    }
+
+    protected int getHistoryLimit() {
+        return -1; // as default (no limit)
     }
 
     // ===================================================================================
