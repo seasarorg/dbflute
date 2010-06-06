@@ -99,33 +99,67 @@ public class Table {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private List<Column> _columnList;
-    private List<ForeignKey> _foreignKeys;
-    private List<Index> _indices;
-    private List<Unique> _unices;
-    private List<IdMethodParameter> _idMethodParameters;
+    // -----------------------------------------------------
+    //                                              Database
+    //                                              --------
+    private Database _tableParent;
+
+    // -----------------------------------------------------
+    //                                      Table Definition
+    //                                      ----------------
     private String _name;
     private String _type;
     private UnifiedSchema _unifiedSchema;
     private String _plainComment;
-    private String _description;
-    private String _javaName;
-    protected String _javaNamingMethod;
-    private Database _tableParent;
-    private List<ForeignKey> _referrers;
-    private List<String> _foreignTableNames;
-    private boolean _containsForeignPK;
-    private Column _inheritanceColumn;
-    protected StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexibleOrdered();
-    private boolean _isForReferenceOnly;
+    private String _description; // [Unused on DBFlute]
     private boolean _existSameNameTable;
 
     // -----------------------------------------------------
-    //                                              Internal
+    //                                                Column
+    //                                                ------
+    private List<Column> _columnList;
+    private StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexibleOrdered();
+
+    // -----------------------------------------------------
+    //                                           Foreign Key
+    //                                           -----------
+    private List<ForeignKey> _foreignKeys;
+    private List<String> _foreignTableNames;
+    private boolean _containsForeignPK;
+    private boolean _isForReferenceOnly;
+
+    // -----------------------------------------------------
+    //                                              Referrer
     //                                              --------
+    private List<ForeignKey> _referrers;
+
+    // -----------------------------------------------------
+    //                                                Unique
+    //                                                ------
+    private List<Unique> _unices;
+
+    // -----------------------------------------------------
+    //                                                 Index
+    //                                                 -----
+    private List<Index> _indices;
+
+    // -----------------------------------------------------
+    //                                       Java Definition
+    //                                       ---------------
+    private String _javaName;
+
+    // -----------------------------------------------------
+    //                                 Sql2Entity Definition
+    //                                 ---------------------
     private boolean _sql2entityTypeSafeCursor;
 
+    // -----------------------------------------------------
+    //                                       Other Component
+    //                                       ---------------
     // [Unused on DBFlute]
+    private List<IdMethodParameter> _idMethodParameters;
+    private Column _inheritanceColumn;
+
     // private String _idMethod;
     // private AttributeListImpl attributes;
     // private boolean _skipSql;
@@ -158,9 +192,9 @@ public class Table {
         _unices = new ArrayList<Unique>(5);
     }
 
-    // ===================================================================================
-    //                                                                         XML Loading
-    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                         Load from XML
+    //                                         -------------
     /**
      * Load the table object from an XML tag.
      * @param attrib XML attributes. (NotNull)
@@ -175,111 +209,54 @@ public class Table {
 
         // It retrieves the method for converting from specified name to a java name.
         // *Attention: Always use Default-JavaNamingMethod!!!
-        _javaNamingMethod = getDatabase().getDefaultJavaNamingMethod();
+        // [Unused on DBFlute]
+        //_javaNamingMethod = getDatabase().getDefaultJavaNamingMethod();
 
         // [Unused on DBFlute]
-        // _idMethod = attrib.getValue("idMethod");
-        // if ("null".equals(_idMethod)) {
-        //     _idMethod = defaultIdMethod;
-        // }
-        // if ("autoincrement".equals(_idMethod) || "sequence".equals(_idMethod)) {
-        //     _log.warn("The value '" + _idMethod + "' for Torque's "
-        //             + "table.idMethod attribute has been deprecated in favor " + "of '" + NATIVE
-        //             + "'.  Please adjust your " + "Torque XML schema accordingly.");
-        //     _idMethod = NATIVE;
-        // }
-        // _skipSql = "true".equals(attrib.getValue("skipSql"));
-        // _pkg = attrib.getValue("package");
-        // _alias = attrib.getValue("alias");
-        // _interface = attrib.getValue("interface");
-        // _abstractValue = "true".equals(attrib.getValue("abstract"));
-        // _baseClass = attrib.getValue("baseClass");
-        // _basePeer = attrib.getValue("basePeer");
+        //_idMethod = attrib.getValue("idMethod");
+        //if ("null".equals(_idMethod)) {
+        //    _idMethod = defaultIdMethod;
+        //}
+        //if ("autoincrement".equals(_idMethod) || "sequence".equals(_idMethod)) {
+        //    _log.warn("The value '" + _idMethod + "' for Torque's "
+        //            + "table.idMethod attribute has been deprecated in favor " + "of '" + NATIVE
+        //            + "'.  Please adjust your " + "Torque XML schema accordingly.");
+        //    _idMethod = NATIVE;
+        //}
+        //_skipSql = "true".equals(attrib.getValue("skipSql"));
+        //_pkg = attrib.getValue("package");
+        //_alias = attrib.getValue("alias");
+        //_interface = attrib.getValue("interface");
+        //_abstractValue = "true".equals(attrib.getValue("abstract"));
+        //_baseClass = attrib.getValue("baseClass");
+        //_basePeer = attrib.getValue("basePeer");
 
         // These are unused on DBFlute
         _description = attrib.getValue("description");
     }
 
     // ===================================================================================
-    //                                                                             Unknown
-    //                                                                             =======
+    //                                                                            Database
+    //                                                                            ========
     /**
-     * <p>A hook for the SAX XML parser to call when this table has
-     * been fully loaded from the XML, and all nested elements have
-     * been processed.</p>
-     * <p>Performs heavy indexing and naming of elements which weren't
-     * provided with a name.</p>
+     * Set the parent of the table
+     * @param parent the parant database
      */
-    public void doFinalInitialization() {
-        // Heavy indexing must wait until after all columns composing
-        // a table's primary key have been parsed.
-        // [Unused on DBFlute]
-        // if (_isHeavyIndexing) {
-        //     doHeavyIndexing();
-        // }
-
-        // Name any indices which are missing a name using the
-        // appropriate algorithm.
-        doNaming();
+    public void setDatabase(Database parent) {
+        _tableParent = parent;
     }
 
     /**
-     * Names composing objects which haven't yet been named.  This
-     * currently consists of foreign-key and index entities.
+     * Get the parent of the table
+     * @return the parant database
      */
-    private void doNaming() {
-        int i;
-        int size;
-        String name;
-
-        // Assure names are unique across all databases.
-        try {
-            for (i = 0, size = _foreignKeys.size(); i < size; i++) {
-                ForeignKey fk = (ForeignKey) _foreignKeys.get(i);
-                name = fk.getName();
-                if (Srl.is_Null_or_Empty(name)) {
-                    name = acquireConstraintName("FK", i + 1);
-                    fk.setName(name);
-                }
-            }
-
-            for (i = 0, size = _indices.size(); i < size; i++) {
-                Index index = (Index) _indices.get(i);
-                name = index.getName();
-                if (Srl.is_Null_or_Empty(name)) {
-                    name = acquireConstraintName("I", i + 1);
-                    index.setName(name);
-                }
-            }
-
-            // NOTE: Most RDBMSes can apparently name unique column
-            // constraints/indices themselves (using MySQL and Oracle
-            // as test cases), so we'll assume that we needn't add an
-            // entry to the system name list for these.
-        } catch (EngineException nameAlreadyInUse) {
-            _log.error(nameAlreadyInUse, nameAlreadyInUse);
-        }
-    }
-
-    /**
-     * Macro to a constraint name.
-     * @param nameType constraint type
-     * @param nbr unique number for this constraint type
-     * @return unique name for constraint
-     * @throws EngineException
-     */
-    private final String acquireConstraintName(String nameType, int nbr) throws EngineException {
-        List<Object> inputs = new ArrayList<Object>(4);
-        inputs.add(getDatabase());
-        inputs.add(getName());
-        inputs.add(nameType);
-        inputs.add(new Integer(nbr));
-        return NameFactory.generateName(NameFactory.CONSTRAINT_GENERATOR, inputs);
+    public Database getDatabase() {
+        return _tableParent;
     }
 
     // ===================================================================================
-    //                                                                          Basic Info
-    //                                                                          ==========
+    //                                                                               Table
+    //                                                                               =====
     // -----------------------------------------------------
     //                                            Table Name
     //                                            ----------
@@ -435,8 +412,8 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                        Display String
-    //                                        --------------
+    //                                               Display
+    //                                               -------
     public String getBasicInfoDispString() {
         final String type = getType();
         return getAliasExpression() + getName() + (type != null ? " for " + getType() : "");
@@ -503,7 +480,7 @@ public class Table {
     /**
      * Get the description for the Table
      */
-    public String getDescription() {
+    public String getDescription() { // [Unused on DBFlute]
         return _description;
     }
 
@@ -513,243 +490,6 @@ public class Table {
      */
     public void setDescription(String newDescription) {
         _description = newDescription;
-    }
-
-    // -----------------------------------------------------
-    //                                             Java Name
-    //                                             ---------
-    protected boolean _needsJavaNameConvert = true;
-
-    public void setupNeedsJavaNameConvertFalse() {
-        _needsJavaNameConvert = false;
-    }
-
-    public boolean needsJavaNameConvert() {
-        return _needsJavaNameConvert;
-    }
-
-    /**
-     * Get name to use in Java sources
-     */
-    public String getJavaName() {
-        if (_javaName == null) {
-            if (needsJavaNameConvert()) {
-                _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
-            } else {
-                _javaName = getName(); // for sql2entity mainly
-            }
-            _javaName = filterBuriJavaNameIfNeeds(_javaName);
-        }
-        return _javaName;
-    }
-
-    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        if (buriProperties.isUseBuri() && isBuriInternal()) {
-            final String arranged = buriProperties.arrangeBuriTableJavaName(_javaName);
-            if (arranged != null) {
-                return arranged;
-            }
-        }
-        return javaName;
-    }
-
-    /**
-     * Set name to use in Java sources
-     */
-    public void setJavaName(String javaName) {
-        this._javaName = javaName;
-    }
-
-    // -----------------------------------------------------
-    //                               Uncapitalized Java Name
-    //                               -----------------------
-    /**
-     * Get variable name to use in Java sources (= uncapitalized java name)
-     */
-    public String getUncapitalisedJavaName() { // allowed spell miss
-        return Srl.initUncap(getJavaName());
-    }
-
-    // -----------------------------------------------------
-    //                         Java Beans Rule Property Name
-    //                         -----------------------------
-    /**
-     * Get property name to use in Java sources (according to java beans rule)
-     */
-    public String getJavaBeansRulePropertyName() {
-        return Srl.initBeansProp(getJavaName());
-    }
-
-    // -----------------------------------------------------
-    //                                            Class Name
-    //                                            ----------
-    public String getBaseEntityClassName() {
-        final String projectPrefix = getDatabase().getProjectPrefix();
-        final String basePrefix = getDatabase().getBasePrefix();
-        final String baseSuffixForEntity = getDatabase().getBaseSuffixForEntity();
-        return projectPrefix + basePrefix + getSchemaClassPrefix() + getJavaName() + baseSuffixForEntity;
-    }
-
-    public String getBaseDaoClassName() {
-        return getBaseEntityClassName() + "Dao";
-    }
-
-    public String getBaseBehaviorClassName() {
-        return getBaseEntityClassName() + "Bhv";
-    }
-
-    public String getBaseBehaviorApClassName() {
-        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
-        return getBaseBehaviorClassName() + suffix;
-    }
-
-    public String getBaseConditionBeanClassName() {
-        return getBaseEntityClassName() + "CB";
-    }
-
-    public String getAbstractBaseConditionQueryClassName() {
-        final String projectPrefix = getDatabase().getProjectPrefix();
-        final String basePrefix = getDatabase().getBasePrefix();
-        return projectPrefix + "Abstract" + basePrefix + getSchemaClassPrefix() + getJavaName() + "CQ";
-    }
-
-    public String getBaseConditionQueryClassName() {
-        return getBaseEntityClassName() + "CQ";
-    }
-
-    public String getExtendedEntityClassName() {
-        final String projectPrefix = getDatabase().getProjectPrefix();
-        return buildExtendedEntityClassName(projectPrefix);
-    }
-
-    protected String buildExtendedEntityClassName(String projectPrefix) {
-        return projectPrefix + getSchemaClassPrefix() + getJavaName();
-    }
-
-    public String getRelationTraceClassName() {
-        return getSchemaClassPrefix() + getJavaName();
-    }
-
-    public String getDBMetaClassName() {
-        return getExtendedEntityClassName() + "Dbm";
-    }
-
-    public String getDBMetaFullClassName() {
-        return getDatabase().getBaseEntityPackage() + ".dbmeta." + getDBMetaClassName();
-    }
-
-    public String getExtendedDaoClassName() {
-        return getExtendedEntityClassName() + "Dao";
-    }
-
-    public String getExtendedDaoFullClassName() {
-        final String extendedDaoPackage = getDatabase().getExtendedDaoPackage();
-        return extendedDaoPackage + "." + getExtendedDaoClassName();
-    }
-
-    public String getExtendedBehaviorClassName() {
-        return getExtendedEntityClassName() + "Bhv";
-    }
-
-    public String getExtendedBehaviorApClassName() {
-        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
-        return getExtendedBehaviorClassName() + suffix;
-    }
-
-    public String getExtendedBehaviorLibClassName() {
-        final String projectPrefix = getBasicProperties().getLibraryProjectPrefix();
-        return buildExtendedEntityClassName(projectPrefix) + "Bhv";
-    }
-
-    public String getExtendedBehaviorFullClassName() {
-        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
-        return extendedBehaviorPackage + "." + getExtendedBehaviorClassName();
-    }
-
-    public String getExtendedBehaviorApFullClassName() {
-        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
-        return extendedBehaviorPackage + "." + getExtendedBehaviorApClassName();
-    }
-
-    public String getExtendedConditionBeanClassName() {
-        return getExtendedEntityClassName() + "CB";
-    }
-
-    public String getExtendedConditionQueryClassName() {
-        return getExtendedEntityClassName() + "CQ";
-    }
-
-    public String getExtendedConditionInlineQueryClassName() {
-        return getExtendedEntityClassName() + "CIQ";
-    }
-
-    public String getNestSelectSetupperClassName() {
-        return getExtendedEntityClassName() + "Nss";
-    }
-
-    public String getNestSelectSetupperTerminalClassName() {
-        return getExtendedEntityClassName() + "Nsst";
-    }
-
-    protected String getSchemaClassPrefix() {
-        // *however same-name tables between different schemas are unsupported at 0.9.6.8
-        if (hasSchema() && isExistSameNameTable()) {
-            // schema of DB2 may have space either size
-            final String prefix;
-            if (isCatalogAdditionalSchema()) {
-                String pureCatalog = getPureCatalog();
-                pureCatalog = pureCatalog != null ? Srl.initCapTrimmed(pureCatalog.trim().toLowerCase()) : "";
-                String pureSchema = getPureSchema();
-                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
-                prefix = pureCatalog + pureSchema;
-            } else {
-                String pureSchema = getPureSchema();
-                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
-                prefix = pureSchema;
-            }
-            return prefix;
-        }
-        return "";
-    }
-
-    protected boolean _alreadyCheckedExistingSameNameTable;
-
-    protected boolean isExistSameNameTable() {
-        if (_alreadyCheckedExistingSameNameTable) {
-            return _existSameNameTable;
-        }
-        _alreadyCheckedExistingSameNameTable = true;
-        final List<Table> tableList = getDatabase().getTableList();
-        int count = 0;
-        for (Table table : tableList) {
-            final String name = table.getName();
-            if (_name.equalsIgnoreCase(name)) {
-                ++count;
-                if (count > 1) {
-                    _existSameNameTable = true;
-                    return _existSameNameTable;
-                }
-            }
-        }
-        _existSameNameTable = false;
-        return _existSameNameTable;
-    }
-
-    // -----------------------------------------------------
-    //                                        Component Name
-    //                                        --------------
-    public String getDaoComponentName() {
-        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Dao";
-    }
-
-    public String getBehaviorComponentName() {
-        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Bhv";
-    }
-
-    public String getBehaviorApComponentName() {
-        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
-        return getBehaviorComponentName() + suffix;
     }
 
     // -----------------------------------------------------
@@ -912,694 +652,8 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                                         Foreign Key
+    //                                                                         Primary Key
     //                                                                         ===========
-    // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
-    /**
-     * Returns an Array containing all the FKs in the table
-     * @return Foreign-key array.
-     */
-    public ForeignKey[] getForeignKeys() {
-        final int size = _foreignKeys.size();
-        final ForeignKey[] tbls = new ForeignKey[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (ForeignKey) _foreignKeys.get(i);
-        }
-        return tbls;
-    }
-
-    /**
-     * Return the first foreign key that includes column in it's list
-     * of local columns.  Eg. Foreign key (a,b,c) references table(x,y,z)
-     * will be returned of column is either a,b or c.
-     * @param columnName column name included in the key
-     * @return Return a Column object or null if it does not exist.
-     */
-    public ForeignKey getForeignKey(String columnName) {
-        ForeignKey firstFK = null;
-        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = iter.next();
-            List<String> localColumns = key.getLocalColumns();
-            if (Srl.containsIgnoreCase(localColumns, columnName)) {
-                if (firstFK == null) {
-                    firstFK = key;
-                }
-            }
-        }
-        return firstFK;
-    }
-
-    public List<ForeignKey> getForeignKeyList(String columnName) {
-        List<ForeignKey> fkList = new ArrayList<ForeignKey>();
-        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = iter.next();
-            List<String> localColumns = key.getLocalColumns();
-            if (Srl.containsIgnoreCase(localColumns, columnName)) {
-                fkList.add(key);
-            }
-        }
-        return fkList;
-    }
-
-    /**
-     * A utility function to create a new foreign key
-     * from attrib and add it to this table.
-     * @param attrib the xml attributes
-     * @return the created ForeignKey
-     */
-    public ForeignKey addForeignKey(Attributes attrib) {
-        final ForeignKey fk = new ForeignKey();
-        fk.loadFromXML(attrib);
-        addForeignKey(fk);
-        return fk;
-    }
-
-    // -----------------------------------------------------
-    //                                               Arrange
-    //                                               -------
-    /**
-     * Returns an comma string containing all the foreign table name. <br />
-     * And contains one-to-one table.
-     * @return Foreign table as comma string.
-     */
-    public String getForeignTableNameCommaString() {
-        final StringBuilder sb = new StringBuilder();
-        final Set<String> tableSet = new HashSet<String>();
-        final List<ForeignKey> foreignKeyList = _foreignKeys;
-        for (int i = 0; i < foreignKeyList.size(); i++) {
-            final ForeignKey fk = foreignKeyList.get(i);
-            final String name = fk.getForeignTableName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(", ").append(name).append(fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
-        }
-        List<ForeignKey> referrerList = _referrers;
-        for (int i = 0; i < referrerList.size(); i++) {
-            final ForeignKey fk = referrerList.get(i);
-            if (!fk.isOneToOne()) {
-                continue;
-            }
-            final String name = fk.getTable().getName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(", ").append(name).append("(AsOne)");
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
-        final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
-        final String delimiter = ", ";
-        final List<ForeignKey> foreignKeyList = _foreignKeys;
-        final int size = foreignKeyList.size();
-        if (size == 0) {
-            return "&nbsp;";
-        }
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = foreignKeyList.get(i);
-            final String foreignTableName = fk.getForeignTableName();
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
-        }
-        sb.delete(0, delimiter.length());
-        return sb.toString();
-    }
-
-    /**
-     * Returns an comma string containing all the foreign property name.
-     * @return Foreign property-name as comma string.
-     */
-    public String getForeignPropertyNameCommaString() {
-        final StringBuilder sb = new StringBuilder();
-
-        final List<ForeignKey> ls = _foreignKeys;
-        final int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getForeignPropertyName());
-        }
-        final List<ForeignKey> referrerList = _referrers;
-        for (ForeignKey fk : referrerList) {
-            if (fk.isOneToOne()) {
-                sb.append(", ").append(fk.getReferrerPropertyNameAsOne());
-            }
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * A list of tables referenced by foreign keys in this table
-     *
-     * @return A list of tables
-     */
-    public List<String> getForeignTableNames() {
-        if (_foreignTableNames == null) {
-            _foreignTableNames = new ArrayList<String>(1);
-        }
-        return _foreignTableNames;
-    }
-
-    /**
-     * Adds a new FK to the FK list and set the
-     * parent table of the column to the current table
-     * @param fk A foreign key
-     */
-    public void addForeignKey(ForeignKey fk) {
-        fk.setTable(this);
-        _foreignKeys.add(fk);
-
-        if (_foreignTableNames == null) {
-            _foreignTableNames = new ArrayList<String>(5);
-        }
-        if (_foreignTableNames.contains(fk.getForeignTableName())) {
-            _foreignTableNames.add(fk.getForeignTableName());
-        }
-    }
-
-    public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) {
-        final Set<String> localColumnNameSet = createFlexibleSet(localColumnNameList);
-        final Set<String> foreignColumnNameSet = createFlexibleSet(foreignColumnNameList);
-        final ForeignKey[] fkArray = getForeignKeys();
-        for (final ForeignKey key : fkArray) {
-            if (isSameTableAsFlexible(key.getForeignTableName(), foreignTableName)) {
-                final List<String> currentLocalColumnNameList = key.getLocalColumns();
-                if (currentLocalColumnNameList == null || currentLocalColumnNameList.isEmpty()) {
-                    String msg = "The foreignKey did not have local column name list: " + currentLocalColumnNameList;
-                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
-                    throw new IllegalStateException(msg);
-                }
-                final List<String> currentForeignColumnNameList = key.getForeignColumns();
-                if (currentForeignColumnNameList == null || currentForeignColumnNameList.isEmpty()) {
-                    String msg = "The foreignKey did not have foreign column name list: "
-                            + currentForeignColumnNameList;
-                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
-                    throw new IllegalStateException(msg);
-                }
-
-                final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
-                final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
-
-                boolean sameAsLocal = false;
-                boolean sameAsForeign = false;
-                if (localColumnNameSet.size() == currentLocalColumnNameSet.size()) {
-                    for (String currentLocalColumnName : currentLocalColumnNameSet) {
-                        if (localColumnNameSet.contains(currentLocalColumnName)) {
-                            sameAsLocal = true;
-                        }
-                    }
-                }
-                if (foreignColumnNameSet.size() == currentForeignColumnNameSet.size()) {
-                    for (String currentForeignColumnName : currentForeignColumnNameSet) {
-                        if (foreignColumnNameSet.contains(currentForeignColumnName)) {
-                            sameAsForeign = true;
-                        }
-                    }
-                }
-                if (sameAsLocal && sameAsForeign) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    protected boolean isSameTableAsFlexible(String tableOne, String tableTwo) {
-        if (tableOne.equalsIgnoreCase(tableTwo)) {
-            return true;
-        }
-        tableOne = Srl.replace(tableOne, "_", "");
-        tableTwo = Srl.replace(tableTwo, "_", "");
-        if (tableOne.equalsIgnoreCase(tableTwo)) {
-            return true;
-        }
-        return false;
-    }
-
-    protected Set<String> createFlexibleSet(List<String> keyList) {
-        final Set<String> flset = StringSet.createAsFlexibleOrdered();
-        flset.addAll(keyList);
-        return flset;
-    }
-
-    public boolean hasForeignKey() {
-        return (getForeignKeys().length != 0);
-    }
-
-    // ===================================================================================
-    //                                                                      Relation Index
-    //                                                                      ==============
-    protected java.util.Map<String, Integer> _relationIndexMap = new java.util.LinkedHashMap<String, Integer>();
-
-    public int resolveForeignIndex(ForeignKey foreignKey) {
-        return doResolveRelationIndex(foreignKey, false, false);// Ignore oneToOne
-    }
-
-    public int resolveReferrerIndexAsOne(ForeignKey foreignKey) {// oneToOne!
-        return doResolveRelationIndex(foreignKey, true, true);
-    }
-
-    public int resolveRefererIndexAsOne(ForeignKey foreignKey) {// oneToOne!
-        return resolveReferrerIndexAsOne(foreignKey);
-    }
-
-    public int resolveReferrerIndex(ForeignKey foreignKey) {
-        return doResolveRelationIndex(foreignKey, true, false);
-    }
-
-    public int resolveRefererIndex(ForeignKey foreignKey) {
-        return resolveReferrerIndex(foreignKey);
-    }
-
-    protected int doResolveRelationIndex(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
-        try {
-            final String relationIndexKey = buildRefererIndexKey(foreignKey, referer, oneToOne);
-            final Integer realIndex = _relationIndexMap.get(relationIndexKey);
-            if (realIndex != null) {
-                return realIndex;
-            }
-            final int minimumRelationIndex = extractMinimumRelationIndex(_relationIndexMap);
-            _relationIndexMap.put(relationIndexKey, minimumRelationIndex);
-            return minimumRelationIndex;
-        } catch (RuntimeException e) {
-            _log.warn("doResolveRelationIndex() threw the exception: " + foreignKey, e);
-            throw e;
-        }
-    }
-
-    protected String buildRefererIndexKey(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
-        if (!referer) {
-            return foreignKey.getForeignJavaBeansRulePropertyName();
-        } else {
-            if (oneToOne) {
-                return foreignKey.getReferrerJavaBeansRulePropertyNameAsOne();
-            } else {
-                return foreignKey.getReferrerJavaBeansRulePropertyName();
-            }
-        }
-    }
-
-    protected int extractMinimumRelationIndex(java.util.Map<String, Integer> relationIndexMap) {
-        final Set<String> keySet = relationIndexMap.keySet();
-        final List<Integer> indexList = new ArrayList<Integer>();
-        for (String key : keySet) {
-            final Integer index = relationIndexMap.get(key);
-            indexList.add(index);
-        }
-        if (indexList.isEmpty()) {
-            return 0;
-        }
-        Integer minimumIndex = -1;
-        for (Integer currentIndex : indexList) {
-            if (minimumIndex + 1 < currentIndex) {
-                return minimumIndex + 1;
-            }
-            minimumIndex = currentIndex;
-        }
-        return indexList.size();
-    }
-
-    // ===================================================================================
-    //                                                                                 ???
-    //                                                                                 ===
-    /**
-     * A utility function to create a new id method parameter
-     * from attrib and add it to this table.
-     */
-    public IdMethodParameter addIdMethodParameter(Attributes attrib) {
-        IdMethodParameter imp = new IdMethodParameter();
-        imp.loadFromXML(attrib);
-        addIdMethodParameter(imp);
-        return imp;
-    }
-
-    /**
-     * Adds a new ID method parameter to the list and sets the parent
-     * table of the column associated with the supplied parameter to this table.
-     *
-     * @param imp The column to add as an ID method parameter.
-     */
-    public void addIdMethodParameter(IdMethodParameter imp) {
-        imp.setTable(this);
-        if (_idMethodParameters == null) {
-            _idMethodParameters = new ArrayList<IdMethodParameter>(2);
-        }
-        _idMethodParameters.add(imp);
-    }
-
-    /**
-     * Adds a new index to the index list and set the
-     * parent table of the column to the current table
-     */
-    public void addIndex(Index index) {
-        index.setTable(this);
-        _indices.add(index);
-    }
-
-    /**
-     * A utility function to create a new index
-     * from attrib and add it to this table.
-     */
-    public Index addIndex(Attributes attrib) {
-        Index index = new Index();
-        index.loadFromXML(attrib);
-        addIndex(index);
-        return index;
-    }
-
-    /**
-     * Adds a new Unique to the Unique list and set the
-     * parent table of the column to the current table
-     */
-    public void addUnique(Unique unique) {
-        unique.setTable(this);
-        _unices.add(unique);
-    }
-
-    /**
-     * A utility function to create a new Unique
-     * from attrib and add it to this table.
-     *
-     * @param attrib the xml attributes
-     */
-    public Unique addUnique(Attributes attrib) {
-        Unique unique = new Unique();
-        unique.loadFromXML(attrib);
-        addUnique(unique);
-        return unique;
-    }
-
-    public boolean hasForeignKeyOrReferrer() {
-        return hasForeignKey() || hasReferrer();
-    }
-
-    public boolean hasForeignKeyOrReferrerAsOne() {
-        return hasForeignKey() || hasReferrerAsOne();
-    }
-
-    public boolean hasTwoOrMoreKeyReferrer() {
-        List<Column> primaryKeyList = getPrimaryKey();
-        for (Column primaryKey : primaryKeyList) {
-            List<ForeignKey> referrers = primaryKey.getReferrers();
-            for (ForeignKey referrer : referrers) {
-                if (!referrer.isSimpleKeyFK()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    // ===================================================================================
-    //                                                                            Referrer
-    //                                                                            ========
-    // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
-    /**
-     * Adds the foreign key from another table that refers to this table.
-     * @param fk A foreign key referring to this table
-     * @return Can the foreign key be referrer?
-     */
-    public boolean addReferrer(ForeignKey fk) {
-        if (!fk.canBeReferrer()) {
-            return false;
-        }
-        if (_referrers == null) {
-            _referrers = new ArrayList<ForeignKey>(5);
-        }
-        _referrers.add(fk);
-        return true;
-    }
-
-    public List<ForeignKey> getReferrerList() {
-        return _referrers;
-    }
-
-    public List<ForeignKey> getRefererList() {
-        return getReferrerList();
-    }
-
-    public List<ForeignKey> getReferrers() {
-        return getReferrerList();
-    }
-
-    public boolean hasReferrer() {
-        return (getReferrerList() != null && !getReferrerList().isEmpty());
-    }
-
-    public boolean hasReferrerAsMany() {
-        final List<ForeignKey> referrers = getReferrerList();
-        if (referrers == null || referrers.isEmpty()) {
-            return false;
-        }
-        for (ForeignKey key : referrers) {
-            if (!key.isOneToOne()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected boolean hasReferrerAsOne() {
-        final List<ForeignKey> referrers = getReferrerList();
-        if (referrers == null || referrers.isEmpty()) {
-            return false;
-        }
-        for (ForeignKey key : referrers) {
-            if (key.isOneToOne()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // -----------------------------------------------------
-    //                                               Arrange
-    //                                               -------
-    protected java.util.List<ForeignKey> _singleKeyReferrers = null;
-
-    public boolean hasSingleKeyReferrer() {
-        return !getSingleKeyReferrers().isEmpty();
-    }
-
-    public List<ForeignKey> getSingleKeyReferrers() {
-        if (_singleKeyReferrers != null) {
-            return _singleKeyReferrers;
-        }
-        _singleKeyReferrers = new ArrayList<ForeignKey>(5);
-        if (!hasReferrer()) {
-            return _singleKeyReferrers;
-        }
-        final List<ForeignKey> referrerList = getReferrers();
-        for (ForeignKey referrer : referrerList) {
-            if (!referrer.isSimpleKeyFK()) {
-                continue;
-            }
-            _singleKeyReferrers.add(referrer);
-        }
-        return _singleKeyReferrers;
-    }
-
-    protected java.util.List<ForeignKey> _singleKeyStringOrIntegerReferrers = null;
-
-    public boolean hasSingleKeyStringOrIntegerReferrer() {
-        return !getSingleKeyStringOrIntegerReferrers().isEmpty();
-    }
-
-    public List<ForeignKey> getSingleKeyStringOrIntegerReferrers() {
-        if (_singleKeyStringOrIntegerReferrers != null) {
-            return _singleKeyStringOrIntegerReferrers;
-        }
-        _singleKeyStringOrIntegerReferrers = new ArrayList<ForeignKey>(5);
-        if (!hasReferrer()) {
-            return _singleKeyStringOrIntegerReferrers;
-        }
-        final List<ForeignKey> referrerList = getReferrers();
-        for (ForeignKey referrer : referrerList) {
-            if (!referrer.isSimpleKeyFK()) {
-                continue;
-            }
-            Column localColumn = referrer.getLocalColumnAsOne();
-            if (!(localColumn.isJavaNativeStringObject() || localColumn.isJavaNativeNumberObject())) {
-                continue;
-            }
-            _singleKeyStringOrIntegerReferrers.add(referrer);
-        }
-        return _singleKeyStringOrIntegerReferrers;
-    }
-
-    public String getReferrerTableNameCommaString() {
-        final StringBuilder sb = new StringBuilder();
-        final Set<String> tableSet = new HashSet<String>();
-        final List<ForeignKey> ls = getReferrerList();
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            if (fk.isOneToOne()) {
-                continue;
-            }
-            final String name = fk.getTable().getName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(", ").append(name);
-        }
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            if (!fk.isOneToOne()) {
-                continue;
-            }
-            final String name = fk.getTable().getName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(", ").append(name);
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    public String getReferrerTableNameCommaStringWithHtmlHref() { // for SchemaHTML
-        final StringBuilder sb = new StringBuilder();
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
-        final String delimiter = ", ";
-        final List<ForeignKey> referrerList = getReferrerList();
-        final int size = referrerList.size();
-        if (size == 0) {
-            return "&nbsp;";
-        }
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = referrerList.get(i);
-            final String referrerTableName = fk.getTable().getName();
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
-        }
-        sb.delete(0, delimiter.length());
-        return sb.toString();
-    }
-
-    public String getReferrerPropertyNameCommaString() {
-        final StringBuilder sb = new StringBuilder();
-        final List<ForeignKey> ls = getReferrerList();
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            if (!fk.isOneToOne()) {
-                sb.append(", ").append(fk.getReferrerPropertyName());
-            }
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    public void setContainsForeignPK(boolean b) {
-        _containsForeignPK = b;
-    }
-
-    public boolean getContainsForeignPK() {
-        return _containsForeignPK;
-    }
-
-    // ===================================================================================
-    //                                                                          Unique Key
-    //                                                                          ==========
-    /**
-     * Returns an Array containing all the UKs in the table
-     * @return An array containing all the UKs
-     */
-    public Unique[] getUnices() {
-        int size = _unices.size();
-        Unique[] tbls = new Unique[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Unique) _unices.get(i);
-        }
-        return tbls;
-    }
-
-    public List<Unique> getUniqueList() {
-        return _unices;
-    }
-
-    // ===================================================================================
-    //                                                                               Index
-    //                                                                               =====
-    /**
-     * Returns an Array containing all the indices in the table
-     * @return An array containing all the indices
-     */
-    public Index[] getIndices() {
-        int size = _indices.size();
-        Index[] tbls = new Index[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Index) _indices.get(i);
-        }
-        return tbls;
-    }
-
-    public List<Index> getIndexList() {
-        return _indices;
-    }
-
-    // ===================================================================================
-    //                                                                            Database
-    //                                                                            ========
-    /**
-     * Set the parent of the table
-     * @param parent the parant database
-     */
-    public void setDatabase(Database parent) {
-        _tableParent = parent;
-    }
-
-    /**
-     * Get the parent of the table
-     * @return the parant database
-     */
-    public Database getDatabase() {
-        return _tableParent;
-    }
-
-    /**
-     * Flag to determine if code/sql gets created for this table.
-     * Table will be skipped, if return true.
-     * @return value of forReferenceOnly.
-     */
-    public boolean isForReferenceOnly() { // Unused on DBFlute but template uses...
-        return _isForReferenceOnly;
-    }
-
-    /**
-     * Flag to determine if code/sql gets created for this table.
-     * Table will be skipped, if set to true.
-     * @param v  Value to assign to forReferenceOnly.
-     */
-    public void setForReferenceOnly(boolean v) {
-        this._isForReferenceOnly = v;
-    }
-
-    /**
-     * Has relation? (hasForeignKey() or hasReferrer())
-     * @return Determination.
-     */
-    public boolean hasRelation() {
-        return (hasForeignKey() || hasReferrer());
-    }
-
-    // ==============================================================================
-    //                                                                     PrimaryKey
-    //                                                                     ==========
     /**
      * Returns the collection of Columns which make up the single primary
      * key for this table.
@@ -1884,9 +938,6 @@ public class Table {
         return hasPrimaryKey();
     }
 
-    // ===================================================================================
-    //                                                                 Attached PrimaryKey
-    //                                                                 ===================
     /**
      * Returns AttachedPKArgsSetupString. [setRcvlcqNo(pk.rcvlcqNo);setSprlptTp(pk.sprlptTp);]
      * @param attachedPKVariableName
@@ -1907,6 +958,896 @@ public class Table {
             }
         }
         return result;
+    }
+
+    // ===================================================================================
+    //                                                                         Foreign Key
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * Returns an Array containing all the FKs in the table
+     * @return Foreign-key array.
+     */
+    public ForeignKey[] getForeignKeys() {
+        final int size = _foreignKeys.size();
+        final ForeignKey[] tbls = new ForeignKey[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (ForeignKey) _foreignKeys.get(i);
+        }
+        return tbls;
+    }
+
+    /**
+     * Return the first foreign key that includes column in it's list
+     * of local columns.  Eg. Foreign key (a,b,c) references table(x,y,z)
+     * will be returned of column is either a,b or c.
+     * @param columnName column name included in the key
+     * @return Return a Column object or null if it does not exist.
+     */
+    public ForeignKey getForeignKey(String columnName) {
+        ForeignKey firstFK = null;
+        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
+            ForeignKey key = iter.next();
+            List<String> localColumns = key.getLocalColumns();
+            if (Srl.containsIgnoreCase(localColumns, columnName)) {
+                if (firstFK == null) {
+                    firstFK = key;
+                }
+            }
+        }
+        return firstFK;
+    }
+
+    public List<ForeignKey> getForeignKeyList(String columnName) {
+        List<ForeignKey> fkList = new ArrayList<ForeignKey>();
+        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
+            ForeignKey key = iter.next();
+            List<String> localColumns = key.getLocalColumns();
+            if (Srl.containsIgnoreCase(localColumns, columnName)) {
+                fkList.add(key);
+            }
+        }
+        return fkList;
+    }
+
+    /**
+     * A utility function to create a new foreign key
+     * from attrib and add it to this table.
+     * @param attrib the xml attributes
+     * @return the created ForeignKey
+     */
+    public ForeignKey addForeignKey(Attributes attrib) {
+        final ForeignKey fk = new ForeignKey();
+        fk.loadFromXML(attrib);
+        addForeignKey(fk);
+        return fk;
+    }
+
+    // -----------------------------------------------------
+    //                                               Arrange
+    //                                               -------
+    /**
+     * Returns an comma string containing all the foreign table name. <br />
+     * And contains one-to-one table.
+     * @return Foreign table as comma string.
+     */
+    public String getForeignTableNameCommaString() {
+        final StringBuilder sb = new StringBuilder();
+        final Set<String> tableSet = new HashSet<String>();
+        final List<ForeignKey> foreignKeyList = _foreignKeys;
+        for (int i = 0; i < foreignKeyList.size(); i++) {
+            final ForeignKey fk = foreignKeyList.get(i);
+            final String name = fk.getForeignTableName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append(name).append(fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
+        }
+        List<ForeignKey> referrerList = _referrers;
+        for (int i = 0; i < referrerList.size(); i++) {
+            final ForeignKey fk = referrerList.get(i);
+            if (!fk.isOneToOne()) {
+                continue;
+            }
+            final String name = fk.getTable().getName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append(name).append("(AsOne)");
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
+        final StringBuilder sb = new StringBuilder();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
+        final String delimiter = ", ";
+        final List<ForeignKey> foreignKeyList = _foreignKeys;
+        final int size = foreignKeyList.size();
+        if (size == 0) {
+            return "&nbsp;";
+        }
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = foreignKeyList.get(i);
+            final String foreignTableName = fk.getForeignTableName();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
+        }
+        sb.delete(0, delimiter.length());
+        return sb.toString();
+    }
+
+    /**
+     * Returns an comma string containing all the foreign property name.
+     * @return Foreign property-name as comma string.
+     */
+    public String getForeignPropertyNameCommaString() {
+        final StringBuilder sb = new StringBuilder();
+
+        final List<ForeignKey> ls = _foreignKeys;
+        final int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            sb.append(", ").append(fk.getForeignPropertyName());
+        }
+        final List<ForeignKey> referrerList = _referrers;
+        for (ForeignKey fk : referrerList) {
+            if (fk.isOneToOne()) {
+                sb.append(", ").append(fk.getReferrerPropertyNameAsOne());
+            }
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * A list of tables referenced by foreign keys in this table
+     *
+     * @return A list of tables
+     */
+    public List<String> getForeignTableNames() {
+        if (_foreignTableNames == null) {
+            _foreignTableNames = new ArrayList<String>(1);
+        }
+        return _foreignTableNames;
+    }
+
+    /**
+     * Adds a new FK to the FK list and set the
+     * parent table of the column to the current table
+     * @param fk A foreign key
+     */
+    public void addForeignKey(ForeignKey fk) {
+        fk.setTable(this);
+        _foreignKeys.add(fk);
+
+        if (_foreignTableNames == null) {
+            _foreignTableNames = new ArrayList<String>(5);
+        }
+        if (_foreignTableNames.contains(fk.getForeignTableName())) {
+            _foreignTableNames.add(fk.getForeignTableName());
+        }
+    }
+
+    public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList) {
+        final Set<String> localColumnNameSet = createFlexibleSet(localColumnNameList);
+        final Set<String> foreignColumnNameSet = createFlexibleSet(foreignColumnNameList);
+        final ForeignKey[] fkArray = getForeignKeys();
+        for (final ForeignKey key : fkArray) {
+            if (isSameTableAsFlexible(key.getForeignTableName(), foreignTableName)) {
+                final List<String> currentLocalColumnNameList = key.getLocalColumns();
+                if (currentLocalColumnNameList == null || currentLocalColumnNameList.isEmpty()) {
+                    String msg = "The foreignKey did not have local column name list: " + currentLocalColumnNameList;
+                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
+                    throw new IllegalStateException(msg);
+                }
+                final List<String> currentForeignColumnNameList = key.getForeignColumns();
+                if (currentForeignColumnNameList == null || currentForeignColumnNameList.isEmpty()) {
+                    String msg = "The foreignKey did not have foreign column name list: "
+                            + currentForeignColumnNameList;
+                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
+                    throw new IllegalStateException(msg);
+                }
+
+                final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
+                final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
+
+                boolean sameAsLocal = false;
+                boolean sameAsForeign = false;
+                if (localColumnNameSet.size() == currentLocalColumnNameSet.size()) {
+                    for (String currentLocalColumnName : currentLocalColumnNameSet) {
+                        if (localColumnNameSet.contains(currentLocalColumnName)) {
+                            sameAsLocal = true;
+                        }
+                    }
+                }
+                if (foreignColumnNameSet.size() == currentForeignColumnNameSet.size()) {
+                    for (String currentForeignColumnName : currentForeignColumnNameSet) {
+                        if (foreignColumnNameSet.contains(currentForeignColumnName)) {
+                            sameAsForeign = true;
+                        }
+                    }
+                }
+                if (sameAsLocal && sameAsForeign) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected boolean isSameTableAsFlexible(String tableOne, String tableTwo) {
+        if (tableOne.equalsIgnoreCase(tableTwo)) {
+            return true;
+        }
+        tableOne = Srl.replace(tableOne, "_", "");
+        tableTwo = Srl.replace(tableTwo, "_", "");
+        if (tableOne.equalsIgnoreCase(tableTwo)) {
+            return true;
+        }
+        return false;
+    }
+
+    protected Set<String> createFlexibleSet(List<String> keyList) {
+        final Set<String> flset = StringSet.createAsFlexibleOrdered();
+        flset.addAll(keyList);
+        return flset;
+    }
+
+    public boolean hasForeignKey() {
+        return (getForeignKeys().length != 0);
+    }
+
+    /**
+     * Has relation? (hasForeignKey() or hasReferrer())
+     * @return Determination.
+     */
+    public boolean hasRelation() {
+        return (hasForeignKey() || hasReferrer());
+    }
+
+    /**
+     * Flag to determine if code/sql gets created for this table.
+     * Table will be skipped, if return true.
+     * @return value of forReferenceOnly.
+     */
+    public boolean isForReferenceOnly() { // Unused on DBFlute but template uses...
+        return _isForReferenceOnly;
+    }
+
+    /**
+     * Flag to determine if code/sql gets created for this table.
+     * Table will be skipped, if set to true.
+     * @param v  Value to assign to forReferenceOnly.
+     */
+    public void setForReferenceOnly(boolean v) {
+        this._isForReferenceOnly = v;
+    }
+
+    // ===================================================================================
+    //                                                                      Relation Index
+    //                                                                      ==============
+    protected java.util.Map<String, Integer> _relationIndexMap = new java.util.LinkedHashMap<String, Integer>();
+
+    public int resolveForeignIndex(ForeignKey foreignKey) {
+        return doResolveRelationIndex(foreignKey, false, false);// Ignore oneToOne
+    }
+
+    public int resolveReferrerIndexAsOne(ForeignKey foreignKey) {// oneToOne!
+        return doResolveRelationIndex(foreignKey, true, true);
+    }
+
+    public int resolveRefererIndexAsOne(ForeignKey foreignKey) {// oneToOne!
+        return resolveReferrerIndexAsOne(foreignKey);
+    }
+
+    public int resolveReferrerIndex(ForeignKey foreignKey) {
+        return doResolveRelationIndex(foreignKey, true, false);
+    }
+
+    public int resolveRefererIndex(ForeignKey foreignKey) {
+        return resolveReferrerIndex(foreignKey);
+    }
+
+    protected int doResolveRelationIndex(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
+        try {
+            final String relationIndexKey = buildRefererIndexKey(foreignKey, referer, oneToOne);
+            final Integer realIndex = _relationIndexMap.get(relationIndexKey);
+            if (realIndex != null) {
+                return realIndex;
+            }
+            final int minimumRelationIndex = extractMinimumRelationIndex(_relationIndexMap);
+            _relationIndexMap.put(relationIndexKey, minimumRelationIndex);
+            return minimumRelationIndex;
+        } catch (RuntimeException e) {
+            _log.warn("doResolveRelationIndex() threw the exception: " + foreignKey, e);
+            throw e;
+        }
+    }
+
+    protected String buildRefererIndexKey(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
+        if (!referer) {
+            return foreignKey.getForeignJavaBeansRulePropertyName();
+        } else {
+            if (oneToOne) {
+                return foreignKey.getReferrerJavaBeansRulePropertyNameAsOne();
+            } else {
+                return foreignKey.getReferrerJavaBeansRulePropertyName();
+            }
+        }
+    }
+
+    protected int extractMinimumRelationIndex(java.util.Map<String, Integer> relationIndexMap) {
+        final Set<String> keySet = relationIndexMap.keySet();
+        final List<Integer> indexList = new ArrayList<Integer>();
+        for (String key : keySet) {
+            final Integer index = relationIndexMap.get(key);
+            indexList.add(index);
+        }
+        if (indexList.isEmpty()) {
+            return 0;
+        }
+        Integer minimumIndex = -1;
+        for (Integer currentIndex : indexList) {
+            if (minimumIndex + 1 < currentIndex) {
+                return minimumIndex + 1;
+            }
+            minimumIndex = currentIndex;
+        }
+        return indexList.size();
+    }
+
+    public boolean hasForeignKeyOrReferrer() {
+        return hasForeignKey() || hasReferrer();
+    }
+
+    public boolean hasForeignKeyOrReferrerAsOne() {
+        return hasForeignKey() || hasReferrerAsOne();
+    }
+
+    public boolean hasTwoOrMoreKeyReferrer() {
+        List<Column> primaryKeyList = getPrimaryKey();
+        for (Column primaryKey : primaryKeyList) {
+            List<ForeignKey> referrers = primaryKey.getReferrers();
+            for (ForeignKey referrer : referrers) {
+                if (!referrer.isSimpleKeyFK()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                            Referrer
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * Adds the foreign key from another table that refers to this table.
+     * @param fk A foreign key referring to this table
+     * @return Can the foreign key be referrer?
+     */
+    public boolean addReferrer(ForeignKey fk) {
+        if (!fk.canBeReferrer()) {
+            return false;
+        }
+        if (_referrers == null) {
+            _referrers = new ArrayList<ForeignKey>(5);
+        }
+        _referrers.add(fk);
+        return true;
+    }
+
+    public List<ForeignKey> getReferrerList() {
+        return _referrers;
+    }
+
+    public List<ForeignKey> getRefererList() {
+        return getReferrerList();
+    }
+
+    public List<ForeignKey> getReferrers() {
+        return getReferrerList();
+    }
+
+    public boolean hasReferrer() {
+        return (getReferrerList() != null && !getReferrerList().isEmpty());
+    }
+
+    public boolean hasReferrerAsMany() {
+        final List<ForeignKey> referrers = getReferrerList();
+        if (referrers == null || referrers.isEmpty()) {
+            return false;
+        }
+        for (ForeignKey key : referrers) {
+            if (!key.isOneToOne()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean hasReferrerAsOne() {
+        final List<ForeignKey> referrers = getReferrerList();
+        if (referrers == null || referrers.isEmpty()) {
+            return false;
+        }
+        for (ForeignKey key : referrers) {
+            if (key.isOneToOne()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // -----------------------------------------------------
+    //                                               Arrange
+    //                                               -------
+    protected java.util.List<ForeignKey> _singleKeyReferrers = null;
+
+    public boolean hasSingleKeyReferrer() {
+        return !getSingleKeyReferrers().isEmpty();
+    }
+
+    public List<ForeignKey> getSingleKeyReferrers() {
+        if (_singleKeyReferrers != null) {
+            return _singleKeyReferrers;
+        }
+        _singleKeyReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _singleKeyReferrers;
+        }
+        final List<ForeignKey> referrerList = getReferrers();
+        for (ForeignKey referrer : referrerList) {
+            if (!referrer.isSimpleKeyFK()) {
+                continue;
+            }
+            _singleKeyReferrers.add(referrer);
+        }
+        return _singleKeyReferrers;
+    }
+
+    protected java.util.List<ForeignKey> _singleKeyStringOrIntegerReferrers = null;
+
+    public boolean hasSingleKeyStringOrIntegerReferrer() {
+        return !getSingleKeyStringOrIntegerReferrers().isEmpty();
+    }
+
+    public List<ForeignKey> getSingleKeyStringOrIntegerReferrers() {
+        if (_singleKeyStringOrIntegerReferrers != null) {
+            return _singleKeyStringOrIntegerReferrers;
+        }
+        _singleKeyStringOrIntegerReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _singleKeyStringOrIntegerReferrers;
+        }
+        final List<ForeignKey> referrerList = getReferrers();
+        for (ForeignKey referrer : referrerList) {
+            if (!referrer.isSimpleKeyFK()) {
+                continue;
+            }
+            Column localColumn = referrer.getLocalColumnAsOne();
+            if (!(localColumn.isJavaNativeStringObject() || localColumn.isJavaNativeNumberObject())) {
+                continue;
+            }
+            _singleKeyStringOrIntegerReferrers.add(referrer);
+        }
+        return _singleKeyStringOrIntegerReferrers;
+    }
+
+    public String getReferrerTableNameCommaString() {
+        final StringBuilder sb = new StringBuilder();
+        final Set<String> tableSet = new HashSet<String>();
+        final List<ForeignKey> ls = getReferrerList();
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            if (fk.isOneToOne()) {
+                continue;
+            }
+            final String name = fk.getTable().getName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append(name);
+        }
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            if (!fk.isOneToOne()) {
+                continue;
+            }
+            final String name = fk.getTable().getName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ").append(name);
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    public String getReferrerTableNameCommaStringWithHtmlHref() { // for SchemaHTML
+        final StringBuilder sb = new StringBuilder();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
+        final String delimiter = ", ";
+        final List<ForeignKey> referrerList = getReferrerList();
+        final int size = referrerList.size();
+        if (size == 0) {
+            return "&nbsp;";
+        }
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = referrerList.get(i);
+            final String referrerTableName = fk.getTable().getName();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
+        }
+        sb.delete(0, delimiter.length());
+        return sb.toString();
+    }
+
+    public String getReferrerPropertyNameCommaString() {
+        final StringBuilder sb = new StringBuilder();
+        final List<ForeignKey> ls = getReferrerList();
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            if (!fk.isOneToOne()) {
+                sb.append(", ").append(fk.getReferrerPropertyName());
+            }
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    public void setContainsForeignPK(boolean b) {
+        _containsForeignPK = b;
+    }
+
+    public boolean getContainsForeignPK() {
+        return _containsForeignPK;
+    }
+
+    // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
+    /**
+     * Returns an Array containing all the UKs in the table
+     * @return An array containing all the UKs
+     */
+    public Unique[] getUnices() {
+        int size = _unices.size();
+        Unique[] tbls = new Unique[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (Unique) _unices.get(i);
+        }
+        return tbls;
+    }
+
+    public List<Unique> getUniqueList() {
+        return _unices;
+    }
+
+    /**
+     * Adds a new Unique to the Unique list and set the
+     * parent table of the column to the current table
+     */
+    public void addUnique(Unique unique) {
+        unique.setTable(this);
+        _unices.add(unique);
+    }
+
+    /**
+     * A utility function to create a new Unique
+     * from attrib and add it to this table.
+     *
+     * @param attrib the xml attributes
+     */
+    public Unique addUnique(Attributes attrib) {
+        Unique unique = new Unique();
+        unique.loadFromXML(attrib);
+        addUnique(unique);
+        return unique;
+    }
+
+    // ===================================================================================
+    //                                                                               Index
+    //                                                                               =====
+    /**
+     * Returns an Array containing all the indices in the table
+     * @return An array containing all the indices
+     */
+    public Index[] getIndices() {
+        int size = _indices.size();
+        Index[] tbls = new Index[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (Index) _indices.get(i);
+        }
+        return tbls;
+    }
+
+    public List<Index> getIndexList() {
+        return _indices;
+    }
+
+    /**
+     * Adds a new index to the index list and set the
+     * parent table of the column to the current table
+     */
+    public void addIndex(Index index) {
+        index.setTable(this);
+        _indices.add(index);
+    }
+
+    /**
+     * A utility function to create a new index
+     * from attrib and add it to this table.
+     */
+    public Index addIndex(Attributes attrib) {
+        Index index = new Index();
+        index.loadFromXML(attrib);
+        addIndex(index);
+        return index;
+    }
+
+    // ===================================================================================
+    //                                                                     Java Definition
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                             Java Name
+    //                                             ---------
+    protected boolean _needsJavaNameConvert = true;
+
+    public void setupNeedsJavaNameConvertFalse() {
+        _needsJavaNameConvert = false;
+    }
+
+    public boolean needsJavaNameConvert() {
+        return _needsJavaNameConvert;
+    }
+
+    /**
+     * Get name to use in Java sources
+     */
+    public String getJavaName() {
+        if (_javaName == null) {
+            if (needsJavaNameConvert()) {
+                _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
+            } else {
+                _javaName = getName(); // for sql2entity mainly
+            }
+            _javaName = filterBuriJavaNameIfNeeds(_javaName);
+        }
+        return _javaName;
+    }
+
+    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        if (buriProperties.isUseBuri() && isBuriInternal()) {
+            final String arranged = buriProperties.arrangeBuriTableJavaName(_javaName);
+            if (arranged != null) {
+                return arranged;
+            }
+        }
+        return javaName;
+    }
+
+    /**
+     * Set name to use in Java sources
+     */
+    public void setJavaName(String javaName) {
+        this._javaName = javaName;
+    }
+
+    // -----------------------------------------------------
+    //                               Uncapitalized Java Name
+    //                               -----------------------
+    /**
+     * Get variable name to use in Java sources (= uncapitalized java name)
+     */
+    public String getUncapitalisedJavaName() { // allowed spell miss
+        return Srl.initUncap(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                         Java Beans Rule Property Name
+    //                         -----------------------------
+    /**
+     * Get property name to use in Java sources (according to java beans rule)
+     */
+    public String getJavaBeansRulePropertyName() {
+        return Srl.initBeansProp(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                                            Class Name
+    //                                            ----------
+    public String getBaseEntityClassName() {
+        final String projectPrefix = getDatabase().getProjectPrefix();
+        final String basePrefix = getDatabase().getBasePrefix();
+        final String baseSuffixForEntity = getDatabase().getBaseSuffixForEntity();
+        return projectPrefix + basePrefix + getSchemaClassPrefix() + getJavaName() + baseSuffixForEntity;
+    }
+
+    public String getBaseDaoClassName() {
+        return getBaseEntityClassName() + "Dao";
+    }
+
+    public String getBaseBehaviorClassName() {
+        return getBaseEntityClassName() + "Bhv";
+    }
+
+    public String getBaseBehaviorApClassName() {
+        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
+        return getBaseBehaviorClassName() + suffix;
+    }
+
+    public String getBaseConditionBeanClassName() {
+        return getBaseEntityClassName() + "CB";
+    }
+
+    public String getAbstractBaseConditionQueryClassName() {
+        final String projectPrefix = getDatabase().getProjectPrefix();
+        final String basePrefix = getDatabase().getBasePrefix();
+        return projectPrefix + "Abstract" + basePrefix + getSchemaClassPrefix() + getJavaName() + "CQ";
+    }
+
+    public String getBaseConditionQueryClassName() {
+        return getBaseEntityClassName() + "CQ";
+    }
+
+    public String getExtendedEntityClassName() {
+        final String projectPrefix = getDatabase().getProjectPrefix();
+        return buildExtendedEntityClassName(projectPrefix);
+    }
+
+    protected String buildExtendedEntityClassName(String projectPrefix) {
+        return projectPrefix + getSchemaClassPrefix() + getJavaName();
+    }
+
+    public String getRelationTraceClassName() {
+        return getSchemaClassPrefix() + getJavaName();
+    }
+
+    public String getDBMetaClassName() {
+        return getExtendedEntityClassName() + "Dbm";
+    }
+
+    public String getDBMetaFullClassName() {
+        return getDatabase().getBaseEntityPackage() + ".dbmeta." + getDBMetaClassName();
+    }
+
+    public String getExtendedDaoClassName() {
+        return getExtendedEntityClassName() + "Dao";
+    }
+
+    public String getExtendedDaoFullClassName() {
+        final String extendedDaoPackage = getDatabase().getExtendedDaoPackage();
+        return extendedDaoPackage + "." + getExtendedDaoClassName();
+    }
+
+    public String getExtendedBehaviorClassName() {
+        return getExtendedEntityClassName() + "Bhv";
+    }
+
+    public String getExtendedBehaviorApClassName() {
+        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
+        return getExtendedBehaviorClassName() + suffix;
+    }
+
+    public String getExtendedBehaviorLibClassName() {
+        final String projectPrefix = getBasicProperties().getLibraryProjectPrefix();
+        return buildExtendedEntityClassName(projectPrefix) + "Bhv";
+    }
+
+    public String getExtendedBehaviorFullClassName() {
+        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
+        return extendedBehaviorPackage + "." + getExtendedBehaviorClassName();
+    }
+
+    public String getExtendedBehaviorApFullClassName() {
+        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
+        return extendedBehaviorPackage + "." + getExtendedBehaviorApClassName();
+    }
+
+    public String getExtendedConditionBeanClassName() {
+        return getExtendedEntityClassName() + "CB";
+    }
+
+    public String getExtendedConditionQueryClassName() {
+        return getExtendedEntityClassName() + "CQ";
+    }
+
+    public String getExtendedConditionInlineQueryClassName() {
+        return getExtendedEntityClassName() + "CIQ";
+    }
+
+    public String getNestSelectSetupperClassName() {
+        return getExtendedEntityClassName() + "Nss";
+    }
+
+    public String getNestSelectSetupperTerminalClassName() {
+        return getExtendedEntityClassName() + "Nsst";
+    }
+
+    protected String getSchemaClassPrefix() {
+        // *however same-name tables between different schemas are unsupported at 0.9.6.8
+        if (hasSchema() && isExistSameNameTable()) {
+            // schema of DB2 may have space either size
+            final String prefix;
+            if (isCatalogAdditionalSchema()) {
+                String pureCatalog = getPureCatalog();
+                pureCatalog = pureCatalog != null ? Srl.initCapTrimmed(pureCatalog.trim().toLowerCase()) : "";
+                String pureSchema = getPureSchema();
+                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
+                prefix = pureCatalog + pureSchema;
+            } else {
+                String pureSchema = getPureSchema();
+                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
+                prefix = pureSchema;
+            }
+            return prefix;
+        }
+        return "";
+    }
+
+    protected boolean _alreadyCheckedExistingSameNameTable;
+
+    protected boolean isExistSameNameTable() {
+        if (_alreadyCheckedExistingSameNameTable) {
+            return _existSameNameTable;
+        }
+        _alreadyCheckedExistingSameNameTable = true;
+        final List<Table> tableList = getDatabase().getTableList();
+        int count = 0;
+        for (Table table : tableList) {
+            final String name = table.getName();
+            if (_name.equalsIgnoreCase(name)) {
+                ++count;
+                if (count > 1) {
+                    _existSameNameTable = true;
+                    return _existSameNameTable;
+                }
+            }
+        }
+        _existSameNameTable = false;
+        return _existSameNameTable;
+    }
+
+    // -----------------------------------------------------
+    //                                        Component Name
+    //                                        --------------
+    public String getDaoComponentName() {
+        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Dao";
+    }
+
+    public String getBehaviorComponentName() {
+        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Bhv";
+    }
+
+    public String getBehaviorApComponentName() {
+        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
+        return getBehaviorComponentName() + suffix;
+    }
+
+    // ===================================================================================
+    //                                                               Sql2Entity Definition
+    //                                                               =====================
+    public boolean isSql2EntityTypeSafeCursor() {
+        return _sql2entityTypeSafeCursor;
+    }
+
+    public void setSql2EntityTypeSafeCursor(boolean sql2entityTypeSafeCursor) {
+        this._sql2entityTypeSafeCursor = sql2entityTypeSafeCursor;
     }
 
     // ===================================================================================
@@ -2884,13 +2825,104 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                         Sql2Entity Type Safe Cursor
-    //                                                         ===========================
-    public boolean isSql2EntityTypeSafeCursor() {
-        return _sql2entityTypeSafeCursor;
+    //                                                                             Unknown
+    //                                                                             =======
+    /**
+     * <p>A hook for the SAX XML parser to call when this table has
+     * been fully loaded from the XML, and all nested elements have
+     * been processed.</p>
+     * <p>Performs heavy indexing and naming of elements which weren't
+     * provided with a name.</p>
+     */
+    public void doFinalInitialization() {
+        // Heavy indexing must wait until after all columns composing
+        // a table's primary key have been parsed.
+        // [Unused on DBFlute]
+        //if (_isHeavyIndexing) {
+        //    doHeavyIndexing();
+        //}
+
+        // Name any indices which are missing a name using the
+        // appropriate algorithm.
+        doNaming();
     }
 
-    public void setSql2EntityTypeSafeCursor(boolean sql2entityTypeSafeCursor) {
-        this._sql2entityTypeSafeCursor = sql2entityTypeSafeCursor;
+    /**
+     * Names composing objects which haven't yet been named.  This
+     * currently consists of foreign-key and index entities.
+     */
+    private void doNaming() {
+        int i;
+        int size;
+        String name;
+
+        // Assure names are unique across all databases.
+        try {
+            for (i = 0, size = _foreignKeys.size(); i < size; i++) {
+                ForeignKey fk = (ForeignKey) _foreignKeys.get(i);
+                name = fk.getName();
+                if (Srl.is_Null_or_Empty(name)) {
+                    name = acquireConstraintName("FK", i + 1);
+                    fk.setName(name);
+                }
+            }
+
+            for (i = 0, size = _indices.size(); i < size; i++) {
+                Index index = (Index) _indices.get(i);
+                name = index.getName();
+                if (Srl.is_Null_or_Empty(name)) {
+                    name = acquireConstraintName("I", i + 1);
+                    index.setName(name);
+                }
+            }
+
+            // NOTE: Most RDBMSes can apparently name unique column
+            // constraints/indices themselves (using MySQL and Oracle
+            // as test cases), so we'll assume that we needn't add an
+            // entry to the system name list for these.
+        } catch (EngineException nameAlreadyInUse) {
+            _log.error(nameAlreadyInUse, nameAlreadyInUse);
+        }
+    }
+
+    /**
+     * Macro to a constraint name.
+     * @param nameType constraint type
+     * @param nbr unique number for this constraint type
+     * @return unique name for constraint
+     * @throws EngineException
+     */
+    private final String acquireConstraintName(String nameType, int nbr) throws EngineException {
+        List<Object> inputs = new ArrayList<Object>(4);
+        inputs.add(getDatabase());
+        inputs.add(getName());
+        inputs.add(nameType);
+        inputs.add(new Integer(nbr));
+        return NameFactory.generateName(NameFactory.CONSTRAINT_GENERATOR, inputs);
+    }
+
+    /**
+     * A utility function to create a new id method parameter
+     * from attrib and add it to this table.
+     */
+    public IdMethodParameter addIdMethodParameter(Attributes attrib) {
+        IdMethodParameter imp = new IdMethodParameter();
+        imp.loadFromXML(attrib);
+        addIdMethodParameter(imp);
+        return imp;
+    }
+
+    /**
+     * Adds a new ID method parameter to the list and sets the parent
+     * table of the column associated with the supplied parameter to this table.
+     *
+     * @param imp The column to add as an ID method parameter.
+     */
+    public void addIdMethodParameter(IdMethodParameter imp) {
+        imp.setTable(this);
+        if (_idMethodParameters == null) {
+            _idMethodParameters = new ArrayList<IdMethodParameter>(2);
+        }
+        _idMethodParameters.add(imp);
     }
 }

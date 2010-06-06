@@ -100,18 +100,26 @@ public class Column {
     // -----------------------------------------------------
     //                                     Column Definition
     //                                     -----------------
-    private boolean _isPrimaryKey;
-    private String _primaryKeyName;
-    private boolean _additionalPrimaryKey;
-    private boolean _isNotNull;
     private String _name;
     private String _dbType;
     private String _columnSize;
+    private boolean _isNotNull;
     private boolean _isAutoIncrement;
     private String _defaultValue;
     private String _plainComment;
     private String _description; // [Unused on DBFlute]
     private int _position; // [Unused on DBFlute]
+
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
+    private boolean _isPrimaryKey;
+    private String _primaryKeyName;
+    private boolean _additionalPrimaryKey;
+
+    // -----------------------------------------------------
+    //                                           Foreign Key
+    //                                           -----------
     private List<ForeignKey> _referrers;
 
     // -----------------------------------------------------
@@ -134,6 +142,7 @@ public class Column {
     // column either contains the classnames or a key to
     // classnames specified in the schema.  Others may be
     // supported later.
+    // [Unused on DBFlute]
     private String _inheritanceType;
     private boolean _isInheritance;
     private boolean _isEnumeratedClasses;
@@ -142,9 +151,9 @@ public class Column {
 
     //private String _inputValidator = null;
 
-    // ==============================================================================
-    //                                                                    Constructor
-    //                                                                    ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Creates a new instance with a <code>null</code> name.
      */
@@ -212,9 +221,9 @@ public class Column {
         return (_table.getName() + '.' + _name);
     }
 
-    // ==============================================================================
-    //                                                                          Table
-    //                                                                          =====
+    // ===================================================================================
+    //                                                                               Table
+    //                                                                               =====
     /**
      * Set the parent Table of the column
      */
@@ -252,187 +261,9 @@ public class Column {
         return _table.getName();
     }
 
-    // =====================================================================================
-    //                                                                     Column Definition
-    //                                                                     =================
-    public String getColumnDefinitionLineDisp() {
-        final StringBuilder sb = new StringBuilder();
-        if (isPrimaryKey()) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("PK");
-        }
-        if (isAutoIncrement()) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("ID");
-        }
-        if (isUnique()) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("UQ");
-        }
-        if (isNotNull()) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("NotNull");
-        }
-        plugDelimiterIfNeeds(sb);
-        sb.append(getDbTypeExpression());
-        if (getColumnSize() != null && getColumnSize().trim().length() > 0) {
-            sb.append("(" + getColumnSize() + ")");
-        }
-        if (getDefaultValue() != null && getDefaultValue().trim().length() > 0 && !isAutoIncrement()) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("default=[").append(getDefaultValue() + "]");
-        }
-        if (isForeignKey()) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("FK to " + getForeignTableName());
-        }
-        if (_sql2EntityRelatedTableName != null) {
-            plugDelimiterIfNeeds(sb);
-            sb.append("related to ").append(_sql2EntityRelatedTableName);
-            if (_sql2EntityRelatedColumnName != null) {
-                sb.append(".").append(_sql2EntityRelatedColumnName);
-            }
-        }
-        return sb.toString();
-    }
-
-    private void plugDelimiterIfNeeds(StringBuilder sb) {
-        if (sb.length() != 0) {
-            sb.append(" : ");
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                           Primary Key
-    //                                           -----------
-    public boolean isPrimaryKey() {
-        return _isPrimaryKey;
-    }
-
-    public void setPrimaryKey(boolean pk) {
-        _isPrimaryKey = pk;
-    }
-
-    public String getPrimaryKeyName() {
-        return _primaryKeyName;
-    }
-
-    public void setPrimaryKeyName(String primaryKeyName) {
-        _primaryKeyName = primaryKeyName;
-    }
-
-    public boolean isAdditionalPrimaryKey() {
-        return _additionalPrimaryKey;
-    }
-
-    public void setAdditionalPrimaryKey(boolean additionalPrimaryKey) {
-        _additionalPrimaryKey = additionalPrimaryKey;
-    }
-
-    public boolean isTwoOrMoreColumnPrimaryKey() {
-        return getTable().getPrimaryKey().size() > 1;
-    }
-
-    public String getPrimaryKeyMarkForSchemaHtml() {
-        final StringBuilder sb = new StringBuilder();
-        if (isPrimaryKey()) {
-            sb.append("o");
-            if (isTwoOrMoreColumnPrimaryKey()) {
-                sb.append("<span class=\"flgplus\">+</span>");
-            }
-        } else {
-            sb.append("&nbsp;");
-        }
-        return sb.toString();
-    }
-
-    public String getPrimaryKeyTitleForSchemaHtml() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String value = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
-        if (value == null) {
-            return "";
-        }
-        final Table table = getTable();
-        final String title;
-        if (table.isUseSequence()) {
-            final String sequenceName = table.getDefinedSequenceName();
-            final BigDecimal minimumValue = table.getSequenceMinimumValue();
-            final StringBuilder optionSb = new StringBuilder();
-            if (minimumValue != null) {
-                if (optionSb.length() > 0) {
-                    optionSb.append(",");
-                }
-                optionSb.append("minimum(" + minimumValue + ")");
-            }
-            final BigDecimal maximumValue = table.getSequenceMaximumValue();
-            if (maximumValue != null) {
-                if (optionSb.length() > 0) {
-                    optionSb.append(",");
-                }
-                optionSb.append("maximum(" + maximumValue + ")");
-            }
-            final Integer incrementSize = table.getSequenceIncrementSize();
-            if (incrementSize != null) {
-                if (optionSb.length() > 0) {
-                    optionSb.append(",");
-                }
-                optionSb.append("increment(" + incrementSize + ")");
-            }
-            final Integer cacheSize = table.getSequenceCacheSize();
-            if (cacheSize != null) {
-                if (optionSb.length() > 0) {
-                    optionSb.append(",");
-                }
-                optionSb.append("dfcache(" + cacheSize + ")");
-            }
-            if (optionSb.length() > 0) {
-                optionSb.insert(0, ":");
-            }
-            title = _primaryKeyName + " :: sequence=" + sequenceName + optionSb;
-        } else {
-            title = _primaryKeyName;
-        }
-        return " title=\"" + prop.resolveAttributeForSchemaHtml(title) + "\"";
-    }
-
-    // -----------------------------------------------------
-    //                                        Auto Increment
-    //                                        --------------
-    /**
-     * Return auto increment/sequence string for the target database. We need to
-     * pass in the props for the target database!
-     * @return Determination.
-     */
-    public boolean isAutoIncrement() {
-        return _isAutoIncrement;
-    }
-
-    /**
-     * Set the auto increment value.
-     * Use isAutoIncrement() to find out if it is set or not.
-     * @param value Determination.
-     */
-    public void setAutoIncrement(boolean value) {
-        _isAutoIncrement = value;
-    }
-
-    // -----------------------------------------------------
-    //                                               NotNull
-    //                                               -------
-    /**
-     * Return the isNotNull property of the column
-     */
-    public boolean isNotNull() {
-        return _isNotNull;
-    }
-
-    /**
-     * Set the isNotNull property of the column
-     */
-    public void setNotNull(boolean status) {
-        _isNotNull = status;
-    }
-
+    // ===================================================================================
+    //                                                                   Column Definition
+    //                                                                   =================
     // -----------------------------------------------------
     //                                           Column Name
     //                                           -----------
@@ -584,6 +415,59 @@ public class Column {
     }
 
     // -----------------------------------------------------
+    //                                               NotNull
+    //                                               -------
+    /**
+     * Return the isNotNull property of the column
+     */
+    public boolean isNotNull() {
+        return _isNotNull;
+    }
+
+    /**
+     * Set the isNotNull property of the column
+     */
+    public void setNotNull(boolean status) {
+        _isNotNull = status;
+    }
+
+    // -----------------------------------------------------
+    //                                        Auto Increment
+    //                                        --------------
+    /**
+     * Return auto increment/sequence string for the target database. We need to
+     * pass in the props for the target database!
+     * @return Determination.
+     */
+    public boolean isAutoIncrement() {
+        return _isAutoIncrement;
+    }
+
+    /**
+     * Set the auto increment value.
+     * Use isAutoIncrement() to find out if it is set or not.
+     * @param value Determination.
+     */
+    public void setAutoIncrement(boolean value) {
+        _isAutoIncrement = value;
+    }
+
+    // -----------------------------------------------------
+    //                                         Default Value
+    //                                         -------------
+    public void setDefaultValue(String def) {
+        _defaultValue = def;
+    }
+
+    public boolean hasDefaultValue() {
+        return _defaultValue != null && _defaultValue.trim().length() > 0;
+    }
+
+    public String getDefaultValue() {
+        return _defaultValue;
+    }
+
+    // -----------------------------------------------------
     //                                        Column Comment
     //                                        --------------
     public String getPlainComment() {
@@ -641,21 +525,6 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                         Default Value
-    //                                         -------------
-    public void setDefaultValue(String def) {
-        _defaultValue = def;
-    }
-
-    public boolean hasDefaultValue() {
-        return _defaultValue != null && _defaultValue.trim().length() > 0;
-    }
-
-    public String getDefaultValue() {
-        return _defaultValue;
-    }
-
-    // -----------------------------------------------------
     //                                              Position
     //                                              --------
     /**
@@ -682,8 +551,151 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                           Foreign Key
-    //                                           -----------
+    //                                               Display
+    //                                               -------
+    public String getColumnDefinitionLineDisp() {
+        final StringBuilder sb = new StringBuilder();
+        if (isPrimaryKey()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("PK");
+        }
+        if (isAutoIncrement()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("ID");
+        }
+        if (isUnique()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("UQ");
+        }
+        if (isNotNull()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("NotNull");
+        }
+        plugDelimiterIfNeeds(sb);
+        sb.append(getDbTypeExpression());
+        if (getColumnSize() != null && getColumnSize().trim().length() > 0) {
+            sb.append("(" + getColumnSize() + ")");
+        }
+        if (getDefaultValue() != null && getDefaultValue().trim().length() > 0 && !isAutoIncrement()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("default=[").append(getDefaultValue() + "]");
+        }
+        if (isForeignKey()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("FK to " + getForeignTableName());
+        }
+        if (_sql2EntityRelatedTableName != null) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("related to ").append(_sql2EntityRelatedTableName);
+            if (_sql2EntityRelatedColumnName != null) {
+                sb.append(".").append(_sql2EntityRelatedColumnName);
+            }
+        }
+        return sb.toString();
+    }
+
+    private void plugDelimiterIfNeeds(StringBuilder sb) {
+        if (sb.length() != 0) {
+            sb.append(" : ");
+        }
+    }
+
+    // ===================================================================================
+    //                                                                         Primary Key
+    //                                                                         ===========
+    public boolean isPrimaryKey() {
+        return _isPrimaryKey;
+    }
+
+    public void setPrimaryKey(boolean pk) {
+        _isPrimaryKey = pk;
+    }
+
+    public String getPrimaryKeyName() {
+        return _primaryKeyName;
+    }
+
+    public void setPrimaryKeyName(String primaryKeyName) {
+        _primaryKeyName = primaryKeyName;
+    }
+
+    public boolean isAdditionalPrimaryKey() {
+        return _additionalPrimaryKey;
+    }
+
+    public void setAdditionalPrimaryKey(boolean additionalPrimaryKey) {
+        _additionalPrimaryKey = additionalPrimaryKey;
+    }
+
+    public boolean isTwoOrMoreColumnPrimaryKey() {
+        return getTable().getPrimaryKey().size() > 1;
+    }
+
+    public String getPrimaryKeyMarkForSchemaHtml() {
+        final StringBuilder sb = new StringBuilder();
+        if (isPrimaryKey()) {
+            sb.append("o");
+            if (isTwoOrMoreColumnPrimaryKey()) {
+                sb.append("<span class=\"flgplus\">+</span>");
+            }
+        } else {
+            sb.append("&nbsp;");
+        }
+        return sb.toString();
+    }
+
+    public String getPrimaryKeyTitleForSchemaHtml() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String value = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
+        if (value == null) {
+            return "";
+        }
+        final Table table = getTable();
+        final String title;
+        if (table.isUseSequence()) {
+            final String sequenceName = table.getDefinedSequenceName();
+            final BigDecimal minimumValue = table.getSequenceMinimumValue();
+            final StringBuilder optionSb = new StringBuilder();
+            if (minimumValue != null) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(",");
+                }
+                optionSb.append("minimum(" + minimumValue + ")");
+            }
+            final BigDecimal maximumValue = table.getSequenceMaximumValue();
+            if (maximumValue != null) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(",");
+                }
+                optionSb.append("maximum(" + maximumValue + ")");
+            }
+            final Integer incrementSize = table.getSequenceIncrementSize();
+            if (incrementSize != null) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(",");
+                }
+                optionSb.append("increment(" + incrementSize + ")");
+            }
+            final Integer cacheSize = table.getSequenceCacheSize();
+            if (cacheSize != null) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(",");
+                }
+                optionSb.append("dfcache(" + cacheSize + ")");
+            }
+            if (optionSb.length() > 0) {
+                optionSb.insert(0, ":");
+            }
+            title = _primaryKeyName + " :: sequence=" + sequenceName + optionSb;
+        } else {
+            title = _primaryKeyName;
+        }
+        return " title=\"" + prop.resolveAttributeForSchemaHtml(title) + "\"";
+    }
+
+    // ===================================================================================
+    //                                                                         Foreign Key
+    //                                                                         ===========
     /**
      * Utility method to determine if this column is a foreign key.
      */
@@ -837,9 +849,9 @@ public class Column {
         return false;
     }
 
-    // -----------------------------------------------------
-    //                                              Referrer
-    //                                              --------
+    // ===================================================================================
+    //                                                                            Referrer
+    //                                                                            ========
     /**
      * Adds the foreign key from another table that refers to this column.
      */
@@ -959,9 +971,9 @@ public class Column {
         return "\"" + sb.toString() + "\"";
     }
 
-    // -----------------------------------------------------
-    //                                            Unique Key
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
     public boolean isUnique() { // means this column is contained to one of unique constraints.
         final List<Unique> uniqueList = getTable().getUniqueList();
         for (Unique unique : uniqueList) {
@@ -1058,9 +1070,9 @@ public class Column {
         return title != null ? " title=\"" + title + "\"" : "";
     }
 
-    // -----------------------------------------------------
-    //                                                 Index
-    //                                                 -----
+    // ===================================================================================
+    //                                                                               Index
+    //                                                                               =====
     public boolean hasIndex() { // means this column is contained to one of indexes.
         final List<Index> indexList = getTable().getIndexList();
         for (Index index : indexList) {
@@ -1143,9 +1155,9 @@ public class Column {
         return title != null ? " title=\"" + title + "\"" : "";
     }
 
-    // =====================================================================================
-    //                                                                       Java Definition
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Java Definition
+    //                                                                     ===============
     // -----------------------------------------------------
     //                                             Java Name
     //                                             ---------
