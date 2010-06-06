@@ -239,21 +239,26 @@ public class MapListFile {
             br = new BufferedReader(ir);
 
             int count = -1;
+            boolean previousLineComment = false;
             while (true) {
-                ++count;
-
                 final String lineString = br.readLine();
                 if (lineString == null) {
+                    if (previousLineComment && !_skipToReadLineSeparator) {
+                        sb.append(ln()); // line separator adjustment
+                    }
                     break;
                 }
                 // if the line is comment, skip reading
                 if (!_includeReadLineComment && lineString.trim().startsWith(lineComment)) {
+                    previousLineComment = true;
                     continue;
                 }
-                sb.append(lineString);
-                if (!_skipToReadLineSeparator) {
+                previousLineComment = false;
+                ++count;
+                if (count > 0 && !_skipToReadLineSeparator) {
                     sb.append(ln());
                 }
+                sb.append(lineString);
             }
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: " + encoding;
@@ -268,7 +273,7 @@ public class MapListFile {
                 }
             }
         }
-        return removeInitialUnicodeBomIfNeeds(encoding, sb.toString().trim());
+        return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
     }
 
     // -----------------------------------------------------
