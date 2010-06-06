@@ -43,9 +43,9 @@ import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.ColumnValueMapStringBuilder;
+import org.seasar.dbflute.helper.mapstring.ColumnValueMapString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
-import org.seasar.dbflute.helper.mapstring.impl.ColumnValueMapStringBuilderImpl;
+import org.seasar.dbflute.helper.mapstring.impl.ColumnValueMapStringImpl;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
@@ -585,7 +585,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * {@inheritDoc}
      */
-    public ColumnValueMapStringBuilder createMapStringBuilder() {
+    public ColumnValueMapString createMapStringBuilder() {
         final List<String> columnDbNameList = new ArrayList<String>();
         for (final Iterator<ColumnInfo> ite = getColumnInfoList().iterator(); ite.hasNext();) {
             final ColumnInfo columnInfo = (ColumnInfo) ite.next();
@@ -1050,8 +1050,8 @@ public abstract class AbstractDBMeta implements DBMeta {
             return impl;
         }
 
-        public static ColumnValueMapStringBuilder createMapStringBuilder(List<String> columnNameList) {
-            ColumnValueMapStringBuilderImpl impl = new ColumnValueMapStringBuilderImpl();
+        public static ColumnValueMapString createMapStringBuilder(List<String> columnNameList) {
+            ColumnValueMapStringImpl impl = new ColumnValueMapStringImpl();
             impl.setMsMapMark(MAP_STRING_MAP_MARK);
             impl.setMsStartBrace(MAP_STRING_START_BRACE);
             impl.setMsEndBrace(MAP_STRING_END_BRACE);

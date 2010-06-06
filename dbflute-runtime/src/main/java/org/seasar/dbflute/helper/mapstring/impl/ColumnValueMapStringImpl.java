@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.mapstring.ColumnValueMapStringBuilder;
+import org.seasar.dbflute.helper.mapstring.ColumnValueMapString;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
@@ -29,7 +29,7 @@ import org.seasar.dbflute.util.Srl;
  * The implementation of map-string builder.
  * @author jflute
  */
-public class ColumnValueMapStringBuilderImpl implements ColumnValueMapStringBuilder {
+public class ColumnValueMapStringImpl implements ColumnValueMapString {
 
     // ===================================================================================
     //                                                                           Attribute

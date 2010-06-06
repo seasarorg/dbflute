@@ -21,7 +21,7 @@ import java.util.List;
  * The builder of map-string.
  * @author jflute
  */
-public interface ColumnValueMapStringBuilder {
+public interface ColumnValueMapString {
 
     String buildByDelimiter(String values, String delimiter);
 
