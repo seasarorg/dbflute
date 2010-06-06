@@ -25,8 +25,6 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
-import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.ColumnValueMapString;
 
 /**
  * The interface of DB meta.
@@ -512,21 +510,6 @@ public interface DBMeta {
      * @return The map of column string-value. (NotNull)
      */
     Map<String, String> convertToColumnStringValueMap(Entity entity);
-
-    // ===================================================================================
-    //                                                                          Map String
-    //                                                                          ==========
-    /**
-     * Create map list string that is prepared. (for INTERNAL)
-     * @return Map list string that is prepared. (NotNull)
-     */
-    MapListString createMapListString();
-
-    /**
-     * Create map string builder that is prepared. (for INTERNAL)
-     * @return Map string builder that is prepared. (NotNull)
-     */
-    ColumnValueMapString createMapStringBuilder();
 
     // ===================================================================================
     //                                                               Entity Property Setup

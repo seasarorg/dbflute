@@ -515,13 +515,13 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         protected Entity createEntityByStringValueList(java.util.List<String> columnNameList,
                 java.util.List<String> valueList) {
             final ColumnValueMapStringImpl builder = new ColumnValueMapStringImpl();
-            builder.setMsMapMark(MAP_STRING_MAP_MARK);
-            builder.setMsStartBrace(MAP_STRING_START_BRACE);
-            builder.setMsEndBrace(MAP_STRING_END_BRACE);
-            builder.setMsDelimiter(MAP_STRING_DELIMITER);
-            builder.setMsEqual(MAP_STRING_EQUAL);
+            builder.setMapMark(MAP_STRING_MAP_MARK);
+            builder.setStartBrace(MAP_STRING_START_BRACE);
+            builder.setEndBrace(MAP_STRING_END_BRACE);
+            builder.setDelimiter(MAP_STRING_DELIMITER);
+            builder.setEqual(MAP_STRING_EQUAL);
             builder.setColumnNameList(columnNameList);
-            final String mapString = builder.buildFromList(valueList);
+            final String mapString = builder.buildMapString(valueList);
 
             final Entity entity = getDBMeta().newEntity();
             getDBMeta().acceptColumnValueMapString(entity, mapString);

@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The string for map and list. <br />
- * Interface that offers generation of map and list from the following character strings (map list string).
+ * The string for map and list.
  * <pre> 
- * ex) strings like this
- * map:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
- * list:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
+ * ex) map-string
+ *   map:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
+ * 
+ * ex) list-string
+ *   list:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
  * </pre>
  * @author jflute
  */
@@ -50,6 +51,23 @@ public interface MapListString {
 
     /** Default of equal. */
     public static final String DEFAULT_EQUAL = "=";
+
+    // ===================================================================================
+    //                                                                               Build
+    //                                                                               =====
+    /**
+     * Build map-string from map.
+     * @param map The instance of map. (NotNull)
+     * @return The string as map expression. (NotNull)
+     */
+    String buildMapString(Map<String, ? extends Object> map);
+
+    /**
+     * Build list-string from list.
+     * @param list The instance of list. (NotNull)
+     * @return The string as list expression. (NotNull)
+     */
+    String buildListString(List<? extends Object> list);
 
     // ===================================================================================
     //                                                                            Generate

@@ -87,7 +87,7 @@ public class DfPropFileReader {
                 if (lineString.trim().length() == 0) {
                     continue;
                 }
-                // If the line is comment...
+                // if the line is comment, skip to read
                 if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
                     continue;
                 }
@@ -232,7 +232,7 @@ public class DfPropFileReader {
                 if (lineString.trim().length() == 0) {
                     continue;
                 }
-                // If the line is comment...
+                // if the line is comment, skip to read
                 if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
                     continue;
                 }

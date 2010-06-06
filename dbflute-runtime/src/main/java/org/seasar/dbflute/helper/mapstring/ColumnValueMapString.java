@@ -23,9 +23,9 @@ import java.util.List;
  */
 public interface ColumnValueMapString {
 
-    String buildByDelimiter(String values, String delimiter);
+    String buildMapString(String values, String delimiter);
 
-    String buildFromList(List<String> valueList);
+    String buildMapString(List<String> valueList);
 
     public static class DifferentDelimiterCountException extends RuntimeException {
 

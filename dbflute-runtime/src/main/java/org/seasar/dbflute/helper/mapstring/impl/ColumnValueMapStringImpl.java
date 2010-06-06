@@ -34,17 +34,17 @@ public class ColumnValueMapStringImpl implements ColumnValueMapString {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected String _mapMark;
+    protected String _startBrace;
+    protected String _endBrace;
+    protected String _delimiter;
+    protected String _equal;
     protected List<String> _columnNameList;
-    protected String _msMapMark;
-    protected String _msStartBrace;
-    protected String _msEndBrace;
-    protected String _msDelimiter;
-    protected String _msEqual;
 
     // ===================================================================================
     //                                                                               Build
     //                                                                               =====
-    public String buildByDelimiter(String values, String delimiter) {
+    public String buildMapString(String values, String delimiter) {
         if (values == null) {
             String msg = "The argument[values] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -55,10 +55,10 @@ public class ColumnValueMapStringImpl implements ColumnValueMapString {
         }
         assertStringComponent();
         final List<String> valueList = tokenize(values, delimiter);
-        return buildFromList(valueList);
+        return buildMapString(valueList);
     }
 
-    public String buildFromList(List<String> valueList) {
+    public String buildMapString(List<String> valueList) {
         if (valueList == null) {
             String msg = "The argument[valueList] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -67,15 +67,15 @@ public class ColumnValueMapStringImpl implements ColumnValueMapString {
         assertColumnValueList(_columnNameList, valueList);
 
         final StringBuilder sb = new StringBuilder();
-        sb.append(_msMapMark).append(_msStartBrace);
+        sb.append(_mapMark).append(_startBrace);
         for (int i = 0; i < _columnNameList.size(); i++) {
             final String columnName = _columnNameList.get(i);
             final String value = valueList.get(i);
-            sb.append(columnName).append(_msEqual).append(value).append(_msDelimiter);
+            sb.append(columnName).append(_equal).append(value).append(_delimiter);
         }
 
-        sb.delete(sb.length() - _msDelimiter.length(), sb.length());
-        sb.append(_msEndBrace);
+        sb.delete(sb.length() - _delimiter.length(), sb.length());
+        sb.append(_endBrace);
         return sb.toString();
     }
 
@@ -98,23 +98,23 @@ public class ColumnValueMapStringImpl implements ColumnValueMapString {
             String msg = "The columnNameList should not be empty.";
             throw new IllegalStateException(msg);
         }
-        if (_msMapMark == null) {
+        if (_mapMark == null) {
             String msg = "The msMapMark should not be null.";
             throw new IllegalStateException(msg);
         }
-        if (_msStartBrace == null) {
+        if (_startBrace == null) {
             String msg = "The msStartBrace should not be null.";
             throw new IllegalStateException(msg);
         }
-        if (_msEndBrace == null) {
+        if (_endBrace == null) {
             String msg = "The msEndBrace should not be null.";
             throw new IllegalStateException(msg);
         }
-        if (_msDelimiter == null) {
+        if (_delimiter == null) {
             String msg = "The msDelimiter should not be null.";
             throw new IllegalStateException(msg);
         }
-        if (_msEqual == null) {
+        if (_equal == null) {
             String msg = "The msEqual should not be null.";
             throw new IllegalStateException(msg);
         }
@@ -145,31 +145,31 @@ public class ColumnValueMapStringImpl implements ColumnValueMapString {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public void setMapMark(String value) {
+        _mapMark = value;
+    }
+
+    public void setStartBrace(String value) {
+        _startBrace = value;
+    }
+
+    public void setEndBrace(String value) {
+        _endBrace = value;
+    }
+
+    public void setDelimiter(String value) {
+        _delimiter = value;
+    }
+
+    public void setEqual(String value) {
+        _equal = value;
+    }
+
     public void setColumnNames(String[] columnNames) {
         _columnNameList = Arrays.asList(columnNames);
     }
 
     public void setColumnNameList(List<String> columnNameList) {
         _columnNameList = columnNameList;
-    }
-
-    public void setMsMapMark(String value) {
-        _msMapMark = value;
-    }
-
-    public void setMsStartBrace(String value) {
-        _msStartBrace = value;
-    }
-
-    public void setMsEndBrace(String value) {
-        _msEndBrace = value;
-    }
-
-    public void setMsDelimiter(String value) {
-        _msDelimiter = value;
-    }
-
-    public void setMsEqual(String value) {
-        _msEqual = value;
     }
 }

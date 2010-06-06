@@ -19,12 +19,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * The implementation of MapList-String.
+ * The basic implementation of map-list-string.
  * @author jflute
  */
 public class MapListStringImpl implements MapListString {
@@ -32,28 +34,28 @@ public class MapListStringImpl implements MapListString {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Map-mark. */
+    /** The mark of map. */
     protected String _mapMark;
 
-    /** List-mark. */
+    /** The mark of list. */
     protected String _listMark;
 
-    /** Start-brace. */
+    /** The string of start brace. */
     protected String _startBrace;
 
-    /** End-brace. */
+    /** The string of end brace. */
     protected String _endBrace;
 
-    /** Delimiter. */
+    /** The string of delimiter. */
     protected String _delimiter;
 
-    /** Equal. */
+    /** The string of equal for map-string. */
     protected String _equal;
 
-    /** Top string. */
+    /** The string of top as temporary variable for generation. */
     protected String _topString;
 
-    /** Remainder string. */
+    /** The string of remainder as temporary variable for generation. */
     protected String _remainderString;
 
     // ===================================================================================
@@ -72,12 +74,89 @@ public class MapListStringImpl implements MapListString {
     }
 
     // ===================================================================================
+    //                                                                               Build
+    //                                                                               =====
+    /**
+     * {@inheritDoc}
+     */
+    public String buildMapString(Map<String, ? extends Object> map) {
+        final StringBuilder sb = new StringBuilder();
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> casted = (Map<String, Object>) map;
+        doBuildMapString(sb, casted, "", "    ");
+        return sb.toString();
+    }
+
+    protected void doBuildMapString(StringBuilder sb, Map<String, Object> map, String preIndent, String curIndent) {
+        sb.append(_mapMark).append(_startBrace);
+        final Set<Entry<String, Object>> entrySet = map.entrySet();
+        for (Entry<String, ? extends Object> entry : entrySet) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            sb.append(ln()).append(curIndent).append(_delimiter);
+            sb.append(" ").append(key).append(" ").append(_equal).append(" ");
+            if (value instanceof Map<?, ?>) {
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> valueMap = (Map<String, Object>) value;
+                doBuildMapString(sb, valueMap, curIndent, calculateNextIndent(preIndent, curIndent));
+            } else if (value instanceof List<?>) {
+                @SuppressWarnings("unchecked")
+                final List<Object> valueList = (List<Object>) value;
+                doBuildListString(sb, valueList, curIndent, calculateNextIndent(preIndent, curIndent));
+            } else {
+                sb.append(value);
+            }
+        }
+        sb.append(ln()).append(preIndent).append(_endBrace);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String buildListString(List<? extends Object> list) {
+        final StringBuilder sb = new StringBuilder();
+        @SuppressWarnings("unchecked")
+        final List<Object> casted = (List<Object>) list;
+        doBuildListString(sb, casted, "", "    ");
+        return sb.toString();
+    }
+
+    protected void doBuildListString(StringBuilder sb, List<? extends Object> list, String preIndent, String curIndent) {
+        sb.append(_listMark).append(_startBrace);
+        for (Object value : list) {
+            sb.append(ln()).append(curIndent).append(_delimiter);
+            sb.append(" ");
+            if (value instanceof Map<?, ?>) {
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> valueMap = (Map<String, Object>) value;
+                doBuildMapString(sb, valueMap, curIndent, calculateNextIndent(preIndent, curIndent));
+            } else if (value instanceof List<?>) {
+                @SuppressWarnings("unchecked")
+                final List<Object> valueList = (List<Object>) value;
+                doBuildListString(sb, valueList, curIndent, calculateNextIndent(preIndent, curIndent));
+            } else {
+                sb.append(value);
+            }
+        }
+        sb.append(ln()).append(preIndent).append(_endBrace);
+    }
+
+    protected String calculateNextIndent(String preIndent, String curIndent) {
+        final StringBuilder sb = new StringBuilder();
+        final int indentLength = curIndent.length() - preIndent.length();
+        for (int i = 0; i < indentLength; i++) {
+            sb.append(" ");
+        }
+        return curIndent + sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                            Generate
     //                                                                            ========
     /**
      * {@inheritDoc}
      */
-    public synchronized Map<String, Object> generateMap(String mapString) {
+    public Map<String, Object> generateMap(String mapString) {
         assertMapString(mapString);
 
         _topString = mapString;
@@ -90,9 +169,9 @@ public class MapListStringImpl implements MapListString {
         parseRemainderMapString(generatedMap);
         if (!"".equals(_remainderString)) {
             String msg = "Final remainderString must be empty string:";
-            msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
-            msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString;
-            msg = msg + getNewLineAndIndent() + " # generatedMap --> " + generatedMap;
+            msg = msg + lnd() + " # remainderString --> " + _remainderString;
+            msg = msg + lnd() + " # mapString --> " + mapString;
+            msg = msg + lnd() + " # generatedMap --> " + generatedMap;
             throw new IllegalStateException(msg);
         }
         return generatedMap;
@@ -101,7 +180,7 @@ public class MapListStringImpl implements MapListString {
     /**
      * {@inheritDoc}
      */
-    public synchronized List<Object> generateList(String listString) {
+    public List<Object> generateList(String listString) {
         assertListString(listString);
 
         _topString = listString;
@@ -114,9 +193,9 @@ public class MapListStringImpl implements MapListString {
         parseRemainderListString(generatedList);
         if (!"".equals(_remainderString)) {
             String msg = "Final remainderString must be empty string:";
-            msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
-            msg = msg + getNewLineAndIndent() + " # listString --> " + listString;
-            msg = msg + getNewLineAndIndent() + " # generatedList --> " + generatedList;
+            msg = msg + lnd() + " # remainderString --> " + _remainderString;
+            msg = msg + lnd() + " # listString --> " + listString;
+            msg = msg + lnd() + " # generatedList --> " + generatedList;
             throw new IllegalStateException(msg);
         }
         return generatedList;
@@ -341,14 +420,14 @@ public class MapListStringImpl implements MapListString {
 
         if (_remainderString.length() < prefixString.length()) {
             String msg = "Argument[remainderString] length must be larger than Argument[prefixString] length:";
-            msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
-            msg = msg + getNewLineAndIndent() + " # prefixString=" + prefixString;
+            msg = msg + lnd() + " # remainderString --> " + _remainderString;
+            msg = msg + lnd() + " # prefixString=" + prefixString;
             throw new IllegalArgumentException(msg);
         }
         if (!_remainderString.startsWith(prefixString)) {
             String msg = "Argument[remainderString] must start with Argument[prefixString:]";
-            msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
-            msg = msg + getNewLineAndIndent() + " # prefixString --> " + prefixString;
+            msg = msg + lnd() + " # remainderString --> " + _remainderString;
+            msg = msg + lnd() + " # prefixString --> " + prefixString;
             throw new IllegalArgumentException(msg);
         }
 
@@ -572,14 +651,6 @@ public class MapListStringImpl implements MapListString {
     }
 
     /**
-     * Get new-line and indent.
-     * @return New-line and indent. (NotNull)
-     */
-    protected String getNewLineAndIndent() {
-        return ln() + "    ";
-    }
-
-    /**
      * Get count that target string exist in the base string.
      * @param targetString Target string.
      * @param delimiter Delimiter
@@ -627,9 +698,9 @@ public class MapListStringImpl implements MapListString {
         final int endBraceCount = getDelimiterCount(mapString, _endBrace);
         if (startBraceCount != endBraceCount) {
             String msg = "It is necessary to have braces of the same number on start and end:";
-            msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString;
-            msg = msg + getNewLineAndIndent() + " # startBraceCount --> " + startBraceCount;
-            msg = msg + getNewLineAndIndent() + " # endBraceCount --> " + endBraceCount;
+            msg = msg + lnd() + " # mapString --> " + mapString;
+            msg = msg + lnd() + " # startBraceCount --> " + startBraceCount;
+            msg = msg + lnd() + " # endBraceCount --> " + endBraceCount;
             throw new IllegalArgumentException(msg);
         }
     }
@@ -657,9 +728,9 @@ public class MapListStringImpl implements MapListString {
         final int endBraceCount = getDelimiterCount(listString, _endBrace);
         if (startBraceCount != endBraceCount) {
             String msg = "It is necessary to have braces of the same number on start and end:";
-            msg = msg + getNewLineAndIndent() + " # listString --> " + listString;
-            msg = msg + getNewLineAndIndent() + " # startBraceCount --> " + startBraceCount;
-            msg = msg + getNewLineAndIndent() + " # endBraceCount --> " + endBraceCount;
+            msg = msg + lnd() + " # listString --> " + listString;
+            msg = msg + lnd() + " # startBraceCount --> " + startBraceCount;
+            msg = msg + lnd() + " # endBraceCount --> " + endBraceCount;
             throw new IllegalArgumentException(msg);
         }
     }
@@ -675,55 +746,55 @@ public class MapListStringImpl implements MapListString {
             Map<String, Object> currentMap4Log) {
         if (remainderMapString == null) {
             String msg = "Argument[remainderMapString] must not be null:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> null";
-            msg = msg + getNewLineAndIndent() + " # equalIndex --> " + equalIndex;
-            msg = msg + getNewLineAndIndent() + " # mapString4Log --> " + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap4Log --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> null";
+            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
+            msg = msg + lnd() + " # mapString4Log --> " + mapString4Log;
+            msg = msg + lnd() + " # currentMap4Log --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
         if (equalIndex < 0) {
             String msg = "Argument[equalIndex] must be plus or zero:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + getNewLineAndIndent() + " # equalIndex --> " + equalIndex;
-            msg = msg + getNewLineAndIndent() + " # mapString4Log --> " + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap4Log --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
+            msg = msg + lnd() + " # mapString4Log --> " + mapString4Log;
+            msg = msg + lnd() + " # currentMap4Log --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
         if (remainderMapString.length() < equalIndex) {
             String msg = "Argument[remainderMapString] length must be larger than equalIndex value:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + getNewLineAndIndent() + " # equalIndex --> " + equalIndex;
-            msg = msg + getNewLineAndIndent() + " # mapString4Log --> " + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap4Log --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
+            msg = msg + lnd() + " # mapString4Log --> " + mapString4Log;
+            msg = msg + lnd() + " # currentMap4Log --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
         final String expectedAsEndMark = remainderMapString.substring(equalIndex, equalIndex + _equal.length());
         if (!expectedAsEndMark.equals(_equal)) {
             String msg = "Argument[remainderMapString] must have '" + _equal + "' at Argument[equalIndex]:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + getNewLineAndIndent() + " # equalIndex --> " + equalIndex;
-            msg = msg + getNewLineAndIndent() + " # expectedAsEndMark --> " + expectedAsEndMark;
-            msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
+            msg = msg + lnd() + " # expectedAsEndMark --> " + expectedAsEndMark;
+            msg = msg + lnd() + " # mapString --> " + mapString4Log;
+            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
     }
@@ -739,40 +810,40 @@ public class MapListStringImpl implements MapListString {
             Map<String, Object> currentMap4Log) {
         if (remainderMapString == null) {
             String msg = "Argument[remainderMapString] must not be null:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> null";
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> null";
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # mapString --> " + mapString4Log;
+            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
         if (endBraceIndex < 0) {
             String msg = "Argument[endMarkIndex] must be plus or zero:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # mapString --> =" + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # mapString --> =" + mapString4Log;
+            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
         if (remainderMapString.length() < endBraceIndex) {
             String msg = "Argument[remainderMapString] length must be larger than endMarkIndex value:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # mapString --> " + mapString4Log;
+            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
@@ -780,15 +851,15 @@ public class MapListStringImpl implements MapListString {
                 .substring(endBraceIndex, endBraceIndex + _endBrace.length());
         if (!expectedAsEndMark.equals(_endBrace)) {
             String msg = "Argument[remainderMapString] must have '" + _endBrace + "' at Argument[endBraceIndex]:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # expectedAsEndMark --> " + expectedAsEndMark;
-            msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentMap --> " + currentMap4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # expectedAsEndMark --> " + expectedAsEndMark;
+            msg = msg + lnd() + " # mapString --> " + mapString4Log;
+            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
     }
@@ -804,40 +875,40 @@ public class MapListStringImpl implements MapListString {
             List<?> currentList4Log) {
         if (remainderListString == null) {
             String msg = "Argument[remainderListString] must not be null:";
-            msg = msg + getNewLineAndIndent() + " # remainderListString --> null";
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # listString --> " + listString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentList --> " + currentList4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderListString --> null";
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # listString --> " + listString4Log;
+            msg = msg + lnd() + " # currentList --> " + currentList4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
         if (endBraceIndex < 0) {
             String msg = "Argument[endMarkIndex] must be plus or zero:";
-            msg = msg + getNewLineAndIndent() + " # remainderListString --> " + remainderListString;
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # listString --> " + listString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentList --> " + currentList4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderListString --> " + remainderListString;
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # listString --> " + listString4Log;
+            msg = msg + lnd() + " # currentList --> " + currentList4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
         if (remainderListString.length() < endBraceIndex) {
             String msg = "Argument[remainderListString] length must be larger than endMarkIndex value:";
-            msg = msg + getNewLineAndIndent() + " # remainderListString --> " + remainderListString;
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # listString --> " + listString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentList --> " + currentList4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderListString --> " + remainderListString;
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # listString --> " + listString4Log;
+            msg = msg + lnd() + " # currentList --> " + currentList4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
 
@@ -845,15 +916,15 @@ public class MapListStringImpl implements MapListString {
                 + _endBrace.length());
         if (!expectedAsEndBrace.equals(_endBrace)) {
             String msg = "Argument[remainderListString] must have '" + _endBrace + "' at Argument[endBraceIndex]:";
-            msg = msg + getNewLineAndIndent() + " # remainderListString --> " + remainderListString;
-            msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + getNewLineAndIndent() + " # expectedAsEndBrace --> " + expectedAsEndBrace;
-            msg = msg + getNewLineAndIndent() + " # listString --> " + listString4Log;
-            msg = msg + getNewLineAndIndent() + " # currentList --> " + currentList4Log;
-            msg = msg + getNewLineAndIndent() + " # _startBrace --> " + _startBrace;
-            msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
-            msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
-            msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
+            msg = msg + lnd() + " # remainderListString --> " + remainderListString;
+            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
+            msg = msg + lnd() + " # expectedAsEndBrace --> " + expectedAsEndBrace;
+            msg = msg + lnd() + " # listString --> " + listString4Log;
+            msg = msg + lnd() + " # currentList --> " + currentList4Log;
+            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
+            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
+            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
+            msg = msg + lnd() + " # _equal --> " + _equal;
             throw new IllegalArgumentException(msg);
         }
     }
@@ -861,6 +932,14 @@ public class MapListStringImpl implements MapListString {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    /**
+     * Get new-line and indent.
+     * @return The string of new-line and indent. (NotNull)
+     */
+    protected String lnd() {
+        return ln() + "    ";
+    }
+
     protected final String ln() {
         return DfSystemUtil.getLineSeparator();
     }

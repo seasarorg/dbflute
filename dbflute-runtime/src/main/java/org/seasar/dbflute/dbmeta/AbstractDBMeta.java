@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +41,10 @@ import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.ColumnValueMapString;
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.ColumnValueMapStringImpl;
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
@@ -573,28 +572,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // ===================================================================================
-    //                                                                          Map String
-    //                                                                          ==========
-    /**
-     * {@inheritDoc}
-     */
-    public MapListString createMapListString() {
-        return MapStringUtil.createMapListString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ColumnValueMapString createMapStringBuilder() {
-        final List<String> columnDbNameList = new ArrayList<String>();
-        for (final Iterator<ColumnInfo> ite = getColumnInfoList().iterator(); ite.hasNext();) {
-            final ColumnInfo columnInfo = (ColumnInfo) ite.next();
-            columnDbNameList.add(columnInfo.getColumnDbName());
-        }
-        return MapStringUtil.createMapStringBuilder(columnDbNameList);
-    }
-
-    // ===================================================================================
     //                                                                        Various Info
     //                                                                        ============
     // These methods is expected to override if it needs.
@@ -951,7 +928,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (!primaryKeyMapString.trim().endsWith(suffix)) {
                 primaryKeyMapString = primaryKeyMapString + suffix;
             }
-            MapListString mapListString = createMapListString();
+            final MapListString mapListString = createMapListString();
             entity.getDBMeta().acceptPrimaryKeyMap(entity, mapListString.generateMap(primaryKeyMapString));
         }
 
@@ -968,7 +945,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (!columnValueMapString.trim().endsWith(suffix)) {
                 columnValueMapString = columnValueMapString + suffix;
             }
-            MapListString mapListString = createMapListString();
+            final MapListString mapListString = createMapListString();
             entity.getDBMeta().acceptColumnValueMap(entity, mapListString.generateMap(columnValueMapString));
         }
 
@@ -1052,11 +1029,11 @@ public abstract class AbstractDBMeta implements DBMeta {
 
         public static ColumnValueMapString createMapStringBuilder(List<String> columnNameList) {
             ColumnValueMapStringImpl impl = new ColumnValueMapStringImpl();
-            impl.setMsMapMark(MAP_STRING_MAP_MARK);
-            impl.setMsStartBrace(MAP_STRING_START_BRACE);
-            impl.setMsEndBrace(MAP_STRING_END_BRACE);
-            impl.setMsEqual(MAP_STRING_EQUAL);
-            impl.setMsDelimiter(MAP_STRING_DELIMITER);
+            impl.setMapMark(MAP_STRING_MAP_MARK);
+            impl.setStartBrace(MAP_STRING_START_BRACE);
+            impl.setEndBrace(MAP_STRING_END_BRACE);
+            impl.setEqual(MAP_STRING_EQUAL);
+            impl.setDelimiter(MAP_STRING_DELIMITER);
             impl.setColumnNameList(columnNameList);
             return impl;
         }
