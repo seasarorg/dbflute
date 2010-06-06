@@ -155,7 +155,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected DfSchemaXmlReader createSchemaFileReader() {
         final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
-        return new DfSchemaXmlReader(filePath, getProject(), getTargetDatabase());
+        return new DfSchemaXmlReader(filePath, getTargetDatabase());
     }
 
     protected void setupControlTemplate() {

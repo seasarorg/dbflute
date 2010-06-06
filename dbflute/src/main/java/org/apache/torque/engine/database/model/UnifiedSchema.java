@@ -1,6 +1,7 @@
 package org.apache.torque.engine.database.model;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
@@ -65,7 +66,7 @@ public class UnifiedSchema {
     }
 
     protected boolean isCompletelyUnsupportedDBMS() {
-        return DfBuildProperties.getInstance().getBasicProperties().isDatabaseAsUnifiedSchemaUnsupported();
+        return getBasicProperties().isDatabaseAsUnifiedSchemaUnsupported();
     }
 
     // -----------------------------------------------------
@@ -84,13 +85,11 @@ public class UnifiedSchema {
     }
 
     public static UnifiedSchema createAsDynamicSchema(String schemaExpression) {
-        final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
-        return new UnifiedSchema(schemaExpression).judgeSchema(databaseProp);
+        return new UnifiedSchema(schemaExpression).judgeSchema();
     }
 
     public static UnifiedSchema createAsDynamicSchema(String catalog, String schema) {
-        final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
-        return new UnifiedSchema(catalog, schema).judgeSchema(databaseProp);
+        return new UnifiedSchema(catalog, schema).judgeSchema();
     }
 
     // -----------------------------------------------------
@@ -116,7 +115,8 @@ public class UnifiedSchema {
         return this;
     }
 
-    protected UnifiedSchema judgeSchema(DfDatabaseProperties databaseProp) {
+    protected UnifiedSchema judgeSchema() {
+        final DfDatabaseProperties databaseProp = getDatabaseProperties();
         final UnifiedSchema mainSchema = databaseProp.getDatabaseSchema();
         if (equals(mainSchema)) {
             asMainSchema();
@@ -303,9 +303,20 @@ public class UnifiedSchema {
                 + (isUnknownSchema() ? "unknown" : "") + "}";
     }
 
-    // ===============================================================================
-    //                                                                  General Helper
-    //                                                                  ==============
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return DfBuildProperties.getInstance().getDatabaseProperties();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }

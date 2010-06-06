@@ -1,6 +1,5 @@
 package org.seasar.dbflute.logic.jdbc.schemaxml;
 
-import org.apache.tools.ant.Project;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.transform.XmlToAppData;
 
@@ -10,16 +9,14 @@ public class DfSchemaXmlReader {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _schemaXml;
-    protected final Project _project;
     protected final String _targetDatabase;
     protected AppData _schemaData;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSchemaXmlReader(String schemaXml, Project project, String targetDatabase) {
+    public DfSchemaXmlReader(String schemaXml, String targetDatabase) {
         _schemaXml = schemaXml;
-        _project = project;
         _targetDatabase = targetDatabase;
     }
 
