@@ -20,13 +20,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
+import org.seasar.dbflute.infra.dfprop.DfPropFile;
 
 /**
  * @author jflute
  * @since 0.5.4 (2007/07/18)
  */
 public class DfStringFileReader {
+
+    protected final DfPropFile _dfpropFile = new DfPropFile();
 
     // ===================================================================================
     //                                                                                Read
@@ -35,7 +37,7 @@ public class DfStringFileReader {
         FileInputStream ins = null;
         try {
             ins = new FileInputStream(new File(path));
-            return new DfPropFileReader().readString(ins);
+            return _dfpropFile.readString(ins);
         } catch (FileNotFoundException e) {
             return "";
         } finally {

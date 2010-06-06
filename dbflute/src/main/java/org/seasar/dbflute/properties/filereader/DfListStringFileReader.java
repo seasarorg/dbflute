@@ -22,13 +22,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
+import org.seasar.dbflute.infra.dfprop.DfPropFile;
 
 /**
  * @author jflute
  * @since 0.6.8 (2008/03/31 Monday)
  */
 public class DfListStringFileReader {
+    
+    protected final DfPropFile _dfpropFile = new DfPropFile();
 
     // ===================================================================================
     //                                                                                Read
@@ -37,7 +39,7 @@ public class DfListStringFileReader {
         FileInputStream ins = null;
         try {
             ins = new FileInputStream(new File(path));
-            return new DfPropFileReader().readList(ins);
+            return _dfpropFile.readList(ins);
         } catch (FileNotFoundException e) {
             return new ArrayList<Object>();
         } finally {

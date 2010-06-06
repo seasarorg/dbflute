@@ -1,5 +1,10 @@
 package org.seasar.dbflute.logic.jdbc.diff;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +14,8 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.infra.schemadiff.SchemaDiffFile;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -22,11 +29,17 @@ import org.seasar.dbflute.util.DfTypeUtil;
 public class DfSchemaDiff {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String KEY_DIFF_DATE = "$$DiffDate$$";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Database _nextDb;
-    protected Database _previousDb;
-    protected Date _diffDate;
+    protected Database _nextDb; // not null after loading
+    protected Database _previousDb; // not null after loading
+    protected Date _diffDate; // not null after loading next schema
+    protected boolean _firstTime; // judged when loading previous schema
     protected final List<DfTableDiff> _addedTableList = DfCollectionUtil.newArrayList();
     protected final List<DfTableDiff> _changedTableList = DfCollectionUtil.newArrayList();
     protected final List<DfTableDiff> _deletedTableList = DfCollectionUtil.newArrayList();
@@ -34,23 +47,64 @@ public class DfSchemaDiff {
     // ===================================================================================
     //                                                                         Load Schema
     //                                                                         ===========
-    public void loadNextSchema() throws EngineException {
+    public void loadNextSchema() { // after loading previous schema
+        if (isFirstTime()) {
+            String msg = "You should not call this because of first time.";
+            throw new IllegalStateException(msg);
+        }
+        if (_previousDb == null) {
+            String msg = "You should not call this because of previous not loaded.";
+            throw new IllegalStateException(msg);
+        }
         final DfSchemaXmlReader reader = createSchemaXmlReader();
-        reader.read();
-        _nextDb = reader.getSchemaData().getDatabase();
+        try {
+            reader.read();
+        } catch (IOException e) {
+            handleException(e);
+        }
+        try {
+            _nextDb = reader.getSchemaData().getDatabase();
+        } catch (EngineException e) {
+            handleException(e);
+        }
         _diffDate = new Date(DfSystemUtil.currentTimeMillis());
     }
 
-    public void loadPreviousSchema() throws EngineException {
+    public void loadPreviousSchema() { // before loading next schema
         final DfSchemaXmlReader reader = createSchemaXmlReader();
-        reader.read();
-        _previousDb = reader.getSchemaData().getDatabase();
+        try {
+            reader.read();
+        } catch (FileNotFoundException normal) {
+            _firstTime = true;
+            return;
+        } catch (IOException e) {
+            handleException(e);
+        }
+        try {
+            _previousDb = reader.getSchemaData().getDatabase();
+        } catch (EngineException e) {
+            handleException(e);
+        }
+    }
+
+    protected void handleException(Exception e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to load schema XML.");
+        br.addItem("SchemaXML");
+        br.addElement(getSchemaXmlFilePath());
+        br.addItem("DatabaseType");
+        br.addElement(getDatabaseType());
+        br.addItem("Exception");
+        br.addElement(e.getClass().getName());
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg, e);
     }
 
     // ===================================================================================
     //                                                                             Analyze
     //                                                                             =======
-    public void analyzeDiff() throws EngineException {
+    public void analyzeDiff() {
         processAddedTable();
         processChangedTable();
         processDeletedTable();
@@ -211,12 +265,16 @@ public class DfSchemaDiff {
         return false;
     }
 
+    public boolean isFirstTime() {
+        return _firstTime;
+    }
+
     // ===================================================================================
     //                                                                             DiffMap
     //                                                                             =======
     public Map<String, Object> createDiffMap() {
         final Map<String, Object> tableDiffMap = DfCollectionUtil.newLinkedHashMap();
-        tableDiffMap.put("$$DiffDate$$", DfTypeUtil.toString(_diffDate, "yyyy/MM/dd HH:mm:dd"));
+        tableDiffMap.put(KEY_DIFF_DATE, DfTypeUtil.toString(_diffDate, "yyyy/MM/dd HH:mm:dd"));
         tableDiffMap.put("$$NextTableCount$$", _nextDb.getTableList().size());
         tableDiffMap.put("$$PreviousTableCount$$", _previousDb.getTableList().size());
         tableDiffMap.put("$$AddedTableCount$$", _addedTableList.size());
@@ -240,19 +298,55 @@ public class DfSchemaDiff {
         return tableDiffMap;
     }
 
+    public void serializeSchemaDiff() throws IOException {
+        final String path = getDiffMapFilePath();
+        final SchemaDiffFile diffFile = new SchemaDiffFile();
+        final File file = new File(path);
+        final Map<String, Object> map;
+        if (file.exists()) {
+            FileInputStream ins = null;
+            try {
+                ins = new FileInputStream(file);
+                map = diffFile.readMap(new FileInputStream(file));
+            } finally {
+                if (ins != null) {
+                    ins.close();
+                }
+            }
+        } else {
+            map = DfCollectionUtil.newLinkedHashMap();
+            file.createNewFile();
+        }
+        final Map<String, Object> diffMap = createDiffMap();
+        map.put((String) diffMap.get(KEY_DIFF_DATE), diffMap);
+        FileOutputStream ous = null;
+        try {
+            ous = new FileOutputStream(path);
+            diffFile.writeMap(ous, map);
+        } finally {
+            if (ous != null) {
+                ous.close();
+            }
+        }
+    }
+
     // ===================================================================================
     //                                                                       Schema Reader
     //                                                                       =============
     protected DfSchemaXmlReader createSchemaXmlReader() {
-        return new DfSchemaXmlReader(getSchemaXml(), getDatabaseType());
+        return new DfSchemaXmlReader(getSchemaXmlFilePath(), getDatabaseType());
     }
 
-    protected String getSchemaXml() {
+    protected String getSchemaXmlFilePath() {
         return getBasicProperties().getProejctSchemaXMLFilePath();
     }
 
     protected String getDatabaseType() {
         return getBasicProperties().getDatabaseType();
+    }
+
+    protected String getDiffMapFilePath() {
+        return getBasicProperties().getProejctSchemaDiffMapFilePath();
     }
 
     // ===================================================================================

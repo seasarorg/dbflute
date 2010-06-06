@@ -1,5 +1,7 @@
 package org.seasar.dbflute.logic.jdbc.schemaxml;
 
+import java.io.IOException;
+
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.transform.XmlToAppData;
 
@@ -10,7 +12,7 @@ public class DfSchemaXmlReader {
     //                                                                           =========
     protected final String _schemaXml;
     protected final String _targetDatabase;
-    protected AppData _schemaData;
+    protected AppData _schemaData; // not null after reading
 
     // ===================================================================================
     //                                                                         Constructor
@@ -23,7 +25,7 @@ public class DfSchemaXmlReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public void read() {
+    public void read() throws IOException {
         if (_schemaXml == null) {
             String msg = "The property 'schemaXml' should not be null!";
             throw new IllegalStateException(msg);

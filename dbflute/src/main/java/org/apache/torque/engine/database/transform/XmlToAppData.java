@@ -56,10 +56,12 @@ package org.apache.torque.engine.database.transform;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Stack;
 import java.util.Vector;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -71,7 +73,7 @@ import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -128,40 +130,41 @@ public class XmlToAppData extends DefaultHandler {
      * populated AppData structure.
      * @param xmlFile The input file to parse.
      * @return AppData populated by <code>xmlFile</code>.
+     * @throws IOException
      */
-    public AppData parseFile(String xmlFile) {
+    public AppData parseFile(String xmlFile) throws IOException {
+        // in case I am missing something, make it obvious
+        if (!_firstPass) {
+            throw new Error("No more double pass");
+        }
+        // check to see if we already have parsed the file
+        if ((_alreadyReadFiles != null) && _alreadyReadFiles.contains(xmlFile)) {
+            return _appData;
+        } else if (_alreadyReadFiles == null) {
+            _alreadyReadFiles = new Vector<String>(3, 1);
+        }
+
+        // remember the file to avoid looping
+        _alreadyReadFiles.add(xmlFile);
+        _currentXmlFile = xmlFile;
+
+        final String encoding = getProejctSchemaXMLEncoding();
+        BufferedReader reader = null;
         try {
-            // in case I am missing something, make it obvious
-            if (!_firstPass) {
-                throw new Error("No more double pass");
-            }
-            // check to see if we already have parsed the file
-            if ((_alreadyReadFiles != null) && _alreadyReadFiles.contains(xmlFile)) {
-                return _appData;
-            } else if (_alreadyReadFiles == null) {
-                _alreadyReadFiles = new Vector<String>(3, 1);
-            }
-
-            // remember the file to avoid looping
-            _alreadyReadFiles.add(xmlFile);
-            _currentXmlFile = xmlFile;
-
-            // Uses InputStreamReader for specifying an encoding for project schema XML.
-            final String encoding = getProejctSchemaXMLEncoding();
-            final InputStreamReader fr = new InputStreamReader(new FileInputStream(xmlFile), encoding);
-            final BufferedReader br = new BufferedReader(fr);
+            // Uses InputStreamReader for setting an encoding for project schema XML.
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile), encoding));
+            final InputSource is = new InputSource(reader);
+            final SAXParser parser = _saxFactory.newSAXParser();
+            parser.parse(is, this);
+        } catch (ParserConfigurationException e) {
+            handleException(e, xmlFile, encoding);
+        } catch (SAXException e) {
+            handleException(e, xmlFile, encoding);
+        } finally {
             try {
-                final InputSource is = new InputSource(br);
-                final SAXParser parser = _saxFactory.newSAXParser();
-                parser.parse(is, this);
-            } finally {
-                br.close();
+                reader.close();
+            } catch (IOException ignored) {
             }
-        } catch (Exception e) {
-            final String title = DfTypeUtil.toClassTitle(this);
-            String msg = title + ".parseFile() threw the exception:";
-            msg = msg + " xmlFile=" + xmlFile;
-            throw new IllegalStateException(msg, e);
         }
         _firstPass = false;
         return _appData;
@@ -171,6 +174,23 @@ public class XmlToAppData extends DefaultHandler {
         return DfBuildProperties.getInstance().getBasicProperties().getProejctSchemaXMLEncoding();
     }
 
+    protected void handleException(Exception e, String xmlFile, String encoding) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to parse SchemaXML.");
+        br.addItem("SchemaXML");
+        br.addElement(xmlFile);
+        br.addItem("Encoding");
+        br.addElement(encoding);
+        br.addItem("Exception");
+        br.addElement(e.getClass().getName());
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg, e);
+    }
+
+    // ===================================================================================
+    //                                                                    Handler Override
+    //                                                                    ================
     /**
      * EntityResolver implementation. Called by the XML parser
      * @param publicId The public identifier of the external entity

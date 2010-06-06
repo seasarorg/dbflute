@@ -23,13 +23,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
+import org.seasar.dbflute.infra.dfprop.DfPropFile;
 
 /**
  * @author jflute
  */
 public class DfMapStringFileReader {
 
+    protected final DfPropFile _dfpropFile = new DfPropFile();
+    
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
@@ -37,7 +39,7 @@ public class DfMapStringFileReader {
         FileInputStream ins = null;
         try {
             ins = new FileInputStream(new File(path));
-            return new DfPropFileReader().readMap(ins);
+            return _dfpropFile.readMap(ins);
         } catch (FileNotFoundException e) {
             return newLinkedHashMap();
         } finally {
@@ -54,7 +56,7 @@ public class DfMapStringFileReader {
         FileInputStream ins = null;
         try {
             ins = new FileInputStream(new File(path));
-            return new DfPropFileReader().readMapAsStringValue(ins);
+            return _dfpropFile.readMapAsStringValue(ins);
         } catch (FileNotFoundException e) {
             return newLinkedHashMap();
         } finally {
@@ -71,7 +73,7 @@ public class DfMapStringFileReader {
         FileInputStream ins = null;
         try {
             ins = new FileInputStream(new File(path));
-            return new DfPropFileReader().readMapAsStringListValue(ins);
+            return _dfpropFile.readMapAsStringListValue(ins);
         } catch (FileNotFoundException e) {
             return newLinkedHashMap();
         } finally {
@@ -88,7 +90,7 @@ public class DfMapStringFileReader {
         FileInputStream ins = null;
         try {
             ins = new FileInputStream(new File(path));
-            return new DfPropFileReader().readMapAsStringMapValue(ins);
+            return _dfpropFile.readMapAsStringMapValue(ins);
         } catch (FileNotFoundException e) {
             return newLinkedHashMap();
         } finally {
