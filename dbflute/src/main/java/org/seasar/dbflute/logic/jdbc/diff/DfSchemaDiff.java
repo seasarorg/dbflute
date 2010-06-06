@@ -35,7 +35,7 @@ public class DfSchemaDiff {
     //                                                                          ==========
     protected static final String DIFF_DATE_KEY = "$$DiffDate$$";
     protected static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
-    protected static final String TABLE_COUNT_KEY = "$$TableCountDiff$$";
+    protected static final String TABLE_COUNT_KEY = "$$TableCount$$";
 
     // ===================================================================================
     //                                                                           Attribute
