@@ -149,11 +149,11 @@ public class XmlToAppData extends DefaultHandler {
         _currentXmlFile = xmlFile;
 
         final String encoding = getProejctSchemaXMLEncoding();
-        BufferedReader reader = null;
+        BufferedReader br = null;
         try {
             // Uses InputStreamReader for setting an encoding for project schema XML.
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile), encoding));
-            final InputSource is = new InputSource(reader);
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile), encoding));
+            final InputSource is = new InputSource(br);
             final SAXParser parser = _saxFactory.newSAXParser();
             parser.parse(is, this);
         } catch (ParserConfigurationException e) {
@@ -161,9 +161,11 @@ public class XmlToAppData extends DefaultHandler {
         } catch (SAXException e) {
             handleException(e, xmlFile, encoding);
         } finally {
-            try {
-                reader.close();
-            } catch (IOException ignored) {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
             }
         }
         _firstPass = false;

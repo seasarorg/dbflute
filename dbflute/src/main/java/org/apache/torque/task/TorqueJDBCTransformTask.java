@@ -969,7 +969,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
         if (_schemaDiff.isFirstTime()) {
-            _log.info("  -> no previous (first time)");
+            _log.info("*no previous (first time)");
         }
     }
 
