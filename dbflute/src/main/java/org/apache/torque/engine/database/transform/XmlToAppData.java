@@ -86,30 +86,27 @@ public class XmlToAppData extends DefaultHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private AppData app;
-    private Database currDB;
-    private Table currTable;
-    private Column currColumn;
-    private ForeignKey currFK;
-    private Index currIndex;
-    private Unique currUnique;
-
-    private boolean firstPass;
-    private String currentPackage;
-    private String currentXmlFile;
-
-    private static SAXParserFactory saxFactory;
-
-    /** remember all files we have already parsed to detect looping. */
-    private Vector<String> alreadyReadFiles;
+    private static SAXParserFactory _saxFactory;
+    static {
+        _saxFactory = SAXParserFactory.newInstance();
+        _saxFactory.setValidating(true);
+    }
+    private final AppData _appData;
+    private Database _currentDB;
+    private Table _currentTable;
+    private Column _currentColumn;
+    private ForeignKey _currentFK;
+    private Index _currentIndex;
+    private Unique _currentUnique;
+    private String _currentPackage;
+    private String _currentXmlFile;
+    private boolean _firstPass;
 
     /** this is the stack to store parsing data */
-    private Stack<ParseStackElement> parsingStack = new Stack<ParseStackElement>();
+    private final Stack<ParseStackElement> _parsingStack = new Stack<ParseStackElement>();
 
-    static {
-        saxFactory = SAXParserFactory.newInstance();
-        saxFactory.setValidating(true);
-    }
+    /** remember all files we have already parsed to detect looping. */
+    private Vector<String> _alreadyReadFiles;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -119,8 +116,8 @@ public class XmlToAppData extends DefaultHandler {
      * @param databaseType The type of database for the application.
      */
     public XmlToAppData(String databaseType) {
-        app = new AppData(databaseType);
-        firstPass = true;
+        _appData = new AppData(databaseType);
+        _firstPass = true;
     }
 
     // ===================================================================================
@@ -135,19 +132,19 @@ public class XmlToAppData extends DefaultHandler {
     public AppData parseFile(String xmlFile) {
         try {
             // in case I am missing something, make it obvious
-            if (!firstPass) {
+            if (!_firstPass) {
                 throw new Error("No more double pass");
             }
             // check to see if we already have parsed the file
-            if ((alreadyReadFiles != null) && alreadyReadFiles.contains(xmlFile)) {
-                return app;
-            } else if (alreadyReadFiles == null) {
-                alreadyReadFiles = new Vector<String>(3, 1);
+            if ((_alreadyReadFiles != null) && _alreadyReadFiles.contains(xmlFile)) {
+                return _appData;
+            } else if (_alreadyReadFiles == null) {
+                _alreadyReadFiles = new Vector<String>(3, 1);
             }
 
             // remember the file to avoid looping
-            alreadyReadFiles.add(xmlFile);
-            currentXmlFile = xmlFile;
+            _alreadyReadFiles.add(xmlFile);
+            _currentXmlFile = xmlFile;
 
             // Uses InputStreamReader for specifying an encoding for project schema XML.
             final String encoding = getProejctSchemaXMLEncoding();
@@ -155,18 +152,19 @@ public class XmlToAppData extends DefaultHandler {
             final BufferedReader br = new BufferedReader(fr);
             try {
                 final InputSource is = new InputSource(br);
-                final SAXParser parser = saxFactory.newSAXParser();
+                final SAXParser parser = _saxFactory.newSAXParser();
                 parser.parse(is, this);
             } finally {
                 br.close();
             }
         } catch (Exception e) {
-            String msg = DfTypeUtil.toClassTitle(this) + ".parseFile() threw the exception:";
+            final String title = DfTypeUtil.toClassTitle(this);
+            String msg = title + ".parseFile() threw the exception:";
             msg = msg + " xmlFile=" + xmlFile;
-            throw new RuntimeException(msg, e);
+            throw new IllegalStateException(msg, e);
         }
-        firstPass = false;
-        return app;
+        _firstPass = false;
+        return _appData;
     }
 
     protected String getProejctSchemaXMLEncoding() {
@@ -180,6 +178,7 @@ public class XmlToAppData extends DefaultHandler {
      * @return an InputSource for the database.dtd file
      * @see org.apache.torque.engine.database.transform.DTDResolver#resolveEntity(String, String)
      */
+    @Override
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
         try {
             return new DTDResolver().resolveEntity(publicId, systemId);
@@ -195,46 +194,47 @@ public class XmlToAppData extends DefaultHandler {
      * @param rawName The qualified name (with prefix), or the empty string if qualified names are not available.
      * @param attributes The specified or defaulted attributes
      */
+    @Override
     public void startElement(String uri, String localName, String rawName, Attributes attributes) {
         try {
             if (rawName.equals("database")) {
-                currDB = app.addDatabase(attributes);
+                _currentDB = _appData.addDatabase(attributes);
                 // [Unused on DBFlute]
-                // } else if (rawName.equals("external-schema")) {
-                //     String xmlFile = attributes.getValue("filename");
-                //     if (xmlFile.charAt(0) != '/') {
-                //         File f = new File(currentXmlFile);
-                //         xmlFile = new File(f.getParent(), xmlFile).getPath();
-                //     }
+                //} else if (rawName.equals("external-schema")) {
+                //    String xmlFile = attributes.getValue("filename");
+                //    if (xmlFile.charAt(0) != '/') {
+                //        File f = new File(currentXmlFile);
+                //        xmlFile = new File(f.getParent(), xmlFile).getPath();
+                //    }
                 //
-                //     // put current state onto the stack
-                //     ParseStackElement.pushState(this);
+                //    // put current state onto the stack
+                //    ParseStackElement.pushState(this);
                 //
-                //     isExternalSchema = true;
+                //    isExternalSchema = true;
                 //
-                //     parseFile(xmlFile);
-                //     // get the last state from the stack
-                //     ParseStackElement.popState(this);
+                //    parseFile(xmlFile);
+                //    // get the last state from the stack
+                //    ParseStackElement.popState(this);
             } else if (rawName.equals("table")) {
-                currTable = currDB.addTable(attributes);
+                _currentTable = _currentDB.addTable(attributes);
             } else if (rawName.equals("column")) {
-                currColumn = currTable.addColumn(attributes);
+                _currentColumn = _currentTable.addColumn(attributes);
             } else if (rawName.equals("inheritance")) {
-                currColumn.addInheritance(attributes);
+                _currentColumn.addInheritance(attributes);
             } else if (rawName.equals("foreign-key")) {
-                currFK = currTable.addForeignKey(attributes);
+                _currentFK = _currentTable.addForeignKey(attributes);
             } else if (rawName.equals("reference")) {
-                currFK.addReference(attributes);
+                _currentFK.addReference(attributes);
             } else if (rawName.equals("index")) {
-                currIndex = currTable.addIndex(attributes);
+                _currentIndex = _currentTable.addIndex(attributes);
             } else if (rawName.equals("index-column")) {
-                currIndex.addColumn(attributes);
+                _currentIndex.addColumn(attributes);
             } else if (rawName.equals("unique")) {
-                currUnique = currTable.addUnique(attributes);
+                _currentUnique = _currentTable.addUnique(attributes);
             } else if (rawName.equals("unique-column")) {
-                currUnique.addColumn(attributes);
+                _currentUnique.addColumn(attributes);
             } else if (rawName.equals("id-method-parameter")) {
-                currTable.addIdMethodParameter(attributes);
+                _currentTable.addIdMethodParameter(attributes);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -249,6 +249,7 @@ public class XmlToAppData extends DefaultHandler {
      * @param rawName The qualified name (with prefix), or the empty string if
      *         qualified names are not available.
      */
+    @Override
     public void endElement(String uri, String localName, String rawName) {
         // Comment out!
         // if (log.isDebugEnabled()) {
@@ -270,12 +271,12 @@ public class XmlToAppData extends DefaultHandler {
          */
         public ParseStackElement(XmlToAppData parser) {
             // remember current state of parent object
-            currentPackage = parser.currentPackage;
-            currentXmlFile = parser.currentXmlFile;
-            firstPass = parser.firstPass;
+            currentPackage = parser._currentPackage;
+            currentXmlFile = parser._currentXmlFile;
+            firstPass = parser._firstPass;
 
             // push the state onto the stack
-            parser.parsingStack.push(this);
+            parser._parsingStack.push(this);
         }
 
         /**
@@ -283,13 +284,13 @@ public class XmlToAppData extends DefaultHandler {
          * @param parser
          */
         public static void popState(XmlToAppData parser) {
-            if (!parser.parsingStack.isEmpty()) {
-                ParseStackElement elem = (ParseStackElement) parser.parsingStack.pop();
+            if (!parser._parsingStack.isEmpty()) {
+                ParseStackElement elem = (ParseStackElement) parser._parsingStack.pop();
 
                 // activate stored state
-                parser.currentPackage = elem.currentPackage;
-                parser.currentXmlFile = elem.currentXmlFile;
-                parser.firstPass = elem.firstPass;
+                parser._currentPackage = elem.currentPackage;
+                parser._currentXmlFile = elem.currentXmlFile;
+                parser._firstPass = elem.firstPass;
             }
         }
 

@@ -93,16 +93,14 @@ public class Column {
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
-    //                                     Basic Information
-    //                                     -----------------
-    private String _name;
-    private String _javaName;
-    private String _description;
+    //                                                 Table
+    //                                                 -----
     private Table _table;
 
     // -----------------------------------------------------
     //                                     Column Definition
     //                                     -----------------
+    private String _name;
     private String _dbType;
     private String _columnSize;
     private String _defaultValue;
@@ -112,16 +110,19 @@ public class Column {
     private boolean _isAutoIncrement;
     private boolean _additionalPrimaryKey;
     private String _plainComment;
+    private String _description; // [Unused on DBFlute]
+    private int _position; // [Unused on DBFlute]
     private List<ForeignKey> _referrers;
 
     // -----------------------------------------------------
-    //                                          Type Mapping
-    //                                          ------------
+    //                                       Java Definition
+    //                                       ---------------
+    private String _javaName;
     private String _jdbcType;
 
     // -----------------------------------------------------
-    //                                Sql2Entity Information
-    //                                ----------------------
+    //                                 Sql2Entity Definition
+    //                                 ---------------------
     private String _sql2EntityRelatedTableName;
     private String _sql2EntityRelatedColumnName;
     private String _sql2EntityForcedJavaNative;
@@ -129,14 +130,11 @@ public class Column {
     // -----------------------------------------------------
     //                                       Other Component
     //                                       ---------------
-    private int _position;
-
     // only one type is supported currently, which assumes the
     // column either contains the classnames or a key to
     // classnames specified in the schema.  Others may be
     // supported later.
     private String _inheritanceType;
-
     private boolean _isInheritance;
     private boolean _isEnumeratedClasses;
     private List<Inheritance> _inheritanceList;
@@ -215,161 +213,8 @@ public class Column {
     }
 
     // ==============================================================================
-    //                                                              Basic Information
-    //                                                              =================
-    // -----------------------------------------------------
-    //                                           Column Name
-    //                                           -----------
-    public String getName() {
-        return _name;
-    }
-
-    public void setName(String newName) {
-        _name = newName;
-    }
-
-    // -----------------------------------------------------
-    //                                            Alias Name
-    //                                            ----------
-    public boolean hasAlias() {
-        final String alias = getAlias();
-        return alias != null && alias.trim().length() > 0;
-    }
-
-    public String getAlias() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = _plainComment;
-        if (comment != null) {
-            final String alias = prop.extractAliasFromDbComment(comment);
-            if (alias != null) {
-                return alias;
-            }
-        }
-        return "";
-    }
-
-    public String getAliasExpression() { // for expression '(alias)name'
-        final String alias = getAlias();
-        if (alias == null || alias.trim().length() == 0) {
-            return "";
-        }
-        return "(" + alias + ")";
-    }
-
-    public String getAliasSettingExpression() {
-        final String alias = getAlias();
-        if (alias == null || alias.trim().length() == 0) {
-            return "null";
-        }
-        return "\"" + alias + "\"";
-    }
-
-    // -----------------------------------------------------
-    //                                             Java Name
-    //                                             ---------
-    protected boolean _needsJavaNameConvert = true;
-
-    public void setupNeedsJavaNameConvertFalse() {
-        _needsJavaNameConvert = false;
-    }
-
-    public boolean needsJavaNameConvert() {
-        return _needsJavaNameConvert;
-    }
-
-    public String getJavaName() {
-        if (_javaName == null) {
-            if (needsJavaNameConvert()) {
-                _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
-            } else {
-                // initial-capitalize only
-                _javaName = initCap(getName());
-            }
-            _javaName = filterBuriJavaNameIfNeeds(_javaName); // for Buri
-        }
-        return _javaName;
-    }
-
-    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        if (buriProperties.isUseBuri() && getTable().isBuriInternal()) {
-            final String arranged = buriProperties.arrangeBuriColumnJavaName(_javaName);
-            if (arranged != null) {
-                return arranged;
-            }
-        }
-        return javaName;
-    }
-
-    /**
-     * Set name to use in Java sources
-     */
-    public void setJavaName(String javaName) {
-        this._javaName = javaName;
-    }
-
-    // -----------------------------------------------------
-    //                               Uncapitalised Java Name
-    //                               -----------------------
-    /**
-     * Get variable name to use in Java sources (= uncapitalized java name)
-     */
-    public String getUncapitalisedJavaName() { // allowed spell miss
-        return Srl.initUncap(getJavaName());
-    }
-
-    // -----------------------------------------------------
-    //                         Java Beans Rule Property Name
-    //                         -----------------------------
-    /**
-     * Get variable name to use in Java sources (= uncapitalized java name)
-     */
-    public String getJavaBeansRulePropertyName() {
-        return Srl.initBeansProp(getJavaName());
-    }
-
-    public String getJavaBeansRulePropertyNameInitCap() {
-        return initCap(getJavaBeansRulePropertyName());
-    }
-
-    protected String initCap(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
-    }
-
-    // -----------------------------------------------------
-    //                                              Position
-    //                                              --------
-    /**
-     * Get the location of this column within the table (one-based).
-     * @return value of position.
-     */
-    public int getPosition() {
-        return _position;
-    }
-
-    /**
-     * Get the location of this column within the table (one-based).
-     * @param v  Value to assign to position.
-     */
-    public void setPosition(int v) {
-        this._position = v;
-    }
-
-    // -----------------------------------------------------
-    //                                           Description
-    //                                           -----------
-    // No use at DBFlute
-    public String getDescription() {
-        return _description;
-    }
-
-    public void setDescription(String newDescription) {
-        _description = newDescription;
-    }
-
-    // -----------------------------------------------------
-    //                                                 Table
-    //                                                 -----
+    //                                                                          Table
+    //                                                                          =====
     /**
      * Set the parent Table of the column
      */
@@ -572,6 +417,255 @@ public class Column {
     }
 
     // -----------------------------------------------------
+    //                                               NotNull
+    //                                               -------
+    /**
+     * Return the isNotNull property of the column
+     */
+    public boolean isNotNull() {
+        return _isNotNull;
+    }
+
+    /**
+     * Set the isNotNull property of the column
+     */
+    public void setNotNull(boolean status) {
+        _isNotNull = status;
+    }
+
+    // -----------------------------------------------------
+    //                                           Column Name
+    //                                           -----------
+    public String getName() {
+        return _name;
+    }
+
+    public void setName(String newName) {
+        _name = newName;
+    }
+
+    // -----------------------------------------------------
+    //                                            Alias Name
+    //                                            ----------
+    public boolean hasAlias() {
+        final String alias = getAlias();
+        return alias != null && alias.trim().length() > 0;
+    }
+
+    public String getAlias() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = _plainComment;
+        if (comment != null) {
+            final String alias = prop.extractAliasFromDbComment(comment);
+            if (alias != null) {
+                return alias;
+            }
+        }
+        return "";
+    }
+
+    public String getAliasExpression() { // for expression '(alias)name'
+        final String alias = getAlias();
+        if (alias == null || alias.trim().length() == 0) {
+            return "";
+        }
+        return "(" + alias + ")";
+    }
+
+    public String getAliasSettingExpression() {
+        final String alias = getAlias();
+        if (alias == null || alias.trim().length() == 0) {
+            return "null";
+        }
+        return "\"" + alias + "\"";
+    }
+
+    // -----------------------------------------------------
+    //                                               DB Type
+    //                                               -------
+    // for documents basically
+    public void setDbType(String dbType) {
+        this._dbType = dbType;
+    }
+
+    public String getDbType() {
+        return _dbType;
+    }
+
+    public String getDbTypeExpression() {
+        return _dbType != null ? _dbType : "UnknownType";
+    }
+
+    // -----------------------------------------------------
+    //                                           Column Size
+    //                                           -----------
+    public String getColumnSize() {
+        return _columnSize;
+    }
+
+    public void setColumnSize(String columnSize) {
+        _columnSize = columnSize;
+    }
+
+    public void setupColumnSize(int columnSize, int decimalDigits) {
+        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
+            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
+                setColumnSize(columnSize + ", " + decimalDigits);
+            } else {
+                setColumnSize(String.valueOf(columnSize));
+            }
+        }
+    }
+
+    public boolean hasColumnSize() {
+        return _columnSize != null && _columnSize.trim().length() > 0;
+    }
+
+    protected Integer getIntegerColumnSize() { // without decimal digits!
+        if (_columnSize == null) {
+            return null;
+        }
+        final String realSize;
+        if (_columnSize.contains(",")) {
+            realSize = _columnSize.split(",")[0];
+        } else {
+            realSize = _columnSize;
+        }
+        try {
+            return Integer.parseInt(realSize);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    protected Integer getDecimalDigits() {
+        if (_columnSize == null) {
+            return null;
+        }
+        if (!_columnSize.contains(",")) {
+            return 0;
+        }
+        return Integer.parseInt(_columnSize.split(",")[1].trim());
+    }
+
+    public String getColumnSizeSettingExpression() {
+        final Integer columnSize = getIntegerColumnSize();
+        if (columnSize == null) {
+            return "null";
+        }
+        return String.valueOf(columnSize);
+    }
+
+    // -----------------------------------------------------
+    //                                        Decimal Digits
+    //                                        --------------
+    public String getColumnDecimalDigitsSettingExpression() {
+        final Integer decimalDigits = getDecimalDigits();
+        if (decimalDigits == null) {
+            return "null";
+        }
+        return String.valueOf(decimalDigits);
+    }
+
+    // -----------------------------------------------------
+    //                                        Column Comment
+    //                                        --------------
+    public String getPlainComment() {
+        return _plainComment;
+    }
+
+    public void setPlainComment(String plainComment) {
+        this._plainComment = plainComment;
+    }
+
+    public boolean hasComment() {
+        final String comment = getComment();
+        return comment != null && comment.trim().length() > 0;
+    }
+
+    public String getComment() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.extractCommentFromDbComment(_plainComment);
+        return comment != null ? comment : "";
+    }
+
+    public void setComment(String comment) {
+        this._plainComment = comment;
+    }
+
+    public String getCommentForSchemaHtml() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveTextForSchemaHtml(getComment());
+        return comment != null ? comment : "";
+    }
+
+    public boolean isCommentForJavaDocValid() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return hasComment() && prop.isEntityJavaDocDbCommentValid();
+    }
+
+    public String getCommentForJavaDoc() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveTextForJavaDoc(getComment(), "    ");
+        return comment != null ? comment : "";
+    }
+
+    public boolean isCommentForDBMetaValid() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return hasComment() && prop.isEntityDBMetaDbCommentValid();
+    }
+
+    public String getCommentForDBMetaSettingExpression() {
+        if (!isCommentForDBMetaValid()) {
+            return "null";
+        }
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveTextForDBMeta(getComment());
+        return comment != null ? "\"" + comment + "\"" : "null";
+    }
+
+    // -----------------------------------------------------
+    //                                         Default Value
+    //                                         -------------
+    public void setDefaultValue(String def) {
+        _defaultValue = def;
+    }
+
+    public boolean hasDefaultValue() {
+        return _defaultValue != null && _defaultValue.trim().length() > 0;
+    }
+
+    public String getDefaultValue() {
+        return _defaultValue;
+    }
+
+    // -----------------------------------------------------
+    //                                              Position
+    //                                              --------
+    /**
+     * Get the location of this column within the table (one-based).
+     * @return value of position.
+     */
+    public int getPosition() { // [Unused on DBFlute]
+        return _position;
+    }
+
+    public void setPosition(int v) {
+        this._position = v;
+    }
+
+    // -----------------------------------------------------
+    //                                           Description
+    //                                           -----------
+    public String getDescription() { // [Unused on DBFlute]
+        return _description;
+    }
+
+    public void setDescription(String newDescription) {
+        _description = newDescription;
+    }
+
+    // -----------------------------------------------------
     //                                            Unique Key
     //                                            ----------
     public boolean isUnique() { // means this column is contained to one of unique constraints.
@@ -753,182 +847,6 @@ public class Column {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
         return title != null ? " title=\"" + title + "\"" : "";
-    }
-
-    // -----------------------------------------------------
-    //                                               NotNull
-    //                                               -------
-    /**
-     * Return the isNotNull property of the column
-     */
-    public boolean isNotNull() {
-        return _isNotNull;
-    }
-
-    /**
-     * Set the isNotNull property of the column
-     */
-    public void setNotNull(boolean status) {
-        _isNotNull = status;
-    }
-
-    // -----------------------------------------------------
-    //                                               DB Type
-    //                                               -------
-    // for documents basically
-    public void setDbType(String dbType) {
-        this._dbType = dbType;
-    }
-
-    public String getDbType() {
-        return _dbType;
-    }
-
-    public String getDbTypeExpression() {
-        return _dbType != null ? _dbType : "UnknownType";
-    }
-
-    // -----------------------------------------------------
-    //                                           Column Size
-    //                                           -----------
-    public String getColumnSize() {
-        return _columnSize;
-    }
-
-    public void setColumnSize(String columnSize) {
-        _columnSize = columnSize;
-    }
-
-    public void setupColumnSize(int columnSize, int decimalDigits) {
-        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
-            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
-                setColumnSize(columnSize + ", " + decimalDigits);
-            } else {
-                setColumnSize(String.valueOf(columnSize));
-            }
-        }
-    }
-
-    public boolean hasColumnSize() {
-        return _columnSize != null && _columnSize.trim().length() > 0;
-    }
-
-    protected Integer getIntegerColumnSize() { // without decimal digits!
-        if (_columnSize == null) {
-            return null;
-        }
-        final String realSize;
-        if (_columnSize.contains(",")) {
-            realSize = _columnSize.split(",")[0];
-        } else {
-            realSize = _columnSize;
-        }
-        try {
-            return Integer.parseInt(realSize);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    protected Integer getDecimalDigits() {
-        if (_columnSize == null) {
-            return null;
-        }
-        if (!_columnSize.contains(",")) {
-            return 0;
-        }
-        return Integer.parseInt(_columnSize.split(",")[1].trim());
-    }
-
-    public String getColumnSizeSettingExpression() {
-        final Integer columnSize = getIntegerColumnSize();
-        if (columnSize == null) {
-            return "null";
-        }
-        return String.valueOf(columnSize);
-    }
-
-    // -----------------------------------------------------
-    //                                        Decimal Digits
-    //                                        --------------
-    public String getColumnDecimalDigitsSettingExpression() {
-        final Integer decimalDigits = getDecimalDigits();
-        if (decimalDigits == null) {
-            return "null";
-        }
-        return String.valueOf(decimalDigits);
-    }
-
-    // -----------------------------------------------------
-    //                                        Column Comment
-    //                                        --------------
-    public String getPlainComment() {
-        return _plainComment;
-    }
-
-    public void setPlainComment(String plainComment) {
-        this._plainComment = plainComment;
-    }
-
-    public boolean hasComment() {
-        final String comment = getComment();
-        return comment != null && comment.trim().length() > 0;
-    }
-
-    public String getComment() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.extractCommentFromDbComment(_plainComment);
-        return comment != null ? comment : "";
-    }
-
-    public void setComment(String comment) {
-        this._plainComment = comment;
-    }
-
-    public String getCommentForSchemaHtml() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForSchemaHtml(getComment());
-        return comment != null ? comment : "";
-    }
-
-    public boolean isCommentForJavaDocValid() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        return hasComment() && prop.isEntityJavaDocDbCommentValid();
-    }
-
-    public String getCommentForJavaDoc() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForJavaDoc(getComment(), "    ");
-        return comment != null ? comment : "";
-    }
-
-    public boolean isCommentForDBMetaValid() {
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        return hasComment() && prop.isEntityDBMetaDbCommentValid();
-    }
-
-    public String getCommentForDBMetaSettingExpression() {
-        if (!isCommentForDBMetaValid()) {
-            return "null";
-        }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveTextForDBMeta(getComment());
-        return comment != null ? "\"" + comment + "\"" : "null";
-    }
-
-    // -----------------------------------------------------
-    //                                         Default Value
-    //                                         -------------
-    public void setDefaultValue(String def) {
-        _defaultValue = def;
-    }
-
-    public boolean hasDefaultValue() {
-        return _defaultValue != null && _defaultValue.trim().length() > 0;
-    }
-
-    public String getDefaultValue() {
-        return _defaultValue;
     }
 
     // -----------------------------------------------------
@@ -1124,7 +1042,7 @@ public class Column {
         return getReferrerList();
     }
 
-    protected java.util.List<ForeignKey> _singleKeyRefferrers = null;
+    protected List<ForeignKey> _singleKeyRefferrers = null;
 
     /**
      * Adds the foreign key from another table that refers to this column.
@@ -1209,9 +1127,100 @@ public class Column {
         return "\"" + sb.toString() + "\"";
     }
 
-    // ===================================================================================
-    //                                                                        Type Mapping
-    //                                                                        ============
+    // -----------------------------------------------------
+    //                                           Type Helper
+    //                                           -----------
+    public boolean isDbTypeCharOrVarchar() {
+        final String dbType = getDbType();
+        if (dbType == null) {
+            return false;
+        }
+        return dbType.startsWith("char") || dbType.startsWith("varchar");
+    }
+
+    public boolean isDbTypeNCharOrNVarchar() {
+        final String dbType = getDbType();
+        if (dbType == null) {
+            return false;
+        }
+        return dbType.startsWith("nchar") || dbType.startsWith("nvarchar");
+    }
+
+    // =====================================================================================
+    //                                                                       Java Definition
+    //                                                                       ===============
+    // -----------------------------------------------------
+    //                                             Java Name
+    //                                             ---------
+    protected boolean _needsJavaNameConvert = true;
+
+    public void setupNeedsJavaNameConvertFalse() {
+        _needsJavaNameConvert = false;
+    }
+
+    public boolean needsJavaNameConvert() {
+        return _needsJavaNameConvert;
+    }
+
+    public String getJavaName() {
+        if (_javaName == null) {
+            if (needsJavaNameConvert()) {
+                _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
+            } else {
+                // initial-capitalize only
+                _javaName = initCap(getName());
+            }
+            _javaName = filterBuriJavaNameIfNeeds(_javaName); // for Buri
+        }
+        return _javaName;
+    }
+
+    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        if (buriProperties.isUseBuri() && getTable().isBuriInternal()) {
+            final String arranged = buriProperties.arrangeBuriColumnJavaName(_javaName);
+            if (arranged != null) {
+                return arranged;
+            }
+        }
+        return javaName;
+    }
+
+    /**
+     * Set name to use in Java sources
+     */
+    public void setJavaName(String javaName) {
+        this._javaName = javaName;
+    }
+
+    // -----------------------------------------------------
+    //                               Uncapitalised Java Name
+    //                               -----------------------
+    /**
+     * Get variable name to use in Java sources (= uncapitalized java name)
+     */
+    public String getUncapitalisedJavaName() { // allowed spell miss
+        return Srl.initUncap(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                         Java Beans Rule Property Name
+    //                         -----------------------------
+    /**
+     * Get variable name to use in Java sources (= uncapitalized java name)
+     */
+    public String getJavaBeansRulePropertyName() {
+        return Srl.initBeansProp(getJavaName());
+    }
+
+    public String getJavaBeansRulePropertyNameInitCap() {
+        return initCap(getJavaBeansRulePropertyName());
+    }
+
+    protected String initCap(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
     // -----------------------------------------------------
     //                                             JDBC Type
     //                                             ---------
@@ -1272,11 +1281,38 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                    Type Determination
-    //                                    ------------------
-    // - - - -
-    // [Basic]
-    // - - - -
+    //                                           Type Helper
+    //                                           -----------
+    // - - - - - -
+    // [JDBC Type]
+    // - - - - - -
+    public boolean isJdbcTypeChar() { // as pinpoint
+        return TypeMap.CHAR.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeClob() { // as pinpoint
+        return TypeMap.CLOB.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeDate() { // as pinpoint
+        return TypeMap.DATE.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeTime() { // as pinpoint
+        return TypeMap.TIME.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeTimestamp() { // as pinpoint
+        return TypeMap.TIMESTAMP.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeBlob() { // as pinpoint
+        return TypeMap.BLOB.equals(getJdbcType());
+    }
+
+    // - - - - - - -
+    // [Java Native]
+    // - - - - - - -
     public boolean isJavaNativeStringObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
     }
@@ -1297,30 +1333,27 @@ public class Column {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBinaryList());
     }
 
-    // - - - - - -
-    // [Pinpoint]
-    // - - - - - -
-    public boolean isJavaNativeInteger() {
+    public boolean isJavaNativeInteger() { // as pinpoint
         return getJavaNative().equals("Integer");
     }
 
-    public boolean isJavaNativeLong() {
+    public boolean isJavaNativeLong() { // as pinpoint
         return getJavaNative().equals("Long");
     }
 
-    public boolean isJavaNativeBigDecimal() {
+    public boolean isJavaNativeBigDecimal() { // as pinpoint
         return getJavaNative().equals("java.math.BigDecimal");
     }
 
-    public boolean isJavaNativeUtilDate() {
+    public boolean isJavaNativeUtilDate() { // as pinpoint
         return getJavaNative().equals("java.util.Date");
     }
 
-    public boolean isJavaNativeByteArray() {
+    public boolean isJavaNativeByteArray() { // as pinpoint
         return getJavaNative().equals("byte[]");
     }
 
-    public boolean isJavaNativeUUIDObject() {
+    public boolean isJavaNativeUUIDObject() { // as pinpoint
         if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
                 || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {
             return false;
@@ -1332,7 +1365,7 @@ public class Column {
         return _columnHandler.isUUID(dbTypeName);
     }
 
-    public boolean isJavaNativeStringClob() {
+    public boolean isJavaNativeStringClob() { // as pinpoint
         final String dbTypeName = getDbType();
         if (dbTypeName == null) {
             return false;
@@ -1340,7 +1373,7 @@ public class Column {
         return _columnHandler.isOracleStringClob(dbTypeName);
     }
 
-    public boolean isJavaNativeBytesOid() {
+    public boolean isJavaNativeBytesOid() { // as pinpoint
         final String dbTypeName = getDbType();
         if (dbTypeName == null) {
             return false;
@@ -1360,33 +1393,6 @@ public class Column {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
 
-    // - - - - - -
-    // [JDBC Type]
-    // - - - - - -
-    public boolean isJdbcTypeChar() { // as Pinpoint
-        return TypeMap.CHAR.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeClob() { // as Pinpoint
-        return TypeMap.CLOB.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeDate() { // as Pinpoint
-        return TypeMap.DATE.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeTime() { // as Pinpoint
-        return TypeMap.TIME.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeTimestamp() { // as Pinpoint
-        return TypeMap.TIMESTAMP.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeBlob() { // as Pinpoint
-        return TypeMap.BLOB.equals(getJdbcType());
-    }
-
     protected boolean containsAsEndsWith(String str, List<Object> ls) {
         for (Object current : ls) {
             final String currentString = (String) current;
@@ -1397,28 +1403,9 @@ public class Column {
         return false;
     }
 
-    // - - - - -
-    // [DB Type]
-    // - - - - -
-    public boolean isDbTypeCharOrVarchar() {
-        final String dbType = getDbType();
-        if (dbType == null) {
-            return false;
-        }
-        return dbType.startsWith("char") || dbType.startsWith("varchar");
-    }
-
-    public boolean isDbTypeNCharOrNVarchar() {
-        final String dbType = getDbType();
-        if (dbType == null) {
-            return false;
-        }
-        return dbType.startsWith("nchar") || dbType.startsWith("nvarchar");
-    }
-
     // ===================================================================================
-    //                                                              Sql2Entity Information
-    //                                                              ======================
+    //                                                               Sql2Entity Definition
+    //                                                               =====================
     /**
      * Set the related table name for Sql2Entity. <br />
      * This is used at supplementary information.
