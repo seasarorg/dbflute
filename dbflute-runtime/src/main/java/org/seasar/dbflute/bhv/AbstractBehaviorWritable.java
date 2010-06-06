@@ -46,7 +46,8 @@ import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.mapstring.impl.ColumnValueMapStringImpl;
+import org.seasar.dbflute.helper.mapstring.ColumnMapString;
+import org.seasar.dbflute.helper.mapstring.impl.ColumnMapStringImpl;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.FileTokenizingCallback;
 import org.seasar.dbflute.helper.token.file.FileTokenizingHeaderInfo;
@@ -512,20 +513,23 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             return fileTokenizingCallback;
         }
 
-        protected Entity createEntityByStringValueList(java.util.List<String> columnNameList,
-                java.util.List<String> valueList) {
-            final ColumnValueMapStringImpl builder = new ColumnValueMapStringImpl();
-            builder.setMapMark(MAP_STRING_MAP_MARK);
-            builder.setStartBrace(MAP_STRING_START_BRACE);
-            builder.setEndBrace(MAP_STRING_END_BRACE);
-            builder.setDelimiter(MAP_STRING_DELIMITER);
-            builder.setEqual(MAP_STRING_EQUAL);
-            builder.setColumnNameList(columnNameList);
-            final String mapString = builder.buildMapString(valueList);
-
+        protected Entity createEntityByStringValueList(List<String> columnNameList, java.util.List<String> valueList) {
+            final ColumnMapString columnMapString = createColumnMapString(columnNameList);
+            final String mapString = columnMapString.buildMapString(valueList);
             final Entity entity = getDBMeta().newEntity();
             getDBMeta().acceptColumnValueMapString(entity, mapString);
             return entity;
+        }
+
+        protected ColumnMapString createColumnMapString(List<String> columnNameList) {
+            final ColumnMapStringImpl impl = new ColumnMapStringImpl();
+            impl.setMapMark(MAP_STRING_MAP_MARK);
+            impl.setStartBrace(MAP_STRING_START_BRACE);
+            impl.setEndBrace(MAP_STRING_END_BRACE);
+            impl.setDelimiter(MAP_STRING_DELIMITER);
+            impl.setEqual(MAP_STRING_EQUAL);
+            impl.setColumnNameList(columnNameList);
+            return impl;
         }
 
         protected FileTokenizingOption buildFileTokenReflectionFileTokenizingOption(

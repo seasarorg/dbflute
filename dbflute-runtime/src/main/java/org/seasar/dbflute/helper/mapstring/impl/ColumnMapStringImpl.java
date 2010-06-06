@@ -19,17 +19,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.mapstring.ColumnValueMapString;
+import org.seasar.dbflute.helper.mapstring.ColumnMapString;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * The implementation of map-string builder.
+ * The implementation of column map-string.
  * @author jflute
  */
-public class ColumnValueMapStringImpl implements ColumnValueMapString {
+public class ColumnMapStringImpl implements ColumnMapString {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -132,6 +132,30 @@ public class ColumnValueMapStringImpl implements ColumnValueMapString {
             br.addElement(valueList.toString());
             final String msg = br.buildExceptionMessage();
             throw new DifferentDelimiterCountException(msg, columnNameList, valueList);
+        }
+    }
+
+    public static class DifferentDelimiterCountException extends RuntimeException {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
+
+        protected List<String> _columnNameList;
+        protected List<String> _valueList;
+
+        public DifferentDelimiterCountException(String msg, List<String> columnNameList,
+                java.util.List<String> valueList) {
+            super(msg);
+            _columnNameList = columnNameList;
+            _valueList = valueList;
+        }
+
+        public java.util.List<String> getColumnNameList() {
+            return _columnNameList;
+        }
+
+        public java.util.List<String> getValueList() {
+            return _valueList;
         }
     }
 

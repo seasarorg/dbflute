@@ -18,36 +18,12 @@ package org.seasar.dbflute.helper.mapstring;
 import java.util.List;
 
 /**
- * The builder of map-string.
+ * The map-string for column.
  * @author jflute
  */
-public interface ColumnValueMapString {
+public interface ColumnMapString {
 
     String buildMapString(String values, String delimiter);
 
     String buildMapString(List<String> valueList);
-
-    public static class DifferentDelimiterCountException extends RuntimeException {
-
-        /** Serial version UID. (Default) */
-        private static final long serialVersionUID = 1L;
-
-        protected List<String> _columnNameList;
-        protected List<String> _valueList;
-
-        public DifferentDelimiterCountException(String msg, List<String> columnNameList,
-                java.util.List<String> valueList) {
-            super(msg);
-            _columnNameList = columnNameList;
-            _valueList = valueList;
-        }
-
-        public java.util.List<String> getColumnNameList() {
-            return _columnNameList;
-        }
-
-        public java.util.List<String> getValueList() {
-            return _valueList;
-        }
-    }
 }

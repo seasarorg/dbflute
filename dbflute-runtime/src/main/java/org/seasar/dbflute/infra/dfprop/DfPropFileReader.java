@@ -15,34 +15,18 @@
  */
 package org.seasar.dbflute.infra.dfprop;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
-import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.MapListFile;
 
 /**
- * The reader for map string file.
+ * The reader for DBFlute property file (dfprop).
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
  */
 public class DfPropFileReader {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final String UTF8_ENCODING = "UTF-8";
-    public static final String FILE_ENCODING = UTF8_ENCODING;
-    public static final String LINE_COMMENT_MARK = "#";
 
     // ===================================================================================
     //                                                                            Read Map
@@ -64,53 +48,8 @@ public class DfPropFileReader {
      * @return The read map. (NotNull)
      */
     public Map<String, Object> readMap(InputStream ins) {
-        final String encoding = getFileEncoding();
-        final String lineCommentMark = getLineCommentMark();
-        final StringBuilder sb = new StringBuilder();
-        InputStreamReader ir = null;
-        BufferedReader br = null;
-        try {
-            ir = new InputStreamReader(ins, encoding);
-            br = new BufferedReader(ir);
-
-            int count = -1;
-            while (true) {
-                ++count;
-
-                String lineString = br.readLine();
-                if (lineString == null) {
-                    break;
-                }
-                if (count == 0) {
-                    lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
-                }
-                if (lineString.trim().length() == 0) {
-                    continue;
-                }
-                // if the line is comment, skip to read
-                if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
-                    continue;
-                }
-                sb.append(lineString);
-            }
-        } catch (UnsupportedEncodingException e) {
-            String msg = "The encoding is unsupported: " + encoding;
-            throw new IllegalStateException(msg, e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-        if (sb.toString().trim().length() == 0) {
-            return new LinkedHashMap<String, Object>();
-        }
-        final MapListString mapListString = createMapListString();
-        return mapListString.generateMap(sb.toString());
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMap(ins);
     }
 
     /**
@@ -129,13 +68,8 @@ public class DfPropFileReader {
      * @return The read map whose values is string. (NotNull)
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) {
-        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        final Map<String, Object> map = readMap(ins);
-        final Set<Entry<String, Object>> entrySet = map.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
-            resultMap.put(entry.getKey(), (String) entry.getValue());
-        }
-        return resultMap;
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMapAsStringValue(ins);
     }
 
     /**
@@ -153,15 +87,9 @@ public class DfPropFileReader {
      * @param ins The input stream for DBFlute property file. (NotNull)
      * @return The read map whose values is string list. (NotNull)
      */
-    @SuppressWarnings("unchecked")
     public Map<String, List<String>> readMapAsStringListValue(InputStream ins) {
-        final Map<String, List<String>> resultMap = newLinkedHashMap();
-        final Map<String, Object> map = readMap(ins);
-        final Set<Entry<String, Object>> entrySet = map.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
-            resultMap.put(entry.getKey(), (List<String>) entry.getValue());
-        }
-        return resultMap;
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMapAsStringListValue(ins);
     }
 
     /**
@@ -179,15 +107,9 @@ public class DfPropFileReader {
      * @param ins The input stream for DBFlute property file. (NotNull)
      * @return The read map whose values is string map. (NotNull)
      */
-    @SuppressWarnings("unchecked")
     public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) {
-        final Map<String, Map<String, String>> resultMap = newLinkedHashMap();
-        final Map<String, Object> map = readMap(ins);
-        final Set<Entry<String, Object>> entrySet = map.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
-            resultMap.put(entry.getKey(), (Map<String, String>) entry.getValue());
-        }
-        return resultMap;
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMapAsStringMapValue(ins);
     }
 
     // ===================================================================================
@@ -209,133 +131,7 @@ public class DfPropFileReader {
      * @return The read list. (NotNull)
      */
     public List<Object> readList(InputStream ins) {
-        final String encoding = getFileEncoding();
-        final String lineCommentMark = getLineCommentMark();
-        final StringBuilder sb = new StringBuilder();
-        InputStreamReader ir = null;
-        BufferedReader br = null;
-        try {
-            ir = new InputStreamReader(ins, encoding);
-            br = new BufferedReader(ir);
-
-            int count = -1;
-            while (true) {
-                ++count;
-
-                String lineString = br.readLine();
-                if (lineString == null) {
-                    break;
-                }
-                if (count == 0) {
-                    lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
-                }
-                if (lineString.trim().length() == 0) {
-                    continue;
-                }
-                // if the line is comment, skip to read
-                if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
-                    continue;
-                }
-                sb.append(lineString);
-            }
-        } catch (UnsupportedEncodingException e) {
-            String msg = "The encoding is unsupported: " + encoding;
-            throw new IllegalStateException(msg, e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-        if (sb.toString().trim().length() == 0) {
-            return new ArrayList<Object>();
-        }
-        final MapListString mapListString = createMapListString();
-        return mapListString.generateList(sb.toString());
-    }
-
-    // ===================================================================================
-    //                                                                         Read String
-    //                                                                         ===========
-    /**
-     * Read the string file. <br />
-     * A trimmed line that starts with '#' is treated as line comment. <br />
-     * @param ins The input stream for DBFlute property file. (NotNull)
-     * @return The read string. (NotNull)
-     */
-    public String readString(InputStream ins) {
-        final String encoding = getFileEncoding();
-        final String lineCommentMark = getLineCommentMark();
-        final StringBuilder sb = new StringBuilder();
-        InputStreamReader ir = null;
-        BufferedReader br = null;
-        try {
-            ir = new InputStreamReader(ins, encoding);
-            br = new BufferedReader(ir);
-
-            int count = -1;
-            while (true) {
-                ++count;
-
-                final String lineString = br.readLine();
-                if (lineString == null) {
-                    break;
-                }
-                // If the line is comment...
-                if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
-                    continue;
-                }
-                sb.append(lineString + "\n");
-            }
-        } catch (UnsupportedEncodingException e) {
-            String msg = "The encoding is unsupported: " + encoding;
-            throw new IllegalStateException(msg, e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-        return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
-    }
-
-    // ===================================================================================
-    //                                                                     Extension Point
-    //                                                                     ===============
-    protected String getFileEncoding() {
-        return FILE_ENCODING;
-    }
-
-    protected String getLineCommentMark() {
-        return LINE_COMMENT_MARK;
-    }
-
-    protected MapListString createMapListString() {
-        return new MapListStringImpl();
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
-        if (UTF8_ENCODING.equalsIgnoreCase(encoding) && value.length() > 0 && value.charAt(0) == '\uFEFF') {
-            value = value.substring(1);
-        }
-        return value;
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
-        return new LinkedHashMap<KEY, VALUE>();
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readList(ins);
     }
 }

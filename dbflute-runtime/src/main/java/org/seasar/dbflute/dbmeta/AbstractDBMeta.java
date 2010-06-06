@@ -41,9 +41,9 @@ import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.mapstring.ColumnValueMapString;
+import org.seasar.dbflute.helper.mapstring.ColumnMapString;
 import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.impl.ColumnValueMapStringImpl;
+import org.seasar.dbflute.helper.mapstring.impl.ColumnMapStringImpl;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
@@ -1027,8 +1027,8 @@ public abstract class AbstractDBMeta implements DBMeta {
             return impl;
         }
 
-        public static ColumnValueMapString createMapStringBuilder(List<String> columnNameList) {
-            ColumnValueMapStringImpl impl = new ColumnValueMapStringImpl();
+        public static ColumnMapString createColumnMapString(List<String> columnNameList) {
+            final ColumnMapStringImpl impl = new ColumnMapStringImpl();
             impl.setMapMark(MAP_STRING_MAP_MARK);
             impl.setStartBrace(MAP_STRING_START_BRACE);
             impl.setEndBrace(MAP_STRING_END_BRACE);
