@@ -100,15 +100,15 @@ public class Column {
     // -----------------------------------------------------
     //                                     Column Definition
     //                                     -----------------
+    private boolean _isPrimaryKey;
+    private String _primaryKeyName;
+    private boolean _additionalPrimaryKey;
+    private boolean _isNotNull;
     private String _name;
     private String _dbType;
     private String _columnSize;
-    private String _defaultValue;
-    private boolean _isNotNull;
-    private boolean _isPrimaryKey;
-    private String _primaryKeyName;
     private boolean _isAutoIncrement;
-    private boolean _additionalPrimaryKey;
+    private String _defaultValue;
     private String _plainComment;
     private String _description; // [Unused on DBFlute]
     private int _position; // [Unused on DBFlute]
@@ -496,6 +496,22 @@ public class Column {
         return _dbType != null ? _dbType : "UnknownType";
     }
 
+    public boolean isDbTypeCharOrVarchar() {
+        final String dbType = getDbType();
+        if (dbType == null) {
+            return false;
+        }
+        return dbType.startsWith("char") || dbType.startsWith("varchar");
+    }
+
+    public boolean isDbTypeNCharOrNVarchar() {
+        final String dbType = getDbType();
+        if (dbType == null) {
+            return false;
+        }
+        return dbType.startsWith("nchar") || dbType.startsWith("nvarchar");
+    }
+
     // -----------------------------------------------------
     //                                           Column Size
     //                                           -----------
@@ -663,190 +679,6 @@ public class Column {
 
     public void setDescription(String newDescription) {
         _description = newDescription;
-    }
-
-    // -----------------------------------------------------
-    //                                            Unique Key
-    //                                            ----------
-    public boolean isUnique() { // means this column is contained to one of unique constraints.
-        final List<Unique> uniqueList = getTable().getUniqueList();
-        for (Unique unique : uniqueList) {
-            if (unique.hasSameColumn(this)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isUniqueAllAdditional() {
-        final List<Unique> uniqueList = getTable().getUniqueList();
-        boolean exists = false;
-        for (Unique unique : uniqueList) {
-            if (unique.hasSameColumn(this)) {
-                exists = true;
-                if (!unique.isAdditional()) {
-                    return false;
-                }
-            }
-        }
-        return exists;
-    }
-
-    public boolean hasOnlyOneColumnUnique() {
-        final List<Unique> uniqueList = getTable().getUniqueList();
-        for (Unique unique : uniqueList) {
-            if (!unique.isTwoOrMoreColumn()) {
-                if (unique.hasSameColumn(this)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean hasTwoOrMoreColumnUnique() {
-        final List<Unique> uniqueList = getTable().getUniqueList();
-        for (Unique unique : uniqueList) {
-            if (unique.isTwoOrMoreColumn()) {
-                if (unique.hasSameColumn(this)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public String getUniqueKeyMarkForSchemaHtml() {
-        final StringBuilder sb = new StringBuilder();
-        if (isUnique()) {
-            sb.append("o");
-            if (hasTwoOrMoreColumnUnique()) {
-                sb.append("<span class=\"flgplus\">+</span>");
-            }
-        } else {
-            sb.append("&nbsp;");
-        }
-        return sb.toString();
-    }
-
-    public String getUniqueKeyTitleForSchemaHtml() {
-        if (!isUnique()) {
-            return "";
-        }
-        final StringBuilder sb = new StringBuilder();
-        final List<Unique> uniqueList = getTable().getUniqueList();
-        for (Unique unique : uniqueList) {
-            if (!unique.hasSameColumn(this)) {
-                continue;
-            }
-            final String uniqueKeyName = unique.getName();
-            sb.append(sb.length() > 0 ? ", " : "");
-            if (uniqueKeyName != null && uniqueKeyName.trim().length() > 0) {
-                sb.append(uniqueKeyName + "(");
-            } else {
-                sb.append("(");
-            }
-            final Map<Integer, String> indexColumnMap = unique.getIndexColumnMap();
-            final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
-            final StringBuilder oneUniqueSb = new StringBuilder();
-            for (Entry<Integer, String> entry : entrySet) {
-                final String columnName = entry.getValue();
-                if (oneUniqueSb.length() > 0) {
-                    oneUniqueSb.append(", ");
-                }
-                oneUniqueSb.append(columnName);
-            }
-            sb.append(oneUniqueSb);
-            sb.append(")");
-        }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
-        return title != null ? " title=\"" + title + "\"" : "";
-    }
-
-    // -----------------------------------------------------
-    //                                                 Index
-    //                                                 -----
-    public boolean hasIndex() { // means this column is contained to one of indexes.
-        final List<Index> indexList = getTable().getIndexList();
-        for (Index index : indexList) {
-            if (index.hasSameColumn(this)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasOnlyOneColumnIndex() {
-        final List<Index> indexList = getTable().getIndexList();
-        for (Index index : indexList) {
-            if (!index.isTwoOrMoreColumn()) {
-                if (index.hasSameColumn(this)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean hasTwoOrMoreColumnIndex() {
-        final List<Index> indexList = getTable().getIndexList();
-        for (Index index : indexList) {
-            if (index.isTwoOrMoreColumn()) {
-                if (index.hasSameColumn(this)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public String getIndexMarkForSchemaHtml() {
-        final StringBuilder sb = new StringBuilder();
-        if (hasIndex()) {
-            sb.append("o");
-            if (hasTwoOrMoreColumnIndex()) {
-                sb.append("<span class=\"flgplus\">+</span>");
-            }
-        } else {
-            sb.append("&nbsp;");
-        }
-        return sb.toString();
-    }
-
-    public String getIndexTitleForSchemaHtml() {
-        if (!hasIndex()) {
-            return "";
-        }
-        final StringBuilder sb = new StringBuilder();
-        final List<Index> indexList = getTable().getIndexList();
-        for (Index index : indexList) {
-            if (!index.hasSameColumn(this)) {
-                continue;
-            }
-            final String indexName = index.getName();
-            sb.append(sb.length() > 0 ? ", " : "");
-            if (indexName != null && indexName.trim().length() > 0) {
-                sb.append(indexName + "(");
-            } else {
-                sb.append("(");
-            }
-            final Map<Integer, String> indexColumnMap = index.getIndexColumnMap();
-            final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
-            final StringBuilder oneIndexSb = new StringBuilder();
-            for (Entry<Integer, String> entry : entrySet) {
-                final String columnName = entry.getValue();
-                if (oneIndexSb.length() > 0) {
-                    oneIndexSb.append(", ");
-                }
-                oneIndexSb.append(columnName);
-            }
-            sb.append(oneIndexSb);
-            sb.append(")");
-        }
-        final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
-        return title != null ? " title=\"" + title + "\"" : "";
     }
 
     // -----------------------------------------------------
@@ -1128,22 +960,187 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                           Type Helper
-    //                                           -----------
-    public boolean isDbTypeCharOrVarchar() {
-        final String dbType = getDbType();
-        if (dbType == null) {
-            return false;
+    //                                            Unique Key
+    //                                            ----------
+    public boolean isUnique() { // means this column is contained to one of unique constraints.
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            if (unique.hasSameColumn(this)) {
+                return true;
+            }
         }
-        return dbType.startsWith("char") || dbType.startsWith("varchar");
+        return false;
     }
 
-    public boolean isDbTypeNCharOrNVarchar() {
-        final String dbType = getDbType();
-        if (dbType == null) {
-            return false;
+    public boolean isUniqueAllAdditional() {
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        boolean exists = false;
+        for (Unique unique : uniqueList) {
+            if (unique.hasSameColumn(this)) {
+                exists = true;
+                if (!unique.isAdditional()) {
+                    return false;
+                }
+            }
         }
-        return dbType.startsWith("nchar") || dbType.startsWith("nvarchar");
+        return exists;
+    }
+
+    public boolean hasOnlyOneColumnUnique() {
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            if (!unique.isTwoOrMoreColumn()) {
+                if (unique.hasSameColumn(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasTwoOrMoreColumnUnique() {
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            if (unique.isTwoOrMoreColumn()) {
+                if (unique.hasSameColumn(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String getUniqueKeyMarkForSchemaHtml() {
+        final StringBuilder sb = new StringBuilder();
+        if (isUnique()) {
+            sb.append("o");
+            if (hasTwoOrMoreColumnUnique()) {
+                sb.append("<span class=\"flgplus\">+</span>");
+            }
+        } else {
+            sb.append("&nbsp;");
+        }
+        return sb.toString();
+    }
+
+    public String getUniqueKeyTitleForSchemaHtml() {
+        if (!isUnique()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            if (!unique.hasSameColumn(this)) {
+                continue;
+            }
+            final String uniqueKeyName = unique.getName();
+            sb.append(sb.length() > 0 ? ", " : "");
+            if (uniqueKeyName != null && uniqueKeyName.trim().length() > 0) {
+                sb.append(uniqueKeyName + "(");
+            } else {
+                sb.append("(");
+            }
+            final Map<Integer, String> indexColumnMap = unique.getIndexColumnMap();
+            final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
+            final StringBuilder oneUniqueSb = new StringBuilder();
+            for (Entry<Integer, String> entry : entrySet) {
+                final String columnName = entry.getValue();
+                if (oneUniqueSb.length() > 0) {
+                    oneUniqueSb.append(", ");
+                }
+                oneUniqueSb.append(columnName);
+            }
+            sb.append(oneUniqueSb);
+            sb.append(")");
+        }
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        return title != null ? " title=\"" + title + "\"" : "";
+    }
+
+    // -----------------------------------------------------
+    //                                                 Index
+    //                                                 -----
+    public boolean hasIndex() { // means this column is contained to one of indexes.
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (index.hasSameColumn(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasOnlyOneColumnIndex() {
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (!index.isTwoOrMoreColumn()) {
+                if (index.hasSameColumn(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasTwoOrMoreColumnIndex() {
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (index.isTwoOrMoreColumn()) {
+                if (index.hasSameColumn(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String getIndexMarkForSchemaHtml() {
+        final StringBuilder sb = new StringBuilder();
+        if (hasIndex()) {
+            sb.append("o");
+            if (hasTwoOrMoreColumnIndex()) {
+                sb.append("<span class=\"flgplus\">+</span>");
+            }
+        } else {
+            sb.append("&nbsp;");
+        }
+        return sb.toString();
+    }
+
+    public String getIndexTitleForSchemaHtml() {
+        if (!hasIndex()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (!index.hasSameColumn(this)) {
+                continue;
+            }
+            final String indexName = index.getName();
+            sb.append(sb.length() > 0 ? ", " : "");
+            if (indexName != null && indexName.trim().length() > 0) {
+                sb.append(indexName + "(");
+            } else {
+                sb.append("(");
+            }
+            final Map<Integer, String> indexColumnMap = index.getIndexColumnMap();
+            final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
+            final StringBuilder oneIndexSb = new StringBuilder();
+            for (Entry<Integer, String> entry : entrySet) {
+                final String columnName = entry.getValue();
+                if (oneIndexSb.length() > 0) {
+                    oneIndexSb.append(", ");
+                }
+                oneIndexSb.append(columnName);
+            }
+            sb.append(oneIndexSb);
+            sb.append(")");
+        }
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        return title != null ? " title=\"" + title + "\"" : "";
     }
 
     // =====================================================================================
@@ -1232,6 +1229,30 @@ public class Column {
         return _jdbcType;
     }
 
+    public boolean isJdbcTypeChar() { // as pinpoint
+        return TypeMap.CHAR.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeClob() { // as pinpoint
+        return TypeMap.CLOB.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeDate() { // as pinpoint
+        return TypeMap.DATE.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeTime() { // as pinpoint
+        return TypeMap.TIME.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeTimestamp() { // as pinpoint
+        return TypeMap.TIMESTAMP.equals(getJdbcType());
+    }
+
+    public boolean isJdbcTypeBlob() { // as pinpoint
+        return TypeMap.BLOB.equals(getJdbcType());
+    }
+
     // -----------------------------------------------------
     //                                           Java Native
     //                                           -----------
@@ -1273,46 +1294,6 @@ public class Column {
         return javaNative;
     }
 
-    // -----------------------------------------------------
-    //                                           Flex Native
-    //                                           -----------
-    public String getFlexNative() {
-        return TypeMap.findFlexNativeByJavaNative(getJavaNative());
-    }
-
-    // -----------------------------------------------------
-    //                                           Type Helper
-    //                                           -----------
-    // - - - - - -
-    // [JDBC Type]
-    // - - - - - -
-    public boolean isJdbcTypeChar() { // as pinpoint
-        return TypeMap.CHAR.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeClob() { // as pinpoint
-        return TypeMap.CLOB.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeDate() { // as pinpoint
-        return TypeMap.DATE.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeTime() { // as pinpoint
-        return TypeMap.TIME.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeTimestamp() { // as pinpoint
-        return TypeMap.TIMESTAMP.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeBlob() { // as pinpoint
-        return TypeMap.BLOB.equals(getJdbcType());
-    }
-
-    // - - - - - - -
-    // [Java Native]
-    // - - - - - - -
     public boolean isJavaNativeStringObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
     }
@@ -1401,6 +1382,13 @@ public class Column {
             }
         }
         return false;
+    }
+
+    // -----------------------------------------------------
+    //                                           Flex Native
+    //                                           -----------
+    public String getFlexNative() {
+        return TypeMap.findFlexNativeByJavaNative(getJavaNative());
     }
 
     // ===================================================================================
