@@ -22,11 +22,11 @@ import java.util.Map;
 import org.seasar.dbflute.helper.mapstring.MapListFile;
 
 /**
- * The reader for schema difference file.
+ * The file handling for schema difference.
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public class DfSchemaDiffFile {
+public class SchemaDiffFile {
 
     // ===================================================================================
     //                                                                                Read

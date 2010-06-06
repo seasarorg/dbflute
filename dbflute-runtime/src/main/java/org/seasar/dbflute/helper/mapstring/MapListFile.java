@@ -205,16 +205,28 @@ public class MapListFile {
         return mapListString.generateList(listString);
     }
 
+    // -----------------------------------------------------
+    //                                                 Write
+    //                                                 -----
+    public void writeList(OutputStream ous, List<Object> list) {
+        final MapListString mapListString = createMapListString();
+        final String listString = mapListString.buildListString(list);
+        writeString(ous, listString);
+    }
+
     // ===================================================================================
     //                                                                              String
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                                  Read
+    //                                                  ----
     /**
      * Read the string file. <br />
      * A trimmed line that starts with '#' is treated as line comment.
      * @param ins The input stream for DBFlute property file. (NotNull)
      * @return The read string. (NotNull)
      */
-    protected String readString(InputStream ins) {
+    public String readString(InputStream ins) {
         final String encoding = getFileEncoding();
         final String lineComment = getLineCommentMark();
         final StringBuilder sb = new StringBuilder();
@@ -254,7 +266,10 @@ public class MapListFile {
         return removeInitialUnicodeBomIfNeeds(encoding, sb.toString().trim());
     }
 
-    protected void writeString(OutputStream ous, String mapListString) {
+    // -----------------------------------------------------
+    //                                                 Write
+    //                                                 -----
+    public void writeString(OutputStream ous, String mapListString) {
         final String encoding = getFileEncoding();
         OutputStreamWriter ow = null;
         BufferedWriter bw = null;

@@ -19,17 +19,21 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.helper.mapstring.MapListFile;
+
 /**
- * The reader for DBFlute property file (dfprop).
+ * The file handling for DBFlute property (dfprop).
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
- * @deprecated Please use DfPropFile.java
  */
-public class DfPropFileReader {
+public class DfPropFile {
 
     // ===================================================================================
-    //                                                                            Read Map
-    //                                                                            ========
+    //                                                                                 Map
+    //                                                                                 ===
+    // -----------------------------------------------------
+    //                                                  Read
+    //                                                  ----
     /**
      * Read the map string file. <br />
      * If the type of values is various type, this method is available. <br />
@@ -47,7 +51,8 @@ public class DfPropFileReader {
      * @return The read map. (NotNull)
      */
     public Map<String, Object> readMap(InputStream ins) {
-        return new DfPropFile().readMap(ins);
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMap(ins);
     }
 
     /**
@@ -66,7 +71,8 @@ public class DfPropFileReader {
      * @return The read map whose values is string. (NotNull)
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) {
-        return new DfPropFile().readMapAsStringValue(ins);
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMapAsStringValue(ins);
     }
 
     /**
@@ -85,7 +91,8 @@ public class DfPropFileReader {
      * @return The read map whose values is string list. (NotNull)
      */
     public Map<String, List<String>> readMapAsStringListValue(InputStream ins) {
-        return new DfPropFile().readMapAsStringListValue(ins);
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMapAsStringListValue(ins);
     }
 
     /**
@@ -104,12 +111,16 @@ public class DfPropFileReader {
      * @return The read map whose values is string map. (NotNull)
      */
     public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) {
-        return new DfPropFile().readMapAsStringMapValue(ins);
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readMapAsStringMapValue(ins);
     }
 
     // ===================================================================================
-    //                                                                           Read List
-    //                                                                           =========
+    //                                                                                List
+    //                                                                                ====
+    // -----------------------------------------------------
+    //                                                  Read
+    //                                                  ----
     /**
      * Read the list string file. <br />
      * If the type of values is various type, this method is available. <br />
@@ -126,7 +137,8 @@ public class DfPropFileReader {
      * @return The read list. (NotNull)
      */
     public List<Object> readList(InputStream ins) {
-        return new DfPropFile().readList(ins);
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readList(ins);
     }
 
     // ===================================================================================
@@ -142,6 +154,7 @@ public class DfPropFileReader {
      * @return The read string. (NotNull)
      */
     public String readString(InputStream ins) {
-        return new DfPropFile().readString(ins);
+        final MapListFile mapListFile = new MapListFile();
+        return mapListFile.readString(ins);
     }
 }
