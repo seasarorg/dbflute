@@ -92,7 +92,7 @@ public class DTDResolver implements EntityResolver {
      */
     public DTDResolver() throws SAXException {
         try {
-            InputStream dtdStream = getClass().getResourceAsStream("database.dtd");
+            final InputStream dtdStream = getClass().getResourceAsStream("database.dtd");
 
             // getResource was buggy on many systems including Linux,
             // OSX, and some versions of windows in jdk1.3.
@@ -120,14 +120,13 @@ public class DTDResolver implements EntityResolver {
      */
     public InputSource resolveEntity(String publicId, String systemId) throws IOException {
         if (databaseDTD != null && WEB_SITE_DTD.equals(systemId)) {
-            String pkg = getClass().getName().substring(0, getClass().getName().lastIndexOf('.'));
-            log.info("Resolver: used database.dtd from '" + pkg + "' package");
+            log.info("...Resolving XML by database.dtd in same package");
             return databaseDTD;
         } else if (systemId == null || "".equals(systemId.trim())) {
-            log.info("Resolver: used '" + WEB_SITE_DTD + '\'');
+            log.info("...Resolving XML by '" + WEB_SITE_DTD + '\'');
             return getInputSource(WEB_SITE_DTD);
         } else {
-            log.info("Resolver: used '" + systemId + '\'');
+            log.info("...Resolving XML by '" + systemId + '\'');
             return getInputSource(systemId);
         }
     }
@@ -138,7 +137,7 @@ public class DTDResolver implements EntityResolver {
      * @return InputSource for the URL.
      */
     private InputSource getInputSource(String urlString) throws IOException {
-        URL url = new URL(urlString);
+        final URL url = new URL(urlString);
         return new InputSource(url.openStream());
     }
 }

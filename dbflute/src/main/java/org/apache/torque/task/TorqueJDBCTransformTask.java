@@ -990,6 +990,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {
+                _log.info("*different from previous");
                 _log.info("...Serializing schema-diff:");
                 _log.info("  path = " + _schemaDiff.getDiffMapFilePath());
                 _schemaDiff.serializeSchemaDiff();
@@ -997,6 +998,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 String msg = "*Failed to serialize schema-diff";
                 throw new IllegalStateException(msg, e);
             }
+        } else {
+            _log.info("*no different from previous");
         }
     }
 }
