@@ -208,6 +208,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+
+        loadNextSchema();
     }
 
     protected DocumentImpl createDocumentImpl() {
@@ -956,7 +958,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                         Schema Diff
     //                                                                         ===========
     protected void loadPreviousSchema() {
-        doLoadPreviousSchema();
+        try {
+            doLoadPreviousSchema();
+        } catch (RuntimeException continued) {
+            _log.warn("*Failed to load previous schema", continued);
+        }
     }
 
     protected void doLoadPreviousSchema() {
@@ -970,13 +976,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void loadNextSchema() {
         try {
             doLoadNextSchema();
-        } catch (Exception continued) {
-            
+        } catch (RuntimeException continued) {
+            _log.warn("*Failed to load next schema", continued);
         }
     }
 
     protected void doLoadNextSchema() {
-        if (_schemaDiff.isFirstTime()) {
+        if (_schemaDiff.isFirstTime() || _schemaDiff.isLoadingFailure()) {
             return;
         }
         _log.info("...Loading next schema (schema diff process)");
@@ -984,9 +990,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {
+                _log.info("...Serializing schema-diff:");
+                _log.info("  path = " + _schemaDiff.getDiffMapFilePath());
                 _schemaDiff.serializeSchemaDiff();
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                String msg = "*Failed to serialize schema-diff";
+                throw new IllegalStateException(msg, e);
             }
         }
     }

@@ -31,7 +31,8 @@ public class DfSchemaDiff {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String KEY_DIFF_DATE = "$$DiffDate$$";
+    protected static final String DIFF_DATE_KEY = "$$DiffDate$$";
+    protected static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -40,6 +41,7 @@ public class DfSchemaDiff {
     protected Database _previousDb; // not null after loading
     protected Date _diffDate; // not null after loading next schema
     protected boolean _firstTime; // judged when loading previous schema
+    protected boolean _loadingFailure; // judged when loading previous schema
     protected final List<DfTableDiff> _addedTableList = DfCollectionUtil.newArrayList();
     protected final List<DfTableDiff> _changedTableList = DfCollectionUtil.newArrayList();
     protected final List<DfTableDiff> _deletedTableList = DfCollectionUtil.newArrayList();
@@ -71,6 +73,15 @@ public class DfSchemaDiff {
     }
 
     public void loadPreviousSchema() { // before loading next schema
+        try {
+            doLoadPreviousSchema();
+        } catch (RuntimeException e) {
+            _loadingFailure = true;
+            throw e;
+        }
+    }
+
+    public void doLoadPreviousSchema() {
         final DfSchemaXmlReader reader = createSchemaXmlReader();
         try {
             reader.read();
@@ -269,12 +280,16 @@ public class DfSchemaDiff {
         return _firstTime;
     }
 
+    public boolean isLoadingFailure() {
+        return _loadingFailure;
+    }
+
     // ===================================================================================
     //                                                                             DiffMap
     //                                                                             =======
     public Map<String, Object> createDiffMap() {
         final Map<String, Object> tableDiffMap = DfCollectionUtil.newLinkedHashMap();
-        tableDiffMap.put(KEY_DIFF_DATE, DfTypeUtil.toString(_diffDate, "yyyy/MM/dd HH:mm:dd"));
+        tableDiffMap.put(DIFF_DATE_KEY, DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN));
         tableDiffMap.put("$$NextTableCount$$", _nextDb.getTableList().size());
         tableDiffMap.put("$$PreviousTableCount$$", _previousDb.getTableList().size());
         tableDiffMap.put("$$AddedTableCount$$", _addedTableList.size());
@@ -302,27 +317,31 @@ public class DfSchemaDiff {
         final String path = getDiffMapFilePath();
         final SchemaDiffFile diffFile = new SchemaDiffFile();
         final File file = new File(path);
-        final Map<String, Object> map;
+
+        // ordered by DIFF_DATE desc
+        final Map<String, Object> serializedMap = DfCollectionUtil.newLinkedHashMap();
+        final Map<String, Object> diffMap = createDiffMap();
+        serializedMap.put((String) diffMap.get(DIFF_DATE_KEY), diffMap);
+
         if (file.exists()) {
             FileInputStream ins = null;
             try {
                 ins = new FileInputStream(file);
-                map = diffFile.readMap(new FileInputStream(file));
+                final Map<String, Object> existingMap = diffFile.readMap(ins);
+                serializedMap.putAll(existingMap);
             } finally {
                 if (ins != null) {
                     ins.close();
                 }
             }
         } else {
-            map = DfCollectionUtil.newLinkedHashMap();
             file.createNewFile();
         }
-        final Map<String, Object> diffMap = createDiffMap();
-        map.put((String) diffMap.get(KEY_DIFF_DATE), diffMap);
+
         FileOutputStream ous = null;
         try {
             ous = new FileOutputStream(path);
-            diffFile.writeMap(ous, map);
+            diffFile.writeMap(ous, serializedMap);
         } finally {
             if (ous != null) {
                 ous.close();
@@ -345,7 +364,7 @@ public class DfSchemaDiff {
         return getBasicProperties().getDatabaseType();
     }
 
-    protected String getDiffMapFilePath() {
+    public String getDiffMapFilePath() {
         return getBasicProperties().getProejctSchemaDiffMapFilePath();
     }
 

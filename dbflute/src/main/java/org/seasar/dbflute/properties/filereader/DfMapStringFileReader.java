@@ -30,8 +30,11 @@ import org.seasar.dbflute.infra.dfprop.DfPropFile;
  */
 public class DfMapStringFileReader {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final DfPropFile _dfpropFile = new DfPropFile();
-    
+
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====

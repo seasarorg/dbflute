@@ -29,7 +29,10 @@ import org.seasar.dbflute.infra.dfprop.DfPropFile;
  * @since 0.6.8 (2008/03/31 Monday)
  */
 public class DfListStringFileReader {
-    
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final DfPropFile _dfpropFile = new DfPropFile();
 
     // ===================================================================================
