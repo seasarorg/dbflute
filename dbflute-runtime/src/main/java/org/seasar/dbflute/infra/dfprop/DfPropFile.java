@@ -51,8 +51,7 @@ public class DfPropFile {
      * @return The read map. (NotNull)
      */
     public Map<String, Object> readMap(InputStream ins) {
-        final MapListFile mapListFile = new MapListFile();
-        return mapListFile.readMap(ins);
+        return createMapListFileAsSkipLn().readMap(ins);
     }
 
     /**
@@ -71,8 +70,7 @@ public class DfPropFile {
      * @return The read map whose values is string. (NotNull)
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) {
-        final MapListFile mapListFile = new MapListFile();
-        return mapListFile.readMapAsStringValue(ins);
+        return createMapListFileAsSkipLn().readMapAsStringValue(ins);
     }
 
     /**
@@ -91,8 +89,7 @@ public class DfPropFile {
      * @return The read map whose values is string list. (NotNull)
      */
     public Map<String, List<String>> readMapAsStringListValue(InputStream ins) {
-        final MapListFile mapListFile = new MapListFile();
-        return mapListFile.readMapAsStringListValue(ins);
+        return createMapListFileAsSkipLn().readMapAsStringListValue(ins);
     }
 
     /**
@@ -111,8 +108,7 @@ public class DfPropFile {
      * @return The read map whose values is string map. (NotNull)
      */
     public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) {
-        final MapListFile mapListFile = new MapListFile();
-        return mapListFile.readMapAsStringMapValue(ins);
+        return createMapListFileAsSkipLn().readMapAsStringMapValue(ins);
     }
 
     // ===================================================================================
@@ -137,8 +133,7 @@ public class DfPropFile {
      * @return The read list. (NotNull)
      */
     public List<Object> readList(InputStream ins) {
-        final MapListFile mapListFile = new MapListFile();
-        return mapListFile.readList(ins);
+        return createMapListFileAsSkipLn().readList(ins);
     }
 
     // ===================================================================================
@@ -154,7 +149,18 @@ public class DfPropFile {
      * @return The read string. (NotNull)
      */
     public String readString(InputStream ins) {
+        return createMapListFile().readString(ins);
+    }
+
+    // ===================================================================================
+    //                                                                       Map List File
+    //                                                                       =============
+    protected MapListFile createMapListFile() {
         final MapListFile mapListFile = new MapListFile();
-        return mapListFile.readString(ins);
+        return mapListFile;
+    }
+
+    protected MapListFile createMapListFileAsSkipLn() {
+        return createMapListFile().skipReadingLineSeparator();
     }
 }

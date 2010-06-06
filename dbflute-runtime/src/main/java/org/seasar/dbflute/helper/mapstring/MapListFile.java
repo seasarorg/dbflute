@@ -49,6 +49,8 @@ public class MapListFile {
     //                                                                           =========
     protected final String _fileEncoding;
     protected final String _lineCommentMark;
+    protected boolean _includeReadLineComment;
+    protected boolean _skipToReadLineSeparator;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -245,10 +247,13 @@ public class MapListFile {
                     break;
                 }
                 // if the line is comment, skip reading
-                if (lineComment != null && lineString.trim().startsWith(lineComment)) {
+                if (!_includeReadLineComment && lineString.trim().startsWith(lineComment)) {
                     continue;
                 }
-                sb.append(lineString + ln());
+                sb.append(lineString);
+                if (!_skipToReadLineSeparator) {
+                    sb.append(ln());
+                }
             }
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: " + encoding;
@@ -291,6 +296,19 @@ public class MapListFile {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public MapListFile includeReadingLineComment() {
+        _includeReadLineComment = true;
+        return this;
+    }
+
+    public MapListFile skipReadingLineSeparator() {
+        _skipToReadLineSeparator = true;
+        return this;
     }
 
     // ===================================================================================
