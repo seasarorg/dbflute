@@ -99,7 +99,7 @@ public class DfTableDiff extends DfAbstractDiff {
             final String key = "columnDiff";
             final Object value = tableDiffMap.get(key);
             if (value != null) {
-                assertElementMap(key, value, tableDiffMap);
+                assertElementValueMap(key, value, tableDiffMap);
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> columnDiffAllMap = (Map<String, Object>) value;
                 acceptColumnDiff(columnDiffAllMap);
@@ -113,15 +113,14 @@ public class DfTableDiff extends DfAbstractDiff {
         if (value == null) {
             return;
         }
-        assertElementMap(key, value, tableDiffMap);
+        assertElementValueMap(key, value, tableDiffMap);
         @SuppressWarnings("unchecked")
         final Map<String, Object> columnDiffAllMap = (Map<String, Object>) value;
-        acceptColumnDiff(columnDiffAllMap);
         final Set<Entry<String, Object>> entrySet = columnDiffAllMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
             final String columnName = entry.getKey();
             final Object columnDiffObj = entry.getValue();
-            assertElementMap(columnName, columnDiffObj, columnDiffAllMap);
+            assertElementValueMap(columnName, columnDiffObj, columnDiffAllMap);
             @SuppressWarnings("unchecked")
             final Map<String, Object> columnDiffMap = (Map<String, Object>) columnDiffObj;
             final DfColumnDiff columnDiff = createColumnDiff(columnDiffMap);

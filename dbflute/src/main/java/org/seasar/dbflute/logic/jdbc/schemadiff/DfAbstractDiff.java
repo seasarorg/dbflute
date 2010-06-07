@@ -23,7 +23,7 @@ public abstract class DfAbstractDiff {
         if (value == null) {
             return null;
         }
-        assertElementMap(key, value, diffMap);
+        assertElementValueMap(key, value, diffMap);
         @SuppressWarnings("unchecked")
         final Map<String, Object> nextPreviousDiffMap = (Map<String, Object>) value;
         return DfNextPreviousDiff.create(nextPreviousDiffMap);
@@ -47,7 +47,7 @@ public abstract class DfAbstractDiff {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
-    protected void assertElementMap(String key, Object value, Map<String, Object> diffMap) {
+    protected void assertElementValueMap(String key, Object value, Map<String, Object> diffMap) {
         if (!(value instanceof Map<?, ?>)) { // basically no way
             String msg = "The element in table diff-map should be Map:";
             msg = msg + " key=" + key + " value=" + value + " diffMap=" + diffMap;
