@@ -257,7 +257,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             resultList.add(metaInfo);
         }
         if (passedCount == 0) {
-            _log.info("  --> All procedures are target: count=" + procedureList.size());
+            _log.info("  -> All procedures are target: count=" + procedureList.size());
         }
         return resultList;
     }

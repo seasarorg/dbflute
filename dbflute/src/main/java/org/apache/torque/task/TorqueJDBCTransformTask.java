@@ -970,7 +970,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
         if (_schemaDiff.isFirstTime()) {
-            _log.info("*no previous (first time)");
+            _log.info("  -> no previous (first time)");
         }
     }
 
@@ -991,7 +991,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {
-                _log.info("*different from previous");
+                _log.info("  -> different from previous");
                 final DfSchemaHistory schemaHistory = new DfSchemaHistory();
                 _log.info("...Serializing schema-diff:");
                 _log.info("  filePath = " + schemaHistory.getSchemaHistoryFilePath());
@@ -1001,7 +1001,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 throw new IllegalStateException(msg, e);
             }
         } else {
-            _log.info("*no different from previous");
+            _log.info("  -> same as previous");
         }
     }
 }

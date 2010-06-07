@@ -2020,9 +2020,9 @@ public class Database {
         _schemaHistory = new DfSchemaHistory();
         _schemaHistory.loadHistory();
         if (existsSchemaHistory()) {
-            _log.info("*found history: size=" + getSchemaDiffList().size());
+            _log.info("  -> found history: count=" + getSchemaDiffList().size());
         } else {
-            _log.info("*no history");
+            _log.info("  -> no history");
         }
     }
 
