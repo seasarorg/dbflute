@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.infra.schemadiff.SchemaDiffFile;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -88,18 +89,21 @@ public class DfSchemaHistory {
     //                                                                        Load History
     //                                                                        ============
     public void loadHistory() {
+        final String filePath = getSchemaDiffFilePath();
         final File file = new File(getSchemaDiffFilePath());
         if (!file.exists()) {
             _existsSchemaDiff = false;
+            return;
         }
         final SchemaDiffFile schemaDiffFile = createSchemaDiffFile();
+        final Map<String, Object> diffMap;
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(file);
-            final Map<String, Object> diffMap = schemaDiffFile.readMap(fis);
-            acceptDiffMap(diffMap);
+            diffMap = schemaDiffFile.readMap(fis);
         } catch (FileNotFoundException ignored) {
             _existsSchemaDiff = false;
+            return;
         } finally {
             if (fis != null) {
                 try {
@@ -107,6 +111,19 @@ public class DfSchemaHistory {
                 } catch (IOException ignored) {
                 }
             }
+        }
+        try {
+            acceptDiffMap(diffMap);
+        } catch (RuntimeException e) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to accept diff-map.");
+            br.addItem("File Path");
+            br.addElement(filePath);
+            br.addItem("Exception");
+            br.addElement(e.getClass().getName());
+            br.addElement(e.getMessage());
+            final String msg = br.buildExceptionMessage();
+            throw new IllegalStateException(msg, e);
         }
         _existsSchemaDiff = true;
     }

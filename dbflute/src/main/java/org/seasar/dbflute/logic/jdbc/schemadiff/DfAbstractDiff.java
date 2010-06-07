@@ -11,14 +11,6 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  */
 public abstract class DfAbstractDiff {
 
-    protected void assertElementMap(String key, Object value, Map<String, Object> diffMap) {
-        if (value != null && !(value instanceof Map<?, ?>)) { // basically no way
-            String msg = "The element in table diff-map should be Map:";
-            msg = msg + " key=" + key + " value=" + value + " diffMap=" + diffMap;
-            throw new IllegalStateException(msg);
-        }
-    }
-
     // ===================================================================================
     //                                                                         Create Diff
     //                                                                         ===========
@@ -28,6 +20,9 @@ public abstract class DfAbstractDiff {
 
     protected DfNextPreviousDiff createNextPreviousDiff(Map<String, Object> diffMap, String key) {
         final Object value = diffMap.get(key);
+        if (value == null) {
+            return null;
+        }
         assertElementMap(key, value, diffMap);
         @SuppressWarnings("unchecked")
         final Map<String, Object> nextPreviousDiffMap = (Map<String, Object>) value;
@@ -50,6 +45,17 @@ public abstract class DfAbstractDiff {
     }
 
     // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertElementMap(String key, Object value, Map<String, Object> diffMap) {
+        if (value != null && !(value instanceof Map<?, ?>)) { // basically no way
+            String msg = "The element in table diff-map should be Map:";
+            msg = msg + " key=" + key + " value=" + value + " diffMap=" + diffMap;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected boolean isSame(Object next, Object previous) {
@@ -61,5 +67,4 @@ public abstract class DfAbstractDiff {
         }
         return next.equals(previous);
     }
-
 }
