@@ -994,7 +994,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 _log.info("*different from previous");
                 final DfSchemaHistory schemaHistory = new DfSchemaHistory();
                 _log.info("...Serializing schema-diff:");
-                _log.info("  filePath = " + schemaHistory.getSchemaDiffFilePath());
+                _log.info("  filePath = " + schemaHistory.getSchemaHistoryFilePath());
                 schemaHistory.serializeSchemaDiff(_schemaDiff);
             } catch (IOException e) {
                 String msg = "*Failed to serialize schema-diff";

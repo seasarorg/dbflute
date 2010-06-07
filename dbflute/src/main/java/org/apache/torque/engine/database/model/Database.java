@@ -1606,9 +1606,9 @@ public class Database {
         return hasTableBqpMap() || isGenerateProcedureParameterBean();
     }
 
-    public String getSchemaHistoryHtmlFileName() {
+    public String getHistoryHtmlFileName() {
         final String projectName = getProjectName();
-        return getProperties().getDocumentProperties().getSchemaHistoryHtmlFileName(projectName);
+        return getProperties().getDocumentProperties().getHistoryHtmlFileName(projectName);
     }
 
     // ===================================================================================

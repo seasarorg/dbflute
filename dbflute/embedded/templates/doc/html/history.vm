@@ -191,17 +191,17 @@
 <body>
 <h1>Project Schema History for ${database.projectName} (${database.databaseName})</h1>
 #foreach ($schemaDiff in $database.schemaDiffList)
-<h2>${schemaDiff.diffDate} (table count: ${schemaDiff.tableCount.display})</h2>
+<h2>${schemaDiff.diffDate} (table count: ${schemaDiff.tableCount.displayForHtml})</h2>
 #foreach ($tableDiff in $schemaDiff.tableDiffAllList)
 <h3>${tableDiff.tableName} (${tableDiff.diffType})</h3>
 <dl>
 #if ($tableDiff.hasUnifiedSchemaDiff())
     <dt>Schema</dt>
-    <dd>${tableDiff.unifiedSchemaDiff.display}</dd>
+    <dd>${tableDiff.unifiedSchemaDiff.displayForHtml}</dd>
 #end
 #if ($tableDiff.hasObjectTypeDiff())
     <dt>Object Type</dt>
-    <dd>${tableDiff.objectTypeDiff.display}</dd>
+    <dd>${tableDiff.objectTypeDiff.displayForHtml}</dd>
 #end
 #if ($tableDiff.hasColumnDiff())
     <dt>Column</dt>
@@ -213,11 +213,11 @@
                 <dl>
 #if ($columnDiff.hasDbTypeDiff())
                     <dt>DB Type</dt>
-                    <dd>${columnDiff.dbTypeDiff.display}</dd>
+                    <dd>${columnDiff.dbTypeDiff.displayForHtml}</dd>
 #end
 #if ($columnDiff.hasColumnSizeDiff())
                     <dt>Column Size</dt>
-                    <dd>${columnDiff.columnSizeDiff.display}</dd>
+                    <dd>${columnDiff.columnSizeDiff.displayForHtml}</dd>
 #end
                 </dl>
             </dd>

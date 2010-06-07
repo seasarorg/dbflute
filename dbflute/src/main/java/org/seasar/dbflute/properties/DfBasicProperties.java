@@ -291,10 +291,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("projectSchemaXMLEncoding", DEFAULT_projectSchemaXMLEncoding);
     }
 
-    public String getSchemaDiffFilePath() {
+    public String getSchemaHistoryFilePath() {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();
-        sb.append("./schema/schema-diff-").append(projectName).append(".dfmap"); // fixed
+        sb.append("./schema/history-").append(projectName).append(".diffmap"); // fixed
         return sb.toString();
     }
 

@@ -654,6 +654,16 @@ public class Table {
     // ===================================================================================
     //                                                                         Primary Key
     //                                                                         ===========
+    public String getPrimaryKeyConstraintName() {
+        final List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.isPrimaryKey()) {
+                return column.getPrimaryKeyName();
+            }
+        }
+        return null;
+    }
+
     /**
      * Returns the collection of Columns which make up the single primary
      * key for this table.

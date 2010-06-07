@@ -2,6 +2,8 @@ package org.seasar.dbflute.logic.jdbc.schemadiff;
 
 import java.util.Map;
 
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -50,8 +52,16 @@ public class DfNextPreviousDiff {
     // ===================================================================================
     //                                                                          Expression
     //                                                                          ==========
-    public String getDisplay() {
-        return _previous + " to " + _next;
+    public String getDisplayForHtml() {
+        return escape(_previous + " to " + _next);
+    }
+
+    protected String escape(String value) {
+        return getDocumentProperties().resolveTextForSchemaHtml(value);
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return DfBuildProperties.getInstance().getDocumentProperties();
     }
 
     // ===================================================================================

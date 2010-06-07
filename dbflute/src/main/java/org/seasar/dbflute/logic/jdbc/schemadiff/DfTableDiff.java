@@ -57,6 +57,7 @@ public class DfTableDiff extends DfAbstractDiff {
             }
         });
     }
+
     // -----------------------------------------------------
     //                                           Column Diff
     //                                           -----------
@@ -64,6 +65,14 @@ public class DfTableDiff extends DfAbstractDiff {
     protected final List<DfColumnDiff> _addedColumnDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfColumnDiff> _changedColumnDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfColumnDiff> _deletedColumnDiffList = DfCollectionUtil.newArrayList();
+
+    // -----------------------------------------------------
+    //                                       PrimaryKey Diff
+    //                                       ---------------
+    protected final List<DfPrimaryKeyDiff> _primaryKeyDiffAllList = DfCollectionUtil.newArrayList();
+    protected final List<DfPrimaryKeyDiff> _addedPrimaryKeyDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfPrimaryKeyDiff> _changedPrimaryKeyDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfPrimaryKeyDiff> _deletedPrimaryKeyDiffList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -168,6 +177,27 @@ public class DfTableDiff extends DfAbstractDiff {
         }
     }
 
+    protected void restorePrimaryKeyDiff(Map<String, Object> tableDiffMap) {
+        final String key = "primaryKeyDiff";
+        final Object value = tableDiffMap.get(key);
+        if (value == null) {
+            return;
+        }
+        assertElementValueMap(key, value, tableDiffMap);
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> primaryKeyDiffAllMap = (Map<String, Object>) value;
+        final Set<Entry<String, Object>> entrySet = primaryKeyDiffAllMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String constraintName = entry.getKey();
+            final Object primaryKeyDiffObj = entry.getValue();
+            assertElementValueMap(constraintName, primaryKeyDiffObj, primaryKeyDiffAllMap);
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> primaryKeyDiffMap = (Map<String, Object>) primaryKeyDiffObj;
+            final DfPrimaryKeyDiff primaryKeyDiff = createPrimaryKeyDiff(primaryKeyDiffMap);
+            addPrimaryKeyDiff(primaryKeyDiff);
+        }
+    }
+
     // ===================================================================================
     //                                                                              Status
     //                                                                              ======
@@ -182,6 +212,11 @@ public class DfTableDiff extends DfAbstractDiff {
             }
         }
         for (DfColumnDiff diff : _columnDiffAllList) {
+            if (diff.hasDiff()) {
+                return true;
+            }
+        }
+        for (DfPrimaryKeyDiff diff : _primaryKeyDiffAllList) {
             if (diff.hasDiff()) {
                 return true;
             }
@@ -267,16 +302,55 @@ public class DfTableDiff extends DfAbstractDiff {
 
     public void addColumnDiff(DfColumnDiff columnDiff) {
         _columnDiffAllList.add(columnDiff);
-        if (DfDiffType.ADD.equals(columnDiff.getDiffType())) {
+        if (columnDiff.isAdded()) {
             _addedColumnDiffList.add(columnDiff);
-        } else if (DfDiffType.CHANGE.equals(columnDiff.getDiffType())) {
+        } else if (columnDiff.isChanged()) {
             _changedColumnDiffList.add(columnDiff);
-        } else if (DfDiffType.DELETE.equals(columnDiff.getDiffType())) {
+        } else if (columnDiff.isDeleted()) {
             _deletedColumnDiffList.add(columnDiff);
         } else {
             String msg = "Unknown diff-type of column: ";
             msg = msg + " diffType=" + columnDiff.getDiffType();
             msg = msg + " columnDiff=" + columnDiff;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           Column Diff
+    //                                           -----------
+    public boolean hasPrimaryKeyDiff() {
+        return !_primaryKeyDiffAllList.isEmpty();
+    }
+
+    public List<DfPrimaryKeyDiff> getPrimaryKeyDiffAllList() {
+        return _primaryKeyDiffAllList;
+    }
+
+    public List<DfPrimaryKeyDiff> getAddedPrimaryKeyDiffList() {
+        return _addedPrimaryKeyDiffList;
+    }
+
+    public List<DfPrimaryKeyDiff> getChangedPrimaryKeyDiffList() {
+        return _changedPrimaryKeyDiffList;
+    }
+
+    public List<DfPrimaryKeyDiff> getDeletedPrimaryKeyDiffList() {
+        return _deletedPrimaryKeyDiffList;
+    }
+
+    public void addPrimaryKeyDiff(DfPrimaryKeyDiff primaryKeyDiff) {
+        _primaryKeyDiffAllList.add(primaryKeyDiff);
+        if (primaryKeyDiff.isAdded()) {
+            _addedPrimaryKeyDiffList.add(primaryKeyDiff);
+        } else if (primaryKeyDiff.isChanged()) {
+            _changedPrimaryKeyDiffList.add(primaryKeyDiff);
+        } else if (primaryKeyDiff.isDeleted()) {
+            _deletedPrimaryKeyDiffList.add(primaryKeyDiff);
+        } else {
+            String msg = "Unknown diff-type of column: ";
+            msg = msg + " diffType=" + primaryKeyDiff.getDiffType();
+            msg = msg + " primaryKeyDiff=" + primaryKeyDiff;
             throw new IllegalStateException(msg);
         }
     }

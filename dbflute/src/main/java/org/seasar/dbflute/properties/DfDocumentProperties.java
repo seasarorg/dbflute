@@ -219,11 +219,11 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                   SchemaHistoryHTML
-    //                                                                   =================
-    public String getSchemaHistoryHtmlFileName(String projectName) {
-        final String defaultNonExtName = "schema-history-" + projectName;
-        return getProperty("schemaHistoryHtmlFileName", defaultNonExtName + ".html", getDocumentDefinitionMap());
+    //                                                                         HistoryHTML
+    //                                                                         ===========
+    public String getHistoryHtmlFileName(String projectName) {
+        final String defaultNonExtName = "history-" + projectName;
+        return getProperty("historyHtmlFileName", defaultNonExtName + ".html", getDocumentDefinitionMap());
     }
 
     // ===================================================================================

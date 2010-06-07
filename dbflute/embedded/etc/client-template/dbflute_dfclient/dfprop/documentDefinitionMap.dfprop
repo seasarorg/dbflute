@@ -7,6 +7,7 @@
 # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
 # o schemaHtmlFileName (NotRequired - Default 'project-schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
+# o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
 # o dataXlsTemplateRecordLimit (NotRequired - Default '')
 # o isDataXlsTemplateContainsCommonColumn (NotRequired - Default false)
 # 
@@ -18,6 +19,7 @@
 #     ; isEntityDBMetaDbCommentValid = true
 #     ; schemaHtmlFileName = xxx.html
 #     ; isSuppressSchemaHtmlOutsideSql = false
+#     ; historyHtmlFileName = xxx.html
 #     ; dataXlsTemplateRecordLimit = 10
 #     ; isDataXlsTemplateContainsCommonColumn = false
 # }
@@ -75,6 +77,15 @@ map:{
     #  OutsideSql information (related to tables) is very useful.
     # 
     #; isSuppressSchemaHtmlOutsideSql = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
+    #  The file name (not contain path) of historyHtml.
+    #  Basically you don't need this.
+    #  (For example, when you use Application Behavior, you need this)
+    # 
+    #; historyHtmlFileName = xxx.html
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -172,6 +172,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
             processAddedColumn(tableDiff, next, previous);
             processChangedColumn(tableDiff, next, previous);
             processDeletedColumn(tableDiff, next, previous);
+            processPrimaryKey(tableDiff, next, previous);
+            processForeignKey(tableDiff, next, previous);
+            processUniqueKey(tableDiff, next, previous);
+            processIndex(tableDiff, next, previous);
             if (tableDiff.hasDiff()) {
                 addTableDiff(tableDiff);
             }
@@ -300,6 +304,54 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     protected boolean isSameColumnName(Column next, Column previous) {
         return isSame(next.getName(), previous.getName());
+    }
+
+    // -----------------------------------------------------
+    //                                    PrimaryKey Process
+    //                                    ------------------
+    protected void processPrimaryKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        final String nextName = nextTable.getPrimaryKeyConstraintName();
+        final String previousName = previousTable.getPrimaryKeyConstraintName();
+        if (!isSame(nextName, previousName)) {
+            if (nextName == null) { // deleted
+                final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createAdded(previousName);
+                tableDiff.addPrimaryKeyDiff(primaryKeyDiff);
+                return;
+            } else if (previousName == null) { // added
+                final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createChanged(nextName);
+                tableDiff.addPrimaryKeyDiff(primaryKeyDiff);
+                return;
+            }
+        }
+        // changed
+        final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createChanged(nextName);
+        final String nextColumn = nextTable.getPrimaryKeyNameCommaString();
+        final String previousColumn = previousTable.getPrimaryKeyNameCommaString();
+        if (!isSame(nextColumn, previousColumn)) {
+            final DfNextPreviousDiff columnDiff = createNextPreviousDiff(nextColumn, previousColumn);
+            primaryKeyDiff.setColumnDiff(columnDiff);
+        }
+        if (primaryKeyDiff.hasDiff()) {
+            tableDiff.addPrimaryKeyDiff(primaryKeyDiff);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                    ForeignKey Process
+    //                                    ------------------
+    protected void processForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+    }
+
+    // -----------------------------------------------------
+    //                                     UniqueKey Process
+    //                                     -----------------
+    protected void processUniqueKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+    }
+
+    // -----------------------------------------------------
+    //                                         Index Process
+    //                                         -------------
+    protected void processIndex(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
     }
 
     // ===================================================================================

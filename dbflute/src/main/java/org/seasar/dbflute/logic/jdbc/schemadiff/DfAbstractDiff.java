@@ -45,6 +45,10 @@ public abstract class DfAbstractDiff {
         return DfColumnDiff.createFromDiffMap(columnDiffMap);
     }
 
+    protected DfPrimaryKeyDiff createPrimaryKeyDiff(Map<String, Object> primaryKeyDiffMap) {
+        return DfPrimaryKeyDiff.createFromDiffMap(primaryKeyDiffMap);
+    }
+
     protected static interface NextPreviousDiffSetupper<OBJECT, DIFF> {
         Object provide(OBJECT obj);
 

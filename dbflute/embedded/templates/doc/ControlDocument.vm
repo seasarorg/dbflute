@@ -21,10 +21,10 @@ $database.initializeClassificationDeployment()
 ## *the argument 'dataModel' might be unused on DBFlute
 $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
 
-## - - - - - - - - - -
-## Schema History HTML
-## - - - - - - - - - -
-#set ($outFile = "${database.schemaHistoryHtmlFileName}")
+## - - - - - - -
+## History HTML
+## - - - - - - -
+#set ($outFile = "${database.historyHtmlFileName}")
 $database.loadSchemaHistory()
 #if ($database.existsSchemaHistory())
 $generator.parse("doc/html/history.vm", $outFile, "dataModel", $dataModel)
