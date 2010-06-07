@@ -31,7 +31,7 @@ public class DfPrimaryKeyDiff extends DfConstraintDiff {
         return new DfPrimaryKeyDiff(constraintName, DfDiffType.DELETE);
     }
 
-    public static DfPrimaryKeyDiff createFromDiffMap(Map<String, Object> columnDiffMap) {
-        return new DfPrimaryKeyDiff(columnDiffMap);
+    public static DfPrimaryKeyDiff createFromDiffMap(Map<String, Object> primaryKeyDiffMap) {
+        return new DfPrimaryKeyDiff(primaryKeyDiffMap);
     }
 }

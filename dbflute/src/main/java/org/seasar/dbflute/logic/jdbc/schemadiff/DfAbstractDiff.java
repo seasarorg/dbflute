@@ -1,6 +1,9 @@
 package org.seasar.dbflute.logic.jdbc.schemadiff;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -14,6 +17,33 @@ public abstract class DfAbstractDiff {
     // ===================================================================================
     //                                                                         Create Diff
     //                                                                         ===========
+    protected DfTableDiff createTableDiff(Map<String, Object> tableDiffMap) {
+        return DfTableDiff.createFromDiffMap(tableDiffMap);
+    }
+
+    protected DfColumnDiff createColumnDiff(Map<String, Object> columnDiffMap) {
+        return DfColumnDiff.createFromDiffMap(columnDiffMap);
+    }
+
+    protected DfPrimaryKeyDiff createPrimaryKeyDiff(Map<String, Object> primaryKeyDiffMap) {
+        return DfPrimaryKeyDiff.createFromDiffMap(primaryKeyDiffMap);
+    }
+
+    protected DfForeignKeyDiff createForeignKeyDiff(Map<String, Object> foreignKeyDiffMap) {
+        return DfForeignKeyDiff.createFromDiffMap(foreignKeyDiffMap);
+    }
+
+    protected DfUniqueKeyDiff createUniqueKeyDiff(Map<String, Object> uniqueKeyDiffMap) {
+        return DfUniqueKeyDiff.createFromDiffMap(uniqueKeyDiffMap);
+    }
+
+    protected DfIndexDiff createIndexDiff(Map<String, Object> indexDiffMap) {
+        return DfIndexDiff.createFromDiffMap(indexDiffMap);
+    }
+
+    // ===================================================================================
+    //                                                                  Next Previous Diff
+    //                                                                  ==================
     protected DfNextPreviousDiff createNextPreviousDiff(String next, String previous) {
         return DfNextPreviousDiff.create(next, previous);
     }
@@ -37,34 +67,49 @@ public abstract class DfAbstractDiff {
         return DfNextPreviousDiff.create(nextPreviousDiffMap);
     }
 
-    protected DfTableDiff createTableDiff(Map<String, Object> tableDiffMap) {
-        return DfTableDiff.createFromDiffMap(tableDiffMap);
-    }
-
-    protected DfColumnDiff createColumnDiff(Map<String, Object> columnDiffMap) {
-        return DfColumnDiff.createFromDiffMap(columnDiffMap);
-    }
-
-    protected DfPrimaryKeyDiff createPrimaryKeyDiff(Map<String, Object> primaryKeyDiffMap) {
-        return DfPrimaryKeyDiff.createFromDiffMap(primaryKeyDiffMap);
-    }
-
-    protected DfForeignKeyDiff createForeignKeyDiff(Map<String, Object> foreignKeyDiffMap) {
-        return DfForeignKeyDiff.createFromDiffMap(foreignKeyDiffMap);
-    }
-
-    protected static interface NextPreviousDiffSetupper<OBJECT, DIFF> {
+    protected static interface NextPreviousDiffer<OBJECT, DIFF> {
         Object provide(OBJECT obj);
 
-        void setup(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
+        void diff(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
     }
 
-    protected static interface NextPreviousItemHandler {
+    protected static interface NextPreviousHandler {
         String propertyName();
 
         DfNextPreviousDiff provide();
 
         void restore(Map<String, Object> diffMap);
+    }
+
+    // ===================================================================================
+    //                                                                           Nest Diff
+    //                                                                           =========
+    protected void restoreNestDiff(Map<String, Object> parentDiffMap, NestDiffSetupper setupper) {
+        final String key = setupper.propertyName();
+        final Object value = parentDiffMap.get(key);
+        if (value == null) {
+            return;
+        }
+        assertElementValueMap(key, value, parentDiffMap);
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> diffAllMap = (Map<String, Object>) value;
+        final Set<Entry<String, Object>> entrySet = diffAllMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String name = entry.getKey();
+            final Object diffObj = entry.getValue();
+            assertElementValueMap(name, diffObj, diffAllMap);
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> nestDiffMap = (Map<String, Object>) diffObj;
+            setupper.setup(nestDiffMap);
+        }
+    }
+
+    protected static interface NestDiffSetupper {
+        String propertyName();
+
+        List<? extends DfNestDiff> provide();
+
+        void setup(Map<String, Object> diff);
     }
 
     // ===================================================================================

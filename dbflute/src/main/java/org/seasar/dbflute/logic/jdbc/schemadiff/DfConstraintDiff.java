@@ -9,7 +9,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public abstract class DfConstraintDiff extends DfAbstractDiff {
+public abstract class DfConstraintDiff extends DfAbstractDiff implements DfNestDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -25,9 +25,9 @@ public abstract class DfConstraintDiff extends DfAbstractDiff {
     //                                             ---------
     protected DfNextPreviousDiff _columnDiff;
 
-    protected List<NextPreviousItemHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
+    protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public String propertyName() {
                 return "columnDiff";
             }
@@ -36,8 +36,8 @@ public abstract class DfConstraintDiff extends DfAbstractDiff {
                 return _columnDiff;
             }
 
-            public void restore(Map<String, Object> foreignKeyDiffMap) {
-                _columnDiff = restoreNextPreviousDiff(foreignKeyDiffMap, propertyName());
+            public void restore(Map<String, Object> diffMap) {
+                _columnDiff = restoreNextPreviousDiff(diffMap, propertyName());
             }
         });
     }
@@ -54,7 +54,7 @@ public abstract class DfConstraintDiff extends DfAbstractDiff {
         _constraintName = (String) diffMap.get("constraintName");
         assertForeignKeyNameExists(_constraintName, diffMap);
         _diffType = DfDiffType.valueOf((String) diffMap.get("diffType"));
-        acceptColumnDiffMap(diffMap);
+        acceptDiffMap(diffMap);
     }
 
     protected void assertForeignKeyNameExists(String constraintName, Map<String, Object> diffMap) {
@@ -76,12 +76,12 @@ public abstract class DfConstraintDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Diff Map
     //                                                                            ========
-    public Map<String, Object> createConstraintDiffMap() {
+    public Map<String, Object> createDiffMap() {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("constraintName", _constraintName);
         map.put("diffType", _diffType.toString());
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
             final DfNextPreviousDiff nextPreviousDiff = provider.provide();
             if (nextPreviousDiff != null) {
                 map.put(provider.propertyName(), nextPreviousDiff.createNextPreviousDiffMap());
@@ -90,10 +90,10 @@ public abstract class DfConstraintDiff extends DfAbstractDiff {
         return map;
     }
 
-    public void acceptColumnDiffMap(Map<String, Object> columnDiffMap) {
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
-            provider.restore(columnDiffMap);
+    public void acceptDiffMap(Map<String, Object> diffMap) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
+            provider.restore(diffMap);
         }
     }
 
@@ -104,8 +104,8 @@ public abstract class DfConstraintDiff extends DfAbstractDiff {
         if (!DfDiffType.CHANGE.equals(_diffType)) {
             return true; // if not change, always different
         }
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
             if (provider.provide() != null) {
                 return true;
             }
@@ -119,6 +119,10 @@ public abstract class DfConstraintDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
+    public String getKeyName() {
+        return getConstraintName();
+    }
+
     public String getConstraintName() {
         return _constraintName;
     }

@@ -9,6 +9,30 @@ import java.util.Map;
 public class DfForeignKeyDiff extends DfConstraintDiff {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                             Diff Item
+    //                                             ---------
+    protected DfNextPreviousDiff _foreignTableDiff;
+
+    {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String propertyName() {
+                return "foreignTableDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _foreignTableDiff;
+            }
+
+            public void restore(Map<String, Object> foreignKeyDiffMap) {
+                _foreignTableDiff = restoreNextPreviousDiff(foreignKeyDiffMap, propertyName());
+            }
+        });
+    }
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     protected DfForeignKeyDiff(String columnName, DfDiffType diffType) {
@@ -33,5 +57,23 @@ public class DfForeignKeyDiff extends DfConstraintDiff {
 
     public static DfForeignKeyDiff createFromDiffMap(Map<String, Object> columnDiffMap) {
         return new DfForeignKeyDiff(columnDiffMap);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                             Diff Item
+    //                                             ---------
+    public boolean hasForeignTableDiff() {
+        return _foreignTableDiff != null;
+    }
+
+    public DfNextPreviousDiff getForeignTableDiff() {
+        return _foreignTableDiff;
+    }
+
+    public void setForeignTableDiff(DfNextPreviousDiff foreignTableDiff) {
+        _foreignTableDiff = foreignTableDiff;
     }
 }

@@ -2,8 +2,6 @@ package org.seasar.dbflute.logic.jdbc.schemadiff;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -11,7 +9,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public class DfTableDiff extends DfAbstractDiff {
+public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -28,9 +26,9 @@ public class DfTableDiff extends DfAbstractDiff {
     protected DfNextPreviousDiff _unifiedSchemaDiff;
     protected DfNextPreviousDiff _objectTypeDiff;
 
-    protected List<NextPreviousItemHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
+    protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public String propertyName() {
                 return "unifiedSchemaDiff";
             }
@@ -43,7 +41,7 @@ public class DfTableDiff extends DfAbstractDiff {
                 _unifiedSchemaDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public String propertyName() {
                 return "objectTypeDiff";
             }
@@ -82,6 +80,94 @@ public class DfTableDiff extends DfAbstractDiff {
     protected final List<DfForeignKeyDiff> _changedForeignKeyDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfForeignKeyDiff> _deletedForeignKeyDiffList = DfCollectionUtil.newArrayList();
 
+    // -----------------------------------------------------
+    //                                        UniqueKey Diff
+    //                                        --------------
+    protected final List<DfUniqueKeyDiff> _uniqueKeyDiffAllList = DfCollectionUtil.newArrayList();
+    protected final List<DfUniqueKeyDiff> _addedUniqueKeyDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfUniqueKeyDiff> _changedUniqueKeyDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfUniqueKeyDiff> _deletedUniqueKeyDiffList = DfCollectionUtil.newArrayList();
+
+    // -----------------------------------------------------
+    //                                            Index Diff
+    //                                            ----------
+    protected final List<DfIndexDiff> _indexDiffAllList = DfCollectionUtil.newArrayList();
+    protected final List<DfIndexDiff> _addedIndexDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfIndexDiff> _changedIndexDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfIndexDiff> _deletedIndexDiffList = DfCollectionUtil.newArrayList();
+
+    // -----------------------------------------------------
+    //                                             Nest Diff
+    //                                             ---------
+    protected List<NestDiffSetupper> _nestDiffList = DfCollectionUtil.newArrayList();
+    {
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return "columnDiff";
+            }
+
+            public List<? extends DfNestDiff> provide() {
+                return _columnDiffAllList;
+            }
+
+            public void setup(Map<String, Object> diff) {
+                addColumnDiff(createColumnDiff(diff));
+            }
+        });
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return "primaryKeyDiff";
+            }
+
+            public List<? extends DfNestDiff> provide() {
+                return _primaryKeyDiffAllList;
+            }
+
+            public void setup(Map<String, Object> diff) {
+                addPrimaryKeyDiff(createPrimaryKeyDiff(diff));
+            }
+        });
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return "foreignKeyDiff";
+            }
+
+            public List<? extends DfNestDiff> provide() {
+                return _foreignKeyDiffAllList;
+            }
+
+            public void setup(Map<String, Object> diff) {
+                addForeignKeyDiff(createForeignKeyDiff(diff));
+            }
+        });
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return "uniqueKeyDiff";
+            }
+
+            public List<? extends DfNestDiff> provide() {
+                return _uniqueKeyDiffAllList;
+            }
+
+            public void setup(Map<String, Object> diff) {
+                addUniqueKeyDiff(createUniqueKeyDiff(diff));
+            }
+        });
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return "indexDiff";
+            }
+
+            public List<? extends DfNestDiff> provide() {
+                return _indexDiffAllList;
+            }
+
+            public void setup(Map<String, Object> diff) {
+                addIndexDiff(createIndexDiff(diff));
+            }
+        });
+    }
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -95,7 +181,7 @@ public class DfTableDiff extends DfAbstractDiff {
         assertTableNameExists(_tableName, tableDiffMap);
         _diffType = DfDiffType.valueOf((String) tableDiffMap.get("diffType"));
         assertDiffTypeExists(_tableName, tableDiffMap, _diffType);
-        acceptTableDiffMap(tableDiffMap);
+        acceptDiffMap(tableDiffMap);
     }
 
     protected void assertTableNameExists(String tableName, Map<String, Object> tableDiffMap) {
@@ -133,125 +219,41 @@ public class DfTableDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Diff Map
     //                                                                            ========
-    public Map<String, Object> createTableDiffMap() {
+    public Map<String, Object> createDiffMap() {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("tableName", _tableName);
         map.put("diffType", _diffType.toString());
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
             final DfNextPreviousDiff nextPreviousDiff = provider.provide();
             if (nextPreviousDiff != null) {
                 map.put(provider.propertyName(), nextPreviousDiff.createNextPreviousDiffMap());
             }
         }
-        {
-            final List<DfColumnDiff> diffAllList = _columnDiffAllList;
-            if (!_columnDiffAllList.isEmpty()) {
-                final Map<String, Map<String, Object>> diffMap = DfCollectionUtil.newLinkedHashMap();
-                for (DfColumnDiff columnDiff : diffAllList) {
-                    if (columnDiff.hasDiff()) {
-                        diffMap.put(columnDiff.getColumnName(), columnDiff.createColumnDiffMap());
-                    }
-                }
-                map.put("columnDiff", diffMap);
-            }
-        }
-        {
-            final List<DfPrimaryKeyDiff> diffAllList = _primaryKeyDiffAllList;
+        final List<NestDiffSetupper> nestDiffList = _nestDiffList;
+        for (NestDiffSetupper setupper : nestDiffList) {
+            final List<? extends DfNestDiff> diffAllList = setupper.provide();
             if (!diffAllList.isEmpty()) {
                 final Map<String, Map<String, Object>> diffMap = DfCollectionUtil.newLinkedHashMap();
-                for (DfPrimaryKeyDiff primaryKeyDiff : diffAllList) {
-                    if (primaryKeyDiff.hasDiff()) {
-                        diffMap.put(primaryKeyDiff.getConstraintName(), primaryKeyDiff.createConstraintDiffMap());
+                for (DfNestDiff nestDiff : diffAllList) {
+                    if (nestDiff.hasDiff()) {
+                        diffMap.put(nestDiff.getKeyName(), nestDiff.createDiffMap());
                     }
                 }
-                map.put("primaryKeyDiff", diffMap);
-            }
-        }
-        {
-            final List<DfForeignKeyDiff> diffAllList = _foreignKeyDiffAllList;
-            if (!diffAllList.isEmpty()) {
-                final Map<String, Map<String, Object>> diffMap = DfCollectionUtil.newLinkedHashMap();
-                for (DfForeignKeyDiff foreignKeyDiff : diffAllList) {
-                    if (foreignKeyDiff.hasDiff()) {
-                        diffMap.put(foreignKeyDiff.getConstraintName(), foreignKeyDiff.createConstraintDiffMap());
-                    }
-                }
-                map.put("foreignKeyDiff", diffMap);
+                map.put(setupper.propertyName(), diffMap);
             }
         }
         return map;
     }
 
-    protected void acceptTableDiffMap(Map<String, Object> tableDiffMap) {
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+    public void acceptDiffMap(Map<String, Object> tableDiffMap) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
             provider.restore(tableDiffMap);
         }
-        restoreColumnDiff(tableDiffMap);
-        restorePrimaryKeyDiff(tableDiffMap);
-    }
-
-    protected void restoreColumnDiff(Map<String, Object> tableDiffMap) {
-        final String key = "columnDiff";
-        final Object value = tableDiffMap.get(key);
-        if (value == null) {
-            return;
-        }
-        assertElementValueMap(key, value, tableDiffMap);
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> columnDiffAllMap = (Map<String, Object>) value;
-        final Set<Entry<String, Object>> entrySet = columnDiffAllMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
-            final String columnName = entry.getKey();
-            final Object columnDiffObj = entry.getValue();
-            assertElementValueMap(columnName, columnDiffObj, columnDiffAllMap);
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> columnDiffMap = (Map<String, Object>) columnDiffObj;
-            final DfColumnDiff columnDiff = createColumnDiff(columnDiffMap);
-            addColumnDiff(columnDiff);
-        }
-    }
-
-    protected void restorePrimaryKeyDiff(Map<String, Object> tableDiffMap) {
-        final String key = "primaryKeyDiff";
-        final Object value = tableDiffMap.get(key);
-        if (value == null) {
-            return;
-        }
-        assertElementValueMap(key, value, tableDiffMap);
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> primaryKeyDiffAllMap = (Map<String, Object>) value;
-        final Set<Entry<String, Object>> entrySet = primaryKeyDiffAllMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
-            final String constraintName = entry.getKey();
-            final Object primaryKeyDiffObj = entry.getValue();
-            assertElementValueMap(constraintName, primaryKeyDiffObj, primaryKeyDiffAllMap);
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> primaryKeyDiffMap = (Map<String, Object>) primaryKeyDiffObj;
-            final DfPrimaryKeyDiff primaryKeyDiff = createPrimaryKeyDiff(primaryKeyDiffMap);
-            addPrimaryKeyDiff(primaryKeyDiff);
-        }
-    }
-
-    protected void restoreForeignKeyDiff(Map<String, Object> tableDiffMap) {
-        final String key = "foreignKeyDiff";
-        final Object value = tableDiffMap.get(key);
-        if (value == null) {
-            return;
-        }
-        assertElementValueMap(key, value, tableDiffMap);
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> foreignKeyDiffAllMap = (Map<String, Object>) value;
-        final Set<Entry<String, Object>> entrySet = foreignKeyDiffAllMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
-            final String constraintName = entry.getKey();
-            final Object foreignKeyDiffObj = entry.getValue();
-            assertElementValueMap(constraintName, foreignKeyDiffObj, foreignKeyDiffAllMap);
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> foreignKeyDiffMap = (Map<String, Object>) foreignKeyDiffObj;
-            final DfForeignKeyDiff foreignKeyDiff = createForeignKeyDiff(foreignKeyDiffMap);
-            addForeignKeyDiff(foreignKeyDiff);
+        final List<NestDiffSetupper> nestDiffList = _nestDiffList;
+        for (NestDiffSetupper setupper : nestDiffList) {
+            restoreNestDiff(tableDiffMap, setupper);
         }
     }
 
@@ -262,25 +264,19 @@ public class DfTableDiff extends DfAbstractDiff {
         if (!DfDiffType.CHANGE.equals(_diffType)) {
             return true; // if not change, always different
         }
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
             if (provider.provide() != null) {
                 return true;
             }
         }
-        for (DfColumnDiff diff : _columnDiffAllList) {
-            if (diff.hasDiff()) {
-                return true;
-            }
-        }
-        for (DfPrimaryKeyDiff diff : _primaryKeyDiffAllList) {
-            if (diff.hasDiff()) {
-                return true;
-            }
-        }
-        for (DfForeignKeyDiff diff : _foreignKeyDiffAllList) {
-            if (diff.hasDiff()) {
-                return true;
+        final List<NestDiffSetupper> nestDiffList = _nestDiffList;
+        for (NestDiffSetupper setupper : nestDiffList) {
+            final List<? extends DfNestDiff> diffAllList = setupper.provide();
+            for (DfNestDiff nestDiff : diffAllList) {
+                if (nestDiff.hasDiff()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -292,6 +288,10 @@ public class DfTableDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
+    public String getKeyName() {
+        return getTableName();
+    }
+
     public String getTableName() {
         return _tableName;
     }
@@ -452,6 +452,84 @@ public class DfTableDiff extends DfAbstractDiff {
             String msg = "Unknown diff-type of column: ";
             msg = msg + " diffType=" + foreignKeyDiff.getDiffType();
             msg = msg + " foreignKeyDiff=" + foreignKeyDiff;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                       UniqueKey Diff
+    //                                       ---------------
+    public boolean hasUniqueKeyDiff() {
+        return !_uniqueKeyDiffAllList.isEmpty();
+    }
+
+    public List<DfUniqueKeyDiff> getUniqueKeyDiffAllList() {
+        return _uniqueKeyDiffAllList;
+    }
+
+    public List<DfUniqueKeyDiff> getAddedUniqueKeyDiffList() {
+        return _addedUniqueKeyDiffList;
+    }
+
+    public List<DfUniqueKeyDiff> getChangedUniqueKeyDiffList() {
+        return _changedUniqueKeyDiffList;
+    }
+
+    public List<DfUniqueKeyDiff> getDeletedUniqueKeyDiffList() {
+        return _deletedUniqueKeyDiffList;
+    }
+
+    public void addUniqueKeyDiff(DfUniqueKeyDiff uniqueKeyDiff) {
+        _uniqueKeyDiffAllList.add(uniqueKeyDiff);
+        if (uniqueKeyDiff.isAdded()) {
+            _addedUniqueKeyDiffList.add(uniqueKeyDiff);
+        } else if (uniqueKeyDiff.isChanged()) {
+            _changedUniqueKeyDiffList.add(uniqueKeyDiff);
+        } else if (uniqueKeyDiff.isDeleted()) {
+            _deletedUniqueKeyDiffList.add(uniqueKeyDiff);
+        } else {
+            String msg = "Unknown diff-type of column: ";
+            msg = msg + " diffType=" + uniqueKeyDiff.getDiffType();
+            msg = msg + " uniqueKeyDiff=" + uniqueKeyDiff;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            Index Diff
+    //                                            ----------
+    public boolean hasIndexDiff() {
+        return !_indexDiffAllList.isEmpty();
+    }
+
+    public List<DfIndexDiff> getIndexDiffAllList() {
+        return _indexDiffAllList;
+    }
+
+    public List<DfIndexDiff> getAddedIndexDiffList() {
+        return _addedIndexDiffList;
+    }
+
+    public List<DfIndexDiff> getChangedIndexDiffList() {
+        return _changedIndexDiffList;
+    }
+
+    public List<DfIndexDiff> getDeletedIndexDiffList() {
+        return _deletedIndexDiffList;
+    }
+
+    public void addIndexDiff(DfIndexDiff indexDiff) {
+        _indexDiffAllList.add(indexDiff);
+        if (indexDiff.isAdded()) {
+            _addedIndexDiffList.add(indexDiff);
+        } else if (indexDiff.isChanged()) {
+            _changedIndexDiffList.add(indexDiff);
+        } else if (indexDiff.isDeleted()) {
+            _deletedIndexDiffList.add(indexDiff);
+        } else {
+            String msg = "Unknown diff-type of column: ";
+            msg = msg + " diffType=" + indexDiff.getDiffType();
+            msg = msg + " indexDiff=" + indexDiff;
             throw new IllegalStateException(msg);
         }
     }

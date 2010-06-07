@@ -9,7 +9,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public class DfColumnDiff extends DfAbstractDiff {
+public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -29,9 +29,9 @@ public class DfColumnDiff extends DfAbstractDiff {
     protected DfNextPreviousDiff _notNullDiff;
     protected DfNextPreviousDiff _autoIncrementDiff;
 
-    protected List<NextPreviousItemHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
+    protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public String propertyName() {
                 return "dbTypeDiff";
             }
@@ -44,7 +44,7 @@ public class DfColumnDiff extends DfAbstractDiff {
                 _dbTypeDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public String propertyName() {
                 return "columnSizeDiff";
             }
@@ -57,7 +57,7 @@ public class DfColumnDiff extends DfAbstractDiff {
                 _columnSizeDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public DfNextPreviousDiff provide() {
                 return _defaultValueDiff;
             }
@@ -70,7 +70,7 @@ public class DfColumnDiff extends DfAbstractDiff {
                 _defaultValueDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public String propertyName() {
                 return "notNullDiff";
             }
@@ -83,7 +83,7 @@ public class DfColumnDiff extends DfAbstractDiff {
                 _notNullDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandler() {
             public String propertyName() {
                 return "autoIncrementDiff";
             }
@@ -110,7 +110,7 @@ public class DfColumnDiff extends DfAbstractDiff {
         _columnName = (String) columnDiffMap.get("columnName");
         assertColumnNameExists(_columnName, columnDiffMap);
         _diffType = DfDiffType.valueOf((String) columnDiffMap.get("diffType"));
-        acceptColumnDiffMap(columnDiffMap);
+        acceptDiffMap(columnDiffMap);
     }
 
     protected void assertColumnNameExists(String columnName, Map<String, Object> columnDiffMap) {
@@ -148,12 +148,12 @@ public class DfColumnDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Diff Map
     //                                                                            ========
-    public Map<String, Object> createColumnDiffMap() {
+    public Map<String, Object> createDiffMap() {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("columnName", _columnName);
         map.put("diffType", _diffType.toString());
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
             final DfNextPreviousDiff nextPreviousDiff = provider.provide();
             if (nextPreviousDiff != null) {
                 map.put(provider.propertyName(), nextPreviousDiff.createNextPreviousDiffMap());
@@ -162,10 +162,10 @@ public class DfColumnDiff extends DfAbstractDiff {
         return map;
     }
 
-    public void acceptColumnDiffMap(Map<String, Object> columnDiffMap) {
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
-            provider.restore(columnDiffMap);
+    public void acceptDiffMap(Map<String, Object> diffMap) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
+            provider.restore(diffMap);
         }
     }
 
@@ -176,8 +176,8 @@ public class DfColumnDiff extends DfAbstractDiff {
         if (!DfDiffType.CHANGE.equals(_diffType)) {
             return true; // if not change, always different
         }
-        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+        final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousHandler provider : nextPreviousItemList) {
             if (provider.provide() != null) {
                 return true;
             }
@@ -191,6 +191,10 @@ public class DfColumnDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
+    public String getKeyName() {
+        return getColumnName();
+    }
+
     public String getColumnName() {
         return _columnName;
     }
