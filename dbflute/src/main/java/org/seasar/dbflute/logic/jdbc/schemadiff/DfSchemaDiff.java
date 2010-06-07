@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
+import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
@@ -149,7 +150,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             if (previous == null || !isSameTableName(next, previous)) {
                 continue;
             }
-            // changed
+            // found
             final DfTableDiff tableDiff = DfTableDiff.createChanged(next.getName());
             setupNextPreviousIfNotSame(next, previous, tableDiff, new NextPreviousDiffSetupper<Table, DfTableDiff>() {
                 public Object provide(Table obj) {
@@ -169,14 +170,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     diff.setObjectTypeDiff(nextPreviousDiff);
                 }
             });
-            processAddedColumn(tableDiff, next, previous);
-            processChangedColumn(tableDiff, next, previous);
-            processDeletedColumn(tableDiff, next, previous);
+            processColumn(tableDiff, next, previous);
             processPrimaryKey(tableDiff, next, previous);
             processForeignKey(tableDiff, next, previous);
             processUniqueKey(tableDiff, next, previous);
             processIndex(tableDiff, next, previous);
-            if (tableDiff.hasDiff()) {
+            if (tableDiff.hasDiff()) { // changed
                 addTableDiff(tableDiff);
             }
         }
@@ -208,6 +207,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                        Column Process
     //                                        --------------
+    protected void processColumn(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        processAddedColumn(tableDiff, nextTable, previousTable);
+        processChangedColumn(tableDiff, nextTable, previousTable);
+        processDeletedColumn(tableDiff, nextTable, previousTable);
+    }
+
     protected void processAddedColumn(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         final List<Column> columnList = nextTable.getColumnList();
         for (Column column : columnList) {
@@ -225,7 +230,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             if (previous == null || !isSameColumnName(next, previous)) {
                 continue;
             }
-            // changed
+            // found
             final DfColumnDiff columnDiff = DfColumnDiff.createChanged(next.getName());
             setupNextPreviousIfNotSame(next, previous, columnDiff,
                     new NextPreviousDiffSetupper<Column, DfColumnDiff>() {
@@ -277,7 +282,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                             diff.setAutoIncrementDiff(nextPreviousDiff);
                         }
                     });
-            if (columnDiff.hasDiff()) {
+            if (columnDiff.hasDiff()) { // changed
                 tableDiff.addColumnDiff(columnDiff);
             }
         }
@@ -314,16 +319,18 @@ public class DfSchemaDiff extends DfAbstractDiff {
         final String previousName = previousTable.getPrimaryKeyConstraintName();
         if (!isSame(nextName, previousName)) {
             if (nextName == null) { // deleted
-                final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createAdded(previousName);
-                tableDiff.addPrimaryKeyDiff(primaryKeyDiff);
+                tableDiff.addPrimaryKeyDiff(DfPrimaryKeyDiff.createDeleted(previousName));
                 return;
             } else if (previousName == null) { // added
-                final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createChanged(nextName);
-                tableDiff.addPrimaryKeyDiff(primaryKeyDiff);
+                tableDiff.addPrimaryKeyDiff(DfPrimaryKeyDiff.createAdded(nextName));
+                return;
+            } else { // both deleted and added 
+                tableDiff.addPrimaryKeyDiff(DfPrimaryKeyDiff.createDeleted(previousName));
+                tableDiff.addPrimaryKeyDiff(DfPrimaryKeyDiff.createAdded(nextName));
                 return;
             }
         }
-        // changed
+        // found
         final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createChanged(nextName);
         final String nextColumn = nextTable.getPrimaryKeyNameCommaString();
         final String previousColumn = previousTable.getPrimaryKeyNameCommaString();
@@ -331,7 +338,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             final DfNextPreviousDiff columnDiff = createNextPreviousDiff(nextColumn, previousColumn);
             primaryKeyDiff.setColumnDiff(columnDiff);
         }
-        if (primaryKeyDiff.hasDiff()) {
+        if (primaryKeyDiff.hasDiff()) { // changed
             tableDiff.addPrimaryKeyDiff(primaryKeyDiff);
         }
     }
@@ -340,7 +347,62 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                    ForeignKey Process
     //                                    ------------------
     protected void processForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
-        // TODO
+        processAddedForeignKey(tableDiff, nextTable, previousTable);
+        processChangedForeignKey(tableDiff, nextTable, previousTable);
+        processDeletedForeignKey(tableDiff, nextTable, previousTable);
+    }
+
+    protected void processAddedForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        final ForeignKey[] foreignKeys = nextTable.getForeignKeys();
+        nextLoop: for (ForeignKey nextFK : foreignKeys) {
+            final String nextName = nextFK.getName();
+            for (ForeignKey previousFK : previousTable.getForeignKeys()) {
+                final String previousName = previousFK.getName();
+                if (isSame(nextName, previousName)) {
+                    continue nextLoop;
+                }
+            }
+            // added
+            tableDiff.addForeignKeyDiff(DfForeignKeyDiff.createAdded(nextName));
+        }
+    }
+
+    protected void processChangedForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        final ForeignKey[] foreignKeys = nextTable.getForeignKeys();
+        nextLoop: for (ForeignKey nextFK : foreignKeys) {
+            final String nextName = nextFK.getName();
+            for (ForeignKey previousFK : previousTable.getForeignKeys()) {
+                final String previousName = previousFK.getName();
+                if (isSame(nextName, previousName)) { // found
+                    final DfForeignKeyDiff foreignKeyDiff = DfForeignKeyDiff.createChanged(nextName);
+                    final String nextColumn = nextFK.getLocalColumnNameCommaString();
+                    final String previousColumn = previousFK.getLocalColumnNameCommaString();
+                    if (!isSame(nextColumn, previousColumn)) {
+                        final DfNextPreviousDiff columnDiff = createNextPreviousDiff(nextColumn, previousColumn);
+                        foreignKeyDiff.setColumnDiff(columnDiff);
+                    }
+                    if (foreignKeyDiff.hasDiff()) { // changed
+                        tableDiff.addForeignKeyDiff(foreignKeyDiff);
+                    }
+                    continue nextLoop;
+                }
+            }
+        }
+    }
+
+    protected void processDeletedForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        final ForeignKey[] foreignKeys = previousTable.getForeignKeys();
+        previousLoop: for (ForeignKey previousFK : foreignKeys) {
+            final String previousName = previousFK.getName();
+            for (ForeignKey nextFK : nextTable.getForeignKeys()) {
+                final String nextName = nextFK.getName();
+                if (isSame(nextName, previousName)) {
+                    continue previousLoop;
+                }
+            }
+            // added
+            tableDiff.addForeignKeyDiff(DfForeignKeyDiff.createDeleted(previousName));
+        }
     }
 
     // -----------------------------------------------------

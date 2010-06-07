@@ -1,0 +1,37 @@
+package org.seasar.dbflute.logic.jdbc.schemadiff;
+
+import java.util.Map;
+
+/**
+ * @author jflute
+ * @since 0.9.7.1 (2010/06/06 Sunday)
+ */
+public class DfForeignKeyDiff extends DfConstraintDiff {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected DfForeignKeyDiff(String columnName, DfDiffType diffType) {
+        super(columnName, diffType);
+    }
+
+    protected DfForeignKeyDiff(Map<String, Object> foreignKeyDiffMap) {
+        super(foreignKeyDiffMap);
+    }
+
+    public static DfForeignKeyDiff createAdded(String constraintName) {
+        return new DfForeignKeyDiff(constraintName, DfDiffType.ADD);
+    }
+
+    public static DfForeignKeyDiff createChanged(String constraintName) {
+        return new DfForeignKeyDiff(constraintName, DfDiffType.CHANGE);
+    }
+
+    public static DfForeignKeyDiff createDeleted(String constraintName) {
+        return new DfForeignKeyDiff(constraintName, DfDiffType.DELETE);
+    }
+
+    public static DfForeignKeyDiff createFromDiffMap(Map<String, Object> columnDiffMap) {
+        return new DfForeignKeyDiff(columnDiffMap);
+    }
+}
