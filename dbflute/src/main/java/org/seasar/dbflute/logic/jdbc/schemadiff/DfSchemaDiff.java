@@ -292,27 +292,28 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     _previousTableCount = DfTypeUtil.toInteger(previousValue);
                 }
             } else { // table elements
-                assertTableElementMap(key, value);
+                assertTableElementMap(key, value, schemaDiffMap);
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> tableDiffMap = (Map<String, Object>) value;
-                final DfTableDiff tableDiff = DfTableDiff.createFromDiffMap(tableDiffMap);
+                final DfTableDiff tableDiff = createTableDiff(tableDiffMap);
                 addTableDiff(tableDiff);
             }
         }
     }
 
-    protected void assertDiffDateExists(String key, Date diffDate, Map<String, Object> diffMap) {
+    protected void assertDiffDateExists(String key, Date diffDate, Map<String, Object> schemaDiffMap) {
         if (diffDate == null) { // basically no way
             String msg = "The diff-date of diff-map is required:";
-            msg = msg + " key=" + key + " diffMap=" + diffMap;
+            msg = msg + " key=" + key + " diffMap=" + schemaDiffMap;
             throw new IllegalStateException(msg);
         }
     }
 
-    protected void assertTableElementMap(String key, Object value) {
+    protected void assertTableElementMap(String key, Object value, Map<String, Object> schemaDiffMap) {
         if (!(value instanceof Map<?, ?>)) { // basically no way
             String msg = "The elements of table should be Map:";
             msg = msg + " table=" + key + " value=" + value;
+            msg = msg + " schemaDiffMap=" + schemaDiffMap;
             throw new IllegalStateException(msg);
         }
     }
@@ -359,8 +360,16 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return _diffDate;
     }
 
+    public boolean hasNextTableCount() {
+        return _nextTableCount != null;
+    }
+
     public Integer getNextTableCount() {
         return _nextTableCount;
+    }
+
+    public boolean hasPreviousTableCount() {
+        return _previousTableCount != null;
     }
 
     public Integer getPreviousTableCount() {
