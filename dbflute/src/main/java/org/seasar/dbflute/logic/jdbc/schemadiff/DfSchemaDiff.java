@@ -356,8 +356,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Date getDiffDate() {
-        return _diffDate;
+    public String getDiffDate() {
+        return DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN);
     }
 
     public boolean hasNextTableCount() {
