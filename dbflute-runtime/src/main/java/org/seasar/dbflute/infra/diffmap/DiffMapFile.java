@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.infra.history;
+package org.seasar.dbflute.infra.diffmap;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,7 +26,7 @@ import org.seasar.dbflute.helper.mapstring.MapListFile;
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public class SchemaHistoryFile {
+public class DiffMapFile {
 
     // ===================================================================================
     //                                                                                Read
