@@ -26,7 +26,7 @@ import org.seasar.dbflute.helper.mapstring.MapListFile;
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public class SchemaDiffFile {
+public class SchemaHistoryFile {
 
     // ===================================================================================
     //                                                                                Read
