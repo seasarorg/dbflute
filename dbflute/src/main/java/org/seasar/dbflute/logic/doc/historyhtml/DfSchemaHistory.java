@@ -42,7 +42,7 @@ public class DfSchemaHistory {
 
         // ordered by DIFF_DATE desc
         final Map<String, Object> serializedMap = DfCollectionUtil.newLinkedHashMap();
-        final Map<String, Object> schemaDiffMap = schemaDiff.createDiffMap();
+        final Map<String, Object> schemaDiffMap = schemaDiff.createSchemaDiffMap();
         serializedMap.put((String) schemaDiffMap.get(DfSchemaDiff.DIFF_DATE_KEY), schemaDiffMap);
 
         if (file.exists()) {
@@ -137,7 +137,7 @@ public class DfSchemaHistory {
             @SuppressWarnings("unchecked")
             final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
             DfSchemaDiff schemaDiff = new DfSchemaDiff();
-            schemaDiff.acceptDiffMap(schemaDiffMap);
+            schemaDiff.acceptSchemaDiffMap(schemaDiffMap);
             _schemaDiffList.add(schemaDiff);
         }
     }

@@ -471,8 +471,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         } else if (DfDiffType.DELETE.equals(tableDiff.getDiffType())) {
             _deletedTableDiffList.add(tableDiff);
         } else {
-            String msg = "Unknown diff-mode of table: ";
-            msg = msg + " diffMode=" + tableDiff.getDiffType();
+            String msg = "Unknown diff-type of table: ";
+            msg = msg + " diffType=" + tableDiff.getDiffType();
             msg = msg + " tableDiff=" + tableDiff;
             throw new IllegalStateException(msg);
         }

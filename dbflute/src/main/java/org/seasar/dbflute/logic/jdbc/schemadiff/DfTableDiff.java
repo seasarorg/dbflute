@@ -68,16 +68,16 @@ public class DfTableDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfTableDiff(String tableName, DfDiffType diffMode) {
+    protected DfTableDiff(String tableName, DfDiffType diffType) {
         _tableName = tableName;
-        _diffType = diffMode;
+        _diffType = diffType;
     }
 
     protected DfTableDiff(Map<String, Object> tableDiffMap) {
         _tableName = (String) tableDiffMap.get("tableName");
         assertTableNameExists(_tableName, tableDiffMap);
         _diffType = DfDiffType.valueOf((String) tableDiffMap.get("diffType"));
-        assertDiffModeExists(_tableName, tableDiffMap, _diffType);
+        assertDiffTypeExists(_tableName, tableDiffMap, _diffType);
         acceptTableDiffMap(tableDiffMap);
     }
 
@@ -89,9 +89,9 @@ public class DfTableDiff extends DfAbstractDiff {
         }
     }
 
-    protected void assertDiffModeExists(String tableName, Map<String, Object> tableDiffMap, DfDiffType diffMode) {
-        if (diffMode == null) { // basically no way
-            String msg = "The diffMode is required in table diff-map:";
+    protected void assertDiffTypeExists(String tableName, Map<String, Object> tableDiffMap, DfDiffType diffType) {
+        if (diffType == null) { // basically no way
+            String msg = "The diffType is required in table diff-map:";
             msg = msg + " table=" + tableName + " tableDiffMap=" + tableDiffMap;
             throw new IllegalStateException(msg);
         }
@@ -119,7 +119,7 @@ public class DfTableDiff extends DfAbstractDiff {
     public Map<String, Object> createTableDiffMap() {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("tableName", _tableName);
-        map.put("diffMode", _diffType.toString());
+        map.put("diffType", _diffType.toString());
         final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
         for (NextPreviousItemHandler provider : nextPreviousItemList) {
             final DfNextPreviousDiff nextPreviousDiff = provider.provide();
@@ -274,8 +274,8 @@ public class DfTableDiff extends DfAbstractDiff {
         } else if (DfDiffType.DELETE.equals(columnDiff.getDiffType())) {
             _deletedColumnDiffList.add(columnDiff);
         } else {
-            String msg = "Unknown diff-mode of column: ";
-            msg = msg + " diffMode=" + columnDiff.getDiffType();
+            String msg = "Unknown diff-type of column: ";
+            msg = msg + " diffType=" + columnDiff.getDiffType();
             msg = msg + " columnDiff=" + columnDiff;
             throw new IllegalStateException(msg);
         }

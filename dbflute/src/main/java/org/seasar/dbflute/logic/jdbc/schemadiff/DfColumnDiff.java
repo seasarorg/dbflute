@@ -121,9 +121,9 @@ public class DfColumnDiff extends DfAbstractDiff {
         }
     }
 
-    protected void assertDiffModeExists(String columnName, Map<String, Object> columnDiffMap, DfDiffType diffMode) {
-        if (diffMode == null) { // basically no way
-            String msg = "The diffMode is required in column diff-map:";
+    protected void assertDiffTypeExists(String columnName, Map<String, Object> columnDiffMap, DfDiffType diffType) {
+        if (diffType == null) { // basically no way
+            String msg = "The diffType is required in column diff-map:";
             msg = msg + " column=" + columnName + " columnDiffMap=" + columnDiffMap;
             throw new IllegalStateException(msg);
         }
@@ -151,7 +151,7 @@ public class DfColumnDiff extends DfAbstractDiff {
     public Map<String, Object> createColumnDiffMap() {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("columnName", _columnName);
-        map.put("diffMode", _diffType.toString());
+        map.put("diffType", _diffType.toString());
         final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
         for (NextPreviousItemHandler provider : nextPreviousItemList) {
             final DfNextPreviousDiff nextPreviousDiff = provider.provide();
