@@ -226,7 +226,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             UnifiedSchema unifiedSchema, String tableName, List<String> pkList) throws SQLException { // non primary key only
         final StringSet pkSet = StringSet.createAsFlexible();
         pkSet.addAll(pkList);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = new LinkedHashMap<String, Map<Integer, String>>();
+        final Map<String, Map<Integer, String>> uniqueKeyMap = newLinkedHashMap();
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = true;
@@ -236,8 +236,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             while (parts.next()) {
                 final boolean isNonUnique;
                 {
-                    final String nonUnique = parts.getString(4);
-                    isNonUnique = (nonUnique != null && nonUnique.equalsIgnoreCase("true"));
+                    final Boolean nonUnique = parts.getBoolean(4);
+                    isNonUnique = (nonUnique != null && nonUnique);
                 }
                 if (isNonUnique) {
                     continue;

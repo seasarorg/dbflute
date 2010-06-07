@@ -75,8 +75,8 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 final String indexName = parts.getString(6);
                 final boolean isNonUnique;
                 {
-                    final String nonUnique = parts.getString(4);
-                    isNonUnique = (nonUnique != null && nonUnique.equalsIgnoreCase("true"));
+                    final Boolean nonUnique = parts.getBoolean(4);
+                    isNonUnique = (nonUnique != null && nonUnique);
                 }
                 if (!isNonUnique) {
                     continue;
@@ -119,12 +119,12 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 }
 
                 if (indexMap.containsKey(indexName)) {
-                    final Map<Integer, String> uniqueElementMap = indexMap.get(indexName);
-                    uniqueElementMap.put(ordinalPosition, columnName);
+                    final Map<Integer, String> indexElementMap = indexMap.get(indexName);
+                    indexElementMap.put(ordinalPosition, columnName);
                 } else {
-                    final Map<Integer, String> uniqueElementMap = new LinkedHashMap<Integer, String>();
-                    uniqueElementMap.put(ordinalPosition, columnName);
-                    indexMap.put(indexName, uniqueElementMap);
+                    final Map<Integer, String> indexElementMap = newLinkedHashMap();
+                    indexElementMap.put(ordinalPosition, columnName);
+                    indexMap.put(indexName, indexElementMap);
                 }
             }
         } finally {
