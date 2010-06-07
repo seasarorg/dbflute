@@ -78,8 +78,8 @@ public class DfColumnDiff extends DfAbstractDiff {
     }
 
     public void acceptDiffMap(Map<String, Object> columnDiffMap) {
-        _dbTypeDiff = createNextPreviousDiff(columnDiffMap, "dbTypeDiff");
-        _columnSizeDiff = createNextPreviousDiff(columnDiffMap, "columnSizeDiff");
+        _dbTypeDiff = restoreNextPreviousDiff(columnDiffMap, "dbTypeDiff");
+        _columnSizeDiff = restoreNextPreviousDiff(columnDiffMap, "columnSizeDiff");
     }
 
     // ===================================================================================
@@ -106,12 +106,32 @@ public class DfColumnDiff extends DfAbstractDiff {
         return _diffMode;
     }
 
+    public boolean isAdded() {
+        return DfDiffMode.ADDED.equals(_diffMode);
+    }
+
+    public boolean isChanged() {
+        return DfDiffMode.CHANGED.equals(_diffMode);
+    }
+
+    public boolean isDeleted() {
+        return DfDiffMode.DELETED.equals(_diffMode);
+    }
+
+    public boolean hasDbTypeDiff() {
+        return _dbTypeDiff != null;
+    }
+
     public DfNextPreviousDiff getDbTypeDiff() {
         return _dbTypeDiff;
     }
 
     public void setDbTypeDiff(DfNextPreviousDiff dbTypeDiff) {
         _dbTypeDiff = dbTypeDiff;
+    }
+
+    public boolean hasColumnSizeDiff() {
+        return _columnSizeDiff != null;
     }
 
     public DfNextPreviousDiff getColumnSizeDiff() {

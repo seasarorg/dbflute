@@ -213,7 +213,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
             if (!isSameColumnSize(next, previous)) {
                 diff.setColumnSizeDiff(createNextPreviousDiff(next.getColumnSize(), previous.getColumnSize()));
             }
-            tableDiff.addColumnDiff(diff);
+            if (diff.hasDiff()) {
+                tableDiff.addColumnDiff(diff);
+            }
         }
     }
 
@@ -280,7 +282,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 _diffDate = DfTypeUtil.toDate(value, DIFF_DATE_PATTERN);
                 assertDiffDateExists(key, _diffDate, schemaDiffMap);
             } else if (TABLE_COUNT_KEY.equals(key)) {
-                final DfNextPreviousDiff nextPreviousDiff = createNextPreviousDiff(schemaDiffMap, key);
+                final DfNextPreviousDiff nextPreviousDiff = restoreNextPreviousDiff(schemaDiffMap, key);
                 final String nextValue = nextPreviousDiff.getNextValue();
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(nextValue)) { // basically true
                     _nextTableCount = DfTypeUtil.toInteger(nextValue);

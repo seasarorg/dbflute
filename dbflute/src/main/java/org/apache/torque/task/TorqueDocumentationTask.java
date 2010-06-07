@@ -263,6 +263,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                       Task Override
     //                                                                       =============
+    @Override
     public Context initControlContext() throws Exception {
         super.initControlContext();
         _context.put("escape", new Escape());

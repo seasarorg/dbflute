@@ -91,16 +91,18 @@ public class DfTableDiff extends DfAbstractDiff {
     }
 
     protected void acceptDiffMap(Map<String, Object> tableDiffMap) {
-        _unifiedSchemaDiff = createNextPreviousDiff(tableDiffMap, "unifiedSchemaDiff");
-        _objectTypeDiff = createNextPreviousDiff(tableDiffMap, "objectTypeDiff");
+        _unifiedSchemaDiff = restoreNextPreviousDiff(tableDiffMap, "unifiedSchemaDiff");
+        _objectTypeDiff = restoreNextPreviousDiff(tableDiffMap, "objectTypeDiff");
         {
             final String key = "columnDiff";
             final Object value = tableDiffMap.get(key);
-            assertElementMap(key, value, tableDiffMap);
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> columnDiffMap = (Map<String, Object>) value;
-            final DfColumnDiff columnDiff = createColumnDiff(columnDiffMap);
-            addColumnDiff(columnDiff);
+            if (value != null) {
+                assertElementMap(key, value, tableDiffMap);
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> columnDiffMap = (Map<String, Object>) value;
+                final DfColumnDiff columnDiff = createColumnDiff(columnDiffMap);
+                addColumnDiff(columnDiff);
+            }
         }
     }
 
@@ -133,12 +135,32 @@ public class DfTableDiff extends DfAbstractDiff {
         return _diffMode;
     }
 
+    public boolean isAdded() {
+        return DfDiffMode.ADDED.equals(_diffMode);
+    }
+
+    public boolean isChanged() {
+        return DfDiffMode.CHANGED.equals(_diffMode);
+    }
+
+    public boolean isDeleted() {
+        return DfDiffMode.DELETED.equals(_diffMode);
+    }
+
+    public boolean hasUnifiedSchemaDiff() {
+        return _unifiedSchemaDiff != null;
+    }
+
     public DfNextPreviousDiff getUnifiedSchemaDiff() {
         return _unifiedSchemaDiff;
     }
 
     public void setUnifiedSchemaDiff(DfNextPreviousDiff unifiedSchemaDiff) {
         _unifiedSchemaDiff = unifiedSchemaDiff;
+    }
+
+    public boolean hasObjectTypeDiff() {
+        return _objectTypeDiff != null;
     }
 
     public DfNextPreviousDiff getObjectTypeDiff() {
