@@ -4,8 +4,6 @@
 #set ($database = $schemaData.database)
 $database.enableDocumentOutputDirectory()
 
-#set ($outFile = "${database.schemaHtmlFileName}")
-
 ## - - - - - - - - - - - -
 ## Initialize properties.
 ## - - - - - - - - - - - -
@@ -19,13 +17,17 @@ $database.initializeClassificationDeployment()
 ## Schema HTML
 ## - - - - - -
 ## *the argument 'dataModel' might be unused on DBFlute
+#set ($outFile = "${database.schemaHtmlFileName}")
 $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
+
+## for migration of renaming
+$database.deleteOldSchemaHtmlFile()
 
 ## - - - - - - -
 ## History HTML
 ## - - - - - - -
-#set ($outFile = "${database.historyHtmlFileName}")
 $database.loadSchemaHistory()
 #if ($database.existsSchemaHistory())
-$generator.parse("doc/html/history.vm", $outFile, "dataModel", $dataModel)
+#set ($outFile = "${database.historyHtmlFileName}")
+$generator.parse("doc/html/diffhist.vm", $outFile, "dataModel", $dataModel)
 #end
