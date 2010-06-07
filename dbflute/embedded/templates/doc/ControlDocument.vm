@@ -18,6 +18,7 @@ $database.initializeClassificationDeployment()
 ## - - - - - -
 ## Schema HTML
 ## - - - - - -
+## *the argument 'dataModel' might be unused on DBFlute
 $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
 
 ## - - - - - - - - - -
