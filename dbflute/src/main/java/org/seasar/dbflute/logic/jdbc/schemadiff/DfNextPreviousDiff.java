@@ -52,7 +52,7 @@ public class DfNextPreviousDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                              Status
     //                                                                              ======
-    public boolean hasDiff() {
+    public boolean hasDiff() { // required items only return false
         return !isSame(_next, _previous);
     }
 
