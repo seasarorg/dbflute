@@ -12,7 +12,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 public abstract class DfAbstractDiff {
 
     protected void assertElementMap(String key, Object value, Map<String, Object> diffMap) {
-        if (!(value instanceof Map<?, ?>)) { // basically no way
+        if (value != null && !(value instanceof Map<?, ?>)) { // basically no way
             String msg = "The element in table diff-map should be Map:";
             msg = msg + " key=" + key + " value=" + value + " diffMap=" + diffMap;
             throw new IllegalStateException(msg);

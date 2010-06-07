@@ -309,7 +309,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     protected void assertTableElementMap(String key, Object value) {
         if (!(value instanceof Map<?, ?>)) { // basically no way
-            String msg = "The elements of tables should be Map:";
+            String msg = "The elements of table should be Map:";
             msg = msg + " table=" + key + " value=" + value;
             throw new IllegalStateException(msg);
         }
