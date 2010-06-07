@@ -219,6 +219,14 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                   SchemaHistoryHTML
+    //                                                                   =================
+    public String getSchemaHistoryHtmlFileName(String projectName) {
+        final String defaultNonExtName = "schema-history-" + projectName;
+        return getProperty("schemaHistoryHtmlFileName", defaultNonExtName + ".html", getDocumentDefinitionMap());
+    }
+
+    // ===================================================================================
     //                                                                   Data Xls Tempalte
     //                                                                   =================
     public boolean isDataXlsTemplateRecordLimitValid() {

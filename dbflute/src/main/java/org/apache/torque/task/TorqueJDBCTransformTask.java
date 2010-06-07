@@ -81,6 +81,7 @@ import org.seasar.dbflute.exception.DfTableDuplicateException;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.factory.DfDbCommentExtractorFactory;
 import org.seasar.dbflute.logic.factory.DfIdentityExtractorFactory;
 import org.seasar.dbflute.logic.factory.DfSynonymExtractorFactory;
@@ -991,9 +992,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (_schemaDiff.hasDiff()) {
             try {
                 _log.info("*different from previous");
+                final DfSchemaHistory schemaHistory = new DfSchemaHistory();
                 _log.info("...Serializing schema-diff:");
-                _log.info("  filePath = " + _schemaDiff.getDiffMapFilePath());
-                _schemaDiff.serializeSchemaDiff();
+                _log.info("  filePath = " + schemaHistory.getSchemaDiffFilePath());
+                schemaHistory.serializeSchemaDiff(_schemaDiff);
             } catch (IOException e) {
                 String msg = "*Failed to serialize schema-diff";
                 throw new IllegalStateException(msg, e);

@@ -6,8 +6,6 @@ $database.enableDocumentOutputDirectory()
 
 #set ($outFile = "${database.schemaHtmlFileName}")
 
-File to be created: $outFile
-
 ## - - - - - - - - - - - -
 ## Initialize properties.
 ## - - - - - - - - - - - -
@@ -17,4 +15,16 @@ $database.initializeAdditionalUniqueKey()
 $database.initializeAdditionalForeignKey()
 $database.initializeClassificationDeployment()
 
+## - - - - - -
+## Schema HTML
+## - - - - - -
 $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
+
+## - - - - - - - - - -
+## Schema History HTML
+## - - - - - - - - - -
+#set ($outFile = "${database.schemaHistoryHtmlFileName}")
+$database.loadSchemaHistory()
+#if ($database.existsSchemaHistory())
+$generator.parse("doc/html/history.vm", $outFile, "dataModel", $dataModel)
+#end

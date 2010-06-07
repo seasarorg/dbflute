@@ -8,7 +8,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public class DfNextPreviousBean {
+public class DfNextPreviousDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -19,19 +19,27 @@ public class DfNextPreviousBean {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfNextPreviousBean(String nextValue, String previousValue) {
+    protected DfNextPreviousDiff(String nextValue, String previousValue) {
         _nextValue = nextValue;
         _previousValue = previousValue;
     }
 
-    public DfNextPreviousBean(Map<String, String> nextPreviousMap) {
-        _nextValue = nextPreviousMap.get("next");
-        _previousValue = nextPreviousMap.get("previous");
+    protected DfNextPreviousDiff(Map<String, Object> nextPreviousDiffMap) {
+        _nextValue = (String) nextPreviousDiffMap.get("next");
+        _previousValue = (String) nextPreviousDiffMap.get("previous");
+    }
+
+    public static DfNextPreviousDiff create(String nextValue, String previousValue) {
+        return new DfNextPreviousDiff(nextValue, previousValue);
+    }
+
+    public static DfNextPreviousDiff create(Map<String, Object> nextPreviousDiffMap) {
+        return new DfNextPreviousDiff(nextPreviousDiffMap);
     }
 
     // ===================================================================================
-    //                                                                             DiffMap
-    //                                                                             =======
+    //                                                                            Diff Map
+    //                                                                            ========
     public Map<String, String> createDiffMap() {
         final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
         map.put("next", _nextValue);

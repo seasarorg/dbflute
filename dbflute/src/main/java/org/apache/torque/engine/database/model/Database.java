@@ -79,10 +79,12 @@ import org.seasar.dbflute.config.DfDatabaseNameMapping;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
+import org.seasar.dbflute.logic.jdbc.diff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
@@ -137,10 +139,15 @@ public class Database {
     protected StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexibleOrdered();
 
     // -----------------------------------------------------
-    //                                        for Sql2Entity
-    //                                        --------------
+    //                                         ParameterBean
+    //                                         -------------
     /** The meta data of parameter bean. */
-    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap; // when sql2entity only
+
+    // -----------------------------------------------------
+    //                                        Schema History
+    //                                        --------------
+    protected DfSchemaHistory _schemaHistory; // when doc only
 
     // -----------------------------------------------------
     //                                                 Other
@@ -1599,6 +1606,11 @@ public class Database {
         return hasTableBqpMap() || isGenerateProcedureParameterBean();
     }
 
+    public String getSchemaHistoryHtmlFileName() {
+        final String projectName = getProjectName();
+        return getProperties().getDocumentProperties().getSchemaHistoryHtmlFileName(projectName);
+    }
+
     // ===================================================================================
     //                                                               Simple DTO Properties
     //                                                               =====================
@@ -1986,6 +1998,28 @@ public class Database {
         final DataSource dataSource = getDataSource();
         _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource);
         return _procedureMetaInfoList;
+    }
+
+    // ===================================================================================
+    //                                                                      Schema History
+    //                                                                      ==============
+    public void loadSchemaHistory() {
+        _log.info("...Loading schema history");
+        _schemaHistory = new DfSchemaHistory();
+        _schemaHistory.loadHistory();
+        if (existsSchemaHistory()) {
+            _log.info("*found history: size=" + getSchemaDiffList().size());
+        } else {
+            _log.info("*no history");
+        }
+    }
+
+    public boolean existsSchemaHistory() {
+        return _schemaHistory.existsHistory();
+    }
+
+    public List<DfSchemaDiff> getSchemaDiffList() {
+        return _schemaHistory.getSchemaDiffList();
     }
 
     // ===================================================================================
