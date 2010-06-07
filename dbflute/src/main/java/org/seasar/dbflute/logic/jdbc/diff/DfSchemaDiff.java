@@ -124,7 +124,7 @@ public class DfSchemaDiff {
         final List<Table> tableList = _nextDb.getTableList();
         for (Table table : tableList) {
             final Table found = findPreviousTable(table);
-            if (found == null) { // added
+            if (found == null || !isSameTableName(table, found)) { // added
                 _addedTableList.add(DfTableDiff.createAdded(table.getName()));
             }
         }
@@ -134,9 +134,10 @@ public class DfSchemaDiff {
         final List<Table> tableList = _nextDb.getTableList();
         for (Table next : tableList) {
             final Table previous = findPreviousTable(next);
-            if (previous == null) {
+            if (previous == null || !isSameTableName(next, previous)) {
                 continue;
             }
+            // changed
             final DfTableDiff diff = DfTableDiff.createChanged(next.getName());
             if (!isSameSchema(next, previous)) {
                 final String nextSchema = next.getUnifiedSchema().getCatalogSchema();
@@ -159,10 +160,14 @@ public class DfSchemaDiff {
         final List<Table> tableList = _previousDb.getTableList();
         for (Table table : tableList) {
             final Table found = findNextTable(table);
-            if (found == null) { // deleted
+            if (found == null || !isSameTableName(table, found)) { // deleted
                 _deletedTableList.add(DfTableDiff.createDeleted(table.getName()));
             }
         }
+    }
+
+    protected boolean isSameTableName(Table next, Table previous) {
+        return isSame(next.getName(), previous.getName());
     }
 
     protected boolean isSameSchema(Table next, Table previous) {
@@ -180,7 +185,7 @@ public class DfSchemaDiff {
         final List<Column> columnList = nextTable.getColumnList();
         for (Column column : columnList) {
             final Column found = previousTable.getColumn(column.getName());
-            if (found == null) { // added
+            if (found == null || !isSameColumnName(column, found)) { // added
                 tableDiff.addAddedColumn(DfColumnDiff.createAdded(column.getName()));
             }
         }
@@ -190,9 +195,10 @@ public class DfSchemaDiff {
         final List<Column> columnList = nextTable.getColumnList();
         for (Column next : columnList) {
             final Column previous = previousTable.getColumn(next.getName());
-            if (previous == null) {
+            if (previous == null || !isSameColumnName(next, previous)) {
                 continue;
             }
+            // changed
             final DfColumnDiff diff = DfColumnDiff.createChanged(next.getName());
             if (!isSameDbType(next, previous)) {
                 diff.setDbTypeDiff(createNextPreviousBean(next.getDbType(), previous.getDbType()));
@@ -208,10 +214,14 @@ public class DfSchemaDiff {
         final List<Column> columnList = previousTable.getColumnList();
         for (Column column : columnList) {
             final Column found = nextTable.getColumn(column.getName());
-            if (found == null) { // deleted
+            if (found == null || !isSameColumnName(column, found)) { // deleted
                 tableDiff.addAddedColumn(DfColumnDiff.createDeleted(column.getName()));
             }
         }
+    }
+
+    protected boolean isSameColumnName(Column next, Column previous) {
+        return isSame(next.getName(), previous.getName());
     }
 
     protected boolean isSameDbType(Column next, Column previous) {
