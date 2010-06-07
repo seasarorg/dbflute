@@ -22,7 +22,7 @@ import java.util.Map;
 import org.seasar.dbflute.helper.mapstring.MapListFile;
 
 /**
- * The file handling for schema difference.
+ * The file handling for difference map.
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
