@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.jdbc.diff;
+package org.seasar.dbflute.logic.jdbc.schemadiff;
 
 import java.util.List;
 import java.util.Map;

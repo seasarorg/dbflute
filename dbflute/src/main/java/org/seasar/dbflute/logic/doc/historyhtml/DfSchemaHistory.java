@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.infra.schemadiff.SchemaDiffFile;
-import org.seasar.dbflute.logic.jdbc.diff.DfSchemaDiff;
+import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
