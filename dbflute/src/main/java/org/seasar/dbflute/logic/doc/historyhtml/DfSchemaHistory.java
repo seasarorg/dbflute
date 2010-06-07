@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.infra.history.SchemaHistoryFile;
+import org.seasar.dbflute.infra.diffmap.DiffMapFile;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -37,7 +37,7 @@ public class DfSchemaHistory {
     //                                                                           =========
     public void serializeSchemaDiff(DfSchemaDiff schemaDiff) throws IOException {
         final String path = getSchemaHistoryFilePath();
-        final SchemaHistoryFile historyFile = createSchemaHistoryFile();
+        final DiffMapFile diffMapFile = createDiffMapFile();
         final File file = new File(path);
 
         // ordered by DIFF_DATE desc
@@ -49,7 +49,7 @@ public class DfSchemaHistory {
             FileInputStream ins = null;
             try {
                 ins = new FileInputStream(file);
-                final Map<String, Object> existingMap = historyFile.readMap(ins);
+                final Map<String, Object> existingMap = diffMapFile.readMap(ins);
                 final Set<Entry<String, Object>> entrySet = existingMap.entrySet();
                 int count = 0;
                 final int historyLimit = getHistoryLimit();
@@ -73,7 +73,7 @@ public class DfSchemaHistory {
         FileOutputStream ous = null;
         try {
             ous = new FileOutputStream(path);
-            historyFile.writeMap(ous, serializedMap);
+            diffMapFile.writeMap(ous, serializedMap);
         } finally {
             if (ous != null) {
                 ous.close();
@@ -95,12 +95,12 @@ public class DfSchemaHistory {
             _existsSchemaDiff = false;
             return;
         }
-        final SchemaHistoryFile historyFile = createSchemaHistoryFile();
+        final DiffMapFile diffMapFile = createDiffMapFile();
         final Map<String, Object> diffMap;
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(file);
-            diffMap = historyFile.readMap(fis);
+            diffMap = diffMapFile.readMap(fis);
         } catch (FileNotFoundException ignored) {
             _existsSchemaDiff = false;
             return;
@@ -160,8 +160,8 @@ public class DfSchemaHistory {
     // ===================================================================================
     //                                                                         Schema Diff
     //                                                                         ===========
-    protected SchemaHistoryFile createSchemaHistoryFile() {
-        return new SchemaHistoryFile();
+    protected DiffMapFile createDiffMapFile() {
+        return new DiffMapFile();
     }
 
     public String getSchemaHistoryFilePath() {
