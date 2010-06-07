@@ -28,6 +28,68 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public class DfSchemaDiff extends DfAbstractDiff {
 
+    //[diff-date] = map:{
+    //    ; diffDate = 2010/12/12 12:34:56
+    //    ; tableCount = map:{ next = 123 ; previous = 145}
+    //    ; tableDiff = map:{
+    //        ; [table-name] = map:{
+    //            ; diffType = [ADD or CHANGE or DELETE]
+    //            ; unifiedSchemaDiff = map:{ next = [schema] ; previous = [schema] }
+    //            ; objectTypeDiff = map:{ next = [type] ; previous = [type] }
+    //            ; columnDiff = map:{
+    //                [column-name] = map:{
+    //                    ; diffType = [ADD or CHANGE or DELETE]
+    //                    ; dbTypeDiff = map:{next = [db-type-name]; previous = [db-type-name]}
+    //                    ; columnSizeDiff = map:{next = [column-size&digit]; previous = [column-size&digit]}
+    //                    ; defaultValueDiff = map:{next = [default-value]; previous = [default-value]}
+    //                    ; notNullDiff = map:{next = [true or false] ; previous = [true or false]}
+    //                    ; autoIncrementDiff = map:{next = [true or false] ; previous = [true or false]}
+    //                }
+    //            }
+    //            ; primaryKeyDiff = map:{
+    //                ; [pk-name] = map:{
+    //                    ; diffType = [ADD or CHANGE or DELETE]
+    //                    ; columnDiff = map:{
+    //                        ; next = [column-name, ...]
+    //                        ; previous = [column-name, ...]
+    //                    }
+    //                }
+    //            }
+    //            ; foreingkKeyDiff = map:{
+    //                ; [fk-name] = map:{
+    //                    ; diffType = [ADD or CHANGE or DELETE]
+    //                    ; columnDiff = map:{
+    //                        ; next = [column-name, ...]
+    //                        ; previous = [column-name, ...]
+    //                    }
+    //                    ; foreignTableDiff = map:{
+    //                        ; next = [table-name]
+    //                        ; previous = [table-name]
+    //                    }
+    //                }
+    //            }
+    //            ; uniqueKeyDiff = map:{
+    //                ; [uq-name] = map:{
+    //                    ; diffType = [ADD or CHANGE or DELETE]
+    //                    ; columnDiff = map:{
+    //                        ; next = [column-name, ...]
+    //                        ; previous = [column-name, ...]
+    //                    }
+    //                }
+    //            }
+    //            ; indexDiff = map:{
+    //                ; [index-name] = map:{
+    //                    ; diffType = [ADD or CHANGE or DELETE]
+    //                    ; columnDiff = map:{
+    //                        ; next = [column-name, ...]
+    //                        ; previous = [column-name, ...]
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
