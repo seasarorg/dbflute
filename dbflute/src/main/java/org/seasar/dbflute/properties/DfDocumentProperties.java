@@ -210,8 +210,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                          SchemaHTML
     //                                                                          ==========
-    public String getSchemaHtmlFileName(String defaultNonExtName) {
-        return getProperty("schemaHtmlFileName", defaultNonExtName + ".html", getDocumentDefinitionMap());
+    public String getSchemaHtmlFileName(String projectName) {
+        final String defaultName = "schema-" + projectName + ".html";
+        return getProperty("schemaHtmlFileName", defaultName, getDocumentDefinitionMap());
     }
 
     public boolean isSuppressSchemaHtmlOutsideSql() {
@@ -222,8 +223,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                                         HistoryHTML
     //                                                                         ===========
     public String getHistoryHtmlFileName(String projectName) {
-        final String defaultNonExtName = "history-" + projectName;
-        return getProperty("historyHtmlFileName", defaultNonExtName + ".html", getDocumentDefinitionMap());
+        final String defaultName = "history-" + projectName + ".html";
+        return getProperty("historyHtmlFileName", defaultName, getDocumentDefinitionMap());
     }
 
     // ===================================================================================

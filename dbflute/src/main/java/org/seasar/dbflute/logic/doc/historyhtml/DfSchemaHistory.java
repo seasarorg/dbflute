@@ -165,7 +165,7 @@ public class DfSchemaHistory {
     }
 
     public String getSchemaHistoryFilePath() {
-        return getBasicProperties().getSchemaHistoryFilePath();
+        return getBasicProperties().getProjectSchemaHistoryFilePath();
     }
 
     // ===================================================================================

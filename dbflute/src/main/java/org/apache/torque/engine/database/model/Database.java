@@ -1595,8 +1595,8 @@ public class Database {
     }
 
     public String getSchemaHtmlFileName() {
-        final String defaultName = getAppData().getName();
-        return getProperties().getDocumentProperties().getSchemaHtmlFileName(defaultName);
+        final String projectName = getProjectName();
+        return getProperties().getDocumentProperties().getSchemaHtmlFileName(projectName);
     }
 
     public boolean isSchemaHtmlOutsideSqlValid() {
@@ -1609,6 +1609,18 @@ public class Database {
     public String getHistoryHtmlFileName() {
         final String projectName = getProjectName();
         return getProperties().getDocumentProperties().getHistoryHtmlFileName(projectName);
+    }
+
+    public void deleteOldSchemaHtmlFile() {
+        final String outputDirectory = getProperties().getDocumentProperties().getDocumentOutputDirectory();
+        final File file = new File(outputDirectory + "/project-schema-" + getProjectName() + ".html");
+        if (file.exists()) {
+            try {
+                file.delete();
+            } catch (RuntimeException continued) {
+                _log.info("*Failed to delete old schemaHtml: " + file, continued);
+            }
+        }
     }
 
     // ===================================================================================
