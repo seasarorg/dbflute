@@ -136,14 +136,29 @@ public class DfTableDiff extends DfAbstractDiff {
                 map.put(provider.propertyName(), nextPreviousDiff.createNextPreviousDiffMap());
             }
         }
-        if (!_columnDiffAllList.isEmpty()) {
-            final Map<String, Map<String, Object>> columnDiffMap = DfCollectionUtil.newLinkedHashMap();
-            for (DfColumnDiff columnDiff : _columnDiffAllList) {
-                if (columnDiff.hasDiff()) {
-                    columnDiffMap.put(columnDiff.getColumnName(), columnDiff.createColumnDiffMap());
+        {
+            final List<DfColumnDiff> diffAllList = _columnDiffAllList;
+            if (!_columnDiffAllList.isEmpty()) {
+                final Map<String, Map<String, Object>> diffMap = DfCollectionUtil.newLinkedHashMap();
+                for (DfColumnDiff columnDiff : diffAllList) {
+                    if (columnDiff.hasDiff()) {
+                        diffMap.put(columnDiff.getColumnName(), columnDiff.createColumnDiffMap());
+                    }
                 }
+                map.put("columnDiff", diffMap);
             }
-            map.put("columnDiff", columnDiffMap);
+        }
+        {
+            final List<DfPrimaryKeyDiff> diffAllList = _primaryKeyDiffAllList;
+            if (!diffAllList.isEmpty()) {
+                final Map<String, Map<String, Object>> diffMap = DfCollectionUtil.newLinkedHashMap();
+                for (DfPrimaryKeyDiff primaryKeyDiff : diffAllList) {
+                    if (primaryKeyDiff.hasDiff()) {
+                        diffMap.put(primaryKeyDiff.getConstraintName(), primaryKeyDiff.createPrimaryKeyDiffMap());
+                    }
+                }
+                map.put("primaryKeyDiff", diffMap);
+            }
         }
         return map;
     }

@@ -136,7 +136,7 @@ public class DfPrimaryKeyDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    public String getConstraintNameName() {
+    public String getConstraintName() {
         return _constraintName;
     }
 

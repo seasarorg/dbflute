@@ -10,7 +10,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
  */
-public class DfNextPreviousDiff {
+public class DfNextPreviousDiff extends DfAbstractDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -47,6 +47,13 @@ public class DfNextPreviousDiff {
         map.put("next", _next);
         map.put("previous", _previous);
         return map;
+    }
+
+    // ===================================================================================
+    //                                                                              Status
+    //                                                                              ======
+    public boolean hasDiff() {
+        return !isSame(_next, _previous);
     }
 
     // ===================================================================================

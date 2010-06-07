@@ -340,18 +340,21 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                    ForeignKey Process
     //                                    ------------------
     protected void processForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        // TODO
     }
 
     // -----------------------------------------------------
     //                                     UniqueKey Process
     //                                     -----------------
     protected void processUniqueKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        // TODO
     }
 
     // -----------------------------------------------------
     //                                         Index Process
     //                                         -------------
     protected void processIndex(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        // TODO
     }
 
     // ===================================================================================
@@ -521,11 +524,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public void addTableDiff(DfTableDiff tableDiff) {
         _tableDiffAllList.add(tableDiff);
-        if (DfDiffType.ADD.equals(tableDiff.getDiffType())) {
+        if (tableDiff.isAdded()) {
             _addedTableDiffList.add(tableDiff);
-        } else if (DfDiffType.CHANGE.equals(tableDiff.getDiffType())) {
+        } else if (tableDiff.isChanged()) {
             _changedTableDiffList.add(tableDiff);
-        } else if (DfDiffType.DELETE.equals(tableDiff.getDiffType())) {
+        } else if (tableDiff.isDeleted()) {
             _deletedTableDiffList.add(tableDiff);
         } else {
             String msg = "Unknown diff-type of table: ";
