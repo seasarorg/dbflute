@@ -101,9 +101,9 @@ public class DfColumnDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfColumnDiff(String columnName, DfDiffType diffMode) {
+    protected DfColumnDiff(String columnName, DfDiffType diffType) {
         _columnName = columnName;
-        _diffType = diffMode;
+        _diffType = diffType;
     }
 
     protected DfColumnDiff(Map<String, Object> columnDiffMap) {
