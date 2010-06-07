@@ -1612,8 +1612,13 @@ public class Database {
     }
 
     public void deleteOldSchemaHtmlFile() {
+        final String currentFileName = getSchemaHtmlFileName();
         final String outputDirectory = getProperties().getDocumentProperties().getDocumentOutputDirectory();
-        final File file = new File(outputDirectory + "/project-schema-" + getProjectName() + ".html");
+        final String oldFileName = outputDirectory + "/project-schema-" + getProjectName() + ".html";
+        if (currentFileName.equalsIgnoreCase(oldFileName)) {
+            return; // if current is same as old
+        }
+        final File file = new File(oldFileName);
         if (file.exists()) {
             try {
                 file.delete();
