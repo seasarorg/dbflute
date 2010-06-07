@@ -45,6 +45,12 @@ public abstract class DfAbstractDiff {
         return DfColumnDiff.createFromDiffMap(columnDiffMap);
     }
 
+    protected static interface NextPreviousDiffSetupper<OBJECT, DIFF> {
+        Object provide(OBJECT obj);
+
+        void setup(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
+    }
+
     protected static interface NextPreviousItemHandler {
         String propertyName();
 
@@ -63,12 +69,6 @@ public abstract class DfAbstractDiff {
     // ===================================================================================
     //                                                                         Same Helper
     //                                                                         ===========
-    protected static interface NextPreviousSetupper<OBJECT, DIFF> {
-        Object provide(OBJECT obj);
-
-        void setup(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
-    }
-
     protected boolean isSame(Object next, Object previous) {
         if (next == null && previous == null) {
             return true;

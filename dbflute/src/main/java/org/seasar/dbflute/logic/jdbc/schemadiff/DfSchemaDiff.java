@@ -151,7 +151,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             // changed
             final DfTableDiff tableDiff = DfTableDiff.createChanged(next.getName());
-            setupNextPreviousIfSame(next, previous, tableDiff, new NextPreviousSetupper<Table, DfTableDiff>() {
+            setupNextPreviousIfNotSame(next, previous, tableDiff, new NextPreviousDiffSetupper<Table, DfTableDiff>() {
                 public Object provide(Table obj) {
                     return obj.getUnifiedSchema().getCatalogSchema();
                 }
@@ -160,7 +160,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     diff.setUnifiedSchemaDiff(nextPreviousDiff);
                 }
             });
-            setupNextPreviousIfSame(next, previous, tableDiff, new NextPreviousSetupper<Table, DfTableDiff>() {
+            setupNextPreviousIfNotSame(next, previous, tableDiff, new NextPreviousDiffSetupper<Table, DfTableDiff>() {
                 public Object provide(Table obj) {
                     return obj.getType();
                 }
@@ -188,11 +188,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected void setupNextPreviousIfSame(Table next, Table previous, DfTableDiff diff,
-            NextPreviousSetupper<Table, DfTableDiff> setupper) {
+    protected void setupNextPreviousIfNotSame(Table next, Table previous, DfTableDiff diff,
+            NextPreviousDiffSetupper<Table, DfTableDiff> setupper) {
         final Object nextValue = setupper.provide(next);
         final Object previousValue = setupper.provide(previous);
-        if (isSame(nextValue, previousValue)) {
+        if (!isSame(nextValue, previousValue)) {
             setupper.setup(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
         }
     }
@@ -223,51 +223,56 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             // changed
             final DfColumnDiff columnDiff = DfColumnDiff.createChanged(next.getName());
-            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
-                    return obj.getDbType();
-                }
+            setupNextPreviousIfNotSame(next, previous, columnDiff,
+                    new NextPreviousDiffSetupper<Column, DfColumnDiff>() {
+                        public Object provide(Column obj) {
+                            return obj.getDbType();
+                        }
 
-                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setDbTypeDiff(nextPreviousDiff);
-                }
-            });
-            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
-                    return obj.getColumnSize();
-                }
+                        public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                            diff.setDbTypeDiff(nextPreviousDiff);
+                        }
+                    });
+            setupNextPreviousIfNotSame(next, previous, columnDiff,
+                    new NextPreviousDiffSetupper<Column, DfColumnDiff>() {
+                        public Object provide(Column obj) {
+                            return obj.getColumnSize();
+                        }
 
-                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setColumnSizeDiff(nextPreviousDiff);
-                }
-            });
-            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
-                    return obj.getDefaultValue();
-                }
+                        public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                            diff.setColumnSizeDiff(nextPreviousDiff);
+                        }
+                    });
+            setupNextPreviousIfNotSame(next, previous, columnDiff,
+                    new NextPreviousDiffSetupper<Column, DfColumnDiff>() {
+                        public Object provide(Column obj) {
+                            return obj.getDefaultValue();
+                        }
 
-                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setDefaultValueDiff(nextPreviousDiff);
-                }
-            });
-            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
-                    return obj.isNotNull();
-                }
+                        public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                            diff.setDefaultValueDiff(nextPreviousDiff);
+                        }
+                    });
+            setupNextPreviousIfNotSame(next, previous, columnDiff,
+                    new NextPreviousDiffSetupper<Column, DfColumnDiff>() {
+                        public Object provide(Column obj) {
+                            return obj.isNotNull();
+                        }
 
-                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setNotNullDiff(nextPreviousDiff);
-                }
-            });
-            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
-                    return obj.isAutoIncrement();
-                }
+                        public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                            diff.setNotNullDiff(nextPreviousDiff);
+                        }
+                    });
+            setupNextPreviousIfNotSame(next, previous, columnDiff,
+                    new NextPreviousDiffSetupper<Column, DfColumnDiff>() {
+                        public Object provide(Column obj) {
+                            return obj.isAutoIncrement();
+                        }
 
-                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setAutoIncrementDiff(nextPreviousDiff);
-                }
-            });
+                        public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                            diff.setAutoIncrementDiff(nextPreviousDiff);
+                        }
+                    });
             if (columnDiff.hasDiff()) {
                 tableDiff.addColumnDiff(columnDiff);
             }
@@ -284,11 +289,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected <ITEM> void setupNextPreviousIfSame(Column next, Column previous, DfColumnDiff diff,
-            NextPreviousSetupper<Column, DfColumnDiff> setupper) {
+    protected <ITEM> void setupNextPreviousIfNotSame(Column next, Column previous, DfColumnDiff diff,
+            NextPreviousDiffSetupper<Column, DfColumnDiff> setupper) {
         final Object nextValue = setupper.provide(next);
         final Object previousValue = setupper.provide(previous);
-        if (isSame(nextValue, previousValue)) {
+        if (!isSame(nextValue, previousValue)) {
             setupper.setup(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
         }
     }
