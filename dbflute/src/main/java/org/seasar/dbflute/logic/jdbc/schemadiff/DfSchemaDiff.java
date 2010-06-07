@@ -283,11 +283,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 assertDiffDateExists(key, _diffDate, schemaDiffMap);
             } else if (TABLE_COUNT_KEY.equals(key)) {
                 final DfNextPreviousDiff nextPreviousDiff = restoreNextPreviousDiff(schemaDiffMap, key);
-                final String nextValue = nextPreviousDiff.getNextValue();
+                final String nextValue = nextPreviousDiff.getNext();
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(nextValue)) { // basically true
                     _nextTableCount = DfTypeUtil.toInteger(nextValue);
                 }
-                final String previousValue = nextPreviousDiff.getPreviousValue();
+                final String previousValue = nextPreviousDiff.getPrevious();
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(previousValue)) { // basically true
                     _previousTableCount = DfTypeUtil.toInteger(previousValue);
                 }

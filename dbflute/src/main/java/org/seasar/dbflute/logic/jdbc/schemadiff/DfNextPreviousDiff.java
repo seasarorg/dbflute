@@ -13,20 +13,20 @@ public class DfNextPreviousDiff {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _nextValue;
-    protected final String _previousValue;
+    protected final String _next;
+    protected final String _previous;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     protected DfNextPreviousDiff(String nextValue, String previousValue) {
-        _nextValue = nextValue;
-        _previousValue = previousValue;
+        _next = nextValue;
+        _previous = previousValue;
     }
 
     protected DfNextPreviousDiff(Map<String, Object> nextPreviousDiffMap) {
-        _nextValue = (String) nextPreviousDiffMap.get("next");
-        _previousValue = (String) nextPreviousDiffMap.get("previous");
+        _next = (String) nextPreviousDiffMap.get("next");
+        _previous = (String) nextPreviousDiffMap.get("previous");
     }
 
     public static DfNextPreviousDiff create(String nextValue, String previousValue) {
@@ -42,19 +42,19 @@ public class DfNextPreviousDiff {
     //                                                                            ========
     public Map<String, String> createDiffMap() {
         final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
-        map.put("next", _nextValue);
-        map.put("previous", _previousValue);
+        map.put("next", _next);
+        map.put("previous", _previous);
         return map;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getNextValue() {
-        return _nextValue;
+    public String getNext() {
+        return _next;
     }
 
-    public String getPreviousValue() {
-        return _previousValue;
+    public String getPrevious() {
+        return _previous;
     }
 }

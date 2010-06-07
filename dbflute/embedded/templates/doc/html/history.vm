@@ -131,31 +131,31 @@
 	span.tableschema {
 		font-size: 0.6em;
 	}
-	span.bqpcount {
+	span.tablecount {
 		font-size: 0.5em;
 	}
-	dl.bqplist {
+	dl.tablelist {
 		padding-left: 2em;
 	}
-	dl.bqplist dt {
+	dl.tablelist dt {
 		display: list-item;
 		font-size: 1.2em;
 		margin-top: 0.3em;
 	}
-	dl.bqplist dd {
+	dl.tablelist dd {
 		font-size: 0.9em;
 		padding-left: 1em;
 	}
-	dl.bqplist dd.subinfo {
+	dl.tablelist dd.subinfo {
 		padding-left: 2em;
 	}
-	dl.bqplist dd.subinfo span.file {
+	dl.tablelist dd.subinfo span.file {
 		font-style: italic;
 	}
-	dl.bqplist dd.subinfo span.ctet {
+	dl.tablelist dd.subinfo span.ctet {
 		color: green;
 	}
-	dl.bqplist dd.subinfo span.pmb {
+	dl.tablelist dd.subinfo span.pmb {
 		color: green;
 	}
 	dl.procedurelist {
@@ -194,6 +194,32 @@
 <h2>${schemaDiff.diffDate}</h2>
 #foreach ($tableDiff in $schemaDiff.tableDiffAllList)
 <h3>${tableDiff.tableName} (${tableDiff.diffMode})</h3>
+<dl>
+#if ($tableDiff.hasUnifiedSchemaDiff())
+    <dt>Schema</dt>
+    <dd>${tableDiff.unifiedSchemaDiff.previous} to ${tableDiff.unifiedSchemaDiff.next}</dd>
+#end
+#if ($tableDiff.hasObjectTypeDiff())
+    <dt>Schema</dt>
+    <dd>${tableDiff.objectTypeDiff.previous} to ${tableDiff.objectTypeDiff.next}</dd>
+#end
+    <dt>Column</dt>
+    <dd>
+#foreach ($columnDiff in $tableDiff.columnDiffAllList)
+        <dt>${columnDiff.columnName} (${columnDiff.diffMode})</dt>
+        <dd>
+#if ($columnDiff.hasDbTypeDiff())
+            <dt>DB Type</dt>
+            <dd>${columnDiff.dbTypeDiff}</dd>
+#end
+#if ($columnDiff.hasColumnSizeDiff())
+            <dt>Column Size</dt>
+            <dd>${columnDiff.columnSizeDiff}</dd>
+#end
+        </dd>
+#end
+    </dd>
+</dl>
 #end
 #end
 </body>
