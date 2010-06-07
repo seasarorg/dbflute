@@ -18,6 +18,14 @@ public abstract class DfAbstractDiff {
         return DfNextPreviousDiff.create(next, previous);
     }
 
+    protected DfNextPreviousDiff createNextPreviousDiff(Integer next, Integer previous) {
+        return DfNextPreviousDiff.create(next.toString(), previous.toString());
+    }
+
+    protected DfNextPreviousDiff createNextPreviousDiff(Boolean next, Boolean previous) {
+        return DfNextPreviousDiff.create(next.toString(), previous.toString());
+    }
+
     protected DfNextPreviousDiff restoreNextPreviousDiff(Map<String, Object> diffMap, String key) {
         final Object value = diffMap.get(key);
         if (value == null) {
@@ -37,6 +45,14 @@ public abstract class DfAbstractDiff {
         return DfColumnDiff.createFromDiffMap(columnDiffMap);
     }
 
+    protected static interface NextPreviousItemHandler {
+        String propertyName();
+
+        DfNextPreviousDiff provide();
+
+        void restore(Map<String, Object> diffMap);
+    }
+
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
@@ -45,19 +61,14 @@ public abstract class DfAbstractDiff {
     }
 
     // ===================================================================================
-    //                                                                       Assert Helper
-    //                                                                       =============
-    protected void assertElementValueMap(String key, Object value, Map<String, Object> diffMap) {
-        if (!(value instanceof Map<?, ?>)) { // basically no way
-            String msg = "The element in table diff-map should be Map:";
-            msg = msg + " key=" + key + " value=" + value + " diffMap=" + diffMap;
-            throw new IllegalStateException(msg);
-        }
+    //                                                                         Same Helper
+    //                                                                         ===========
+    protected static interface NextPreviousSetupper<OBJECT, DIFF> {
+        Object provide(OBJECT obj);
+
+        void setup(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
     }
 
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
     protected boolean isSame(Object next, Object previous) {
         if (next == null && previous == null) {
             return true;
@@ -66,5 +77,16 @@ public abstract class DfAbstractDiff {
             return false;
         }
         return next.equals(previous);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertElementValueMap(String key, Object value, Map<String, Object> diffMap) {
+        if (!(value instanceof Map<?, ?>)) { // basically no way
+            String msg = "The element in diff-map should be Map:";
+            msg = msg + " key=" + key + " value=" + value + " diffMap=" + diffMap;
+            throw new IllegalStateException(msg);
+        }
     }
 }

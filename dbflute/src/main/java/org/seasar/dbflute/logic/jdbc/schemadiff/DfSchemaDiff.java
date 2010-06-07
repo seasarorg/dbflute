@@ -17,7 +17,6 @@ import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -28,9 +27,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String DIFF_DATE_KEY = "$$DiffDate$$";
+    public static final String DIFF_DATE_KEY = "diffDate";
     public static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
-    public static final String TABLE_COUNT_KEY = "$$TableCount$$";
+    public static final String TABLE_COUNT_KEY = "tableCount";
+    public static final String TABLE_DIFF_KEY = "tableDiff";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -38,17 +38,21 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                           Load Schema
     //                                           -----------
-    protected Database _nextDb; // not null after loading
-    protected Integer _nextTableCount = null;
-    protected Database _previousDb; // not null after loading
-    protected Integer _previousTableCount = null;
-    protected Date _diffDate; // not null after loading next schema
+    protected Database _nextDb; // not null after next loading
+    protected Database _previousDb; // not null after previous loading
+    protected Integer _previousTableCount; // not null after previous loading
     protected boolean _firstTime; // judged when loading previous schema
     protected boolean _loadingFailure; // judged when loading previous schema
 
     // -----------------------------------------------------
-    //                                          Analyze Diff
-    //                                          ------------
+    //                                                 Basic
+    //                                                 -----
+    protected Date _diffDate; // not null after loading next schema
+    protected DfNextPreviousDiff _tableCountDiff; // not null after next loading
+
+    // -----------------------------------------------------
+    //                                            Table Diff
+    //                                            ----------
     protected final List<DfTableDiff> _tableDiffAllList = DfCollectionUtil.newArrayList();
     protected final List<DfTableDiff> _addedTableDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfTableDiff> _changedTableDiffList = DfCollectionUtil.newArrayList();
@@ -57,6 +61,26 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                         Load Schema
     //                                                                         ===========
+    public void loadPreviousSchema() { // before loading next schema
+        final DfSchemaXmlReader reader = createSchemaXmlReader();
+        try {
+            reader.read();
+        } catch (FileNotFoundException normal) {
+            _firstTime = true;
+            return;
+        } catch (IOException e) {
+            _loadingFailure = true;
+            handleException(e);
+        }
+        try {
+            _previousDb = reader.getSchemaData().getDatabase();
+        } catch (EngineException e) {
+            _loadingFailure = true;
+            handleException(e);
+        }
+        _previousTableCount = _previousDb.getTableList().size();
+    }
+
     public void loadNextSchema() { // after loading previous schema
         if (isFirstTime()) {
             String msg = "You should not call this because of first time.";
@@ -78,27 +102,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
             handleException(e);
         }
         _diffDate = new Date(DfSystemUtil.currentTimeMillis());
-        _nextTableCount = _nextDb.getTableList().size();
-    }
-
-    public void loadPreviousSchema() { // before loading next schema
-        final DfSchemaXmlReader reader = createSchemaXmlReader();
-        try {
-            reader.read();
-        } catch (FileNotFoundException normal) {
-            _firstTime = true;
-            return;
-        } catch (IOException e) {
-            _loadingFailure = true;
-            handleException(e);
-        }
-        try {
-            _previousDb = reader.getSchemaData().getDatabase();
-        } catch (EngineException e) {
-            _loadingFailure = true;
-            handleException(e);
-        }
-        _previousTableCount = _previousDb.getTableList().size();
+        final int nextTableCount = _nextDb.getTableList().size();
+        _tableCountDiff = createNextPreviousDiff(nextTableCount, _previousTableCount);
     }
 
     protected void handleException(Exception e) {
@@ -146,14 +151,24 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             // changed
             final DfTableDiff tableDiff = DfTableDiff.createChanged(next.getName());
-            if (!isSameUnifiedSchema(next, previous)) {
-                final String nextSchema = next.getUnifiedSchema().getCatalogSchema();
-                final String previousSchema = previous.getUnifiedSchema().getCatalogSchema();
-                tableDiff.setUnifiedSchemaDiff(createNextPreviousDiff(nextSchema, previousSchema));
-            }
-            if (!isSameObjectType(next, previous)) {
-                tableDiff.setObjectTypeDiff(createNextPreviousDiff(next.getType(), previous.getType()));
-            }
+            setupNextPreviousIfSame(next, previous, tableDiff, new NextPreviousSetupper<Table, DfTableDiff>() {
+                public Object provide(Table obj) {
+                    return obj.getUnifiedSchema().getCatalogSchema();
+                }
+
+                public void setup(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                    diff.setUnifiedSchemaDiff(nextPreviousDiff);
+                }
+            });
+            setupNextPreviousIfSame(next, previous, tableDiff, new NextPreviousSetupper<Table, DfTableDiff>() {
+                public Object provide(Table obj) {
+                    return obj.getType();
+                }
+
+                public void setup(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                    diff.setObjectTypeDiff(nextPreviousDiff);
+                }
+            });
             processAddedColumn(tableDiff, next, previous);
             processChangedColumn(tableDiff, next, previous);
             processDeletedColumn(tableDiff, next, previous);
@@ -173,16 +188,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
+    protected void setupNextPreviousIfSame(Table next, Table previous, DfTableDiff diff,
+            NextPreviousSetupper<Table, DfTableDiff> setupper) {
+        final Object nextValue = setupper.provide(next);
+        final Object previousValue = setupper.provide(previous);
+        if (isSame(nextValue, previousValue)) {
+            setupper.setup(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
+        }
+    }
+
     protected boolean isSameTableName(Table next, Table previous) {
         return isSame(next.getName(), previous.getName());
-    }
-
-    protected boolean isSameUnifiedSchema(Table next, Table previous) {
-        return isSame(next.getUnifiedSchema(), previous.getUnifiedSchema());
-    }
-
-    protected boolean isSameObjectType(Table next, Table previous) {
-        return isSame(next.getType(), previous.getType());
     }
 
     // -----------------------------------------------------
@@ -206,15 +222,54 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 continue;
             }
             // changed
-            final DfColumnDiff diff = DfColumnDiff.createChanged(next.getName());
-            if (!isSameDbType(next, previous)) {
-                diff.setDbTypeDiff(createNextPreviousDiff(next.getDbType(), previous.getDbType()));
-            }
-            if (!isSameColumnSize(next, previous)) {
-                diff.setColumnSizeDiff(createNextPreviousDiff(next.getColumnSize(), previous.getColumnSize()));
-            }
-            if (diff.hasDiff()) {
-                tableDiff.addColumnDiff(diff);
+            final DfColumnDiff columnDiff = DfColumnDiff.createChanged(next.getName());
+            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
+                public Object provide(Column obj) {
+                    return obj.getDbType();
+                }
+
+                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                    diff.setDbTypeDiff(nextPreviousDiff);
+                }
+            });
+            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
+                public Object provide(Column obj) {
+                    return obj.getColumnSize();
+                }
+
+                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                    diff.setColumnSizeDiff(nextPreviousDiff);
+                }
+            });
+            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
+                public Object provide(Column obj) {
+                    return obj.getDefaultValue();
+                }
+
+                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                    diff.setDefaultValueDiff(nextPreviousDiff);
+                }
+            });
+            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
+                public Object provide(Column obj) {
+                    return obj.isNotNull();
+                }
+
+                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                    diff.setNotNullDiff(nextPreviousDiff);
+                }
+            });
+            setupNextPreviousIfSame(next, previous, columnDiff, new NextPreviousSetupper<Column, DfColumnDiff>() {
+                public Object provide(Column obj) {
+                    return obj.isAutoIncrement();
+                }
+
+                public void setup(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                    diff.setAutoIncrementDiff(nextPreviousDiff);
+                }
+            });
+            if (columnDiff.hasDiff()) {
+                tableDiff.addColumnDiff(columnDiff);
             }
         }
     }
@@ -229,16 +284,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
+    protected <ITEM> void setupNextPreviousIfSame(Column next, Column previous, DfColumnDiff diff,
+            NextPreviousSetupper<Column, DfColumnDiff> setupper) {
+        final Object nextValue = setupper.provide(next);
+        final Object previousValue = setupper.provide(previous);
+        if (isSame(nextValue, previousValue)) {
+            setupper.setup(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
+        }
+    }
+
     protected boolean isSameColumnName(Column next, Column previous) {
         return isSame(next.getName(), previous.getName());
-    }
-
-    protected boolean isSameDbType(Column next, Column previous) {
-        return isSame(next.getDbType(), previous.getDbType());
-    }
-
-    protected boolean isSameColumnSize(Column next, Column previous) {
-        return isSame(next.getColumnSize(), previous.getColumnSize());
     }
 
     // ===================================================================================
@@ -255,25 +311,23 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Diff Map
     //                                                                            ========
-    public Map<String, Object> createDiffMap() {
-        final Map<String, Object> tableDiffMap = DfCollectionUtil.newLinkedHashMap();
-        tableDiffMap.put(DIFF_DATE_KEY, DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN));
-        final Map<String, Object> tableCountMap = DfCollectionUtil.newLinkedHashMap();
-        tableCountMap.put("next", _nextTableCount);
-        tableCountMap.put("previous", _previousTableCount);
-        tableCountMap.put("added", _addedTableDiffList.size());
-        tableCountMap.put("changed", _changedTableDiffList.size());
-        tableCountMap.put("deleted", _deletedTableDiffList.size());
-        tableDiffMap.put(TABLE_COUNT_KEY, tableCountMap);
-        for (DfTableDiff tableDiff : _tableDiffAllList) {
-            if (tableDiff.hasDiff()) {
-                tableDiffMap.put(tableDiff.getTableName(), tableDiff.createDiffMap());
+    public Map<String, Object> createSchemaDiffMap() {
+        final Map<String, Object> schemaDiffMap = DfCollectionUtil.newLinkedHashMap();
+        schemaDiffMap.put(DIFF_DATE_KEY, DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN));
+        schemaDiffMap.put(TABLE_COUNT_KEY, _tableCountDiff.createNextPreviousDiffMap());
+        if (!_tableDiffAllList.isEmpty()) {
+            final Map<String, Map<String, Object>> tableDiffMap = DfCollectionUtil.newLinkedHashMap();
+            schemaDiffMap.put(TABLE_DIFF_KEY, tableDiffMap);
+            for (DfTableDiff tableDiff : _tableDiffAllList) {
+                if (tableDiff.hasDiff()) {
+                    tableDiffMap.put(tableDiff.getTableName(), tableDiff.createTableDiffMap());
+                }
             }
         }
-        return tableDiffMap;
+        return schemaDiffMap;
     }
 
-    public void acceptDiffMap(Map<String, Object> schemaDiffMap) {
+    public void acceptSchemaDiffMap(Map<String, Object> schemaDiffMap) {
         final Set<Entry<String, Object>> entrySet = schemaDiffMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
             final String key = entry.getKey();
@@ -282,38 +336,60 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 _diffDate = DfTypeUtil.toDate(value, DIFF_DATE_PATTERN);
                 assertDiffDateExists(key, _diffDate, schemaDiffMap);
             } else if (TABLE_COUNT_KEY.equals(key)) {
-                final DfNextPreviousDiff nextPreviousDiff = restoreNextPreviousDiff(schemaDiffMap, key);
-                final String nextValue = nextPreviousDiff.getNext();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(nextValue)) { // basically true
-                    _nextTableCount = DfTypeUtil.toInteger(nextValue);
-                }
-                final String previousValue = nextPreviousDiff.getPrevious();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(previousValue)) { // basically true
-                    _previousTableCount = DfTypeUtil.toInteger(previousValue);
-                }
-            } else { // table elements
-                assertTableElementMap(key, value, schemaDiffMap);
-                @SuppressWarnings("unchecked")
-                final Map<String, Object> tableDiffMap = (Map<String, Object>) value;
-                final DfTableDiff tableDiff = createTableDiff(tableDiffMap);
-                addTableDiff(tableDiff);
+                _tableCountDiff = restoreNextPreviousDiff(schemaDiffMap, key);
+                assertTableCountExists(key, _tableCountDiff, schemaDiffMap);
+            } else if (TABLE_DIFF_KEY.equals(key)) { // table elements
+                restoreTableDiffMap(key, value, schemaDiffMap);
             }
+        }
+    }
+
+    protected void restoreTableDiffMap(String key, Object value, Map<String, Object> schemaDiffMap) {
+        assertElementValueMap(key, value, schemaDiffMap);
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> tableDiffAllMap = (Map<String, Object>) value;
+        final Set<Entry<String, Object>> entrySet = tableDiffAllMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String tableName = entry.getKey();
+            final Object tableDiffObj = entry.getValue();
+            assertElementValueMap(tableName, tableDiffObj, tableDiffAllMap);
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> tableDiffMap = (Map<String, Object>) tableDiffObj;
+            final DfTableDiff tableDiff = createTableDiff(tableDiffMap);
+            addTableDiff(tableDiff);
         }
     }
 
     protected void assertDiffDateExists(String key, Date diffDate, Map<String, Object> schemaDiffMap) {
         if (diffDate == null) { // basically no way
             String msg = "The diff-date of diff-map is required:";
-            msg = msg + " key=" + key + " diffMap=" + schemaDiffMap;
+            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
             throw new IllegalStateException(msg);
         }
     }
 
-    protected void assertTableElementMap(String key, Object value, Map<String, Object> schemaDiffMap) {
-        if (!(value instanceof Map<?, ?>)) { // basically no way
-            String msg = "The elements of table should be Map:";
-            msg = msg + " table=" + key + " value=" + value;
-            msg = msg + " schemaDiffMap=" + schemaDiffMap;
+    protected void assertTableCountExists(String key, DfNextPreviousDiff nextPreviousDiff,
+            Map<String, Object> schemaDiffMap) {
+        if (nextPreviousDiff == null) { // basically no way
+            String msg = "The table count of diff-map is required:";
+            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertNextTableCountExists(String key, String nextTableCount, Map<String, Object> schemaDiffMap) {
+        if (nextTableCount == null) { // basically no way
+            String msg = "The next table count of diff-map is required:";
+            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertPreviousTableCountExists(String key, String previousTableCount,
+            Map<String, Object> schemaDiffMap) {
+        if (previousTableCount == null) { // basically no way
+            String msg = "The previous table count of diff-map is required:";
+            msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
             throw new IllegalStateException(msg);
         }
     }
@@ -356,26 +432,20 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public String getDiffDate() {
         return DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN);
     }
 
-    public boolean hasNextTableCount() {
-        return _nextTableCount != null;
+    public DfNextPreviousDiff getTableCount() {
+        return _tableCountDiff;
     }
 
-    public Integer getNextTableCount() {
-        return _nextTableCount;
-    }
-
-    public boolean hasPreviousTableCount() {
-        return _previousTableCount != null;
-    }
-
-    public Integer getPreviousTableCount() {
-        return _previousTableCount;
-    }
-
+    // -----------------------------------------------------
+    //                                            Table Diff
+    //                                            ----------
     public List<DfTableDiff> getTableDiffAllList() {
         return _tableDiffAllList;
     }
@@ -394,15 +464,15 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public void addTableDiff(DfTableDiff tableDiff) {
         _tableDiffAllList.add(tableDiff);
-        if (DfDiffMode.ADDED.equals(tableDiff.getDiffMode())) {
+        if (DfDiffType.ADD.equals(tableDiff.getDiffType())) {
             _addedTableDiffList.add(tableDiff);
-        } else if (DfDiffMode.CHANGED.equals(tableDiff.getDiffMode())) {
+        } else if (DfDiffType.CHANGE.equals(tableDiff.getDiffType())) {
             _changedTableDiffList.add(tableDiff);
-        } else if (DfDiffMode.DELETED.equals(tableDiff.getDiffMode())) {
+        } else if (DfDiffType.DELETE.equals(tableDiff.getDiffType())) {
             _deletedTableDiffList.add(tableDiff);
         } else {
             String msg = "Unknown diff-mode of table: ";
-            msg = msg + " diffMode=" + tableDiff.getDiffMode();
+            msg = msg + " diffMode=" + tableDiff.getDiffType();
             msg = msg + " tableDiff=" + tableDiff;
             throw new IllegalStateException(msg);
         }

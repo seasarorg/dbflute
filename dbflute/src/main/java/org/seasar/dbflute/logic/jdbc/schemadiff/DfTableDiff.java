@@ -16,10 +16,50 @@ public class DfTableDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected final String _tableName;
-    protected final DfDiffMode _diffMode;
+    protected final DfDiffType _diffType;
+
+    // -----------------------------------------------------
+    //                                             Diff Item
+    //                                             ---------
     protected DfNextPreviousDiff _unifiedSchemaDiff;
     protected DfNextPreviousDiff _objectTypeDiff;
+
+    protected List<NextPreviousItemHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
+    {
+        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+            public String propertyName() {
+                return "unifiedSchemaDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _unifiedSchemaDiff;
+            }
+
+            public void restore(Map<String, Object> tableDiffMap) {
+                _unifiedSchemaDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+            public String propertyName() {
+                return "objectTypeDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _objectTypeDiff;
+            }
+
+            public void restore(Map<String, Object> tableDiffMap) {
+                _objectTypeDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
+            }
+        });
+    }
+    // -----------------------------------------------------
+    //                                           Column Diff
+    //                                           -----------
     protected final List<DfColumnDiff> _columnDiffAllList = DfCollectionUtil.newArrayList();
     protected final List<DfColumnDiff> _addedColumnDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfColumnDiff> _changedColumnDiffList = DfCollectionUtil.newArrayList();
@@ -28,17 +68,17 @@ public class DfTableDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfTableDiff(String tableName, DfDiffMode diffMode) {
+    protected DfTableDiff(String tableName, DfDiffType diffMode) {
         _tableName = tableName;
-        _diffMode = diffMode;
+        _diffType = diffMode;
     }
 
     protected DfTableDiff(Map<String, Object> tableDiffMap) {
         _tableName = (String) tableDiffMap.get("tableName");
         assertTableNameExists(_tableName, tableDiffMap);
-        _diffMode = DfDiffMode.valueOf((String) tableDiffMap.get("diffMode"));
-        assertDiffModeExists(_tableName, tableDiffMap, _diffMode);
-        acceptDiffMap(tableDiffMap);
+        _diffType = DfDiffType.valueOf((String) tableDiffMap.get("diffType"));
+        assertDiffModeExists(_tableName, tableDiffMap, _diffType);
+        acceptTableDiffMap(tableDiffMap);
     }
 
     protected void assertTableNameExists(String tableName, Map<String, Object> tableDiffMap) {
@@ -49,7 +89,7 @@ public class DfTableDiff extends DfAbstractDiff {
         }
     }
 
-    protected void assertDiffModeExists(String tableName, Map<String, Object> tableDiffMap, DfDiffMode diffMode) {
+    protected void assertDiffModeExists(String tableName, Map<String, Object> tableDiffMap, DfDiffType diffMode) {
         if (diffMode == null) { // basically no way
             String msg = "The diffMode is required in table diff-map:";
             msg = msg + " table=" + tableName + " tableDiffMap=" + tableDiffMap;
@@ -58,15 +98,15 @@ public class DfTableDiff extends DfAbstractDiff {
     }
 
     public static DfTableDiff createAdded(String tableName) {
-        return new DfTableDiff(tableName, DfDiffMode.ADDED);
+        return new DfTableDiff(tableName, DfDiffType.ADD);
     }
 
     public static DfTableDiff createChanged(String tableName) {
-        return new DfTableDiff(tableName, DfDiffMode.CHANGED);
+        return new DfTableDiff(tableName, DfDiffType.CHANGE);
     }
 
     public static DfTableDiff createDeleted(String tableName) {
-        return new DfTableDiff(tableName, DfDiffMode.DELETED);
+        return new DfTableDiff(tableName, DfDiffType.DELETE);
     }
 
     public static DfTableDiff createFromDiffMap(Map<String, Object> tableDiffMap) {
@@ -76,38 +116,38 @@ public class DfTableDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Diff Map
     //                                                                            ========
-    public Map<String, Object> createDiffMap() {
+    public Map<String, Object> createTableDiffMap() {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("tableName", _tableName);
-        map.put("diffMode", _diffMode.toString());
-        map.put("unifiedSchemaDiff", _unifiedSchemaDiff != null ? _unifiedSchemaDiff.createDiffMap() : null);
-        map.put("objectTypeDiff", _objectTypeDiff != null ? _objectTypeDiff.createDiffMap() : null);
-        final Map<String, Map<String, Object>> columnDiffMap = DfCollectionUtil.newLinkedHashMap();
-        for (DfColumnDiff diff : _columnDiffAllList) {
-            if (diff.hasDiff()) {
-                columnDiffMap.put(diff.getColumnName(), diff.createDiffMap());
+        map.put("diffMode", _diffType.toString());
+        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+            final DfNextPreviousDiff nextPreviousDiff = provider.provide();
+            if (nextPreviousDiff != null) {
+                map.put(provider.propertyName(), nextPreviousDiff.createNextPreviousDiffMap());
             }
         }
-        map.put("columnDiff", columnDiffMap);
+        if (!_columnDiffAllList.isEmpty()) {
+            final Map<String, Map<String, Object>> columnDiffMap = DfCollectionUtil.newLinkedHashMap();
+            for (DfColumnDiff columnDiff : _columnDiffAllList) {
+                if (columnDiff.hasDiff()) {
+                    columnDiffMap.put(columnDiff.getColumnName(), columnDiff.createColumnDiffMap());
+                }
+            }
+            map.put("columnDiff", columnDiffMap);
+        }
         return map;
     }
 
-    protected void acceptDiffMap(Map<String, Object> tableDiffMap) {
-        _unifiedSchemaDiff = restoreNextPreviousDiff(tableDiffMap, "unifiedSchemaDiff");
-        _objectTypeDiff = restoreNextPreviousDiff(tableDiffMap, "objectTypeDiff");
-        {
-            final String key = "columnDiff";
-            final Object value = tableDiffMap.get(key);
-            if (value != null) {
-                assertElementValueMap(key, value, tableDiffMap);
-                @SuppressWarnings("unchecked")
-                final Map<String, Object> columnDiffAllMap = (Map<String, Object>) value;
-                acceptColumnDiff(columnDiffAllMap);
-            }
+    protected void acceptTableDiffMap(Map<String, Object> tableDiffMap) {
+        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+            provider.restore(tableDiffMap);
         }
+        restoreColumnDiff(tableDiffMap);
     }
 
-    protected void acceptColumnDiff(Map<String, Object> tableDiffMap) {
+    protected void restoreColumnDiff(Map<String, Object> tableDiffMap) {
         final String key = "columnDiff";
         final Object value = tableDiffMap.get(key);
         if (value == null) {
@@ -132,11 +172,14 @@ public class DfTableDiff extends DfAbstractDiff {
     //                                                                              Status
     //                                                                              ======
     public boolean hasDiff() {
-        if (!DfDiffMode.CHANGED.equals(_diffMode)) {
+        if (!DfDiffType.CHANGE.equals(_diffType)) {
             return true; // if not change, always different
         }
-        if (_unifiedSchemaDiff != null || _objectTypeDiff != null) {
-            return true;
+        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+            if (provider.provide() != null) {
+                return true;
+            }
         }
         for (DfColumnDiff diff : _columnDiffAllList) {
             if (diff.hasDiff()) {
@@ -149,26 +192,32 @@ public class DfTableDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public String getTableName() {
         return _tableName;
     }
 
-    public DfDiffMode getDiffMode() {
-        return _diffMode;
+    public DfDiffType getDiffType() {
+        return _diffType;
     }
 
     public boolean isAdded() {
-        return DfDiffMode.ADDED.equals(_diffMode);
+        return DfDiffType.ADD.equals(_diffType);
     }
 
     public boolean isChanged() {
-        return DfDiffMode.CHANGED.equals(_diffMode);
+        return DfDiffType.CHANGE.equals(_diffType);
     }
 
     public boolean isDeleted() {
-        return DfDiffMode.DELETED.equals(_diffMode);
+        return DfDiffType.DELETE.equals(_diffType);
     }
 
+    // -----------------------------------------------------
+    //                                             Diff Item
+    //                                             ---------
     public boolean hasUnifiedSchemaDiff() {
         return _unifiedSchemaDiff != null;
     }
@@ -193,6 +242,13 @@ public class DfTableDiff extends DfAbstractDiff {
         _objectTypeDiff = objectTypeDiff;
     }
 
+    // -----------------------------------------------------
+    //                                           Column Diff
+    //                                           -----------
+    public boolean hasColumnDiff() {
+        return !_columnDiffAllList.isEmpty();
+    }
+
     public List<DfColumnDiff> getColumnDiffAllList() {
         return _columnDiffAllList;
     }
@@ -211,15 +267,15 @@ public class DfTableDiff extends DfAbstractDiff {
 
     public void addColumnDiff(DfColumnDiff columnDiff) {
         _columnDiffAllList.add(columnDiff);
-        if (DfDiffMode.ADDED.equals(columnDiff.getDiffMode())) {
+        if (DfDiffType.ADD.equals(columnDiff.getDiffType())) {
             _addedColumnDiffList.add(columnDiff);
-        } else if (DfDiffMode.CHANGED.equals(columnDiff.getDiffMode())) {
+        } else if (DfDiffType.CHANGE.equals(columnDiff.getDiffType())) {
             _changedColumnDiffList.add(columnDiff);
-        } else if (DfDiffMode.DELETED.equals(columnDiff.getDiffMode())) {
+        } else if (DfDiffType.DELETE.equals(columnDiff.getDiffType())) {
             _deletedColumnDiffList.add(columnDiff);
         } else {
             String msg = "Unknown diff-mode of column: ";
-            msg = msg + " diffMode=" + columnDiff.getDiffMode();
+            msg = msg + " diffMode=" + columnDiff.getDiffType();
             msg = msg + " columnDiff=" + columnDiff;
             throw new IllegalStateException(msg);
         }

@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.jdbc.schemadiff;
 
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -13,24 +14,103 @@ public class DfColumnDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected final String _columnName;
-    protected final DfDiffMode _diffMode;
+    protected final DfDiffType _diffType;
+
+    // -----------------------------------------------------
+    //                                             Diff Item
+    //                                             ---------
     protected DfNextPreviousDiff _dbTypeDiff;
     protected DfNextPreviousDiff _columnSizeDiff;
+    protected DfNextPreviousDiff _defaultValueDiff;
+    protected DfNextPreviousDiff _notNullDiff;
+    protected DfNextPreviousDiff _autoIncrementDiff;
+
+    protected List<NextPreviousItemHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
+    {
+        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+            public String propertyName() {
+                return "dbTypeDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _dbTypeDiff;
+            }
+
+            public void restore(Map<String, Object> columnDiffMap) {
+                _dbTypeDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+            public String propertyName() {
+                return "columnSizeDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _columnSizeDiff;
+            }
+
+            public void restore(Map<String, Object> columnDiffMap) {
+                _columnSizeDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+            public DfNextPreviousDiff provide() {
+                return _defaultValueDiff;
+            }
+
+            public String propertyName() {
+                return "defaultValueDiff";
+            }
+
+            public void restore(Map<String, Object> columnDiffMap) {
+                _defaultValueDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+            public String propertyName() {
+                return "notNullDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _notNullDiff;
+            }
+
+            public void restore(Map<String, Object> columnDiffMap) {
+                _notNullDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousItemHandler() {
+            public String propertyName() {
+                return "autoIncrementDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _autoIncrementDiff;
+            }
+
+            public void restore(Map<String, Object> columnDiffMap) {
+                _autoIncrementDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
+            }
+        });
+    }
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfColumnDiff(String columnName, DfDiffMode diffMode) {
+    protected DfColumnDiff(String columnName, DfDiffType diffMode) {
         _columnName = columnName;
-        _diffMode = diffMode;
+        _diffType = diffMode;
     }
 
     protected DfColumnDiff(Map<String, Object> columnDiffMap) {
         _columnName = (String) columnDiffMap.get("columnName");
         assertColumnNameExists(_columnName, columnDiffMap);
-        _diffMode = DfDiffMode.valueOf((String) columnDiffMap.get("diffMode"));
-        acceptDiffMap(columnDiffMap);
+        _diffType = DfDiffType.valueOf((String) columnDiffMap.get("diffType"));
+        acceptColumnDiffMap(columnDiffMap);
     }
 
     protected void assertColumnNameExists(String columnName, Map<String, Object> columnDiffMap) {
@@ -41,7 +121,7 @@ public class DfColumnDiff extends DfAbstractDiff {
         }
     }
 
-    protected void assertDiffModeExists(String columnName, Map<String, Object> columnDiffMap, DfDiffMode diffMode) {
+    protected void assertDiffModeExists(String columnName, Map<String, Object> columnDiffMap, DfDiffType diffMode) {
         if (diffMode == null) { // basically no way
             String msg = "The diffMode is required in column diff-map:";
             msg = msg + " column=" + columnName + " columnDiffMap=" + columnDiffMap;
@@ -50,15 +130,15 @@ public class DfColumnDiff extends DfAbstractDiff {
     }
 
     public static DfColumnDiff createAdded(String columnName) {
-        return new DfColumnDiff(columnName, DfDiffMode.ADDED);
+        return new DfColumnDiff(columnName, DfDiffType.ADD);
     }
 
     public static DfColumnDiff createChanged(String columnName) {
-        return new DfColumnDiff(columnName, DfDiffMode.CHANGED);
+        return new DfColumnDiff(columnName, DfDiffType.CHANGE);
     }
 
     public static DfColumnDiff createDeleted(String columnName) {
-        return new DfColumnDiff(columnName, DfDiffMode.DELETED);
+        return new DfColumnDiff(columnName, DfDiffType.DELETE);
     }
 
     public static DfColumnDiff createFromDiffMap(Map<String, Object> columnDiffMap) {
@@ -68,29 +148,39 @@ public class DfColumnDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Diff Map
     //                                                                            ========
-    public Map<String, Object> createDiffMap() {
+    public Map<String, Object> createColumnDiffMap() {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("columnName", _columnName);
-        map.put("diffMode", _diffMode.toString());
-        map.put("dbTypeDiff", _dbTypeDiff != null ? _dbTypeDiff.createDiffMap() : null);
-        map.put("columnSizeDiff", _columnSizeDiff != null ? _columnSizeDiff.createDiffMap() : null);
+        map.put("diffMode", _diffType.toString());
+        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+            final DfNextPreviousDiff nextPreviousDiff = provider.provide();
+            if (nextPreviousDiff != null) {
+                map.put(provider.propertyName(), nextPreviousDiff.createNextPreviousDiffMap());
+            }
+        }
         return map;
     }
 
-    public void acceptDiffMap(Map<String, Object> columnDiffMap) {
-        _dbTypeDiff = restoreNextPreviousDiff(columnDiffMap, "dbTypeDiff");
-        _columnSizeDiff = restoreNextPreviousDiff(columnDiffMap, "columnSizeDiff");
+    public void acceptColumnDiffMap(Map<String, Object> columnDiffMap) {
+        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+            provider.restore(columnDiffMap);
+        }
     }
 
     // ===================================================================================
     //                                                                              Status
     //                                                                              ======
     public boolean hasDiff() {
-        if (!DfDiffMode.CHANGED.equals(_diffMode)) {
+        if (!DfDiffType.CHANGE.equals(_diffType)) {
             return true; // if not change, always different
         }
-        if (_dbTypeDiff != null || _columnSizeDiff != null) {
-            return true;
+        final List<NextPreviousItemHandler> nextPreviousItemList = _nextPreviousItemList;
+        for (NextPreviousItemHandler provider : nextPreviousItemList) {
+            if (provider.provide() != null) {
+                return true;
+            }
         }
         return false;
     }
@@ -98,26 +188,32 @@ public class DfColumnDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public String getColumnName() {
         return _columnName;
     }
 
-    public DfDiffMode getDiffMode() {
-        return _diffMode;
+    public DfDiffType getDiffType() {
+        return _diffType;
     }
 
     public boolean isAdded() {
-        return DfDiffMode.ADDED.equals(_diffMode);
+        return DfDiffType.ADD.equals(_diffType);
     }
 
     public boolean isChanged() {
-        return DfDiffMode.CHANGED.equals(_diffMode);
+        return DfDiffType.CHANGE.equals(_diffType);
     }
 
     public boolean isDeleted() {
-        return DfDiffMode.DELETED.equals(_diffMode);
+        return DfDiffType.DELETE.equals(_diffType);
     }
 
+    // -----------------------------------------------------
+    //                                             Diff Item
+    //                                             ---------
     public boolean hasDbTypeDiff() {
         return _dbTypeDiff != null;
     }
@@ -140,5 +236,41 @@ public class DfColumnDiff extends DfAbstractDiff {
 
     public void setColumnSizeDiff(DfNextPreviousDiff columnSizeDiff) {
         _columnSizeDiff = columnSizeDiff;
+    }
+
+    public boolean hasDefaultValueDiff() {
+        return _defaultValueDiff != null;
+    }
+
+    public DfNextPreviousDiff getDefaultValueDiff() {
+        return _defaultValueDiff;
+    }
+
+    public void setDefaultValueDiff(DfNextPreviousDiff defaultValueDiff) {
+        _defaultValueDiff = defaultValueDiff;
+    }
+
+    public boolean hasNotNullDiff() {
+        return _notNullDiff != null;
+    }
+
+    public DfNextPreviousDiff getNotNullDiff() {
+        return _notNullDiff;
+    }
+
+    public void setNotNullDiff(DfNextPreviousDiff notNullDiff) {
+        _notNullDiff = notNullDiff;
+    }
+
+    public boolean hasAutoIncrementDiff() {
+        return _autoIncrementDiff != null;
+    }
+
+    public DfNextPreviousDiff getAutoIncrementDiff() {
+        return _autoIncrementDiff;
+    }
+
+    public void setAutoIncrementDiff(DfNextPreviousDiff autoIncrementDiff) {
+        _autoIncrementDiff = autoIncrementDiff;
     }
 }

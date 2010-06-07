@@ -40,11 +40,18 @@ public class DfNextPreviousDiff {
     // ===================================================================================
     //                                                                            Diff Map
     //                                                                            ========
-    public Map<String, String> createDiffMap() {
+    public Map<String, String> createNextPreviousDiffMap() {
         final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
         map.put("next", _next);
         map.put("previous", _previous);
         return map;
+    }
+
+    // ===================================================================================
+    //                                                                          Expression
+    //                                                                          ==========
+    public String getDisplay() {
+        return _previous + " to " + _next;
     }
 
     // ===================================================================================
