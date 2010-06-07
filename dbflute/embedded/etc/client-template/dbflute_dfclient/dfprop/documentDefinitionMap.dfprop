@@ -5,7 +5,7 @@
 # o aliasDelimiterInDbComment (NotRequired - Default '')
 # o isEntityJavaDocDbCommentValid (NotRequired - Default false)
 # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
-# o schemaHtmlFileName (NotRequired - Default 'project-schema-[project-name].html')
+# o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
 # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
 # o dataXlsTemplateRecordLimit (NotRequired - Default '')
@@ -62,7 +62,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o schemaHtmlFileName (NotRequired - Default 'project-schema-[project-name].html')
+    # o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
     #  The file name (not contain path) of schemaHtml.
     #  Basically you don't need this.
     #  (For example, when you use Application Behavior, you need this)
