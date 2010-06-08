@@ -1144,70 +1144,34 @@ public class Table {
         }
     }
 
-    public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) {
-        final Set<String> localColumnNameSet = createFlexibleSet(localColumnNameList);
-        final Set<String> foreignColumnNameSet = createFlexibleSet(foreignColumnNameList);
+    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList, String fixedSuffix) {
+        final StringSet localColumnNameSet = StringSet.createAsFlexibleOrdered();
+        localColumnNameSet.addAll(localColumnNameList);
+        final StringSet foreignColumnNameSet = StringSet.createAsFlexibleOrdered();
+        localColumnNameSet.addAll(foreignColumnNameList);
+
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
-            if (isSameTableAsFlexible(key.getForeignTableName(), foreignTableName)) {
-                final List<String> currentLocalColumnNameList = key.getLocalColumns();
-                if (currentLocalColumnNameList == null || currentLocalColumnNameList.isEmpty()) {
-                    String msg = "The foreignKey did not have local column name list: " + currentLocalColumnNameList;
-                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
-                    throw new IllegalStateException(msg);
-                }
-                final List<String> currentForeignColumnNameList = key.getForeignColumns();
-                if (currentForeignColumnNameList == null || currentForeignColumnNameList.isEmpty()) {
-                    String msg = "The foreignKey did not have foreign column name list: "
-                            + currentForeignColumnNameList;
-                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
-                    throw new IllegalStateException(msg);
-                }
-
-                final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
-                final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
-
-                boolean sameAsLocal = false;
-                boolean sameAsForeign = false;
-                if (localColumnNameSet.size() == currentLocalColumnNameSet.size()) {
-                    for (String currentLocalColumnName : currentLocalColumnNameSet) {
-                        if (localColumnNameSet.contains(currentLocalColumnName)) {
-                            sameAsLocal = true;
-                        }
-                    }
-                }
-                if (foreignColumnNameSet.size() == currentForeignColumnNameSet.size()) {
-                    for (String currentForeignColumnName : currentForeignColumnNameSet) {
-                        if (foreignColumnNameSet.contains(currentForeignColumnName)) {
-                            sameAsForeign = true;
-                        }
-                    }
-                }
-                if (sameAsLocal && sameAsForeign) {
-                    return true;
-                }
+            if (!Srl.equalsFlexible(foreignTableName, key.getForeignTableName())) {
+                continue;
             }
-        }
-        return false;
-    }
-
-    protected boolean isSameTableAsFlexible(String tableOne, String tableTwo) {
-        if (tableOne.equalsIgnoreCase(tableTwo)) {
+            if (!Srl.equalsFlexible(fixedSuffix, key.getFixedSuffix())) {
+                continue;
+            }
+            final StringSet currentLocalColumnNameSet = StringSet.createAsFlexibleOrdered();
+            currentLocalColumnNameSet.addAll(key.getLocalColumns());
+            if (!localColumnNameSet.equalsUnderCharOption(currentLocalColumnNameSet)) {
+                continue;
+            }
+            final StringSet currentForeignColumnNameSet = StringSet.createAsFlexibleOrdered();
+            currentForeignColumnNameSet.addAll(key.getForeignColumns());
+            if (!foreignColumnNameSet.equalsUnderCharOption(currentForeignColumnNameSet)) {
+                continue;
+            }
             return true;
         }
-        tableOne = Srl.replace(tableOne, "_", "");
-        tableTwo = Srl.replace(tableTwo, "_", "");
-        if (tableOne.equalsIgnoreCase(tableTwo)) {
-            return true;
-        }
         return false;
-    }
-
-    protected Set<String> createFlexibleSet(List<String> keyList) {
-        final Set<String> flset = StringSet.createAsFlexibleOrdered();
-        flset.addAll(keyList);
-        return flset;
     }
 
     public boolean hasForeignKey() {

@@ -25,6 +25,9 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfPropertySettingColumnNotFoundException;
+import org.seasar.dbflute.exception.DfPropertySettingTableNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 
 /**
@@ -63,13 +66,14 @@ public class DfAdditionalPrimaryKeyInitializer {
         final Set<String> primaryNameKeySet = additionalPrimaryKeyMap.keySet();
         for (String primaryKeyName : primaryNameKeySet) {
             final String tableName = getTableName(primaryKeyName);
-            assertTable(tableName);
+            assertTable(primaryKeyName, tableName);
             final List<String> columnNameList = getLocalColumnNameList(primaryKeyName);
-            assertColumnList(tableName, columnNameList);
+            assertColumnList(primaryKeyName, tableName, columnNameList);
             final Table table = getTable(tableName);
             if (table.hasPrimaryKey()) {
-                String msg = "The primary key of the table has already set up: ";
-                msg = msg + " tableName=" + tableName + " existing primaryKey=" + table.getPrimaryKeyDispValueString();
+                String pkDisp = table.getPrimaryKeyDispValueString();
+                String msg = "The primary key of the table has already set up:";
+                msg = msg + " tableName=" + tableName + " existing primaryKey=" + pkDisp;
                 msg = msg + " your specified primaryKey=" + columnNameList;
                 _log.info(msg);
                 continue;
@@ -97,21 +101,34 @@ public class DfAdditionalPrimaryKeyInitializer {
         return DfBuildProperties.getInstance().getAdditionalPrimaryKeyProperties();
     }
 
-    protected void assertTable(final String tableName) {
-        if (getTable(tableName) == null) {
-            String msg = "Not found table by the tableName: " + tableName;
-            msg = msg + " additionalPrimaryKeyMap=" + getAdditionalPrimaryKeyMap();
-            throw new IllegalStateException(msg);
+    protected void assertTable(final String primaryKeyName, final String tableName) {
+        if (getTable(tableName) != null) {
+            return;
         }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found table by the tableName of additionalPrimaryKey.");
+        br.addItem("Additional PK");
+        br.addElement(primaryKeyName);
+        br.addItem("NotFound Table");
+        br.addElement(tableName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropertySettingTableNotFoundException(msg);
     }
 
-    protected void assertColumnList(final String tableName, List<String> columnNameList) {
-        if (!getTable(tableName).containsColumn(columnNameList)) {
-            String msg = "Not found column by the columnNames: " + columnNameList;
-            msg = msg + " of the table '" + tableName + "'";
-            msg = msg + " additionalPrimaryKeyMap=" + getAdditionalPrimaryKeyMap();
-            throw new IllegalStateException(msg);
+    protected void assertColumnList(final String primaryKeyName, final String tableName, List<String> columnNameList) {
+        if (getTable(tableName).containsColumn(columnNameList)) {
+            return;
         }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found table by the tableName of additionalPrimaryKey.");
+        br.addItem("Additional PK");
+        br.addElement(primaryKeyName);
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("NotFound Column");
+        br.addElement(columnNameList);
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropertySettingColumnNotFoundException(msg);
     }
 
     protected String getTableName(String primaryKeyName) {

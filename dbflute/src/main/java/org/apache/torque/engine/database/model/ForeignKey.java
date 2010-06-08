@@ -74,6 +74,7 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -93,17 +94,17 @@ public class ForeignKey {
     private Table _localTable;
     private String _foreignTableName;
 
-    private List<String> _localColumns = new ArrayList<String>(3);
-    private List<String> _foreignColumns = new ArrayList<String>(3);
+    private final List<String> _localColumns = new ArrayList<String>(3);
+    private final List<String> _foreignColumns = new ArrayList<String>(3);
 
-    protected Map<String, String> _localForeignMap = StringKeyMap.createAsFlexibleOrdered();
-    protected Map<String, String> _foreignLocalMap = StringKeyMap.createAsFlexibleOrdered();
+    protected final Map<String, String> _localForeignMap = StringKeyMap.createAsFlexibleOrdered();
+    protected final Map<String, String> _foreignLocalMap = StringKeyMap.createAsFlexibleOrdered();
 
     private String _foreignPropertyNamePrefix;
     private boolean _additionalForeignKey;
     private String _fixedCondition;
     private String _fixedSuffix;
-    private Map<String, String> _dynamicFixedConditionMap = new LinkedHashMap<String, String>();
+    private final Map<String, String> _dynamicFixedConditionMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                                Load

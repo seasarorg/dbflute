@@ -30,7 +30,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.exception.DfTableNotFoundException;
+import org.seasar.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
@@ -176,7 +176,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         if (table == null) {
             String msg = "Failed to find the table in generated target tables:";
             msg = msg + " table=" + tableName + " target=" + _tableMap.keySet();
-            throw new DfTableNotFoundException(msg);
+            throw new DfPropertySettingTableNotFoundException(msg);
         }
         return table;
     }

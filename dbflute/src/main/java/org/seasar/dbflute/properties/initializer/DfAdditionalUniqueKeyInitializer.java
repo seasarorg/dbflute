@@ -25,6 +25,9 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfPropertySettingColumnNotFoundException;
+import org.seasar.dbflute.exception.DfPropertySettingTableNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfAdditionalUniqueKeyProperties;
 
 /**
@@ -60,12 +63,12 @@ public class DfAdditionalUniqueKeyInitializer {
         _log.info("...Initializing additional unique keys.");
 
         final Map<String, Map<String, String>> additionalUniqueKeyMap = getAdditionalUniqueKeyMap();
-        final Set<String> primaryNameKeySet = additionalUniqueKeyMap.keySet();
-        for (String uniqueKeyName : primaryNameKeySet) {
+        final Set<String> uniqueKeyNameSet = additionalUniqueKeyMap.keySet();
+        for (String uniqueKeyName : uniqueKeyNameSet) {
             final String tableName = getTableName(uniqueKeyName);
-            assertTable(tableName);
+            assertTable(uniqueKeyName, tableName);
             final List<String> columnNameList = getLocalColumnNameList(uniqueKeyName);
-            assertColumnList(tableName, columnNameList);
+            assertColumnList(uniqueKeyName, tableName, columnNameList);
             final Table table = getTable(tableName);
             final Unique unique = new Unique();
             unique.setAdditional(true);
@@ -93,21 +96,34 @@ public class DfAdditionalUniqueKeyInitializer {
         return DfBuildProperties.getInstance().getAdditionalUniqueKeyProperties();
     }
 
-    protected void assertTable(final String tableName) {
-        if (getTable(tableName) == null) {
-            String msg = "Not found table by the tableName: " + tableName;
-            msg = msg + " additionalUniqueKeyMap=" + getAdditionalUniqueKeyMap();
-            throw new IllegalStateException(msg);
+    protected void assertTable(final String primaryKeyName, final String tableName) {
+        if (getTable(tableName) != null) {
+            return;
         }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found table by the tableName of additionalUniqueKey.");
+        br.addItem("Additional UQ");
+        br.addElement(primaryKeyName);
+        br.addItem("NotFound Table");
+        br.addElement(tableName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropertySettingTableNotFoundException(msg);
     }
 
-    protected void assertColumnList(final String tableName, List<String> columnNameList) {
-        if (!getTable(tableName).containsColumn(columnNameList)) {
-            String msg = "Not found column by the columnNames: " + columnNameList;
-            msg = msg + " of the table '" + tableName + "'";
-            msg = msg + " additionalUniqueKeyMap=" + getAdditionalUniqueKeyMap();
-            throw new IllegalStateException(msg);
+    protected void assertColumnList(final String primaryKeyName, final String tableName, List<String> columnNameList) {
+        if (getTable(tableName).containsColumn(columnNameList)) {
+            return;
         }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found table by the tableName of additionalUniqueKey.");
+        br.addItem("Additional UQ");
+        br.addElement(primaryKeyName);
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("NotFound Column");
+        br.addElement(columnNameList);
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropertySettingColumnNotFoundException(msg);
     }
 
     protected String getTableName(String primaryKeyName) {
