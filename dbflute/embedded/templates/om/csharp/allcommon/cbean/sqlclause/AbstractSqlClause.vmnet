@@ -497,8 +497,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
             String aliasName = ite.next();
             LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
             String joinTableName = joinInfo.getJoinTableName();
-            List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-            List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
             Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
@@ -509,27 +507,38 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 sb.append(" left outer join "); // is main!
             }
             String tableSqlName = findDBMeta(joinTableName).TableSqlName;
+            List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(tableSqlName);
             } else {
                 sb.append(getInlineViewClause(tableSqlName, inlineWhereClauseList));
             }
-            sb.append(" ").append(aliasName).append(" on ");
+            sb.append(" ").append(aliasName);
+            if (joinInfo.hasInlineOrOnClause() || joinOnMap.containsKey(fixedConditionKey)) {
+                sb.append(ln()).append("     "); // only when additional conditions exist
+            }
+            sb.append(" on ");
             int count = 0;
             Set<String> localColumnNameSet = joinOnMap.keySet();
             foreach (String localColumnName in localColumnNameSet) {
                 String foreignColumnName = (String)joinOnMap.get(localColumnName);
-                if (count > 0) {
-                    sb.append(" and ");
-                }
-                if (localColumnName.Equals(fixedConditionKey)) {
-                    sb.append(foreignColumnName);
+                if (localColumnName.Equals(fixedConditionKey)) { // if fixed condition
+                    if (count > 0) { // basically true because basic join-condition exists before
+                        sb.append(ln()).append("    ");
+                        sb.append(" and ");
+                    }
+                    sb.append(foreignColumnName); // foreignColumnName has just conditions
                 } else {
+                    if (count > 0) {
+                        sb.append(" and ");
+                    }
                     sb.append(localColumnName).append(" = ").append(foreignColumnName);
                 }
                 ++count;
             }
+            List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
             foreach (String additionalOnClause in additionalOnClauseList) {
+                sb.append(ln()).append("    ");
                 sb.append(" and ").append(additionalOnClause);
             }
             if (isJoinInParentheses()) {
@@ -737,6 +746,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
         protected bool _innerJoin;
+        public bool hasInlineOrOnClause() {
+            return !_inlineWhereClauseList.isEmpty() || !_additionalOnClauseList.isEmpty();
+        }
         public String getAliasName() {
             return _aliasName;
         }
