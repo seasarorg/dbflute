@@ -29,6 +29,10 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Schema";
+            }
+
             public String propertyName() {
                 return "unifiedSchemaDiff";
             }
@@ -42,6 +46,10 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Object Type";
+            }
+
             public String propertyName() {
                 return "objectTypeDiff";
             }
@@ -315,6 +323,18 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     // -----------------------------------------------------
     //                                             Diff Item
     //                                             ---------
+    public List<NextPreviousHandler> getNextPreviousValidList() {
+        final List<NextPreviousHandler> previousItemList = _nextPreviousItemList;
+        final List<NextPreviousHandler> validHandlerList = DfCollectionUtil.newArrayList();
+        for (NextPreviousHandler handler : previousItemList) {
+            final DfNextPreviousDiff nextPreviousDiff = handler.provide();
+            if (nextPreviousDiff != null && nextPreviousDiff.hasDiff()) {
+                validHandlerList.add(handler);
+            }
+        }
+        return validHandlerList;
+    }
+
     public boolean hasUnifiedSchemaDiff() {
         return _unifiedSchemaDiff != null;
     }
@@ -337,6 +357,83 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
     public void setObjectTypeDiff(DfNextPreviousDiff objectTypeDiff) {
         _objectTypeDiff = objectTypeDiff;
+    }
+
+    public List<DfNestDiffContent> getNestDiffContentOrderedList() {
+        final List<DfNestDiffContent> contentList = DfCollectionUtil.newArrayList();
+        {
+            final String typeName = "Column";
+            setupNestDiffList(contentList, "Add " + typeName, _addedColumnDiffList);
+            setupNestDiffList(contentList, "Change " + typeName, _changedColumnDiffList);
+            setupNestDiffList(contentList, "Delete " + typeName, _deletedColumnDiffList);
+        }
+        {
+            final String typeName = "PK";
+            setupNestDiffList(contentList, "Add " + typeName, _addedPrimaryKeyDiffList);
+            setupNestDiffList(contentList, "Change " + typeName, _changedPrimaryKeyDiffList);
+            setupNestDiffList(contentList, "Delete " + typeName, _deletedPrimaryKeyDiffList);
+        }
+        {
+            final String typeName = "FK";
+            setupNestDiffList(contentList, "Add " + typeName, _addedForeignKeyDiffList);
+            setupNestDiffList(contentList, "Change " + typeName, _changedForeignKeyDiffList);
+            setupNestDiffList(contentList, "Delete " + typeName, _deletedForeignKeyDiffList);
+        }
+        {
+            final String typeName = "UQ";
+            setupNestDiffList(contentList, "Add " + typeName, _addedUniqueKeyDiffList);
+            setupNestDiffList(contentList, "Change " + typeName, _changedUniqueKeyDiffList);
+            setupNestDiffList(contentList, "Delete " + typeName, _deletedUniqueKeyDiffList);
+        }
+        {
+            final String typeName = "Index";
+            setupNestDiffList(contentList, "Add " + typeName, _addedIndexDiffList);
+            setupNestDiffList(contentList, "Change " + typeName, _changedIndexDiffList);
+            setupNestDiffList(contentList, "Delete " + typeName, _deletedIndexDiffList);
+        }
+        return contentList;
+    }
+
+    protected void setupNestDiffList(List<DfNestDiffContent> contentList, String title,
+            List<? extends DfNestDiff> nestDiffList) {
+        if (!nestDiffList.isEmpty()) {
+            final DfNestDiffContent content = new DfNestDiffContent();
+            content.setTitleName(title);
+            content.setNestDiffList(nestDiffList);
+            content.setChange(DfDiffType.CHANGE.equals(nestDiffList.get(0).getDiffType()));
+            contentList.add(content);
+        }
+    }
+
+    public static class DfNestDiffContent {
+        protected String _titleName;
+        protected boolean _change;
+
+        protected List<? extends DfNestDiff> _nestDiffList;
+
+        public String getTitleName() {
+            return _titleName;
+        }
+
+        public void setTitleName(String titleName) {
+            _titleName = titleName;
+        }
+
+        public boolean isChange() {
+            return _change;
+        }
+
+        public void setChange(boolean change) {
+            this._change = change;
+        }
+
+        public List<? extends DfNestDiff> getNestDiffList() {
+            return _nestDiffList;
+        }
+
+        public void setNestDiffList(List<? extends DfNestDiff> nestDiffList) {
+            _nestDiffList = nestDiffList;
+        }
     }
 
     // -----------------------------------------------------

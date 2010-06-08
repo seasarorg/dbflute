@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>${database.projectName} schema</title>
+  <title>${database.projectName} history</title>
   <style type="text/css">
 	* {
 		margin: 0;
@@ -12,8 +12,8 @@
 	body {
 		font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
 		font-size: 90%;
-		margin: 10px 5px 5px 15px;
-		background-color: #ffffe0;
+		margin: 1em 1.5em;
+		background-color: #ffffee;
 	}
 
 	/* heading */
@@ -23,210 +23,133 @@
 		border-top: 2px solid #af0000;
 	}
 	h2 {
-		margin: 30px 0 5px 0;
-		font-size: 1.8em;
+		margin-top: 2em;
 		border-bottom: 2px solid #af0000;
 		border-left: 10px solid #af0000;
-		text-indent: 10px;
+		text-indent: 1em;
+		font-size: 1.6em;
 	}
 	h3 {
-		padding: 0 0 0 10px;
-		margin: 1em 10% 0 0;
-		border-top: double 3px #af0000;
-		border-bottom: solid 1px #333333;
-		font-size: 1.5em;
-		color: #333333;
+		width: 10em;
+		margin: 0.8em 0;
+		padding-left: 1.8em;
+		border-bottom: solid 1px #333;
+		color: #555;
+		font-size: 1.2em;
 	}
 	h4 {
- 		padding: 0 0 0 10px;
-		margin: 1em 10% 0 1em;
-		border-top: solid 1px #af0000;
-		border-bottom: solid 1px #af0000;
-		font-size: 1.4em;
-		color: #333333;
-	}
-
-	/* total info */
-	.updatedate {
-		text-align: right;
-	}
-	.mainschema {
-		text-align: right;
-	}
-	.sublink {
-		text-align: right;
-	}
-
-	/* table */
-	table {
-		border-collapse:collapse;
-	}
-	table, th {
-		border: 1px solid #555;
-	}
-	th {
-		background-color: #cc9;
-		font-size: 0.8em;
-	}
-	td {
-		border-bottom: 1px dotted #aaa;
-		border-left: 1px solid #555;
-		padding:2px;
-	}
-	.schemacell {
-		font-size: 0.8em;
-		white-space: nowrap;
-	}
-	.aliascell {
-		white-space: nowrap;
-	}
-	.flgcell {
-		text-align: center;
-	}
-	.flgplus {
-		font-size: 0.7em;
-	}
-	.numcell {
-		text-align: center;
-	}
-	.linkcell {
-		font-size: 0.8em;
-	}
-	.commentcell {
-		font-size: 0.7em;
-	}
-	.subcell {
-		font-size: 0.8em;
-	}
-	.comcolcell {
-		color: #666;
-	}
-	.optcell {
-		font-style: italic;
-	}
-	.additionalpk {
-		font-size: 0.7em;
-		font-style: italic;
-	}
-	.additionalfk {
-		font-size: 0.7em;
-		font-style: italic;
-	}
-
-	/* inner table */
-	table.child {
-		margin: 3px;
-	}
-	table.child th {
-		font-size: 0.7em;
-	}
-	table.child, table.child td, table.child th {
-		border-top: none;
-		border-left: none;
-		border-bottom: 1px solid #aaa;
-		border-right: 1px solid #aaa;
-	}
-
-	/* table supplementary info */
-	span.tableschema {
-		font-size: 0.6em;
-	}
-	span.tablecount {
-		font-size: 0.5em;
-	}
-	dl.tablelist {
-		padding-left: 2em;
-	}
-	dl.tablelist dt {
+		margin: 1em 0em;
+		font-size: 1em;
+		font-weight: normal;
 		display: list-item;
-		font-size: 1.2em;
-		margin-top: 0.3em;
 	}
-	dl.tablelist dd {
-		font-size: 0.9em;
-		padding-left: 1em;
+	h5 {
+		width: 10em;
+		font-size: 85%;
+		border-bottom: solid 1px #333;
+		text-indent: 0.3em;
+		color: #555;
 	}
-	dl.tablelist dd.subinfo {
-		padding-left: 2em;
+
+	.table-content {
+		margin: 0 6em;
 	}
-	dl.tablelist dd.subinfo span.file {
-		font-style: italic;
+	.column-content {
+		margin: 0.5em 1em 0.5em 3em;
+		line-height: 1.4em;
 	}
-	dl.tablelist dd.subinfo span.ctet {
-		color: green;
+
+	div.change-table-content {
+		margin-left: 3em;
 	}
-	dl.tablelist dd.subinfo span.pmb {
-		color: green;
-	}
-	dl.procedurelist {
-		padding-left: 2em;
-	}
-	dl.procedurelist dt {
+
+	dl.column-content dt {
 		display: list-item;
-		font-size: 1.2em;
-		margin-top: 0.3em;
 	}
-	dl.procedurelist dt span.type {
-		font-size: 0.7em;
-		color: green;
+	dl.column-content dd {
+		margin: 0 4em;
 	}
-	dl.procedurelist dd {
-		font-size: 0.9em;
-		padding-left: 1em;
+	dl.column-content dd span {
+		display: block;
+		float: left;
+		width: 6em;
+		margin-right: 1.5em;
+		border-right: dotted 2px #333;
+		font-weight: bold;
+		font-size: 80%;
+		color: #555;
 	}
-	dl.procedurelist dd.column {
-		font-style: italic;
-		padding-left: 2em;
+	
+	span.dt {
+		font-size: 80%;
 	}
-	dl.procedurelist dd.column span.type {
-		font-size: 0.9em;
-		color: green;
-	}
-	dl.procedurelist dd.column pre {
-		padding-left: 1em;
+	p.tablecount {
+		margin-left: 23em;
 	}
   </style>
 </head>
 
 <body>
-<h1>Project Schema History for ${database.projectName} (${database.databaseName})</h1>
+<h1>History for ${database.projectName} (${database.databaseName})</h1>
+
 #foreach ($schemaDiff in $database.schemaDiffList)
-<h2>${schemaDiff.diffDate} (table count: ${schemaDiff.tableCount.displayForHtml})</h2>
-#foreach ($tableDiff in $schemaDiff.tableDiffAllList)
-<h3>${tableDiff.tableName} (${tableDiff.diffType})</h3>
-<dl>
-#if ($tableDiff.hasUnifiedSchemaDiff())
-    <dt>Schema</dt>
-    <dd>${tableDiff.unifiedSchemaDiff.displayForHtml}</dd>
+<div class="section">
+	<h2><span class="dt">Diff Date: </span>${schemaDiff.diffDate}</h2>
+#if ($schemaDiff.tableCount.hasDiff())
+	<p class="tablecount"><span class="dt">table count: </span>${schemaDiff.tableCount.displayForHtml}</p>
 #end
-#if ($tableDiff.hasObjectTypeDiff())
-    <dt>Object Type</dt>
-    <dd>${tableDiff.objectTypeDiff.displayForHtml}</dd>
+
+#if (!$schemaDiff.addedTableDiffList.isEmpty())
+	<h3>Add Table</h3>
+	<ul class="table-content">
+#foreach ($tableDiff in $schemaDiff.addedTableDiffList)
+		<li>${tableDiff.tableName}</li>
 #end
-#if ($tableDiff.hasColumnDiff())
-    <dt>Column</dt>
-    <dd>
-        <dl>
-#foreach ($columnDiff in $tableDiff.columnDiffAllList)
-            <dt>${columnDiff.columnName} (${columnDiff.diffType})</dt>
-            <dd>
-                <dl>
-#if ($columnDiff.hasDbTypeDiff())
-                    <dt>DB Type</dt>
-                    <dd>${columnDiff.dbTypeDiff.displayForHtml}</dd>
+	</ul>
 #end
-#if ($columnDiff.hasColumnSizeDiff())
-                    <dt>Column Size</dt>
-                    <dd>${columnDiff.columnSizeDiff.displayForHtml}</dd>
+#if (!$schemaDiff.changedTableDiffList.isEmpty())
+	<h3>Change Table</h3>
+	<div class="table-content">
+#foreach ($tableDiff in $schemaDiff.changedTableDiffList)
+		<h4>${tableDiff.tableName}</h4>
+		<div class="change-table-content">
+#foreach ($handler in $tableDiff.nextPreviousValidList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
 #end
-                </dl>
-            </dd>
-#end
-        </dl>
-    </dd>
-#end
-</dl>
+#foreach ($content in $tableDiff.nestDiffContentOrderedList)
+			<h5>${content.titleName}</h5>
+#if ($content.isChange())
+			<dl class="column-content">
+#foreach ($nestDiff in $content.nestDiffList)
+				<dt>${nestDiff.keyName}</dt>
+#foreach ($handler in $nestDiff.nextPreviousValidList)
+				<dd><span>$handler.titleName()</span>$handler.provide().displayForHtml</dd>
 #end
 #end
+			</dl>
+#else
+			<ul class="column-content">
+#foreach ($nestDiff in $content.nestDiffList)
+				<li>${nestDiff.keyName}</li>
+#end
+			</ul>
+#end
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$schemaDiff.deletedTableDiffList.isEmpty())
+	<h3>Delete Table</h3>
+	<ul class="table-content">
+#foreach ($tableDiff in $schemaDiff.deletedTableDiffList)
+		<li>${tableDiff.tableName}</li>
+#end
+	</ul>
+#end
+</div>
+#end
+
 </body>
 </html>

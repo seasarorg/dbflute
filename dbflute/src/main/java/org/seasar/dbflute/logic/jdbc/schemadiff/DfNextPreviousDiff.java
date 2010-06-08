@@ -60,7 +60,7 @@ public class DfNextPreviousDiff extends DfAbstractDiff {
     //                                                                          Expression
     //                                                                          ==========
     public String getDisplayForHtml() {
-        return escape(_previous + " to " + _next);
+        return escape(_previous + " -> " + _next);
     }
 
     protected String escape(String value) {

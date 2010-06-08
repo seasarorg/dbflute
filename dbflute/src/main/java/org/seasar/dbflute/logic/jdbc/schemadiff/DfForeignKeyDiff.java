@@ -18,6 +18,10 @@ public class DfForeignKeyDiff extends DfConstraintDiff {
 
     {
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "FK Table";
+            }
+
             public String propertyName() {
                 return "foreignTableDiff";
             }

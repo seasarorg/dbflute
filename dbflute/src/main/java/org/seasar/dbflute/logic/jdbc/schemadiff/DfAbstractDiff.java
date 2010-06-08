@@ -73,7 +73,9 @@ public abstract class DfAbstractDiff {
         void diff(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
     }
 
-    protected static interface NextPreviousHandler {
+    public static interface NextPreviousHandler { // accessed from Velocity template
+        String titleName();
+
         String propertyName();
 
         DfNextPreviousDiff provide();

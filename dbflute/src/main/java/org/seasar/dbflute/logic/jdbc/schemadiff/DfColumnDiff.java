@@ -32,6 +32,10 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Type";
+            }
+
             public String propertyName() {
                 return "dbTypeDiff";
             }
@@ -45,6 +49,10 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Size";
+            }
+
             public String propertyName() {
                 return "columnSizeDiff";
             }
@@ -58,6 +66,10 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Default";
+            }
+
             public DfNextPreviousDiff provide() {
                 return _defaultValueDiff;
             }
@@ -71,6 +83,10 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Not Null";
+            }
+
             public String propertyName() {
                 return "notNullDiff";
             }
@@ -84,6 +100,10 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Identity";
+            }
+
             public String propertyName() {
                 return "autoIncrementDiff";
             }
@@ -218,6 +238,18 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
     // -----------------------------------------------------
     //                                             Diff Item
     //                                             ---------
+    public List<NextPreviousHandler> getNextPreviousValidList() {
+        final List<NextPreviousHandler> previousItemList = _nextPreviousItemList;
+        final List<NextPreviousHandler> validHandlerList = DfCollectionUtil.newArrayList();
+        for (NextPreviousHandler handler : previousItemList) {
+            final DfNextPreviousDiff nextPreviousDiff = handler.provide();
+            if (nextPreviousDiff != null && nextPreviousDiff.hasDiff()) {
+                validHandlerList.add(handler);
+            }
+        }
+        return validHandlerList;
+    }
+
     public boolean hasDbTypeDiff() {
         return _dbTypeDiff != null;
     }
