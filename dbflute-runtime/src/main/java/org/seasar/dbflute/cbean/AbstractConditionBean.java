@@ -570,6 +570,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
+    protected abstract boolean hasSpecifiedColumn();
+
     protected abstract HpAbstractSpecification<? extends ConditionQuery> localSp();
 
     // [DBFlute-0.9.5.3]

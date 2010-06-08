@@ -22,7 +22,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected final boolean _forScalarSubQuery;
     protected final DBMetaProvider _dbmetaProvider;
     protected CQ _query;
-    protected boolean _alreadySpecifyRequiredColumn; // also means specification existence
+    protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
     protected boolean _forGeneralOneSpecificaion;
 
     // ===================================================================================
@@ -55,7 +55,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             _query = _qyCall.qy();
         }
         if (isRequiredColumnSpecificationEnabled()) {
-            _alreadySpecifyRequiredColumn = true;
+            _alreadySpecifiedRequiredColumn = true;
             doSpecifyRequiredColumn();
         }
         final String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
@@ -70,7 +70,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
 
     protected boolean isRequiredColumnSpecificationEnabled() {
         return !_forGeneralOneSpecificaion && !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery
-                && !_alreadySpecifyRequiredColumn;
+                && !_alreadySpecifiedRequiredColumn;
     }
 
     protected void assertColumn(String columnName) {
@@ -131,8 +131,8 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public boolean isAlreadySpecifyRequiredColumn() {
-        return _alreadySpecifyRequiredColumn;
+    public boolean isAlreadySpecifiedRequiredColumn() {
+        return _alreadySpecifiedRequiredColumn;
     }
 
     public boolean isForGeneralOneSpecificaion() {
