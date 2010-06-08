@@ -616,6 +616,9 @@ public class Table {
     //                                         Determination
     //                                         -------------
     public boolean containsColumn(List<String> columnNameList) {
+        if (columnNameList.isEmpty()) {
+            return false;
+        }
         for (String columnName : columnNameList) {
             if (getColumn(columnName) == null) {
                 return false;
