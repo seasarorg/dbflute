@@ -156,11 +156,10 @@ public class DfPropFile {
     //                                                                       Map List File
     //                                                                       =============
     protected MapListFile createMapListFile() {
-        final MapListFile mapListFile = new MapListFile();
-        return mapListFile;
+        return new MapListFile();
     }
 
     protected MapListFile createMapListFileAsSkipLn() {
-        return createMapListFile().skipReadingLineSeparator();
+        return createMapListFile().skipLineSeparator();
     }
 }

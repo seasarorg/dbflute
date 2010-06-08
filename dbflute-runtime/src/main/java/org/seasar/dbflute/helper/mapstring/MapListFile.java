@@ -49,8 +49,7 @@ public class MapListFile {
     //                                                                           =========
     protected final String _fileEncoding;
     protected final String _lineCommentMark;
-    protected boolean _includeReadLineComment;
-    protected boolean _skipToReadLineSeparator;
+    protected boolean _skipLineSeparator;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -232,6 +231,7 @@ public class MapListFile {
         final String encoding = getFileEncoding();
         final String lineComment = getLineCommentMark();
         final StringBuilder sb = new StringBuilder();
+        final boolean addLn = !_skipLineSeparator;
         InputStreamReader ir = null;
         BufferedReader br = null;
         try {
@@ -243,19 +243,19 @@ public class MapListFile {
             while (true) {
                 final String lineString = br.readLine();
                 if (lineString == null) {
-                    if (previousLineComment && !_skipToReadLineSeparator) {
+                    if (previousLineComment && addLn) {
                         sb.append(ln()); // line separator adjustment
                     }
                     break;
                 }
-                // if the line is comment, skip reading
-                if (!_includeReadLineComment && lineString.trim().startsWith(lineComment)) {
+                // if the line is comment, skip to read
+                if (lineString.trim().startsWith(lineComment)) {
                     previousLineComment = true;
                     continue;
                 }
                 previousLineComment = false;
                 ++count;
-                if (count > 0 && !_skipToReadLineSeparator) {
+                if (count > 0 && addLn) {
                     sb.append(ln());
                 }
                 sb.append(lineString);
@@ -306,13 +306,8 @@ public class MapListFile {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public MapListFile includeReadingLineComment() {
-        _includeReadLineComment = true;
-        return this;
-    }
-
-    public MapListFile skipReadingLineSeparator() {
-        _skipToReadLineSeparator = true;
+    public MapListFile skipLineSeparator() {
+        _skipLineSeparator = true;
         return this;
     }
 
