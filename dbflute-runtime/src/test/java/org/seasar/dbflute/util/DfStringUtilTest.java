@@ -5,6 +5,10 @@ import static org.seasar.dbflute.util.Srl.connectPrefix;
 import static org.seasar.dbflute.util.Srl.connectSuffix;
 import static org.seasar.dbflute.util.Srl.count;
 import static org.seasar.dbflute.util.Srl.decamelize;
+import static org.seasar.dbflute.util.Srl.equalsFlexible;
+import static org.seasar.dbflute.util.Srl.equalsFlexibleTrimmed;
+import static org.seasar.dbflute.util.Srl.equalsIgnoreCase;
+import static org.seasar.dbflute.util.Srl.equalsPlain;
 import static org.seasar.dbflute.util.Srl.extractDelimiterList;
 import static org.seasar.dbflute.util.Srl.extractScopeFirst;
 import static org.seasar.dbflute.util.Srl.extractScopeList;
@@ -217,6 +221,49 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals(1, count("foo.bar", "foo"));
         assertEquals(2, count("foo.bar.baz", "."));
         assertEquals(4, count(".foo.bar.baz.", "."));
+    }
+
+    // ===================================================================================
+    //                                                                              Equals
+    //                                                                              ======
+    public void test_equalsIgnoreCase_basic() {
+        assertTrue(equalsIgnoreCase(null, null));
+        assertFalse(equalsIgnoreCase(null, ""));
+        assertFalse(equalsIgnoreCase("", null));
+        assertTrue(equalsIgnoreCase("foobar", "foobar"));
+        assertTrue(equalsIgnoreCase("foobar", "fooBar"));
+        assertFalse(equalsIgnoreCase("foobar", "foo_bar"));
+        assertFalse(equalsIgnoreCase("foobar", "foobar "));
+    }
+
+    public void test_equalsFlexible_basic() {
+        assertTrue(equalsFlexible(null, null));
+        assertFalse(equalsFlexible(null, ""));
+        assertFalse(equalsFlexible("", null));
+        assertTrue(equalsFlexible("foobar", "foobar"));
+        assertTrue(equalsFlexible("foobar", "fooBar"));
+        assertTrue(equalsFlexible("foobar", "foo_bar"));
+        assertFalse(equalsFlexible("foobar", "foobar "));
+    }
+
+    public void test_equalsFlexibleTrimmed_basic() {
+        assertTrue(equalsFlexibleTrimmed(null, null));
+        assertFalse(equalsFlexibleTrimmed(null, ""));
+        assertFalse(equalsFlexibleTrimmed("", null));
+        assertTrue(equalsFlexibleTrimmed("foobar", "foobar"));
+        assertTrue(equalsFlexibleTrimmed("foobar", "fooBar"));
+        assertTrue(equalsFlexibleTrimmed("foobar", "foo_bar"));
+        assertTrue(equalsFlexibleTrimmed("foobar", "foobar "));
+    }
+
+    public void test_equalsPlain_basic() {
+        assertTrue(equalsPlain(null, null));
+        assertFalse(equalsPlain(null, ""));
+        assertFalse(equalsPlain("", null));
+        assertTrue(equalsPlain("foobar", "foobar"));
+        assertFalse(equalsPlain("foobar", "fooBar"));
+        assertFalse(equalsPlain("foobar", "foo_bar"));
+        assertFalse(equalsPlain("foobar", "foobar "));
     }
 
     // ===================================================================================

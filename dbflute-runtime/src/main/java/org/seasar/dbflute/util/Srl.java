@@ -394,7 +394,7 @@ public class Srl {
     public static boolean contains(List<String> strList, String str) {
         assertListStringNotNull(strList);
         for (String element : strList) {
-            if (equals(element, str)) {
+            if (equalsPlain(element, str)) {
                 return true;
             }
         }
@@ -430,18 +430,6 @@ public class Srl {
     // ===================================================================================
     //                                                                              Equals
     //                                                                              ======
-    public static final boolean equals(String str1, String str2) {
-        if (str1 != null) {
-            if (str2 != null) {
-                return str1.equals(str2);
-            } else {
-                return false;
-            }
-        } else {
-            return str2 == null; // if both are null, it means equal
-        }
-    }
-
     public static final boolean equalsIgnoreCase(String str1, String str2) {
         if (str1 != null) {
             if (str2 != null) {
@@ -472,6 +460,18 @@ public class Srl {
         str1 = str1 != null ? str1.trim() : null;
         str2 = str2 != null ? str2.trim() : null;
         return equalsFlexible(str1, str2);
+    }
+
+    public static final boolean equalsPlain(String str1, String str2) {
+        if (str1 != null) {
+            if (str2 != null) {
+                return str1.equals(str2);
+            } else {
+                return false;
+            }
+        } else {
+            return str2 == null; // if both are null, it means equal
+        }
     }
 
     // ===================================================================================
