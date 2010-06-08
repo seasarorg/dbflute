@@ -203,18 +203,21 @@ namespace ${glPackageBaseCB} {
 #end
         protected override void doSpecifyRequiredColumn() {
 #foreach ($col in $table.primaryKey)
-            Column${col.javaName}();// PK
+            Column${col.javaName}(); // PK
 #end
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
-            if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()) {
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+            if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
+                    || _myQyCall.qy().getReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
 #foreach ($col in $foreignKey.localColumnList)
 #if (!$col.isPrimaryKey())
-                Column${col.javaName}();// FK
+                Column${col.javaName}(); // FK or one-to-one referrer
 #end
 #end
             }
+#end
 #end
         }
         protected override String getTableDbName() { return "$table.name"; }
