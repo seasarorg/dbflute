@@ -2133,9 +2133,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
             _specifiedSelectColumnMap.put(tableAliasName, new LinkedHashMap<String, String>());
         }
-        Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
-        elementMap.put(columnName, tableDbName);
-        _specifiedSelectColumnMap.put(tableAliasName, elementMap);
+        final Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        elementMap.put(columnName, tableDbName); // this tableDbName is unused actually, this is for future
     }
 
     public void specifyDerivingSubQuery(String aliasName, String deriveSubQuery) {

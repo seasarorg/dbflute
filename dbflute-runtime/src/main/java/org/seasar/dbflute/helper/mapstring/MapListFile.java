@@ -238,15 +238,22 @@ public class MapListFile {
             ir = new InputStreamReader(ins, encoding);
             br = new BufferedReader(ir);
 
-            int count = -1;
+            int loopIndex = -1;
+            int validlineCount = -1;
             boolean previousLineComment = false;
             while (true) {
-                final String lineString = br.readLine();
+                ++loopIndex;
+                String lineString = br.readLine();
                 if (lineString == null) {
                     if (previousLineComment && addLn) {
                         sb.append(ln()); // line separator adjustment
                     }
                     break;
+                }
+                if (loopIndex == 0) {
+                    // it needs to before line comment process
+                    // because the BOM character is not trimmed by trim()
+                    lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
                 }
                 // if the line is comment, skip to read
                 if (lineString.trim().startsWith(lineComment)) {
@@ -254,8 +261,8 @@ public class MapListFile {
                     continue;
                 }
                 previousLineComment = false;
-                ++count;
-                if (count > 0 && addLn) {
+                ++validlineCount;
+                if (validlineCount > 0 && addLn) {
                     sb.append(ln());
                 }
                 sb.append(lineString);
@@ -273,7 +280,7 @@ public class MapListFile {
                 }
             }
         }
-        return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
+        return sb.toString();
     }
 
     // -----------------------------------------------------
