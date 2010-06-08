@@ -205,13 +205,13 @@ namespace ${glPackageBaseCB} {
 #foreach ($col in $table.primaryKey)
             Column${col.javaName}(); // PK
 #end
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($tmpPropertyName = "${foreignKey.foreignPropertyName}")
-#set ($tmpPropertyNameInitCap = "${foreignKey.foreignPropertyNameInitCap}")
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #if ($fk.hasLocalColumnExceptPrimaryKey())
             if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
                     || _myQyCall.qy().getReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
-#foreach ($col in $foreignKey.localColumnList)
+#foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
                 Column${col.javaName}(); // FK or one-to-one referrer
 #end

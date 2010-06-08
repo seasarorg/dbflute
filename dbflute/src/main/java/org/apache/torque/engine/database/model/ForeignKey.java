@@ -257,7 +257,7 @@ public class ForeignKey {
     }
 
     /**
-     * Are the local columns primary-key?
+     * Are all local columns primary-key?
      * @return Determination.
      */
     public boolean isLocalColumnPrimaryKey() {
@@ -271,7 +271,7 @@ public class ForeignKey {
     }
 
     /**
-     * Are the foreign columns primary-key? <br />
+     * Are all foreign columns primary-key? <br />
      * Basically true. Only when a relation is for biz-one-to-one, false.
      * @return Determination.
      */
