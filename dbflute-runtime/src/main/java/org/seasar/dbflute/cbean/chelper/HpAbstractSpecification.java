@@ -15,15 +15,15 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ConditionBean _baseCB;
-    protected HpSpQyCall<CQ> _qyCall;
+    protected final ConditionBean _baseCB;
+    protected HpSpQyCall<CQ> _qyCall; // overridden when GeneralOneSpecification
+    protected final boolean _forDerivedReferrer;
+    protected final boolean _forScalarSelect;
+    protected final boolean _forScalarSubQuery;
+    protected final DBMetaProvider _dbmetaProvider;
     protected CQ _query;
-    protected boolean _forDerivedReferrer;
-    protected boolean _forScalarSelect;
-    protected boolean _forScalarSubQuery;
-    protected boolean _alreadySpecifyRequiredColumn;
+    protected boolean _alreadySpecifyRequiredColumn; // also means specification existence
     protected boolean _forGeneralOneSpecificaion;
-    protected DBMetaProvider _dbmetaProvider;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -58,7 +58,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             _alreadySpecifyRequiredColumn = true;
             doSpecifyRequiredColumn();
         }
-        String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
+        final String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
         final String tableAliasName;
         if (_query.isBaseQuery()) {
             tableAliasName = _baseCB.getSqlClause().getLocalTableAliasName();
@@ -126,5 +126,16 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                      ==============
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isAlreadySpecifyRequiredColumn() {
+        return _alreadySpecifyRequiredColumn;
+    }
+
+    public boolean isForGeneralOneSpecificaion() {
+        return _forGeneralOneSpecificaion;
     }
 }

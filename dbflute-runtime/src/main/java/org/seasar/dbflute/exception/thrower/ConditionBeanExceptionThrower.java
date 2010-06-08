@@ -99,7 +99,7 @@ public class ConditionBeanExceptionThrower {
             String columnName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "You specified the column that had Not been Set up!" + ln();
+        msg = msg + "You specified the column that had not been set up!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should call setupSelect_[ForeignTable]()"
@@ -131,7 +131,7 @@ public class ConditionBeanExceptionThrower {
     //                                                                       =============
     public void throwScalarSelectInvalidColumnSpecificationException(ConditionBean cb, Class<?> resultType) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The specified column for scalar select was invalid");
+        br.addNotice("The specified column for scalar select was invalid.");
         br.addItem("Advice");
         br.addElement("You should call specify().column[TargetColumn]() only once.");
         br.addElement("For example:");
