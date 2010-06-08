@@ -629,8 +629,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String aliasName = outerJoinEntry.getKey();
             final LeftOuterJoinInfo joinInfo = outerJoinEntry.getValue();
             final String joinTableDbName = joinInfo.getJoinTableDbName();
-            final List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-            final List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
             final Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
@@ -641,28 +639,39 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 sb.append(" left outer join "); // is main!
             }
             final String joinTableSqlName = findDBMeta(joinTableDbName).getTableSqlName();
+            final List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(joinTableSqlName);
             } else {
                 sb.append(getInlineViewClause(joinTableSqlName, inlineWhereClauseList));
             }
-            sb.append(" ").append(aliasName).append(" on ");
+            sb.append(" ").append(aliasName);
+            if (joinInfo.hasInlineOrOnClause() || joinOnMap.containsKey(fixedConditionKey)) {
+                sb.append(ln()).append("     "); // only when additional conditions exist
+            }
+            sb.append(" on ");
             int count = 0;
             final Set<Entry<String, String>> joinOnSet = joinOnMap.entrySet();
             for (Entry<String, String> joinOnEntry : joinOnSet) {
                 final String localColumnName = joinOnEntry.getKey();
                 final String foreignColumnName = joinOnEntry.getValue();
-                if (count > 0) {
-                    sb.append(" and ");
-                }
-                if (localColumnName.equals(fixedConditionKey)) {
-                    sb.append(foreignColumnName);
+                if (localColumnName.equals(fixedConditionKey)) { // if fixed condition
+                    if (count > 0) { // basically true because basic join-condition exists before
+                        sb.append(ln()).append("    ");
+                        sb.append(" and ");
+                    }
+                    sb.append(foreignColumnName); // foreignColumnName has just conditions
                 } else {
+                    if (count > 0) {
+                        sb.append(" and ");
+                    }
                     sb.append(localColumnName).append(" = ").append(foreignColumnName);
                 }
                 ++count;
             }
+            final List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
             for (String additionalOnClause : additionalOnClauseList) {
+                sb.append(ln()).append("    ");
                 sb.append(" and ").append(additionalOnClause);
             }
             if (isJoinInParentheses()) {
@@ -899,10 +908,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected static class LeftOuterJoinInfo {
         protected String _aliasName;
         protected String _joinTableDbName;
-        protected List<String> _inlineWhereClauseList = new ArrayList<String>();
-        protected List<String> _additionalOnClauseList = new ArrayList<String>();
+        protected final List<String> _inlineWhereClauseList = new ArrayList<String>();
+        protected final List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
         protected boolean _innerJoin;
+
+        public boolean hasInlineOrOnClause() {
+            return !_inlineWhereClauseList.isEmpty() || !_additionalOnClauseList.isEmpty();
+        }
 
         public String getAliasName() {
             return _aliasName;
