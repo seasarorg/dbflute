@@ -1152,10 +1152,10 @@ public class Table {
         final StringSet localColumnNameSet = StringSet.createAsFlexibleOrdered();
         localColumnNameSet.addAll(localColumnNameList);
         final StringSet foreignColumnNameSet = StringSet.createAsFlexibleOrdered();
-        localColumnNameSet.addAll(foreignColumnNameList);
+        foreignColumnNameSet.addAll(foreignColumnNameList);
 
-        final ForeignKey[] fkArray = getForeignKeys();
-        for (final ForeignKey key : fkArray) {
+        final ForeignKey[] fks = getForeignKeys();
+        for (final ForeignKey key : fks) {
             if (!Srl.equalsFlexible(foreignTableName, key.getForeignTableName())) {
                 continue;
             }

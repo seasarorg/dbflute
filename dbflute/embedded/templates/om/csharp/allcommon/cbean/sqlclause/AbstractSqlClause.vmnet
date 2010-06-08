@@ -1903,8 +1903,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             _specifiedSelectColumnMap.put(tableAliasName, new LinkedHashMap<String, String>());
         }
         Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
-        elementMap.put(columnName, null); // The value is dummy for extension at the future.
-        _specifiedSelectColumnMap.put(tableAliasName, elementMap);
+        elementMap.put(columnName, null); // The null value is unused actually, this is for future.
     }
 
     public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery) {

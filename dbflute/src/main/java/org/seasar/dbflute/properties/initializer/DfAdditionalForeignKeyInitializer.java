@@ -145,6 +145,60 @@ public class DfAdditionalForeignKeyInitializer {
     protected void setupForeignKeyToTable(String foreignKeyName, String foreignTableName,
             List<String> foreignColumnNameList, String fixedCondition, Table table, List<String> localColumnNameList,
             String fixedSuffix) {
+        // set up foreign key instance
+        final ForeignKey fk = createAdditionalForeignKey(foreignKeyName, foreignTableName, localColumnNameList,
+                foreignColumnNameList, fixedCondition, fixedSuffix);
+        table.addForeignKey(fk);
+
+        // set up referrer instance
+        final Table foreignTable = getTable(foreignTableName);
+        final boolean canBeReferrer = foreignTable.addReferrer(fk);
+        if (canBeReferrer) {
+            for (String foreignColumnName : foreignColumnNameList) {
+                final Column foreignColumn = foreignTable.getColumn(foreignColumnName);
+                foreignColumn.addReferrer(fk);
+            }
+        } else {
+            _log.info("  *Referrer setting was not allowed in this case");
+        }
+
+        // set up implicit reverse foreign key if fixed condition is valid
+        // (and if a same-structured FK does not exist)
+        // because biz-one-to-one needs reverse foreign key for ConditionBean' Specify
+        if (fk.hasFixedCondition()) {
+            processImplicitReverseForeignKey(table, foreignTable, localColumnNameList, foreignColumnNameList);
+        }
+    }
+
+    protected void processImplicitReverseForeignKey(Table table, Table foreignTable, List<String> localColumnNameList,
+            List<String> foreignColumnNameList) {
+        // name is "FK_ + foreign + local" because it's reversed
+        final String reverseName = "FK_" + foreignTable.getName() + table.getName();
+        final ForeignKey fk = createAdditionalForeignKey(reverseName, table.getName(), foreignColumnNameList,
+                localColumnNameList, null, null);
+        for (String localColumnName : localColumnNameList) {
+            final Column localColumn = table.getColumn(localColumnName);
+            if (!localColumn.isPrimaryKey()) { // check PK just in case
+                return;
+            }
+        }
+        if (foreignTable.existsForeignKey(table.getName(), foreignColumnNameList, localColumnNameList, null)) {
+            return;
+        }
+        foreignTable.addForeignKey(fk);
+        final boolean canBeReferrer = table.addReferrer(fk);
+        if (canBeReferrer) { // basically true because foreign columns are PK and no fixed condition
+            for (String localColumnName : localColumnNameList) {
+                final Column localColumn = table.getColumn(localColumnName);
+                localColumn.addReferrer(fk);
+            }
+        }
+        _log.info("  *Reversed FK was also made implicitly");
+    }
+
+    protected ForeignKey createAdditionalForeignKey(String foreignKeyName, String foreignTableName,
+            List<String> localColumnNameList, List<String> foreignColumnNameList, String fixedCondition,
+            String fixedSuffix) {
         final ForeignKey fk = new ForeignKey();
         fk.setName(foreignKeyName);
         fk.setForeignTableName(foreignTableName);
@@ -156,17 +210,7 @@ public class DfAdditionalForeignKeyInitializer {
         if (fixedSuffix != null && fixedSuffix.trim().length() > 0) {
             fk.setFixedSuffix(fixedSuffix);
         }
-        table.addForeignKey(fk);
-        final boolean canBeReferrer = getTable(foreignTableName).addReferrer(fk);
-        if (canBeReferrer) {
-            for (String foreignColumnName : foreignColumnNameList) {
-                final Column foreignColumn = getTable(foreignTableName).getColumn(foreignColumnName);
-                foreignColumn.addReferrer(fk);
-            }
-        } else {
-            String msg = "  *Cannot add referrer!";
-            _log.info(msg);
-        }
+        return fk;
     }
 
     protected void showResult(String foreignTableName, List<String> foreignColumnNameList, String fixedCondition,

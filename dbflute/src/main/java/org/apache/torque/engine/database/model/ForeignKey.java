@@ -257,11 +257,25 @@ public class ForeignKey {
     }
 
     /**
+     * Are the local columns primary-key?
+     * @return Determination.
+     */
+    public boolean isLocalColumnPrimaryKey() {
+        final List<Column> localColumnList = getLocalColumnList();
+        for (Column column : localColumnList) {
+            if (!column.isPrimaryKey()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Are the foreign columns primary-key? <br />
      * Basically true. Only when a relation is for biz-one-to-one, false.
      * @return Determination.
      */
-    protected boolean isForeignColumnPrimaryKey() {
+    public boolean isForeignColumnPrimaryKey() {
         final List<Column> foreignColumnList = getForeignColumnList();
         for (Column column : foreignColumnList) {
             if (!column.isPrimaryKey()) {
@@ -371,9 +385,10 @@ public class ForeignKey {
 
     public String getForeignColumnNameAsOne() {
         if (getForeignColumns().size() != 1) {
-            String msg = "This method is for only-one foreign-key: getForeignColumns().size()="
-                    + getForeignColumns().size();
-            msg = msg + " baseTable=" + getTable().getName() + " foreignTable=" + getForeignTable().getName();
+            String msg = "This method is for only-one foreign-key:";
+            msg = msg + " getForeignColumns().size()=" + getForeignColumns().size();
+            msg = msg + " baseTable=" + getTable().getName();
+            msg = msg + " foreignTable=" + getForeignTable().getName();
             throw new IllegalStateException(msg);
         }
         return getForeignColumns().get(0);
@@ -387,7 +402,6 @@ public class ForeignKey {
 
     /**
      * Returns the list of foreign column objects. You should not edit this List.
-     * 
      * @return the foreign objects
      */
     public List<Column> getForeignColumnObjectList() {
@@ -408,7 +422,6 @@ public class ForeignKey {
 
     /**
      * Get foreign table.
-     * <p>
      * @return Foreign table.
      */
     public Table getForeignTable() {
