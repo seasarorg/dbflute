@@ -131,7 +131,7 @@ public class Table {
     // -----------------------------------------------------
     //                                              Referrer
     //                                              --------
-    private List<ForeignKey> _referrers;
+    private List<ForeignKey> _referrerList;
 
     // -----------------------------------------------------
     //                                                Unique
@@ -187,7 +187,7 @@ public class Table {
         this._name = name;
         _columnList = new ArrayList<Column>();
         _foreignKeys = new ArrayList<ForeignKey>(5);
-        _referrers = new ArrayList<ForeignKey>(5);
+        _referrerList = new ArrayList<ForeignKey>(5);
         _indices = new ArrayList<Index>(5);
         _unices = new ArrayList<Unique>(5);
     }
@@ -1059,7 +1059,7 @@ public class Table {
             tableSet.add(name);
             sb.append(", ").append(name).append(fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         }
-        List<ForeignKey> referrerList = _referrers;
+        List<ForeignKey> referrerList = _referrerList;
         for (int i = 0; i < referrerList.size(); i++) {
             final ForeignKey fk = referrerList.get(i);
             if (!fk.isOneToOne()) {
@@ -1108,7 +1108,7 @@ public class Table {
             final ForeignKey fk = ls.get(i);
             sb.append(", ").append(fk.getForeignPropertyName());
         }
-        final List<ForeignKey> referrerList = _referrers;
+        final List<ForeignKey> referrerList = _referrerList;
         for (ForeignKey fk : referrerList) {
             if (fk.isOneToOne()) {
                 sb.append(", ").append(fk.getReferrerPropertyNameAsOne());
@@ -1316,15 +1316,15 @@ public class Table {
         if (!fk.canBeReferrer()) {
             return false;
         }
-        if (_referrers == null) {
-            _referrers = new ArrayList<ForeignKey>(5);
+        if (_referrerList == null) {
+            _referrerList = new ArrayList<ForeignKey>(5);
         }
-        _referrers.add(fk);
+        _referrerList.add(fk);
         return true;
     }
 
     public List<ForeignKey> getReferrerList() {
-        return _referrers;
+        return _referrerList;
     }
 
     public List<ForeignKey> getRefererList() {

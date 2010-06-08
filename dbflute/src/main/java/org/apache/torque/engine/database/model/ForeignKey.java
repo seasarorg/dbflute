@@ -253,32 +253,18 @@ public class ForeignKey {
     }
 
     public boolean canBeReferrer() {
-        return isForeignColumnsSameAsForeignTablePrimaryKeys() && !hasFixedCondition();
+        return isForeignColumnPrimaryKey() && !hasFixedCondition();
     }
 
     /**
+     * Are the foreign columns primary-key? <br />
+     * Basically true. Only when a relation is for biz-one-to-one, false.
      * @return Determination.
      */
-    protected boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
-        final List<String> foreginTablePrimaryKeyNameList = new ArrayList<String>();
-        {
-            final Table fkTable = _localTable.getDatabase().getTable(_foreignTableName);
-            final List<Column> foreignTablePrimaryKeyList = fkTable.getPrimaryKey();
-            for (Column column : foreignTablePrimaryKeyList) {
-                foreginTablePrimaryKeyNameList.add(column.getName());
-            }
-        }
-        if (foreginTablePrimaryKeyNameList.size() != _foreignColumns.size()) {
-            return false;
-        }
-        for (String foreginTablePrimaryKeyName : foreginTablePrimaryKeyNameList) {
-            boolean exists = false;
-            for (String foreignColumn : _foreignColumns) {
-                if (foreginTablePrimaryKeyName.equalsIgnoreCase(foreignColumn)) {
-                    exists = true;
-                }
-            }
-            if (!exists) {
+    protected boolean isForeignColumnPrimaryKey() {
+        final List<Column> foreignColumnList = getForeignColumnList();
+        for (Column column : foreignColumnList) {
+            if (!column.isPrimaryKey()) {
                 return false;
             }
         }
