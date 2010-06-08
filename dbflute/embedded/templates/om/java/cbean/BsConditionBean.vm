@@ -366,6 +366,15 @@ public class ${myClassName} extends AbstractConditionBean {
      * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
      */
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+        if (hasSpecifiedColumn()) { // if reverse call
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+            specify().column${col.javaName}();
+#end
+#end
+        }
+#end
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
         { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
@@ -410,17 +419,18 @@ public class ${myClassName} extends AbstractConditionBean {
     protected HpSpecification _specification;
 
     /**
-     * Prepare for SpecifyColumn, (Specify)DerivedReferrer.
+     * Prepare for SpecifyColumn, (Specify)DerivedReferrer. <br />
+     * This method should be called after SetupSelect.
      * <pre>
-     * cb.specify().columnMemberId(...);
-     * cb.specify().columnMemberName(...);
+     * cb.setupSelect_MemberStatus(); <span style="color: #3F7E5E">// should be called before specify()</span>
+     * cb.specify().columnMemberName();
+     * cb.specify().specifyMemberStatus().columnMemberStatusName();
      * cb.specify().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchaseDatetime();
      *         subCB.query().set...
      *     }
      * }, aliasName);
-     * cb.specify().specifyMemberStatus()...
      * </pre>
      * @return The instance of specification. (NotNull)
      */
@@ -433,6 +443,11 @@ public class ${myClassName} extends AbstractConditionBean {
             , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, getDBMetaProvider()); }
         return _specification;
     }
+
+    protected boolean hasSpecifiedColumn() {
+        return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
+    }
+
     protected HpAbstractSpecification<? extends ConditionQuery> localSp() {
         return specify();
     }

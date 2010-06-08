@@ -402,11 +402,11 @@ namespace ${glPackageBaseCommonCBean} {
     public abstract class AbstractSpecification<CQ> where CQ : ${glConditionQuery} {
         protected ${glConditionBean} _baseCB;
         protected SpQyCall<CQ> _qyCall;
-        protected CQ _query;
         protected bool _forDerivedReferrer;
         protected bool _forScalarSelect;
         protected bool _forScalarSubQuery;
-        protected bool _alreadySpecifyRequiredColumn;
+        protected CQ _query;
+        protected bool _alreadySpecifiedRequiredColumn;
 
         protected AbstractSpecification(${glConditionBean} baseCB, SpQyCall<CQ> qyCall
                                       , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery) {
@@ -421,7 +421,7 @@ namespace ${glPackageBaseCommonCBean} {
             assertColumn(columnName);
             if (_query == null) { _query = _qyCall.qy(); }
             if (isRequiredColumnSpecificationEnabled()) {
-                _alreadySpecifyRequiredColumn = true;
+                _alreadySpecifiedRequiredColumn = true;
                 doSpecifyRequiredColumn();
             }
             String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
@@ -435,7 +435,7 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         protected bool isRequiredColumnSpecificationEnabled() {
-            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_alreadySpecifyRequiredColumn;
+            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_alreadySpecifiedRequiredColumn;
         }
 
         protected void assertColumn(String columnName) {
@@ -553,8 +553,12 @@ namespace ${glPackageBaseCommonCBean} {
         protected String ln() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
         }
+
+        public bool IsAlreadySpecifiedRequiredColumn { get {
+            return _alreadySpecifiedRequiredColumn;
+        }}
     }
-    
+
     public interface SpQyCall<CQ> where CQ : ${glConditionQuery} {
         bool has(); 
         CQ qy(); 

@@ -129,6 +129,15 @@ namespace ${glPackageBaseCB} {
             return _nss${tmpPropertyNameInitCap};
         }}
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+            if (HasSpecifiedColumn) { // if reverse call
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+                Specify().Column${col.javaName}();
+#end
+#end
+            }
+#end
             doSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
             { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
@@ -164,6 +173,9 @@ namespace ${glPackageBaseCB} {
             if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
             return _specification;
         }
+        protected bool HasSpecifiedColumn { get {
+            return _specification != null && _specification.IsAlreadySpecifiedRequiredColumn;
+        }}
         protected class MySpQyCall : SpQyCall<${myConditionQueryClassName}> {
 			protected ${myClassName} _myCB;
 			public MySpQyCall(${myClassName} myCB) { _myCB = myCB; }
