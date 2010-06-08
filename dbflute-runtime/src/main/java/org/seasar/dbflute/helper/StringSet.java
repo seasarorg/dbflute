@@ -18,7 +18,6 @@ package org.seasar.dbflute.helper;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -42,7 +41,7 @@ public class StringSet implements Set<String>, Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Object> _stringKeyMap;
+    protected final StringKeyMap<Object> _stringKeyMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -186,11 +185,34 @@ public class StringSet implements Set<String>, Serializable {
     }
 
     // ===================================================================================
+    //                                                                    Original Utility
+    //                                                                    ================
+    public boolean equalsUnderCharOption(StringSet set) { // ignores ordered
+        if (set == null) {
+            return false;
+        }
+        if (size() != set.size()) {
+            return false;
+        }
+        return _stringKeyMap.equalsUnderCharOption(set._stringKeyMap);
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public boolean equals(Object obj) {
-        return _stringKeyMap.keySet().equals(obj);
+        if (obj instanceof StringSet) {
+            final StringSet set = (StringSet) obj;
+            if (size() != set.size()) {
+                return false;
+            }
+            return _stringKeyMap.equals(set._stringKeyMap);
+        } else if (obj instanceof Set<?>) {
+            return _stringKeyMap.keySet().equals(obj);
+        } else {
+            return false;
+        }
     }
 
     @Override

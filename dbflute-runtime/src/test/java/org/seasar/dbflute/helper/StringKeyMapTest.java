@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTraceViewUtil;
 
 /**
@@ -54,60 +55,6 @@ public class StringKeyMapTest extends PlainTestCase {
         assertEquals(2, map.get("bbb"));
         assertEquals(3, map.get("ccc"));
         assertEquals(3, map.size());
-    }
-
-    public void test_equals_all_same() throws Exception {
-        // ## Arrange ##
-        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
-        map1.put("aaa", 1);
-        map1.put("bbb", 2);
-        map1.put("ccc", 3);
-        StringKeyMap<Object> map2 = StringKeyMap.createAsFlexible();
-        map2.put("aaa", 1);
-        map2.put("bbb", 2);
-        map2.put("ccc", 3);
-
-        // ## Act ##
-        boolean actual = map1.equals(map2);
-
-        // ## Assert ##
-        assertTrue(actual);
-    }
-
-    public void test_equals_searchMap_same() throws Exception {
-        // ## Arrange ##
-        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
-        map1.put("aaa", 1);
-        map1.put("bbb", 2);
-        map1.put("ccc", 3);
-        StringKeyMap<Object> map2 = StringKeyMap.createAsFlexible();
-        map2.put("aa_a", 1);
-        map2.put("bbb", 2);
-        map2.put("ccc", 3);
-
-        // ## Act ##
-        boolean actual = map1.equals(map2);
-
-        // ## Assert ##
-        assertTrue(actual);
-    }
-
-    public void test_equals_searchMap_diff() throws Exception {
-        // ## Arrange ##
-        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
-        map1.put("aaa", 1);
-        map1.put("bbb", 2);
-        map1.put("ccc", 3);
-        StringKeyMap<Object> map2 = StringKeyMap.createAsCaseInsensitive();
-        map2.put("aa_a", 1);
-        map2.put("bbb", 2);
-        map2.put("ccc", 3);
-
-        // ## Act ##
-        boolean actual = map1.equals(map2);
-
-        // ## Assert ##
-        assertFalse(actual);
     }
 
     // ===================================================================================
@@ -649,5 +596,140 @@ public class StringKeyMapTest extends PlainTestCase {
             long afterGet = System.currentTimeMillis();
             log("get() = " + DfTraceViewUtil.convertToPerformanceView(afterGet - beforeGet));
         }
+    }
+
+    // ===================================================================================
+    //                                                                    Original Utility
+    //                                                                    ================
+    public void test_equalsUnderCharOption_basic() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
+        map1.put("aaa", 1);
+        map1.put("bbb", 2);
+        map1.put("ccc", 3);
+        StringKeyMap<Object> map2 = StringKeyMap.createAsCaseInsensitive();
+        map2.put("aaa", 1);
+        map2.put("bbb", 2);
+        map2.put("ccc", 3);
+
+        // ## Act & Assert ##
+        assertTrue(map1.equalsUnderCharOption(map2));
+        assertTrue(map2.equalsUnderCharOption(map1));
+        map2.put("ddd", 4);
+        assertFalse(map1.equalsUnderCharOption(map2));
+        map1.put("DDD", 4);
+        assertTrue(map1.equalsUnderCharOption(map2));
+        map1.put("eee", 6);
+        map2.put("eee", 5);
+        assertFalse(map1.equalsUnderCharOption(map2));
+    }
+
+    public void test_equalsUnderCharOption_with_flexible() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
+        map1.put("AAA", 1);
+        map1.put("bbb", 2);
+        map1.put("ccc", 3);
+        StringKeyMap<Object> map2 = StringKeyMap.createAsFlexible();
+        map2.put("aaa", 1);
+        map2.put("BB_B", 2);
+        map2.put("ccc", 3);
+
+        // ## Act & Assert ##
+        assertFalse(map1.equalsUnderCharOption(map2));
+        assertTrue(map2.equalsUnderCharOption(map1));
+    }
+
+    public void test_equalsUnderCharOption_caseInsensitive_with_ordered() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
+        map1.put("AAA", 1);
+        map1.put("bbb", 2);
+        map1.put("ccc", 3);
+        StringKeyMap<Object> map2 = StringKeyMap.createAsCaseInsensitiveOrdered();
+        map2.put("aaa", 1);
+        map2.put("ccc", 3);
+        map2.put("BBB", 2);
+
+        // ## Act ##
+        boolean actual = map1.equalsUnderCharOption(map2);
+
+        // ## Assert ##
+        assertTrue(actual);
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public void test_equals_basic() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
+        map1.put("aaa", 1);
+        map1.put("bbb", 2);
+        map1.put("ccc", 3);
+        StringKeyMap<Object> map2 = StringKeyMap.createAsCaseInsensitive();
+        map2.put("aaa", 1);
+        map2.put("bbb", 2);
+        map2.put("ccc", 3);
+
+        // ## Act ##
+        boolean actual = map1.equals(map2);
+
+        // ## Assert ##
+        assertTrue(actual);
+    }
+
+    public void test_equals_with_normalMap() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
+        map1.put("aaa", 1);
+        map1.put("bbb", 2);
+        map1.put("ccc", 3);
+        Map<String, Integer> map2 = DfCollectionUtil.newHashMap();
+        map2.put("aaa", 1);
+        map2.put("bbb", 2);
+        map2.put("ccc", 3);
+
+        // ## Act ##
+        boolean actual = map1.equals(map2);
+
+        // ## Assert ##
+        assertTrue(actual);
+    }
+
+    public void test_equals_nonCaseInsensitive() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
+        map1.put("aaa", 1);
+        map1.put("bbb", 2);
+        map1.put("ccc", 3);
+        StringKeyMap<Object> map2 = StringKeyMap.createAsCaseInsensitive();
+        map2.put("aaA", 1);
+        map2.put("bbb", 2);
+        map2.put("ccc", 3);
+
+        // ## Act ##
+        boolean actual = map1.equals(map2);
+
+        // ## Assert ##
+        assertFalse(actual);
+    }
+
+    public void test_equals_nonFlexible() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map1 = StringKeyMap.createAsCaseInsensitive();
+        map1.put("aaa", 1);
+        map1.put("bbb", 2);
+        map1.put("ccc", 3);
+        StringKeyMap<Object> map2 = StringKeyMap.createAsFlexible();
+        map2.put("aa_a", 1);
+        map2.put("bbb", 2);
+        map2.put("ccc", 3);
+
+        // ## Act ##
+        boolean actual = map1.equals(map2);
+
+        // ## Assert ##
+        assertFalse(actual);
     }
 }

@@ -391,11 +391,20 @@ public class Srl {
     // ===================================================================================
     //                                                                            Contains
     //                                                                            ========
+    public static boolean contains(List<String> strList, String str) {
+        assertListStringNotNull(strList);
+        for (String element : strList) {
+            if (equals(element, str)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean containsIgnoreCase(List<String> strList, String str) {
         assertListStringNotNull(strList);
-        assertStringNotNull(str);
         for (String element : strList) {
-            if (str.equalsIgnoreCase(element)) {
+            if (equalsIgnoreCase(element, str)) {
                 return true;
             }
         }
@@ -416,6 +425,53 @@ public class Srl {
             ++count;
         }
         return count;
+    }
+
+    // ===================================================================================
+    //                                                                              Equals
+    //                                                                              ======
+    public static final boolean equals(String str1, String str2) {
+        if (str1 != null) {
+            if (str2 != null) {
+                return str1.equals(str2);
+            } else {
+                return false;
+            }
+        } else {
+            return str2 == null; // if both are null, it means equal
+        }
+    }
+
+    public static final boolean equalsIgnoreCase(String str1, String str2) {
+        if (str1 != null) {
+            if (str2 != null) {
+                return str1.equalsIgnoreCase(str2);
+            } else {
+                return false;
+            }
+        } else {
+            return str2 == null; // if both are null, it means equal
+        }
+    }
+
+    public static final boolean equalsFlexible(String str1, String str2) {
+        if (str1 != null) {
+            if (str2 != null) {
+                str1 = replace(str1, "_", "");
+                str2 = replace(str2, "_", "");
+                return str1.equalsIgnoreCase(str2);
+            } else {
+                return false;
+            }
+        } else {
+            return str2 == null; // if both are null, it means equal
+        }
+    }
+
+    public static final boolean equalsFlexibleTrimmed(String str1, String str2) {
+        str1 = str1 != null ? str1.trim() : null;
+        str2 = str2 != null ? str2.trim() : null;
+        return equalsFlexible(str1, str2);
     }
 
     // ===================================================================================

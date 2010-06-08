@@ -231,6 +231,35 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     // ===================================================================================
+    //                                                                    Original Utility
+    //                                                                    ================
+    public boolean equalsUnderCharOption(StringKeyMap<VALUE> map) { // ignores ordered
+        if (map == null) {
+            return false;
+        }
+        if (size() != map.size()) {
+            return false;
+        }
+        final Set<Entry<String, VALUE>> entrySet = map.entrySet();
+        for (Entry<String, VALUE> entry : entrySet) {
+            if (!containsKey(entry.getKey())) {
+                return false;
+            }
+            final VALUE value = get(entry.getKey());
+            if (value != null) {
+                if (!value.equals(entry.getValue())) {
+                    return false;
+                }
+            } else {
+                if (entry.getValue() != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // ===================================================================================
     //                                                                       Key Converter
     //                                                                       =============
     protected String convertStringKey(Object key) {
@@ -296,9 +325,21 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof StringKeyMap<?>) {
-            return _searchMap.equals(((StringKeyMap<?>) obj)._searchMap);
+            @SuppressWarnings("unchecked")
+            final StringKeyMap<Object> map = (StringKeyMap<Object>) obj;
+            if (size() != map.size()) {
+                return false;
+            }
+            final Map<?, ?> myMap = _plainMap != null ? _plainMap : _searchMap;
+            final Map<?, ?> yourMap = map._plainMap != null ? map._plainMap : map._searchMap;
+            return myMap.equals(yourMap);
         } else if (obj instanceof Map<?, ?>) {
-            return _searchMap.equals(obj);
+            @SuppressWarnings("unchecked")
+            final Map<Object, Object> map = (Map<Object, Object>) obj;
+            if (size() != map.size()) {
+                return false;
+            }
+            return _plainMap != null ? _plainMap.equals(map) : _searchMap.equals(map);
         } else {
             return false;
         }
@@ -306,14 +347,11 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
 
     @Override
     public int hashCode() {
-        return _searchMap.hashCode();
+        return _plainMap != null ? _plainMap.hashCode() : _searchMap.hashCode();
     }
 
     @Override
     public String toString() {
-        if (_plainMap != null) {
-            return _plainMap.toString();
-        }
-        return _searchMap.toString();
+        return _plainMap != null ? _plainMap.toString() : _searchMap.toString();
     }
 }
