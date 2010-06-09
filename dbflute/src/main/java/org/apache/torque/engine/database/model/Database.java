@@ -337,144 +337,127 @@ public class Database {
     }
 
     public String getPmbMetaDataSuperClassDefinition(String className) {
-        return getParameterBeanBasicHandler().getPmbMetaDataSuperClassDefinition(className);
+        return getParameterBeanBasicHandler().getSuperClassDefinition(className);
     }
 
     public boolean hasPmbMetaDataSafetyResultDefitinion(String className) {
-        return getParameterBeanBasicHandler().hasPmbMetaDataSafetyResultDefitinion(className);
-    }
-
-    public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertyNameTypeMap(className);
-    }
-
-    public Map<String, String> getPmbMetaDataPropertyNameColumnNameMap(String className) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertyNameColumnNameMap(className);
-    }
-
-    public Map<String, String> getPmbMetaDataPropertyNameOptionMap(String className) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertyNameOptionMap(className);
+        return getParameterBeanBasicHandler().hasSafetyResultDefitinion(className);
     }
 
     public Set<String> getPmbMetaDataPropertySet(String className) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertySet(className);
+        return getParameterBeanBasicHandler().getPropertySet(className);
     }
 
     public String getPmbMetaDataPropertyType(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertyType(className, propertyName);
+        return getParameterBeanBasicHandler().getPropertyType(className, propertyName);
     }
 
     public String getPmbMetaDataPropertyColumnName(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertyColumnName(className, propertyName);
+        return getParameterBeanBasicHandler().getPropertyColumnName(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
     public boolean isPmbMetaDataForProcedure(String className) {
-        return getParameterBeanBasicHandler().isPmbMetaDataForProcedure(className);
+        return getParameterBeanBasicHandler().isForProcedure(className);
     }
 
     public String getPmbMetaDataProcedureName(String className) {
-        return getParameterBeanBasicHandler().getPmbMetaDataProcedureName(className);
+        return getParameterBeanBasicHandler().getProcedureName(className);
     }
 
     public boolean isPmbMetaDataRefCustomizeEntity(String className) {
-        return getParameterBeanBasicHandler().isPmbMetaDataRefCustomizeEntity(className);
+        return getParameterBeanBasicHandler().isRefCustomizeEntity(className);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterIn(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterIn(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterIn(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterOut(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterOut(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterOut(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterInOut(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterInOut(className,
-                propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterInOut(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterReturn(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterReturn(className,
-                propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterReturn(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterResult(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterResult(className,
-                propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterResult(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
     public boolean hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter(String className, String propertyName) {
-        return getParameterBeanBasicHandler()
-                .hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter(className, propertyName);
+        return getParameterBeanBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                    Option LikeSeasrch
     //                                    ------------------
     public boolean hasPmbMetaDataPropertyOptionAnyLikeSearch(String className) {
-        return getParameterBeanBasicHandler().hasPmbMetaDataPropertyOptionAnyLikeSearch(className);
+        return getParameterBeanBasicHandler().hasPropertyOptionAnyLikeSearch(className);
     }
 
     public boolean hasPmbMetaDataPropertyOptionAnyLikeSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().hasPmbMetaDataPropertyOptionAnyLikeSearch(className, propertyName);
+        return getParameterBeanBasicHandler().hasPropertyOptionAnyLikeSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionLikeSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionLikeSearch(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionLikeSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionPrefixSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionPrefixSearch(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionPrefixSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionContainSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionContainSearch(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionContainSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionSuffixSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionSuffixSearch(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionSuffixSearch(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                         Option FromTo
     //                                         -------------
     public boolean hasPmbMetaDataPropertyOptionAnyFromTo(String className) {
-        return getParameterBeanBasicHandler().hasPmbMetaDataPropertyOptionAnyFromTo(className);
+        return getParameterBeanBasicHandler().hasPropertyOptionAnyFromTo(className);
     }
 
     public boolean hasPmbMetaDataPropertyOptionAnyFromTo(String className, String propertyName) {
-        return getParameterBeanBasicHandler().hasPmbMetaDataPropertyOptionAnyFromTo(className, propertyName);
+        return getParameterBeanBasicHandler().hasPropertyOptionAnyFromTo(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionFromDate(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionFromDate(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionFromDate(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionToDate(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionToDate(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionToDate(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                 Option Classification
     //                                 ---------------------
     public boolean isPmbMetaDataPropertyOptionClassification(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionClassification(className, propertyName);
+        return getParameterBeanBasicHandler().isPropertyOptionClassification(className, propertyName);
     }
 
     public String getPmbMetaDataPropertyOptionClassificationName(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertyOptionClassificationName(className, propertyName);
+        return getParameterBeanBasicHandler().getPropertyOptionClassificationName(className, propertyName);
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
-        return getParameterBeanBasicHandler()
-                .getPmbMetaDataPropertyOptionClassificationMapList(className, propertyName);
+        return getParameterBeanBasicHandler().getPropertyOptionClassificationMapList(className, propertyName);
     }
 
     // -----------------------------------------------------
@@ -483,31 +466,21 @@ public class Database {
     public String getPmbMetaDataPropertyRefColumnInfo(String className, String propertyName) {
         try {
             final DfParameterBeanBasicHandler handler = getParameterBeanBasicHandler();
-            final AppData data = _sql2entitySchemaData;
-            final String alias = handler.getPmbMetaDataPropertyRefAlias(className, propertyName, data);
-            final String name = handler.getPmbMetaDataPropertyRefName(className, propertyName, data);
-            final String lineDisp = handler.getPmbMetaDataPropertyRefLineDisp(className, propertyName, data);
-            if (name != null && name.trim().length() > 0) {
-                return " :: refers to " + alias + name + ": " + lineDisp;
-            } else {
-                return "";
-            }
-        } catch (RuntimeException e) {
-            String msg = "Failed to execute getPmbMetaDataPropertyRefColumnInfo(): ";
+            return handler.getPropertyRefColumnInfo(className, propertyName, _sql2entitySchemaData);
+        } catch (RuntimeException e) { // just in case
+            String msg = "Failed to get ref-column info:";
             msg = msg + " " + className + "." + propertyName;
             _log.debug(msg, e);
-            throw new IllegalStateException(msg, e);
+            throw e;
         }
     }
 
     public boolean isPmbMetaDataPropertyRefColumnChar(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPmbMetaDataPropertyRefColumnChar(className, propertyName,
-                _sql2entitySchemaData);
+        return getParameterBeanBasicHandler().isPropertyRefColumnChar(className, propertyName, _sql2entitySchemaData);
     }
 
     public String getPmbMetaDataPropertyRefSize(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPmbMetaDataPropertyRefSize(className, propertyName,
-                _sql2entitySchemaData);
+        return getParameterBeanBasicHandler().getPropertyRefSize(className, propertyName, _sql2entitySchemaData);
     }
 
     // ===================================================================================

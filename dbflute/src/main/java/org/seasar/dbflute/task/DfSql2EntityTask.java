@@ -31,7 +31,6 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DBDef;
@@ -47,29 +46,23 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
-import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
-import org.seasar.dbflute.logic.sql2entity.cmentity.DfProcedureExecutionMetaExtractor;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfParameterBeanMetaData;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfProcedurePmbSetupper;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -86,16 +79,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap = new LinkedHashMap<String, Map<String, DfColumnMetaInfo>>();
-    protected final Map<String, Object> _cursorInfoMap = new LinkedHashMap<String, Object>();
-    protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
-    protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
-    protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
-    protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
+    protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, Object> _cursorInfoMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, File> _entitySqlFileMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, String> _exceptionInfoMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, List<String>> _primaryKeyMap = DfCollectionUtil.newLinkedHashMap();
 
-    protected DfColumnHandler _columnHandler = new DfColumnHandler();
-    protected DfProcedureHandler _procedureHandler = new DfProcedureHandler();
-    protected DfOutsideSqlMarkAnalyzer _markAnalyzer = new DfOutsideSqlMarkAnalyzer();
+    protected final DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected final DfOutsideSqlMarkAnalyzer _markAnalyzer = new DfOutsideSqlMarkAnalyzer();
 
     // for getting schema
     protected AppData _schemaData;
@@ -615,10 +607,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                           =========
     protected void setupProcedure() {
         try {
-            doSetupProcedure();
+            final DfProcedurePmbSetupper setupper = createProcedurePmbSetupper();
+            setupper.setupProcedure();
         } catch (SQLException e) {
             throwProcedureSetupFailureException(e);
         }
+    }
+
+    protected DfProcedurePmbSetupper createProcedurePmbSetupper() {
+        return new DfProcedurePmbSetupper(getDataSource(), _entityInfoMap, _pmbMetaDataMap);
     }
 
     protected void throwProcedureSetupFailureException(SQLException e) {
@@ -629,192 +626,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         msg = msg + "[SQL Exception]" + ln() + e.getClass() + ln();
         msg = msg + "* * * * * * * * * */";
         throw new DfProcedureSetupFailureException(msg, e);
-    }
-
-    protected void doSetupProcedure() throws SQLException {
-        final DfOutsideSqlProperties outsideSqlProperties = getOutsideSqlProperties();
-        if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
-            return;
-        }
-        _log.info(" ");
-        _log.info("...Setting up procedures for generating parameter-beans");
-        final List<DfProcedureMetaInfo> procedureList = getAvailableProcedureList();
-        _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
-        for (DfProcedureMetaInfo procedure : procedureList) {
-            final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
-            final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
-            final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
-            final Map<String, String> propertyNameColumnNameMap = new LinkedHashMap<String, String>();
-            final List<DfProcedureColumnMetaInfo> procedureColumnList = procedure.getProcedureColumnList();
-            final List<DfProcedureNotParamResultMetaInfo> notParamResultList = procedure.getNotParamResultList();
-
-            final String pmbName = convertProcedureNameToPmbName(procedure.getProcedureName());
-            {
-                final String procDisp = procedure.buildProcedureLoggingName();
-                final DfProcedureType procType = procedure.getProcedureType();
-                _log.info("[" + pmbName + "]: " + procDisp + " // " + procType);
-                if (procedureColumnList.isEmpty() && notParamResultList.isEmpty()) {
-                    _log.info("    *No Parameter");
-                }
-            }
-
-            boolean existsCustomizeEntity = false;
-            int index = 0;
-            for (DfProcedureColumnMetaInfo column : procedureColumnList) {
-                String columnName = column.getColumnName();
-                if (columnName == null || columnName.trim().length() == 0) {
-                    columnName = "arg" + (index + 1);
-                }
-                columnName = filterColumnNameAboutVendorDependency(columnName);
-                final String propertyName;
-                {
-                    propertyName = convertColumnNameToPropertyName(columnName);
-                }
-                String propertyType = getProcedureColumnPropertyType(column);
-                if (column.hasColumnMetaInfo()) {
-                    final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
-                    _entityInfoMap.put(entityName, column.getColumnMetaInfoMap());
-                    existsCustomizeEntity = true;
-                    propertyType = convertProcedureListPropertyType(entityName);
-                }
-                propertyNameTypeMap.put(propertyName, propertyType);
-                final DfProcedureColumnType procedureColumnType = column.getProcedureColumnType();
-                propertyNameOptionMap.put(propertyName, procedureColumnType.toString());
-                propertyNameColumnNameMap.put(propertyName, columnName);
-                String msg = "    " + propertyType + " " + propertyName + ";";
-                msg = msg + " // " + column.getProcedureColumnType();
-                msg = msg + "(" + column.getJdbcType() + ", " + column.getDbTypeName() + ")";
-                _log.info(msg);
-                ++index;
-            }
-            for (DfProcedureNotParamResultMetaInfo result : notParamResultList) {
-                final String propertyName = result.getPropertyName();
-                String propertyType = getProcedureDefaultResultSetPropertyType();
-                if (result.hasColumnMetaInfo()) {
-                    final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
-                    _entityInfoMap.put(entityName, result.getColumnMetaInfoMap());
-                    existsCustomizeEntity = true;
-                    propertyType = convertProcedureListPropertyType(entityName);
-                }
-                propertyNameTypeMap.put(propertyName, propertyType);
-                propertyNameOptionMap.put(propertyName, DfProcedureColumnType.procedureColumnResult.toString());
-                propertyNameColumnNameMap.put(propertyName, propertyName);
-                String msg = "    " + propertyType + " " + propertyName + ";";
-                msg = msg + " // " + DfProcedureColumnType.procedureColumnResult;
-                _log.info(msg);
-            }
-            parameterBeanMetaData.setClassName(pmbName);
-            parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
-            parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
-            parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
-            parameterBeanMetaData.setProcedureName(procedure.buildProcedureSqlName());
-            parameterBeanMetaData.setRefCustomizeEntity(existsCustomizeEntity);
-            _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
-        }
-        _log.info("= = = = = = = = = =/");
-        _log.info(" ");
-    }
-
-    // -----------------------------------------------------
-    //                                   Procedure Meta Info
-    //                                   -------------------
-    protected List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
-        _procedureHandler.includeProcedureSynonym(getDataSource());
-        final List<DfProcedureMetaInfo> procedureList = _procedureHandler.getAvailableProcedureList(getDataSource());
-        if (getProperties().getOutsideSqlProperties().isGenerateProcedureCustomizeEntity()) {
-            final DfProcedureExecutionMetaExtractor executionMetaHandler = new DfProcedureExecutionMetaExtractor();
-            executionMetaHandler.extractExecutionMetaData(getDataSource(), procedureList);
-        }
-        return procedureList;
-    }
-
-    // -----------------------------------------------------
-    //                                      Procedure Column
-    //                                      ----------------
-    protected String getProcedureColumnPropertyType(DfProcedureColumnMetaInfo column) {
-        if (isResultSetProperty(column)) {
-            return getProcedureDefaultResultSetPropertyType();
-        }
-        final int jdbcType = column.getJdbcType();
-        final String dbTypeName = column.getDbTypeName();
-        final Integer columnSize = column.getColumnSize();
-        final Integer decimalDigits = column.getDecimalDigits();
-        final String propertyType;
-        if (getBasicProperties().isDatabaseOracle() && "number".equalsIgnoreCase(dbTypeName)) {
-            // Because the length setting of procedure parameter is unsupported on Oracle.
-            propertyType = TypeMap.getDefaultDecimalJavaNativeType();
-        } else {
-            final String torqueType = _columnHandler.getColumnJdbcType(jdbcType, dbTypeName);
-            propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
-        }
-        return propertyType;
-    }
-
-    protected String getProcedureDefaultResultSetPropertyType() {
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-        return grammarInfo.getGenericMapListClassName("String", "Object");
-    }
-
-    // -----------------------------------------------------
-    //                                        Various Helper
-    //                                        --------------
-    protected boolean isResultSetProperty(DfProcedureColumnMetaInfo column) {
-        if (column.hasColumnMetaInfo()) {
-            return true;
-        }
-        if (isCursorPostgreSQL(column)) {
-            return true;
-        } else if (isCursorOracle(column)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    protected boolean isCursorPostgreSQL(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabaseOracle() && column.isCursorPostgreSQL(column);
-    }
-
-    protected boolean isCursorOracle(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabasePostgreSQL() && column.isCursorOracle(column);
-    }
-
-    protected String convertProcedureNameToPmbName(String procedureName) {
-        procedureName = replaceString(procedureName, ".", "_");
-        procedureName = filterProcedureName4PmbNameAboutVendorDependency(procedureName);
-        return Srl.camelize(procedureName) + "Pmb";
-    }
-
-    protected String convertProcedurePmbNameToEntityName(String pmbName, String propertyName) {
-        final String baseName = pmbName.substring(0, pmbName.length() - "Pmb".length());
-        final String entityName = baseName + Srl.initCap(propertyName);
-        return entityName;
-    }
-
-    protected String convertProcedureListPropertyType(String entityName) {
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-        return grammarInfo.getGenericListClassName(entityName);
-    }
-
-    protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
-        // Because SQLServer returns 'Abc;1'.
-        if (getBasicProperties().isDatabaseSQLServer() && procedureName.contains(";")) {
-            procedureName = procedureName.substring(0, procedureName.indexOf(";"));
-        }
-        return procedureName;
-    }
-
-    protected String convertColumnNameToPropertyName(String columnName) {
-        columnName = filterColumnNameAboutVendorDependency(columnName);
-        return Srl.initBeansProp(Srl.camelize(columnName));
-    }
-
-    protected String filterColumnNameAboutVendorDependency(String columnName) {
-        // Because SQLServer returns '@returnValue'.
-        if (getBasicProperties().isDatabaseSQLServer() && columnName.startsWith("@")) {
-            columnName = columnName.substring("@".length());
-        }
-        return columnName;
     }
 
     // ===================================================================================
@@ -829,6 +640,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                 Initialize Override
     //                                                                 ===================
+    @Override
     public Context initControlContext() throws Exception {
         final Database database = new Database();
         database.setSql2EntitySchemaData(_schemaData);

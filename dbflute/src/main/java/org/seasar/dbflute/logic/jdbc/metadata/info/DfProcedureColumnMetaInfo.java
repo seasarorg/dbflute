@@ -11,40 +11,60 @@ import org.seasar.dbflute.util.Srl;
 
 public class DfProcedureColumnMetaInfo {
 
-    protected String columnName;
-    protected int jdbcType;
-    protected String dbTypeName;
-    protected Integer columnSize;
-    protected Integer decimalDigits;
-    protected String columnComment;
-    protected DfProcedureColumnType procedureColumnType;
-    protected Map<String, DfColumnMetaInfo> columnMetaInfoMap = DfCollectionUtil.emptyMap(); // if result set
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String _columnName;
+    protected int _jdbcType;
+    protected String _dbTypeName;
+    protected Integer _columnSize;
+    protected Integer _decimalDigits;
+    protected String _columnComment;
+    protected DfProcedureColumnType _procedureColumnType;
+    protected Map<String, DfColumnMetaInfo> _columnMetaInfoMap = DfCollectionUtil.emptyMap(); // if result set
 
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
     public String getColumnDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(columnName)) {
-            sb.append(columnName);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_columnName)) {
+            sb.append(_columnName);
         } else {
-            if (DfProcedureColumnType.procedureColumnReturn.equals(procedureColumnType)) {
+            if (DfProcedureColumnType.procedureColumnReturn.equals(_procedureColumnType)) {
                 sb.append("(result)");
             } else {
                 sb.append("(arg)");
             }
         }
-        sb.append(" - ").append(dbTypeName);
-        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
-            sb.append("(").append(columnSize);
-            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
-                sb.append(", ").append(decimalDigits);
+        sb.append(" - ").append(_dbTypeName);
+        if (DfColumnHandler.isColumnSizeValid(_columnSize)) {
+            sb.append("(").append(_columnSize);
+            if (DfColumnHandler.isDecimalDigitsValid(_decimalDigits)) {
+                sb.append(", ").append(_decimalDigits);
             }
             sb.append(")");
         }
-        sb.append(" <span class=\"type\">(").append(procedureColumnType.alias()).append(")</span>");
+        sb.append(" <span class=\"type\">(").append(_procedureColumnType.alias()).append(")</span>");
+        return sb.toString();
+    }
+
+    public String getColumnDefinitionLineDisp() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_dbTypeName);
+        if (DfColumnHandler.isColumnSizeValid(_columnSize)) {
+            sb.append("(").append(_columnSize);
+            if (DfColumnHandler.isDecimalDigitsValid(_decimalDigits)) {
+                sb.append(", ").append(_decimalDigits);
+            }
+            sb.append(")");
+        }
+        sb.append(" as ").append(_procedureColumnType.alias());
         return sb.toString();
     }
 
     public boolean hasColumnMetaInfo() {
-        return !columnMetaInfoMap.isEmpty();
+        return !_columnMetaInfoMap.isEmpty();
     }
 
     public boolean hasColumnComment() {
@@ -53,7 +73,7 @@ public class DfProcedureColumnMetaInfo {
 
     public String getColumnCommentForSchemaHtml() {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        String comment = columnComment;
+        String comment = _columnComment;
         comment = prop.resolvePreTextForSchemaHtml(comment);
         return comment;
     }
@@ -72,12 +92,6 @@ public class DfProcedureColumnMetaInfo {
         return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
     }
 
-    @Override
-    public String toString() {
-        return "{" + columnName + ", " + procedureColumnType + ", " + jdbcType + ", " + dbTypeName + "(" + columnSize
-                + ", " + decimalDigits + ")" + columnComment + "}";
-    }
-
     public enum DfProcedureColumnType {
         procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut(
                 "Out"), procedureColumnReturn("Return"), procedureColumnResult("Result");
@@ -92,67 +106,79 @@ public class DfProcedureColumnMetaInfo {
         }
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _columnName + ", " + _procedureColumnType + ", " + _jdbcType + ", " + _dbTypeName + "("
+                + _columnSize + ", " + _decimalDigits + ")" + _columnComment + "}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getColumnName() {
-        return columnName;
+        return _columnName;
     }
 
     public void setColumnName(String columnName) {
-        this.columnName = columnName;
+        this._columnName = columnName;
     }
 
     public DfProcedureColumnType getProcedureColumnType() {
-        return procedureColumnType;
+        return _procedureColumnType;
     }
 
     public void setProcedureColumnType(DfProcedureColumnType procedureColumnType) {
-        this.procedureColumnType = procedureColumnType;
+        this._procedureColumnType = procedureColumnType;
     }
 
     public int getJdbcType() {
-        return jdbcType;
+        return _jdbcType;
     }
 
     public void setJdbcType(int jdbcType) {
-        this.jdbcType = jdbcType;
+        this._jdbcType = jdbcType;
     }
 
     public String getDbTypeName() {
-        return dbTypeName;
+        return _dbTypeName;
     }
 
     public void setDbTypeName(String dbTypeName) {
-        this.dbTypeName = dbTypeName;
+        this._dbTypeName = dbTypeName;
     }
 
     public Integer getColumnSize() {
-        return columnSize;
+        return _columnSize;
     }
 
     public void setColumnSize(Integer columnSize) {
-        this.columnSize = columnSize;
+        this._columnSize = columnSize;
     }
 
     public Integer getDecimalDigits() {
-        return decimalDigits;
+        return _decimalDigits;
     }
 
     public void setDecimalDigits(Integer decimalDigits) {
-        this.decimalDigits = decimalDigits;
+        this._decimalDigits = decimalDigits;
     }
 
     public String getColumnComment() {
-        return columnComment;
+        return _columnComment;
     }
 
     public void setColumnComment(String columnComment) {
-        this.columnComment = columnComment;
+        this._columnComment = columnComment;
     }
 
     public Map<String, DfColumnMetaInfo> getColumnMetaInfoMap() {
-        return columnMetaInfoMap;
+        return _columnMetaInfoMap;
     }
 
     public void setColumnMetaInfoMap(Map<String, DfColumnMetaInfo> columnMetaInfoMap) {
-        this.columnMetaInfoMap = columnMetaInfoMap;
+        this._columnMetaInfoMap = columnMetaInfoMap;
     }
 }

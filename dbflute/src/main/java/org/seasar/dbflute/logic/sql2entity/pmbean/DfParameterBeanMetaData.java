@@ -3,6 +3,8 @@ package org.seasar.dbflute.logic.sql2entity.pmbean;
 import java.io.File;
 import java.util.Map;
 
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
+
 /**
  * @author jflute
  */
@@ -16,6 +18,7 @@ public class DfParameterBeanMetaData {
     protected Map<String, String> propertyNameTypeMap;
     protected Map<String, String> propertyNameOptionMap;
     protected Map<String, String> propertyNameColumnNameMap; // only when this is for procedure
+    protected Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap; // only when this is for procedure
     protected String procedureName; // only when this is for procedure
     protected File sqlFile; // when procedure, always null
     protected boolean refCustomizeEntity;
@@ -69,6 +72,14 @@ public class DfParameterBeanMetaData {
         this.propertyNameOptionMap = propertyNameOptionMap;
     }
 
+    public String getProcedureName() {
+        return procedureName;
+    }
+
+    public void setProcedureName(String procedureName) {
+        this.procedureName = procedureName;
+    }
+
     public Map<String, String> getPropertyNameColumnNameMap() {
         return propertyNameColumnNameMap;
     }
@@ -77,12 +88,12 @@ public class DfParameterBeanMetaData {
         this.propertyNameColumnNameMap = propertyNameColumnNameMap;
     }
 
-    public String getProcedureName() {
-        return procedureName;
+    public Map<String, DfProcedureColumnMetaInfo> getPropertyNameColumnInfoMap() {
+        return propertyNameColumnInfoMap;
     }
 
-    public void setProcedureName(String procedureName) {
-        this.procedureName = procedureName;
+    public void setPropertyNameColumnInfoMap(Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap) {
+        this.propertyNameColumnInfoMap = propertyNameColumnInfoMap;
     }
 
     public File getSqlFile() {
