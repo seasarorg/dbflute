@@ -158,7 +158,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
         info.put("password", _password);
 
         try {
-            _log.info("...Connecting the database:");
+            _log.info("...Connecting to the database:");
             conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
             String msg = "Failed to connect:";

@@ -26,18 +26,38 @@ public class DfProcedureColumnMetaInfo {
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
+    public String getColumnDisplayName() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getColumnNameDisp());
+        sb.append(": ").append(_dbTypeName);
+        sb.append(getColumnSizeDisp());
+        sb.append(" as ").append(_procedureColumnType.alias());
+        return sb.toString();
+    }
+
     public String getColumnDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
+        sb.append(getColumnNameDisp());
+        sb.append(" - ").append(_dbTypeName);
+        sb.append(getColumnSizeDisp());
+        sb.append(" <span class=\"type\">(").append(_procedureColumnType.alias()).append(")</span>");
+        return sb.toString();
+    }
+
+    public String getColumnNameDisp() {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_columnName)) {
-            sb.append(_columnName);
+            return _columnName;
         } else {
             if (DfProcedureColumnType.procedureColumnReturn.equals(_procedureColumnType)) {
-                sb.append("(result)");
+                return "(result)";
             } else {
-                sb.append("(arg)");
+                return "(arg)";
             }
         }
-        sb.append(" - ").append(_dbTypeName);
+    }
+
+    public String getColumnSizeDisp() {
+        final StringBuilder sb = new StringBuilder();
         if (DfColumnHandler.isColumnSizeValid(_columnSize)) {
             sb.append("(").append(_columnSize);
             if (DfColumnHandler.isDecimalDigitsValid(_decimalDigits)) {
@@ -45,7 +65,6 @@ public class DfProcedureColumnMetaInfo {
             }
             sb.append(")");
         }
-        sb.append(" <span class=\"type\">(").append(_procedureColumnType.alias()).append(")</span>");
         return sb.toString();
     }
 
@@ -78,18 +97,31 @@ public class DfProcedureColumnMetaInfo {
         return comment;
     }
 
-    public boolean isCursorPostgreSQL(DfProcedureColumnMetaInfo column) {
+    public boolean isPostgreSQLUuid(DfProcedureColumnMetaInfo column) {
+        final String key = "uuid";
+        final int jdbcType = column.getJdbcType();
+        final String dbTypeName = column.getDbTypeName();
+        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
+    }
+
+    public boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
         final String key = "cursor";
         final int jdbcType = column.getJdbcType();
         final String dbTypeName = column.getDbTypeName();
         return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
     }
 
-    public boolean isCursorOracle(DfProcedureColumnMetaInfo column) {
+    public boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
         final String key = "cursor";
         final int jdbcType = column.getJdbcType();
         final String dbTypeName = column.getDbTypeName();
         return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
+    }
+
+    public boolean isSQLServerUuid(DfProcedureColumnMetaInfo column) {
+        final String key = "uniqueidentifier";
+        final String dbTypeName = column.getDbTypeName();
+        return dbTypeName != null && dbTypeName.equalsIgnoreCase(key);
     }
 
     public enum DfProcedureColumnType {

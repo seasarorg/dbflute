@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -163,7 +164,10 @@ public class DfProcedureExecutionMetaExtractor {
         } catch (SQLException continued) {
             String msg = "*Failed to execute the procedure for getting meta data:" + ln();
             msg = msg + " " + sql + ln();
-            msg = msg + " " + testValueList + ln();
+            for (DfProcedureColumnMetaInfo column : columnList) {
+                msg = msg + "   " + column.getColumnDisplayName() + ln();
+            }
+            msg = msg + " test values = " + testValueList + ln();
             msg = msg + " " + DfJDBCException.extractMessage(continued);
             _log.info(msg);
         } finally {
@@ -226,14 +230,28 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void doSetupTestValueList(DfProcedureColumnMetaInfo column, List<Object> testValueList) {
-        final String stringValue = "0";
         final DfProcedureColumnType columnType = column.getProcedureColumnType();
         if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
             return;
         }
         if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
                 || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-            final String dbTypeName = column.getDbTypeName();
+            final String stringValue = "0";
+            final String uuidValue = "FD8C7155-3A0A-DB11-BAC4-0011F5099158";
+
+            // mapping by DB type name as pinpoint patch
+            Object testValue = null;
+            if (isPostgreSQLUuid(column)) {
+                testValue = UUID.fromString(uuidValue);
+            } else if (isSQLServerUuid(column)) {
+                testValue = uuidValue;
+            }
+            if (testValue != null) {
+                testValueList.add(testValue);
+                return;
+            }
+
+            // mapping by JDBC type
             final int jdbcDefType = column.getJdbcType();
             final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
             if (jdbcType == null) {
@@ -243,10 +261,7 @@ public class DfProcedureExecutionMetaExtractor {
             final Integer columnSize = column.getColumnSize();
             final Integer decimalDigits = column.getDecimalDigits();
             final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
-            Object testValue = null;
-            if (isSQLServer() && "uniqueidentifier".equalsIgnoreCase(dbTypeName)) {
-                testValue = "FD8C7155-3A0A-DB11-BAC4-0011F5099158"; // as pinpoint patch
-            } else if (containsAsEndsWith(nativeType, numberList)) {
+            if (containsAsEndsWith(nativeType, numberList)) {
                 testValue = 0;
             } else if (containsAsEndsWith(nativeType, dateList)) {
                 testValue = DfTypeUtil.toTimestamp("2010-03-31 12:34:56");
@@ -307,11 +322,12 @@ public class DfProcedureExecutionMetaExtractor {
         for (DfProcedureColumnMetaInfo column : columnList) {
             final int paramIndex = (index + 1);
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
+            final int jdbcType = column.getJdbcType();
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                cs.registerOutParameter(paramIndex, column.getJdbcType());
+                cs.registerOutParameter(paramIndex, jdbcType);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                cs.setObject(paramIndex, testValueList.get(testValueIndex));
+                cs.setObject(paramIndex, testValueList.get(testValueIndex), jdbcType);
                 ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
@@ -320,12 +336,12 @@ public class DfProcedureExecutionMetaExtractor {
                 } else if (isOracleCursor(column)) {
                     cs.registerOutParameter(paramIndex, OracleResultSetType.CURSOR);
                 } else {
-                    cs.registerOutParameter(paramIndex, column.getJdbcType());
+                    cs.registerOutParameter(paramIndex, jdbcType);
                 }
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                cs.registerOutParameter(paramIndex, column.getJdbcType());
-                cs.setObject(paramIndex, testValueList.get(testValueIndex));
+                cs.registerOutParameter(paramIndex, jdbcType);
+                cs.setObject(paramIndex, testValueList.get(testValueIndex), jdbcType);
                 ++testValueIndex;
                 boundColumnList.add(column);
             }
@@ -333,14 +349,28 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
+    // ===================================================================================
+    //                                                                       Pinpoint Type
+    //                                                                       =============
+    protected boolean isPostgreSQLUuid(DfProcedureColumnMetaInfo column) {
+        return isPostgreSQL() && column.isPostgreSQLUuid(column);
+    }
+
     protected boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
-        return isPostgreSQL() && column.isCursorPostgreSQL(column);
+        return isPostgreSQL() && column.isPostgreSQLCursor(column);
     }
 
     protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
-        return isOracle() && column.isCursorOracle(column);
+        return isOracle() && column.isOracleCursor(column);
     }
 
+    protected boolean isSQLServerUuid(DfProcedureColumnMetaInfo column) {
+        return isPostgreSQL() && column.isSQLServerUuid(column);
+    }
+
+    // ===================================================================================
+    //                                                                    Column Meta Info
+    //                                                                    ================
     protected Map<String, DfColumnMetaInfo> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {
         return extractor.extractColumnMetaInfoMap(rs, sql, null);
     }

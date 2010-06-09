@@ -206,11 +206,11 @@ public class DfProcedurePmbSetupper {
     }
 
     protected boolean isCursorPostgreSQL(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabaseOracle() && column.isCursorPostgreSQL(column);
+        return getBasicProperties().isDatabaseOracle() && column.isPostgreSQLCursor(column);
     }
 
     protected boolean isCursorOracle(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabasePostgreSQL() && column.isCursorOracle(column);
+        return getBasicProperties().isDatabasePostgreSQL() && column.isOracleCursor(column);
     }
 
     protected String convertProcedureNameToPmbName(String procedureName) {

@@ -157,13 +157,41 @@ public final class DfDBFluteTaskUtil {
             br.addElement(metaInfo.getDriverDisp());
         }
         if (e instanceof SQLException) {
-            DfJDBCException.buildExceptionMessage(br, (SQLException) e);
+            buildSQLExceptionMessage(br, (SQLException) e);
         } else {
             br.addItem("Exception");
             br.addElement(e.getClass().getName());
         }
         final String msg = br.buildExceptionMessage();
         _log.error(msg, e);
+    }
+
+    protected static void buildSQLExceptionMessage(ExceptionMessageBuilder br, SQLException e) {
+        final String sqlState = DfJDBCException.extractSQLState(e);
+        br.addItem("SQLState");
+        br.addElement(sqlState);
+        final Integer errorCode = DfJDBCException.extractErrorCode(e);
+        br.addItem("ErrorCode");
+        br.addElement(errorCode);
+        br.addItem("SQLException");
+        br.addElement(e.getClass().getName());
+        if (e instanceof DfJDBCException) {
+            br.addElement("*Look at the message on the stack trace");
+        } else {
+            br.addElement(DfJDBCException.extractMessage(e));
+        }
+        final SQLException nextEx = e.getNextException();
+        if (nextEx != null) {
+            br.addItem("NextException");
+            br.addElement(nextEx.getClass().getName());
+            br.addElement(DfJDBCException.extractMessage(nextEx));
+            final SQLException nextNextEx = nextEx.getNextException();
+            if (nextNextEx != null) {
+                br.addItem("NextNextException");
+                br.addElement(nextNextEx.getClass().getName());
+                br.addElement(DfJDBCException.extractMessage(nextNextEx));
+            }
+        }
     }
 
     public static void logError(Error e, String taskName, DfConnectionMetaInfo metaInfo) {

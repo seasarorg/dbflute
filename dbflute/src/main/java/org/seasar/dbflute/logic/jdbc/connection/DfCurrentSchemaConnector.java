@@ -81,7 +81,8 @@ public class DfCurrentSchemaConnector {
     protected void executeCurrentSchemaSql(Connection conn, String sql) throws SQLException {
         final Statement st = conn.createStatement();
         try {
-            _log.info("...Connecting the schema: " + _unifiedSchema + ln() + sql);
+            _log.info("...Connecting to the schema: " + _unifiedSchema);
+            _log.info(sql);
             st.execute(sql);
         } catch (SQLException continued) { // continue because it's supplementary SQL
             String msg = "Failed to execute the SQL:" + ln() + sql + ln() + continued.getMessage();
