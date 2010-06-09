@@ -463,7 +463,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             {
                 final String columnType = columnRs.getString("COLUMN_TYPE");
                 final int unknowType = DatabaseMetaData.procedureColumnUnknown;
-                procedureColumnType = columnType != null ? new Integer(columnType) : unknowType;
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(columnType)) {
+                    procedureColumnType = Integer.valueOf(columnType);
+                } else {
+                    procedureColumnType = unknowType;
+                }
             }
 
             // uses getInt():int because it returns
@@ -477,17 +481,25 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final Integer columnSize;
             {
                 final String precision = columnRs.getString("PRECISION");
-                if (precision != null && precision.trim().length() != 0) {
-                    columnSize = new Integer(precision);
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(precision)) {
+                    columnSize = Integer.valueOf(precision);
                 } else {
                     final String length = columnRs.getString("LENGTH");
-                    columnSize = length != null ? new Integer(length) : null;
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(length)) {
+                        columnSize = Integer.valueOf(length);
+                    } else {
+                        columnSize = null;
+                    }
                 }
             }
             final Integer decimalDigits;
             {
                 final String scale = columnRs.getString("SCALE");
-                decimalDigits = scale != null ? new Integer(scale) : null;
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(scale)) {
+                    decimalDigits = Integer.valueOf(scale);
+                } else {
+                    decimalDigits = null;
+                }
             }
             final String columnComment = columnRs.getString("REMARKS");
 
