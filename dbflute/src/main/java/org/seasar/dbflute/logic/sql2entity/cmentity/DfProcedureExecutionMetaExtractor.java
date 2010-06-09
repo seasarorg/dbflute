@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -159,11 +160,12 @@ public class DfProcedureExecutionMetaExtractor {
                 }
                 ++index;
             }
-        } catch (SQLException e) {
+        } catch (SQLException continued) {
             String msg = "*Failed to execute the procedure for getting meta data:" + ln();
             msg = msg + " " + sql + ln();
-            msg = msg + " " + e.getMessage();
-            _log.info(msg); // continued
+            msg = msg + " " + testValueList + ln();
+            msg = msg + " " + DfJDBCException.extractMessage(continued);
+            _log.info(msg);
         } finally {
             if (cs != null) {
                 cs.close();

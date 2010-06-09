@@ -48,7 +48,8 @@ import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.friends.velocity.DfOriginalLog4JLogSystem;
-import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
+import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
+import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
@@ -93,7 +94,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected Properties _connectionProperties;
 
     /** The simple creator of data source. (NotNull) */
-    protected final DfSimpleDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
+    protected final DfDataSourceCreator _dataSourceCreator = new DfDataSourceCreator();
 
     // ===================================================================================
     //                                                                                Main
@@ -164,11 +165,11 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void logException(Exception e) {
-        DfDBFluteTaskUtil.logException(e, getDisplayTaskName());
+        DfDBFluteTaskUtil.logException(e, getDisplayTaskName(), getConnectionMetaInfo());
     }
 
     protected void logError(Error e) {
-        DfDBFluteTaskUtil.logError(e, getDisplayTaskName());
+        DfDBFluteTaskUtil.logError(e, getDisplayTaskName(), getConnectionMetaInfo());
     }
 
     protected boolean isValidTaskEndInformation() {
@@ -186,8 +187,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             sb.append(" *Abort");
         }
         sb.append(ln);
+
+        final DfConnectionMetaInfo metaInfo = getConnectionMetaInfo();
+        final String productDisp = metaInfo != null ? " (" + metaInfo.getProductDisp() + ")" : "";
+        final String databaseType = getBasicProperties().getDatabaseType() + productDisp;
         sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");
-        sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseType());
+        sb.append(ln).append("    database  = " + databaseType);
         sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
         sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
         sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
@@ -555,6 +560,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected void connectSchema() throws SQLException {
         final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_mainSchema, getBasicProperties());
         connector.connectSchema(getDataSource());
+    }
+
+    protected DfConnectionMetaInfo getConnectionMetaInfo() {
+        return _dataSourceCreator.getConnectionMetaInfo();
     }
 
     // -----------------------------------------------------

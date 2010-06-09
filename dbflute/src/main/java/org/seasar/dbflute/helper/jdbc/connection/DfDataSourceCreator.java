@@ -15,46 +15,274 @@
  */
 package org.seasar.dbflute.helper.jdbc.connection;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Driver;
 import java.sql.SQLException;
+import java.util.Properties;
 
-/**
- * @author jflute
- */
-public interface DfDataSourceCreator {
+import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+
+public class DfDataSourceCreator implements DfConnectionProvider {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static Log _log = LogFactory.getLog(DfDataSourceCreator.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** DB driver. */
+    protected String _driver;
+
+    /** DB URL. */
+    protected String _url;
+
+    /** User name. */
+    protected String _userId;
+
+    /** Password */
+    protected String _password;
+
+    /** Connection properties. */
+    protected Properties _connectionProperties;
+
+    /** Is the mode auto commit? */
+    protected boolean _autoCommit;
+
+    /** Cached connection object. */
+    protected Connection _cachedConnection;
+
+    /** The meta information of connected database. (lazy load) */
+    protected DfConnectionMetaInfo _connectionMetaInfo;
+
+    /** Has a connection meta already been set up? (related to connectionMetaInfo) */
+    protected boolean _alreadySetupMeta;
+
+    // ===================================================================================
+    //                                                                              Create
+    //                                                                              ======
+    public void create() throws SQLException {
+        if (!DfDataSourceContext.isExistDataSource()) {
+            _log.info("...Creating data source:");
+            _log.info("  driver = " + _driver);
+            _log.info("  url    = " + _url);
+            _log.info("  user   = " + _userId);
+            DfDataSourceContext.setDataSource(new DfSimpleDataSource(this));
+        }
+    }
+
+    // ===================================================================================
+    //                                                             Provider Implementation
+    //                                                             =======================
+    public void commit() throws SQLException {
+        if (DfDataSourceContext.isExistDataSource()) {
+            final DataSource dataSource = DfDataSourceContext.getDataSource();
+            Connection conn = null;
+            try {
+                conn = dataSource.getConnection();
+                if (!conn.getAutoCommit()) {
+                    _log.info("...commit()");
+                    conn.commit();
+                }
+            } catch (SQLException e) {
+                String msg = "Failed to commit the conection: conn=" + conn;
+                throw new DfJDBCException(msg, e);
+            } finally {
+                if (conn != null) {
+                    try {
+                        conn.close();
+                    } catch (SQLException ignored) {
+                    }
+                }
+            }
+        }
+    }
+
+    public void destroy() throws SQLException {
+        if (DfDataSourceContext.isExistDataSource()) {
+            final DataSource dataSource = DfDataSourceContext.getDataSource();
+            Connection conn;
+            try {
+                conn = dataSource.getConnection();
+                if (!conn.getAutoCommit()) {
+                    _log.info("...rollback()");
+                    conn.rollback();
+                }
+                if (conn instanceof DfSimpleConnection) {
+                    _log.info("...closeReally()");
+                    ((DfSimpleConnection) conn).closeReally();
+                } else {
+                    _log.info("...close()");
+                    conn.close();
+                }
+            } catch (SQLException ignored) {
+            } finally {
+                DfDataSourceContext.clearDataSource();
+            }
+        }
+    }
+
+    public Connection getConnection() throws SQLException {
+        return processCachedConnection();
+    }
+
+    protected Connection processCachedConnection() throws SQLException {
+        if (_cachedConnection != null) {
+            return _cachedConnection;
+        }
+        final Connection conn = createConnection();
+        _cachedConnection = new DfSimpleConnection(conn);
+        processConnectionMetaInfo(conn);
+        return _cachedConnection;
+    }
+
+    protected Connection createConnection() throws SQLException {
+        Connection conn = null;
+        final Driver driverInstance = newDriver();
+        final Properties info = new Properties();
+        if (_connectionProperties != null && !_connectionProperties.isEmpty()) {
+            info.putAll(_connectionProperties);
+        }
+        info.put("user", _userId);
+        info.put("password", _password);
+
+        try {
+            _log.info("...Connecting the database");
+            conn = driverInstance.connect(_url, info);
+        } catch (SQLException e) {
+            String msg = "Failed to connect:";
+            msg = msg + " url=" + _url + " user=" + _userId;
+            throw new DfJDBCException(msg, e);
+        }
+        if (conn == null) {
+            String msg = "The driver didn't understand the URL: " + _url;
+            throw new DfJDBCException(msg);
+        }
+        try {
+            conn.setAutoCommit(_autoCommit);
+        } catch (SQLException e) {
+            String msg = "Failed to set auto commit:";
+            msg = msg + " autocommit=" + _autoCommit;
+            throw new DfJDBCException(msg, e);
+        }
+        return conn;
+    }
+
+    protected Driver newDriver() {
+        final String driver = _driver;
+        final Driver driverInstance;
+        try {
+            final Class<?> dc = Class.forName(driver);
+            driverInstance = (Driver) dc.newInstance();
+        } catch (ClassNotFoundException e) {
+            String msg = "Class Not Found: JDBC driver " + driver + " could not be loaded.";
+            throw new IllegalStateException(msg, e);
+        } catch (IllegalAccessException e) {
+            String msg = "Illegal Access: JDBC driver " + driver + " could not be loaded.";
+            throw new IllegalStateException(msg, e);
+        } catch (InstantiationException e) {
+            String msg = "Instantiation Exception: JDBC driver " + driver + " could not be loaded.";
+            throw new IllegalStateException(msg, e);
+        }
+        return driverInstance;
+    }
+
+    protected void processConnectionMetaInfo(Connection conn) throws SQLException {
+        if (_alreadySetupMeta) {
+            return;
+        }
+        try {
+            final DfConnectionMetaInfo metaInfo = new DfConnectionMetaInfo();
+            final DatabaseMetaData metaData = conn.getMetaData();
+            metaInfo.setProductName(metaData.getDatabaseProductName());
+            metaInfo.setProductVersion(metaData.getDatabaseProductVersion());
+            metaInfo.setDriverName(metaData.getDriverName());
+            metaInfo.setDriverVersion(metaData.getDriverVersion());
+            final int majorVersion = metaData.getJDBCMajorVersion();
+            final int minorVersion = metaData.getJDBCMinorVersion();
+            metaInfo.setJdbcVersion(majorVersion + "." + minorVersion);
+            _log.info("  product = " + metaInfo.getProductDisp());
+            _log.info("  driver  = " + metaInfo.getDriverDisp());
+            _connectionMetaInfo = metaInfo;
+        } catch (SQLException continued) {
+            _log.info("*Failed to get product informations: " + continued.getMessage());
+            _connectionMetaInfo = null;
+        }
+        _alreadySetupMeta = true;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{url=" + _url + ", user=" + _userId + ", prop=" + _connectionProperties + "}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * Set the JDBC driver to be used.
      * @param driver driver class name
      */
-    public void setDriver(String driver);
+    public void setDriver(String driver) {
+        this._driver = driver;
+    }
 
     /**
-     * Set the DB connection url.
-     * @param url connection url
+     * Set the DB connection URL.
+     * @param url connection URL
      */
-    public void setUrl(String url);
+    public void setUrl(String url) {
+        this._url = url;
+    }
 
     /**
      * Set the user name for the DB connection.
      * @param userId database user
      */
-    public void setUserId(String userId);
+    public void setUserId(String userId) {
+        this._userId = userId;
+    }
 
     /**
      * Set the password for the DB connection.
      * @param password database password
      */
-    public void setPassword(String password);
+    public void setPassword(String password) {
+        this._password = password;
+    }
+
+    /**
+     * Set the connection properties for the DB connection.
+     * @param connectionProperties The connection properties.
+     */
+    public void setConnectionProperties(Properties connectionProperties) {
+        this._connectionProperties = connectionProperties;
+    }
 
     /**
      * Set the autoCommit for the DB connection.
      * @param autoCommit Is auto commit?
      */
-    public void setAutoCommit(boolean autoCommit) throws SQLException;
+    public void setAutoCommit(boolean autoCommit) {
+        this._autoCommit = autoCommit;
+    }
 
-    public void create() throws SQLException;
-
-    public void commit() throws SQLException;
-
-    public void destroy() throws SQLException;
+    /**
+     * Get the meta information of connected database.
+     * @return The instance of meta information. (Nullable)
+     */
+    public DfConnectionMetaInfo getConnectionMetaInfo() {
+        return _connectionMetaInfo;
+    }
 }
