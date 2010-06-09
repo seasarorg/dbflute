@@ -15,7 +15,7 @@ public class DfSimpleDataSource implements DataSource {
 
     protected final DfConnectionProvider _dataSourceProvider;
 
-    public DfSimpleDataSource(DfDataSourceCreator dataSourceProvider) {
+    public DfSimpleDataSource(DfDataSourceHandler dataSourceProvider) {
         _dataSourceProvider = dataSourceProvider;
     }
 

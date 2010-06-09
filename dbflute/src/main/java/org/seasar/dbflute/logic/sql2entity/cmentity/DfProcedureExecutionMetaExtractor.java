@@ -245,7 +245,7 @@ public class DfProcedureExecutionMetaExtractor {
             final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
             Object testValue = null;
             if (isSQLServer() && "uniqueidentifier".equalsIgnoreCase(dbTypeName)) {
-                testValue = "FD8C7155-3A0A-DB11-BAC4-0011F5099158";
+                testValue = "FD8C7155-3A0A-DB11-BAC4-0011F5099158"; // as pinpoint patch
             } else if (containsAsEndsWith(nativeType, numberList)) {
                 testValue = 0;
             } else if (containsAsEndsWith(nativeType, dateList)) {

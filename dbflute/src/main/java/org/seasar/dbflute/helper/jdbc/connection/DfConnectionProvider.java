@@ -23,9 +23,5 @@ import java.sql.SQLException;
  */
 public interface DfConnectionProvider {
 
-    void commit() throws SQLException;
-
-    void destroy() throws SQLException;
-
     Connection getConnection() throws SQLException;
 }

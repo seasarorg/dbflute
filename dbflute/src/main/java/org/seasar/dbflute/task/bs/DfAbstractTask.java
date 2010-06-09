@@ -29,7 +29,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
-import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
+import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
@@ -72,8 +72,8 @@ public abstract class DfAbstractTask extends Task {
     /** Connection properties. */
     protected Properties _connectionProperties;
 
-    /** The simple creator of data source. (NotNull) */
-    protected final DfDataSourceCreator _dataSourceCreator = new DfDataSourceCreator();
+    /** The handler of data source. (NotNull) */
+    protected final DfDataSourceHandler _dataSourceHandler = new DfDataSourceHandler();
 
     // ===================================================================================
     //                                                                             Execute
@@ -328,22 +328,22 @@ public abstract class DfAbstractTask extends Task {
     protected abstract boolean isUseDataSource();
 
     protected void setupDataSource() throws SQLException {
-        _dataSourceCreator.setUserId(_userId);
-        _dataSourceCreator.setPassword(_password);
-        _dataSourceCreator.setDriver(_driver);
-        _dataSourceCreator.setUrl(_url);
-        _dataSourceCreator.setConnectionProperties(_connectionProperties);
-        _dataSourceCreator.setAutoCommit(true);
-        _dataSourceCreator.create();
+        _dataSourceHandler.setUserId(_userId);
+        _dataSourceHandler.setPassword(_password);
+        _dataSourceHandler.setDriver(_driver);
+        _dataSourceHandler.setUrl(_url);
+        _dataSourceHandler.setConnectionProperties(_connectionProperties);
+        _dataSourceHandler.setAutoCommit(true);
+        _dataSourceHandler.create();
         connectSchema();
     }
 
     protected void commitDataSource() throws SQLException {
-        _dataSourceCreator.commit();
+        _dataSourceHandler.commit();
     }
 
     protected void destroyDataSource() throws SQLException {
-        _dataSourceCreator.destroy();
+        _dataSourceHandler.destroy();
 
         if (getBasicProperties().isDatabaseDerby()) {
             // Derby(Embedded) needs an original shutdown for destroying a connection
@@ -361,7 +361,7 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected DfConnectionMetaInfo getConnectionMetaInfo() {
-        return _dataSourceCreator.getConnectionMetaInfo();
+        return _dataSourceHandler.getConnectionMetaInfo();
     }
 
     // -----------------------------------------------------

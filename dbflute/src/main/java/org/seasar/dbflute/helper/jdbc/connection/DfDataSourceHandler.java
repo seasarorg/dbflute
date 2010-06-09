@@ -21,20 +21,18 @@ import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 
-public class DfDataSourceCreator implements DfConnectionProvider {
+public class DfDataSourceHandler implements DfConnectionProvider {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static Log _log = LogFactory.getLog(DfDataSourceCreator.class);
+    private static Log _log = LogFactory.getLog(DfDataSourceHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -79,59 +77,64 @@ public class DfDataSourceCreator implements DfConnectionProvider {
         }
     }
 
-    // ===================================================================================
-    //                                                             Provider Implementation
-    //                                                             =======================
     public void commit() throws SQLException {
-        if (DfDataSourceContext.isExistDataSource()) {
-            final DataSource dataSource = DfDataSourceContext.getDataSource();
-            Connection conn = null;
-            try {
-                conn = dataSource.getConnection();
-                if (!conn.getAutoCommit()) {
-                    _log.info("...commit()");
-                    conn.commit();
-                }
-            } catch (SQLException e) {
-                String msg = "Failed to commit the conection: conn=" + conn;
-                throw new DfJDBCException(msg, e);
-            } finally {
-                if (conn != null) {
-                    try {
-                        conn.close();
-                    } catch (SQLException ignored) {
-                    }
+        Connection conn = null;
+        try {
+            conn = getCachedConnection();
+            if (conn == null) {
+                return; // if no cache, do nothing
+            }
+            if (!conn.getAutoCommit()) {
+                _log.info("...commit()");
+                conn.commit();
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to commit the conection: conn=" + conn;
+            throw new DfJDBCException(msg, e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
                 }
             }
         }
     }
 
     public void destroy() throws SQLException {
-        if (DfDataSourceContext.isExistDataSource()) {
-            final DataSource dataSource = DfDataSourceContext.getDataSource();
-            Connection conn;
-            try {
-                conn = dataSource.getConnection();
-                if (!conn.getAutoCommit()) {
-                    _log.info("...rollback()");
-                    conn.rollback();
-                }
-                if (conn instanceof DfSimpleConnection) {
-                    _log.info("...closeReally()");
-                    ((DfSimpleConnection) conn).closeReally();
-                } else {
-                    _log.info("...close()");
-                    conn.close();
-                }
-            } catch (SQLException ignored) {
-            } finally {
+        try {
+            final Connection conn = getCachedConnection();
+            if (conn == null) {
+                return; // if no cache, do nothing
+            }
+            if (!conn.getAutoCommit()) {
+                _log.info("...rollback()");
+                conn.rollback();
+            }
+            if (conn instanceof DfSimpleConnection) {
+                _log.info("...closeReally()");
+                ((DfSimpleConnection) conn).closeReally();
+            } else {
+                _log.info("...close()");
+                conn.close();
+            }
+        } catch (SQLException ignored) {
+        } finally {
+            if (DfDataSourceContext.isExistDataSource()) {
                 DfDataSourceContext.clearDataSource();
             }
         }
     }
 
+    // ===================================================================================
+    //                                                             Provider Implementation
+    //                                                             =======================
     public Connection getConnection() throws SQLException {
         return processCachedConnection();
+    }
+
+    public Connection getCachedConnection() {
+        return _cachedConnection;
     }
 
     protected Connection processCachedConnection() throws SQLException {
@@ -155,7 +158,7 @@ public class DfDataSourceCreator implements DfConnectionProvider {
         info.put("password", _password);
 
         try {
-            _log.info("...Connecting the database");
+            _log.info("...Connecting the database:");
             conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
             String msg = "Failed to connect:";
@@ -213,7 +216,7 @@ public class DfDataSourceCreator implements DfConnectionProvider {
             _log.info("  driver  = " + metaInfo.getDriverDisp());
             _connectionMetaInfo = metaInfo;
         } catch (SQLException continued) {
-            _log.info("*Failed to get product informations: " + continued.getMessage());
+            _log.info("*Failed to get connection meta: " + continued.getMessage());
             _connectionMetaInfo = null;
         }
         _alreadySetupMeta = true;
