@@ -233,6 +233,7 @@ public class DfProcedureExecutionMetaExtractor {
         }
         if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
                 || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
+            final String dbTypeName = column.getDbTypeName();
             final int jdbcDefType = column.getJdbcType();
             final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
             if (jdbcType == null) {
@@ -243,7 +244,9 @@ public class DfProcedureExecutionMetaExtractor {
             final Integer decimalDigits = column.getDecimalDigits();
             final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
             Object testValue = null;
-            if (containsAsEndsWith(nativeType, numberList)) {
+            if (isSQLServer() && "uniqueidentifier".equalsIgnoreCase(dbTypeName)) {
+                testValue = "FD8C7155-3A0A-DB11-BAC4-0011F5099158";
+            } else if (containsAsEndsWith(nativeType, numberList)) {
                 testValue = 0;
             } else if (containsAsEndsWith(nativeType, dateList)) {
                 testValue = DfTypeUtil.toTimestamp("2010-03-31 12:34:56");

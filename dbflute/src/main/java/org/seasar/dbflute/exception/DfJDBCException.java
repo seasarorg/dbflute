@@ -31,7 +31,11 @@ public class DfJDBCException extends SQLException {
         br.addElement(errorCode);
         br.addItem("SQLException");
         br.addElement(e.getClass().getName());
-        br.addElement(extractMessage(e));
+        if (e instanceof DfJDBCException) {
+            br.addElement("*Look at the message on the stack trace");
+        } else {
+            br.addElement(extractMessage(e));
+        }
         final SQLException nextEx = e.getNextException();
         if (nextEx != null) {
             br.addItem("NextException");
