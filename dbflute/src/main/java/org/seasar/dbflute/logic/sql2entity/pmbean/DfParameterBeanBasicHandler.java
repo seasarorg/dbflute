@@ -304,7 +304,7 @@ public class DfParameterBeanBasicHandler {
             if (metaInfo == null) {
                 return "";
             }
-            return " - " + metaInfo.getColumnDefinitionLineDisp();
+            return ": {" + metaInfo.getColumnDefinitionLineDisp() + "}";
         }
     }
 
