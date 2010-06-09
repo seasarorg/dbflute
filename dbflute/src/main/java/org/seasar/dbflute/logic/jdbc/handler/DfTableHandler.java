@@ -72,6 +72,12 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
             final String schemaName = unifiedSchema.getPureSchema();
             resultSet = metaData.getTables(catalogName, schemaName, "%", objectTypes);
             while (resultSet.next()) {
+                // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // basically uses getString() because
+                // a JDBC driver might return an unexpected accident
+                // (other methods are used only when an item can be trust)
+                // - - - - - - - - - -/
+
                 final String tableName = resultSet.getString("TABLE_NAME");
                 final String tableType = resultSet.getString("TABLE_TYPE");
                 final String tableCatalog;

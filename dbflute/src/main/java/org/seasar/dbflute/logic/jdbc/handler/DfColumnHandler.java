@@ -130,6 +130,10 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         final StringSet duplicateColumnNameSet = StringSet.createAsFlexible();
 
         while (columnResultSet.next()) {
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // same policy of table process (see DfTableHandler.java)
+            // - - - - - - - - - -/
+
             final String columnName = columnResultSet.getString(4);
             if (isColumnExcept(unifiedSchema, tableName, columnName)) {
                 continue;

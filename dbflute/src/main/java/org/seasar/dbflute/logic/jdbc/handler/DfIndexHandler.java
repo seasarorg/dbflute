@@ -72,6 +72,11 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
             final String schemaName = unifiedSchema.getPureSchema();
             parts = dbMeta.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
+                // /- - - - - - - - - - - - - - - - - - - - - - - -
+                // same policy as table process about JDBC handling
+                // (see DfTableHandler.java)
+                // - - - - - - - - - -/
+
                 final String indexName = parts.getString(6);
                 final boolean isNonUnique;
                 {

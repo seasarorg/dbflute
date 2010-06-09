@@ -96,6 +96,11 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
             final String schemaName = unifiedSchema.getPureSchema();
             rs = dbMeta.getImportedKeys(catalogName, schemaName, tableName);
             while (rs.next()) {
+                // /- - - - - - - - - - - - - - - - - - - - - - - -
+                // same policy as table process about JDBC handling
+                // (see DfTableHandler.java)
+                // - - - - - - - - - -/
+
                 final String foreignCatalogName = rs.getString(1);
                 final String foreignSchemaName = rs.getString(2);
                 final String foreignTableName = rs.getString(3);

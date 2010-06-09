@@ -18,7 +18,6 @@ package org.seasar.dbflute.logic.jdbc.handler;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +30,9 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.factory.DfProcedureSynonymExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -337,6 +338,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         } catch (SQLException e) {
             throwProcedureListGettingFailureException(unifiedSchema, procedureName, e);
             return null; // unreachable
+        } catch (RuntimeException e) { // for an unexpected exception from JDBC driver
+            throwProcedureListGettingFailureException(unifiedSchema, procedureName, e);
+            return null; // unreachable
         } finally {
             if (columnResultSet != null) {
                 try {
@@ -357,6 +361,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     protected void setupProcedureMetaInfo(List<DfProcedureMetaInfo> procedureMetaInfoList, ResultSet procedureRs,
             UnifiedSchema unifiedSchema) throws SQLException {
         while (procedureRs.next()) {
+            // /- - - - - - - - - - - - - - - - - - - - - - - -
+            // same policy as table process about JDBC handling
+            // (see DfTableHandler.java)
+            // - - - - - - - - - -/
+
             final String procedureSchema = procedureRs.getString("PROCEDURE_SCHEM");
             final String procedurePackage;
             final String procedureCatalog;
@@ -436,6 +445,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             throws SQLException {
         final Set<String> uniqueSet = new HashSet<String>();
         while (columnRs.next()) {
+            // /- - - - - - - - - - - - - - - - - - - - - - - -
+            // same policy as table process about JDBC handling
+            // (see DfTableHandler.java)
+            // - - - - - - - - - -/
+
             final String columnName = columnRs.getString("COLUMN_NAME");
 
             // filter duplicated informations
@@ -451,12 +465,15 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 final int unknowType = DatabaseMetaData.procedureColumnUnknown;
                 procedureColumnType = columnType != null ? new Integer(columnType) : unknowType;
             }
-            final Integer jdbcType;
-            {
-                final String dataType = columnRs.getString("DATA_TYPE");
-                jdbcType = dataType != null ? new Integer(dataType) : Types.OTHER;
-            }
+
+            // uses getInt():int because it returns
+            // Types.OTHER when the type is unknown
+            final int jdbcType = columnRs.getInt("DATA_TYPE");
+
             final String dbTypeName = columnRs.getString("TYPE_NAME");
+
+            // uses getString() to get null value
+            // (getInt() returns zero when a value is no defined)
             final Integer columnSize;
             {
                 final String precision = columnRs.getString("PRECISION");
@@ -550,18 +567,27 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     }
 
     protected void throwProcedureListGettingFailureException(UnifiedSchema unifiedSchema, String procedureName,
-            SQLException e) throws SQLException {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to get a list of procedures!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Unified Schema]" + ln() + unifiedSchema + ln();
-        msg = msg + ln();
-        msg = msg + "[Current Procedure]" + ln() + procedureName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL Exception]" + ln() + e.getClass() + ln() + e.getMessage() + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfJDBCException(msg);
+            Exception e) throws SQLException {
+        final boolean forSqlEx = e instanceof SQLException;
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to get a list of procedures.");
+        br.addItem("Unified Schema");
+        br.addElement(unifiedSchema);
+        br.addItem("Current Procedure");
+        br.addElement(procedureName);
+        if (forSqlEx) {
+            br.addItem("SQL Exception");
+        } else {
+            br.addItem("Unexpected Exception");
+        }
+        br.addElement(e.getClass().getName());
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        if (forSqlEx) {
+            throw new DfJDBCException(msg, (SQLException) e);
+        } else {
+            throw new DfDBFluteTaskFailureException(msg, e);
+        }
     }
 
     // ===================================================================================
