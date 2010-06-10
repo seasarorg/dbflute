@@ -107,19 +107,19 @@ public class DfJdbcTypeMapper {
         // - - - - - - - - - -/
         if (dbTypeName == null) {
             return getVarcharJdbcType();
-        } else if (dbTypeName.toLowerCase().contains("varchar")) {
+        } else if (containsIgnoreCase(dbTypeName, "varchar")) {
             return getVarcharJdbcType();
-        } else if (dbTypeName.toLowerCase().contains("char")) {
+        } else if (containsIgnoreCase(dbTypeName, "char")) {
             return getCharJdbcType();
-        } else if (dbTypeName.toLowerCase().contains("timestamp")) {
+        } else if (containsIgnoreCase(dbTypeName, "timestamp")) {
             return getTimestampJdbcType();
-        } else if (dbTypeName.toLowerCase().contains("date")) {
+        } else if (containsIgnoreCase(dbTypeName, "date")) {
             return getDateJdbcType();
-        } else if (dbTypeName.toLowerCase().contains("time")) {
+        } else if (containsIgnoreCase(dbTypeName, "time")) {
             return getTimeJdbcType();
-        } else if (dbTypeName.toLowerCase().contains("clob")) {
+        } else if (containsIgnoreCase(dbTypeName, "clob")) {
             return getClobJdbcType();
-        } else if (_resource.isLangJava() && isConceptTypeUUID(dbTypeName)) {
+        } else if (isConceptTypeUUID(dbTypeName) && _resource.isLangJava()) {
             // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // This is for Java only because the type has not been checked yet on C#.
             // - - - - - - - - - -/
@@ -196,23 +196,22 @@ public class DfJdbcTypeMapper {
     }
 
     public boolean isPostgreSQLCursor(final int jdbcType, final String dbTypeName) {
-        if (!_resource.isDbmsPostgreSQL() || dbTypeName == null) {
+        if (jdbcType != Types.OTHER) {
             return false;
         }
-        final String key = "cursor";
-        return jdbcType == Types.OTHER && dbTypeName.toLowerCase().contains(key);
+        return _resource.isDbmsPostgreSQL() && containsIgnoreCase(dbTypeName, "cursor");
     }
 
     public boolean isOracleClob(final String dbTypeName) {
-        return _resource.isDbmsOracle() && matchIgnoreCase(dbTypeName, "clob", "nclob");
+        return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "clob");
     }
 
     public boolean isOracleNCharOrNVarchar(final String dbTypeName) {
-        return _resource.isDbmsOracle() && matchIgnoreCase(dbTypeName, "nchar", "nvarchar");
+        return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "nchar", "nvarchar");
     }
 
     public boolean isOracleNCharOrNVarcharOrClob(final String dbTypeName) {
-        return isOracleNCharOrNVarchar(dbTypeName) && matchIgnoreCase(dbTypeName, "nclob");
+        return isOracleNCharOrNVarchar(dbTypeName) && containsIgnoreCase(dbTypeName, "nclob");
     }
 
     public boolean isOracleNumber(final String dbTypeName) {
@@ -228,27 +227,14 @@ public class DfJdbcTypeMapper {
     }
 
     public boolean isOracleCursor(final int jdbcType, final String dbTypeName) {
-        if (!_resource.isDbmsOracle() || dbTypeName == null) {
+        if (jdbcType != Types.OTHER) {
             return false;
         }
-        final String key = "cursor";
-        return jdbcType == Types.OTHER && dbTypeName.toLowerCase().contains(key);
+        return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "cursor");
     }
 
     public boolean isSQLServerUniqueIdentifier(final String dbTypeName) {
         return _resource.isDbmsSQLServer() && matchIgnoreCase(dbTypeName, "uniqueidentifier");
-    }
-
-    protected boolean matchIgnoreCase(String dbTypeName, String... types) {
-        if (dbTypeName == null) {
-            return false;
-        }
-        for (String type : types) {
-            if (type.equalsIgnoreCase(dbTypeName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // -----------------------------------------------------
@@ -288,6 +274,34 @@ public class DfJdbcTypeMapper {
 
     protected String getBlobJdbcType() {
         return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.BLOB);
+    }
+
+    // ===================================================================================
+    //                                                                     Matching Helper
+    //                                                                     ===============
+    protected boolean matchIgnoreCase(String dbTypeName, String... types) {
+        if (dbTypeName == null) {
+            return false;
+        }
+        for (String type : types) {
+            if (dbTypeName.trim().equalsIgnoreCase(type.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean containsIgnoreCase(String dbTypeName, String... types) {
+        if (dbTypeName == null) {
+            return false;
+        }
+        final String trimmedLowerName = dbTypeName.toLowerCase().trim();
+        for (String type : types) {
+            if (trimmedLowerName.contains(type.toLowerCase().trim())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================
