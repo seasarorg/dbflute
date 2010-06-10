@@ -128,17 +128,15 @@ public final class DfDBFluteTaskUtil {
             }
             _log.info("");
         } catch (RuntimeException e) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-            msg = msg + "Failed to get build-properties!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + "Check the existence of build.properties on DBFlute client directory." + ln();
-            msg = msg + ln();
-            msg = msg + "[File Name]" + ln() + file + ln();
-            msg = msg + ln();
-            msg = msg + "[Project]" + ln() + project + ln();
-            msg = msg + "- - - - - - - - - -/";
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to get build.properties.");
+            br.addItem("Advice");
+            br.addElement("Check the existence of build.properties on DBFlute client directory");
+            br.addItem("File");
+            br.addElement(file);
+            br.addItem("Project");
+            br.addElement(project);
+            final String msg = br.buildExceptionMessage();
             throw new IllegalStateException(msg, e);
         }
         return prop;
@@ -149,19 +147,25 @@ public final class DfDBFluteTaskUtil {
     //                                                                             =======
     public static void logException(Exception e, String taskName, DfConnectionMetaInfo metaInfo) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to execute DBFlute Task '" + taskName + "'.");
-        if (metaInfo != null) {
-            br.addItem("Database Product");
-            br.addElement(metaInfo.getProductDisp());
-            br.addItem("JDBC Driver");
-            br.addElement(metaInfo.getDriverDisp());
-        }
+        setupCommonMessage(br, taskName, metaInfo);
         if (e instanceof SQLException) {
             // for showing next exception of SQLException
             buildSQLExceptionMessage(br, (SQLException) e);
         }
         final String msg = br.buildExceptionMessage();
         _log.error(msg, e);
+    }
+
+    protected static void setupCommonMessage(ExceptionMessageBuilder br, String taskName, DfConnectionMetaInfo metaInfo) {
+        br.addNotice("Failed to execute DBFlute Task '" + taskName + "'.");
+        br.addItem("Advice");
+        br.addElement("Check the exception messages and the stack traces.");
+        if (metaInfo != null) {
+            br.addItem("Database Product");
+            br.addElement(metaInfo.getProductDisp());
+            br.addItem("JDBC Driver");
+            br.addElement(metaInfo.getDriverDisp());
+        }
     }
 
     protected static void buildSQLExceptionMessage(ExceptionMessageBuilder br, SQLException e) {
@@ -194,15 +198,7 @@ public final class DfDBFluteTaskUtil {
 
     public static void logError(Error e, String taskName, DfConnectionMetaInfo metaInfo) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to execute DBFlute Task '" + taskName + "'.");
-        br.addItem("Error");
-        br.addElement(e.getClass().getName());
-        if (metaInfo != null) {
-            br.addItem("Database Product");
-            br.addElement(metaInfo.getProductDisp());
-            br.addItem("JDBC Driver");
-            br.addElement(metaInfo.getDriverDisp());
-        }
+        setupCommonMessage(br, taskName, metaInfo);
         final String msg = br.buildExceptionMessage();
         _log.error(msg, e);
     }
