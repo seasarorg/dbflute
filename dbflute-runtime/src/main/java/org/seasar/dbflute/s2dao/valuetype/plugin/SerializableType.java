@@ -33,26 +33,32 @@ public class SerializableType extends BytesType {
         super(trait);
     }
 
-    public Object getValue(final ResultSet resultSet, final int index) throws SQLException {
-        return deserialize(super.getValue(resultSet, index));
+    @Override
+    public Object getValue(final ResultSet rs, final int index) throws SQLException {
+        return deserialize(super.getValue(rs, index));
     }
 
-    public Object getValue(final ResultSet resultSet, final String columnName) throws SQLException {
-        return deserialize(super.getValue(resultSet, columnName));
+    @Override
+    public Object getValue(final ResultSet rs, final String columnName) throws SQLException {
+        return deserialize(super.getValue(rs, columnName));
     }
 
+    @Override
     public Object getValue(final CallableStatement cs, final int index) throws SQLException {
         return deserialize(super.getValue(cs, index));
     }
 
+    @Override
     public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
         return deserialize(super.getValue(cs, parameterName));
     }
 
+    @Override
     public void bindValue(final PreparedStatement ps, final int index, final Object value) throws SQLException {
         super.bindValue(ps, index, serialize(value));
     }
 
+    @Override
     public void bindValue(final CallableStatement cs, final String parameterName, final Object value)
             throws SQLException {
         super.bindValue(cs, parameterName, serialize(value));

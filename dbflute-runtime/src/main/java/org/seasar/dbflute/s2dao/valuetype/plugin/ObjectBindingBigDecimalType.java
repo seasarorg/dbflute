@@ -17,44 +17,36 @@ package org.seasar.dbflute.s2dao.valuetype.plugin;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
-import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BigDecimalType;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
+ * The value type for BigDecimal which uses setObject() when binding. <br />
+ * Basically for NUMERIC of PostgreSQL's procedure parameter which needs setObject().
  * @author jflute
  */
-public class PostgreSQLResultSetType extends TnAbstractValueType {
+public class ObjectBindingBigDecimalType extends BigDecimalType {
 
-    public static final int CURSOR = Types.OTHER;
-
-    public PostgreSQLResultSetType() {
-        super(CURSOR);
+    public ObjectBindingBigDecimalType() {
     }
 
-    public Object getValue(ResultSet rs, int index) throws SQLException {
-        throw new SQLException("not supported");
-    }
-
-    public Object getValue(ResultSet rs, String columnName) throws SQLException {
-        throw new SQLException("not supported");
-    }
-
-    public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getObject(index);
-    }
-
-    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getObject(parameterName);
-    }
-
+    @Override
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-        throw new SQLException("not supported");
+        if (value == null) {
+            setNull(ps, index);
+        } else {
+            ps.setObject(index, DfTypeUtil.toBigDecimal(value), getSqlType());
+        }
     }
 
+    @Override
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-        throw new SQLException("not supported");
+        if (value == null) {
+            setNull(cs, parameterName);
+        } else {
+            cs.setObject(parameterName, DfTypeUtil.toBigDecimal(value), getSqlType());
+        }
     }
 }

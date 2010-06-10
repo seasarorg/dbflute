@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 
 /**
- * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class OracleResultSetType extends TnAbstractValueType {
@@ -34,11 +33,11 @@ public class OracleResultSetType extends TnAbstractValueType {
         super(CURSOR);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
+    public Object getValue(ResultSet rs, int index) throws SQLException {
         throw new SQLException("not supported");
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
         throw new SQLException("not supported");
     }
 

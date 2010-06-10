@@ -29,7 +29,8 @@ import org.seasar.dbflute.util.DfResourceUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * The value type for CLOB type. <br />
+ * Basically for Oracle.
  * @author jflute
  */
 public class StringClobType extends TnAbstractValueType {
@@ -38,12 +39,12 @@ public class StringClobType extends TnAbstractValueType {
         super(Types.CLOB);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return convertToString(resultSet.getCharacterStream(index));
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        return convertToString(rs.getCharacterStream(index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return convertToString(resultSet.getCharacterStream(columnName));
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        return convertToString(rs.getCharacterStream(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
@@ -72,8 +73,8 @@ public class StringClobType extends TnAbstractValueType {
         if (value == null) {
             setNull(ps, index);
         } else {
-            final String s = DfTypeUtil.toString(value);
-            ps.setCharacterStream(index, new StringReader(s), s.length());
+            final String str = DfTypeUtil.toString(value);
+            ps.setCharacterStream(index, new StringReader(str), str.length());
         }
     }
 
@@ -81,8 +82,8 @@ public class StringClobType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            final String s = DfTypeUtil.toString(value);
-            cs.setCharacterStream(parameterName, new StringReader(s), s.length());
+            final String str = DfTypeUtil.toString(value);
+            cs.setCharacterStream(parameterName, new StringReader(str), str.length());
         }
     }
 }

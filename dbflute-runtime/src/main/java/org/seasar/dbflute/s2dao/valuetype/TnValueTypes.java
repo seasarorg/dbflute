@@ -53,6 +53,7 @@ import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesOidType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.FixedLengthStringType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.ObjectBindingBigDecimalType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.SerializableType;
@@ -152,6 +153,7 @@ public class TnValueTypes {
 
         // plug-in (default)
         registerPluginValueType("fixedLengthStringType", new FixedLengthStringType());
+        registerPluginValueType("objectBindingBigDecimalType", new ObjectBindingBigDecimalType());
         registerPluginValueType("stringClobType", new StringClobType());
         registerPluginValueType("bytesOidType", new BytesOidType());
     }
