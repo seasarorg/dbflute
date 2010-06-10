@@ -328,7 +328,7 @@ public class DfProcedureExecutionMetaExtractor {
                 registerOutParameter(cs, paramIndex, jdbcType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                cs.setObject(paramIndex, testValueList.get(testValueIndex), jdbcType);
+                bindObject(cs, paramIndex, jdbcType, testValueList.get(testValueIndex), column);
                 ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
