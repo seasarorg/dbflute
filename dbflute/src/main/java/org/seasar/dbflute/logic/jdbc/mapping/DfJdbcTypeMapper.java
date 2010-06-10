@@ -105,9 +105,7 @@ public class DfJdbcTypeMapper {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Here is coming if the JDBC type is OTHER or is not found in TypeMap.
         // - - - - - - - - - -/
-        if (dbTypeName == null) {
-            return getVarcharJdbcType();
-        } else if (containsIgnoreCase(dbTypeName, "varchar")) {
+        if (containsIgnoreCase(dbTypeName, "varchar")) {
             return getVarcharJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "char")) {
             return getCharJdbcType();
@@ -119,13 +117,6 @@ public class DfJdbcTypeMapper {
             return getTimeJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "clob")) {
             return getClobJdbcType();
-        } else if (isConceptTypeUUID(dbTypeName) && _resource.isLangJava()) {
-            // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // This is for Java only because the type has not been checked yet on C#.
-            // - - - - - - - - - -/
-
-            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
-            return TypeMap.UUID;
         } else {
             // * * * * * *
             // Priority 5
@@ -135,6 +126,13 @@ public class DfJdbcTypeMapper {
     }
 
     protected String processForcedAdjustment(int jdbcDefValue, String dbTypeName) {
+        if (isConceptTypeUUID(dbTypeName) && _resource.isLangJava()) {
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // This is for Java only because the type has not been checked yet on C#.
+            // - - - - - - - - - -/
+            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
+            return TypeMap.UUID;
+        }
         if (isConceptTypeBytesOid(dbTypeName)) {
             return getBlobJdbcType();
         }
