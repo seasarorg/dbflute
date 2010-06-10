@@ -416,7 +416,7 @@ public class TypeMap {
             } else { // DECIMAL
                 defaultJavaNativeType = getDefaultDecimalJavaNativeType();
             }
-            if (columnSize == null || columnSize == 0) { // no determination
+            if (columnSize == null || columnSize == 0) { // cannot judge about auto-mapping
                 return defaultJavaNativeType;
             }
             if (decimalDigits != null && decimalDigits > 0) { // has decimal digits
