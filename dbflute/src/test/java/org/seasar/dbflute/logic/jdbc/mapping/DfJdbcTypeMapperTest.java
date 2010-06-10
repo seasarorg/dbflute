@@ -10,7 +10,6 @@ import java.util.Properties;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.junit.Test;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
 
 /**
@@ -91,6 +90,7 @@ public class DfJdbcTypeMapperTest {
         protected boolean _targetLanguageJava;
         protected boolean _databaseOracle;
         protected boolean _databasePostgreSQL;
+        protected boolean _databaseSQLServer;
 
         public TestResource java() {
             _targetLanguageJava = true;
@@ -107,6 +107,11 @@ public class DfJdbcTypeMapperTest {
             return this;
         }
 
+        public TestResource sqlServer() {
+            _databaseSQLServer = true;
+            return this;
+        }
+
         public boolean isLangJava() {
             return _targetLanguageJava;
         }
@@ -117,6 +122,10 @@ public class DfJdbcTypeMapperTest {
 
         public boolean isDbmsPostgreSQL() {
             return _databasePostgreSQL;
+        }
+
+        public boolean isDbmsSQLServer() {
+            return _databaseSQLServer;
         }
     }
 }

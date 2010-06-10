@@ -1,6 +1,5 @@
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
-import java.sql.Types;
 import java.util.Map;
 
 import org.seasar.dbflute.DfBuildProperties;
@@ -22,6 +21,7 @@ public class DfProcedureColumnMetaInfo {
     protected String _columnComment;
     protected DfProcedureColumnType _procedureColumnType;
     protected Map<String, DfColumnMetaInfo> _columnMetaInfoMap = DfCollectionUtil.emptyMap(); // if result set
+    protected DfColumnHandler _columnHandler = new DfColumnHandler();
 
     // ===================================================================================
     //                                                                            Behavior
@@ -97,31 +97,31 @@ public class DfProcedureColumnMetaInfo {
         return comment;
     }
 
-    public boolean isPostgreSQLUuid(DfProcedureColumnMetaInfo column) {
-        final String key = "uuid";
-        final int jdbcType = column.getJdbcType();
-        final String dbTypeName = column.getDbTypeName();
-        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
+    public boolean isConceptTypeUuid() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isConceptTypeUUID(dbTypeName);
     }
 
-    public boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
-        final String key = "cursor";
-        final int jdbcType = column.getJdbcType();
-        final String dbTypeName = column.getDbTypeName();
-        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
+    public boolean isPostgreSQLCursor() {
+        final int jdbcType = getJdbcType();
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isPostgreSQLCursor(jdbcType, dbTypeName);
     }
 
-    public boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
-        final String key = "cursor";
-        final int jdbcType = column.getJdbcType();
-        final String dbTypeName = column.getDbTypeName();
-        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
+    public boolean isOracleNumber() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isOracleNumber(dbTypeName);
     }
 
-    public boolean isSQLServerUuid(DfProcedureColumnMetaInfo column) {
-        final String key = "uniqueidentifier";
-        final String dbTypeName = column.getDbTypeName();
-        return dbTypeName != null && dbTypeName.equalsIgnoreCase(key);
+    public boolean isOracleCursor() {
+        final int jdbcType = getJdbcType();
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isOracleCursor(jdbcType, dbTypeName);
+    }
+
+    public boolean isSQLServerUniqueIdentifier() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isSQLServerUniqueIdentifier(dbTypeName);
     }
 
     public enum DfProcedureColumnType {

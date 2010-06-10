@@ -174,7 +174,7 @@ public class DfProcedurePmbSetupper {
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
         final String propertyType;
-        if (getBasicProperties().isDatabaseOracle() && "number".equalsIgnoreCase(dbTypeName)) {
+        if (column.isOracleNumber()) {
             // Because the length setting of procedure parameter is unsupported on Oracle.
             propertyType = TypeMap.getDefaultDecimalJavaNativeType();
         } else {
@@ -196,21 +196,11 @@ public class DfProcedurePmbSetupper {
         if (column.hasColumnMetaInfo()) {
             return true;
         }
-        if (isCursorPostgreSQL(column)) {
-            return true;
-        } else if (isCursorOracle(column)) {
+        if (column.isPostgreSQLCursor() || column.isOracleCursor()) {
             return true;
         } else {
             return false;
         }
-    }
-
-    protected boolean isCursorPostgreSQL(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabaseOracle() && column.isPostgreSQLCursor(column);
-    }
-
-    protected boolean isCursorOracle(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabasePostgreSQL() && column.isOracleCursor(column);
     }
 
     protected String convertProcedureNameToPmbName(String procedureName) {

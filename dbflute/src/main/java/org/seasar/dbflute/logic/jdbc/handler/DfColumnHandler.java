@@ -237,10 +237,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 return isDatabaseOracle();
             }
 
+            public boolean isDbmsSQLServer() {
+                return isDatabaseSQLServer();
+            }
+
             @Override
             public String toString() {
                 return "{" + isLangJava() + ", " + isDbmsOracle() + ", " + isDbmsPostgreSQL() + "}";
             }
+
         });
         return mapper;
     }
@@ -248,23 +253,43 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     // -----------------------------------------------------
     //                                          Concept Type
     //                                          ------------
-    public boolean isDbTypeBytesOid(final String dbTypeName) {
-        return getJdbcTypeMapper().isDbTypeBytesOid(dbTypeName);
+    public boolean isConceptTypeUUID(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypeUUID(dbTypeName);
     }
 
-    public boolean isDbTypeStringClob(final String dbTypeName) {
-        return getJdbcTypeMapper().isDbTypeStringClob(dbTypeName);
+    public boolean isConceptTypeBytesOid(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypeBytesOid(dbTypeName);
+    }
+
+    public boolean isConceptTypeStringClob(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypeStringClob(dbTypeName);
     }
 
     // -----------------------------------------------------
     //                                         Pinpoint Type
     //                                         -------------
-    public boolean isPostgreSQL_BpChar(final String dbTypeName) {
-        return getJdbcTypeMapper().isPostgreSQL_BpChar(dbTypeName);
+    public boolean isPostgreSQLBpChar(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLBpChar(dbTypeName);
     }
 
-    public boolean isPostgreSQL_Numeric(final String dbTypeName) {
-        return getJdbcTypeMapper().isPostgreSQL_Numeric(dbTypeName);
+    public boolean isPostgreSQLNumeric(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLNumeric(dbTypeName);
+    }
+
+    public boolean isPostgreSQLCursor(final int jdbcType, final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLCursor(jdbcType, dbTypeName);
+    }
+
+    public boolean isOracleNumber(final String dbTypeName) {
+        return getJdbcTypeMapper().isOracleNumber(dbTypeName);
+    }
+
+    public boolean isOracleCursor(final int jdbcType, final String dbTypeName) {
+        return getJdbcTypeMapper().isOracleCursor(jdbcType, dbTypeName);
+    }
+
+    public boolean isSQLServerUniqueIdentifier(final String dbTypeName) {
+        return getJdbcTypeMapper().isSQLServerUniqueIdentifier(dbTypeName);
     }
 
     // ===================================================================================

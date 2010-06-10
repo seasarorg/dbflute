@@ -31,8 +31,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.exception.DfProcedureListGettingFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.factory.DfProcedureSynonymExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
@@ -465,19 +465,29 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 final String columnType = columnRs.getString("COLUMN_TYPE");
                 final int unknowType = DatabaseMetaData.procedureColumnUnknown;
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(columnType)) {
-                    procedureColumnType = Integer.valueOf(columnType);
+                    procedureColumnType = toInt("columnType", columnType);
                 } else {
                     procedureColumnType = unknowType;
                 }
             }
 
-            // uses getInt():int because it returns
-            // Types.OTHER when the type is unknown
-            //final int jdbcType = columnRs.getInt("DATA_TYPE");
-            final int jdbcType; // TODO temporary
+            final int jdbcType;
             {
-                final String dataType = columnRs.getString("DATA_TYPE");
-                jdbcType = dataType != null ? Integer.valueOf(dataType) : Types.OTHER;
+                int tmpJdbcType = Types.OTHER;
+                String dataType = null;
+                try {
+                    dataType = columnRs.getString("DATA_TYPE");
+                } catch (RuntimeException ignored) { // pinpoint patch
+                    // for example, SQLServer throws an exception
+                    // if the procedure is a function that returns table type
+                    final String procdureName = procedureMetaInfo.getProcedureFullQualifiedName();
+                    _log.info("*Failed to get data type: " + procdureName + "." + columnName);
+                    tmpJdbcType = Types.OTHER;
+                }
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(dataType)) {
+                    tmpJdbcType = toInt("dataType", dataType);
+                }
+                jdbcType = tmpJdbcType;
             }
 
             final String dbTypeName = columnRs.getString("TYPE_NAME");
@@ -488,11 +498,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             {
                 final String precision = columnRs.getString("PRECISION");
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(precision)) {
-                    columnSize = Integer.valueOf(precision);
+                    columnSize = toInt("precision", precision);
                 } else {
                     final String length = columnRs.getString("LENGTH");
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(length)) {
-                        columnSize = Integer.valueOf(length);
+                        columnSize = toInt("length", length);
                     } else {
                         columnSize = null;
                     }
@@ -502,7 +512,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             {
                 final String scale = columnRs.getString("SCALE");
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(scale)) {
-                    decimalDigits = Integer.valueOf(scale);
+                    decimalDigits = toInt("scale", scale);
                 } else {
                     decimalDigits = null;
                 }
@@ -534,6 +544,16 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureMetaInfo.addProcedureColumn(procedureColumnMetaInfo);
         }
         adjustProcedureColumnList(procedureMetaInfo);
+    }
+
+    protected int toInt(String title, String value) {
+        try {
+            return Integer.valueOf(value).intValue();
+        } catch (NumberFormatException e) {
+            String msg = "Failed to convert the value to integer:";
+            msg = msg + " title=" + title + " value=" + value;
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     protected String buildProcedureFullQualifiedName(DfProcedureMetaInfo metaInfo) {
@@ -602,7 +622,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         if (forSqlEx) {
             throw new DfJDBCException(msg, (SQLException) e);
         } else {
-            throw new DfDBFluteTaskFailureException(msg, e);
+            throw new DfProcedureListGettingFailureException(msg, e);
         }
     }
 

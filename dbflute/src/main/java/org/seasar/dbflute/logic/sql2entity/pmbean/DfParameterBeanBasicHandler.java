@@ -179,7 +179,7 @@ public class DfParameterBeanBasicHandler {
         if (metaInfo == null) {
             return false;
         }
-        return _columnHandler.isDbTypeStringClob(metaInfo.getDbTypeName());
+        return _columnHandler.isConceptTypeStringClob(metaInfo.getDbTypeName());
     }
 
     public boolean needsBytesOidHandling(String className, String propertyName) {
@@ -188,7 +188,7 @@ public class DfParameterBeanBasicHandler {
         if (metaInfo == null) {
             return false;
         }
-        return _columnHandler.isDbTypeBytesOid(metaInfo.getDbTypeName());
+        return _columnHandler.isConceptTypeBytesOid(metaInfo.getDbTypeName());
     }
 
     public boolean needsFixedLengthStringHandling(String className, String propertyName) {
@@ -197,7 +197,7 @@ public class DfParameterBeanBasicHandler {
         if (metaInfo == null) {
             return false;
         }
-        return _columnHandler.isPostgreSQL_BpChar(metaInfo.getDbTypeName());
+        return _columnHandler.isPostgreSQLBpChar(metaInfo.getDbTypeName());
     }
 
     public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
@@ -206,7 +206,7 @@ public class DfParameterBeanBasicHandler {
         if (metaInfo == null) {
             return false;
         }
-        return _columnHandler.isPostgreSQL_Numeric(metaInfo.getDbTypeName());
+        return _columnHandler.isPostgreSQLNumeric(metaInfo.getDbTypeName());
     }
 
     protected DfProcedureColumnMetaInfo getPropertyNameColumnInfo(String className, String propertyName) {

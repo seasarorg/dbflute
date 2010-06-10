@@ -46,6 +46,8 @@ public class DfJdbcTypeMapper {
         boolean isDbmsPostgreSQL();
 
         boolean isDbmsOracle();
+
+        boolean isDbmsSQLServer();
     }
 
     // ===================================================================================
@@ -131,13 +133,13 @@ public class DfJdbcTypeMapper {
     }
 
     protected String processForcedAdjustment(int jdbcDefValue, String dbTypeName) {
-        if (isDbTypeBytesOid(dbTypeName)) {
+        if (isConceptTypeBytesOid(dbTypeName)) {
             return getBlobJdbcType();
         }
-        if (isPostgreSQL_Interval(dbTypeName)) {
+        if (isPostgreSQLInterval(dbTypeName)) {
             return getTimeJdbcType();
         }
-        if (isOracle_CompatibleDate(jdbcDefValue, dbTypeName)) {
+        if (isOracleCompatibleDate(jdbcDefValue, dbTypeName)) {
             // for compatible to Oracle's JDBC driver
             return getDateJdbcType();
         }
@@ -147,45 +149,79 @@ public class DfJdbcTypeMapper {
     // -----------------------------------------------------
     //                                          Concept Type
     //                                          ------------
-    public boolean isDbTypeStringClob(final String dbTypeName) {
+    public boolean isConceptTypeUUID(final String dbTypeName) {
+        if (_resource.isDbmsPostgreSQL() && "uuid".equalsIgnoreCase(dbTypeName)) {
+            return true;
+        }
+        // now only PostgreSQL's uuid
+        // (SQLServer's uniqueidentifier is not supported yet)
+        return false;
+    }
+
+    public boolean isConceptTypeStringClob(final String dbTypeName) {
+        // basically types needs to be handled as stream on JDBC
         return _resource.isDbmsOracle() && "clob".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isDbTypeBytesOid(final String dbTypeName) {
+    public boolean isConceptTypeBytesOid(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
     }
 
     // -----------------------------------------------------
     //                                         Pinpoint Type
     //                                         -------------
-    public boolean isPostgreSQL_BpChar(final String dbTypeName) {
+    public boolean isPostgreSQLBpChar(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && "bpchar".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isPostgreSQL_Numeric(final String dbTypeName) {
+    public boolean isPostgreSQLNumeric(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && "numeric".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isPostgreSQL_Interval(final String dbTypeName) {
+    public boolean isPostgreSQLInterval(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && "interval".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isOracle_CompatibleDate(final int jdbcType, final String dbTypeName) {
+    public boolean isPostgreSQLCursor(final int jdbcType, final String dbTypeName) {
+        if (dbTypeName == null) {
+            return false;
+        }
+        final String key = "cursor";
+        return jdbcType == Types.OTHER && dbTypeName.toLowerCase().contains(key);
+    }
+
+    public boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
         return _resource.isDbmsOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isOracle_BinaryFloatDouble(final int jdbcType, final String dbTypeName) {
+    public boolean isOracleBinaryFloatDouble(final int jdbcType, final String dbTypeName) {
         return _resource.isDbmsOracle()
                 && ("binary_float".equalsIgnoreCase(dbTypeName) || "binary_double".equalsIgnoreCase(dbTypeName));
     }
 
+    public boolean isOracleNumber(final String dbTypeName) {
+        return _resource.isDbmsOracle() && "number".equalsIgnoreCase(dbTypeName);
+    }
+
+    public boolean isOracleCursor(final int jdbcType, final String dbTypeName) {
+        if (dbTypeName == null) {
+            return false;
+        }
+        final String key = "cursor";
+        return jdbcType == Types.OTHER && dbTypeName.toLowerCase().contains(key);
+    }
+
+    public boolean isSQLServerUniqueIdentifier(final String dbTypeName) {
+        return _resource.isDbmsSQLServer() && "uniqueidentifier".equalsIgnoreCase(dbTypeName);
+    }
+
+    // -----------------------------------------------------
+    //                                             JDBC Type
+    //                                             ---------
     protected boolean isOtherType(final int jdbcDefValue) {
         return Types.OTHER == jdbcDefValue;
     }
 
-    // -----------------------------------------------------
-    //                                      JDBC Type Helper
-    //                                      ----------------
     protected String getJdbcType(int jdbcDefValue) {
         return TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefValue);
     }

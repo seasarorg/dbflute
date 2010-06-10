@@ -147,9 +147,9 @@ public class DfProcedureExecutionMetaExtractor {
                 }
                 final int paramIndex = (index + 1);
                 final Object obj;
-                if (isPostgreSQLCursor(column)) {
+                if (column.isPostgreSQLCursor()) {
                     obj = TnValueTypes.POSTGRESQL_RESULT_SET.getValue(cs, paramIndex);
-                } else if (isOracleCursor(column)) {
+                } else if (column.isOracleCursor()) {
                     obj = TnValueTypes.ORACLE_RESULT_SET.getValue(cs, paramIndex);
                 } else {
                     obj = cs.getObject(paramIndex); // as default
@@ -241,9 +241,9 @@ public class DfProcedureExecutionMetaExtractor {
 
             // mapping by DB type name as pinpoint patch
             Object testValue = null;
-            if (isPostgreSQLUuid(column)) {
+            if (column.isConceptTypeUuid()) {
                 testValue = UUID.fromString(uuidValue);
-            } else if (isSQLServerUuid(column)) {
+            } else if (column.isSQLServerUniqueIdentifier()) {
                 testValue = uuidValue;
             }
             if (testValue != null) {
@@ -331,9 +331,9 @@ public class DfProcedureExecutionMetaExtractor {
                 ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
-                if (isPostgreSQLCursor(column)) {
+                if (column.isPostgreSQLCursor()) {
                     cs.registerOutParameter(paramIndex, PostgreSQLResultSetType.CURSOR);
-                } else if (isOracleCursor(column)) {
+                } else if (column.isOracleCursor()) {
                     cs.registerOutParameter(paramIndex, OracleResultSetType.CURSOR);
                 } else {
                     cs.registerOutParameter(paramIndex, jdbcType);
@@ -347,25 +347,6 @@ public class DfProcedureExecutionMetaExtractor {
             }
             ++index;
         }
-    }
-
-    // ===================================================================================
-    //                                                                       Pinpoint Type
-    //                                                                       =============
-    protected boolean isPostgreSQLUuid(DfProcedureColumnMetaInfo column) {
-        return isPostgreSQL() && column.isPostgreSQLUuid(column);
-    }
-
-    protected boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
-        return isPostgreSQL() && column.isPostgreSQLCursor(column);
-    }
-
-    protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
-        return isOracle() && column.isOracleCursor(column);
-    }
-
-    protected boolean isSQLServerUuid(DfProcedureColumnMetaInfo column) {
-        return isPostgreSQL() && column.isSQLServerUuid(column);
     }
 
     // ===================================================================================

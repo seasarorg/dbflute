@@ -348,7 +348,7 @@ public class Column {
         if (dbTypeName == null) {
             return false;
         }
-        return _columnHandler.isDbTypeStringClob(dbTypeName);
+        return _columnHandler.isConceptTypeStringClob(dbTypeName);
     }
 
     public boolean isDbTypeBytesOid() { // as pinpoint
@@ -356,7 +356,7 @@ public class Column {
         if (dbTypeName == null) {
             return false;
         }
-        return _columnHandler.isDbTypeBytesOid(dbTypeName);
+        return _columnHandler.isConceptTypeBytesOid(dbTypeName);
     }
 
     // -----------------------------------------------------
