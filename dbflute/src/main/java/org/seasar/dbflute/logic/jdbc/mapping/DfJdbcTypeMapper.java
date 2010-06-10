@@ -149,15 +149,6 @@ public class DfJdbcTypeMapper {
     // -----------------------------------------------------
     //                                          Concept Type
     //                                          ------------
-    public boolean isConceptTypeUUID(final String dbTypeName) {
-        if (_resource.isDbmsPostgreSQL() && "uuid".equalsIgnoreCase(dbTypeName)) {
-            return true;
-        }
-        // now only PostgreSQL's uuid
-        // (SQLServer's uniqueidentifier is not supported yet)
-        return false;
-    }
-
     public boolean isConceptTypeStringClob(final String dbTypeName) {
         // basically types needs to be handled as stream on JDBC
         return _resource.isDbmsOracle() && "clob".equalsIgnoreCase(dbTypeName);
@@ -165,6 +156,15 @@ public class DfJdbcTypeMapper {
 
     public boolean isConceptTypeBytesOid(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
+    }
+
+    public boolean isConceptTypeUUID(final String dbTypeName) {
+        if (_resource.isDbmsPostgreSQL() && "uuid".equalsIgnoreCase(dbTypeName)) {
+            return true;
+        }
+        // now only PostgreSQL's uuid
+        // (SQLServer's uniqueidentifier is not supported yet)
+        return false;
     }
 
     // -----------------------------------------------------

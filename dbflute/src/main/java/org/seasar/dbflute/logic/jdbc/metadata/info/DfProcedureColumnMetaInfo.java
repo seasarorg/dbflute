@@ -97,6 +97,11 @@ public class DfProcedureColumnMetaInfo {
         return comment;
     }
 
+    public boolean isConceptTypeStringClob() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isConceptTypeStringClob(dbTypeName);
+    }
+
     public boolean isConceptTypeUuid() {
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isConceptTypeUUID(dbTypeName);

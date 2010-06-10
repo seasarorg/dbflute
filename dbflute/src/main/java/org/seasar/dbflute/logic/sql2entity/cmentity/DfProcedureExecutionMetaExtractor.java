@@ -40,6 +40,7 @@ import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -323,29 +324,45 @@ public class DfProcedureExecutionMetaExtractor {
             final int paramIndex = (index + 1);
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
             final int jdbcType = column.getJdbcType();
+            final Object testValue = testValueList.get(testValueIndex);
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                cs.registerOutParameter(paramIndex, jdbcType);
+                registerOutParameter(cs, paramIndex, jdbcType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                cs.setObject(paramIndex, testValueList.get(testValueIndex), jdbcType);
+                cs.setObject(paramIndex, testValue, jdbcType);
                 ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
-                if (column.isPostgreSQLCursor()) {
-                    cs.registerOutParameter(paramIndex, PostgreSQLResultSetType.CURSOR);
-                } else if (column.isOracleCursor()) {
-                    cs.registerOutParameter(paramIndex, OracleResultSetType.CURSOR);
-                } else {
-                    cs.registerOutParameter(paramIndex, jdbcType);
-                }
+                registerOutParameter(cs, paramIndex, jdbcType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                cs.registerOutParameter(paramIndex, jdbcType);
-                cs.setObject(paramIndex, testValueList.get(testValueIndex), jdbcType);
+                registerOutParameter(cs, paramIndex, jdbcType, column);
+                bindObject(cs, paramIndex, jdbcType, testValue, column);
                 ++testValueIndex;
                 boundColumnList.add(column);
             }
             ++index;
+        }
+    }
+
+    protected void registerOutParameter(CallableStatement cs, int paramIndex, int jdbcType,
+            DfProcedureColumnMetaInfo column) throws SQLException {
+        if (column.isPostgreSQLCursor()) {
+            cs.registerOutParameter(paramIndex, PostgreSQLResultSetType.CURSOR);
+        } else if (column.isOracleCursor()) {
+            cs.registerOutParameter(paramIndex, OracleResultSetType.CURSOR);
+        } else {
+            cs.registerOutParameter(paramIndex, jdbcType);
+        }
+    }
+
+    protected void bindObject(CallableStatement cs, int paramIndex, int jdbcType, Object value,
+            DfProcedureColumnMetaInfo column) throws SQLException {
+        if (column.isConceptTypeStringClob()) {
+            final StringClobType clobType = new StringClobType();
+            clobType.bindValue(cs, paramIndex, value);
+        } else {
+            cs.setObject(paramIndex, value, jdbcType);
         }
     }
 
