@@ -152,10 +152,10 @@ public class TnValueTypes {
         //registerBasicValueType(Object.class, OBJECT);
 
         // plug-in (default)
-        registerPluginValueType("fixedLengthStringType", new FixedLengthStringType());
-        registerPluginValueType("objectBindingBigDecimalType", new ObjectBindingBigDecimalType());
         registerPluginValueType("stringClobType", new StringClobType());
         registerPluginValueType("bytesOidType", new BytesOidType());
+        registerPluginValueType("fixedLengthStringType", new FixedLengthStringType());
+        registerPluginValueType("objectBindingBigDecimalType", new ObjectBindingBigDecimalType());
     }
 
     // ===================================================================================
