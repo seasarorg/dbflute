@@ -47,7 +47,8 @@ import org.seasar.dbflute.s2dao.valuetype.basic.SqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
 import org.seasar.dbflute.s2dao.valuetype.basic.TimeType;
 import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
-import org.seasar.dbflute.s2dao.valuetype.basic.UUIDType;
+import org.seasar.dbflute.s2dao.valuetype.basic.UUIDAsDirectType;
+import org.seasar.dbflute.s2dao.valuetype.basic.UUIDAsStringType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesOidType;
@@ -87,7 +88,8 @@ public class TnValueTypes {
     public static final ValueType BINARY = new BinaryType();
     public static final ValueType BINARY_STREAM = new BinaryStreamType();
     public static final ValueType BOOLEAN = new BooleanType();
-    public static final ValueType UUID = new UUIDType();
+    public static final ValueType UUID_AS_DIRECT = new UUIDAsDirectType();
+    public static final ValueType UUID_AS_STRING = new UUIDAsStringType();
 
     // basic (interface)
     public static final ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
@@ -132,9 +134,9 @@ public class TnValueTypes {
         registerBasicValueType(java.sql.Date.class, SQLDATE);
         registerBasicValueType(java.sql.Time.class, TIME);
 
-        // The (java.util.)date type is treated as SqlDate by default.
-        // When the DATE type of your database has time, you need to change this.
-        // (But basically DBFlute resolves the problem automatically, for example, Oracle)
+        // The (java.util.)date type is treated as As-SqlDate by default.
+        // If Oracle, this switches to As-Timestamp when initialization
+        // because the date type of Oracle has time parts.
         registerBasicValueType(java.util.Date.class, UTILDATE_AS_SQLDATE);
 
         registerBasicValueType(Timestamp.class, TIMESTAMP);
@@ -143,7 +145,11 @@ public class TnValueTypes {
         registerBasicValueType(InputStream.class, BINARY_STREAM);
         registerBasicValueType(boolean.class, BOOLEAN);
         registerBasicValueType(Boolean.class, BOOLEAN);
-        registerBasicValueType(UUID.class, UUID);
+
+        // The (java.util.)UUID type is treated as As-Direct by default.
+        // If SQLServer, this switches to As-String when initialization
+        // because the UUID type of SQLServer cannot handle the type.
+        registerBasicValueType(UUID.class, UUID_AS_DIRECT);
 
         // basic (interface)
         registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class

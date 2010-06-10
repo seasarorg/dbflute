@@ -23,42 +23,49 @@ import java.sql.Types;
 import java.util.UUID;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The value type of UUID.
+ * The value type of UUID as direct handling. <br />
+ * This value type is available if the JDBC driver
+ * allows UUID type, for example when binding.
  * @author jflute
  */
-public class UUIDType extends TnAbstractValueType {
+public class UUIDAsDirectType extends TnAbstractValueType {
 
-    public UUIDType() {
-        super(Types.OTHER);
+    public UUIDAsDirectType() {
+        this(Types.OTHER);
+    }
+
+    protected UUIDAsDirectType(int sqlType) { // for extension
+        super(sqlType);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        String string = resultSet.getString(index);
-        return string != null ? UUID.fromString(string) : string;
+        final String string = resultSet.getString(index);
+        return string != null ? toUUID(string) : string;
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        String string = resultSet.getString(columnName);
-        return string != null ? UUID.fromString(string) : string;
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        final String string = rs.getString(columnName);
+        return string != null ? toUUID(string) : string;
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        String string = cs.getString(index);
-        return string != null ? UUID.fromString(string) : string;
+        final String string = cs.getString(index);
+        return string != null ? toUUID(string) : string;
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        String string = cs.getString(parameterName);
-        return string != null ? UUID.fromString(string) : string;
+        final String string = cs.getString(parameterName);
+        return string != null ? toUUID(string) : string;
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setObject(index, value, getSqlType());
+            ps.setObject(index, toBindingValue(value), getSqlType());
         }
     }
 
@@ -66,7 +73,15 @@ public class UUIDType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setObject(parameterName, value, getSqlType());
+            cs.setObject(parameterName, toBindingValue(value), getSqlType());
         }
+    }
+
+    protected Object toBindingValue(Object value) {
+        return toUUID(value);
+    }
+
+    protected UUID toUUID(Object value) {
+        return DfTypeUtil.toUUID(value);
     }
 }
