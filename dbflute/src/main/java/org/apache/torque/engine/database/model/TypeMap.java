@@ -395,6 +395,13 @@ public class TypeMap {
     //                                           Java Native
     //                                           -----------
     // *Java Native is NOT always FQCN (For example, String and CSharp's type)
+    /**
+     * Find java native type by JDBC type.
+     * @param jdbcType The type of JDBC. (NotNull)
+     * @param columnSize The size of column. (Nullable: if null, returns numeric or decimal)
+     * @param decimalDigits The decimal digits. (Nullable: if null, returns numeric or decimal)
+     * @return The string expression of java native type. (NotNull)
+     */
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {
         initializeIfNeeds();
         if (Srl.is_Null_or_TrimmedEmpty(jdbcType)) {
@@ -409,25 +416,25 @@ public class TypeMap {
             } else { // DECIMAL
                 defaultJavaNativeType = getDefaultDecimalJavaNativeType();
             }
-            if (decimalDigits != null && decimalDigits > 0) {
+            if (columnSize == null || columnSize == 0) { // no determination
                 return defaultJavaNativeType;
-            } else {
-                if (columnSize == null) {
-                    return getJavaNative(BIGINT);
-                }
-                if (columnSize > 9) {
-                    if (columnSize > 18) {
-                        if (prop.isCompatibleAutoMappingOldStyle()) {
-                            return getJavaNative(BIGINT); // old style
-                        } else {
-                            return defaultJavaNativeType;
-                        }
+            }
+            if (decimalDigits != null && decimalDigits > 0) { // has decimal digits
+                return defaultJavaNativeType;
+            }
+            // columnSize > 0 && (decimalDigits == null || decimalDigits == 0) here
+            if (columnSize > 9) {
+                if (columnSize > 18) {
+                    if (prop.isCompatibleAutoMappingOldStyle()) {
+                        return getJavaNative(BIGINT); // old style
                     } else {
-                        return getJavaNative(BIGINT);
+                        return defaultJavaNativeType;
                     }
                 } else {
-                    return getJavaNative(INTEGER);
+                    return getJavaNative(BIGINT);
                 }
+            } else {
+                return getJavaNative(INTEGER);
             }
         }
         return javaType;
