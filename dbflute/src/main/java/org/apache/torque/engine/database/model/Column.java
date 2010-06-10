@@ -343,6 +343,22 @@ public class Column {
         return dbType.startsWith("nchar") || dbType.startsWith("nvarchar");
     }
 
+    public boolean isDbTypeStringClob() { // as pinpoint
+        final String dbTypeName = getDbType();
+        if (dbTypeName == null) {
+            return false;
+        }
+        return _columnHandler.isDbTypeStringClob(dbTypeName);
+    }
+
+    public boolean isDbTypeBytesOid() { // as pinpoint
+        final String dbTypeName = getDbType();
+        if (dbTypeName == null) {
+            return false;
+        }
+        return _columnHandler.isDbTypeBytesOid(dbTypeName);
+    }
+
     // -----------------------------------------------------
     //                                           Column Size
     //                                           -----------
@@ -1347,31 +1363,7 @@ public class Column {
     }
 
     public boolean isJavaNativeUUIDObject() { // as pinpoint
-        if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
-                || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {
-            return false;
-        }
-        final String dbTypeName = getDbType();
-        if (dbTypeName == null) {
-            return false;
-        }
-        return _columnHandler.isUUID(dbTypeName);
-    }
-
-    public boolean isJavaNativeStringClob() { // as pinpoint
-        final String dbTypeName = getDbType();
-        if (dbTypeName == null) {
-            return false;
-        }
-        return _columnHandler.isOracleStringClob(dbTypeName);
-    }
-
-    public boolean isJavaNativeBytesOid() { // as pinpoint
-        final String dbTypeName = getDbType();
-        if (dbTypeName == null) {
-            return false;
-        }
-        return _columnHandler.isPostgreSQLBytesOid(dbTypeName);
+        return getJavaNative().equals("java.util.UUID");
     }
 
     public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able

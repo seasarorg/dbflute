@@ -65,6 +65,18 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "notParamResult, ${procedureNotParamResultIndex}";
 #set ($procedureNotParamResultIndex = $procedureNotParamResultIndex + 1)
 #end
+#if ($database.needsStringClobHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "stringClobType";
+#end
+#if ($database.needsBytesOidHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "bytesOidType";
+#end
+#if ($database.needsFixedLengthStringHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "fixedLengthStringType";
+#end
+#if ($database.needsObjectBindingBigDecimalHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "objectBindingBigDecimalType";
+#end
 #end
 #end
 

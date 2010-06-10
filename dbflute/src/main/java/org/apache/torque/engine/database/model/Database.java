@@ -391,6 +391,22 @@ public class Database {
         return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterResult(className, propertyName);
     }
 
+    public boolean needsStringClobHandling(String className, String propertyName) {
+        return getParameterBeanBasicHandler().needsStringClobHandling(className, propertyName);
+    }
+
+    public boolean needsBytesOidHandling(String className, String propertyName) {
+        return getParameterBeanBasicHandler().needsBytesOidHandling(className, propertyName);
+    }
+
+    public boolean needsFixedLengthStringHandling(String className, String propertyName) {
+        return getParameterBeanBasicHandler().needsFixedLengthStringHandling(className, propertyName);
+    }
+
+    public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
+        return getParameterBeanBasicHandler().needsObjectBindingBigDecimalHandling(className, propertyName);
+    }
+
     // -----------------------------------------------------
     //                                                Option
     //                                                ------

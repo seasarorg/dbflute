@@ -43,9 +43,9 @@ public class DfJdbcTypeMapper {
     public static interface Resource {
         boolean isLangJava();
 
-        boolean isDbmsOracle();
-
         boolean isDbmsPostgreSQL();
+
+        boolean isDbmsOracle();
     }
 
     // ===================================================================================
@@ -131,7 +131,7 @@ public class DfJdbcTypeMapper {
     }
 
     protected String processForcedAdjustment(int jdbcDefValue, String dbTypeName) {
-        if (isPostgreSQL_Oid(dbTypeName)) {
+        if (isDbTypeBytesOid(dbTypeName)) {
             return getBlobJdbcType();
         }
         if (isPostgreSQL_Interval(dbTypeName)) {
@@ -145,31 +145,38 @@ public class DfJdbcTypeMapper {
     }
 
     // -----------------------------------------------------
-    //                                    Type Determination
-    //                                    ------------------
-    public boolean isOracle_CompatibleDate(final int jdbcType, final String dbTypeName) {
-        return _resource.isDbmsOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
-    }
-
-    public boolean isOracle_Clob(final String dbTypeName) {
+    //                                          Concept Type
+    //                                          ------------
+    public boolean isDbTypeStringClob(final String dbTypeName) {
         return _resource.isDbmsOracle() && "clob".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isOracle_BinaryFloatDouble(final int jdbcType, final String dbTypeName) {
-        return _resource.isDbmsOracle()
-                && ("binary_float".equalsIgnoreCase(dbTypeName) || "binary_double".equalsIgnoreCase(dbTypeName));
+    public boolean isDbTypeBytesOid(final String dbTypeName) {
+        return _resource.isDbmsPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isPostgreSQL_Oid(final String dbTypeName) {
-        return _resource.isDbmsPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
+    // -----------------------------------------------------
+    //                                         Pinpoint Type
+    //                                         -------------
+    public boolean isPostgreSQL_BpChar(final String dbTypeName) {
+        return _resource.isDbmsPostgreSQL() && "bpchar".equalsIgnoreCase(dbTypeName);
+    }
+
+    public boolean isPostgreSQL_Numeric(final String dbTypeName) {
+        return _resource.isDbmsPostgreSQL() && "numeric".equalsIgnoreCase(dbTypeName);
     }
 
     public boolean isPostgreSQL_Interval(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && "interval".equalsIgnoreCase(dbTypeName);
     }
 
-    public boolean isUUID(final String dbTypeName) {
-        return "uuid".equalsIgnoreCase(dbTypeName);
+    public boolean isOracle_CompatibleDate(final int jdbcType, final String dbTypeName) {
+        return _resource.isDbmsOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
+    }
+
+    public boolean isOracle_BinaryFloatDouble(final int jdbcType, final String dbTypeName) {
+        return _resource.isDbmsOracle()
+                && ("binary_float".equalsIgnoreCase(dbTypeName) || "binary_double".equalsIgnoreCase(dbTypeName));
     }
 
     protected boolean isOtherType(final int jdbcDefValue) {

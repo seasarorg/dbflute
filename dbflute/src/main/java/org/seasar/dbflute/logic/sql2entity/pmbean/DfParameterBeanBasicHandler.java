@@ -9,6 +9,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -29,6 +30,8 @@ public class DfParameterBeanBasicHandler {
 
     protected DfBasicProperties _basicProperties;
     protected DfClassificationProperties _classificationProperties;
+
+    private static DfColumnHandler _columnHandler = new DfColumnHandler();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -160,8 +163,7 @@ public class DfParameterBeanBasicHandler {
     }
 
     public String getPropertyColumnName(String className, String propertyName) {
-        assertArgumentPmbMetaDataClassName(className);
-        assertArgumentPmbMetaDataPropertyName(propertyName);
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         return getPropertyNameColumnNameMap(className).get(propertyName);
     }
 
@@ -169,6 +171,51 @@ public class DfParameterBeanBasicHandler {
         assertArgumentPmbMetaDataClassName(className);
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameColumnNameMap();
+    }
+
+    public boolean needsStringClobHandling(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        if (metaInfo == null) {
+            return false;
+        }
+        return _columnHandler.isDbTypeStringClob(metaInfo.getDbTypeName());
+    }
+
+    public boolean needsBytesOidHandling(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        if (metaInfo == null) {
+            return false;
+        }
+        return _columnHandler.isDbTypeBytesOid(metaInfo.getDbTypeName());
+    }
+
+    public boolean needsFixedLengthStringHandling(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        if (metaInfo == null) {
+            return false;
+        }
+        return _columnHandler.isPostgreSQL_BpChar(metaInfo.getDbTypeName());
+    }
+
+    public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        if (metaInfo == null) {
+            return false;
+        }
+        return _columnHandler.isPostgreSQL_Numeric(metaInfo.getDbTypeName());
+    }
+
+    protected DfProcedureColumnMetaInfo getPropertyNameColumnInfo(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);
+        if (columnInfoMap == null) {
+            return null;
+        }
+        return columnInfoMap.get(propertyName);
     }
 
     protected Map<String, DfProcedureColumnMetaInfo> getPropertyNameColumnInfoMap(String className) {
@@ -296,11 +343,7 @@ public class DfParameterBeanBasicHandler {
             final String lineDisp = getPropertyRefLineDisp(className, propertyName, appData);
             return " :: refers to " + alias + name + ": " + lineDisp;
         } else { // basically procedure parameters
-            final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);
-            if (columnInfoMap == null) {
-                return "";
-            }
-            final DfProcedureColumnMetaInfo metaInfo = columnInfoMap.get(propertyName);
+            final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
             if (metaInfo == null) {
                 return "";
             }
@@ -394,6 +437,11 @@ public class DfParameterBeanBasicHandler {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    protected void assertArgumentPmbMetaDataClassPropertyName(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassName(className);
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+    }
+
     protected void assertArgumentPmbMetaDataClassName(String className) {
         if (className == null || className.trim().length() == 0) {
             String msg = "The className should not be null or empty: [" + className + "]";

@@ -28,9 +28,9 @@ public class ${myClassName} {
     protected ResultSet _rs;
 
 #foreach ($col in $table.columns)
-#if ($col.isJavaNativeStringClob())
+#if ($col.isDbTypeStringClob())
     protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class, "stringClobType");
-#elseif ($col.isJavaNativeBytesOid())
+#elseif ($col.isDbTypeBytesOid())
     protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class, "bytesOidType");
 #else
     protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class);

@@ -229,12 +229,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 return getBasicProperties().isTargetLanguageJava();
             }
 
-            public boolean isDbmsOracle() {
-                return isDatabaseOracle();
-            }
-
             public boolean isDbmsPostgreSQL() {
                 return isDatabasePostgreSQL();
+            }
+
+            public boolean isDbmsOracle() {
+                return isDatabaseOracle();
             }
 
             @Override
@@ -246,18 +246,25 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     }
 
     // -----------------------------------------------------
-    //                                    Type Determination
-    //                                    ------------------
-    public boolean isOracleStringClob(final String dbTypeName) {
-        return getJdbcTypeMapper().isOracle_Clob(dbTypeName);
+    //                                          Concept Type
+    //                                          ------------
+    public boolean isDbTypeBytesOid(final String dbTypeName) {
+        return getJdbcTypeMapper().isDbTypeBytesOid(dbTypeName);
     }
 
-    public boolean isPostgreSQLBytesOid(final String dbTypeName) {
-        return getJdbcTypeMapper().isPostgreSQL_Oid(dbTypeName);
+    public boolean isDbTypeStringClob(final String dbTypeName) {
+        return getJdbcTypeMapper().isDbTypeStringClob(dbTypeName);
     }
 
-    public boolean isUUID(final String dbTypeName) {
-        return getJdbcTypeMapper().isUUID(dbTypeName);
+    // -----------------------------------------------------
+    //                                         Pinpoint Type
+    //                                         -------------
+    public boolean isPostgreSQL_BpChar(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQL_BpChar(dbTypeName);
+    }
+
+    public boolean isPostgreSQL_Numeric(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQL_Numeric(dbTypeName);
     }
 
     // ===================================================================================
