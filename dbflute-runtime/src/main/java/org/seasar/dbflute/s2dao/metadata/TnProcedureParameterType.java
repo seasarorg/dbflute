@@ -92,7 +92,7 @@ public class TnProcedureParameterType {
         return _valueType;
     }
 
-    public void setValueType(final ValueType valueType) {
+    public void setValueType(ValueType valueType) {
         this._valueType = valueType;
     }
 
@@ -100,7 +100,7 @@ public class TnProcedureParameterType {
         return _inType;
     }
 
-    public void setInType(final boolean inType) {
+    public void setInType(boolean inType) {
         this._inType = inType;
     }
 
@@ -108,7 +108,7 @@ public class TnProcedureParameterType {
         return _outType;
     }
 
-    public void setOutType(final boolean outType) {
+    public void setOutType(boolean outType) {
         this._outType = outType;
     }
 
@@ -116,7 +116,7 @@ public class TnProcedureParameterType {
         return _returnType;
     }
 
-    public void setReturnType(final boolean returnType) {
+    public void setReturnType(boolean returnType) {
         this._returnType = returnType;
     }
 
@@ -124,7 +124,7 @@ public class TnProcedureParameterType {
         return _notParamResultType;
     }
 
-    public void setNotParamResultType(final boolean notParamResultType) {
+    public void setNotParamResultType(boolean notParamResultType) {
         this._notParamResultType = notParamResultType;
     }
 }

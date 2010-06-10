@@ -50,12 +50,13 @@ import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UUIDType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.BytesOidType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.FixedLengthStringType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.SerializableType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.TnBytesOidType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.TnStringClobType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -150,8 +151,9 @@ public class TnValueTypes {
         //registerBasicValueType(Object.class, OBJECT);
 
         // plug-in (default)
-        registerPluginValueType("stringClobType", new TnStringClobType());
-        registerPluginValueType("bytesOidType", new TnBytesOidType());
+        registerPluginValueType("fixedLengthStringType", new FixedLengthStringType());
+        registerPluginValueType("stringClobType", new StringClobType());
+        registerPluginValueType("bytesOidType", new BytesOidType());
     }
 
     // ===================================================================================

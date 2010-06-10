@@ -56,15 +56,15 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     }
 
     protected boolean isEntity() {
-        return Entity.class.isAssignableFrom(beanClass);
+        return Entity.class.isAssignableFrom(_beanClass);
     }
 
     protected DBMeta findDBMeta() {
         try {
-            final Entity entity = (Entity) beanClass.newInstance();
+            final Entity entity = (Entity) _beanClass.newInstance();
             return entity.getDBMeta();
         } catch (Exception e) {
-            String msg = "beanClass.newInstance() threw the exception: beanClass=" + beanClass;
+            String msg = "beanClass.newInstance() threw the exception: beanClass=" + _beanClass;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -129,7 +129,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     }
 
     protected boolean hasRelationNoAnnotation(DfPropertyDesc propertyDesc) {
-        return beanAnnotationReader.hasRelationNo(propertyDesc);
+        return _beanAnnotationReader.hasRelationNo(propertyDesc);
     }
 
     protected boolean isPrimaryKey(DfPropertyDesc propertyDesc) {
@@ -143,7 +143,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     }
 
     protected boolean hasIdAnnotation(DfPropertyDesc propertyDesc) {
-        return beanAnnotationReader.getId(propertyDesc) != null;
+        return _beanAnnotationReader.getId(propertyDesc) != null;
     }
 
     protected boolean isPersistent(TnPropertyType propertyType) {
@@ -156,7 +156,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     }
 
     protected boolean hasColumnAnnotation(DfPropertyDesc propertyDesc) {
-        return beanAnnotationReader.getColumnAnnotation(propertyDesc) != null;
+        return _beanAnnotationReader.getColumnAnnotation(propertyDesc) != null;
     }
 
     // ===================================================================================

@@ -27,29 +27,29 @@ import org.seasar.dbflute.jdbc.ValueType;
  */
 public abstract class TnAbstractValueType implements ValueType {
 
-    private int sqlType;
+    private int _sqlType;
 
     public TnAbstractValueType(int sqlType) {
-        this.sqlType = sqlType;
+        this._sqlType = sqlType;
     }
 
     protected void setNull(PreparedStatement ps, int index) throws SQLException {
-        ps.setNull(index, sqlType);
+        ps.setNull(index, _sqlType);
     }
 
     protected void setNull(CallableStatement cs, String parameterName) throws SQLException {
-        cs.setNull(parameterName, sqlType);
+        cs.setNull(parameterName, _sqlType);
     }
 
     public void registerOutParameter(CallableStatement cs, int index) throws SQLException {
-        cs.registerOutParameter(index, sqlType);
+        cs.registerOutParameter(index, _sqlType);
     }
 
     public void registerOutParameter(CallableStatement cs, String parameterName) throws SQLException {
-        cs.registerOutParameter(parameterName, sqlType);
+        cs.registerOutParameter(parameterName, _sqlType);
     }
 
     public int getSqlType() {
-        return sqlType;
+        return _sqlType;
     }
 }

@@ -31,15 +31,19 @@ import org.seasar.dbflute.util.DfTypeUtil;
 public class StringType extends TnAbstractValueType {
 
     public StringType() {
-        super(Types.VARCHAR);
+        this(Types.VARCHAR);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getString(index);
+    protected StringType(int sqlType) { // constructor for extension
+        super(sqlType);
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getString(columnName);
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        return rs.getString(index);
+    }
+
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        return rs.getString(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {

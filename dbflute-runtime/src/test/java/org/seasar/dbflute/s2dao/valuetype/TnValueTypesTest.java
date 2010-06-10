@@ -1,7 +1,9 @@
 package org.seasar.dbflute.s2dao.valuetype;
 
+import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -15,6 +17,10 @@ import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.mock.MockValueType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BigDecimalType;
+import org.seasar.dbflute.s2dao.valuetype.basic.IntegerType;
+import org.seasar.dbflute.s2dao.valuetype.basic.ObjectType;
+import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -23,6 +29,24 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class TnValueTypesTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                              String
+    //                                                                              ======
+    public void test_getValueType_byClassType_string_basic() throws Exception {
+        assertEquals(StringType.class, TnValueTypes.getValueType(String.class).getClass());
+    }
+
+    // ===================================================================================
+    //                                                                              Number
+    //                                                                              ======
+    public void test_getValueType_byClassType_number_basic() throws Exception {
+        assertEquals(IntegerType.class, TnValueTypes.getValueType(Integer.class).getClass());
+        assertEquals(BigDecimalType.class, TnValueTypes.getValueType(BigDecimal.class).getClass());
+    }
+
+    // ===================================================================================
+    //                                                                                ENUM
+    //                                                                                ====
     public void test_getValueType_byClassType_enum_priority_classification() throws Exception {
         // ## Arrange ##
         Class<?> keyType = TestClassificationStatus.class; // embedded
@@ -172,6 +196,14 @@ public class TnValueTypesTest extends PlainTestCase {
 
         // ## Act & Assert ##
         fireSameExecution(creator);
+    }
+
+    // ===================================================================================
+    //                                                                              Object
+    //                                                                              ======
+    public void test_getValueType_byClassType_object_basic() throws Exception {
+        assertEquals(ObjectType.class, TnValueTypes.getValueType(Object.class).getClass());
+        assertEquals(ObjectType.class, TnValueTypes.getValueType(File.class).getClass());
     }
 
     // ===================================================================================

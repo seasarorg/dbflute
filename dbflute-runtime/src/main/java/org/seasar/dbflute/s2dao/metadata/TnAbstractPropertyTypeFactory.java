@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
+import org.seasar.dbflute.exception.PluginValueTypeNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
@@ -31,22 +33,22 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Class<?> beanClass;
-    protected TnBeanAnnotationReader beanAnnotationReader;
+    protected final Class<?> _beanClass;
+    protected final TnBeanAnnotationReader _beanAnnotationReader;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractPropertyTypeFactory(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
-        this.beanClass = beanClass;
-        this.beanAnnotationReader = beanAnnotationReader;
+        this._beanClass = beanClass;
+        this._beanAnnotationReader = beanAnnotationReader;
     }
 
     // ===================================================================================
     //                                                                     Property Helper
     //                                                                     ===============
     protected DfBeanDesc getBeanDesc() {
-        return DfBeanDescFactory.getBeanDesc(beanClass);
+        return DfBeanDescFactory.getBeanDesc(_beanClass);
     }
 
     protected TnPropertyType createPropertyType(DfPropertyDesc propertyDesc) {
@@ -56,17 +58,36 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     }
 
     protected String getColumnName(DfPropertyDesc propertyDesc) {
-        String propertyName = propertyDesc.getPropertyName();
-        String name = beanAnnotationReader.getColumnAnnotation(propertyDesc);
+        final String propertyName = propertyDesc.getPropertyName();
+        final String name = _beanAnnotationReader.getColumnAnnotation(propertyDesc);
         return name != null ? name : propertyName;
     }
 
     protected ValueType getValueType(DfPropertyDesc propertyDesc) {
-        final String name = beanAnnotationReader.getValueType(propertyDesc);
-        if (name != null) {
-            return TnValueTypes.getPluginValueType(name);
+        final String propertyName = propertyDesc.getPropertyName();
+        final Class<?> propertyType = propertyDesc.getPropertyType();
+        final String keyName = _beanAnnotationReader.getValueType(propertyDesc);
+        if (keyName != null) {
+            return findValueTypeByName(propertyName, propertyType, keyName);
         }
-        final Class<?> type = propertyDesc.getPropertyType();
-        return TnValueTypes.getValueType(type);
+        return TnValueTypes.getValueType(propertyType);
+    }
+
+    protected ValueType findValueTypeByName(String propertyName, Class<?> propertyType, String keyName) {
+        final ValueType valueType = TnValueTypes.getPluginValueType(keyName);
+        if (valueType != null) {
+            return valueType;
+        }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found a plug-in value type by the name.");
+        br.addItem("Bean Type");
+        br.addElement(_beanClass.getName());
+        br.addItem("Property");
+        br.addElement(propertyName);
+        br.addElement(propertyType.getName());
+        br.addItem("Key Name");
+        br.addElement(keyName);
+        final String msg = br.buildExceptionMessage();
+        throw new PluginValueTypeNotFoundException(msg);
     }
 }

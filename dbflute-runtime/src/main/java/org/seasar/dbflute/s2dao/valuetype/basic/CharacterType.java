@@ -25,6 +25,8 @@ import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
+ * Basically unused on DBFlute because
+ * character type is out of mapping target. <br />
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */

@@ -18,6 +18,8 @@ package org.seasar.dbflute.s2dao.metadata;
 import java.util.List;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.exception.PluginValueTypeNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
@@ -27,21 +29,65 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 public class TnProcedureValueTypeProvider {
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
-    public ValueType provideValueType(final String name, Class<?> type, DBDef currentDBDef) {
-        if (name != null) {
-            return TnValueTypes.getPluginValueType(name);
+    //                                                                             Provide
+    //                                                                             =======
+    /**
+     * Provide value type for procedure.
+     * @param pmbType The type of ProcdurePmb for the parameter. (NotNull)
+     * @param paramName The name of parameter. (NotNull)
+     * @param paramType The type of parameter. (NotNull)
+     * @param keyName The key name for plug-in value type. (Nullable) 
+     * @param dbdef The current DB definition. (NotNull)
+     * @return The instance of value type. (NotNull: if not found by (not-null) valueTypeName, exception)
+     */
+    public ValueType provide(Class<?> pmbType, String paramName, Class<?> paramType, String keyName, DBDef dbdef) {
+        if (keyName != null) {
+            return findValueTypeByName(pmbType, paramName, paramType, keyName);
         }
-        if (List.class.isAssignableFrom(type)) { // is for out parameter cursor.
-            if (DBDef.PostgreSQL.equals(currentDBDef)) {
-                return TnValueTypes.POSTGRESQL_RESULT_SET;
-            } else if (DBDef.Oracle.equals(currentDBDef)) {
-                return TnValueTypes.ORACLE_RESULT_SET;
-            } else {
-                return TnValueTypes.SERIALIZABLE_BYTE_ARRAY;
-            }
+        if (List.class.isAssignableFrom(paramType)) { // is for out parameter cursor.
+            return findCursorValueType(dbdef);
         }
-        return TnValueTypes.getValueType(type);
+        return findValueTypeByType(paramType);
+    }
+
+    // ===================================================================================
+    //                                                                             By Name
+    //                                                                             =======
+    protected ValueType findValueTypeByName(Class<?> pmbType, String paramName, Class<?> paramType, String keyName) {
+        final ValueType valueType = TnValueTypes.getPluginValueType(keyName);
+        if (valueType != null) {
+            return valueType;
+        }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found a plug-in value type by the name.");
+        br.addItem("ProcedurePmb");
+        br.addElement(pmbType.getName());
+        br.addItem("Parameter");
+        br.addElement(paramName);
+        br.addElement(paramType.getName());
+        br.addItem("Key Name");
+        br.addElement(keyName);
+        final String msg = br.buildExceptionMessage();
+        throw new PluginValueTypeNotFoundException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                              Cursor
+    //                                                                              ======
+    protected ValueType findCursorValueType(DBDef dbdef) {
+        if (DBDef.PostgreSQL.equals(dbdef)) {
+            return TnValueTypes.POSTGRESQL_RESULT_SET;
+        } else if (DBDef.Oracle.equals(dbdef)) {
+            return TnValueTypes.ORACLE_RESULT_SET;
+        } else {
+            return TnValueTypes.SERIALIZABLE_BYTE_ARRAY;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             By Type
+    //                                                                             =======
+    protected ValueType findValueTypeByType(Class<?> paramType) {
+        return TnValueTypes.getValueType(paramType);
     }
 }

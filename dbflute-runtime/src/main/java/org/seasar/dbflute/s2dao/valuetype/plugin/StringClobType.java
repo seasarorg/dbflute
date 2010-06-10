@@ -32,9 +32,9 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnStringClobType extends TnAbstractValueType {
+public class StringClobType extends TnAbstractValueType {
 
-    public TnStringClobType() {
+    public StringClobType() {
         super(Types.CLOB);
     }
 

@@ -32,12 +32,12 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnBytesOidType extends BytesType {
+public class BytesOidType extends BytesType {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBytesOidType() {
+    public BytesOidType() {
         super(new TnBytesOidTrait());
     }
 

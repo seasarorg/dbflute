@@ -112,14 +112,19 @@ public class TnProcedureHandler extends TnBasicHandler {
         int i = 0;
         for (TnProcedureParameterType ppt : _procedureMetaData.getBindParameterTypeList()) {
             final ValueType valueType = ppt.getValueType();
+            final int bindIndex = (i + 1);
             // if INOUT parameter, both are true
             if (ppt.isOutType()) {
-                valueType.registerOutParameter(cs, i + 1);
+                valueType.registerOutParameter(cs, bindIndex);
             }
             if (ppt.isInType()) {
+                // bind as PreparedStatement
+                // because CallableStatement's setter might be unsupported
+                // (for example, PostgreSQL JDBC Driver for JDBC 3.0)
                 final Object value = ppt.getValue(dto);
-                valueType.bindValue(cs, i + 1, value);
+                valueType.bindValue(cs, bindIndex, value);
             }
+            // either must be true
             ++i;
         }
     }

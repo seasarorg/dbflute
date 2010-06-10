@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
@@ -44,8 +45,8 @@ public class TnProcedureMetaDataFactory {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected TnFieldProcedureAnnotationReader _annotationReader = new TnFieldProcedureAnnotationReader();
-    protected TnProcedureValueTypeProvider _valueTypeProvider = new TnProcedureValueTypeProvider();
+    protected final TnFieldProcedureAnnotationReader _annotationReader = new TnFieldProcedureAnnotationReader();
+    protected final TnProcedureValueTypeProvider _valueTypeProvider = new TnProcedureValueTypeProvider();
 
     // ===================================================================================
     //                                                                                Main
@@ -107,8 +108,7 @@ public class TnProcedureMetaDataFactory {
             throw new IllegalStateException(msg);
         }
         ppt.setParameterOrder(spec.getParameterOrder());
-        final ValueType valueType = findValueType(parameterDesc);
-        ppt.setValueType(valueType);
+        ppt.setValueType(findValueType(parameterDesc));
         return ppt;
     }
 
@@ -132,23 +132,35 @@ public class TnProcedureMetaDataFactory {
     protected TnProcedureParameterSpec parseParameterSpec(String specExp, DfPropertyDesc parameterDesc) {
         final List<String> list = Srl.splitListTrimmed(specExp, ",");
         if (list.size() != 2) {
-            String msg = "The size of parameterInfo elements was illegal:";
-            msg = msg + " elements=" + list + " spec=" + specExp;
-            msg = msg + " parameter=" + parameterDesc.getPropertyName();
-            msg = msg + " pmb=" + DfTypeUtil.toClassTitle(parameterDesc.getBeanDesc().getBeanClass());
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The size of parameter spec elements was illegal.");
+            br.addItem("ProcedurePmb");
+            br.addElement(DfTypeUtil.toClassTitle(parameterDesc.getBeanDesc().getBeanClass()));
+            br.addItem("Parameter");
+            br.addElement(parameterDesc.getPropertyName());
+            br.addElement(parameterDesc.getPropertyType());
+            br.addItem("Parameter Spec");
+            br.addElement(specExp);
+            final String msg = br.buildExceptionMessage();
             throw new IllegalStateException(msg);
         }
+        final String parameterType = list.get(0);
+        final String parameterIndex = list.get(1);
         final TnProcedureParameterSpec spec = new TnProcedureParameterSpec();
-        spec.setParameterType(list.get(0));
-        final String order = list.get(1);
+        spec.setParameterType(parameterType);
         try {
-            spec.setParameterOrder(DfTypeUtil.toInteger(list.get(1)));
+            spec.setParameterOrder(DfTypeUtil.toInteger(parameterIndex));
         } catch (NumberFormatException e) {
-            String msg = "Failed to parse the parameter index as Integer:";
-            msg = msg + " order=" + order + " spec=" + specExp;
-            msg = msg + " parameter=" + parameterDesc.getPropertyName();
-            msg = msg + " pmb=" + DfTypeUtil.toClassTitle(parameterDesc.getBeanDesc().getBeanClass());
-
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to parse the parameter index as Integer.");
+            br.addItem("ProcedurePmb");
+            br.addElement(DfTypeUtil.toClassTitle(parameterDesc.getBeanDesc().getBeanClass()));
+            br.addItem("Parameter");
+            br.addElement(parameterDesc.getPropertyName());
+            br.addElement(parameterDesc.getPropertyType());
+            br.addItem("Parameter Spec");
+            br.addElement(specExp);
+            final String msg = br.buildExceptionMessage();
             throw new IllegalStateException(msg);
         }
         return spec;
@@ -179,10 +191,12 @@ public class TnProcedureMetaDataFactory {
     //                                                                          Value Type
     //                                                                          ==========
     protected ValueType findValueType(DfPropertyDesc parameterDesc) {
-        final String name = _annotationReader.getValueType(parameterDesc);
-        final Class<?> type = parameterDesc.getPropertyType();
-        final DBDef currentDBDef = ResourceContext.currentDBDef();
-        return _valueTypeProvider.provideValueType(name, type, currentDBDef);
+        final Class<?> pmbType = parameterDesc.getBeanDesc().getBeanClass();
+        final String paramName = parameterDesc.getPropertyName();
+        final Class<?> paramType = parameterDesc.getPropertyType();
+        final String keyName = _annotationReader.getValueType(parameterDesc);
+        final DBDef dbdef = ResourceContext.currentDBDef();
+        return _valueTypeProvider.provide(pmbType, paramName, paramType, keyName, dbdef);
     }
 
     // ===================================================================================
