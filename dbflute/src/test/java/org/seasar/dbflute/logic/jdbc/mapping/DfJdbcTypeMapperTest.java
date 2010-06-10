@@ -1,6 +1,8 @@
 package org.seasar.dbflute.logic.jdbc.mapping;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.Types;
 import java.util.LinkedHashMap;
@@ -72,6 +74,42 @@ public class DfJdbcTypeMapperTest {
         // ## Act & Assert ##
         assertEquals("FOO", mapper.getColumnJdbcType(Types.TIMESTAMP, "__int4"));
         assertEquals("java.bar.Tender", TypeMap.findJavaNativeByJdbcType("FOO", 0, 0));
+    }
+
+    @Test
+    public void test_isOracleNCharOrNVarchar_basic() {
+        // ## Arrange ##
+        initializeEmptyProperty();
+        Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
+        nameToTorqueTypeMap.put("foo", "bar");
+        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+
+        // ## Act & Assert ##
+        assertTrue(mapper.isOracleNCharOrNVarchar("NVARCHAR2"));
+        assertTrue(mapper.isOracleNCharOrNVarchar("NCHAR2"));
+        assertFalse(mapper.isOracleNCharOrNVarchar("VARCHAR"));
+        assertFalse(mapper.isOracleNCharOrNVarchar("VARCHAR2"));
+        assertFalse(mapper.isOracleNCharOrNVarchar("CHAR"));
+        assertFalse(mapper.isOracleNCharOrNVarchar("CLOB"));
+        assertFalse(mapper.isOracleNCharOrNVarchar("NCLOB"));
+    }
+
+    @Test
+    public void test_isOracleNCharOrNVarcharOrNClob_basic() {
+        // ## Arrange ##
+        initializeEmptyProperty();
+        Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
+        nameToTorqueTypeMap.put("foo", "bar");
+        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+
+        // ## Act & Assert ##
+        assertTrue(mapper.isOracleNCharOrNVarcharOrNClob("NVARCHAR2"));
+        assertTrue(mapper.isOracleNCharOrNVarcharOrNClob("NCHAR2"));
+        assertTrue(mapper.isOracleNCharOrNVarcharOrNClob("NCLOB"));
+        assertFalse(mapper.isOracleNCharOrNVarcharOrNClob("VARCHAR"));
+        assertFalse(mapper.isOracleNCharOrNVarcharOrNClob("VARCHAR2"));
+        assertFalse(mapper.isOracleNCharOrNVarcharOrNClob("CHAR"));
+        assertFalse(mapper.isOracleNCharOrNVarcharOrNClob("CLOB"));
     }
 
     protected void initializeEmptyProperty() {

@@ -210,8 +210,8 @@ public class DfJdbcTypeMapper {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "nchar", "nvarchar");
     }
 
-    public boolean isOracleNCharOrNVarcharOrClob(final String dbTypeName) {
-        return isOracleNCharOrNVarchar(dbTypeName) && containsIgnoreCase(dbTypeName, "nclob");
+    public boolean isOracleNCharOrNVarcharOrNClob(final String dbTypeName) {
+        return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "nchar", "nvarchar", "nclob");
     }
 
     public boolean isOracleNumber(final String dbTypeName) {

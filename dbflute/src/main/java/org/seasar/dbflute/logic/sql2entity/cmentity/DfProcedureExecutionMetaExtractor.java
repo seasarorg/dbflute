@@ -38,8 +38,6 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -172,6 +170,10 @@ public class DfProcedureExecutionMetaExtractor {
             }
             msg = msg + " test values = " + testValueList + ln();
             msg = msg + " " + DfJDBCException.extractMessage(continued);
+            SQLException nextEx = continued.getNextException();
+            if (nextEx == null) {
+                msg = msg + ln() + " " + DfJDBCException.extractMessage(nextEx);
+            }
             _log.info(msg);
         } finally {
             if (cs != null) {
@@ -342,27 +344,47 @@ public class DfProcedureExecutionMetaExtractor {
 
     protected void registerOutParameter(CallableStatement cs, int paramIndex, int jdbcType,
             DfProcedureColumnMetaInfo column) throws SQLException {
-        if (column.isPostgreSQLCursor()) {
-            cs.registerOutParameter(paramIndex, PostgreSQLResultSetType.CURSOR);
-        } else if (column.isOracleCursor()) {
-            cs.registerOutParameter(paramIndex, OracleResultSetType.CURSOR);
-        } else {
-            cs.registerOutParameter(paramIndex, jdbcType);
+        try {
+            if (column.isOracleNCharOrNVarchar()) {
+                _stringType.registerOutParameter(cs, paramIndex);
+            } else if (column.isConceptTypeStringClob()) {
+                _stringClobType.registerOutParameter(cs, paramIndex);
+            } else if (column.isPostgreSQLUuid()) {
+                TnValueTypes.UUID_AS_DIRECT.registerOutParameter(cs, paramIndex);
+            } else if (column.isSQLServerUniqueIdentifier()) {
+                TnValueTypes.UUID_AS_STRING.registerOutParameter(cs, paramIndex);
+            } else if (column.isPostgreSQLCursor()) {
+                TnValueTypes.POSTGRESQL_RESULT_SET.registerOutParameter(cs, paramIndex);
+            } else if (column.isOracleCursor()) {
+                TnValueTypes.ORACLE_RESULT_SET.registerOutParameter(cs, paramIndex);
+            } else {
+                cs.registerOutParameter(paramIndex, jdbcType);
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to register OUT parameter(" + paramIndex + "):";
+            msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
+            throw new DfJDBCException(msg, e);
         }
     }
 
     protected void bindObject(CallableStatement cs, int paramIndex, int jdbcType, Object value,
             DfProcedureColumnMetaInfo column) throws SQLException {
-        if (column.isOracleNCharOrNVarchar()) {
-            _stringType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
-        } else if (column.isConceptTypeStringClob()) {
-            _stringClobType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
-        } else if (column.isPostgreSQLUuid()) {
-            TnValueTypes.UUID_AS_DIRECT.bindValue(cs, paramIndex, value);
-        } else if (column.isSQLServerUniqueIdentifier()) {
-            TnValueTypes.UUID_AS_STRING.bindValue(cs, paramIndex, value);
-        } else {
-            cs.setObject(paramIndex, value, jdbcType);
+        try {
+            if (column.isOracleNCharOrNVarchar()) {
+                _stringType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
+            } else if (column.isConceptTypeStringClob()) {
+                _stringClobType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
+            } else if (column.isPostgreSQLUuid()) {
+                TnValueTypes.UUID_AS_DIRECT.bindValue(cs, paramIndex, value);
+            } else if (column.isSQLServerUniqueIdentifier()) {
+                TnValueTypes.UUID_AS_STRING.bindValue(cs, paramIndex, value);
+            } else {
+                cs.setObject(paramIndex, value, jdbcType);
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to bind parameter(" + paramIndex + "):";
+            msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
+            throw new DfJDBCException(msg, e);
         }
     }
 

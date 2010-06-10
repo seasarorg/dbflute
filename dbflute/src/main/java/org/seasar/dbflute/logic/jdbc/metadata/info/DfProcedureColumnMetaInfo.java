@@ -49,7 +49,7 @@ public class DfProcedureColumnMetaInfo {
             return _columnName;
         } else {
             if (DfProcedureColumnType.procedureColumnReturn.equals(_procedureColumnType)) {
-                return "(result)";
+                return "(return)";
             } else {
                 return "(arg)";
             }
