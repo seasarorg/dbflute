@@ -324,12 +324,11 @@ public class DfProcedureExecutionMetaExtractor {
             final int paramIndex = (index + 1);
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
             final int jdbcType = column.getJdbcType();
-            final Object testValue = testValueList.get(testValueIndex);
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
                 registerOutParameter(cs, paramIndex, jdbcType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                cs.setObject(paramIndex, testValue, jdbcType);
+                cs.setObject(paramIndex, testValueList.get(testValueIndex), jdbcType);
                 ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
@@ -337,7 +336,7 @@ public class DfProcedureExecutionMetaExtractor {
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
                 registerOutParameter(cs, paramIndex, jdbcType, column);
-                bindObject(cs, paramIndex, jdbcType, testValue, column);
+                bindObject(cs, paramIndex, jdbcType, testValueList.get(testValueIndex), column);
                 ++testValueIndex;
                 boundColumnList.add(column);
             }
