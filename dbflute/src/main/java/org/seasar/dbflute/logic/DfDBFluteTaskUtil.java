@@ -157,10 +157,8 @@ public final class DfDBFluteTaskUtil {
             br.addElement(metaInfo.getDriverDisp());
         }
         if (e instanceof SQLException) {
+            // for showing next exception of SQLException
             buildSQLExceptionMessage(br, (SQLException) e);
-        } else {
-            br.addItem("Exception");
-            br.addElement(e.getClass().getName());
         }
         final String msg = br.buildExceptionMessage();
         _log.error(msg, e);

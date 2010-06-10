@@ -13,15 +13,20 @@ public class DfParameterBeanMetaData {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String className;
-    protected String superClassName;
-    protected Map<String, String> propertyNameTypeMap;
-    protected Map<String, String> propertyNameOptionMap;
-    protected Map<String, String> propertyNameColumnNameMap; // only when this is for procedure
-    protected Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap; // only when this is for procedure
-    protected String procedureName; // only when this is for procedure
-    protected File sqlFile; // when procedure, always null
-    protected boolean refCustomizeEntity;
+    protected String _className;
+    protected String _superClassName;
+    protected Map<String, String> _propertyNameTypeMap;
+    protected Map<String, String> _propertyNameOptionMap;
+
+    // -----------------------------------------------------
+    //                                             Procedure
+    //                                             ---------
+    // only when for procedure
+    protected String _procedureName;
+    protected Map<String, String> _propertyNameColumnNameMap;
+    protected Map<String, DfProcedureColumnMetaInfo> _propertyNameColumnInfoMap;
+    protected File _sqlFile;
+    protected boolean _refCustomizeEntity;
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -29,11 +34,11 @@ public class DfParameterBeanMetaData {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(className);
-        sb.append(", ").append(superClassName);
-        sb.append(", ").append(propertyNameTypeMap);
-        sb.append(", ").append(propertyNameOptionMap);
-        sb.append(", ").append(procedureName);
+        sb.append(_className);
+        sb.append(", ").append(_superClassName);
+        sb.append(", ").append(_propertyNameTypeMap);
+        sb.append(", ").append(_propertyNameOptionMap);
+        sb.append(", ").append(_procedureName);
         return sb.toString();
     }
 
@@ -41,74 +46,77 @@ public class DfParameterBeanMetaData {
     //                                                                            Accessor
     //                                                                            ========
     public String getClassName() {
-        return className;
+        return _className;
     }
 
     public void setClassName(String className) {
-        this.className = className;
+        this._className = className;
     }
 
     public String getSuperClassName() {
-        return superClassName;
+        return _superClassName;
     }
 
     public void setSuperClassName(String superClassName) {
-        this.superClassName = superClassName;
+        this._superClassName = superClassName;
     }
 
     public Map<String, String> getPropertyNameTypeMap() {
-        return propertyNameTypeMap;
+        return _propertyNameTypeMap;
     }
 
     public void setPropertyNameTypeMap(Map<String, String> propertyNameTypeMap) {
-        this.propertyNameTypeMap = propertyNameTypeMap;
+        this._propertyNameTypeMap = propertyNameTypeMap;
     }
 
     public Map<String, String> getPropertyNameOptionMap() {
-        return propertyNameOptionMap;
+        return _propertyNameOptionMap;
     }
 
     public void setPropertyNameOptionMap(Map<String, String> propertyNameOptionMap) {
-        this.propertyNameOptionMap = propertyNameOptionMap;
+        this._propertyNameOptionMap = propertyNameOptionMap;
     }
 
+    // -----------------------------------------------------
+    //                                             Procedure
+    //                                             ---------
     public String getProcedureName() {
-        return procedureName;
+        return _procedureName;
     }
 
     public void setProcedureName(String procedureName) {
-        this.procedureName = procedureName;
+        this._procedureName = procedureName;
     }
 
     public Map<String, String> getPropertyNameColumnNameMap() {
-        return propertyNameColumnNameMap;
+        return _propertyNameColumnNameMap;
     }
 
     public void setPropertyNameColumnNameMap(Map<String, String> propertyNameColumnNameMap) {
-        this.propertyNameColumnNameMap = propertyNameColumnNameMap;
+        this._propertyNameColumnNameMap = propertyNameColumnNameMap;
     }
 
     public Map<String, DfProcedureColumnMetaInfo> getPropertyNameColumnInfoMap() {
-        return propertyNameColumnInfoMap;
+        return _propertyNameColumnInfoMap;
     }
 
     public void setPropertyNameColumnInfoMap(Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap) {
-        this.propertyNameColumnInfoMap = propertyNameColumnInfoMap;
+        this._propertyNameColumnInfoMap = propertyNameColumnInfoMap;
     }
 
     public File getSqlFile() {
-        return sqlFile;
+        return _sqlFile;
     }
 
     public void setSqlFile(File sqlFile) {
-        this.sqlFile = sqlFile;
+        this._sqlFile = sqlFile;
     }
 
     public boolean isRefCustomizeEntity() {
-        return refCustomizeEntity;
+        return _refCustomizeEntity;
     }
 
     public void setRefCustomizeEntity(boolean refCustomizeEntity) {
-        this.refCustomizeEntity = refCustomizeEntity;
+        this._refCustomizeEntity = refCustomizeEntity;
     }
 }

@@ -92,7 +92,7 @@ public class DfProcedurePmbSetupper {
                 {
                     final String plainColumnName = column.getColumnName();
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(plainColumnName)) {
-                        columnName = filterColumnNameAboutVendorDependency(plainColumnName);
+                        columnName = resolveVendorColumnNameHeadable(plainColumnName);
                     } else {
                         columnName = "arg" + (index + 1);
                     }
@@ -205,12 +205,20 @@ public class DfProcedurePmbSetupper {
 
     protected String convertProcedureNameToPmbName(String procedureName) {
         procedureName = Srl.replace(procedureName, ".", "_");
-        procedureName = filterProcedureName4PmbNameAboutVendorDependency(procedureName);
+        procedureName = resolveVendorProcedureNameHeadable(procedureName);
         return Srl.camelize(procedureName) + "Pmb";
     }
 
+    protected String resolveVendorProcedureNameHeadable(String procedureName) {
+        if (getBasicProperties().isDatabaseSQLServer()) {
+            // SQLServer returns 'sp_foo;1'
+            procedureName = Srl.substringLastFront(procedureName, ";");
+        }
+        return procedureName;
+    }
+
     protected String convertProcedurePmbNameToEntityName(String pmbName, String propertyName) {
-        final String baseName = pmbName.substring(0, pmbName.length() - "Pmb".length());
+        final String baseName = Srl.substringLastFront(pmbName, "Pmb");
         final String entityName = baseName + Srl.initCap(propertyName);
         return entityName;
     }
@@ -220,23 +228,15 @@ public class DfProcedurePmbSetupper {
         return grammarInfo.getGenericListClassName(entityName);
     }
 
-    protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
-        // Because SQLServer returns 'Abc;1'.
-        if (getBasicProperties().isDatabaseSQLServer() && procedureName.contains(";")) {
-            procedureName = procedureName.substring(0, procedureName.indexOf(";"));
-        }
-        return procedureName;
-    }
-
     protected String convertColumnNameToPropertyName(String columnName) {
-        columnName = filterColumnNameAboutVendorDependency(columnName);
+        columnName = resolveVendorColumnNameHeadable(columnName);
         return Srl.initBeansProp(Srl.camelize(columnName));
     }
 
-    protected String filterColumnNameAboutVendorDependency(String columnName) {
-        // Because SQLServer returns '@returnValue'.
-        if (getBasicProperties().isDatabaseSQLServer() && columnName.startsWith("@")) {
-            columnName = columnName.substring("@".length());
+    protected String resolveVendorColumnNameHeadable(String columnName) {
+        if (getBasicProperties().isDatabaseSQLServer()) {
+            // SQLServer returns '@returnValue'
+            columnName = Srl.substringFirstRear(columnName, "@");
         }
         return columnName;
     }

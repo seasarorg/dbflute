@@ -79,6 +79,10 @@ public class DfProcedureMetaInfo {
         } else {
             _procedureSqlName = sqlName;
         }
+        if (prop.isDatabaseSQLServer()) {
+            // SQLServer returns 'sp_foo;1'
+            _procedureSqlName = Srl.substringLastFront(_procedureSqlName, ";");
+        }
         return _procedureSqlName;
     }
 
