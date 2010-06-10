@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -240,22 +239,15 @@ public class DfProcedureExecutionMetaExtractor {
         }
         if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
                 || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-            final String stringValue = "0";
-            final String uuidValue = "FD8C7155-3A0A-DB11-BAC4-0011F5099158";
 
             // mapping by DB type name as pinpoint patch
-            Object testValue = null;
-            if (column.isPostgreSQLUuid()) {
-                testValue = UUID.fromString(uuidValue);
-            } else if (column.isSQLServerUniqueIdentifier()) {
-                testValue = uuidValue;
-            }
-            if (testValue != null) {
-                testValueList.add(testValue);
+            if (column.isPostgreSQLUuid() || column.isSQLServerUniqueIdentifier()) {
+                testValueList.add("FD8C7155-3A0A-DB11-BAC4-0011F5099158");
                 return;
             }
 
             // mapping by JDBC type
+            final String stringValue = "0";
             final int jdbcDefType = column.getJdbcType();
             final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
             if (jdbcType == null) {
@@ -265,6 +257,7 @@ public class DfProcedureExecutionMetaExtractor {
             final Integer columnSize = column.getColumnSize();
             final Integer decimalDigits = column.getDecimalDigits();
             final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
+            Object testValue = null;
             if (containsAsEndsWith(nativeType, _numberList)) {
                 testValue = 0;
             } else if (containsAsEndsWith(nativeType, _dateList)) {
@@ -364,6 +357,10 @@ public class DfProcedureExecutionMetaExtractor {
             _stringType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
         } else if (column.isConceptTypeStringClob()) {
             _stringClobType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
+        } else if (column.isPostgreSQLUuid()) {
+            TnValueTypes.UUID_AS_DIRECT.bindValue(cs, paramIndex, value);
+        } else if (column.isSQLServerUniqueIdentifier()) {
+            TnValueTypes.UUID_AS_STRING.bindValue(cs, paramIndex, value);
         } else {
             cs.setObject(paramIndex, value, jdbcType);
         }
