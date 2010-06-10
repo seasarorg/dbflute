@@ -365,7 +365,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             /**
              * Extract the meta data of parameter bean.
              * @param sql Target SQL. (NotNull and NotEmpty)
-             * @return the meta data of parameter bean. (Nullable: If it returns null, it means 'Not Found'.)
+             * @return the meta data of parameter bean. (Nullable: If it returns null, it means 'not found'.)
              */
             protected DfParameterBeanMetaData extractParameterBeanMetaData(String sql) {
                 final String parameterBeanName = getParameterBeanName(sql);
@@ -479,7 +479,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 if (totalSqlCount > 0) {
                     _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
                 } else {
-                    _log.info("  --> SQL for sql2entity was Not Found in the SQL file!");
+                    _log.info("  --> SQL for sql2entity was not found in the SQL file!");
                 }
             }
 

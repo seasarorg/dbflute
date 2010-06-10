@@ -18,6 +18,7 @@ package org.seasar.dbflute.logic.jdbc.handler;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -472,7 +473,12 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
             // uses getInt():int because it returns
             // Types.OTHER when the type is unknown
-            final int jdbcType = columnRs.getInt("DATA_TYPE");
+            //final int jdbcType = columnRs.getInt("DATA_TYPE");
+            final int jdbcType; // TODO temporary
+            {
+                final String dataType = columnRs.getString("DATA_TYPE");
+                jdbcType = dataType != null ? Integer.valueOf(dataType) : Types.OTHER;
+            }
 
             final String dbTypeName = columnRs.getString("TYPE_NAME");
 
