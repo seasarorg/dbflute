@@ -102,15 +102,20 @@ public class DfProcedureColumnMetaInfo {
         return _columnHandler.isConceptTypeStringClob(dbTypeName);
     }
 
-    public boolean isConceptTypeUuid() {
+    public boolean isPostgreSQLUuid() {
         final String dbTypeName = getDbTypeName();
-        return _columnHandler.isConceptTypeUUID(dbTypeName);
+        return _columnHandler.isPostgreSQLUuid(dbTypeName);
     }
 
     public boolean isPostgreSQLCursor() {
         final int jdbcType = getJdbcType();
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isPostgreSQLCursor(jdbcType, dbTypeName);
+    }
+
+    public boolean isOracleNCharOrNVarchar() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isOracleNCharOrNVarchar(dbTypeName);
     }
 
     public boolean isOracleNumber() {

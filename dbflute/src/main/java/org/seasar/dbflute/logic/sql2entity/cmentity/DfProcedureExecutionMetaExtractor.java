@@ -38,6 +38,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfP
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
@@ -58,11 +59,13 @@ public class DfProcedureExecutionMetaExtractor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfCustomizeEntityMetaExtractor extractor = new DfCustomizeEntityMetaExtractor();
-    protected final List<Object> numberList = getProperties().getTypeMappingProperties().getJavaNativeNumberList();
-    protected final List<Object> dateList = getProperties().getTypeMappingProperties().getJavaNativeDateList();
-    protected final List<Object> booleanList = getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
-    protected final List<Object> binaryList = getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
+    protected final DfCustomizeEntityMetaExtractor _extractor = new DfCustomizeEntityMetaExtractor();
+    protected final List<Object> _numberList = getProperties().getTypeMappingProperties().getJavaNativeNumberList();
+    protected final List<Object> _dateList = getProperties().getTypeMappingProperties().getJavaNativeDateList();
+    protected final List<Object> _booleanList = getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
+    protected final List<Object> _binaryList = getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
+    protected final StringType _stringType = new StringType();
+    protected final StringClobType _stringClobType = new StringClobType();
 
     // ===================================================================================
     //                                                                             Process
@@ -242,7 +245,7 @@ public class DfProcedureExecutionMetaExtractor {
 
             // mapping by DB type name as pinpoint patch
             Object testValue = null;
-            if (column.isConceptTypeUuid()) {
+            if (column.isPostgreSQLUuid()) {
                 testValue = UUID.fromString(uuidValue);
             } else if (column.isSQLServerUniqueIdentifier()) {
                 testValue = uuidValue;
@@ -262,13 +265,13 @@ public class DfProcedureExecutionMetaExtractor {
             final Integer columnSize = column.getColumnSize();
             final Integer decimalDigits = column.getDecimalDigits();
             final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
-            if (containsAsEndsWith(nativeType, numberList)) {
+            if (containsAsEndsWith(nativeType, _numberList)) {
                 testValue = 0;
-            } else if (containsAsEndsWith(nativeType, dateList)) {
+            } else if (containsAsEndsWith(nativeType, _dateList)) {
                 testValue = DfTypeUtil.toTimestamp("2010-03-31 12:34:56");
-            } else if (containsAsEndsWith(nativeType, booleanList)) {
+            } else if (containsAsEndsWith(nativeType, _booleanList)) {
                 testValue = Boolean.FALSE;
-            } else if (containsAsEndsWith(nativeType, binaryList)) {
+            } else if (containsAsEndsWith(nativeType, _binaryList)) {
                 testValue = stringValue; // binary type is unsupported here
             } else { // as String
                 testValue = stringValue;
@@ -357,9 +360,10 @@ public class DfProcedureExecutionMetaExtractor {
 
     protected void bindObject(CallableStatement cs, int paramIndex, int jdbcType, Object value,
             DfProcedureColumnMetaInfo column) throws SQLException {
-        if (column.isConceptTypeStringClob()) {
-            final StringClobType clobType = new StringClobType();
-            clobType.bindValue(cs, paramIndex, value);
+        if (column.isOracleNCharOrNVarchar()) {
+            _stringType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
+        } else if (column.isConceptTypeStringClob()) {
+            _stringClobType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
         } else {
             cs.setObject(paramIndex, value, jdbcType);
         }
@@ -369,7 +373,7 @@ public class DfProcedureExecutionMetaExtractor {
     //                                                                    Column Meta Info
     //                                                                    ================
     protected Map<String, DfColumnMetaInfo> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {
-        return extractor.extractColumnMetaInfoMap(rs, sql, null);
+        return _extractor.extractColumnMetaInfoMap(rs, sql, null);
     }
 
     // ===================================================================================

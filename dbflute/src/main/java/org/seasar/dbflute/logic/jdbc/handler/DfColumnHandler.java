@@ -276,8 +276,16 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return getJdbcTypeMapper().isPostgreSQLNumeric(dbTypeName);
     }
 
+    public boolean isPostgreSQLUuid(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLUuid(dbTypeName);
+    }
+
     public boolean isPostgreSQLCursor(final int jdbcType, final String dbTypeName) {
         return getJdbcTypeMapper().isPostgreSQLCursor(jdbcType, dbTypeName);
+    }
+
+    public boolean isOracleNCharOrNVarchar(final String dbTypeName) {
+        return getJdbcTypeMapper().isOracleNCharOrNVarchar(dbTypeName);
     }
 
     public boolean isOracleNumber(final String dbTypeName) {
