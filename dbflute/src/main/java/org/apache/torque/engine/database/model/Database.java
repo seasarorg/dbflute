@@ -101,7 +101,7 @@ import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupRes
 import org.seasar.dbflute.properties.initializer.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.properties.initializer.DfAdditionalPrimaryKeyInitializer;
 import org.seasar.dbflute.properties.initializer.DfAdditionalUniqueKeyInitializer;
-import org.seasar.dbflute.properties.initializer.IncludeQueryInitializer;
+import org.seasar.dbflute.properties.initializer.DfIncludeQueryInitializer;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -568,7 +568,7 @@ public class Database {
     //                                          IncludeQuery
     //                                          ------------
     public void initializeIncludeQuery() {
-        IncludeQueryInitializer initializer = new IncludeQueryInitializer();
+        DfIncludeQueryInitializer initializer = new DfIncludeQueryInitializer();
         initializer.setIncludeQueryProperties(getProperties().getIncludeQueryProperties());
         initializer.setTableFinder(new DfTableFinder() {
             public Table findTable(String name) {

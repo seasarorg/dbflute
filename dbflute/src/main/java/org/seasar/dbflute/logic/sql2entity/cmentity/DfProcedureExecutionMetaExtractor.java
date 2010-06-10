@@ -171,7 +171,7 @@ public class DfProcedureExecutionMetaExtractor {
             msg = msg + " test values = " + testValueList + ln();
             msg = msg + " " + DfJDBCException.extractMessage(continued);
             SQLException nextEx = continued.getNextException();
-            if (nextEx == null) {
+            if (nextEx != null) {
                 msg = msg + ln() + " " + DfJDBCException.extractMessage(nextEx);
             }
             _log.info(msg);

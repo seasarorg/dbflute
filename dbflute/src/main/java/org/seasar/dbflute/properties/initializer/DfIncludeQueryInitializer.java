@@ -15,13 +15,13 @@ import org.seasar.dbflute.properties.assistant.DfTableFinder;
  * @author jflute
  * @since 0.7.3 (2008/05/30 Friday)
  */
-public class IncludeQueryInitializer {
+public class DfIncludeQueryInitializer {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(IncludeQueryInitializer.class);
+    private static final Log _log = LogFactory.getLog(DfIncludeQueryInitializer.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -34,20 +34,20 @@ public class IncludeQueryInitializer {
     //                                                                          Initialize
     //                                                                          ==========
     public void initializeIncludeQuery() {
-        _log.debug("/=============================");
-        _log.debug("...Initializing include query.");
+        _log.info("/=============================");
+        _log.info("...Initializing include query.");
         final Map<String, Map<String, Map<String, List<String>>>> map = includeQueryProperties.getIncludeQueryMap();
         final Set<String> keySet = map.keySet();
         for (String key : keySet) {
-            _log.debug(key);
+            _log.info(key);
             final Map<String, Map<String, List<String>>> queryElementMap = map.get(key);
             final Set<String> queryElementKeySet = queryElementMap.keySet();
             for (String queryElementKey : queryElementKeySet) {
-                _log.debug("    " + queryElementKey);
+                _log.info("    " + queryElementKey);
                 final Map<String, List<String>> tableElementMap = queryElementMap.get(queryElementKey);
                 final Set<String> tableElementKeySet = tableElementMap.keySet();
                 for (String tableName : tableElementKeySet) {
-                    _log.debug("        " + tableName);
+                    _log.info("        " + tableName);
                     final Table targetTable = tableFinder.findTable(tableName);
                     if (targetTable == null) {
                         throwIncludeQueryTableNotFoundException(queryElementKey, tableName, map);
@@ -59,7 +59,7 @@ public class IncludeQueryInitializer {
                         throwIncludeQueryNotListColumnSpecificationException(queryElementKey, tableName, map, e);
                     }
                     for (String columnName : columnNameList) {
-                        _log.debug("            " + columnName);
+                        _log.info("            " + columnName);
                         final Column targetColumn = targetTable.getColumn(columnName);
                         if (targetColumn == null) {
                             throwIncludeQueryColumnNotFoundException(queryElementKey, tableName, columnName, map);
@@ -68,7 +68,7 @@ public class IncludeQueryInitializer {
                 }
             }
         }
-        _log.debug("========/");
+        _log.info("========/");
     }
 
     protected void throwIncludeQueryTableNotFoundException(String queryElementKey, String tableName,
@@ -83,7 +83,7 @@ public class IncludeQueryInitializer {
         msg = msg + ln();
         msg = msg + "[Include Query Map]" + ln() + map + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IncludeQueryTableNotFoundException(msg);
+        throw new DfIncludeQueryTableNotFoundException(msg);
     }
 
     protected void throwIncludeQueryNotListColumnSpecificationException(String queryElementKey, String tableName,
@@ -104,7 +104,7 @@ public class IncludeQueryInitializer {
         msg = msg + ln();
         msg = msg + "[Include Query Map]" + ln() + map + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IncludeQueryNotListColumnSpecificationException(msg, e);
+        throw new DfIncludeQueryNotListColumnSpecificationException(msg, e);
     }
 
     protected void throwIncludeQueryColumnNotFoundException(String queryElementKey, String tableName,
@@ -121,29 +121,29 @@ public class IncludeQueryInitializer {
         msg = msg + ln();
         msg = msg + "[Include Query Map]" + ln() + map + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IncludeQueryColumnNotFoundException(msg);
+        throw new DfIncludeQueryColumnNotFoundException(msg);
     }
 
-    protected static class IncludeQueryTableNotFoundException extends RuntimeException {
+    protected static class DfIncludeQueryTableNotFoundException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public IncludeQueryTableNotFoundException(String msg) {
+        public DfIncludeQueryTableNotFoundException(String msg) {
             super(msg);
         }
     }
 
-    protected static class IncludeQueryNotListColumnSpecificationException extends RuntimeException {
+    protected static class DfIncludeQueryNotListColumnSpecificationException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public IncludeQueryNotListColumnSpecificationException(String msg, RuntimeException e) {
+        public DfIncludeQueryNotListColumnSpecificationException(String msg, RuntimeException e) {
             super(msg, e);
         }
     }
 
-    protected static class IncludeQueryColumnNotFoundException extends RuntimeException {
+    protected static class DfIncludeQueryColumnNotFoundException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public IncludeQueryColumnNotFoundException(String msg) {
+        public DfIncludeQueryColumnNotFoundException(String msg) {
             super(msg);
         }
     }
