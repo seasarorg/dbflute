@@ -97,10 +97,16 @@ public class ${glDBFluteConfig} {
             _logTimestampFormat = "timestamp $df:{" + timestampFormat + "}";
 
             // It should treat java.util.Date as time-stamp,
-            // because the DATE type of Oracle has seconds.
+            // because the DATE type of Oracle has time parts.
             Class<?> keyType = java.util.Date.class;
             ValueType valueType = TnValueTypes.UTILDATE_AS_TIMESTAMP;
-            TnValueTypes.registerBasicValueType(keyType, valueType); // override
+            TnValueTypes.registerBasicValueType(keyType, valueType); // switch
+	    } else if (isCurrentDBDef(DBDef.SQLServer)) {
+	        // It should treat java.util.UUID as string,
+	        // because the UUID type of SQLServer cannot handle the type.
+            Class<?> keyType = java.util.UUID.class;
+            ValueType valueType = TnValueTypes.UUID_AS_STRING;
+            TnValueTypes.registerBasicValueType(keyType, valueType); // switch
 	    }
     }
 
