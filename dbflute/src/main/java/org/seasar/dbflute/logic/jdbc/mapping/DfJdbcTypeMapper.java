@@ -117,7 +117,7 @@ public class DfJdbcTypeMapper {
             return getDateJdbcType();
         } else if (dbTypeName.toLowerCase().contains("clob")) {
             return getClobJdbcType();
-        } else if (_resource.isLangJava() && dbTypeName.toLowerCase().contains("uuid")) {
+        } else if (_resource.isLangJava() && isConceptTypeUUID(dbTypeName)) {
             // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // This is for Java only because the type has not been checked yet on C#.
             // - - - - - - - - - -/
@@ -183,7 +183,7 @@ public class DfJdbcTypeMapper {
     }
 
     public boolean isPostgreSQLCursor(final int jdbcType, final String dbTypeName) {
-        if (dbTypeName == null) {
+        if (!_resource.isDbmsPostgreSQL() || dbTypeName == null) {
             return false;
         }
         final String key = "cursor";
@@ -204,7 +204,7 @@ public class DfJdbcTypeMapper {
     }
 
     public boolean isOracleCursor(final int jdbcType, final String dbTypeName) {
-        if (dbTypeName == null) {
+        if (!_resource.isDbmsOracle() || dbTypeName == null) {
             return false;
         }
         final String key = "cursor";
