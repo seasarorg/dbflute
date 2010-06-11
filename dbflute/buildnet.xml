@@ -1,3 +1,4 @@
+
 <project name="DBFlute.NET" default="dist" basedir=".">
 
 	<!-- ============================================================================= -->
@@ -6,7 +7,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.8.9.17"/>
-	<property name="build.version" value="${version}-07-SNAPSHOT"/>
+	<property name="build.version" value="${version}-08-SNAPSHOT"/>
 	<property name="pre.version" value="0.8.9.16"/>
 
 	<!-- Resource Directories -->
