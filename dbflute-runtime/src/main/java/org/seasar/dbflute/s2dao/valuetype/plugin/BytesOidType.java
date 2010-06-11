@@ -28,8 +28,7 @@ import java.sql.Types;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * The value type of bytes OID. (for PostgreSQL) <br />
- * {Refers to Seasar and Extends its class}
+ * The value type of bytes OID. (basically for PostgreSQL)
  * @author jflute
  */
 public class BytesOidType extends BytesType {
@@ -84,10 +83,10 @@ public class BytesOidType extends BytesType {
     //                                                                 ===================
     protected static class TnBytesOidImpl implements Blob {
 
-        protected byte[] bytes;
+        protected byte[] _bytes;
 
         public TnBytesOidImpl(byte[] bytes) {
-            this.bytes = bytes;
+            this._bytes = bytes;
         }
 
         public void free() throws SQLException { // for JDK-6.0
@@ -95,7 +94,7 @@ public class BytesOidType extends BytesType {
         }
 
         public InputStream getBinaryStream() throws SQLException {
-            return new ByteArrayInputStream(bytes);
+            return new ByteArrayInputStream(_bytes);
         }
 
         public InputStream getBinaryStream(long pos, long length) throws SQLException { // for JDK-6.0
@@ -103,16 +102,16 @@ public class BytesOidType extends BytesType {
         }
 
         public byte[] getBytes(long pos, int length) throws SQLException {
-            if (length == bytes.length) {
-                return bytes;
+            if (length == _bytes.length) {
+                return _bytes;
             }
             final byte[] result = new byte[length];
-            DfSystemUtil.arraycopy(bytes, 0, result, 0, length);
+            DfSystemUtil.arraycopy(_bytes, 0, result, 0, length);
             return result;
         }
 
         public long length() throws SQLException {
-            return bytes.length;
+            return _bytes.length;
         }
 
         public long position(Blob pattern, long start) throws SQLException {

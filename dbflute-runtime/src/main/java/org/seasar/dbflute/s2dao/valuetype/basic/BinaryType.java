@@ -27,7 +27,6 @@ import java.sql.Types;
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 
 /**
- * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class BinaryType extends TnAbstractValueType {
@@ -36,26 +35,26 @@ public class BinaryType extends TnAbstractValueType {
         super(Types.BINARY);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
+    public Object getValue(ResultSet rs, int index) throws SQLException {
         try {
-            return toByteArray(resultSet.getBlob(index));
-        } catch (SQLException e) {
-            return resultSet.getBytes(index);
+            return toByteArray(rs.getBlob(index));
+        } catch (SQLException ignored) {
+            return rs.getBytes(index);
         }
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
         try {
-            return toByteArray(resultSet.getBlob(columnName));
-        } catch (SQLException e) {
-            return resultSet.getBytes(columnName);
+            return toByteArray(rs.getBlob(columnName));
+        } catch (SQLException ignored) {
+            return rs.getBytes(columnName);
         }
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
         try {
             return toByteArray(cs.getBlob(index));
-        } catch (SQLException e) {
+        } catch (SQLException ignored) {
             return cs.getBytes(index);
         }
     }
@@ -63,7 +62,7 @@ public class BinaryType extends TnAbstractValueType {
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
         try {
             return toByteArray(cs.getBlob(parameterName));
-        } catch (SQLException e) {
+        } catch (SQLException ignored) {
             return cs.getBytes(parameterName);
         }
     }

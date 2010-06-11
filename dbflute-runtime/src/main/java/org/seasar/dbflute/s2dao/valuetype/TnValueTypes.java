@@ -98,6 +98,12 @@ public class TnValueTypes {
     public static final ValueType DEFAULT_OBJECT = new ObjectType();
 
     // plug-in
+    public static final ValueType STRING_CLOB = new StringClobType();
+    public static final ValueType BYTES_OID = new BytesOidType();
+    public static final ValueType FIXED_LENGTH_STRING = new FixedLengthStringType();
+    public static final ValueType OBJECT_BINDING_BIGDECIMAL = new ObjectBindingBigDecimalType();
+
+    // cursor
     public static final ValueType POSTGRESQL_RESULT_SET = new PostgreSQLResultSetType();
     public static final ValueType ORACLE_RESULT_SET = new OracleResultSetType();
     public static final ValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
@@ -163,10 +169,10 @@ public class TnValueTypes {
         //registerBasicValueType(Object.class, OBJECT);
 
         // plug-in (default)
-        registerPluginValueType("stringClobType", new StringClobType());
-        registerPluginValueType("bytesOidType", new BytesOidType());
-        registerPluginValueType("fixedLengthStringType", new FixedLengthStringType());
-        registerPluginValueType("objectBindingBigDecimalType", new ObjectBindingBigDecimalType());
+        registerPluginValueType("stringClobType", STRING_CLOB);
+        registerPluginValueType("bytesOidType", BYTES_OID);
+        registerPluginValueType("fixedLengthStringType", FIXED_LENGTH_STRING);
+        registerPluginValueType("objectBindingBigDecimalType", OBJECT_BINDING_BIGDECIMAL);
     }
 
     // ===================================================================================
