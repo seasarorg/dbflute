@@ -40,9 +40,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfP
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.BytesOidType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -66,9 +63,15 @@ public class DfProcedureExecutionMetaExtractor {
     protected final List<Object> _dateList = getProperties().getTypeMappingProperties().getJavaNativeDateList();
     protected final List<Object> _booleanList = getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
     protected final List<Object> _binaryList = getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
-    protected final StringType _stringType = new StringType();
-    protected final StringClobType _stringClobType = new StringClobType();
-    protected final BytesOidType _bytesOidType = new BytesOidType();
+    protected final ValueType _stringType = TnValueTypes.STRING;
+    protected final ValueType _stringClobType = TnValueTypes.STRING_CLOB;
+    protected final ValueType _bytesOidType = TnValueTypes.BYTES_OID;
+    protected final ValueType _fixedLengthStringType = TnValueTypes.FIXED_LENGTH_STRING;
+    protected final ValueType _objectBindingBigDecimalType = TnValueTypes.OBJECT_BINDING_BIGDECIMAL;
+    protected final ValueType _uuidAsDirectType = TnValueTypes.UUID_AS_DIRECT;
+    protected final ValueType _uuidAsStringType = TnValueTypes.UUID_AS_STRING;
+    protected final ValueType _postgreSqlResultSetType = TnValueTypes.POSTGRESQL_RESULT_SET;
+    protected final ValueType _oracleResultSetType = TnValueTypes.ORACLE_RESULT_SET;
 
     // ===================================================================================
     //                                                                             Process
@@ -155,9 +158,9 @@ public class DfProcedureExecutionMetaExtractor {
                 final int paramIndex = (index + 1);
                 final Object obj;
                 if (column.isPostgreSQLCursor()) {
-                    obj = TnValueTypes.POSTGRESQL_RESULT_SET.getValue(cs, paramIndex);
+                    obj = _postgreSqlResultSetType.getValue(cs, paramIndex);
                 } else if (column.isOracleCursor()) {
-                    obj = TnValueTypes.ORACLE_RESULT_SET.getValue(cs, paramIndex);
+                    obj = _oracleResultSetType.getValue(cs, paramIndex);
                 } else {
                     obj = cs.getObject(paramIndex); // as default
                 }
@@ -362,22 +365,19 @@ public class DfProcedureExecutionMetaExtractor {
     protected void registerOutParameter(CallableStatement cs, int paramIndex, int jdbcDefType,
             DfProcedureColumnMetaInfo column) throws SQLException {
         final ValueType valueType;
-        if (column.isOracleNCharOrNVarchar()) {
-            valueType = _stringType;
-        } else if (column.isConceptTypeStringClob()) {
-            valueType = _stringClobType;
-        } else if (column.isConceptTypeBytesOid()) {
-            valueType = _bytesOidType;
-        } else if (column.isPostgreSQLUuid()) {
-            valueType = TnValueTypes.UUID_AS_DIRECT;
-        } else if (column.isSQLServerUniqueIdentifier()) {
-            valueType = TnValueTypes.UUID_AS_STRING;
-        } else if (column.isPostgreSQLCursor()) {
-            valueType = TnValueTypes.POSTGRESQL_RESULT_SET;
-        } else if (column.isOracleCursor()) {
-            valueType = TnValueTypes.ORACLE_RESULT_SET;
-        } else {
-            valueType = TnValueTypes.getValueType(jdbcDefType);
+        {
+            final ValueType forcedType = getForcedValueType(column);
+            if (forcedType != null) {
+                valueType = forcedType;
+            } else {
+                if (column.isPostgreSQLCursor()) {
+                    valueType = _postgreSqlResultSetType;
+                } else if (column.isOracleCursor()) {
+                    valueType = _oracleResultSetType;
+                } else {
+                    valueType = TnValueTypes.getValueType(jdbcDefType);
+                }
+            }
         }
         try {
             valueType.registerOutParameter(cs, paramIndex);
@@ -401,18 +401,13 @@ public class DfProcedureExecutionMetaExtractor {
     protected void bindObject(CallableStatement cs, int paramIndex, int jdbcDefType, Object value,
             DfProcedureColumnMetaInfo column) throws SQLException {
         final ValueType valueType;
-        if (column.isOracleNCharOrNVarchar()) {
-            valueType = _stringType;
-        } else if (column.isConceptTypeStringClob()) {
-            valueType = _stringClobType;
-        } else if (column.isConceptTypeBytesOid()) {
-            valueType = _bytesOidType;
-        } else if (column.isPostgreSQLUuid()) {
-            valueType = TnValueTypes.UUID_AS_DIRECT;
-        } else if (column.isSQLServerUniqueIdentifier()) {
-            valueType = TnValueTypes.UUID_AS_STRING;
-        } else {
-            valueType = TnValueTypes.findByValueOrJdbcDefType(value, jdbcDefType);
+        {
+            final ValueType forcedType = getForcedValueType(column);
+            if (forcedType != null) {
+                valueType = forcedType;
+            } else {
+                valueType = TnValueTypes.findByValueOrJdbcDefType(value, jdbcDefType);
+            }
         }
         try {
             valueType.bindValue(cs, paramIndex, value);
@@ -431,6 +426,28 @@ public class DfProcedureExecutionMetaExtractor {
         msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
         msg = msg + " :: " + value + ", " + valueType.getClass().getName();
         return msg;
+    }
+
+    protected ValueType getForcedValueType(DfProcedureColumnMetaInfo column) {
+        final ValueType valueType;
+        if (column.isOracleNCharOrNVarchar()) { // just in case
+            valueType = _stringType;
+        } else if (column.isConceptTypeStringClob()) {
+            valueType = _stringClobType;
+        } else if (column.isConceptTypeBytesOid()) {
+            valueType = _bytesOidType;
+        } else if (column.isConceptTypeFixedLengthString()) {
+            valueType = _fixedLengthStringType;
+        } else if (column.isConceptTypeObjectBindingBigDecimal()) {
+            valueType = _objectBindingBigDecimalType;
+        } else if (column.isPostgreSQLUuid()) { // needs to switch
+            valueType = _uuidAsDirectType;
+        } else if (column.isSQLServerUniqueIdentifier()) { // needs to switch
+            valueType = _uuidAsStringType;
+        } else {
+            valueType = null;
+        }
+        return valueType;
     }
 
     // ===================================================================================

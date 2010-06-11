@@ -253,6 +253,10 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     // -----------------------------------------------------
     //                                          Concept Type
     //                                          ------------
+    public boolean isConceptTypeUUID(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypeUUID(dbTypeName);
+    }
+
     public boolean isConceptTypeStringClob(final String dbTypeName) {
         return getJdbcTypeMapper().isConceptTypeStringClob(dbTypeName);
     }
@@ -261,8 +265,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return getJdbcTypeMapper().isConceptTypeBytesOid(dbTypeName);
     }
 
-    public boolean isConceptTypeUUID(final String dbTypeName) {
-        return getJdbcTypeMapper().isConceptTypeUUID(dbTypeName);
+    public boolean isConceptTypeFixedLengthString(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypeFixedLengthString(dbTypeName);
+    }
+
+    public boolean isConceptTypeObjectBindingBigDecimal(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypeObjectBindingBigDecimal(dbTypeName);
     }
 
     // -----------------------------------------------------

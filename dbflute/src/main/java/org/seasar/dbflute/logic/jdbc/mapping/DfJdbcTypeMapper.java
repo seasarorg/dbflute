@@ -151,6 +151,16 @@ public class DfJdbcTypeMapper {
     // -----------------------------------------------------
     //                                          Concept Type
     //                                          ------------
+    public boolean isConceptTypeUUID(final String dbTypeName) { // mapped by UUID
+        if (isPostgreSQLUuid(dbTypeName)) {
+            return true;
+        }
+        if (isSQLServerUniqueIdentifier(dbTypeName)) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isConceptTypeStringClob(final String dbTypeName) {
         // basically types needs to be handled as stream on JDBC
         // now only Oracle's CLOB
@@ -162,14 +172,12 @@ public class DfJdbcTypeMapper {
         return isPostgreSQLOid(dbTypeName);
     }
 
-    public boolean isConceptTypeUUID(final String dbTypeName) {
-        if (isPostgreSQLUuid(dbTypeName)) {
-            return true;
-        }
-        if (isSQLServerUniqueIdentifier(dbTypeName)) {
-            return true;
-        }
-        return false;
+    public boolean isConceptTypeFixedLengthString(final String dbTypeName) {
+        return isPostgreSQLBpChar(dbTypeName); // procedure only
+    }
+
+    public boolean isConceptTypeObjectBindingBigDecimal(final String dbTypeName) {
+        return isPostgreSQLNumeric(dbTypeName); // procedure only
     }
 
     // -----------------------------------------------------

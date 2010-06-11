@@ -197,7 +197,7 @@ public class DfParameterBeanBasicHandler {
         if (metaInfo == null) {
             return false;
         }
-        return _columnHandler.isPostgreSQLBpChar(metaInfo.getDbTypeName());
+        return _columnHandler.isConceptTypeFixedLengthString(metaInfo.getDbTypeName());
     }
 
     public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
@@ -206,7 +206,7 @@ public class DfParameterBeanBasicHandler {
         if (metaInfo == null) {
             return false;
         }
-        return _columnHandler.isPostgreSQLNumeric(metaInfo.getDbTypeName());
+        return _columnHandler.isConceptTypeObjectBindingBigDecimal(metaInfo.getDbTypeName());
     }
 
     protected DfProcedureColumnMetaInfo getPropertyNameColumnInfo(String className, String propertyName) {

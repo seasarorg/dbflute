@@ -107,6 +107,16 @@ public class DfProcedureColumnMetaInfo {
         return _columnHandler.isConceptTypeBytesOid(dbTypeName);
     }
 
+    public boolean isConceptTypeFixedLengthString() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isConceptTypeFixedLengthString(dbTypeName);
+    }
+
+    public boolean isConceptTypeObjectBindingBigDecimal() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isConceptTypeObjectBindingBigDecimal(dbTypeName);
+    }
+
     public boolean isPostgreSQLUuid() {
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isPostgreSQLUuid(dbTypeName);
