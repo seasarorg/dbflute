@@ -391,20 +391,295 @@ public class Srl {
     // ===================================================================================
     //                                                                            Contains
     //                                                                            ========
-    public static boolean contains(List<String> strList, String str) {
-        assertListStringNotNull(strList);
-        for (String element : strList) {
-            if (equalsPlain(element, str)) {
+    public static boolean containsAll(String str, String... keywords) {
+        return doContainsAll(false, str, keywords);
+    }
+
+    public static boolean containsAllIgnoreCase(String str, String... keywords) {
+        return doContainsAll(true, str, keywords);
+    }
+
+    protected static boolean doContainsAll(boolean ignoreCase, String str, String... keywords) {
+        assertStringNotNull(str);
+        assertKeywordVaryingNotNull(keywords);
+        if (keywords.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            str = str.toLowerCase();
+        }
+        for (String keyword : keywords) {
+            if (ignoreCase) {
+                keyword = keyword.toLowerCase();
+            }
+            if (!str.contains(keyword)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean containsAny(String str, String... keywords) {
+        return doContainsAny(false, str, keywords);
+    }
+
+    public static boolean containsAnyIgnoreCase(String str, String... keywords) {
+        return doContainsAny(true, str, keywords);
+    }
+
+    protected static boolean doContainsAny(boolean ignoreCase, String str, String... keywords) {
+        assertStringNotNull(str);
+        assertKeywordVaryingNotNull(keywords);
+        if (keywords.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            str = str.toLowerCase();
+        }
+        for (String keyword : keywords) {
+            if (ignoreCase) {
+                keyword = keyword.toLowerCase();
+            }
+            if (str.contains(keyword)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static boolean containsIgnoreCase(List<String> strList, String str) {
-        assertListStringNotNull(strList);
-        for (String element : strList) {
-            if (equalsIgnoreCase(element, str)) {
+    public static boolean containsElementAll(List<String> strList, String... elements) {
+        return doContainsElementAll(false, strList, elements);
+    }
+
+    public static boolean containsElementAllIgnoreCase(List<String> strList, String... elements) {
+        return doContainsElementAll(true, strList, elements);
+    }
+
+    protected static boolean doContainsElementAll(boolean ignoreCase, List<String> strList, String... elements) {
+        assertStringListNotNull(strList);
+        assertElementVaryingNotNull(elements);
+        if (elements.length == 0) {
+            return false;
+        }
+        for (String element : elements) {
+            boolean exists = false;
+            for (String current : strList) {
+                if (ignoreCase) {
+                    if (equalsIgnoreCase(current, element)) {
+                        exists = true;
+                    }
+                } else {
+                    if (equalsPlain(current, element)) {
+                        exists = true;
+                    }
+                }
+            }
+            if (!exists) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean containsElementAny(List<String> strList, String... elements) {
+        return doContainsElementAny(false, strList, elements);
+    }
+
+    public static boolean containsElementAnyIgnoreCase(List<String> strList, String... elements) {
+        return doContainsElementAny(true, strList, elements);
+    }
+
+    public static boolean doContainsElementAny(boolean ignoreCase, List<String> strList, String... elements) {
+        assertStringListNotNull(strList);
+        assertElementVaryingNotNull(elements);
+        if (elements.length == 0) {
+            return false;
+        }
+        for (String element : elements) {
+            boolean exists = false;
+            for (String current : strList) {
+                if (ignoreCase) {
+                    if (equalsIgnoreCase(current, element)) {
+                        exists = true;
+                    }
+                } else {
+                    if (equalsPlain(current, element)) {
+                        exists = true;
+                    }
+                }
+            }
+            if (exists) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                          StartsWith
+    //                                                                          ==========
+    public static final boolean startsWith(final String str, final String... prefixes) {
+        return doStartsWith(false, str, prefixes);
+    }
+
+    public static final boolean startsWithIgnoreCase(final String str, final String... prefixes) {
+        return doStartsWith(true, str, prefixes);
+    }
+
+    protected static final boolean doStartsWith(boolean ignoreCase, String str, final String... prefixes) {
+        assertStringNotNull(str);
+        assertPrefixVaryingNotNull(prefixes);
+        if (ignoreCase) {
+            str = str.toLowerCase();
+        }
+        for (String prefix : prefixes) {
+            if (ignoreCase) {
+                prefix = prefix.toLowerCase();
+            }
+            if (str.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static final boolean hasPrefixAll(final String prefix, final String... strs) {
+        return doHasPrefixAll(false, prefix, strs);
+    }
+
+    public static final boolean hasPrefixAllIgnoreCase(final String prefix, final String... strs) {
+        return doHasPrefixAll(true, prefix, strs);
+    }
+
+    protected static final boolean doHasPrefixAll(boolean ignoreCase, String prefix, final String... strs) {
+        assertPrefixNotNull(prefix);
+        assertStringVaryingNotNull(strs);
+        if (strs.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            prefix = prefix.toLowerCase();
+        }
+        for (String str : strs) {
+            if (ignoreCase) {
+                str = str.toLowerCase();
+            }
+            if (!str.startsWith(prefix)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static final boolean hasPrefixAny(final String prefix, final String... strs) {
+        return doHasPrefixAny(false, prefix, strs);
+    }
+
+    public static final boolean hasPrefixAnyIgnoreCase(final String prefix, final String... strs) {
+        return doHasPrefixAny(true, prefix, strs);
+    }
+
+    public static final boolean doHasPrefixAny(boolean ignoreCase, String prefix, final String... strs) {
+        assertPrefixNotNull(prefix);
+        assertStringVaryingNotNull(strs);
+        if (strs.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            prefix = prefix.toLowerCase();
+        }
+        for (String str : strs) {
+            if (ignoreCase) {
+                str = str.toLowerCase();
+            }
+            if (str.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                            EndsWith
+    //                                                                            ========
+    public static final boolean endsWith(final String str, final String... suffixes) {
+        return doEndsWith(false, str, suffixes);
+    }
+
+    public static final boolean endsWithIgnoreCase(final String str, final String... suffixes) {
+        return doEndsWith(true, str, suffixes);
+    }
+
+    protected static final boolean doEndsWith(boolean ignoreCase, String str, final String... suffixes) {
+        assertStringNotNull(str);
+        assertSuffixVaryingNotNull(suffixes);
+        if (suffixes.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            str = str.toLowerCase();
+        }
+        for (String suffix : suffixes) {
+            if (ignoreCase) {
+                suffix = suffix.toLowerCase();
+            }
+            if (str.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static final boolean hasSuffixAll(final String suffix, final String... strs) {
+        return doHasSuffixAll(false, suffix, strs);
+    }
+
+    public static final boolean hasSuffixAllIgnoreCase(final String suffix, final String... strs) {
+        return doHasSuffixAll(true, suffix, strs);
+    }
+
+    protected static final boolean doHasSuffixAll(boolean ignoreCase, String suffix, final String... strs) {
+        assertSuffixNotNull(suffix);
+        assertStringVaryingNotNull(strs);
+        if (strs.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            suffix = suffix.toLowerCase();
+        }
+        for (String str : strs) {
+            if (ignoreCase) {
+                str = str.toLowerCase();
+            }
+            if (!str.endsWith(suffix)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static final boolean hasSuffixAny(final String suffix, final String... strs) {
+        return doHasSuffixAny(false, suffix, strs);
+    }
+
+    public static final boolean hasSuffixAnyIgnoreCase(final String suffix, final String... strs) {
+        return doHasSuffixAny(true, suffix, strs);
+    }
+
+    public static final boolean doHasSuffixAny(boolean ignoreCase, String suffix, final String... strs) {
+        assertSuffixNotNull(suffix);
+        assertStringVaryingNotNull(strs);
+        if (strs.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            suffix = suffix.toLowerCase();
+        }
+        for (String str : strs) {
+            if (ignoreCase) {
+                str = str.toLowerCase();
+            }
+            if (str.endsWith(suffix)) {
                 return true;
             }
         }
@@ -415,7 +690,21 @@ public class Srl {
     //                                                                               Count
     //                                                                               =====
     public static int count(String str, String element) {
+        return doCount(str, element, false);
+    }
+
+    public static int countIgnoreCase(String str, String element) {
+        return doCount(str, element, true);
+    }
+
+    protected static int doCount(String str, String element, boolean ignoreCase) {
+        assertStringNotNull(str);
+        assertElementNotNull(element);
         int count = 0;
+        if (ignoreCase) {
+            str = str.toLowerCase();
+            element = element.toLowerCase();
+        }
         while (true) {
             final int index = str.indexOf(element);
             if (index < 0) {
@@ -1265,6 +1554,46 @@ public class Srl {
         assertObjectNotNull("str", str);
     }
 
+    protected static void assertStringListNotNull(List<String> strList) {
+        assertObjectNotNull("strList", strList);
+    }
+
+    protected static void assertStringVaryingNotNull(String[] strs) {
+        assertObjectNotNull("strs", strs);
+    }
+
+    protected static void assertElementNotNull(String element) {
+        assertObjectNotNull("element", element);
+    }
+
+    protected static void assertElementVaryingNotNull(String[] elements) {
+        assertObjectNotNull("elements", elements);
+    }
+
+    protected static void assertKeywordNotNull(String keyword) {
+        assertObjectNotNull("keyword", keyword);
+    }
+
+    protected static void assertKeywordVaryingNotNull(String[] keywords) {
+        assertObjectNotNull("keywords", keywords);
+    }
+
+    protected static void assertPrefixNotNull(String prefix) {
+        assertObjectNotNull("prefix", prefix);
+    }
+
+    protected static void assertPrefixVaryingNotNull(String[] prefixes) {
+        assertObjectNotNull("prefixes", prefixes);
+    }
+
+    protected static void assertSuffixNotNull(String suffix) {
+        assertObjectNotNull("suffix", suffix);
+    }
+
+    protected static void assertSuffixVaryingNotNull(String[] suffixes) {
+        assertObjectNotNull("suffixes", suffixes);
+    }
+
     protected static void assertFromToMapNotNull(Map<String, String> fromToMap) {
         assertObjectNotNull("fromToMap", fromToMap);
     }
@@ -1287,10 +1616,6 @@ public class Srl {
 
     protected static void assertEndMarkNotNull(String endMark) {
         assertObjectNotNull("endMark", endMark);
-    }
-
-    protected static void assertListStringNotNull(List<String> strList) {
-        assertObjectNotNull("strList", strList);
     }
 
     protected static void assertDecamelNameNotNull(String decamelName) {
