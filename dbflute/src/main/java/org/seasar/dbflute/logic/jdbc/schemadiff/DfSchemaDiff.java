@@ -425,9 +425,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         if (isSame(next, previous)) {
             return true;
         }
+        // treats as same about auto-generated name
         final boolean bothValid = next != null && previous != null;
-
-        // treats same name about auto-generated name
         if (bothValid && getBasicProperties().isDatabaseOracle()) {
             if (Srl.hasPrefixAllIgnoreCase("sys_", next, previous)) {
                 return true;
