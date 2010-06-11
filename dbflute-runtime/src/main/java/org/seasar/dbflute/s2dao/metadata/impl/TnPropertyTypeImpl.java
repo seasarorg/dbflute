@@ -47,7 +47,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                         Constructor
     //                                                                         ===========
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
-        this(propertyDesc, TnValueTypes.OBJECT, propertyDesc.getPropertyName());
+        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName());
     }
 
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType) {

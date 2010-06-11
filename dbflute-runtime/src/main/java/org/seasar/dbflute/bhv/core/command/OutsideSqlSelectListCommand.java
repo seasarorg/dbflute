@@ -62,7 +62,7 @@ public class OutsideSqlSelectListCommand<ENTITY> extends AbstractOutsideSqlSelec
     //                                      ----------------
     protected TnResultSetHandler createOutsideSqlBeanListResultSetHandler(TnBeanMetaData bmd) {
         final ValueType valueType = TnValueTypes.getValueType(_entityType);
-        if (!valueType.equals(TnValueTypes.OBJECT)) {
+        if (!valueType.equals(TnValueTypes.DEFAULT_OBJECT)) {
             return createScalarListResultSetHandler(valueType);
         }
         return createBeanListResultSetHandler(bmd);

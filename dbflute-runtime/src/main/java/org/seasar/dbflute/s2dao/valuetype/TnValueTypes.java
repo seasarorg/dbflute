@@ -95,7 +95,7 @@ public class TnValueTypes {
     public static final ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
 
     // basic (default)
-    public static final ValueType OBJECT = new ObjectType();
+    public static final ValueType DEFAULT_OBJECT = new ObjectType();
 
     // plug-in
     public static final ValueType POSTGRESQL_RESULT_SET = new PostgreSQLResultSetType();
@@ -103,16 +103,21 @@ public class TnValueTypes {
     public static final ValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
 
     // class type
-    private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
+    protected static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static Map<Class<?>, ValueType> basicObjectValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
-    private static Map<Class<?>, ValueType> basicInterfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
-    private static Map<String, ValueType> pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
+    protected static final Map<Class<?>, ValueType> _basicObjectValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
+    protected static final Map<Class<?>, ValueType> _basicInterfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
+    protected static final Map<String, ValueType> _pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
+    protected static final Map<Integer, ValueType> _dynamicObjectValueTypeMap = new ConcurrentHashMap<Integer, ValueType>();
 
     static {
+        initialize();
+    }
+
+    protected static void initialize() {
         // basic (object)
         registerBasicValueType(String.class, STRING);
         registerBasicValueType(char.class, CHARACTER);
@@ -171,128 +176,94 @@ public class TnValueTypes {
     }
 
     // ===================================================================================
-    //                                                                            Register
-    //                                                                            ========
+    //                                                                                Find
+    //                                                                                ====
     // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
+    //                                                  Find
+    //                                                  ----
     /**
-     * Register the basic value type.
-     * @param keyType The key as type. (NotNull)
-     * @param valueType The value type. (NotNull)
+     * Find a value type by a class type or an object instance. <br />
+     * A class type is a prior searching key.
+     * @param type The type of class. (Nullable: if null, searching by instance)
+     * @param value The object value. (Nullable: if null, returns default object type)
+     * @return The value type. (NotNull: if not found, returns object type)
      */
-    public static void registerBasicValueType(Class<?> keyType, ValueType valueType) {
-        assertObjectNotNull("keyType", keyType);
-        assertObjectNotNull("valueType", valueType);
-        if (keyType.isInterface()) {
-            basicInterfaceValueTypeMap.put(keyType, valueType);
-        } else {
-            basicObjectValueTypeMap.put(keyType, valueType);
+    public static ValueType findByTypeOrValue(Class<?> type, Object value) {
+        final ValueType byType = getValueType(type);
+        if (!isDefaultObject(byType)) {
+            return byType;
         }
+        return getValueType(value);
     }
 
     /**
-     * Remove the basic value type.
-     * @param keyType The key as type. (NotNull)
+     * Find a value type by an object instance or a definition type of JDBC. <br />
+     * An object instance is a prior searching key.
+     * @param value The object value. (Nullable: if null, returns dynamic object type)
+     * @param jdbcDefType The definition type of JDBC. (Nullable: if null, searching by instance)
+     * @return The value type. (NotNull: if not found, returns object type)
      */
-    public static void removeBasicValueType(Class<?> keyType) {
-        assertObjectNotNull("keyType", keyType);
-        if (basicObjectValueTypeMap.containsKey(keyType)) {
-            basicObjectValueTypeMap.remove(keyType);
+    public static ValueType findByValueOrJdbcDefType(Object value, int jdbcDefType) {
+        final ValueType byValue = getValueType(value);
+        if (!isDefaultObject(byValue)) {
+            return byValue;
         }
-        if (basicInterfaceValueTypeMap.containsKey(keyType)) {
-            basicInterfaceValueTypeMap.remove(keyType);
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                               Plug-in
-    //                                               -------
-    /**
-     * Register the plug-in value type.
-     * @param keyName The key as name. (NotNull)
-     * @param valueType The value type. (NotNull)
-     */
-    public static void registerPluginValueType(String keyName, ValueType valueType) {
-        assertObjectNotNull("keyName", keyName);
-        assertObjectNotNull("valueType", valueType);
-        pluginValueTypeMap.put(keyName, valueType);
-    }
-
-    /**
-     * Remove the plug-in value type.
-     * @param keyName The key as name. (NotNull)
-     */
-    public static void removePluginValueType(String keyName) {
-        assertObjectNotNull("keyName", keyName);
-        pluginValueTypeMap.remove(keyName);
+        return getValueType(jdbcDefType);
     }
 
     // ===================================================================================
     //                                                                                 Get
     //                                                                                 ===
     // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
-    /**
-     * Find the value type by object instance and class type. <br />
-     * Object instance is prior searching key.
-     * @param obj The object instance. (Nullable: if null, returns object type)
-     * @param clazz The type of class. (Nullable: if null, returns object type)
-     * @return The value type. (NotNull: if not found, returns object type)
-     */
-    public static ValueType findValueType(Object obj, Class<?> clazz) {
-        final ValueType valueType = getValueType(obj);
-        if (!OBJECT.equals(valueType)) {
-            return valueType;
-        }
-        return getValueType(clazz);
-    }
-
+    //                                               byValue
+    //                                               -------
     /**
      * Get the value type by object instance.
-     * @param obj The object instance. (Nullable: if null, returns object type)
+     * @param value The object value. (Nullable: if null, returns object type)
      * @return The value type. (NotNull: if not found, returns object type)
      */
-    public static ValueType getValueType(Object obj) {
-        if (obj == null) {
-            return OBJECT;
+    public static ValueType getValueType(Object value) {
+        if (value == null) {
+            return DEFAULT_OBJECT;
         }
-        return getValueType(obj.getClass());
+        return getValueType(value.getClass());
     }
 
+    // -----------------------------------------------------
+    //                                                byType
+    //                                                ------
     /**
      * Get the value type by class type. <br />
      * The basic objects are prior to the basic interfaces basically,
      * but only when the ENUM is assignable from the class type, interfaces are prior.
      * Because frequently the ENUM has application own interfaces.
      * Actually Classification of DBFlute matches the pattern.
-     * @param clazz The type of class. (Nullable: if null, returns object type)
+     * @param type The type of class. (Nullable: if null, returns object type)
      * @return The value type. (NotNull: if not found, returns object type)
      */
-    public static ValueType getValueType(Class<?> clazz) {
-        if (clazz == null) {
-            return OBJECT;
+    public static ValueType getValueType(Class<?> type) {
+        if (type == null) {
+            return DEFAULT_OBJECT;
         }
-        final boolean interfaceFirst = Enum.class.isAssignableFrom(clazz);
+        final boolean interfaceFirst = Enum.class.isAssignableFrom(type);
         ValueType valueType = null;
         if (interfaceFirst) {
-            valueType = getBasicInterfaceValueType(clazz);
+            valueType = getBasicInterfaceValueType(type);
             if (valueType == null) {
-                valueType = getBasicObjectValueType(clazz);
+                valueType = getBasicObjectValueType(type);
             }
         } else {
-            valueType = getBasicObjectValueType(clazz);
+            valueType = getBasicObjectValueType(type);
             if (valueType == null) {
-                valueType = getBasicInterfaceValueType(clazz);
+                valueType = getBasicInterfaceValueType(type);
             }
         }
-        return valueType != null ? valueType : OBJECT;
+        return valueType != null ? valueType : DEFAULT_OBJECT;
     }
 
-    protected static ValueType getBasicObjectValueType(Class<?> clazz) {
-        for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
-            final ValueType valueType = basicObjectValueTypeMap.get(c);
+    protected static ValueType getBasicObjectValueType(Class<?> type) {
+        for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
+            final ValueType valueType = _basicObjectValueTypeMap.get(c);
             if (valueType != null) {
                 return valueType;
             }
@@ -300,11 +271,11 @@ public class TnValueTypes {
         return null;
     }
 
-    protected static ValueType getBasicInterfaceValueType(Class<?> clazz) {
-        final Set<Entry<Class<?>, ValueType>> entrySet = basicInterfaceValueTypeMap.entrySet();
+    protected static ValueType getBasicInterfaceValueType(Class<?> type) {
+        final Set<Entry<Class<?>, ValueType>> entrySet = _basicInterfaceValueTypeMap.entrySet();
         for (Entry<Class<?>, ValueType> entry : entrySet) {
             final Class<?> inf = entry.getKey();
-            if (inf.isAssignableFrom(clazz)) {
+            if (inf.isAssignableFrom(type)) {
                 return entry.getValue();
             }
         }
@@ -312,30 +283,37 @@ public class TnValueTypes {
     }
 
     // -----------------------------------------------------
-    //                                               Plug-in
-    //                                               -------
+    //                                         byJdbcDefType
+    //                                         -------------
     /**
-     * @param valueTypeName The name of value type. (NotNull)
-     * @return The value type. (Nullable)
-     */
-    public static ValueType getPluginValueType(String valueTypeName) {
-        assertObjectNotNull("valueTypeName", valueTypeName);
-        return pluginValueTypeMap.get(valueTypeName);
-    }
-
-    // -----------------------------------------------------
-    //                                           By SQL Type
-    //                                           -----------
-    /**
-     * @param sqltype The SQL type of JDBC.
+     * @param jdbcDefType The definition type of JDBC.
      * @return The value type. (NotNull)
      */
-    public static ValueType getValueType(int sqltype) { // for no entity and so on
-        return getValueType(getType(sqltype));
+    public static ValueType getValueType(int jdbcDefType) { // for no entity and so on
+        final Class<?> type = getType(jdbcDefType);
+        if (type.equals(Object.class)) {
+            // uses dynamic object
+            ValueType valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
+            if (valueType != null) {
+                return valueType;
+            } else {
+                synchronized (_dynamicObjectValueTypeMap) {
+                    valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
+                    if (valueType != null) {
+                        return valueType;
+                    }
+                    final ObjectType objectType = new ObjectType(jdbcDefType);
+                    _dynamicObjectValueTypeMap.put(jdbcDefType, objectType);
+                    return objectType;
+                }
+            }
+        } else {
+            return getValueType(type);
+        }
     }
 
-    protected static Class<?> getType(int sqltype) {
-        switch (sqltype) {
+    protected static Class<?> getType(int jdbcDefType) {
+        switch (jdbcDefType) {
         case Types.TINYINT:
             return Byte.class;
         case Types.SMALLINT:
@@ -353,7 +331,7 @@ public class TnValueTypes {
         case Types.NUMERIC:
             return BigDecimal.class;
         case Types.DATE:
-            return Timestamp.class;
+            return java.sql.Date.class;
         case Types.TIME:
             return java.sql.Time.class;
         case Types.TIMESTAMP:
@@ -372,6 +350,111 @@ public class TnValueTypes {
         default:
             return Object.class;
         }
+    }
+
+    // -----------------------------------------------------
+    //                                      byName (Plug-in)
+    //                                      ----------------
+    /**
+     * @param valueTypeName The name of value type. (NotNull)
+     * @return The value type. (Nullable)
+     */
+    public static ValueType getPluginValueType(String valueTypeName) {
+        assertObjectNotNull("valueTypeName", valueTypeName);
+        return _pluginValueTypeMap.get(valueTypeName);
+    }
+
+    // -----------------------------------------------------
+    //                                               Default
+    //                                               -------
+    public static boolean isDefaultObject(ValueType valueType) {
+        if (valueType == null) {
+            return false;
+        }
+        if (!ObjectType.class.equals(valueType.getClass())) {
+            return false;
+        }
+        return ((ObjectType) valueType).isDefaultObject();
+    }
+
+    public static boolean isDynamicObject(ValueType valueType) {
+        if (valueType == null) {
+            return false;
+        }
+        if (!ObjectType.class.equals(valueType.getClass())) {
+            return false;
+        }
+        return !((ObjectType) valueType).isDefaultObject(); // means dynamic
+    }
+
+    // ===================================================================================
+    //                                                                            Register
+    //                                                                            ========
+    // *basically should be executed in application's initialization
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * Register the basic value type.
+     * @param keyType The key as type. (NotNull)
+     * @param valueType The value type. (NotNull)
+     */
+    public static synchronized void registerBasicValueType(Class<?> keyType, ValueType valueType) {
+        assertObjectNotNull("keyType", keyType);
+        assertObjectNotNull("valueType", valueType);
+        if (keyType.isInterface()) {
+            _basicInterfaceValueTypeMap.put(keyType, valueType);
+        } else {
+            _basicObjectValueTypeMap.put(keyType, valueType);
+        }
+    }
+
+    /**
+     * Remove the basic value type.
+     * @param keyType The key as type. (NotNull)
+     */
+    public static synchronized void removeBasicValueType(Class<?> keyType) {
+        assertObjectNotNull("keyType", keyType);
+        if (_basicObjectValueTypeMap.containsKey(keyType)) {
+            _basicObjectValueTypeMap.remove(keyType);
+        }
+        if (_basicInterfaceValueTypeMap.containsKey(keyType)) {
+            _basicInterfaceValueTypeMap.remove(keyType);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               Plug-in
+    //                                               -------
+    /**
+     * Register the plug-in value type.
+     * @param keyName The key as name. (NotNull)
+     * @param valueType The value type. (NotNull)
+     */
+    public static synchronized void registerPluginValueType(String keyName, ValueType valueType) {
+        assertObjectNotNull("keyName", keyName);
+        assertObjectNotNull("valueType", valueType);
+        _pluginValueTypeMap.put(keyName, valueType);
+    }
+
+    /**
+     * Remove the plug-in value type.
+     * @param keyName The key as name. (NotNull)
+     */
+    public static synchronized void removePluginValueType(String keyName) {
+        assertObjectNotNull("keyName", keyName);
+        _pluginValueTypeMap.remove(keyName);
+    }
+
+    // ===================================================================================
+    //                                                                             Restore
+    //                                                                             =======
+    protected static synchronized void restoreDefault() { // as unit test utility
+        _basicObjectValueTypeMap.clear();
+        _basicInterfaceValueTypeMap.clear();
+        _pluginValueTypeMap.clear();
+        _dynamicObjectValueTypeMap.clear();
+        initialize();
     }
 
     // ===================================================================================

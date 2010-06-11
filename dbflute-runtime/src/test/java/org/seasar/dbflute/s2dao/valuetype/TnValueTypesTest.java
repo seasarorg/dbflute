@@ -1,9 +1,12 @@
 package org.seasar.dbflute.s2dao.valuetype;
 
-import java.io.File;
+import static org.seasar.dbflute.s2dao.valuetype.TnValueTypes.findByTypeOrValue;
+import static org.seasar.dbflute.s2dao.valuetype.TnValueTypes.findByValueOrJdbcDefType;
+
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.math.BigDecimal;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -18,8 +21,11 @@ import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.mock.MockValueType;
 import org.seasar.dbflute.s2dao.valuetype.basic.BigDecimalType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BinaryType;
 import org.seasar.dbflute.s2dao.valuetype.basic.IntegerType;
+import org.seasar.dbflute.s2dao.valuetype.basic.LongType;
 import org.seasar.dbflute.s2dao.valuetype.basic.ObjectType;
+import org.seasar.dbflute.s2dao.valuetype.basic.SqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
 import org.seasar.dbflute.unit.PlainTestCase;
 
@@ -29,41 +35,79 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class TnValueTypesTest extends PlainTestCase {
 
+    @Override
+    protected void tearDown() throws Exception {
+        TnValueTypes.restoreDefault();
+    }
+
     // ===================================================================================
-    //                                                                              String
-    //                                                                              ======
+    //                                                                                Find
+    //                                                                                ====
+    public void test_findByTypeOrValue_basic() throws Exception {
+        assertEquals(StringType.class, findByTypeOrValue(String.class, "foo").getClass());
+        assertEquals(StringType.class, findByTypeOrValue(Object.class, "foo").getClass());
+        assertEquals(StringType.class, findByTypeOrValue(null, "foo").getClass());
+        assertEquals(StringType.class, findByTypeOrValue(String.class, 123).getClass());
+        assertEquals(StringType.class, findByTypeOrValue(String.class, null).getClass());
+        assertEquals(LongType.class, findByTypeOrValue(Long.class, 123).getClass());
+
+        // binary
+        assertEquals(BinaryType.class, findByTypeOrValue(Object.class, "foo".getBytes("UTF-8")).getClass());
+        assertEquals(BinaryType.class, findByTypeOrValue(byte[].class, "foo").getClass());
+        assertEquals(BinaryType.class, findByTypeOrValue(new byte[0].getClass(), "foo").getClass());
+
+        // object
+        assertEquals(TnValueTypes.DEFAULT_OBJECT, findByTypeOrValue(null, null));
+        assertEquals(TnValueTypes.DEFAULT_OBJECT, findByTypeOrValue(Object.class, Object.class));
+        assertEquals(TnValueTypes.DEFAULT_OBJECT, findByTypeOrValue(FileFilter.class, FileFilter.class));
+        assertTrue(((ObjectType) findByTypeOrValue(null, null)).isDefaultObject());
+        assertTrue(TnValueTypes.isDefaultObject(findByTypeOrValue(null, null)));
+        assertFalse(TnValueTypes.isDynamicObject(findByTypeOrValue(null, null)));
+    }
+
+    public void test_findByValueOrJdbcDefType_basic() throws Exception {
+        assertEquals(StringType.class, findByValueOrJdbcDefType("foo", Types.OTHER).getClass());
+        assertEquals(StringType.class, findByValueOrJdbcDefType("foo", Types.DATE).getClass());
+        assertEquals(IntegerType.class, findByValueOrJdbcDefType(123, Types.DATE).getClass());
+        assertEquals(SqlDateType.class, findByValueOrJdbcDefType(new Object(), Types.DATE).getClass());
+        assertEquals(SqlDateType.class, findByValueOrJdbcDefType(null, Types.DATE).getClass());
+
+        // binary
+        assertEquals(BinaryType.class, findByValueOrJdbcDefType("foo".getBytes("UTF-8"), 12345678).getClass());
+        assertEquals(BinaryType.class, findByValueOrJdbcDefType(new byte[0], 12345678).getClass());
+
+        // object
+        assertEquals(ObjectType.class, findByValueOrJdbcDefType(null, 12345678).getClass());
+        assertFalse(((ObjectType) findByValueOrJdbcDefType(null, 12345678)).isDefaultObject());
+        assertFalse(TnValueTypes.isDefaultObject(findByValueOrJdbcDefType(null, 12345678)));
+        assertTrue(TnValueTypes.isDynamicObject(findByValueOrJdbcDefType(null, 12345678)));
+    }
+
+    // ===================================================================================
+    //                                                                         byClassType
+    //                                                                         ===========
     public void test_getValueType_byClassType_string_basic() throws Exception {
         assertEquals(StringType.class, TnValueTypes.getValueType(String.class).getClass());
     }
 
-    // ===================================================================================
-    //                                                                              Number
-    //                                                                              ======
     public void test_getValueType_byClassType_number_basic() throws Exception {
         assertEquals(IntegerType.class, TnValueTypes.getValueType(Integer.class).getClass());
         assertEquals(BigDecimalType.class, TnValueTypes.getValueType(BigDecimal.class).getClass());
     }
 
-    // ===================================================================================
-    //                                                                                ENUM
-    //                                                                                ====
     public void test_getValueType_byClassType_enum_priority_classification() throws Exception {
         // ## Arrange ##
         Class<?> keyType = TestClassificationStatus.class; // embedded
         MockValueType mockValueType = new MockValueType();
 
-        try {
-            // ## Act ##
-            TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
-            TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
-            ValueType valueType = TnValueTypes.getValueType(keyType);
+        // ## Act ##
+        TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
+        TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
+        ValueType valueType = TnValueTypes.getValueType(keyType);
 
-            // ## Assert ##
-            assertNotSame(mockValueType, valueType);
-            assertEquals(TnValueTypes.CLASSIFICATION, valueType);
-        } finally {
-            TnValueTypes.removeBasicValueType(keyType);
-        }
+        // ## Assert ##
+        assertNotSame(mockValueType, valueType);
+        assertEquals(TnValueTypes.CLASSIFICATION, valueType);
     }
 
     public void test_getValueType_byClassType_enum_priority_plain() throws Exception {
@@ -71,17 +115,13 @@ public class TnValueTypesTest extends PlainTestCase {
         Class<?> keyType = TestPlainStatus.class;
         MockValueType mockValueType = new MockValueType();
 
-        try {
-            // ## Act ##
-            TnValueTypes.registerBasicValueType(keyType, mockValueType);
-            ValueType valueType = TnValueTypes.getValueType(keyType);
+        // ## Act ##
+        TnValueTypes.registerBasicValueType(keyType, mockValueType);
+        ValueType valueType = TnValueTypes.getValueType(keyType);
 
-            // ## Assert ##
-            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
-            assertEquals(mockValueType, valueType);
-        } finally {
-            TnValueTypes.removeBasicValueType(keyType);
-        }
+        // ## Assert ##
+        assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
+        assertEquals(mockValueType, valueType);
     }
 
     public void test_getValueType_byClassType_enum_priority_enumKey() throws Exception {
@@ -89,36 +129,27 @@ public class TnValueTypesTest extends PlainTestCase {
         Class<?> keyType = Enum.class;
         MockValueType mockValueType = new MockValueType();
 
-        try {
-            // ## Act ##
-            TnValueTypes.registerBasicValueType(keyType, mockValueType);
-            ValueType valueType = TnValueTypes.getValueType(keyType);
+        // ## Act ##
+        TnValueTypes.registerBasicValueType(keyType, mockValueType);
+        ValueType valueType = TnValueTypes.getValueType(keyType);
 
-            // ## Assert ##
-            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
-            assertEquals(mockValueType, valueType);
-        } finally {
-            TnValueTypes.removeBasicValueType(Enum.class);
-        }
+        // ## Assert ##
+        assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
+        assertEquals(mockValueType, valueType);
     }
 
     public void test_getValueType_byInstance_enum_priority_classification() throws Exception {
         // ## Arrange ##
-        Class<?> keyType = TestClassificationStatus.class; // embedded
         MockValueType mockValueType = new MockValueType();
 
-        try {
-            // ## Act ##
-            TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
-            TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
-            ValueType valueType = TnValueTypes.getValueType(TestClassificationStatus.FML);
+        // ## Act ##
+        TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
+        TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
+        ValueType valueType = TnValueTypes.getValueType(TestClassificationStatus.FML);
 
-            // ## Assert ##
-            assertNotSame(mockValueType, valueType);
-            assertEquals(TnValueTypes.CLASSIFICATION, valueType);
-        } finally {
-            TnValueTypes.removeBasicValueType(keyType);
-        }
+        // ## Assert ##
+        assertNotSame(mockValueType, valueType);
+        assertEquals(TnValueTypes.CLASSIFICATION, valueType);
     }
 
     public void test_getValueType_byInstance_enum_priority_plain() throws Exception {
@@ -126,17 +157,13 @@ public class TnValueTypesTest extends PlainTestCase {
         Class<?> keyType = TestPlainStatus.class;
         MockValueType mockValueType = new MockValueType();
 
-        try {
-            // ## Act ##
-            TnValueTypes.registerBasicValueType(keyType, mockValueType);
-            ValueType valueType = TnValueTypes.getValueType(TestPlainStatus.FML);
+        // ## Act ##
+        TnValueTypes.registerBasicValueType(keyType, mockValueType);
+        ValueType valueType = TnValueTypes.getValueType(TestPlainStatus.FML);
 
-            // ## Assert ##
-            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
-            assertEquals(mockValueType, valueType);
-        } finally {
-            TnValueTypes.removeBasicValueType(keyType);
-        }
+        // ## Assert ##
+        assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
+        assertEquals(mockValueType, valueType);
     }
 
     private static enum TestPlainStatus {
@@ -198,12 +225,72 @@ public class TnValueTypesTest extends PlainTestCase {
         fireSameExecution(creator);
     }
 
-    // ===================================================================================
-    //                                                                              Object
-    //                                                                              ======
     public void test_getValueType_byClassType_object_basic() throws Exception {
         assertEquals(ObjectType.class, TnValueTypes.getValueType(Object.class).getClass());
-        assertEquals(ObjectType.class, TnValueTypes.getValueType(File.class).getClass());
+        assertEquals(ObjectType.class, TnValueTypes.getValueType(FileFilter.class).getClass());
+    }
+
+    // ===================================================================================
+    //                                                                          byJdbcType
+    //                                                                          ==========
+    public void test_getValueType_byJdbcType_dynamicObject_basic() throws Exception {
+        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.isEmpty());
+        {
+            // ## Arrange & Act ##
+            ValueType valueType = TnValueTypes.getValueType(Types.OTHER);
+
+            // ## Assert ##
+            assertEquals(ObjectType.class, valueType.getClass());
+            assertEquals(Types.OTHER, valueType.getSqlType());
+            assertTrue(TnValueTypes.isDynamicObject(valueType));
+        }
+        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.containsKey(Types.OTHER));
+        {
+            // ## Arrange & Act ##
+            ValueType valueType = TnValueTypes.getValueType(12345678);
+
+            // ## Assert ##
+            assertEquals(ObjectType.class, valueType.getClass());
+            assertEquals(12345678, valueType.getSqlType());
+            assertTrue(TnValueTypes.isDynamicObject(valueType));
+        }
+        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.containsKey(12345678));
+        {
+            // ## Arrange & Act ##
+            ValueType valueType = TnValueTypes.getValueType(12345678);
+
+            // ## Assert ##
+            assertEquals(ObjectType.class, valueType.getClass());
+            assertEquals(12345678, valueType.getSqlType());
+            assertTrue(TnValueTypes.isDynamicObject(valueType));
+        }
+        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.containsKey(12345678));
+    }
+
+    public void test_getValueType_byJdbcType_dynamicObject_threadSafe_basic() throws Exception {
+        // ## Arrange ##
+        ExecutionCreator<ValueType> creator = new ExecutionCreator<ValueType>() {
+            public Execution<ValueType> create() {
+                return new Execution<ValueType>() {
+                    int _index = 12345678;
+
+                    public ValueType execute() {
+                        if (Thread.currentThread().getId() % 2 == 0) {
+                            ++_index;
+                        }
+                        final int sqlType = _index;
+                        log(sqlType);
+                        final ValueType valueType = TnValueTypes.getValueType(sqlType);
+                        assertEquals(sqlType, valueType.getSqlType());
+                        assertTrue(TnValueTypes.isDynamicObject(valueType));
+                        return valueType;
+                    }
+                };
+            }
+        };
+
+        // ## Act & Assert ##
+        fireSameExecution(creator);
     }
 
     // ===================================================================================
@@ -224,10 +311,10 @@ public class TnValueTypesTest extends PlainTestCase {
         }
 
         // ## Act ##
-        // Start!
+        // start!
         start.countDown();
         try {
-            // Wait until all threads are finished!
+            // wait until all threads are finished!
             goal.await();
         } catch (InterruptedException e) {
             String msg = "goal.await() was interrupted!";

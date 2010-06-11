@@ -122,7 +122,7 @@ public class TnBasicHandler {
         }
         try {
             for (int i = beginIndex; i < args.length; ++i) {
-                final ValueType valueType = findValueType(args[i], argTypes[i]);
+                final ValueType valueType = findValueType(argTypes[i], args[i]);
                 valueType.bindValue(ps, i + 1, args[i]);
             }
         } catch (SQLException e) {
@@ -130,8 +130,8 @@ public class TnBasicHandler {
         }
     }
 
-    protected ValueType findValueType(Object arg, Class<?> argType) {
-        return TnValueTypes.findValueType(arg, argType);
+    protected ValueType findValueType(Class<?> type, Object instance) {
+        return TnValueTypes.findByTypeOrValue(type, instance);
     }
 
     protected Class<?>[] getArgTypes(Object[] args) {

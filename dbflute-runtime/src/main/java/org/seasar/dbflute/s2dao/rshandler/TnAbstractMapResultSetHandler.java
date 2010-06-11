@@ -32,6 +32,20 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
  */
 public abstract class TnAbstractMapResultSetHandler implements TnResultSetHandler {
 
+    protected TnPropertyType[] createPropertyTypes(ResultSetMetaData rsmd) throws SQLException {
+        final int count = rsmd.getColumnCount();
+        final TnPropertyType[] propertyTypes = new TnPropertyType[count];
+        for (int i = 0; i < count; ++i) {
+            final String propertyName = rsmd.getColumnLabel(i + 1);
+
+            // because it can only use by-JDBC-type value type here 
+            final ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
+
+            propertyTypes[i] = new TnPropertyTypeImpl(propertyName, valueType);
+        }
+        return propertyTypes;
+    }
+
     protected Map<String, Object> createRow(ResultSet rs, TnPropertyType[] propertyTypes) throws SQLException {
         final Map<String, Object> row = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < propertyTypes.length; ++i) {
@@ -39,16 +53,5 @@ public abstract class TnAbstractMapResultSetHandler implements TnResultSetHandle
             row.put(propertyTypes[i].getPropertyName(), value);
         }
         return row;
-    }
-
-    protected TnPropertyType[] createPropertyTypes(ResultSetMetaData rsmd) throws SQLException {
-        final int count = rsmd.getColumnCount();
-        final TnPropertyType[] propertyTypes = new TnPropertyType[count];
-        for (int i = 0; i < count; ++i) {
-            final String propertyName = rsmd.getColumnLabel(i + 1);
-            final ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
-            propertyTypes[i] = new TnPropertyTypeImpl(propertyName, valueType);
-        }
-        return propertyTypes;
     }
 }

@@ -24,21 +24,28 @@ import java.sql.Types;
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 
 /**
- * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class ObjectType extends TnAbstractValueType {
 
+    protected final boolean _defaultObject; // if false, means dynamic object
+
     public ObjectType() {
         super(Types.VARCHAR);
+        _defaultObject = true;
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getObject(index);
+    public ObjectType(int sqlType) {
+        super(sqlType);
+        _defaultObject = false;
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getObject(columnName);
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        return rs.getObject(index);
+    }
+
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        return rs.getObject(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
@@ -53,7 +60,11 @@ public class ObjectType extends TnAbstractValueType {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setObject(index, value);
+            if (isDefaultObject()) {
+                ps.setObject(index, value);
+            } else {
+                ps.setObject(index, value, getSqlType());
+            }
         }
     }
 
@@ -61,7 +72,15 @@ public class ObjectType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setObject(parameterName, value);
+            if (isDefaultObject()) {
+                cs.setObject(parameterName, value);
+            } else {
+                cs.setObject(parameterName, value, getSqlType());
+            }
         }
+    }
+
+    public boolean isDefaultObject() {
+        return _defaultObject;
     }
 }
