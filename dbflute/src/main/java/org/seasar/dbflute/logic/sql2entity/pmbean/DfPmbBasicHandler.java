@@ -345,7 +345,7 @@ public class DfPmbBasicHandler {
             msg = msg + " property=" + className + "." + propertyName;
             throw new IllegalStateException(msg);
         }
-        if (column.hasClassification()) {
+        if (!column.hasClassification()) { // no way
             String msg = "The reference column should have a classification at this timing:";
             msg = msg + " property=" + className + "." + propertyName + " column=" + column;
             throw new IllegalStateException(msg);
@@ -368,21 +368,6 @@ public class DfPmbBasicHandler {
             }
         }
         return false;
-    }
-
-    public String getPropertyRefColumnInfo(String className, String propertyName, AppData appData) {
-        final String name = getPropertyRefName(className, propertyName, appData);
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(name)) { // basically normal parameter-bean
-            final String alias = getPropertyRefAlias(className, propertyName, appData);
-            final String lineDisp = getPropertyRefLineDisp(className, propertyName, appData);
-            return " :: refers to " + alias + name + ": " + lineDisp;
-        } else { // basically procedure parameters
-            final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
-            if (metaInfo == null) {
-                return "";
-            }
-            return ": {" + metaInfo.getColumnDefinitionLineDisp() + "}";
-        }
     }
 
     public String getPropertyRefName(String className, String propertyName, AppData appData) {
@@ -421,6 +406,31 @@ public class DfPmbBasicHandler {
     }
 
     // -----------------------------------------------------
+    //                                               Display
+    //                                               -------
+    public String getPropertyRefColumnInfo(String className, String propertyName, AppData appData) {
+        if (isForProcedure(className)) {
+            final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+            return metaInfo != null ? ": {" + metaInfo.getColumnDefinitionLineDisp() + "}" : "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        final String optionDisp = getPropertyOptionDisp(className, propertyName);
+        sb.append(optionDisp);
+        final String name = getPropertyRefName(className, propertyName, appData);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(name)) { // basically normal parameter-bean
+            final String alias = getPropertyRefAlias(className, propertyName, appData);
+            final String lineDisp = getPropertyRefLineDisp(className, propertyName, appData);
+            sb.append(" :: refers to " + alias + name + ": " + lineDisp);
+        }
+        return sb.toString();
+    }
+
+    protected String getPropertyOptionDisp(String className, String propertyName) {
+        final String option = findPropertyOption(className, propertyName);
+        return option != null ? ":" + option : "";
+    }
+
+    // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
     protected boolean containsPropertyOption(String className, String propertyName, String option) {
@@ -442,17 +452,17 @@ public class DfPmbBasicHandler {
     }
 
     protected DfPmbPropertyOptionClassification createPropertyOptionClassification(String className, String propertyName) {
-        DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
+        final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
         return new DfPmbPropertyOptionClassification(className, propertyName, _classificationProperties, finder);
     }
 
     protected DfPmbPropertyOptionReference createPropertyOptionReference(String className, String propertyName) {
-        DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
+        final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
         return new DfPmbPropertyOptionReference(className, propertyName, finder);
     }
 
     protected String findPropertyOption(String className, String propertyName) {
-        DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
+        final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
         return finder.findPmbMetaDataPropertyOption(className, propertyName);
     }
 

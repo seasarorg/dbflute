@@ -14,15 +14,14 @@ public class DfPmbPropertyOptionFinder {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _className;
-    protected String _propertyName;
-    protected Map<String, DfPmbMetaData> _pmbMetaDataMap;
+    protected final String _className;
+    protected final String _propertyName;
+    protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPmbPropertyOptionFinder(String className, String propertyName,
-            Map<String, DfPmbMetaData> pmbMetaDataMap) {
+    public DfPmbPropertyOptionFinder(String className, String propertyName, Map<String, DfPmbMetaData> pmbMetaDataMap) {
         _className = className;
         _propertyName = propertyName;
         _pmbMetaDataMap = pmbMetaDataMap;

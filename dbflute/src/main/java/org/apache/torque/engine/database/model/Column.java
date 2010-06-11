@@ -602,17 +602,21 @@ public class Column {
         }
         if (_sql2EntityRelatedTableName != null) {
             plugDelimiterIfNeeds(sb);
-            sb.append("related to ").append(_sql2EntityRelatedTableName);
+            sb.append("refers to ").append(_sql2EntityRelatedTableName);
             if (_sql2EntityRelatedColumnName != null) {
                 sb.append(".").append(_sql2EntityRelatedColumnName);
             }
+        }
+        if (hasClassification()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("classification=").append(getClassificationName());
         }
         return sb.toString();
     }
 
     private void plugDelimiterIfNeeds(StringBuilder sb) {
         if (sb.length() != 0) {
-            sb.append(" : ");
+            sb.append(", ");
         }
     }
 

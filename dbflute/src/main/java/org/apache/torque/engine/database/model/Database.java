@@ -478,8 +478,8 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                      Option Reference
-    //                                      ----------------
+    //                                               Display
+    //                                               -------
     public String getPmbMetaDataPropertyRefColumnInfo(String className, String propertyName) {
         try {
             final DfPmbBasicHandler handler = getPmbBasicHandler();
