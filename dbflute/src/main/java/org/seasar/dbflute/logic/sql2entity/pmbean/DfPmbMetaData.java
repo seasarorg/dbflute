@@ -8,7 +8,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 /**
  * @author jflute
  */
-public class DfParameterBeanMetaData {
+public class DfPmbMetaData {
 
     // ===================================================================================
     //                                                                           Attribute

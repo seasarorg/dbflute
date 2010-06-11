@@ -10,7 +10,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * @author jflute
  * @since 0.6.3 (2008/02/05 Tuesday)
  */
-public class PmbMetaDataPropertyOptionClassification {
+public class DfPmbPropertyOptionClassification {
 
     // ===================================================================================
     //                                                                          Definition
@@ -24,14 +24,14 @@ public class PmbMetaDataPropertyOptionClassification {
     protected String _className;
     protected String _propertyName;
     protected DfClassificationProperties _classificationProperties;
-    protected PmbMetaDataPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
+    protected DfPmbPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public PmbMetaDataPropertyOptionClassification(String className, String propertyName,
+    public DfPmbPropertyOptionClassification(String className, String propertyName,
             DfClassificationProperties classificationProperties,
-            PmbMetaDataPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
+            DfPmbPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
         _className = className;
         _propertyName = propertyName;
         _classificationProperties = classificationProperties;
@@ -131,7 +131,7 @@ public class PmbMetaDataPropertyOptionClassification {
     }
 
     protected List<String> splitOption(String option) {
-        return PmbMetaDataPropertyOptionFinder.splitOption(option);
+        return DfPmbPropertyOptionFinder.splitOption(option);
     }
 
     // ===================================================================================

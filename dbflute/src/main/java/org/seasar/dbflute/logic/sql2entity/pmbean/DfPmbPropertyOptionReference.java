@@ -18,7 +18,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  * @since 0.9.6.1 (2009/11/17 Tuesday)
  */
-public class PmbMetaDataPropertyOptionReference {
+public class DfPmbPropertyOptionReference {
 
     // ===================================================================================
     //                                                                          Definition
@@ -31,13 +31,13 @@ public class PmbMetaDataPropertyOptionReference {
     //                                                                           =========
     protected String _className;
     protected String _propertyName;
-    protected PmbMetaDataPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
+    protected DfPmbPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public PmbMetaDataPropertyOptionReference(String className, String propertyName,
-            PmbMetaDataPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
+    public DfPmbPropertyOptionReference(String className, String propertyName,
+            DfPmbPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
         _className = className;
         _propertyName = propertyName;
         _pmbMetaDataPropertyOptionFinder = pmbMetaDataPropertyOptionFinder;
@@ -165,7 +165,7 @@ public class PmbMetaDataPropertyOptionReference {
     }
 
     protected List<String> splitOption(String option) {
-        return PmbMetaDataPropertyOptionFinder.splitOption(option);
+        return DfPmbPropertyOptionFinder.splitOption(option);
     }
 
     // ===================================================================================

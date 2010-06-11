@@ -54,7 +54,7 @@ import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtract
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileNameResolver;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfParameterBeanMetaData;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfProcedurePmbSetupper;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -81,7 +81,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                           =========
     protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, Object> _cursorInfoMap = DfCollectionUtil.newLinkedHashMap();
-    protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, DfPmbMetaData> _pmbMetaDataMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, File> _entitySqlFileMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, String> _exceptionInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, List<String>> _primaryKeyMap = DfCollectionUtil.newLinkedHashMap();
@@ -300,7 +300,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
 
                         // for Parameter Bean
-                        final DfParameterBeanMetaData parameterBeanMetaData = extractParameterBeanMetaData(sql);
+                        final DfPmbMetaData parameterBeanMetaData = extractParameterBeanMetaData(sql);
                         if (parameterBeanMetaData != null) {
                             final String pmbName = parameterBeanMetaData.getClassName();
                             assertDuplicateParameterBean(pmbName, _sqlFile);
@@ -367,12 +367,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
              * @param sql Target SQL. (NotNull and NotEmpty)
              * @return the meta data of parameter bean. (Nullable: If it returns null, it means 'not found'.)
              */
-            protected DfParameterBeanMetaData extractParameterBeanMetaData(String sql) {
+            protected DfPmbMetaData extractParameterBeanMetaData(String sql) {
                 final String parameterBeanName = getParameterBeanName(sql);
                 if (parameterBeanName == null) {
                     return null;
                 }
-                final DfParameterBeanMetaData pmbMetaData = new DfParameterBeanMetaData();
+                final DfPmbMetaData pmbMetaData = new DfPmbMetaData();
                 {
                     final String delimiter = "extends";
                     final int idx = parameterBeanName.indexOf(delimiter);
@@ -425,7 +425,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 return pmbMetaData;
             }
 
-            protected void resolveSuperClassSimplePagingBean(final DfParameterBeanMetaData pmbMetaData) {
+            protected void resolveSuperClassSimplePagingBean(final DfPmbMetaData pmbMetaData) {
                 if (pmbMetaData.getSuperClassName().equalsIgnoreCase("SPB")) {
                     final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
                     final String projectPrefix = getBasicProperties().getProjectPrefix();
@@ -507,7 +507,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void assertDuplicateParameterBean(String pmbName, File currentSqlFile) {
-        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(pmbName);
+        final DfPmbMetaData metaData = _pmbMetaDataMap.get(pmbName);
         if (metaData == null) {
             return;
         }

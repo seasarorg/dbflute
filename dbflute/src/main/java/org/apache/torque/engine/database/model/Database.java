@@ -89,8 +89,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileCollector;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfParameterBeanBasicHandler;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfParameterBeanMetaData;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbBasicHandler;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -142,7 +142,7 @@ public class Database {
     //                                         ParameterBean
     //                                         -------------
     /** The meta data of parameter bean. */
-    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap; // when sql2entity only
+    protected Map<String, DfPmbMetaData> _pmbMetaDataMap; // when sql2entity only
 
     // -----------------------------------------------------
     //                                        Schema History
@@ -313,15 +313,15 @@ public class Database {
     // ===================================================================================
     //                                                                      Parameter Bean
     //                                                                      ==============
-    protected DfParameterBeanBasicHandler _pmbBasicHandler;
+    protected DfPmbBasicHandler _pmbBasicHandler;
 
-    protected DfParameterBeanBasicHandler getParameterBeanBasicHandler() {
+    protected DfPmbBasicHandler getPmbBasicHandler() {
         if (_pmbBasicHandler != null) {
             return _pmbBasicHandler;
         }
         final DfBasicProperties basicProp = getBasicProperties();
         final DfClassificationProperties classificationProp = getClassificationProperties();
-        _pmbBasicHandler = new DfParameterBeanBasicHandler(_pmbMetaDataMap, basicProp, classificationProp);
+        _pmbBasicHandler = new DfPmbBasicHandler(_pmbMetaDataMap, basicProp, classificationProp);
         return _pmbBasicHandler;
     }
 
@@ -329,151 +329,152 @@ public class Database {
     //                                              MetaData
     //                                              --------
     public boolean isExistPmbMetaData() {
-        return getParameterBeanBasicHandler().isExistPmbMetaData();
+        return getPmbBasicHandler().isExistPmbMetaData();
     }
 
-    public Collection<DfParameterBeanMetaData> getPmbMetaDataList() {
-        return getParameterBeanBasicHandler().getPmbMetaDataList();
+    public Collection<DfPmbMetaData> getPmbMetaDataList() {
+        return getPmbBasicHandler().getPmbMetaDataList();
     }
 
     public String getPmbMetaDataSuperClassDefinition(String className) {
-        return getParameterBeanBasicHandler().getSuperClassDefinition(className);
+        return getPmbBasicHandler().getSuperClassDefinition(className);
     }
 
     public boolean hasPmbMetaDataSafetyResultDefitinion(String className) {
-        return getParameterBeanBasicHandler().hasSafetyResultDefitinion(className);
+        return getPmbBasicHandler().hasSafetyResultDefitinion(className);
     }
 
     public Set<String> getPmbMetaDataPropertySet(String className) {
-        return getParameterBeanBasicHandler().getPropertySet(className);
+        return getPmbBasicHandler().getPropertySet(className);
     }
 
     public String getPmbMetaDataPropertyType(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPropertyType(className, propertyName);
+        return getPmbBasicHandler().getPropertyType(className, propertyName);
     }
 
     public String getPmbMetaDataPropertyColumnName(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPropertyColumnName(className, propertyName);
+        return getPmbBasicHandler().getPropertyColumnName(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
     public boolean isPmbMetaDataForProcedure(String className) {
-        return getParameterBeanBasicHandler().isForProcedure(className);
+        return getPmbBasicHandler().isForProcedure(className);
     }
 
     public String getPmbMetaDataProcedureName(String className) {
-        return getParameterBeanBasicHandler().getProcedureName(className);
+        return getPmbBasicHandler().getProcedureName(className);
     }
 
     public boolean isPmbMetaDataRefCustomizeEntity(String className) {
-        return getParameterBeanBasicHandler().isRefCustomizeEntity(className);
+        return getPmbBasicHandler().isRefCustomizeEntity(className);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterIn(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterIn(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionProcedureParameterIn(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterOut(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterOut(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionProcedureParameterOut(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterInOut(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterInOut(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionProcedureParameterInOut(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterReturn(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterReturn(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionProcedureParameterReturn(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterResult(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionProcedureParameterResult(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionProcedureParameterResult(className, propertyName);
     }
 
     public boolean needsStringClobHandling(String className, String propertyName) {
-        return getParameterBeanBasicHandler().needsStringClobHandling(className, propertyName);
+        return getPmbBasicHandler().needsStringClobHandling(className, propertyName);
     }
 
     public boolean needsBytesOidHandling(String className, String propertyName) {
-        return getParameterBeanBasicHandler().needsBytesOidHandling(className, propertyName);
+        return getPmbBasicHandler().needsBytesOidHandling(className, propertyName);
     }
 
     public boolean needsFixedLengthStringHandling(String className, String propertyName) {
-        return getParameterBeanBasicHandler().needsFixedLengthStringHandling(className, propertyName);
+        return getPmbBasicHandler().needsFixedLengthStringHandling(className, propertyName);
     }
 
     public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
-        return getParameterBeanBasicHandler().needsObjectBindingBigDecimalHandling(className, propertyName);
+        return getPmbBasicHandler().needsObjectBindingBigDecimalHandling(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
     public boolean hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter(String className, String propertyName) {
-        return getParameterBeanBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName);
+        return getPmbBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                    Option LikeSeasrch
     //                                    ------------------
     public boolean hasPmbMetaDataPropertyOptionAnyLikeSearch(String className) {
-        return getParameterBeanBasicHandler().hasPropertyOptionAnyLikeSearch(className);
+        return getPmbBasicHandler().hasPropertyOptionAnyLikeSearch(className);
     }
 
     public boolean hasPmbMetaDataPropertyOptionAnyLikeSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().hasPropertyOptionAnyLikeSearch(className, propertyName);
+        return getPmbBasicHandler().hasPropertyOptionAnyLikeSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionLikeSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionLikeSearch(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionLikeSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionPrefixSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionPrefixSearch(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionPrefixSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionContainSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionContainSearch(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionContainSearch(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionSuffixSearch(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionSuffixSearch(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionSuffixSearch(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                         Option FromTo
     //                                         -------------
     public boolean hasPmbMetaDataPropertyOptionAnyFromTo(String className) {
-        return getParameterBeanBasicHandler().hasPropertyOptionAnyFromTo(className);
+        return getPmbBasicHandler().hasPropertyOptionAnyFromTo(className);
     }
 
     public boolean hasPmbMetaDataPropertyOptionAnyFromTo(String className, String propertyName) {
-        return getParameterBeanBasicHandler().hasPropertyOptionAnyFromTo(className, propertyName);
+        return getPmbBasicHandler().hasPropertyOptionAnyFromTo(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionFromDate(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionFromDate(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionFromDate(className, propertyName);
     }
 
     public boolean isPmbMetaDataPropertyOptionToDate(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionToDate(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionToDate(className, propertyName);
     }
 
     // -----------------------------------------------------
     //                                 Option Classification
     //                                 ---------------------
     public boolean isPmbMetaDataPropertyOptionClassification(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyOptionClassification(className, propertyName);
+        return getPmbBasicHandler().isPropertyOptionClassification(className, propertyName, _sql2entitySchemaData);
     }
 
     public String getPmbMetaDataPropertyOptionClassificationName(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPropertyOptionClassificationName(className, propertyName);
+        return getPmbBasicHandler().getPropertyOptionClassificationName(className, propertyName, _sql2entitySchemaData);
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
-        return getParameterBeanBasicHandler().getPropertyOptionClassificationMapList(className, propertyName);
+        return getPmbBasicHandler().getPropertyOptionClassificationMapList(className, propertyName,
+                _sql2entitySchemaData);
     }
 
     // -----------------------------------------------------
@@ -481,7 +482,7 @@ public class Database {
     //                                      ----------------
     public String getPmbMetaDataPropertyRefColumnInfo(String className, String propertyName) {
         try {
-            final DfParameterBeanBasicHandler handler = getParameterBeanBasicHandler();
+            final DfPmbBasicHandler handler = getPmbBasicHandler();
             return handler.getPropertyRefColumnInfo(className, propertyName, _sql2entitySchemaData);
         } catch (RuntimeException e) { // just in case
             String msg = "Failed to get ref-column info:";
@@ -492,11 +493,11 @@ public class Database {
     }
 
     public boolean isPmbMetaDataPropertyRefColumnChar(String className, String propertyName) {
-        return getParameterBeanBasicHandler().isPropertyRefColumnChar(className, propertyName, _sql2entitySchemaData);
+        return getPmbBasicHandler().isPropertyRefColumnChar(className, propertyName, _sql2entitySchemaData);
     }
 
     public String getPmbMetaDataPropertyRefSize(String className, String propertyName) {
-        return getParameterBeanBasicHandler().getPropertyRefSize(className, propertyName, _sql2entitySchemaData);
+        return getPmbBasicHandler().getPropertyRefSize(className, propertyName, _sql2entitySchemaData);
     }
 
     // ===================================================================================
@@ -2101,11 +2102,11 @@ public class Database {
         this._databaseType = databaseType;
     }
 
-    public Map<String, DfParameterBeanMetaData> getPmbMetaDataMap() {
+    public Map<String, DfPmbMetaData> getPmbMetaDataMap() {
         return _pmbMetaDataMap;
     }
 
-    public void setPmbMetaDataMap(Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
+    public void setPmbMetaDataMap(Map<String, DfPmbMetaData> pmbMetaDataMap) {
         _pmbMetaDataMap = pmbMetaDataMap;
     }
 

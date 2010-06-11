@@ -20,13 +20,13 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfParameterBeanBasicHandler {
+public class DfPmbBasicHandler {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The meta data of parameter bean. */
-    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+    protected Map<String, DfPmbMetaData> _pmbMetaDataMap;
 
     protected DfBasicProperties _basicProperties;
     protected DfClassificationProperties _classificationProperties;
@@ -36,8 +36,8 @@ public class DfParameterBeanBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfParameterBeanBasicHandler(Map<String, DfParameterBeanMetaData> pmbMetaDataMap,
-            DfBasicProperties basicProperties, DfClassificationProperties classificationProperties) {
+    public DfPmbBasicHandler(Map<String, DfPmbMetaData> pmbMetaDataMap, DfBasicProperties basicProperties,
+            DfClassificationProperties classificationProperties) {
         _pmbMetaDataMap = pmbMetaDataMap;
         _basicProperties = basicProperties;
         _classificationProperties = classificationProperties;
@@ -50,7 +50,7 @@ public class DfParameterBeanBasicHandler {
         return _pmbMetaDataMap != null && !_pmbMetaDataMap.isEmpty();
     }
 
-    public Collection<DfParameterBeanMetaData> getPmbMetaDataList() {
+    public Collection<DfPmbMetaData> getPmbMetaDataList() {
         if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
             String msg = "The pmbMetaDataMap should not be null or empty.";
             throw new IllegalStateException(msg);
@@ -60,7 +60,7 @@ public class DfParameterBeanBasicHandler {
 
     public String getSuperClassDefinition(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        final DfPmbMetaData metaData = findPmbMetaData(className);
         String superClassName = metaData.getSuperClassName();
         if (superClassName == null || superClassName.trim().length() == 0) {
             return "";
@@ -84,16 +84,16 @@ public class DfParameterBeanBasicHandler {
 
     public Map<String, String> getPropertyNameOptionMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        final DfPmbMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameOptionMap();
     }
 
-    protected DfParameterBeanMetaData findPmbMetaData(String className) {
+    protected DfPmbMetaData findPmbMetaData(String className) {
         if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
             String msg = "The pmbMetaDataMap should not be null or empty: className=" + className;
             throw new IllegalStateException(msg);
         }
-        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        final DfPmbMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {
             String msg = "The className has no meta data: className=" + className;
             throw new IllegalStateException(msg);
@@ -114,7 +114,7 @@ public class DfParameterBeanBasicHandler {
 
     protected Map<String, String> getPropertyNameTypeMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        final DfPmbMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameTypeMap();
     }
 
@@ -130,7 +130,7 @@ public class DfParameterBeanBasicHandler {
     }
 
     public boolean isRefCustomizeEntity(String className) {
-        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        final DfPmbMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {
             return false;
         }
@@ -169,7 +169,7 @@ public class DfParameterBeanBasicHandler {
 
     protected Map<String, String> getPropertyNameColumnNameMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        final DfPmbMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameColumnNameMap();
     }
 
@@ -220,7 +220,7 @@ public class DfParameterBeanBasicHandler {
 
     protected Map<String, DfProcedureColumnMetaInfo> getPropertyNameColumnInfoMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        final DfPmbMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameColumnInfoMap();
     }
 
@@ -236,7 +236,7 @@ public class DfParameterBeanBasicHandler {
     //                                           LikeSeasrch
     //                                           -----------
     public boolean hasPropertyOptionAnyLikeSearch(String className) {
-        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        final DfPmbMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {
             return false;
         }
@@ -276,7 +276,7 @@ public class DfParameterBeanBasicHandler {
     //                                                FromTo
     //                                                ------
     public boolean hasPropertyOptionAnyFromTo(String className) {
-        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        final DfPmbMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {
             return false;
         }
@@ -304,26 +304,60 @@ public class DfParameterBeanBasicHandler {
     // -----------------------------------------------------
     //                                        Classification
     //                                        --------------
-    public boolean isPropertyOptionClassification(String className, String propertyName) {
-        PmbMetaDataPropertyOptionClassification obj = createPropertyOptionClassification(className, propertyName);
+    public boolean isPropertyOptionClassification(String className, String propertyName, AppData appData) {
+        if (isPropertyOptionSpecifiedClassification(className, propertyName)) {
+            return true;
+        }
+        final Column column = getPropertyOptionReferenceColumn(className, propertyName, appData);
+        return column != null && column.hasClassification();
+    }
+
+    protected boolean isPropertyOptionSpecifiedClassification(String className, String propertyName) {
+        final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(className, propertyName);
         return obj.isPmbMetaDataPropertyOptionClassification();
     }
 
-    public String getPropertyOptionClassificationName(String className, String propertyName) {
-        PmbMetaDataPropertyOptionClassification obj = createPropertyOptionClassification(className, propertyName);
-        return obj.getPmbMetaDataPropertyOptionClassificationName();
+    public String getPropertyOptionClassificationName(String className, String propertyName, AppData appData) {
+        // should be called when it has classification
+        if (isPropertyOptionSpecifiedClassification(className, propertyName)) {
+            final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(className, propertyName);
+            return obj.getPmbMetaDataPropertyOptionClassificationName();
+        }
+        final Column column = getPropertyOptionClassificationColumn(className, propertyName, appData);
+        return column.getClassificationName();
     }
 
-    public List<Map<String, String>> getPropertyOptionClassificationMapList(String className, String propertyName) {
-        PmbMetaDataPropertyOptionClassification obj = createPropertyOptionClassification(className, propertyName);
-        return obj.getPmbMetaDataPropertyOptionClassificationMapList();
+    public List<Map<String, String>> getPropertyOptionClassificationMapList(String className, String propertyName,
+            AppData appData) {
+        // should be called when it has classification
+        if (isPropertyOptionSpecifiedClassification(className, propertyName)) {
+            final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(className, propertyName);
+            return obj.getPmbMetaDataPropertyOptionClassificationMapList();
+        }
+        final Column column = getPropertyOptionClassificationColumn(className, propertyName, appData);
+        return column.getClassificationMapList();
+    }
+
+    protected Column getPropertyOptionClassificationColumn(String className, String propertyName, AppData appData) {
+        final Column column = getPropertyOptionReferenceColumn(className, propertyName, appData);
+        if (column == null) { // no way
+            String msg = "The reference column should exist at this timing:";
+            msg = msg + " property=" + className + "." + propertyName;
+            throw new IllegalStateException(msg);
+        }
+        if (column.hasClassification()) {
+            String msg = "The reference column should have a classification at this timing:";
+            msg = msg + " property=" + className + "." + propertyName + " column=" + column;
+            throw new IllegalStateException(msg);
+        }
+        return column;
     }
 
     // -----------------------------------------------------
     //                                             Reference
     //                                             ---------
     public boolean hasPropertyOptionReference(String className) {
-        DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        DfPmbMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {
             return false;
         }
@@ -382,7 +416,7 @@ public class DfParameterBeanBasicHandler {
     }
 
     protected Column getPropertyOptionReferenceColumn(String className, String propertyName, AppData appData) {
-        final PmbMetaDataPropertyOptionReference reference = createPropertyOptionReference(className, propertyName);
+        final DfPmbPropertyOptionReference reference = createPropertyOptionReference(className, propertyName);
         return reference.getPmbMetaDataPropertyOptionReferenceColumn(appData);
     }
 
@@ -404,27 +438,26 @@ public class DfParameterBeanBasicHandler {
     }
 
     protected List<String> splitOption(String option) {
-        return PmbMetaDataPropertyOptionFinder.splitOption(option);
+        return DfPmbPropertyOptionFinder.splitOption(option);
     }
 
-    protected PmbMetaDataPropertyOptionClassification createPropertyOptionClassification(String className,
-            String propertyName) {
-        PmbMetaDataPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
-        return new PmbMetaDataPropertyOptionClassification(className, propertyName, _classificationProperties, finder);
+    protected DfPmbPropertyOptionClassification createPropertyOptionClassification(String className, String propertyName) {
+        DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
+        return new DfPmbPropertyOptionClassification(className, propertyName, _classificationProperties, finder);
     }
 
-    protected PmbMetaDataPropertyOptionReference createPropertyOptionReference(String className, String propertyName) {
-        PmbMetaDataPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
-        return new PmbMetaDataPropertyOptionReference(className, propertyName, finder);
+    protected DfPmbPropertyOptionReference createPropertyOptionReference(String className, String propertyName) {
+        DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
+        return new DfPmbPropertyOptionReference(className, propertyName, finder);
     }
 
     protected String findPropertyOption(String className, String propertyName) {
-        PmbMetaDataPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
+        DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
         return finder.findPmbMetaDataPropertyOption(className, propertyName);
     }
 
-    protected PmbMetaDataPropertyOptionFinder createPropertyOptionFinder(String className, String propertyName) {
-        return new PmbMetaDataPropertyOptionFinder(className, propertyName, _pmbMetaDataMap);
+    protected DfPmbPropertyOptionFinder createPropertyOptionFinder(String className, String propertyName) {
+        return new DfPmbPropertyOptionFinder(className, propertyName, _pmbMetaDataMap);
     }
 
     // ===================================================================================

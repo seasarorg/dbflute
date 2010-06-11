@@ -41,7 +41,7 @@ public class DfProcedurePmbSetupper {
     //                                                                           =========
     protected final DataSource _dataSource;
     protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap;
-    protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+    protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
     protected final DfProcedureHandler _procedureHandler = new DfProcedureHandler();
 
@@ -49,7 +49,7 @@ public class DfProcedurePmbSetupper {
     //                                                                         Constructor
     //                                                                         ===========
     public DfProcedurePmbSetupper(DataSource dataSource, Map<String, Map<String, DfColumnMetaInfo>> entityInfoMap,
-            Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
+            Map<String, DfPmbMetaData> pmbMetaDataMap) {
         _dataSource = dataSource;
         _entityInfoMap = entityInfoMap;
         _pmbMetaDataMap = pmbMetaDataMap;
@@ -135,7 +135,7 @@ public class DfProcedurePmbSetupper {
                 msg = msg + " // " + DfProcedureColumnType.procedureColumnResult;
                 _log.info(msg);
             }
-            final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
+            final DfPmbMetaData parameterBeanMetaData = new DfPmbMetaData();
             parameterBeanMetaData.setClassName(pmbName);
             parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
             parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);

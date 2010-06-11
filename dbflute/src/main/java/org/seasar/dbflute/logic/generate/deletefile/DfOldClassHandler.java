@@ -13,7 +13,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfParameterBeanMetaData;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
@@ -37,7 +37,7 @@ public class DfOldClassHandler {
     protected DfLittleAdjustmentProperties _littleAdjustmentProperties;
     protected DfGeneratedClassPackageDefault _generatedClassPackageDefault;
     protected List<Table> _tableList;
-    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+    protected Map<String, DfPmbMetaData> _pmbMetaDataMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -441,7 +441,7 @@ public class DfOldClassHandler {
         final String oldStylePackagePath = getBaseDaoPackage() + "." + parameterBeanPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        final Map<String, DfParameterBeanMetaData> pmbMetaDataMap = getPmbMetaDataMap();
+        final Map<String, DfPmbMetaData> pmbMetaDataMap = getPmbMetaDataMap();
         if (pmbMetaDataMap != null && !pmbMetaDataMap.isEmpty()) {
             final Set<String> pmbNameSet = pmbMetaDataMap.keySet();
             for (String pmbName : pmbNameSet) {
@@ -564,11 +564,11 @@ public class DfOldClassHandler {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, DfParameterBeanMetaData> getPmbMetaDataMap() {
+    public Map<String, DfPmbMetaData> getPmbMetaDataMap() {
         return _pmbMetaDataMap;
     }
 
-    public void setPmbMetaDataMap(Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
+    public void setPmbMetaDataMap(Map<String, DfPmbMetaData> pmbMetaDataMap) {
         this._pmbMetaDataMap = pmbMetaDataMap;
     }
 }

@@ -9,20 +9,20 @@ import org.seasar.dbflute.util.DfStringUtil;
  * @author jflute
  * @since 0.6.3 (2008/02/05 Tuesday)
  */
-public class PmbMetaDataPropertyOptionFinder {
+public class DfPmbPropertyOptionFinder {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String _className;
     protected String _propertyName;
-    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+    protected Map<String, DfPmbMetaData> _pmbMetaDataMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public PmbMetaDataPropertyOptionFinder(String className, String propertyName,
-            Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
+    public DfPmbPropertyOptionFinder(String className, String propertyName,
+            Map<String, DfPmbMetaData> pmbMetaDataMap) {
         _className = className;
         _propertyName = propertyName;
         _pmbMetaDataMap = pmbMetaDataMap;
@@ -32,7 +32,7 @@ public class PmbMetaDataPropertyOptionFinder {
     //                                                                         Find Option
     //                                                                         ===========
     public String findPmbMetaDataPropertyOption(String className, String propertyName) {
-        final DfParameterBeanMetaData meta = _pmbMetaDataMap.get(_className);
+        final DfPmbMetaData meta = _pmbMetaDataMap.get(_className);
         if (meta == null) {
             return null;
         }
