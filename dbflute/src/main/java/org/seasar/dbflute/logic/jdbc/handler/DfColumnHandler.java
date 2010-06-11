@@ -206,12 +206,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
     /**
      * Get the JDBC type of the column. <br /> 
-     * @param jdbcDefValue The JDBC definition value.
+     * @param jdbcDefType The JDBC definition value.
      * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
      * @return The JDBC type of the column. (NotNull)
      */
-    public String getColumnJdbcType(int jdbcDefValue, String dbTypeName) {
-        return getJdbcTypeMapper().getColumnJdbcType(jdbcDefValue, dbTypeName);
+    public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
+        return getJdbcTypeMapper().getColumnJdbcType(jdbcDefType, dbTypeName);
     }
 
     protected DfJdbcTypeMapper getJdbcTypeMapper() {
@@ -280,8 +280,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return getJdbcTypeMapper().isPostgreSQLUuid(dbTypeName);
     }
 
-    public boolean isPostgreSQLCursor(final int jdbcType, final String dbTypeName) {
-        return getJdbcTypeMapper().isPostgreSQLCursor(jdbcType, dbTypeName);
+    public boolean isPostgreSQLOid(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLOid(dbTypeName);
+    }
+
+    public boolean isPostgreSQLCursor(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLCursor(dbTypeName);
     }
 
     public boolean isOracleNCharOrNVarchar(final String dbTypeName) {
@@ -292,8 +296,8 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return getJdbcTypeMapper().isOracleNumber(dbTypeName);
     }
 
-    public boolean isOracleCursor(final int jdbcType, final String dbTypeName) {
-        return getJdbcTypeMapper().isOracleCursor(jdbcType, dbTypeName);
+    public boolean isOracleCursor(final String dbTypeName) {
+        return getJdbcTypeMapper().isOracleCursor(dbTypeName);
     }
 
     public boolean isSQLServerUniqueIdentifier(final String dbTypeName) {

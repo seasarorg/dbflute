@@ -63,11 +63,11 @@ public class DfJdbcTypeMapper {
      * 4. The auto type mapping by DB type name
      * 5. String finally
      * </pre>
-     * @param jdbcDefValue The JDBC definition value.
+     * @param jdbcDefType The definition type of JDBC.
      * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
      * @return The JDBC type of the column. (NotNull)
      */
-    public String getColumnJdbcType(int jdbcDefValue, String dbTypeName) {
+    public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
         // * * * * * *
         // Priority 1
         // * * * * * *
@@ -83,7 +83,7 @@ public class DfJdbcTypeMapper {
         // * * * * * *
         // Priority 2
         // * * * * * *
-        final String adjustment = processForcedAdjustment(jdbcDefValue, dbTypeName);
+        final String adjustment = processForcedAdjustment(jdbcDefType, dbTypeName);
         if (adjustment != null) {
             return adjustment;
         }
@@ -91,8 +91,8 @@ public class DfJdbcTypeMapper {
         // * * * * * *
         // Priority 3
         // * * * * * *
-        if (!isOtherType(jdbcDefValue)) {
-            final String jdbcType = getJdbcType(jdbcDefValue);
+        if (!isOtherType(jdbcDefType)) {
+            final String jdbcType = getJdbcType(jdbcDefType);
             if (Srl.is_NotNull_and_NotEmpty(jdbcType)) {
                 return jdbcType;
             }
@@ -110,6 +110,8 @@ public class DfJdbcTypeMapper {
         } else if (containsIgnoreCase(dbTypeName, "char")) {
             return getCharJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "timestamp")) {
+            return getTimestampJdbcType();
+        } else if (containsIgnoreCase(dbTypeName, "datetime")) {
             return getTimestampJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "date")) {
             return getDateJdbcType();
@@ -193,10 +195,7 @@ public class DfJdbcTypeMapper {
         return _resource.isDbmsPostgreSQL() && matchIgnoreCase(dbTypeName, "interval");
     }
 
-    public boolean isPostgreSQLCursor(final int jdbcType, final String dbTypeName) {
-        if (jdbcType != Types.OTHER) {
-            return false;
-        }
+    public boolean isPostgreSQLCursor(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && containsIgnoreCase(dbTypeName, "cursor");
     }
 
@@ -220,14 +219,11 @@ public class DfJdbcTypeMapper {
         return _resource.isDbmsOracle() && java.sql.Types.TIMESTAMP == jdbcType && matchIgnoreCase(dbTypeName, "date");
     }
 
-    public boolean isOracleBinaryFloatDouble(final int jdbcType, final String dbTypeName) {
+    public boolean isOracleBinaryFloatDouble(final String dbTypeName) {
         return _resource.isDbmsOracle() && matchIgnoreCase(dbTypeName, "binary_float", "binary_double");
     }
 
-    public boolean isOracleCursor(final int jdbcType, final String dbTypeName) {
-        if (jdbcType != Types.OTHER) {
-            return false;
-        }
+    public boolean isOracleCursor(final String dbTypeName) {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "cursor");
     }
 

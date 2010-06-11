@@ -14,7 +14,7 @@ public class DfProcedureColumnMetaInfo {
     //                                                                           Attribute
     //                                                                           =========
     protected String _columnName;
-    protected int _jdbcType;
+    protected int _jdbcDefType;
     protected String _dbTypeName;
     protected Integer _columnSize;
     protected Integer _decimalDigits;
@@ -102,15 +102,24 @@ public class DfProcedureColumnMetaInfo {
         return _columnHandler.isConceptTypeStringClob(dbTypeName);
     }
 
+    public boolean isConceptTypeBytesOid() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isConceptTypeBytesOid(dbTypeName);
+    }
+
     public boolean isPostgreSQLUuid() {
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isPostgreSQLUuid(dbTypeName);
     }
 
-    public boolean isPostgreSQLCursor() {
-        final int jdbcType = getJdbcType();
+    public boolean isPostgreSQLOid() {
         final String dbTypeName = getDbTypeName();
-        return _columnHandler.isPostgreSQLCursor(jdbcType, dbTypeName);
+        return _columnHandler.isPostgreSQLOid(dbTypeName);
+    }
+
+    public boolean isPostgreSQLCursor() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isPostgreSQLCursor(dbTypeName);
     }
 
     public boolean isOracleNCharOrNVarchar() {
@@ -124,9 +133,8 @@ public class DfProcedureColumnMetaInfo {
     }
 
     public boolean isOracleCursor() {
-        final int jdbcType = getJdbcType();
         final String dbTypeName = getDbTypeName();
-        return _columnHandler.isOracleCursor(jdbcType, dbTypeName);
+        return _columnHandler.isOracleCursor(dbTypeName);
     }
 
     public boolean isSQLServerUniqueIdentifier() {
@@ -153,7 +161,7 @@ public class DfProcedureColumnMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _columnName + ", " + _procedureColumnType + ", " + _jdbcType + ", " + _dbTypeName + "("
+        return "{" + _columnName + ", " + _procedureColumnType + ", " + _jdbcDefType + ", " + _dbTypeName + "("
                 + _columnSize + ", " + _decimalDigits + ")" + _columnComment + "}";
     }
 
@@ -176,12 +184,12 @@ public class DfProcedureColumnMetaInfo {
         this._procedureColumnType = procedureColumnType;
     }
 
-    public int getJdbcType() {
-        return _jdbcType;
+    public int getJdbcDefType() {
+        return _jdbcDefType;
     }
 
-    public void setJdbcType(int jdbcType) {
-        this._jdbcType = jdbcType;
+    public void setJdbcDefType(int jdbcDefType) {
+        this._jdbcDefType = jdbcDefType;
     }
 
     public String getDbTypeName() {

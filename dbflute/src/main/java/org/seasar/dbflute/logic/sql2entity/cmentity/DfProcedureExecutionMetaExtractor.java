@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.sql2entity.cmentity;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -29,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -38,6 +41,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.BytesOidType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -57,12 +61,14 @@ public class DfProcedureExecutionMetaExtractor {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfCustomizeEntityMetaExtractor _extractor = new DfCustomizeEntityMetaExtractor();
+    protected final DfColumnHandler _columnHandler = new DfColumnHandler();
     protected final List<Object> _numberList = getProperties().getTypeMappingProperties().getJavaNativeNumberList();
     protected final List<Object> _dateList = getProperties().getTypeMappingProperties().getJavaNativeDateList();
     protected final List<Object> _booleanList = getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
     protected final List<Object> _binaryList = getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
     protected final StringType _stringType = new StringType();
     protected final StringClobType _stringClobType = new StringClobType();
+    protected final BytesOidType _bytesOidType = new BytesOidType();
 
     // ===================================================================================
     //                                                                             Process
@@ -250,15 +256,7 @@ public class DfProcedureExecutionMetaExtractor {
 
             // mapping by JDBC type
             final String stringValue = "0";
-            final int jdbcDefType = column.getJdbcType();
-            final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
-            if (jdbcType == null) {
-                testValueList.add(stringValue);
-                return;
-            }
-            final Integer columnSize = column.getColumnSize();
-            final Integer decimalDigits = column.getDecimalDigits();
-            final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
+            final String nativeType = findNativeType(column);
             Object testValue = null;
             if (containsAsEndsWith(nativeType, _numberList)) {
                 testValue = 0;
@@ -267,12 +265,31 @@ public class DfProcedureExecutionMetaExtractor {
             } else if (containsAsEndsWith(nativeType, _booleanList)) {
                 testValue = Boolean.FALSE;
             } else if (containsAsEndsWith(nativeType, _binaryList)) {
-                testValue = stringValue; // binary type is unsupported here
-            } else { // as String
+                final String encoding = "UTF-8";
+                try {
+                    testValue = stringValue.getBytes(encoding);
+                } catch (UnsupportedEncodingException e) {
+                    String msg = "Unsupported encoding: " + encoding;
+                    throw new IllegalStateException(msg, e);
+                }
+            } else { // as string
                 testValue = stringValue;
             }
             testValueList.add(testValue);
         }
+    }
+
+    protected String findNativeType(DfProcedureColumnMetaInfo column) {
+        final String jdbcType = findJdbcType(column);
+        final Integer columnSize = column.getColumnSize();
+        final Integer decimalDigits = column.getDecimalDigits();
+        return TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
+    }
+
+    protected String findJdbcType(DfProcedureColumnMetaInfo column) {
+        final int jdbcDefType = column.getJdbcDefType();
+        final String dbTypeName = column.getDbTypeName();
+        return _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
     }
 
     protected boolean containsAsEndsWith(String str, List<Object> ls) {
@@ -321,20 +338,20 @@ public class DfProcedureExecutionMetaExtractor {
         for (DfProcedureColumnMetaInfo column : columnList) {
             final int paramIndex = (index + 1);
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
-            final int jdbcType = column.getJdbcType();
+            final int jdbcDefType = column.getJdbcDefType();
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                registerOutParameter(cs, paramIndex, jdbcType, column);
+                registerOutParameter(cs, paramIndex, jdbcDefType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                bindObject(cs, paramIndex, jdbcType, testValueList.get(testValueIndex), column);
+                bindObject(cs, paramIndex, jdbcDefType, testValueList.get(testValueIndex), column);
                 ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
-                registerOutParameter(cs, paramIndex, jdbcType, column);
+                registerOutParameter(cs, paramIndex, jdbcDefType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                registerOutParameter(cs, paramIndex, jdbcType, column);
-                bindObject(cs, paramIndex, jdbcType, testValueList.get(testValueIndex), column);
+                registerOutParameter(cs, paramIndex, jdbcDefType, column);
+                bindObject(cs, paramIndex, jdbcDefType, testValueList.get(testValueIndex), column);
                 ++testValueIndex;
                 boundColumnList.add(column);
             }
@@ -342,50 +359,78 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected void registerOutParameter(CallableStatement cs, int paramIndex, int jdbcType,
+    protected void registerOutParameter(CallableStatement cs, int paramIndex, int jdbcDefType,
             DfProcedureColumnMetaInfo column) throws SQLException {
+        final ValueType valueType;
+        if (column.isOracleNCharOrNVarchar()) {
+            valueType = _stringType;
+        } else if (column.isConceptTypeStringClob()) {
+            valueType = _stringClobType;
+        } else if (column.isConceptTypeBytesOid()) {
+            valueType = _bytesOidType;
+        } else if (column.isPostgreSQLUuid()) {
+            valueType = TnValueTypes.UUID_AS_DIRECT;
+        } else if (column.isSQLServerUniqueIdentifier()) {
+            valueType = TnValueTypes.UUID_AS_STRING;
+        } else if (column.isPostgreSQLCursor()) {
+            valueType = TnValueTypes.POSTGRESQL_RESULT_SET;
+        } else if (column.isOracleCursor()) {
+            valueType = TnValueTypes.ORACLE_RESULT_SET;
+        } else {
+            valueType = TnValueTypes.getValueType(jdbcDefType);
+        }
         try {
-            if (column.isOracleNCharOrNVarchar()) {
-                _stringType.registerOutParameter(cs, paramIndex);
-            } else if (column.isConceptTypeStringClob()) {
-                _stringClobType.registerOutParameter(cs, paramIndex);
-            } else if (column.isPostgreSQLUuid()) {
-                TnValueTypes.UUID_AS_DIRECT.registerOutParameter(cs, paramIndex);
-            } else if (column.isSQLServerUniqueIdentifier()) {
-                TnValueTypes.UUID_AS_STRING.registerOutParameter(cs, paramIndex);
-            } else if (column.isPostgreSQLCursor()) {
-                TnValueTypes.POSTGRESQL_RESULT_SET.registerOutParameter(cs, paramIndex);
-            } else if (column.isOracleCursor()) {
-                TnValueTypes.ORACLE_RESULT_SET.registerOutParameter(cs, paramIndex);
-            } else {
-                cs.registerOutParameter(paramIndex, jdbcType);
-            }
+            valueType.registerOutParameter(cs, paramIndex);
         } catch (SQLException e) {
-            String msg = "Failed to register OUT parameter(" + paramIndex + "):";
-            msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
+            String msg = buildOutParameterExceptionMessage(paramIndex, jdbcDefType, column, valueType);
             throw new DfJDBCException(msg, e);
+        } catch (RuntimeException e) {
+            String msg = buildOutParameterExceptionMessage(paramIndex, jdbcDefType, column, valueType);
+            throw new IllegalStateException(msg, e);
         }
     }
 
-    protected void bindObject(CallableStatement cs, int paramIndex, int jdbcType, Object value,
+    protected String buildOutParameterExceptionMessage(int paramIndex, int jdbcDefType,
+            DfProcedureColumnMetaInfo column, ValueType valueType) {
+        String msg = "Failed to register OUT parameter(" + paramIndex + "|" + jdbcDefType + "):";
+        msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
+        msg = msg + " :: " + valueType.getClass().getName();
+        return msg;
+    }
+
+    protected void bindObject(CallableStatement cs, int paramIndex, int jdbcDefType, Object value,
             DfProcedureColumnMetaInfo column) throws SQLException {
-        try {
-            if (column.isOracleNCharOrNVarchar()) {
-                _stringType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
-            } else if (column.isConceptTypeStringClob()) {
-                _stringClobType.bindValue(cs, paramIndex, value != null ? value.toString() : value);
-            } else if (column.isPostgreSQLUuid()) {
-                TnValueTypes.UUID_AS_DIRECT.bindValue(cs, paramIndex, value);
-            } else if (column.isSQLServerUniqueIdentifier()) {
-                TnValueTypes.UUID_AS_STRING.bindValue(cs, paramIndex, value);
-            } else {
-                cs.setObject(paramIndex, value, jdbcType);
-            }
-        } catch (SQLException e) {
-            String msg = "Failed to bind parameter(" + paramIndex + "):";
-            msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
-            throw new DfJDBCException(msg, e);
+        final ValueType valueType;
+        if (column.isOracleNCharOrNVarchar()) {
+            valueType = _stringType;
+        } else if (column.isConceptTypeStringClob()) {
+            valueType = _stringClobType;
+        } else if (column.isConceptTypeBytesOid()) {
+            valueType = _bytesOidType;
+        } else if (column.isPostgreSQLUuid()) {
+            valueType = TnValueTypes.UUID_AS_DIRECT;
+        } else if (column.isSQLServerUniqueIdentifier()) {
+            valueType = TnValueTypes.UUID_AS_STRING;
+        } else {
+            valueType = TnValueTypes.findByValueOrJdbcDefType(value, jdbcDefType);
         }
+        try {
+            valueType.bindValue(cs, paramIndex, value);
+        } catch (SQLException e) {
+            String msg = buildBindingExceptionMessage(paramIndex, jdbcDefType, value, column, valueType);
+            throw new DfJDBCException(msg, e);
+        } catch (RuntimeException e) {
+            String msg = buildBindingExceptionMessage(paramIndex, jdbcDefType, value, column, valueType);
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    protected String buildBindingExceptionMessage(int paramIndex, int jdbcDefType, Object value,
+            DfProcedureColumnMetaInfo column, ValueType valueType) {
+        String msg = "Failed to bind parameter(" + paramIndex + "|" + jdbcDefType + "):";
+        msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
+        msg = msg + " :: " + value + ", " + valueType.getClass().getName();
+        return msg;
     }
 
     // ===================================================================================

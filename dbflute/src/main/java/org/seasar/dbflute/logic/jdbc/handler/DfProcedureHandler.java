@@ -536,7 +536,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             } else {
                 throw new IllegalStateException("Unknown procedureColumnType: " + procedureColumnType);
             }
-            procedureColumnMetaInfo.setJdbcType(jdbcType);
+            procedureColumnMetaInfo.setJdbcDefType(jdbcType);
             procedureColumnMetaInfo.setDbTypeName(dbTypeName);
             procedureColumnMetaInfo.setColumnSize(columnSize);
             procedureColumnMetaInfo.setDecimalDigits(decimalDigits);

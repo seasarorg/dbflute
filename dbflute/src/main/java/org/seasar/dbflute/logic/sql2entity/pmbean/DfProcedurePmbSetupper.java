@@ -115,7 +115,7 @@ public class DfProcedurePmbSetupper {
                 propertyNameColumnNameMap.put(propertyName, columnName);
                 String msg = "    " + propertyType + " " + propertyName + ";";
                 msg = msg + " // " + column.getProcedureColumnType();
-                msg = msg + "(" + column.getJdbcType() + ", " + column.getDbTypeName() + ")";
+                msg = msg + "(" + column.getJdbcDefType() + ", " + column.getDbTypeName() + ")";
                 _log.info(msg);
                 ++index;
             }
@@ -169,7 +169,7 @@ public class DfProcedurePmbSetupper {
         if (isResultSetProperty(column)) {
             return getProcedureDefaultResultSetPropertyType();
         }
-        final int jdbcType = column.getJdbcType();
+        final int jdbcDefType = column.getJdbcDefType();
         final String dbTypeName = column.getDbTypeName();
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
@@ -178,7 +178,7 @@ public class DfProcedurePmbSetupper {
             // Because the length setting of procedure parameter is unsupported on Oracle.
             propertyType = TypeMap.getDefaultDecimalJavaNativeType();
         } else {
-            final String torqueType = _columnHandler.getColumnJdbcType(jdbcType, dbTypeName);
+            final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
             propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
         }
         return propertyType;
