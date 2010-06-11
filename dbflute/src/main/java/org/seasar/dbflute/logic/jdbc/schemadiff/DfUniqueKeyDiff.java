@@ -15,8 +15,8 @@ public class DfUniqueKeyDiff extends DfConstraintDiff {
         super(columnName, diffType);
     }
 
-    protected DfUniqueKeyDiff(Map<String, Object> primaryKeyDiffMap) {
-        super(primaryKeyDiffMap);
+    protected DfUniqueKeyDiff(Map<String, Object> uniqueKeyDiffMap) {
+        super(uniqueKeyDiffMap);
     }
 
     public static DfUniqueKeyDiff createAdded(String constraintName) {

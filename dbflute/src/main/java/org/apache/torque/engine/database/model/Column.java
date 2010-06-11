@@ -741,7 +741,7 @@ public class Column {
                 continue;
             }
             List<String> columnsNameList = fks[i].getLocalColumns();
-            if (!Srl.containsIgnoreCase(columnsNameList, myColumnName)) {
+            if (!Srl.containsElementIgnoreCase(columnsNameList, myColumnName)) {
                 return true;
             }
         }

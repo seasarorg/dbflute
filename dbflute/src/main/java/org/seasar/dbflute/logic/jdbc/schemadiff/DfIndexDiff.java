@@ -15,8 +15,8 @@ public class DfIndexDiff extends DfConstraintDiff {
         super(columnName, diffType);
     }
 
-    protected DfIndexDiff(Map<String, Object> primaryKeyDiffMap) {
-        super(primaryKeyDiffMap);
+    protected DfIndexDiff(Map<String, Object> indexDiffMap) {
+        super(indexDiffMap);
     }
 
     public static DfIndexDiff createAdded(String constraintName) {

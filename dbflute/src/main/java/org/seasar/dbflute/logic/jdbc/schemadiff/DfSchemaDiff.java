@@ -21,6 +21,7 @@ import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -394,7 +395,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected void processPrimaryKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         final String nextName = nextTable.getPrimaryKeyConstraintName();
         final String previousName = previousTable.getPrimaryKeyConstraintName();
-        if (!isSame(nextName, previousName)) {
+        if (!isSamePrimaryKeyName(nextName, previousName)) {
             if (nextName == null) { // deleted
                 tableDiff.addPrimaryKeyDiff(DfPrimaryKeyDiff.createDeleted(previousName));
                 return;
@@ -418,6 +419,31 @@ public class DfSchemaDiff extends DfAbstractDiff {
         if (primaryKeyDiff.hasDiff()) { // changed
             tableDiff.addPrimaryKeyDiff(primaryKeyDiff);
         }
+    }
+
+    protected boolean isSamePrimaryKeyName(String next, String previous) {
+        if (isSame(next, previous)) {
+            return true;
+        }
+        final boolean bothValid = next != null && previous != null;
+
+        // treats same name about auto-generated name
+        if (bothValid && getBasicProperties().isDatabaseOracle()) {
+            if (Srl.hasPrefixAllIgnoreCase("sys_", next, previous)) {
+                return true;
+            }
+        }
+        if (bothValid && getBasicProperties().isDatabaseDB2()) {
+            if (Srl.hasPrefixAllIgnoreCase("SQL", next, previous)) {
+                return true;
+            }
+        }
+        if (bothValid && getBasicProperties().isDatabaseSQLServer()) {
+            if (Srl.hasPrefixAllIgnoreCase("PK__", next, previous)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // -----------------------------------------------------

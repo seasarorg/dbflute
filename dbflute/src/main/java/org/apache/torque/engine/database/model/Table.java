@@ -1004,7 +1004,7 @@ public class Table {
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = iter.next();
             List<String> localColumns = key.getLocalColumns();
-            if (Srl.containsIgnoreCase(localColumns, columnName)) {
+            if (Srl.containsElementIgnoreCase(localColumns, columnName)) {
                 if (firstFK == null) {
                     firstFK = key;
                 }
@@ -1018,7 +1018,7 @@ public class Table {
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = iter.next();
             List<String> localColumns = key.getLocalColumns();
-            if (Srl.containsIgnoreCase(localColumns, columnName)) {
+            if (Srl.containsElementIgnoreCase(localColumns, columnName)) {
                 fkList.add(key);
             }
         }
