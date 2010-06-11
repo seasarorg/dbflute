@@ -417,7 +417,7 @@ public class Srl {
         }
         for (String keyword : keywords) {
             if (ignoreCase) {
-                keyword = keyword != null ? keyword.toLowerCase() : keyword;
+                keyword = keyword != null ? keyword.toLowerCase() : null;
             }
             if (keyword == null || !str.contains(keyword)) {
                 return false;
@@ -444,7 +444,7 @@ public class Srl {
         }
         for (String keyword : keywords) {
             if (ignoreCase) {
-                keyword = keyword != null ? keyword.toLowerCase() : keyword;
+                keyword = keyword != null ? keyword.toLowerCase() : null;
             }
             if (keyword != null && str.contains(keyword)) {
                 return true;
@@ -636,7 +636,7 @@ public class Srl {
         }
         for (String prefix : prefixes) {
             if (ignoreCase) {
-                prefix = prefix != null ? prefix.toLowerCase() : prefix;
+                prefix = prefix != null ? prefix.toLowerCase() : null;
             }
             if (prefix != null && str.startsWith(prefix)) {
                 return true;
@@ -663,7 +663,7 @@ public class Srl {
         }
         for (String str : strs) {
             if (ignoreCase) {
-                str = str != null ? str.toLowerCase() : str;
+                str = str != null ? str.toLowerCase() : null;
             }
             if (str == null || !str.startsWith(prefix)) {
                 return false;
@@ -690,7 +690,7 @@ public class Srl {
         }
         for (String str : strs) {
             if (ignoreCase) {
-                str = str != null ? str.toLowerCase() : str;
+                str = str != null ? str.toLowerCase() : null;
             }
             if (str != null && str.startsWith(prefix)) {
                 return true;
@@ -723,7 +723,7 @@ public class Srl {
         }
         for (String suffix : suffixes) {
             if (ignoreCase) {
-                suffix = suffix != null ? suffix.toLowerCase() : suffix;
+                suffix = suffix != null ? suffix.toLowerCase() : null;
             }
             if (suffix != null && str.endsWith(suffix)) {
                 return true;
@@ -750,7 +750,7 @@ public class Srl {
         }
         for (String str : strs) {
             if (ignoreCase) {
-                str = str != null ? str.toLowerCase() : str;
+                str = str != null ? str.toLowerCase() : null;
             }
             if (str == null || !str.endsWith(suffix)) {
                 return false;
@@ -777,7 +777,7 @@ public class Srl {
         }
         for (String str : strs) {
             if (ignoreCase) {
-                str = str != null ? str.toLowerCase() : str;
+                str = str != null ? str.toLowerCase() : null;
             }
             if (str != null && str.endsWith(suffix)) {
                 return true;
