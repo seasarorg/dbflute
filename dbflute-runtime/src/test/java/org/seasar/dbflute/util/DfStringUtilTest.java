@@ -8,11 +8,19 @@ import static org.seasar.dbflute.util.Srl.containsAll;
 import static org.seasar.dbflute.util.Srl.containsAllIgnoreCase;
 import static org.seasar.dbflute.util.Srl.containsAny;
 import static org.seasar.dbflute.util.Srl.containsAnyIgnoreCase;
+import static org.seasar.dbflute.util.Srl.containsElement;
 import static org.seasar.dbflute.util.Srl.containsElementAll;
 import static org.seasar.dbflute.util.Srl.containsElementAllIgnoreCase;
 import static org.seasar.dbflute.util.Srl.containsElementAny;
 import static org.seasar.dbflute.util.Srl.containsElementAnyIgnoreCase;
+import static org.seasar.dbflute.util.Srl.containsElementIgnoreCase;
 import static org.seasar.dbflute.util.Srl.containsIgnoreCase;
+import static org.seasar.dbflute.util.Srl.containsKeyword;
+import static org.seasar.dbflute.util.Srl.containsKeywordAll;
+import static org.seasar.dbflute.util.Srl.containsKeywordAllIgnoreCase;
+import static org.seasar.dbflute.util.Srl.containsKeywordAny;
+import static org.seasar.dbflute.util.Srl.containsKeywordAnyIgnoreCase;
+import static org.seasar.dbflute.util.Srl.containsKeywordIgnoreCase;
 import static org.seasar.dbflute.util.Srl.containsPrefixAll;
 import static org.seasar.dbflute.util.Srl.containsPrefixAllIgnoreCase;
 import static org.seasar.dbflute.util.Srl.containsPrefixAny;
@@ -34,6 +42,10 @@ import static org.seasar.dbflute.util.Srl.extractDelimiterList;
 import static org.seasar.dbflute.util.Srl.extractScopeFirst;
 import static org.seasar.dbflute.util.Srl.extractScopeList;
 import static org.seasar.dbflute.util.Srl.extractScopeWide;
+import static org.seasar.dbflute.util.Srl.hasKeywordAll;
+import static org.seasar.dbflute.util.Srl.hasKeywordAllIgnoreCase;
+import static org.seasar.dbflute.util.Srl.hasKeywordAny;
+import static org.seasar.dbflute.util.Srl.hasKeywordAnyIgnoreCase;
 import static org.seasar.dbflute.util.Srl.hasPrefixAll;
 import static org.seasar.dbflute.util.Srl.hasPrefixAllIgnoreCase;
 import static org.seasar.dbflute.util.Srl.hasPrefixAny;
@@ -307,6 +319,26 @@ public class DfStringUtilTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                          List Element
     //                                          ------------
+    public void test_containsElement_basic() {
+        assertTrue(containsElement(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsElement(Arrays.asList("foo", "bar"), "bar"));
+        assertFalse(containsElement(Arrays.asList("foo", "bar"), "baz"));
+        assertFalse(containsElement(Arrays.asList("foo", "bar"), "o"));
+        assertFalse(containsElement(Arrays.asList("foo", "bar"), "fOo"));
+        assertFalse(containsElement(new ArrayList<String>(), "o"));
+        assertFalse(containsElement(Arrays.asList("foo", "bar"), null));
+    }
+
+    public void test_containsElementIgnoreCase_basic() {
+        assertTrue(containsElementIgnoreCase(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsElementIgnoreCase(Arrays.asList("foo", "bar"), "bar"));
+        assertFalse(containsElementIgnoreCase(Arrays.asList("foo", "bar"), "baz"));
+        assertFalse(containsElementIgnoreCase(Arrays.asList("foo", "bar"), "o"));
+        assertTrue(containsElementIgnoreCase(Arrays.asList("foo", "bar"), "fOo"));
+        assertFalse(containsElementIgnoreCase(new ArrayList<String>(), "o"));
+        assertFalse(containsElementIgnoreCase(Arrays.asList("foo", "bar"), null));
+    }
+
     public void test_containsElementAll_basic() {
         assertTrue(containsElementAll(Arrays.asList("foo", "bar"), "foo"));
         assertTrue(containsElementAll(Arrays.asList("foo", "bar"), "bar"));
@@ -359,6 +391,83 @@ public class DfStringUtilTest extends PlainTestCase {
         assertFalse(containsElementAnyIgnoreCase(new ArrayList<String>(), "o"));
         assertFalse(containsElementAnyIgnoreCase(Arrays.asList("foo", "bar"), new String[] {}));
         assertTrue(containsElementAnyIgnoreCase(Arrays.asList("foo", "bar", null), "qux", null));
+    }
+
+    // -----------------------------------------------------
+    //                                          List Keyword
+    //                                          ------------
+    public void test_containsKeyword_basic() {
+        assertTrue(containsKeyword(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsKeyword(Arrays.asList("foo", "bar"), "bar"));
+        assertFalse(containsKeyword(Arrays.asList("foo", "bar"), "baz"));
+        assertTrue(containsKeyword(Arrays.asList("foo", "bar"), "o"));
+        assertFalse(containsKeyword(Arrays.asList("foo", "bar"), "fOo"));
+        assertFalse(containsKeyword(new ArrayList<String>(), "o"));
+        assertFalse(containsKeyword(Arrays.asList("foo", "bar"), null));
+    }
+
+    public void test_containsKeywordIgnoreCase_basic() {
+        assertTrue(containsKeywordIgnoreCase(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsKeywordIgnoreCase(Arrays.asList("foo", "bar"), "bar"));
+        assertFalse(containsKeywordIgnoreCase(Arrays.asList("foo", "bar"), "baz"));
+        assertTrue(containsKeywordIgnoreCase(Arrays.asList("foo", "bar"), "o"));
+        assertTrue(containsKeywordIgnoreCase(Arrays.asList("foo", "bar"), "fOo"));
+        assertFalse(containsKeywordIgnoreCase(new ArrayList<String>(), "o"));
+        assertFalse(containsKeywordIgnoreCase(Arrays.asList("foo", "bar"), null));
+    }
+
+    public void test_containsKeywordAll_basic() {
+        assertTrue(containsKeywordAll(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsKeywordAll(Arrays.asList("foo", "bar"), "bar"));
+        assertTrue(containsKeywordAll(Arrays.asList("foo", "bar"), "foo", "bar"));
+        assertFalse(containsKeywordAll(Arrays.asList("foo", "bar"), "quux", "foo"));
+        assertFalse(containsKeywordAll(Arrays.asList("foo", "bar"), "baz"));
+        assertTrue(containsKeywordAll(Arrays.asList("foo", "bar"), "o"));
+        assertFalse(containsKeywordAll(Arrays.asList("foo", "bar"), "fOo"));
+        assertFalse(containsKeywordAll(new ArrayList<String>(), "o"));
+        assertFalse(containsKeywordAll(Arrays.asList("foo", "bar"), new String[] {}));
+        assertFalse(containsKeywordAll(Arrays.asList("foo", "bar", null), "foo", null, "bar"));
+    }
+
+    public void test_containsKeywordAllIgnoreCase_basic() {
+        assertTrue(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "bar"));
+        assertTrue(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "foo", "bar"));
+        assertFalse(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "quux", "foo"));
+        assertFalse(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "baz"));
+        assertTrue(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "o"));
+        assertTrue(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "fOo"));
+        assertTrue(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), "fOo", "foO", "baR"));
+        assertFalse(containsKeywordAllIgnoreCase(new ArrayList<String>(), "o"));
+        assertFalse(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar"), new String[] {}));
+        assertFalse(containsKeywordAllIgnoreCase(Arrays.asList("foo", "bar", null), "Foo", null, "bAr"));
+    }
+
+    public void test_containsKeywordAny_basic() {
+        assertTrue(containsKeywordAny(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsKeywordAny(Arrays.asList("foo", "bar"), "bar"));
+        assertTrue(containsKeywordAny(Arrays.asList("foo", "bar"), "foo", "bar"));
+        assertTrue(containsKeywordAny(Arrays.asList("foo", "bar"), "quux", "foo"));
+        assertFalse(containsKeywordAny(Arrays.asList("foo", "bar"), "baz"));
+        assertTrue(containsKeywordAny(Arrays.asList("foo", "bar"), "o"));
+        assertFalse(containsKeywordAny(Arrays.asList("foo", "bar"), "fOo"));
+        assertFalse(containsKeywordAny(new ArrayList<String>(), "o"));
+        assertFalse(containsKeywordAny(Arrays.asList("foo", "bar"), new String[] {}));
+        assertFalse(containsKeywordAny(Arrays.asList("foo", "bar", null), "qux", null));
+    }
+
+    public void test_containsKeywordAnyIgnoreCase_basic() {
+        assertTrue(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "foo"));
+        assertTrue(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "bar"));
+        assertTrue(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "foo", "bar"));
+        assertTrue(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "quux", "foo"));
+        assertFalse(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "baz"));
+        assertTrue(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "o"));
+        assertTrue(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "fOo"));
+        assertTrue(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), "fOo", "foO", "qux"));
+        assertFalse(containsKeywordAnyIgnoreCase(new ArrayList<String>(), "o"));
+        assertFalse(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar"), new String[] {}));
+        assertFalse(containsKeywordAnyIgnoreCase(Arrays.asList("foo", "bar", null), "qux", null));
     }
 
     // -----------------------------------------------------
@@ -501,6 +610,75 @@ public class DfStringUtilTest extends PlainTestCase {
         assertTrue(startsWithIgnoreCase("fOobar", "fOo"));
     }
 
+    // ===================================================================================
+    //                                                                            EndsWith
+    //                                                                            ========
+    public void test_endsWith_basic() {
+        assertTrue(endsWith("foobar", "bar"));
+        assertTrue(endsWith("foobar", "ar"));
+        assertTrue(endsWith("foobar", "r"));
+        assertTrue(endsWith("foobar", "bar", "baz"));
+        assertTrue(endsWith("foobar", "baz", "bar"));
+        assertFalse(endsWith("foobar", "baz", "qux"));
+        assertFalse(endsWith("foobar", "a"));
+        assertFalse(endsWith("foobar", new String[] {}));
+        assertTrue(endsWith("foobar", ""));
+        assertFalse(endsWith("foobar", "bAr"));
+        assertFalse(endsWith("foobAr", "bar"));
+        assertTrue(endsWith("foobAr", "bAr"));
+    }
+
+    public void test_endsWithIgnoreCase_basic() {
+        assertTrue(endsWithIgnoreCase("foobar", "bar"));
+        assertTrue(endsWithIgnoreCase("foobar", "ar"));
+        assertTrue(endsWithIgnoreCase("foobar", "r"));
+        assertFalse(endsWithIgnoreCase("foobar", "a"));
+        assertFalse(endsWithIgnoreCase("foobar", new String[] {}));
+        assertTrue(endsWithIgnoreCase("foobar", ""));
+        assertTrue(endsWithIgnoreCase("foobar", "bAr"));
+        assertTrue(endsWithIgnoreCase("foobAr", "bar"));
+        assertTrue(endsWithIgnoreCase("foobAr", "bAr"));
+    }
+
+    // ===================================================================================
+    //                                                                          HasKeyword
+    //                                                                          ==========
+    public void test_hasKeywordAll_basic() {
+        assertTrue(hasKeywordAll("foo", "foobar"));
+        assertTrue(hasKeywordAll("foo", "foobar", "barfoo"));
+        assertTrue(hasKeywordAll("oob", "foobar", "foobaz"));
+        assertFalse(hasKeywordAll("foo", "quxbar", "bazqux"));
+        assertFalse(hasKeywordAll("oob", "foObar"));
+        assertFalse(hasKeywordAll("foo", new String[] {}));
+    }
+
+    public void test_hasKeywordAllIgnoreCase_basic() {
+        assertTrue(hasKeywordAllIgnoreCase("foo", "foobar"));
+        assertTrue(hasKeywordAllIgnoreCase("foo", "foobar", "barfoo"));
+        assertTrue(hasKeywordAllIgnoreCase("oob", "foobar", "foobaz"));
+        assertFalse(hasKeywordAllIgnoreCase("foo", "quxbar", "bazqux"));
+        assertTrue(hasKeywordAllIgnoreCase("oob", "foObar"));
+        assertFalse(hasKeywordAllIgnoreCase("foo", new String[] {}));
+    }
+
+    public void test_hasKeywordAny_basic() {
+        assertTrue(hasKeywordAny("foo", "foobar"));
+        assertTrue(hasKeywordAny("foo", "foobar", "quux"));
+        assertTrue(hasKeywordAny("foo", "foobar", "fooqux"));
+        assertFalse(hasKeywordAny("foo", "quxbar", "bazqux"));
+        assertFalse(hasKeywordAny("oob", "foObar"));
+        assertFalse(hasKeywordAny("foo", new String[] {}));
+    }
+
+    public void test_hasKeywordAnyIgnoreCase_basic() {
+        assertTrue(hasKeywordAnyIgnoreCase("foo", "foobar"));
+        assertTrue(hasKeywordAnyIgnoreCase("foo", "foobar", "quux"));
+        assertTrue(hasKeywordAnyIgnoreCase("foo", "foobar", "fooqux"));
+        assertFalse(hasKeywordAnyIgnoreCase("foo", "quxbar", "bazqux"));
+        assertTrue(hasKeywordAnyIgnoreCase("oob", "foObar"));
+        assertFalse(hasKeywordAnyIgnoreCase("foo", new String[] {}));
+    }
+
     public void test_hasPrefixAll_basic() {
         assertTrue(hasPrefixAll("foo", "foobar"));
         assertFalse(hasPrefixAll("foo", "foobar", "barfoo"));
@@ -535,36 +713,6 @@ public class DfStringUtilTest extends PlainTestCase {
         assertFalse(hasPrefixAnyIgnoreCase("foo", "quxbar", "bazqux"));
         assertTrue(hasPrefixAnyIgnoreCase("foo", "foObar"));
         assertFalse(hasPrefixAnyIgnoreCase("foo", new String[] {}));
-    }
-
-    // ===================================================================================
-    //                                                                            EndsWith
-    //                                                                            ========
-    public void test_endsWith_basic() {
-        assertTrue(endsWith("foobar", "bar"));
-        assertTrue(endsWith("foobar", "ar"));
-        assertTrue(endsWith("foobar", "r"));
-        assertTrue(endsWith("foobar", "bar", "baz"));
-        assertTrue(endsWith("foobar", "baz", "bar"));
-        assertFalse(endsWith("foobar", "baz", "qux"));
-        assertFalse(endsWith("foobar", "a"));
-        assertFalse(endsWith("foobar", new String[] {}));
-        assertTrue(endsWith("foobar", ""));
-        assertFalse(endsWith("foobar", "bAr"));
-        assertFalse(endsWith("foobAr", "bar"));
-        assertTrue(endsWith("foobAr", "bAr"));
-    }
-
-    public void test_endsWithIgnoreCase_basic() {
-        assertTrue(endsWithIgnoreCase("foobar", "bar"));
-        assertTrue(endsWithIgnoreCase("foobar", "ar"));
-        assertTrue(endsWithIgnoreCase("foobar", "r"));
-        assertFalse(endsWithIgnoreCase("foobar", "a"));
-        assertFalse(endsWithIgnoreCase("foobar", new String[] {}));
-        assertTrue(endsWithIgnoreCase("foobar", ""));
-        assertTrue(endsWithIgnoreCase("foobar", "bAr"));
-        assertTrue(endsWithIgnoreCase("foobAr", "bar"));
-        assertTrue(endsWithIgnoreCase("foobAr", "bAr"));
     }
 
     public void test_hasSuffixAll_basic() {
