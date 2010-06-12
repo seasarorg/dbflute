@@ -177,7 +177,7 @@ public class DfProcedureExecutionMetaExtractor {
             for (DfProcedureColumnMetaInfo column : columnList) {
                 msg = msg + "   " + column.getColumnDisplayName() + ln();
             }
-            msg = msg + " test values = " + testValueList + ln();
+            msg = msg + " test values = " + buildTestValueDisp(testValueList) + ln();
             msg = msg + " " + DfJDBCException.extractMessage(continued);
             SQLException nextEx = continued.getNextException();
             if (nextEx != null) {
@@ -192,6 +192,24 @@ public class DfProcedureExecutionMetaExtractor {
                 conn.rollback();
             }
         }
+    }
+
+    protected String buildTestValueDisp(List<Object> testValueList) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int index = 0;
+        for (Object value : testValueList) {
+            if (index == 0) {
+                sb.append("null");
+            } else if (value instanceof String) {
+                sb.append("\"").append(value).append("\"");
+            } else {
+                sb.append(value);
+            }
+            ++index;
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
     protected boolean existsReturnValue(List<DfProcedureColumnMetaInfo> columnList) {
@@ -259,12 +277,17 @@ public class DfProcedureExecutionMetaExtractor {
 
             // mapping by JDBC type
             final String stringValue = "0";
-            final String nativeType = findNativeType(column);
+            final String jdbcType = findJdbcType(column);
+            final String nativeType = findNativeType(jdbcType, column);
             Object testValue = null;
             if (containsAsEndsWith(nativeType, _numberList)) {
                 testValue = 0;
             } else if (containsAsEndsWith(nativeType, _dateList)) {
-                testValue = DfTypeUtil.toTimestamp("2010-03-31 12:34:56");
+                if (TypeMap.DATE.equals(jdbcType)) {
+                    testValue = DfTypeUtil.toSqlDate("2010-03-31");
+                } else {
+                    testValue = DfTypeUtil.toTimestamp("2010-03-31 12:34:56");
+                }
             } else if (containsAsEndsWith(nativeType, _booleanList)) {
                 testValue = Boolean.FALSE;
             } else if (containsAsEndsWith(nativeType, _binaryList)) {
@@ -282,17 +305,16 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected String findNativeType(DfProcedureColumnMetaInfo column) {
-        final String jdbcType = findJdbcType(column);
-        final Integer columnSize = column.getColumnSize();
-        final Integer decimalDigits = column.getDecimalDigits();
-        return TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
-    }
-
     protected String findJdbcType(DfProcedureColumnMetaInfo column) {
         final int jdbcDefType = column.getJdbcDefType();
         final String dbTypeName = column.getDbTypeName();
         return _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
+    }
+
+    protected String findNativeType(String jdbcType, DfProcedureColumnMetaInfo column) {
+        final Integer columnSize = column.getColumnSize();
+        final Integer decimalDigits = column.getDecimalDigits();
+        return TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
     }
 
     protected boolean containsAsEndsWith(String str, List<Object> ls) {
