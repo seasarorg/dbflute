@@ -1476,29 +1476,6 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                             Type Mapping Properties
-    //                                                             =======================
-    public List<Object> getJavaNativeStringList() {
-        return getProperties().getTypeMappingProperties().getJavaNativeStringList();
-    }
-
-    public List<Object> getJavaNativeBooleanList() {
-        return getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
-    }
-
-    public List<Object> getJavaNativeNumberList() {
-        return getProperties().getTypeMappingProperties().getJavaNativeNumberList();
-    }
-
-    public List<Object> getJavaNativeDateList() {
-        return getProperties().getTypeMappingProperties().getJavaNativeDateList();
-    }
-
-    public List<Object> getJavaNativeBinaryList() {
-        return getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
-    }
-
-    // ===================================================================================
     //                                                               OutsideSql Properties
     //                                                               =====================
     public boolean isGenerateProcedureParameterBean() {

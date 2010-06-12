@@ -39,6 +39,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMeta
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -59,10 +60,6 @@ public class DfProcedureExecutionMetaExtractor {
     //                                                                           =========
     protected final DfCustomizeEntityMetaExtractor _extractor = new DfCustomizeEntityMetaExtractor();
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
-    protected final List<Object> _numberList = getProperties().getTypeMappingProperties().getJavaNativeNumberList();
-    protected final List<Object> _dateList = getProperties().getTypeMappingProperties().getJavaNativeDateList();
-    protected final List<Object> _booleanList = getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
-    protected final List<Object> _binaryList = getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
     protected final ValueType _stringType = TnValueTypes.STRING;
     protected final ValueType _stringClobType = TnValueTypes.STRING_CLOB;
     protected final ValueType _bytesOidType = TnValueTypes.BYTES_OID;
@@ -278,19 +275,25 @@ public class DfProcedureExecutionMetaExtractor {
             // mapping by JDBC type
             final String stringValue = "0";
             final String jdbcType = findJdbcType(column);
-            final String nativeType = findNativeType(jdbcType, column);
+            final String javaNative = findNativeType(jdbcType, column);
             Object testValue = null;
-            if (containsAsEndsWith(nativeType, _numberList)) {
+            if (isJavaNativeStringObject(javaNative)) {
+                testValue = stringValue;
+            } else if (isJavaNativeNumberObject(javaNative)) {
                 testValue = 0;
-            } else if (containsAsEndsWith(nativeType, _dateList)) {
-                if (TypeMap.DATE.equals(jdbcType)) {
-                    testValue = DfTypeUtil.toSqlDate("2010-03-31");
+            } else if (isJavaNativeDateObject(javaNative)) {
+                if (TypeMap.isJdbcTypeDate(jdbcType)) {
+                    // Oracle date is mapped to java.util.Date in Generate task
+                    // but this ignores it because of execution only here
+                    testValue = DfTypeUtil.toSqlDate("2006-09-26");
+                } else if (TypeMap.isJdbcTypeTime(jdbcType)) {
+                    testValue = DfTypeUtil.toTime("18:21:00");
                 } else {
-                    testValue = DfTypeUtil.toTimestamp("2010-03-31 12:34:56");
+                    testValue = DfTypeUtil.toTimestamp("2006-09-26 18:21:00");
                 }
-            } else if (containsAsEndsWith(nativeType, _booleanList)) {
+            } else if (isJavaNativeBooleanObject(javaNative)) {
                 testValue = Boolean.FALSE;
-            } else if (containsAsEndsWith(nativeType, _binaryList)) {
+            } else if (isJavaNativeBinaryObject(javaNative)) {
                 final String encoding = "UTF-8";
                 try {
                     testValue = stringValue.getBytes(encoding);
@@ -317,14 +320,24 @@ public class DfProcedureExecutionMetaExtractor {
         return TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
     }
 
-    protected boolean containsAsEndsWith(String str, List<Object> ls) {
-        for (Object current : ls) {
-            final String currentString = (String) current;
-            if (str.endsWith(currentString)) {
-                return true;
-            }
-        }
-        return false;
+    protected boolean isJavaNativeStringObject(String javaNative) {
+        return getTypeMappingProperties().isJavaNativeStringObject(javaNative);
+    }
+
+    protected boolean isJavaNativeNumberObject(String javaNative) {
+        return getTypeMappingProperties().isJavaNativeNumberObject(javaNative);
+    }
+
+    protected boolean isJavaNativeDateObject(String javaNative) {
+        return getTypeMappingProperties().isJavaNativeDateObject(javaNative);
+    }
+
+    protected boolean isJavaNativeBooleanObject(String javaNative) {
+        return getTypeMappingProperties().isJavaNativeBooleanObject(javaNative);
+    }
+
+    protected boolean isJavaNativeBinaryObject(String javaNative) {
+        return getTypeMappingProperties().isJavaNativeBinaryObject(javaNative);
     }
 
     public String createSql(String procedureName, int bindSize, boolean existsReturn, boolean escape) {
@@ -487,7 +500,11 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfTypeMappingProperties getTypeMappingProperties() {
+        return getProperties().getTypeMappingProperties();
     }
 
     protected boolean isOracle() {

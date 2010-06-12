@@ -388,6 +388,30 @@ public class TypeMap {
         return defValue;
     }
 
+    public static boolean isJdbcTypeChar(String jdbcType) {
+        return CHAR.equals(jdbcType);
+    }
+
+    public static boolean isJdbcTypeClob(String jdbcType) {
+        return CLOB.equals(jdbcType);
+    }
+
+    public static boolean isJdbcTypeDate(String jdbcType) {
+        return DATE.equals(jdbcType);
+    }
+
+    public static boolean isJdbcTypeTimestamp(String jdbcType) {
+        return TIMESTAMP.equals(jdbcType);
+    }
+
+    public static boolean isJdbcTypeTime(String jdbcType) {
+        return TIME.equals(jdbcType);
+    }
+
+    public static boolean isJdbcTypeBlob(String jdbcType) {
+        return BLOB.equals(jdbcType);
+    }
+
     // ===================================================================================
     //                                                                         Native Type
     //                                                                         ===========

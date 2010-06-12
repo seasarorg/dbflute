@@ -11,30 +11,30 @@ public interface LanguageMetaData {
     /**
      * @return The map of 'JDBC to Java Native'. (NotNull)
      */
-    public Map<String, Object> getJdbcToJavaNativeMap();
+    Map<String, Object> getJdbcToJavaNativeMap();
 
     /**
-     * @return The list of string type. (NotNull)
+     * @return The list of suffix for string native type. (NotNull)
      */
-    public List<Object> getStringList();
+    List<String> getStringList();
 
     /**
-     * @return The list of boolean type. (NotNull)
+     * @return The list of suffix for number native type. (NotNull)
      */
-    public List<Object> getBooleanList();
+    List<String> getNumberList();
 
     /**
-     * @return The list of number type. (NotNull)
+     * @return The list of suffix for date native type. (NotNull)
      */
-    public List<Object> getNumberList();
+    List<String> getDateList();
 
     /**
-     * @return The list of date type. (NotNull)
+     * @return The list of suffix for boolean native type. (NotNull)
      */
-    public List<Object> getDateList();
+    List<String> getBooleanList();
 
     /**
-     * @return The list of binary type. (NotNull)
+     * @return The list of suffix for binary native type. (NotNull)
      */
-    public List<Object> getBinaryList();
+    List<String> getBinaryList();
 }

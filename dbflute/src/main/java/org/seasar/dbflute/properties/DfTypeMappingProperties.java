@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -40,7 +42,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     //                                 ---------------------
     protected Map<String, Object> getJdbcTypeMappingMap() {
         final Map<String, Object> typeMappingMap = getTypeMappingMap();
-        final Map<String, Object> jdbcTypeMappingMap = new LinkedHashMap<String, Object>();
+        final Map<String, Object> jdbcTypeMappingMap = DfCollectionUtil.newLinkedHashMap();
         final Set<String> keySet = typeMappingMap.keySet();
         for (final String key : keySet) {
             if (key == null) {
@@ -199,24 +201,48 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                               Java Native Type List
     //                                                               =====================
-    public List<Object> getJavaNativeStringList() { // It's not property!
+    public List<String> getJavaNativeStringList() { // not property
         return getLanguageMetaData().getStringList();
     }
 
-    public List<Object> getJavaNativeBooleanList() { // It's not property!
-        return getLanguageMetaData().getBooleanList();
+    public boolean isJavaNativeStringObject(String javaNative) {
+        return containsAsEndsWith(javaNative, getJavaNativeStringList());
     }
 
-    public List<Object> getJavaNativeNumberList() { // It's not property!
+    public List<String> getJavaNativeNumberList() { // not property
         return getLanguageMetaData().getNumberList();
     }
 
-    public List<Object> getJavaNativeDateList() { // It's not property!
+    public boolean isJavaNativeNumberObject(String javaNative) {
+        return containsAsEndsWith(javaNative, getJavaNativeNumberList());
+    }
+
+    public List<String> getJavaNativeDateList() { // not property
         return getLanguageMetaData().getDateList();
     }
 
-    public List<Object> getJavaNativeBinaryList() { // It's not property!
+    public boolean isJavaNativeDateObject(String javaNative) {
+        return containsAsEndsWith(javaNative, getJavaNativeDateList());
+    }
+
+    public List<String> getJavaNativeBooleanList() { // not property
+        return getLanguageMetaData().getBooleanList();
+    }
+
+    public boolean isJavaNativeBooleanObject(String javaNative) {
+        return containsAsEndsWith(javaNative, getJavaNativeBooleanList());
+    }
+
+    public List<String> getJavaNativeBinaryList() { // not property
         return getLanguageMetaData().getBinaryList();
+    }
+
+    public boolean isJavaNativeBinaryObject(String javaNative) {
+        return containsAsEndsWith(javaNative, getJavaNativeBinaryList());
+    }
+
+    protected boolean containsAsEndsWith(String str, List<String> suffixList) {
+        return Srl.endsWithIgnoreCase(str, suffixList.toArray(new String[] {}));
     }
 
     // ===================================================================================

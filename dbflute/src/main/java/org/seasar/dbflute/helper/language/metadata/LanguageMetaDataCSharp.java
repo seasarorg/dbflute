@@ -1,17 +1,33 @@
 package org.seasar.dbflute.helper.language.metadata;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
 public class LanguageMetaDataCSharp implements LanguageMetaData {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final List<String> _stringList = newArrayList("String");
+    protected final List<String> _numberList = newArrayList("decimal?", "int?", "long?");
+    protected final List<String> _dateList = newArrayList("DateTime?");
+    protected final List<String> _booleanList = newArrayList("bool?");
+    protected final List<String> _binaryList = newArrayList("byte[]");
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
+        return DfCollectionUtil.newArrayList(elements);
+    }
+
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
     public Map<String, Object> getJdbcToJavaNativeMap() {
-        final Map<String, Object> map = new LinkedHashMap<String, Object>();
+        final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("CHAR", "String");
         map.put("VARCHAR", "String");
         map.put("LONGVARCHAR", "String");
@@ -31,23 +47,26 @@ public class LanguageMetaDataCSharp implements LanguageMetaData {
         return map;
     }
 
-    public List<Object> getStringList() {
-        return Arrays.asList(new Object[] { "String" });
+    // ===================================================================================
+    //                                                                         Suffix List
+    //                                                                         ===========
+    public List<String> getStringList() {
+        return _stringList;
     }
 
-    public List<Object> getBooleanList() {
-        return Arrays.asList(new Object[] { "bool?" });
+    public List<String> getNumberList() {
+        return _numberList;
     }
 
-    public List<Object> getNumberList() {
-        return Arrays.asList(new Object[] { "decimal?", "int?", "long?" });
+    public List<String> getDateList() {
+        return _dateList;
     }
 
-    public List<Object> getDateList() {
-        return Arrays.asList(new Object[] { "DateTime?" });
+    public List<String> getBooleanList() {
+        return _booleanList;
     }
 
-    public List<Object> getBinaryList() {
-        return Arrays.asList(new Object[] { "byte[]" });
+    public List<String> getBinaryList() {
+        return _binaryList;
     }
 }

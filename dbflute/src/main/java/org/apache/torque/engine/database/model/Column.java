@@ -56,7 +56,6 @@ package org.apache.torque.engine.database.model;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +65,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -74,6 +72,8 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfTypeMappingProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -1262,27 +1262,27 @@ public class Column {
     }
 
     public boolean isJdbcTypeChar() { // as pinpoint
-        return TypeMap.CHAR.equals(getJdbcType());
+        return TypeMap.isJdbcTypeChar(getJdbcType());
     }
 
     public boolean isJdbcTypeClob() { // as pinpoint
-        return TypeMap.CLOB.equals(getJdbcType());
+        return TypeMap.isJdbcTypeClob(getJdbcType());
     }
 
     public boolean isJdbcTypeDate() { // as pinpoint
-        return TypeMap.DATE.equals(getJdbcType());
-    }
-
-    public boolean isJdbcTypeTime() { // as pinpoint
-        return TypeMap.TIME.equals(getJdbcType());
+        return TypeMap.isJdbcTypeDate(getJdbcType());
     }
 
     public boolean isJdbcTypeTimestamp() { // as pinpoint
-        return TypeMap.TIMESTAMP.equals(getJdbcType());
+        return TypeMap.isJdbcTypeTimestamp(getJdbcType());
+    }
+
+    public boolean isJdbcTypeTime() { // as pinpoint
+        return TypeMap.isJdbcTypeTime(getJdbcType());
     }
 
     public boolean isJdbcTypeBlob() { // as pinpoint
-        return TypeMap.BLOB.equals(getJdbcType());
+        return TypeMap.isJdbcTypeBlob(getJdbcType());
     }
 
     // -----------------------------------------------------
@@ -1327,25 +1327,28 @@ public class Column {
     }
 
     public boolean isJavaNativeStringObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
+        return getTypeMappingProperties().isJavaNativeStringObject(getJavaNative());
     }
 
     public boolean isJavaNativeNumberObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeNumberList());
+        return getTypeMappingProperties().isJavaNativeNumberObject(getJavaNative());
     }
 
     public boolean isJavaNativeDateObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeDateList());
+        return getTypeMappingProperties().isJavaNativeDateObject(getJavaNative());
     }
 
     public boolean isJavaNativeBooleanObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBooleanList());
+        return getTypeMappingProperties().isJavaNativeBooleanObject(getJavaNative());
     }
 
     public boolean isJavaNativeBinaryObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBinaryList());
+        return getTypeMappingProperties().isJavaNativeBinaryObject(getJavaNative());
     }
 
+    // - - - - - -
+    // [Java Only]
+    // - - - - - -
     public boolean isJavaNativeInteger() { // as pinpoint
         return getJavaNative().equals("Integer");
     }
@@ -1370,14 +1373,16 @@ public class Column {
         return getJavaNative().equals("java.util.UUID");
     }
 
-    public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able
-        List<Object> list = Arrays.asList(new Object[] { "Integer", "Long", "Short", "Byte", "Boolean", "Character" });
-        return containsAsEndsWith(getJavaNative(), list);
+    public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able by String
+        List<String> ls = DfCollectionUtil.newArrayList("Integer", "Long", "Short", "Byte", "Boolean", "Character");
+        return Srl.endsWith(getJavaNative(), ls.toArray(new String[] {}));
+
+        // BigDecimal does not have valueOf(String)
     }
 
-    // - - - - -
-    // [CSharp]
-    // - - - - -
+    // - - - - - - -
+    // [CSharp Only]
+    // - - - - - - -
     public boolean isJavaNativeCSharpNullable() {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
@@ -1549,6 +1554,14 @@ public class Column {
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfTypeMappingProperties getTypeMappingProperties() {
+        return getProperties().getTypeMappingProperties();
     }
 
     // ===================================================================================
@@ -1900,7 +1913,7 @@ public class Column {
             return "null";
         }
         final String classificationName = getClassificationName();
-        final String projectPrefix = getProperties().getBasicProperties().getProjectPrefix();
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
         return projectPrefix + "CDef.DefMeta." + classificationName;
     }
 
@@ -2084,28 +2097,6 @@ public class Column {
 
     public void setBehaviorFilterBeforeUpdateColumnExpression(String expression) {
         _behaviorFilterBeforeUpdateColumnExpression = expression;
-    }
-
-    // ===================================================================================
-    //                                                                       Column Helper
-    //                                                                       =============
-    protected ColumnHelper _columnHelper;
-
-    protected ColumnHelper helper() {
-        if (_columnHelper == null) {
-            _columnHelper = new ColumnHelper();
-        }
-        return _columnHelper;
-    }
-
-    protected class ColumnHelper {
-        public DfBasicProperties getBasicProperties() {
-            return getTable().getProperties().getBasicProperties();
-        }
-
-        public DfLanguageDependencyInfo getLanguageDependencyInfo() {
-            return getBasicProperties().getLanguageDependencyInfo();
-        }
     }
 
     // ===================================================================================
