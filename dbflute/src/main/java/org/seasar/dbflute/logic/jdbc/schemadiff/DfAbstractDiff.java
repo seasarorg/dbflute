@@ -67,10 +67,25 @@ public abstract class DfAbstractDiff {
         return DfNextPreviousDiff.create(nextPreviousDiffMap);
     }
 
-    protected static interface NextPreviousDiffer<OBJECT, DIFF> {
-        Object provide(OBJECT obj);
+    protected static interface NextPreviousDiffer<OBJECT, DIFF, TYPE> {
+        TYPE provide(OBJECT obj);
+
+        boolean isMatch(TYPE next, TYPE previous);
 
         void diff(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
+    }
+
+    protected abstract class StringNextPreviousDiffer<OBJECT, DIFF> implements NextPreviousDiffer<OBJECT, DIFF, String> {
+        public boolean isMatch(String next, String previous) {
+            return isSame(next, previous);
+        }
+    }
+
+    protected abstract class BooleanNextPreviousDiffer<OBJECT, DIFF> implements
+            NextPreviousDiffer<OBJECT, DIFF, Boolean> {
+        public boolean isMatch(Boolean next, Boolean previous) {
+            return isSame(next, previous);
+        }
     }
 
     public static interface NextPreviousHandler { // accessed from Velocity template
@@ -119,6 +134,34 @@ public abstract class DfAbstractDiff {
     //                                                                          ==========
     protected DfBasicProperties getBasicProperties() {
         return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected boolean isDatabaseMySQL() {
+        return getBasicProperties().isDatabaseMySQL();
+    }
+
+    protected boolean isDatabasePostgreSQL() {
+        return getBasicProperties().isDatabasePostgreSQL();
+    }
+
+    protected boolean isDatabaseOracle() {
+        return getBasicProperties().isDatabaseOracle();
+    }
+
+    protected boolean isDatabaseDB2() {
+        return getBasicProperties().isDatabaseDB2();
+    }
+
+    protected boolean isDatabaseSQLServer() {
+        return getBasicProperties().isDatabaseSQLServer();
+    }
+
+    protected boolean isDatabaseH2() {
+        return getBasicProperties().isDatabaseH2();
+    }
+
+    protected boolean isDatabaseDerby() {
+        return getBasicProperties().isDatabaseDerby();
     }
 
     // ===================================================================================

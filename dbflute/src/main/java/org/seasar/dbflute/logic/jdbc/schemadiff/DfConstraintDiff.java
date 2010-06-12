@@ -49,19 +49,19 @@ public abstract class DfConstraintDiff extends DfAbstractDiff implements DfNestD
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfConstraintDiff(String columnName, DfDiffType diffType) {
-        _constraintName = columnName;
+    protected DfConstraintDiff(String constraintName, DfDiffType diffType) {
+        _constraintName = constraintName;
         _diffType = diffType;
     }
 
     protected DfConstraintDiff(Map<String, Object> diffMap) {
         _constraintName = (String) diffMap.get("constraintName");
-        assertForeignKeyNameExists(_constraintName, diffMap);
+        assertConstraintNameExists(_constraintName, diffMap);
         _diffType = DfDiffType.valueOf((String) diffMap.get("diffType"));
         acceptDiffMap(diffMap);
     }
 
-    protected void assertForeignKeyNameExists(String constraintName, Map<String, Object> diffMap) {
+    protected void assertConstraintNameExists(String constraintName, Map<String, Object> diffMap) {
         if (constraintName == null) { // basically no way
             String msg = "The constraintName is required in diff-map:";
             msg = msg + " diffMap=" + diffMap;

@@ -235,8 +235,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             // found
             final DfTableDiff tableDiff = DfTableDiff.createChanged(next.getName());
-            diffNextPrevious(next, previous, tableDiff, new NextPreviousDiffer<Table, DfTableDiff>() {
-                public Object provide(Table obj) {
+            diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
+                public String provide(Table obj) {
                     return obj.getUnifiedSchema().getCatalogSchema();
                 }
 
@@ -244,8 +244,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     diff.setUnifiedSchemaDiff(nextPreviousDiff);
                 }
             });
-            diffNextPrevious(next, previous, tableDiff, new NextPreviousDiffer<Table, DfTableDiff>() {
-                public Object provide(Table obj) {
+            diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
+                public String provide(Table obj) {
                     return obj.getType();
                 }
 
@@ -274,11 +274,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
-            NextPreviousDiffer<Table, DfTableDiff> setupper) {
-        final Object nextValue = setupper.provide(next);
-        final Object previousValue = setupper.provide(previous);
-        if (!isSame(nextValue, previousValue)) {
+    protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
+            NextPreviousDiffer<Table, DfTableDiff, TYPE> setupper) {
+        final TYPE nextValue = setupper.provide(next);
+        final TYPE previousValue = setupper.provide(previous);
+        if (!setupper.isMatch(nextValue, previousValue)) {
             setupper.diff(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
         }
     }
@@ -315,8 +315,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             // found
             final DfColumnDiff columnDiff = DfColumnDiff.createChanged(next.getName());
-            diffNextPrevious(next, previous, columnDiff, new NextPreviousDiffer<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
+            diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+                public String provide(Column obj) {
                     return obj.getDbType();
                 }
 
@@ -324,8 +324,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     diff.setDbTypeDiff(nextPreviousDiff);
                 }
             });
-            diffNextPrevious(next, previous, columnDiff, new NextPreviousDiffer<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
+            diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+                public String provide(Column obj) {
                     return obj.getColumnSize();
                 }
 
@@ -333,17 +333,31 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     diff.setColumnSizeDiff(nextPreviousDiff);
                 }
             });
-            diffNextPrevious(next, previous, columnDiff, new NextPreviousDiffer<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
+            diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+                public String provide(Column obj) {
                     return obj.getDefaultValue();
+                }
+
+                @Override
+                public boolean isMatch(String next, String previous) {
+                    if (super.isMatch(next, previous)) {
+                        return true;
+                    }
+                    final boolean bothValid = next != null && previous != null;
+                    if (bothValid && getBasicProperties().isDatabaseH2()) {
+                        if (Srl.hasKeywordAllIgnoreCase("SYSTEM_SEQUENCE", next, previous)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
 
                 public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
                     diff.setDefaultValueDiff(nextPreviousDiff);
                 }
             });
-            diffNextPrevious(next, previous, columnDiff, new NextPreviousDiffer<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
+            diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
+                public Boolean provide(Column obj) {
                     return obj.isNotNull();
                 }
 
@@ -351,8 +365,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     diff.setNotNullDiff(nextPreviousDiff);
                 }
             });
-            diffNextPrevious(next, previous, columnDiff, new NextPreviousDiffer<Column, DfColumnDiff>() {
-                public Object provide(Column obj) {
+            diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
+                public Boolean provide(Column obj) {
                     return obj.isAutoIncrement();
                 }
 
@@ -376,12 +390,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected <ITEM> void diffNextPrevious(Column next, Column previous, DfColumnDiff diff,
-            NextPreviousDiffer<Column, DfColumnDiff> setupper) {
-        final Object nextValue = setupper.provide(next);
-        final Object previousValue = setupper.provide(previous);
-        if (!isSame(nextValue, previousValue)) {
-            setupper.diff(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
+    protected <ITEM, TYPE> void diffNextPrevious(Column next, Column previous, DfColumnDiff diff,
+            NextPreviousDiffer<Column, DfColumnDiff, TYPE> differ) {
+        final TYPE nextValue = differ.provide(next);
+        final TYPE previousValue = differ.provide(previous);
+        if (!differ.isMatch(nextValue, previousValue)) {
+            differ.diff(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
         }
     }
 
@@ -395,6 +409,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected void processPrimaryKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         final String nextName = nextTable.getPrimaryKeyConstraintName();
         final String previousName = previousTable.getPrimaryKeyConstraintName();
+        if (nextName == null && previousName == null) { // both no PK
+            return; // no changed
+        }
         if (!isSamePrimaryKeyName(nextName, previousName)) {
             if (nextName == null) { // deleted
                 tableDiff.addPrimaryKeyDiff(DfPrimaryKeyDiff.createDeleted(previousName));
@@ -409,7 +426,18 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
         }
         // found
-        final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createChanged(nextName);
+        final String constraintName;
+        if (nextName != null) {
+            constraintName = nextName;
+        } else {
+            constraintName = "(PK)";
+        }
+        final DfPrimaryKeyDiff primaryKeyDiff = DfPrimaryKeyDiff.createChanged(constraintName);
+        processPrimaryKeyColumnDiff(tableDiff, nextTable, previousTable, primaryKeyDiff, constraintName);
+    }
+
+    protected void processPrimaryKeyColumnDiff(DfTableDiff tableDiff, Table nextTable, Table previousTable,
+            DfPrimaryKeyDiff primaryKeyDiff, String constraintName) {
         final String nextColumn = nextTable.getPrimaryKeyNameCommaString();
         final String previousColumn = previousTable.getPrimaryKeyNameCommaString();
         if (!isSame(nextColumn, previousColumn)) {
@@ -425,22 +453,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         if (isSame(next, previous)) {
             return true;
         }
-        // treats as same about auto-generated name
-        final boolean bothValid = next != null && previous != null;
-        if (bothValid && getBasicProperties().isDatabaseOracle()) {
-            if (Srl.hasPrefixAllIgnoreCase("SYS_", next, previous)) {
-                return true;
-            }
-        }
-        if (bothValid && getBasicProperties().isDatabaseDB2()) {
-            if (Srl.hasPrefixAllIgnoreCase("SQL", next, previous)) {
-                return true;
-            }
-        }
-        if (bothValid && getBasicProperties().isDatabaseSQLServer()) {
-            if (Srl.hasPrefixAllIgnoreCase("PK__", next, previous)) {
-                return true;
-            }
+        if (isAutoGeneratedConstraintName(next, previous)) {
+            return true;
         }
         return false;
     }
@@ -493,7 +507,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         });
     }
 
-    protected static abstract class ForeignKeyDiffer implements ConstraintKeyDiffer<ForeignKey> {
+    protected abstract class ForeignKeyDiffer implements ConstraintKeyDiffer<ForeignKey> {
         public String constraintName(ForeignKey key) {
             return key.getName();
         }
@@ -505,6 +519,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
         public String column(ForeignKey key) {
             return key.getLocalColumnNameCommaString();
         }
+
+        public boolean isMatch(String next, String previous) {
+            return isSameForeignKeyName(next, previous);
+        }
+    }
+
+    protected boolean isSameForeignKeyName(String next, String previous) { // for extension
+        if (isSame(next, previous)) {
+            return true;
+        }
+        return false;
     }
 
     // -----------------------------------------------------
@@ -547,7 +572,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         });
     }
 
-    protected static abstract class UniqueKeyDiffer implements ConstraintKeyDiffer<Unique> {
+    protected abstract class UniqueKeyDiffer implements ConstraintKeyDiffer<Unique> {
         public String constraintName(Unique key) {
             return key.getName();
         }
@@ -569,6 +594,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             return sb.toString();
         }
+
+        public boolean isMatch(String next, String previous) {
+            return isSameUniqueKeyName(next, previous);
+        }
+    }
+
+    protected boolean isSameUniqueKeyName(String next, String previous) { // for extension
+        if (isSame(next, previous)) {
+            return true;
+        }
+        return false;
     }
 
     // -----------------------------------------------------
@@ -611,7 +647,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         });
     }
 
-    protected static abstract class IndexDiffer implements ConstraintKeyDiffer<Index> {
+    protected abstract class IndexDiffer implements ConstraintKeyDiffer<Index> {
         public String constraintName(Index key) {
             return key.getName();
         }
@@ -633,70 +669,94 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             return sb.toString();
         }
+
+        public boolean isMatch(String next, String previous) {
+            return isSameIndexName(next, previous);
+        }
+    }
+
+    protected boolean isSameIndexName(String next, String previous) { // for extension
+        if (isSame(next, previous)) {
+            return true;
+        }
+        return false;
     }
 
     // -----------------------------------------------------
     //                                    Constraint Process
     //                                    ------------------
-    protected <KEY> void processAddedConstraintKey(Table nextTable, Table previousTable,
-            ConstraintKeyDiffer<KEY> handler) {
-        final List<KEY> keyList = handler.keyList(nextTable);
+    protected <KEY> void processAddedConstraintKey(Table nextTable, Table previousTable, ConstraintKeyDiffer<KEY> differ) { // for except PK
+        final List<KEY> keyList = differ.keyList(nextTable);
         nextLoop: for (KEY nextKey : keyList) {
-            final String nextName = handler.constraintName(nextKey);
-            for (KEY previousKey : handler.keyList(previousTable)) {
-                final String previousName = handler.constraintName(previousKey);
-                if (isSame(nextName, previousName)) {
+            final String nextName = differ.constraintName(nextKey);
+            if (isAutoGeneratedConstraintName(nextName)) {
+                continue; // auto-generated name is out of target
+            }
+            for (KEY previousKey : differ.keyList(previousTable)) {
+                final String previousName = differ.constraintName(previousKey);
+                if (differ.isMatch(nextName, previousName)) {
                     continue nextLoop;
                 }
             }
             // added
-            handler.diff(nextKey, null, null);
+            differ.diff(nextKey, null, null);
         }
     }
 
     protected <KEY> void processChangedConstraintKey(Table nextTable, Table previousTable,
-            ConstraintKeyDiffer<KEY> differ) {
+            ConstraintKeyDiffer<KEY> differ) { // for except PK
         final List<KEY> keyList = differ.keyList(nextTable);
         final Map<String, KEY> previousMap = DfCollectionUtil.newLinkedHashMap();
         nextLoop: for (KEY nextKey : keyList) {
             final String nextName = differ.constraintName(nextKey);
             for (KEY previousKey : differ.keyList(previousTable)) {
                 final String previousName = differ.constraintName(previousKey);
-                if (isSame(nextName, previousName)) { // found
+                if (differ.isMatch(nextName, previousName)) { // found
                     previousMap.put(nextName, previousKey);
                     continue nextLoop;
                 }
             }
         }
         for (KEY nextKey : differ.keyList(nextTable)) {
-            final String nextName = differ.constraintName(nextKey);
-            final KEY previousKey = previousMap.get(nextName);
+            final String constraintName = differ.constraintName(nextKey);
+            if (isSkipChangedConstraintDiff(constraintName)) {
+                return;
+            }
+            final KEY previousKey = previousMap.get(constraintName);
             if (previousKey == null) {
                 continue;
             }
-            final String nextColumn = differ.column(nextKey);
-            final String previousColumn = differ.column(previousKey);
-            DfNextPreviousDiff columnDiff = null;
-            if (!isSame(nextColumn, previousColumn)) {
-                columnDiff = createNextPreviousDiff(nextColumn, previousColumn);
-            }
-            differ.diff(nextKey, previousKey, columnDiff);
+            processChangedConstraintColumnDiff(nextKey, previousKey, differ, constraintName);
         }
     }
 
+    protected <KEY> void processChangedConstraintColumnDiff(KEY nextKey, KEY previousKey,
+            ConstraintKeyDiffer<KEY> differ, String constraintName) {
+        final String nextColumn = differ.column(nextKey);
+        final String previousColumn = differ.column(previousKey);
+        DfNextPreviousDiff columnDiff = null;
+        if (!isSame(nextColumn, previousColumn)) {
+            columnDiff = createNextPreviousDiff(nextColumn, previousColumn);
+        }
+        differ.diff(nextKey, previousKey, columnDiff);
+    }
+
     protected <KEY> void processDeletedConstraintKey(Table nextTable, Table previousTable,
-            ConstraintKeyDiffer<KEY> handler) {
-        final List<KEY> keyList = handler.keyList(previousTable);
+            ConstraintKeyDiffer<KEY> differ) { // for except PK
+        final List<KEY> keyList = differ.keyList(previousTable);
         previousLoop: for (KEY previousKey : keyList) {
-            final String previousName = handler.constraintName(previousKey);
-            for (KEY nextKey : handler.keyList(nextTable)) {
-                final String nextName = handler.constraintName(nextKey);
-                if (isSame(nextName, previousName)) {
+            final String previousName = differ.constraintName(previousKey);
+            if (isAutoGeneratedConstraintName(previousName)) {
+                continue; // auto-generated name is out of target
+            }
+            for (KEY nextKey : differ.keyList(nextTable)) {
+                final String nextName = differ.constraintName(nextKey);
+                if (differ.isMatch(nextName, previousName)) {
                     continue previousLoop;
                 }
             }
             // deleted
-            handler.diff(null, previousKey, null);
+            differ.diff(null, previousKey, null);
         }
     }
 
@@ -707,7 +767,44 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
         String column(KEY key);
 
+        boolean isMatch(String next, String previous);
+
         void diff(KEY nextKey, KEY previousKey, DfNextPreviousDiff columnDiff);
+    }
+
+    protected boolean isAutoGeneratedConstraintName(String... names) { // for all constraints
+        if (names == null || names.length == 0) {
+            return false;
+        }
+        if (isDatabaseOracle()) {
+            if (Srl.hasPrefixAllIgnoreCase("SYS_", names)) {
+                return true;
+            }
+        }
+        if (isDatabaseDB2() || isDatabaseDerby()) {
+            if (Srl.hasPrefixAllIgnoreCase("SQL", names)) {
+                return true;
+            }
+        }
+        if (isDatabaseSQLServer()) {
+            if (Srl.hasPrefixAllIgnoreCase("PK__", names)) {
+                return true;
+            }
+        }
+        if (isDatabaseH2()) {
+            if (Srl.hasPrefixAllIgnoreCase("CONSTRAINT_", names)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isSkipChangedConstraintDiff(String constraintName) { // for all constraints
+        if (isDatabaseDerby() && isAutoGeneratedConstraintName(constraintName)) {
+            // because Derby switches columns by same name
+            return true;
+        }
+        return false;
     }
 
     // ===================================================================================
