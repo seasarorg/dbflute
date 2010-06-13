@@ -973,7 +973,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateLessThan()})
 
     /**
-     * LessThan(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -983,7 +983,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateGreaterEqual()})
 
     /**
-     * GreaterEqual(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -993,7 +993,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateLessEqual()})
 
     /**
-     * LessEqual(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
