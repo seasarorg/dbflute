@@ -23,6 +23,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public static final String KEY_FOREIGN_COLUMN_NAME = "foreignColumnName";
     public static final String KEY_FIXED_CONDITION = "fixedCondition";
     public static final String KEY_FIXED_SUFFIX = "fixedSuffix";
+    public static final String KEY_COMMENT = "comment";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -84,28 +85,28 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     // ===================================================================================
     //                                                                      Finding Helper
     //                                                                      ==============
-    public String findLocalTableName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+    public String findLocalTableName(String foreignKeyName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
         return componentMap.get(KEY_LOCAL_TABLE_NAME);
     }
 
-    public String findForeignTableName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+    public String findForeignTableName(String foreignKeyName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
         return componentMap.get(KEY_FOREIGN_TABLE_NAME);
     }
 
-    protected String findLocalColumnName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+    protected String findLocalColumnName(String foreignKeyName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
         return componentMap.get(KEY_LOCAL_COLUMN_NAME);
     }
 
-    protected String findForeignColumnName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+    protected String findForeignColumnName(String foreignKeyName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
         return componentMap.get(KEY_FOREIGN_COLUMN_NAME);
     }
 
-    public String findFixedCondition(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+    public String findFixedCondition(String foreignKeyName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
         String fixedCondition = componentMap.get(KEY_FIXED_CONDITION);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             // adjust a little about camel case
@@ -116,13 +117,18 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return fixedCondition;
     }
 
-    public String findFixedSuffix(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+    public String findFixedSuffix(String foreignKeyName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
         return componentMap.get(KEY_FIXED_SUFFIX);
     }
 
-    public List<String> findLocalColumnNameList(String foreignName) {
-        final String property = findLocalColumnName(foreignName);
+    public String findComment(String foreignKeyName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
+        return componentMap.get(KEY_COMMENT);
+    }
+
+    public List<String> findLocalColumnNameList(String foreignKeyName) {
+        final String property = findLocalColumnName(foreignKeyName);
         if (property == null || property.trim().length() == 0) {
             return null;
         }
@@ -134,8 +140,8 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return localColumnNameList;
     }
 
-    public List<String> findForeignColumnNameList(String foreignName) {
-        final String property = findForeignColumnName(foreignName);
+    public List<String> findForeignColumnNameList(String foreignKeyName) {
+        final String property = findForeignColumnName(foreignKeyName);
         if (property == null || property.trim().length() == 0) {
             return null;
         }

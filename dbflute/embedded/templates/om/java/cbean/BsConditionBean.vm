@@ -352,7 +352,7 @@ public class ${myClassName} extends AbstractConditionBean {
     }
     /**
      * Set up relation columns to select clause. <br />
-     * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+     * ${fk.foreignDispForJavaDoc}
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.<span style="color: #FD4747">setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})</span>; <span style="color: #3F7E5E">// ...().with[nested-relation]()</span>
@@ -394,7 +394,7 @@ public class ${myClassName} extends AbstractConditionBean {
     }
     /**
      * Set up relation columns to select clause. <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.<span style="color: #FD4747">setupSelect_${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// ...().with[nested-relation]()</span>
@@ -501,7 +501,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
         /**
          * Prepare to specify functions about relation table. <br />
-         * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+         * ${fk.foreignDispForJavaDocNest}
          * @return The instance for specification for relation table to specify. (NotNull)
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
@@ -528,7 +528,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         /**
          * Prepare to specify functions about relation table. <br />
-         * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+         * ${referrer.referrerDispAsOneForJavaDocNest}
          * @return The instance for specification for relation table to specify. (NotNull)
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
@@ -552,7 +552,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         /**
          * Prepare for '(Specify)DerivedReferrer'. <br />
-         * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+         * ${referrer.referrerDispForJavaDocNest}
          * <pre>
          * cb.specify().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.max(new SubQuery&lt;${tmpCBClassName}&gt;() {
          *     public void query(${tmpCBClassName} subCB) {

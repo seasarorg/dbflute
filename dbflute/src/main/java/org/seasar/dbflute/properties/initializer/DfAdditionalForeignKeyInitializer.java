@@ -33,6 +33,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The initializer of additional foreign key.
@@ -87,6 +88,7 @@ public class DfAdditionalForeignKeyInitializer {
     protected void processAllTableFK(String foreignKeyName, String foreignTableName, List<String> foreignColumnNameList) {
         final String fixedCondition = getFixedCondition(foreignKeyName);
         final String fixedSuffix = getFixedSuffix(foreignKeyName);
+        final String comment = getComment(foreignKeyName);
 
         // for check about same-column self reference
         final Table foreignTable = getTable(foreignTableName);
@@ -118,7 +120,7 @@ public class DfAdditionalForeignKeyInitializer {
 
             final String currentForeignKeyName = foreignKeyName + "_" + localTableName;
             setupForeignKeyToTable(currentForeignKeyName, foreignTableName, foreignColumnNameList, fixedCondition,
-                    localTable, localColumnNameList, fixedSuffix);
+                    localTable, localColumnNameList, fixedSuffix, comment);
             showResult(foreignTableName, foreignColumnNameList, fixedCondition, localTable, localColumnNameList);
         }
     }
@@ -128,6 +130,7 @@ public class DfAdditionalForeignKeyInitializer {
         assertLocalTable(foreignKeyName, localTableName);
         final String fixedCondition = getFixedCondition(foreignKeyName);
         final String fixedSuffix = getFixedSuffix(foreignKeyName);
+        final String comment = getComment(foreignKeyName);
         final Table table = getTable(localTableName);
         final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                 foreignColumnNameList, localTableName, true);
@@ -138,16 +141,16 @@ public class DfAdditionalForeignKeyInitializer {
             return;
         }
         setupForeignKeyToTable(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, table,
-                localColumnNameList, fixedSuffix);
+                localColumnNameList, fixedSuffix, comment);
         showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
     }
 
     protected void setupForeignKeyToTable(String foreignKeyName, String foreignTableName,
             List<String> foreignColumnNameList, String fixedCondition, Table table, List<String> localColumnNameList,
-            String fixedSuffix) {
+            String fixedSuffix, String comment) {
         // set up foreign key instance
         final ForeignKey fk = createAdditionalForeignKey(foreignKeyName, foreignTableName, localColumnNameList,
-                foreignColumnNameList, fixedCondition, fixedSuffix);
+                foreignColumnNameList, fixedCondition, fixedSuffix, comment);
         table.addForeignKey(fk);
 
         // set up referrer instance
@@ -175,7 +178,7 @@ public class DfAdditionalForeignKeyInitializer {
         // name is "FK_ + foreign + local" because it's reversed
         final String reverseName = "FK_" + foreignTable.getName() + table.getName();
         final ForeignKey fk = createAdditionalForeignKey(reverseName, table.getName(), foreignColumnNameList,
-                localColumnNameList, null, null);
+                localColumnNameList, null, null, null);
         for (String localColumnName : localColumnNameList) {
             final Column localColumn = table.getColumn(localColumnName);
             if (!localColumn.isPrimaryKey()) { // check PK just in case
@@ -198,17 +201,20 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected ForeignKey createAdditionalForeignKey(String foreignKeyName, String foreignTableName,
             List<String> localColumnNameList, List<String> foreignColumnNameList, String fixedCondition,
-            String fixedSuffix) {
+            String fixedSuffix, String comment) {
         final ForeignKey fk = new ForeignKey();
         fk.setName(foreignKeyName);
         fk.setForeignTableName(foreignTableName);
         fk.addReference(localColumnNameList, foreignColumnNameList);
         fk.setAdditionalForeignKey(true);
-        if (fixedCondition != null && fixedCondition.trim().length() > 0) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(fixedCondition)) {
             fk.setFixedCondition(fixedCondition);
         }
-        if (fixedSuffix != null && fixedSuffix.trim().length() > 0) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(fixedSuffix)) {
             fk.setFixedSuffix(fixedSuffix);
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+            fk.setComment(comment);
         }
         return fk;
     }
@@ -379,6 +385,10 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected String getFixedSuffix(String foreignKeyName) {
         return getProperties().findFixedSuffix(foreignKeyName);
+    }
+
+    protected String getComment(String foreignKeyName) {
+        return getProperties().findComment(foreignKeyName);
     }
 
     protected Map<String, Map<String, String>> getAdditionalForeignKeyMap() {

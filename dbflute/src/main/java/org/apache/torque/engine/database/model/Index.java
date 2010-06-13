@@ -177,6 +177,10 @@ public class Index {
         return false;
     }
 
+    public boolean isOnlyOneColumn() {
+        return _indexColumnMap.size() == 1;
+    }
+
     public boolean isTwoOrMoreColumn() {
         return _indexColumnMap.size() > 1;
     }

@@ -83,6 +83,7 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -1514,6 +1515,28 @@ public class Table {
         return _unices;
     }
 
+    public List<Unique> getOnlyOneColumnUniqueList() {
+        final List<Unique> uniqueList = getUniqueList();
+        final List<Unique> resultList = DfCollectionUtil.newArrayList();
+        for (Unique unique : uniqueList) {
+            if (unique.isOnlyOneColumn()) {
+                resultList.add(unique);
+            }
+        }
+        return resultList;
+    }
+
+    public List<Unique> getTwoOrMoreColumnUniqueList() {
+        final List<Unique> uniqueList = getUniqueList();
+        final List<Unique> resultList = DfCollectionUtil.newArrayList();
+        for (Unique unique : uniqueList) {
+            if (unique.isTwoOrMoreColumn()) {
+                resultList.add(unique);
+            }
+        }
+        return resultList;
+    }
+
     /**
      * Adds a new Unique to the Unique list and set the
      * parent table of the column to the current table
@@ -1554,6 +1577,29 @@ public class Table {
 
     public List<Index> getIndexList() {
         return _indices;
+    }
+
+    public List<Index> getOnlyOneColumnIndexList() {
+        final List<Index> indexList = getIndexList();
+        final List<Index> resultList = DfCollectionUtil.newArrayList();
+        for (Index index : indexList) {
+            if (index.isOnlyOneColumn()) {
+                resultList.add(index);
+            }
+        }
+        return resultList;
+
+    }
+
+    public List<Index> getTwoOrMoreColumnIndexList() {
+        final List<Index> indexList = getIndexList();
+        final List<Index> resultList = DfCollectionUtil.newArrayList();
+        for (Index index : indexList) {
+            if (index.isTwoOrMoreColumn()) {
+                resultList.add(index);
+            }
+        }
+        return resultList;
     }
 
     /**

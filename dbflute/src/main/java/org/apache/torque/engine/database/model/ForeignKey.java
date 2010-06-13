@@ -71,10 +71,12 @@ import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -89,22 +91,24 @@ public class ForeignKey {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String _name;
+    protected String _name; // constraint name (no change because it's used by templates)
 
-    private Table _localTable;
-    private String _foreignTableName;
+    protected Table _localTable;
+    protected String _foreignTableName;
 
-    private final List<String> _localColumns = new ArrayList<String>(3);
-    private final List<String> _foreignColumns = new ArrayList<String>(3);
+    protected String _fixedCondition;
+    protected String _fixedSuffix;
+    protected String _comment;
+
+    protected boolean _additionalForeignKey;
+    protected String _foreignPropertyNamePrefix;
+
+    protected final List<String> _localColumns = new ArrayList<String>(3);
+    protected final List<String> _foreignColumns = new ArrayList<String>(3);
 
     protected final Map<String, String> _localForeignMap = StringKeyMap.createAsFlexibleOrdered();
     protected final Map<String, String> _foreignLocalMap = StringKeyMap.createAsFlexibleOrdered();
-
-    private String _foreignPropertyNamePrefix;
-    private boolean _additionalForeignKey;
-    private String _fixedCondition;
-    private String _fixedSuffix;
-    private final Map<String, String> _dynamicFixedConditionMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, String> _dynamicFixedConditionMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                                Load
@@ -286,8 +290,24 @@ public class ForeignKey {
     }
 
     // ===================================================================================
-    //                                                     Get Columns & ColumnList Method
-    //                                                     ===============================
+    //                                                                               Table
+    //                                                                               =====
+    /**
+     * Get foreign table.
+     * @return Foreign table.
+     */
+    public Table getForeignTable() {
+        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
+        if (foreignTable == null) {
+            String msg = "The database does not contain the foreign table name: " + getForeignTableName();
+            throw new IllegalStateException(msg);
+        }
+        return foreignTable;
+    }
+
+    // ===================================================================================
+    //                                                                              Column
+    //                                                                              ======
     // -----------------------------------------------------
     //                                         Local Element
     //                                         -------------
@@ -420,27 +440,17 @@ public class ForeignKey {
         return resultList;
     }
 
-    /**
-     * Get foreign table.
-     * @return Foreign table.
-     */
-    public Table getForeignTable() {
-        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
-        if (foreignTable == null) {
-            String msg = "The database does not contain the foreign table name: " + getForeignTableName();
-            throw new IllegalStateException(msg);
-        }
-        return foreignTable;
-    }
-
     public Column getForeignColumnByLocalColumn(Column localColumn) {
         final String foreignColumnName = getLocalForeignMapping().get(localColumn.getName());
         return getForeignTable().getColumn(foreignColumnName);
     }
 
     // ==========================================================================================
-    //                                                                  Get Column Mapping Method
-    //                                                                  =========================
+    //                                                                             Column Mapping
+    //                                                                             ==============
+    // -----------------------------------------------------
+    //                                               Mapping
+    //                                               -------
     public Map<String, String> getLocalForeignMapping() {
         return _localForeignMap;
     }
@@ -449,9 +459,9 @@ public class ForeignKey {
         return _foreignLocalMap;
     }
 
-    // ==========================================================================================
-    //                                                                     Generate String Method
-    //                                                                     ======================
+    // -----------------------------------------------------
+    //                                       String Accessor
+    //                                       ---------------
     /**
      * Returns a comma delimited string of local column names
      * @return Generated string.
@@ -1058,6 +1068,87 @@ public class ForeignKey {
     }
 
     // ===================================================================================
+    //                                                                             Display
+    //                                                                             =======
+    public String getForeignDispForJavaDoc() {
+        return doGetForeignDispForJavaDoc("    ");
+    }
+
+    public String getForeignDispForJavaDocNest() {
+        return doGetForeignDispForJavaDoc("        ");
+    }
+
+    public String doGetForeignDispForJavaDoc(String indent) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getForeignSimpleDisp()).append(".");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
+            final String comment = getDocumentProperties().resolveTextForJavaDoc(_comment, indent);
+            sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
+        }
+        return sb.toString();
+    }
+
+    public String getForeignSimpleDisp() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getForeignTable().getAliasExpression());
+        sb.append(getForeignTable().getName());
+        sb.append(" as '").append(getForeignJavaBeansRulePropertyName()).append("'");
+        return sb.toString();
+    }
+
+    public String getReferrerDispAsOneForJavaDoc() {
+        return doGetReferrerDispAsOneForJavaDoc("    ");
+    }
+
+    public String getReferrerDispAsOneForJavaDocNest() {
+        return doGetReferrerDispAsOneForJavaDoc("        ");
+    }
+
+    public String doGetReferrerDispAsOneForJavaDoc(String indent) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getReferrerSimpleDispAsOne()).append(".");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
+            final String comment = getDocumentProperties().resolveTextForJavaDoc(_comment, indent);
+            sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
+        }
+        return sb.toString();
+    }
+
+    public String getReferrerSimpleDispAsOne() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getTable().getAliasExpression());
+        sb.append(getTable().getName());
+        sb.append(" as '").append(getReferrerJavaBeansRulePropertyNameAsOne()).append("'");
+        return sb.toString();
+    }
+
+    public String getReferrerDispForJavaDoc() {
+        return doGetReferrerDispForJavaDoc("    ");
+    }
+
+    public String getReferrerDispForJavaDocNest() {
+        return doGetReferrerDispForJavaDoc("        ");
+    }
+
+    public String doGetReferrerDispForJavaDoc(String indent) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getReferrerSimpleDisp()).append(".");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
+            final String comment = getDocumentProperties().resolveTextForJavaDoc(_comment, indent);
+            sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
+        }
+        return sb.toString();
+    }
+
+    public String getReferrerSimpleDisp() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getTable().getAliasExpression());
+        sb.append(getTable().getName());
+        sb.append(" as '").append(getReferrerJavaBeansRulePropertyName()).append("'");
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {
@@ -1072,6 +1163,10 @@ public class ForeignKey {
         return Srl.initUncap(str);
     }
 
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
+    }
+
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
@@ -1081,6 +1176,10 @@ public class ForeignKey {
 
     protected DfClassificationProperties getClassificationProperties() {
         return DfBuildProperties.getInstance().getClassificationProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return DfBuildProperties.getInstance().getDocumentProperties();
     }
 
     // ===================================================================================
@@ -1178,5 +1277,13 @@ public class ForeignKey {
 
     public void setFixedSuffix(String fixedSuffix) {
         this._fixedSuffix = fixedSuffix;
+    }
+
+    public String getComment() {
+        return _comment;
+    }
+
+    public void setComment(String comment) {
+        this._comment = comment;
     }
 }

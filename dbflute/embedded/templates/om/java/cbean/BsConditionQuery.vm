@@ -482,7 +482,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
     /**
      * Get the condition-query for relation table. <br />
-     * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+     * ${fk.foreignDispForJavaDoc}
 #if ($fk.hasDynamicFixedCondition())
      * ${fk.dynamicFixedConditionArgsJavaDocString}
 #end
@@ -544,7 +544,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (${referrer.isOneToOne()})
     /**
      * Get the condition-query for relation table. <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @return The instance of condition-query. (NotNull)
      */
     public ${relatedCQClassName} query${referrer.referrerPropertyNameInitCapAsOne}() {

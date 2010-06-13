@@ -579,9 +579,23 @@ public class Column {
             plugDelimiterIfNeeds(sb);
             sb.append("ID");
         }
-        if (isUnique()) {
+        if (hasTopColumnUnique()) {
             plugDelimiterIfNeeds(sb);
             sb.append("UQ");
+        } else {
+            if (isUnique()) {
+                plugDelimiterIfNeeds(sb);
+                sb.append("UQ+");
+            }
+        }
+        if (hasTopColumnIndex()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("IDX");
+        } else {
+            if (hasIndex()) {
+                plugDelimiterIfNeeds(sb);
+                sb.append("IDX+");
+            }
         }
         if (isNotNull()) {
             plugDelimiterIfNeeds(sb);
@@ -1019,22 +1033,33 @@ public class Column {
     }
 
     public boolean hasOnlyOneColumnUnique() {
-        final List<Unique> uniqueList = getTable().getUniqueList();
+        final List<Unique> uniqueList = getTable().getOnlyOneColumnUniqueList();
         for (Unique unique : uniqueList) {
-            if (!unique.isTwoOrMoreColumn()) {
-                if (unique.hasSameColumn(this)) {
-                    return true;
-                }
+            if (unique.hasSameColumn(this)) {
+                return true;
             }
         }
         return false;
     }
 
     public boolean hasTwoOrMoreColumnUnique() {
-        final List<Unique> uniqueList = getTable().getUniqueList();
+        final List<Unique> uniqueList = getTable().getTwoOrMoreColumnUniqueList();
         for (Unique unique : uniqueList) {
-            if (unique.isTwoOrMoreColumn()) {
-                if (unique.hasSameColumn(this)) {
+            if (unique.hasSameColumn(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasTopColumnUnique() {
+        if (hasOnlyOneColumnUnique()) {
+            return true;
+        }
+        if (hasTwoOrMoreColumnUnique()) {
+            final List<Unique> uniqueList = getTable().getTwoOrMoreColumnUniqueList();
+            for (Unique unique : uniqueList) {
+                if (unique.hasSameFirstColumn(this)) {
                     return true;
                 }
             }
@@ -1104,22 +1129,33 @@ public class Column {
     }
 
     public boolean hasOnlyOneColumnIndex() {
-        final List<Index> indexList = getTable().getIndexList();
+        final List<Index> indexList = getTable().getOnlyOneColumnIndexList();
         for (Index index : indexList) {
-            if (!index.isTwoOrMoreColumn()) {
-                if (index.hasSameColumn(this)) {
-                    return true;
-                }
+            if (index.hasSameColumn(this)) {
+                return true;
             }
         }
         return false;
     }
 
     public boolean hasTwoOrMoreColumnIndex() {
-        final List<Index> indexList = getTable().getIndexList();
+        final List<Index> indexList = getTable().getTwoOrMoreColumnIndexList();
         for (Index index : indexList) {
-            if (index.isTwoOrMoreColumn()) {
-                if (index.hasSameColumn(this)) {
+            if (index.hasSameColumn(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasTopColumnIndex() {
+        if (hasOnlyOneColumnIndex()) {
+            return true;
+        }
+        if (hasTwoOrMoreColumnIndex()) {
+            final List<Index> indexList = getTable().getTwoOrMoreColumnIndexList();
+            for (Index index : indexList) {
+                if (index.hasSameFirstColumn(this)) {
                     return true;
                 }
             }
