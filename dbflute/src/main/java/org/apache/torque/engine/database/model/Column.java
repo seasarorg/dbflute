@@ -590,11 +590,11 @@ public class Column {
         }
         if (hasTopColumnIndex()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("IDX");
+            sb.append("IX");
         } else {
             if (hasIndex()) {
                 plugDelimiterIfNeeds(sb);
-                sb.append("IDX+");
+                sb.append("IX+");
             }
         }
         if (isNotNull()) {
