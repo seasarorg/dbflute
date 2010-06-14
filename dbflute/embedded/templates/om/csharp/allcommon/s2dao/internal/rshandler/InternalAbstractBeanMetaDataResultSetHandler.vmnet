@@ -89,7 +89,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return realColumnSet;
         }
 
-        protected Map<String, int> GetSelectIndexReverseMap() { // ResourceContext in Java
+        protected Map<String, int?> GetSelectIndexReverseMap() { // ResourceContext in Java
             if (!${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
                 return null;
             }
