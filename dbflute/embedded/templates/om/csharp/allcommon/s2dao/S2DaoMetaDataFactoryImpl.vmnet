@@ -412,7 +412,8 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected Object GetValue(IDataReader rs, String columnName, IValueType valueType,
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
-            int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
+            // lower because of @see AbstractSqlClause
+            int? selectIndex = selectIndexMap != null ? selectIndexMap.get(columnName.ToLower()) : null;
             if (selectIndex != null) {
                 return valueType.GetValue(rs, selectIndex.Value);
             } else {
@@ -599,7 +600,8 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected Object GetValue(IDataReader rs, String columnName, IValueType valueType,
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
-            int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
+            // lower because of @see AbstractSqlClause
+            int? selectIndex = selectIndexMap != null ? selectIndexMap.get(columnName.ToLower()) : null;
             if (selectIndex != null) {
                 return valueType.GetValue(rs, selectIndex.Value);
             } else {
