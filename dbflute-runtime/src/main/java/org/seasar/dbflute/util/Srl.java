@@ -341,11 +341,17 @@ public class Srl {
         assertStringNotNull(str);
         assertFromStringNotNull(fromStr);
         assertToStringNotNull(toStr);
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = null; // lazy load
         int pos = 0;
         int pos2 = 0;
         do {
             pos = str.indexOf(fromStr, pos2);
+            if (pos2 == 0 && pos < 0) { // first loop and not found
+                return str; // without creating StringBuilder 
+            }
+            if (sb == null) {
+                sb = new StringBuilder();
+            }
             if (pos == 0) {
                 sb.append(toStr);
                 pos2 = fromStr.length();
@@ -353,7 +359,7 @@ public class Srl {
                 sb.append(str.substring(pos2, pos));
                 sb.append(toStr);
                 pos2 = pos + fromStr.length();
-            } else {
+            } else { // (pos < 0) second or after loop only
                 sb.append(str.substring(pos2));
                 return sb.toString();
             }

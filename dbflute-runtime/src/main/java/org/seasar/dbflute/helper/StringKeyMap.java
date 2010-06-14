@@ -44,17 +44,17 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     protected final Map<String, VALUE> _plainMap; // invalid if concurrent
     protected final Map<String, String> _searchPlainKeyMap; // same life-cycle as plainMap
 
-    protected boolean _removeUnderscore;
+    protected boolean _flexible;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected StringKeyMap(boolean removeUnderscore, boolean order, boolean concurrent) {
+    protected StringKeyMap(boolean flexible, boolean order, boolean concurrent) {
         if (order && concurrent) {
             String msg = "The 'order' and 'concurrent' should not be both true at the same time!";
             throw new IllegalStateException(msg);
         }
-        _removeUnderscore = removeUnderscore;
+        _flexible = flexible;
         if (concurrent) {
             _searchMap = newConcurrentHashMap();
             _plainMap = null; // invalid if concurrent
@@ -266,12 +266,17 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
         if (!(key instanceof String)) {
             return null;
         }
-        return toLowerCase(removeUnderscore((String) key));
+        return toLowerCase(removeConnector((String) key));
     }
 
-    protected String removeUnderscore(String value) {
-        if (_removeUnderscore) {
-            return replace(value, "_", "");
+    protected String removeConnector(String value) {
+        if (_flexible) {
+            // a main target mark when flexible
+            value = replace(value, "_", "");
+
+            // non-compilable marks in Java
+            value = replace(value, "-", "");
+            value = replace(value, " ", "");
         }
         return value;
     }
@@ -284,10 +289,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String replace(String text, String fromText, String toText) {
-        if (text == null || fromText == null || toText == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         int pos = 0;
         int pos2 = 0;
         while (true) {

@@ -302,7 +302,7 @@ public class StringKeyMapTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                                Normal
     //                                                ------
-    public void test_createAsFlexible() throws Exception {
+    public void test_createAsFlexible_basic() throws Exception {
         // ## Arrange ##
         StringKeyMap<Object> map = StringKeyMap.createAsFlexible();
 
@@ -316,6 +316,12 @@ public class StringKeyMapTest extends PlainTestCase {
         assertEquals(2, map.get("Bbb"));
         assertEquals(3, map.get("CCC"));
         assertEquals(1, map.get("Aa_A"));
+        assertEquals(1, map.get("Aa__A"));
+        assertEquals(1, map.get("Aa A"));
+        assertEquals(1, map.get("Aa-A"));
+        assertNull(map.get("Aa$A"));
+        assertNull(map.get("Aa@A"));
+        assertNull(map.get("Aa&A"));
         log(map.keySet());
     }
 
