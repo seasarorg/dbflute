@@ -73,7 +73,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 string columnName = (string) row["ColumnName"];
                 columnSet.Add(columnName);
             }
-            Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
+            Map<String, String> selectIndexReverseMap = GetSelectIndexReverseMap();
             if (selectIndexReverseMap == null) {
                 return columnSet;
             }
@@ -89,7 +89,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return realColumnSet;
         }
 
-        protected Map<String, int?> GetSelectIndexReverseMap() { // ResourceContext in Java
+        protected Map<String, String> GetSelectIndexReverseMap() { // ResourceContext in Java
             if (!${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
                 return null;
             }

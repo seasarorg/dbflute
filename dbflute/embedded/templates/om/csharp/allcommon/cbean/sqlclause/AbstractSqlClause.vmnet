@@ -485,7 +485,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         // must be case insensitive because it treats result set column
         // (and it does not need to be ordered)
         // but it uses lower-case keys because of no case insensitive (java-like) map in DBFlute.NET
-        return new HashMap<String, int?>;
+        return new HashMap<String, int?>();
     }
 
     public Map<String, String> getSelectIndexReverseMap() {

@@ -369,7 +369,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 row = dbmeta.NewEntity();
             } else {
                 row = NewBean(beanType);
-                dbmeta = FindDBMeta(row);
+                dbmeta = FindCachedDBMeta(row);
             }
             try {
                 if (dbmeta != null) {
@@ -378,9 +378,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                         propertyName = column.PropertyInfo.Name;
                         selectedValue = GetValue(reader, columnName, column.ValueType, selectIndexMap);
                         if (dbmeta.HasEntityPropertySetupper(propertyName)) {
-                            dbmeta.SetupEntityProperty(propertyName, row, value);
+                            dbmeta.SetupEntityProperty(propertyName, row, selectedValue);
                         } else {
-                            column.PropertyInfo.SetValue(row, value, null);
+                            column.PropertyInfo.SetValue(row, selectedValue, null);
                         }
                     }
                 } else {
@@ -388,7 +388,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                         columnName = column.ColumnName;
                         propertyName = column.PropertyInfo.Name;
                         selectedValue = GetValue(reader, columnName, column.ValueType, selectIndexMap);
-                        column.PropertyInfo.SetValue(row, value, null);
+                        column.PropertyInfo.SetValue(row, selectedValue, null);
                     }
                 }
                 return row;
@@ -414,7 +414,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
             int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
             if (selectIndex != null) {
-                return valueType.GetValue(rs, selectIndex);
+                return valueType.GetValue(rs, selectIndex.Value);
             } else {
                 return valueType.GetValue(rs, columnName);
             }
@@ -601,7 +601,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
             int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
             if (selectIndex != null) {
-                return valueType.GetValue(rs, selectIndex);
+                return valueType.GetValue(rs, selectIndex.Value);
             } else {
                 return valueType.GetValue(rs, columnName);
             }

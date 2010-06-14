@@ -52,7 +52,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 // they are unnecessary to do relation loop!
                 skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
             }
-            Map<String, int> selectIndexMap = GetSelectIndexMap();
+            Map<String, int?> selectIndexMap = GetSelectIndexMap();
 
             while (dataReader.Read()) {
                 if (columnNames == null) {
@@ -89,7 +89,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
                     Object relationRow = null;
                     System.Collections.Hashtable relKeyValues = new System.Collections.Hashtable();
-                    RelationKey relKey = CreateRelationKey(dataReader, rpt, columnNames, relKeyValues);
+                    RelationKey relKey = CreateRelationKey(dataReader, rpt, columnNames, relKeyValues, selectIndexMap);
                     if (relKey != null) {
                         relationRow = relRowCache.GetRelationRow(i, relKey);
                         if (relationRow == null) {
@@ -112,7 +112,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
         protected RelationKey CreateRelationKey(IDataReader reader, IRelationPropertyType rpt
                 , System.Collections.IList columnNames, System.Collections.Hashtable relKeyValues
-                , Map<String, int> selectIndexMap) {
+                , Map<String, int?> selectIndexMap) {
             System.Collections.ArrayList keyList = new System.Collections.ArrayList();
             IBeanMetaData bmd = rpt.BeanMetaData;
             for (int i = 0; i < rpt.KeySize; ++i) {
@@ -134,7 +134,6 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 } else {
                     value = valueType.GetValue(reader, columnName);
                 }
-                object value = valueType.GetValue(reader, columnName);
                 if (value == null) {
                     // reachable when the referred column data is null
                     // (treated as no relation data)
@@ -162,8 +161,8 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         }
 
         protected Object GetValue(IDataReader rs, String columnName, IValueType valueType,
-                Map<String, int> selectIndexMap) { // ResourceContext in Java
-            int selectIndex = selectIndexMap.get(columnName);
+                Map<String, int?> selectIndexMap) { // ResourceContext in Java
+            int? selectIndex = selectIndexMap.get(columnName);
             if (selectIndex != null) {
                 return valueType.GetValue(rs, selectIndex);
             } else {
