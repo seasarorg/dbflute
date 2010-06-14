@@ -50,7 +50,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected Map<String, String> _specifiedDeriveSubQueryMap;
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
-    protected Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>();// Without linked!
+    protected Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>(); // order no needed
 
     /** The type of select clause. (NotNull) */
     protected SelectClauseType _selectClauseType = DEFAULT_SELECT_CLAUSE_TYPE;
@@ -304,7 +304,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
-        int selectIndex = 0;
+        int selectIndex = -1; // because 0 origin in ADO.NET
         if (_useSelectIndex) {
             _selectIndexMap = createSelectIndexMap();
         }
@@ -348,7 +348,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 onQueryName = columnName;
             }
             sb.append(realColumnName).append(" as ").append(onQueryName);
-            _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
+            _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
         }
         
         // Columns of foreign tables.
@@ -372,7 +372,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 String onQueryName;
                 ++selectIndex;
                 if (_useSelectIndex) {
-                    _selectIndexMap.put(columnAliasName, selectIndex);
+                    _selectIndexMap.put(columnAliasName.ToLower(), selectIndex); // lower because of case sensitive map
                     onQueryName = buildSelectIndexAliasName(selectIndex);
                 } else {
                     onQueryName = columnAliasName;
@@ -382,7 +382,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                     finishedForeignIndent = true;
                 }
                 sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
-                _selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
+                _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
             }
         }
 
@@ -689,7 +689,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         String orderByClause = null;
         if (hasUnionQuery()) {
             if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.isEmpty()) {
-                String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: " + toString();
+                String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists.";
                 throw new IllegalStateException(msg);
             }
             orderByClause = _orderByClause.getOrderByClause(_selectClauseRealColumnAliasMap);

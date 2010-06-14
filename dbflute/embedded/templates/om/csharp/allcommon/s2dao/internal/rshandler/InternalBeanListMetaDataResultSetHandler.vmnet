@@ -162,11 +162,9 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
         protected Object GetValue(IDataReader rs, String columnName, IValueType valueType,
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
-            int? selectIndex = selectIndexMap.get(columnName);
+            int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
             if (selectIndex != null) {
-                // it does not work if it uses an index (@see InternalRowCreator)
-                String labelName = "c" + selectIndex.Value;
-                return valueType.GetValue(rs, labelName);
+                return valueType.GetValue(rs, selectIndex.Value);
             } else {
                 return valueType.GetValue(rs, columnName);
             }
