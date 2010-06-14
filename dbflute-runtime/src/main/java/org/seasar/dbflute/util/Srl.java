@@ -980,7 +980,6 @@ public class Srl {
     public static boolean isSingleQuoted(String str) {
         assertStringNotNull(str);
         return str.length() > 1 && str.startsWith("'") && str.endsWith("'");
-
     }
 
     public static boolean isDoubleQuoted(String str) {

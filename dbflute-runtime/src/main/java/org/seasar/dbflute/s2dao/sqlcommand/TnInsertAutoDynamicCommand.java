@@ -78,7 +78,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
             }
             sb.append(columnName);
         }
-        sb.append(")").append(getLineSeparator()).append(" values (");
+        sb.append(")").append(ln()).append(" values (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             if (i > 0) {
                 sb.append(", ");
@@ -98,12 +98,12 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
             String msg = "The property name was not found in the bean: " + bean;
             throw new IllegalStateException(msg);
         }
-        List<TnPropertyType> types = new ArrayList<TnPropertyType>();
+        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
 
         for (int i = 0; i < propertyNames.length; ++i) {
-            TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
+            final TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
                 final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(pt.getPropertyName());
                 if (!generator.isSelfGenerate()) {
@@ -124,14 +124,13 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
             String msg = "The target property type was not found in the bean: " + bean;
             throw new IllegalStateException(msg);
         }
-        TnPropertyType[] propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
-        return propertyTypes;
+        return (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
     }
 
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 

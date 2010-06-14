@@ -47,6 +47,7 @@ public class ColumnInfo {
     //                                                                           =========
     protected final DBMeta _dbmeta;
     protected final String _columnDbName;
+    protected final String _columnSqlName;
     protected final String _columnAlias;
     protected final boolean _notNull;
     protected final String _propertyName;
@@ -66,17 +67,19 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, boolean notNull, String propertyName,
-            Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
-            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, List<String> foreignPropList, List<String> referrerPropList,
-            ClassificationMeta classificationMeta) {
+    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnSqlName, String columnAlias, boolean notNull,
+            String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType,
+            Integer columnSize, Integer columnDecimalDigits, boolean commonColumn,
+            OptimisticLockType optimisticLockType, String columnComment, List<String> foreignPropList,
+            List<String> referrerPropList, ClassificationMeta classificationMeta) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
+        assertObjectNotNull("columnSqlName", columnSqlName);
         assertObjectNotNull("propertyName", propertyName);
         assertObjectNotNull("propertyType", propertyType);
         this._dbmeta = dbmeta;
         this._columnDbName = columnDbName;
+        this._columnSqlName = columnSqlName;
         this._columnAlias = columnAlias;
         this._notNull = notNull;
         this._propertyName = propertyName;
@@ -225,6 +228,14 @@ public class ColumnInfo {
      */
     public String getColumnDbName() {
         return this._columnDbName;
+    }
+
+    /**
+     * Get the SQL name of the column.
+     * @return The SQL name of the column. (NotNull)
+     */
+    public String getColumnSqlName() {
+        return this._columnSqlName;
     }
 
     /**

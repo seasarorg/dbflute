@@ -75,7 +75,7 @@ public interface WhereClauseSimpleFilter {
                 return toEmbedded(clauseElement);
             }
             for (ColumnInfo columnInfo : _filterTargetColumnInfoSet) {
-                if (isTargetClause(clauseElement, columnInfo.getColumnDbName())) {
+                if (isTargetClause(clauseElement, columnInfo.getColumnSqlName())) {
                     return toEmbedded(clauseElement);
                 }
             }

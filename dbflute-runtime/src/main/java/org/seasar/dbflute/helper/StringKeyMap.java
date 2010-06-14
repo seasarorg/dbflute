@@ -270,7 +270,18 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     protected String removeConnector(String value) {
+        if (value == null) {
+            return null;
+        }
         if (_flexible) {
+            // both side quotations
+            if (isSingleQuoted(value)) {
+                value = unquoteSingle(value);
+            }
+            if (isDoubleQuoted(value)) {
+                value = unquoteDouble(value);
+            }
+
             // a main target mark when flexible
             value = replace(value, "_", "");
 
@@ -288,25 +299,52 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected static String replace(String text, String fromText, String toText) {
-        final StringBuilder sb = new StringBuilder();
+    protected static String replace(String str, String fromStr, String toStr) { // copy from Srl 
+        StringBuilder sb = null; // lazy load
         int pos = 0;
         int pos2 = 0;
-        while (true) {
-            pos = text.indexOf(fromText, pos2);
-            if (pos == 0) {
-                sb.append(toText);
-                pos2 = fromText.length();
-            } else if (pos > 0) {
-                sb.append(text.substring(pos2, pos));
-                sb.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                sb.append(text.substring(pos2));
-                break;
+        do {
+            pos = str.indexOf(fromStr, pos2);
+            if (pos2 == 0 && pos < 0) { // first loop and not found
+                return str; // without creating StringBuilder 
             }
+            if (sb == null) {
+                sb = new StringBuilder();
+            }
+            if (pos == 0) {
+                sb.append(toStr);
+                pos2 = fromStr.length();
+            } else if (pos > 0) {
+                sb.append(str.substring(pos2, pos));
+                sb.append(toStr);
+                pos2 = pos + fromStr.length();
+            } else { // (pos < 0) second or after loop only
+                sb.append(str.substring(pos2));
+                return sb.toString();
+            }
+        } while (true);
+    }
+
+    public static boolean isSingleQuoted(String str) {
+        return str.length() > 1 && str.startsWith("'") && str.endsWith("'");
+    }
+
+    public static boolean isDoubleQuoted(String str) {
+        return str.length() > 1 && str.startsWith("\"") && str.endsWith("\"");
+    }
+
+    public static String unquoteSingle(String str) {
+        if (!isSingleQuoted(str)) {
+            return str;
         }
-        return sb.toString();
+        return str.substring("'".length(), str.length() - "'".length());
+    }
+
+    public static String unquoteDouble(String str) {
+        if (!isDoubleQuoted(str)) {
+            return str;
+        }
+        return str.substring("\"".length(), str.length() - "\"".length());
     }
 
     protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {

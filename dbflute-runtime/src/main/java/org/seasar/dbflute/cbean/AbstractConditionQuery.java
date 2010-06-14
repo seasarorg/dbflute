@@ -33,6 +33,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
@@ -798,7 +799,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 msg = msg + " table=" + subQuery.getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
-            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
             final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
                     + relatedColumnName + ", " + deriveColumnName;
             final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
@@ -901,7 +902,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 msg = msg + " table=" + subQuery.getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
-            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
             final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
                     + relatedColumnName + ", " + deriveColumnName;
             final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
@@ -1013,7 +1014,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             msg = msg + " table=" + subQuery.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
         if (subQuery.getSqlClause().hasUnionQuery()) {
             final String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
             final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
@@ -1151,21 +1152,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
             String colName) {
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final String propertyName = dbmeta.findPropertyName(colName);
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(colName);
+        final String columnSqlName = columnInfo.getColumnSqlName();
+        final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
+        getSqlClause().registerWhereClause(getRealColumnName(columnSqlName), key, cvalue);
     }
 
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
             String colName, ConditionOption option) {
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final String propertyName = dbmeta.findPropertyName(colName);
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(colName);
+        final String columnSqlName = columnInfo.getColumnSqlName();
+        final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
+        getSqlClause().registerWhereClause(getRealColumnName(columnSqlName), key, cvalue, option);
     }
 
     protected void registerWhereClause(String whereClause) {

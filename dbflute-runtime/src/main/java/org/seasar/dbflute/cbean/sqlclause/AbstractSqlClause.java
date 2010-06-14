@@ -384,7 +384,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         // Columns of local table.
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
-            final String columnName = columnInfo.getColumnDbName();
+            final String columnName = columnInfo.getColumnSqlName();
 
             // [DBFlute-0.7.4]
             if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
@@ -2252,7 +2252,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final String aliasName = getLocalTableAliasName();
         final DBMeta dbmeta = getDBMeta();
         final String tableSqlName = dbmeta.getTableSqlName();
-        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
 
@@ -2270,10 +2270,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         for (Entry<String, String> entry : entrySet) {
             final String columnName = entry.getKey();
             final String parameter = entry.getValue();
+            final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
+            final String columnSqlName = columnInfo.getColumnSqlName();
             if (index == 0) {
-                sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
+                sb.append("   set ").append(columnSqlName).append(" = ").append(parameter).append(ln);
             } else {
-                sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln);
+                sb.append("     , ").append(columnSqlName).append(" = ").append(parameter).append(ln);
             }
             ++index;
         }
@@ -2312,7 +2314,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final String aliasName = getLocalTableAliasName();
         final DBMeta dbmeta = getDBMeta();
         final String tableSqlName = dbmeta.getTableSqlName();
-        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
 

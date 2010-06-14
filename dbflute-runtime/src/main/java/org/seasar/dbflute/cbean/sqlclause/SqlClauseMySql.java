@@ -187,7 +187,7 @@ public class SqlClauseMySql extends AbstractSqlClause {
                 msg = msg + " type=" + propertyType + " column=" + columnInfo;
                 throw new IllegalArgumentException(msg);
             }
-            String columnDbName = columnInfo.getColumnDbName();
+            String columnDbName = columnInfo.getColumnSqlName();
             if (index > 0) {
                 sb.append(",");
             }

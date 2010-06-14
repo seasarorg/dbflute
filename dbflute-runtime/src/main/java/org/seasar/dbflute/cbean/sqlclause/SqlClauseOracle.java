@@ -127,10 +127,10 @@ public class SqlClauseOracle extends AbstractSqlClause {
     public SqlClause lockForUpdate() {
         final DBMeta dbmeta = findDBMeta(_tableDbName);
         if (dbmeta.hasPrimaryKey()) {
-            final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + primaryKeyColumnName;
         } else {
-            final String randomColumnName = ((ColumnInfo) dbmeta.getColumnInfoList().get(0)).getColumnDbName();
+            final String randomColumnName = ((ColumnInfo) dbmeta.getColumnInfoList().get(0)).getColumnSqlName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + randomColumnName;
         }
         return this;

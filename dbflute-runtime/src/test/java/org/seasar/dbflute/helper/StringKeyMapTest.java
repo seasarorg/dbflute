@@ -76,7 +76,16 @@ public class StringKeyMapTest extends PlainTestCase {
         assertEquals(1, map.get("AaA"));
         assertEquals(2, map.get("Bbb"));
         assertEquals(3, map.get("CCC"));
-        assertEquals(null, map.get("Aa_A"));
+        assertNull(map.get("Aa_A"));
+        assertNull(map.get("Aa__A"));
+        assertNull(map.get("Aa A"));
+        assertNull(map.get("Aa-A"));
+        assertNull(map.get("'Aa-A'"));
+        assertNull(map.get("\"Aa-A\""));
+        assertNull(map.get("Aa$A"));
+        assertNull(map.get("Aa@A"));
+        assertNull(map.get("Aa&A"));
+
         log(map.keySet());
     }
 
@@ -319,6 +328,8 @@ public class StringKeyMapTest extends PlainTestCase {
         assertEquals(1, map.get("Aa__A"));
         assertEquals(1, map.get("Aa A"));
         assertEquals(1, map.get("Aa-A"));
+        assertEquals(1, map.get("'Aa-A'"));
+        assertEquals(1, map.get("\"Aa-A\""));
         assertNull(map.get("Aa$A"));
         assertNull(map.get("Aa@A"));
         assertNull(map.get("Aa&A"));

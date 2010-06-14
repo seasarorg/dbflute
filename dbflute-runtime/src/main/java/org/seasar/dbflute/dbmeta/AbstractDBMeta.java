@@ -191,10 +191,11 @@ public abstract class AbstractDBMeta implements DBMeta {
         return columnInfo;
     }
 
-    protected ColumnInfo cci(String columnDbName, String columnAlias, boolean notNull, String propertyName,
-            Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
-            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, String foreignListExp, String referrerListExp, ClassificationMeta classificationMeta) { // createColumnInfo()
+    protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnAlias, boolean notNull,
+            String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType,
+            Integer columnSize, Integer columnDecimalDigits, boolean commonColumn,
+            OptimisticLockType optimisticLockType, String columnComment, String foreignListExp, String referrerListExp,
+            ClassificationMeta classificationMeta) { // createColumnInfo()
         final String delimiter = ",";
         List<String> foreignPropList = null;
         if (foreignListExp != null && foreignListExp.trim().length() > 0) {
@@ -204,9 +205,9 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (referrerListExp != null && referrerListExp.trim().length() > 0) {
             referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
-        return new ColumnInfo(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary,
-                autoIncrement, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType,
-                columnComment, foreignPropList, referrerPropList, classificationMeta);
+        return new ColumnInfo(this, columnDbName, columnSqlName, columnAlias, notNull, propertyName, propertyType,
+                primary, autoIncrement, columnDbType, columnSize, columnDecimalDigits, commonColumn,
+                optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta);
     }
 
     /**

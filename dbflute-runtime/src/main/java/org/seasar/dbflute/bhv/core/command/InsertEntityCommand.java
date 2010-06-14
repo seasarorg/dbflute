@@ -80,7 +80,7 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         final StringBuilder columnDefSb = new StringBuilder();
         for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : columnInfoList) {
-            columnDefSb.append(", ").append(columnInfo.getColumnDbName());
+            columnDefSb.append(", ").append(columnInfo.getColumnSqlName());
         }
         columnDefSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final StringBuilder columnValuesSb = new StringBuilder();
