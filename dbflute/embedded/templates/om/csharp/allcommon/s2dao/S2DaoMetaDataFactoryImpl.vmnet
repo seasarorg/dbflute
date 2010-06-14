@@ -392,11 +392,11 @@ namespace ${glPackageBaseCommonS2Dao} {
                     }
                 }
                 return row;
-            } catch (Exception) {
+            } catch (Exception e) {
                 if (_log.IsDebugEnabled) {
                     String msg = "Failed to get selected values while resultSet handling:";
                     msg = msg + " target=" + beanType.Name + "." + propertyName;
-                    _log.Debug(msg);
+                    _log.Debug(msg + " -> " + e.StackTrace); // because C# loses nested stack trace
                 }
                 throw;
             }
