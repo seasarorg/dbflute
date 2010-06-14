@@ -22,7 +22,9 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                                          Clause Parts
     //                                                                          ============
-	String getSelectClause();
+    String getSelectClause();
+    Map<String, int?> getSelectIndexMap();
+    Map<String, String> getSelectIndexReverseMap();
     String getSelectHint();
     String getFromClause();
     String getFromBaseTableHint();
@@ -31,14 +33,14 @@ public interface ${myClassName} {
     String getOrderByClause();
     String getSqlSuffix();
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                SelectedSelectColumn
     //                                                                ====================
     void registerSelectedSelectColumn(String foreignTableAliasName
-			                               , String localTableName
-										   , String foreignPropertyName
-										   , String localRelationPath);
-	
+                                           , String localTableName
+                                           , String foreignPropertyName
+                                           , String localRelationPath);
+    
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
@@ -81,14 +83,14 @@ public interface ${myClassName} {
     ${myClassName} clearOrderBy();
     ${myClassName} ignoreOrderBy();
     ${myClassName} makeOrderByEffective();
-	
+    
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
     void registerOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);
-	
+    
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
@@ -96,10 +98,10 @@ public interface ${myClassName} {
      */
     void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);
 
-	void addNullsFirstToPreviousOrderBy();
-	void addNullsLastToPreviousOrderBy();
-	bool hasOrderByClause();
-	
+    void addNullsFirstToPreviousOrderBy();
+    void addNullsLastToPreviousOrderBy();
+    bool hasOrderByClause();
+    
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
@@ -142,20 +144,20 @@ public interface ${myClassName} {
     String resolveNestLevelExpression(String name, int cqNestNo);
     int resolveRelationNo(String baseTableName, String foreignPropertyName);
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                    Table Alias Info
     //                                                                    ================
-	String getLocalTableAliasName();
-	String getForeignTableAliasPrefix();
+    String getLocalTableAliasName();
+    String getForeignTableAliasPrefix();
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============
-	String getWhereClauseMark();
-	String getWhereFirstConditionMark();
-	String getUnionSelectClauseMark();
-	String getUnionWhereClauseMark();
-	String getUnionWhereFirstConditionMark();
+    String getWhereClauseMark();
+    String getWhereFirstConditionMark();
+    String getUnionSelectClauseMark();
+    String getUnionWhereClauseMark();
+    String getUnionWhereFirstConditionMark();
 
     // =====================================================================================
     //                                                            Where Clause Simple Filter
@@ -165,9 +167,9 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
-	bool isSelectedForeignInfoEmpty();
-	bool hasSelectedForeignInfo(String relationPath);
-	void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
+    bool isSelectedForeignInfoEmpty();
+    bool hasSelectedForeignInfo(String relationPath);
+    void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 
     // ===================================================================================
     //                                                                    Sub Query Indent

@@ -10,6 +10,7 @@ using Seasar.Dao.Impl;
 
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 

@@ -8,6 +8,7 @@ using Seasar.Extension.ADO;
 using Seasar.Dao;
 
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
