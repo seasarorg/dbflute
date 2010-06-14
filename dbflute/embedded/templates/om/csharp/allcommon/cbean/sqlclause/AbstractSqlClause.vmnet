@@ -347,7 +347,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             } else {
                 onQueryName = columnName;
             }
-            sb.append(realColumnName).append(" as ").append(columnName);
+            sb.append(realColumnName).append(" as ").append(onQueryName);
             _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
         }
         
@@ -368,11 +368,20 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 }
 
                 String realColumnName = selectColumnInfo.buildRealColumnName();
+                String columnAliasName = selectColumnInfo.getColumnAliasName();
+                String onQueryName;
+                ++selectIndex;
+                if (_useSelectIndex) {
+                    _selectIndexMap.put(columnAliasName, selectIndex);
+                    onQueryName = buildSelectIndexAliasName(selectIndex);
+                } else {
+                    onQueryName = columnAliasName;
+                }
                 if (!finishedForeignIndent) {
                     sb.append(ln()).append("     ");
                     finishedForeignIndent = true;
                 }
-                sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
+                sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
                 _selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
             }
         }
