@@ -187,8 +187,9 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             if (columnNames.contains(columnName)) {
                 valueType = pt.getValueType();
             } else {
-                // basically unreachable because
-                // its existence has already been checked
+                // basically unreachable
+                // because the referred column (basically PK or FK) must exist
+                // if the relation's select clause is specified
                 return null;
             }
             final Object value;
@@ -198,8 +199,8 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 value = valueType.getValue(rs, columnName);
             }
             if (value == null) {
-                // reachable when local column data is null
-                // or the relation is one-to-one and so on
+                // reachable when the referred column data is null
+                // (treated as no relation data)
                 return null;
             }
             relKeyValues.put(columnName, value);
@@ -224,11 +225,8 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         if (!hasConditionBean()) {
             return true;
         }
-        ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        if (cb.getSqlClause().isSelectedForeignInfoEmpty()) {
-            return true;
-        }
-        return false;
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        return cb.getSqlClause().isSelectedForeignInfoEmpty();
     }
 
     /**
@@ -239,10 +237,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      */
     protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        if (cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix)) {
-            return true;
-        }
-        return false;
+        return cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix);
     }
 
     /**

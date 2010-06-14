@@ -140,10 +140,7 @@ public class ResourceContext {
             return null;
         }
         final DBMetaProvider provider = getResourceContextOnThread().getDBMetaProvider();
-        if (provider == null) {
-            return null;
-        }
-        return provider.provideDBMeta(tableFlexibleName);
+        return provider != null ? provider.provideDBMeta(tableFlexibleName) : null;
     }
 
     /**
@@ -214,38 +211,25 @@ public class ResourceContext {
     }
 
     public static String getOutsideSqlPackage() {
-        ResourceParameter resourceParameter = resourceParameter();
-        if (resourceParameter == null) {
-            return null;
-        }
-        return resourceParameter.getOutsideSqlPackage();
+        final ResourceParameter resourceParameter = resourceParameter();
+        return resourceParameter != null ? resourceParameter.getOutsideSqlPackage() : null;
     }
 
     public static String getLogDateFormat() {
-        ResourceParameter resourceParameter = resourceParameter();
-        if (resourceParameter == null) {
-            return null;
-        }
-        return resourceParameter.getLogDateFormat();
+        final ResourceParameter resourceParameter = resourceParameter();
+        return resourceParameter != null ? resourceParameter.getLogDateFormat() : null;
     }
 
     public static String getLogTimestampFormat() {
-        ResourceParameter resourceParameter = resourceParameter();
-        if (resourceParameter == null) {
-            return null;
-        }
-        return resourceParameter.getLogTimestampFormat();
+        final ResourceParameter resourceParameter = resourceParameter();
+        return resourceParameter != null ? resourceParameter.getLogTimestampFormat() : null;
     }
 
     protected static ResourceParameter resourceParameter() {
         if (!isExistResourceContextOnThread()) {
             return null;
         }
-        ResourceParameter resourceParameter = getResourceContextOnThread().getResourceParameter();
-        if (resourceParameter == null) {
-            return null;
-        }
-        return resourceParameter;
+        return getResourceContextOnThread().getResourceParameter();
     }
 
     protected static void assertResourceContextExists() {
@@ -289,7 +273,7 @@ public class ResourceContext {
         final Set<String> realColumnSet = StringSet.createAsCaseInsensitive();
         for (String columnName : columnSet) {
             final String realColumnName = selectIndexReverseMap.get(columnName);
-            if (realColumnName != null) { // basically true
+            if (realColumnName != null) { // mainly true
                 realColumnSet.add(realColumnName);
             } else { // for derived columns and so on
                 realColumnSet.add(columnName);
@@ -306,9 +290,6 @@ public class ResourceContext {
             return null;
         }
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        if (cb == null) {
-            return null;
-        }
         return cb.getSqlClause().getSelectIndexMap();
     }
 
@@ -316,10 +297,7 @@ public class ResourceContext {
         if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
             return null;
         }
-        ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        if (cb == null) {
-            return null;
-        }
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         return cb.getSqlClause().getSelectIndexReverseMap();
     }
 

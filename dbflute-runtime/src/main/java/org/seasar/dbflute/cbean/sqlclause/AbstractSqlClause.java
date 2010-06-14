@@ -109,6 +109,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The map of select index. {key:columnName, value:selectIndex} (Nullable) */
     protected Map<String, Integer> _selectIndexMap;
 
+    /** The reverse map of select index. {key:selectIndex, value:columnName} (Nullable) */
+    protected Map<String, String> _selectIndexReverseMap;
+
     /** Is use select index? Default value is true. */
     protected boolean _useSelectIndex = true;
 
@@ -379,7 +382,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         Integer selectIndex = 0;
         if (_useSelectIndex) {
-            _selectIndexMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+            _selectIndexMap = createSelectIndexMap();
         }
 
         // Columns of local table.
@@ -563,16 +566,26 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _selectIndexMap;
     }
 
+    protected <VALUE> Map<String, VALUE> createSelectIndexMap() {
+        // must be case insensitive because it treats result set column
+        // (and it does not need to be ordered)
+        // so it uses case insensitive non-ordered map 
+        return StringKeyMap.createAsCaseInsensitive();
+    }
+
     public Map<String, String> getSelectIndexReverseMap() {
+        if (_selectIndexReverseMap != null) {
+            return _selectIndexReverseMap;
+        }
         if (_selectIndexMap == null) {
             return null;
         }
-        final Map<String, String> selectIndexReverseMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+        _selectIndexReverseMap = createSelectIndexMap(); // same style as select index map 
         for (String columnName : _selectIndexMap.keySet()) {
             final Integer selectIndex = _selectIndexMap.get(columnName);
-            selectIndexReverseMap.put(buildSelectIndexAliasName(selectIndex), columnName);
+            _selectIndexReverseMap.put(buildSelectIndexAliasName(selectIndex), columnName);
         }
-        return selectIndexReverseMap;
+        return _selectIndexReverseMap;
     }
 
     public void disableSelectIndex() {

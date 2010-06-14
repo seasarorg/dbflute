@@ -138,12 +138,10 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     columnName = entry.getKey();
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
+                    selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
-                        final ValueType valueType = mapping.getValueType();
-                        selectedValue = getValue(rs, columnName, valueType, selectIndexMap);
                         dbmeta.setupEntityProperty(propertyName, row, selectedValue);
                     } else {
-                        selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
                         mapping.getPropertyAccessor().setValue(row, selectedValue);
                     }
                 }
@@ -163,7 +161,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             return null; // unreachable
         } catch (SQLException e) {
             if (_log.isDebugEnabled()) {
-                String msg = "Failed to get selected values while resultSet handlings:";
+                String msg = "Failed to get selected values while resultSet handling:";
                 msg = msg + " target=" + DfTypeUtil.toClassTitle(beanClass) + "." + propertyName;
                 _log.debug(msg);
             }

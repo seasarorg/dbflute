@@ -83,6 +83,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             }
             final Object value = res.extractRelKeyValue(columnName);
             if (value == null) {
+                // basically no way
+                // because this is not called if the referred value
+                // is null (then it must be no relation key)
+                // @see TnBeanListResultSetHandler
                 continue;
             }
 
