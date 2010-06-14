@@ -7,6 +7,8 @@ using Seasar.Framework.Util;
 using Seasar.Extension.ADO;
 using Seasar.Dao;
 
+using ${glPackageBaseCommonCBean};
+
 namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
 
     public abstract class ${glInternalAbstractBeanMetaDataResultSetHandler} : IDataReaderHandler {
@@ -64,13 +66,34 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return ClassUtil.NewInstance(rpt.PropertyInfo.PropertyType);
         }
 
-        protected virtual System.Collections.IList CreateColumnNames(DataTable dt) {
-            System.Collections.IList columnNames = new CaseInsentiveSet();
+        protected virtual System.Collections.IList CreateColumnNames(DataTable dt) { // ResourceContext in Java
+            System.Collections.IList columnSet = new CaseInsentiveSet();
             foreach (DataRow row in dt.Rows) {
                 string columnName = (string) row["ColumnName"];
-                columnNames.Add(columnName);
+                columnSet.Add(columnName);
             }
-            return columnNames;
+            Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
+            if (selectIndexReverseMap == null) {
+                return columnSet;
+            }
+            System.Collections.IList realColumnSet = new CaseInsentiveSet();
+            foreach (String columnName in columnSet) {
+                String realColumnName = selectIndexReverseMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
+                if (realColumnName != null) { // mainly true
+                    realColumnSet.Add(realColumnName);
+                } else { // for derived columns and so on
+                    realColumnSet.Add(columnName);
+                }
+            }
+            return realColumnSet;
+        }
+
+        protected Map<String, int> GetSelectIndexReverseMap() { // ResourceContext in Java
+            if (!${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                return null;
+            }
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
+            return cb.SqlClause.getSelectIndexReverseMap();
         }
 
         protected virtual void PostCreateRow(Object row, IBeanMetaData bmd) {

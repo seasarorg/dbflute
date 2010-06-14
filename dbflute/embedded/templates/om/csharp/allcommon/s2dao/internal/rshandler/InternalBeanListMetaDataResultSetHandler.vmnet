@@ -51,6 +51,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 // they are unnecessary to do relation loop!
                 skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
             }
+            Map<String, int> selectIndexMap = GetSelectIndexMap();
 
             while (dataReader.Read()) {
                 if (columnNames == null) {
@@ -108,28 +109,36 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             }
         }
 
-        protected RelationKey CreateRelationKey(IDataReader reader,
-            IRelationPropertyType rpt, System.Collections.IList columnNames, System.Collections.Hashtable relKeyValues) {
+        protected RelationKey CreateRelationKey(IDataReader reader, IRelationPropertyType rpt
+                , System.Collections.IList columnNames, System.Collections.Hashtable relKeyValues
+                , Map<String, int> selectIndexMap) {
             System.Collections.ArrayList keyList = new System.Collections.ArrayList();
             IBeanMetaData bmd = rpt.BeanMetaData;
             for (int i = 0; i < rpt.KeySize; ++i) {
                 IValueType valueType = null;
-                string columnName = rpt.GetMyKey(i);
-                IPropertyType pt;
+                IPropertyType pt = rpt.BeanMetaData.GetPropertyTypeByColumnName(rpt.GetYourKey(i));
+                String relationNoSuffix = BuildRelationNoSuffix(rpt);
+                String columnName = pt.ColumnName + relationNoSuffix;
                 if (columnNames.Contains(columnName)) {
-                    pt = BeanMetaData.GetPropertyTypeByColumnName(columnName);
                     valueType = pt.ValueType;
                 } else {
-                    pt = bmd.GetPropertyTypeByColumnName(rpt.GetYourKey(i));
-                    columnName = pt.ColumnName + BuildRelationNoSuffix(rpt);
-                    if (columnNames.Contains(columnName))
-                        valueType = pt.ValueType;
-                    else
-                        return null;
+                    // basically unreachable
+                    // because the referred column (basically PK or FK) must exist
+                    // if the relation's select clause is specified
+                    return null;
+                }
+                Object value;
+                if (selectIndexMap != null) {
+                    value = GetValue(reader, columnName, valueType, selectIndexMap);
+                } else {
+                    value = valueType.GetValue(reader, columnName);
                 }
                 object value = valueType.GetValue(reader, columnName);
-                if (value == null) return null;
-
+                if (value == null) {
+                    // reachable when the referred column data is null
+                    // (treated as no relation data)
+                    return null;
+                }
                 relKeyValues[columnName] = value;
                 keyList.Add(value);
             }
@@ -139,8 +148,28 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             }
             else return null;
         }
-        
-    
+
+        // ===================================================================================
+        //                                                                        Select Index
+        //                                                                        ============
+        protected Map<String, int> GetSelectIndexMap() { // ResourceContext in Java
+            if (!HasConditionBean()) {
+                return null;
+            }
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
+            return cb.SqlClause.getSelectIndexMap();
+        }
+
+        protected Object GetValue(IDataReader rs, String columnName, IValueType valueType,
+                Map<String, int> selectIndexMap) { // ResourceContext in Java
+            int selectIndex = selectIndexMap.get(columnName);
+            if (selectIndex != null) {
+                return valueType.GetValue(rs, selectIndex);
+            } else {
+                return valueType.GetValue(rs, columnName);
+            }
+        }
+
         // ===================================================================================
         //                                                                       Assist Helper
         //                                                                       =============
@@ -153,19 +182,13 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 return true;
             }
             ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
-            if (cb.SqlClause.isSelectedForeignInfoEmpty()) {
-                return true;
-            }
-            return false;
+            return cb.SqlClause.isSelectedForeignInfoEmpty();
         }
 
         // You should call HasConditionBean() before calling this!
         protected bool HasSelectedForeignInfo(String relationNoSuffix) {
             ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
-            if (cb.SqlClause.hasSelectedForeignInfo(relationNoSuffix)) {
-                return true;
-            }
-            return false;
+            return cb.SqlClause.hasSelectedForeignInfo(relationNoSuffix);
         }
 
         protected String BuildRelationNoSuffix(IRelationPropertyType rpt) {

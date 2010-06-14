@@ -328,6 +328,8 @@ namespace ${glPackageBaseCommonS2Dao} {
     //                                                                         ===========
     public class InternalRowCreator : RowCreatorImpl {
 
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         protected ${glDBMeta} _dbmeta;
         public ${glDBMeta} DBMeta { set { _dbmeta = value; } }
 
@@ -352,6 +354,14 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         public override Object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
+            if (columns.Length == 0) {
+                String msg = "The propertyCache should not be empty: bean=" + beanType.Name;
+                throw new IllegalStateException(msg);
+            }
+            String columnName = null;
+            String propertyName = null;
+            Object selectedValue = null;
+            Map<String, int?> selectIndexMap = GetSelectIndexMap();
             Object row;
             ${glDBMeta} dbmeta;
             if (_dbmeta != null) {
@@ -361,29 +371,60 @@ namespace ${glPackageBaseCommonS2Dao} {
                 row = NewBean(beanType);
                 dbmeta = FindDBMeta(row);
             }
-            if (dbmeta != null) {
-                foreach (IColumnMetaData column in columns) {
-                    Object value = column.ValueType.GetValue(reader, column.ColumnName);
-			    	if (dbmeta.HasEntityPropertySetupper(column.PropertyInfo.Name)) {
-			    	    dbmeta.SetupEntityProperty(column.PropertyInfo.Name, row, value);
-			    		continue;
+            try {
+                if (dbmeta != null) {
+                    foreach (IColumnMetaData column in columns) {
+                        columnName = column.ColumnName;
+                        propertyName = column.PropertyInfo.Name;
+                        selectedValue = GetValue(reader, columnName, column.ValueType, selectIndexMap);
+                        if (dbmeta.HasEntityPropertySetupper(propertyName)) {
+                            dbmeta.SetupEntityProperty(propertyName, row, value);
+                        } else {
+                            column.PropertyInfo.SetValue(row, value, null);
+                        }
                     }
-                    column.PropertyInfo.SetValue(row, value, null);
+                } else {
+                    foreach (IColumnMetaData column in columns) {
+                        columnName = column.ColumnName;
+                        propertyName = column.PropertyInfo.Name;
+                        selectedValue = GetValue(reader, columnName, column.ValueType, selectIndexMap);
+                        column.PropertyInfo.SetValue(row, value, null);
+                    }
                 }
-            } else {
-                foreach (IColumnMetaData column in columns) {
-                    Object value = column.ValueType.GetValue(reader, column.ColumnName);
-                    column.PropertyInfo.SetValue(row, value, null);
+                return row;
+            } catch (Exception) {
+                if (_log.IsDebugEnabled) {
+                    String msg = "Failed to get selected values while resultSet handling:";
+                    msg = msg + " target=" + beanType.Name + "." + propertyName;
+                    _log.Debug(msg);
                 }
+                throw;
             }
-            return row;
         }
 
-		public static ${glDBMeta} FindDBMeta(Object row) {
+        protected Map<String, int?> GetSelectIndexMap() { // ResourceContext in Java
+            if (!${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                return null;
+            }
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
+            return cb.SqlClause.getSelectIndexMap();
+        }
+
+        protected Object GetValue(IDataReader rs, String columnName, IValueType valueType,
+                Map<String, int?> selectIndexMap) { // ResourceContext in Java
+            int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
+            if (selectIndex != null) {
+                return valueType.GetValue(rs, selectIndex);
+            } else {
+                return valueType.GetValue(rs, columnName);
+            }
+        }
+
+		public static ${glDBMeta} FindCachedDBMeta(Object row) {
 		    return DBMetaCacheHandler.FindDBMeta(row);
         }
 
-		public static ${glDBMeta} FindDBMeta(Type rowType, String tableName) {
+		public static ${glDBMeta} FindCachedDBMeta(Type rowType, String tableName) {
 		    return DBMetaCacheHandler.FindDBMeta(rowType, tableName);
         }
     }
@@ -471,6 +512,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
                 Object value = res.ExtractRelKeyValue(columnName);
                 if (value == null) {
+                    // basically no way
+                    // because this is not called if the referred value
+                    // is null (then it must be no relation key)
+                    // @see InternalBeanListMetaDataResultSetHandler
                     continue;
                 }
 
@@ -490,7 +535,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected ${glDBMeta} FindDBMeta(Type rowType, String tableName) {
-            return InternalRowCreator.FindDBMeta(rowType, tableName);
+            return InternalRowCreator.FindCachedDBMeta(rowType, tableName);
         }
 
         protected override void SetupRelationAllValue(RelationRowCreationResource res) {
@@ -522,7 +567,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                 value = res.ExtractRelKeyValue(columnName);
             } else {
                 IValueType valueType = pt.ValueType;
-                value = valueType.GetValue(res.DataReader, columnName);
+                Map<String, int?> selectIndexMap = GetSelectIndexMap();
+                if (selectIndexMap != null) {
+                    value = GetValue(res.DataReader, columnName, valueType, selectIndexMap);
+                } else {
+                    value = valueType.GetValue(res.DataReader, columnName);
+                }
             }
             if (value != null) {
                 res.IncrementValidValueCount();
@@ -536,9 +586,27 @@ namespace ${glPackageBaseCommonS2Dao} {
 				}
             }
         }
-		
+
+        protected Map<String, int?> GetSelectIndexMap() { // RelationRowCreationResource in Java
+            if (!${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                return null;
+            }
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
+            return cb.SqlClause.getSelectIndexMap();
+        }
+
+        protected Object GetValue(IDataReader rs, String columnName, IValueType valueType,
+                Map<String, int?> selectIndexMap) { // ResourceContext in Java
+            int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
+            if (selectIndex != null) {
+                return valueType.GetValue(rs, selectIndex);
+            } else {
+                return valueType.GetValue(rs, columnName);
+            }
+        }
+
 		protected ${glDBMeta} FindDBMeta(Object row) {
-		    return InternalRowCreator.FindDBMeta(row);
+		    return InternalRowCreator.FindCachedDBMeta(row);
         }
 
         protected override void SetupPropertyCache(RelationRowCreationResource res) {

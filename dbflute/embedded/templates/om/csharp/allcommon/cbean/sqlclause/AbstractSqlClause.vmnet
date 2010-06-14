@@ -58,6 +58,15 @@ public abstract class ${myClassName} : ${glSqlClause} {
     /** The previous type of select clause. (Nullable: The default is null) */
     protected SelectClauseType _previousSelectClauseType;
 
+    /** The map of select index. {key:columnName, value:selectIndex} (Nullable) */
+    protected Map<String, int?> _selectIndexMap;
+
+    /** The reverse map of select index. {key:selectIndex, value:columnName} (Nullable) */
+    protected Map<String, String> _selectIndexReverseMap;
+
+    /** Is use select index? Default value is true. */
+    protected bool _useSelectIndex = true;
+
     /** Outer join map. */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
 
@@ -295,6 +304,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
+        int selectIndex = 0;
+        if (_useSelectIndex) {
+            _selectIndexMap = createSelectIndexMap();
+        }
+
         // Columns of local table.
         bool needsDelimiter = false;
         foreach (${glColumnInfo} columnInfo in columnInfoList) {
@@ -325,6 +339,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 needsDelimiter = true;
             }
             String realColumnName = getLocalTableAliasName() + "." + columnName;
+            String onQueryName;
+            ++selectIndex;
+            if (_useSelectIndex) {
+                _selectIndexMap.put(columnName.ToLower(), selectIndex); // lower because of case sensitive map
+                onQueryName = buildSelectIndexAliasName(selectIndex);
+            } else {
+                onQueryName = columnName;
+            }
             sb.append(realColumnName).append(" as ").append(columnName);
             _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
         }
@@ -450,6 +472,43 @@ public abstract class ${myClassName} : ${glSqlClause} {
         msg = msg + " when the type of select clause is for scalar:";
         msg = msg + " specifiedSelectColumnMap=" + _specifiedSelectColumnMap;
         throw new IllegalStateException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                          Select Index
+    //                                          ------------
+    public Map<String, int?> getSelectIndexMap() {
+        return _selectIndexMap;
+    }
+
+    protected Map<String, int?> createSelectIndexMap() {
+        // must be case insensitive because it treats result set column
+        // (and it does not need to be ordered)
+        // but it uses lower-case keys because of no case insensitive (java-like) map in DBFlute.NET
+        return new HashMap<String, int?>;
+    }
+
+    public Map<String, String> getSelectIndexReverseMap() {
+        if (_selectIndexReverseMap != null) {
+            return _selectIndexReverseMap;
+        }
+        if (_selectIndexMap == null) {
+            return null;
+        }
+        _selectIndexReverseMap = new HashMap<String, String>(); // same style as select index map
+        foreach (String columnName in _selectIndexMap.keySet()) {
+            int? selectIndex = _selectIndexMap.get(columnName);
+            _selectIndexReverseMap.put(buildSelectIndexAliasName(selectIndex), columnName);
+        }
+        return _selectIndexReverseMap;
+    }
+
+    public void disableSelectIndex() {
+        _useSelectIndex = false;
+    }
+
+    protected String buildSelectIndexAliasName(int? selectIndex) {
+        return "c" + selectIndex;
     }
 
     // -----------------------------------------------------
