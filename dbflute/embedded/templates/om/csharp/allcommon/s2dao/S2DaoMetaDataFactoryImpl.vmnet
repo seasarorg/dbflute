@@ -414,7 +414,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
             int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
             if (selectIndex != null) {
-                return valueType.GetValue(rs, selectIndex.Value);
+                // it does not work if it uses an index (don't know why)
+                // so it uses a label name (c + index) here
+                String labelName = "c" + selectIndex.Value;
+                return valueType.GetValue(rs, labelName);
             } else {
                 return valueType.GetValue(rs, columnName);
             }
@@ -601,7 +604,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
             int? selectIndex = selectIndexMap.get(columnName.ToLower()); // lower because of @see AbstractSqlClause
             if (selectIndex != null) {
-                return valueType.GetValue(rs, selectIndex.Value);
+                // it does not work if it uses an index (@see InternalRowCreator)
+                String labelName = "c" + selectIndex.Value;
+                return valueType.GetValue(rs, labelName);
             } else {
                 return valueType.GetValue(rs, columnName);
             }

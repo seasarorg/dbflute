@@ -164,7 +164,9 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 Map<String, int?> selectIndexMap) { // ResourceContext in Java
             int? selectIndex = selectIndexMap.get(columnName);
             if (selectIndex != null) {
-                return valueType.GetValue(rs, selectIndex.Value);
+                // it does not work if it uses an index (@see InternalRowCreator)
+                String labelName = "c" + selectIndex.Value;
+                return valueType.GetValue(rs, labelName);
             } else {
                 return valueType.GetValue(rs, columnName);
             }
