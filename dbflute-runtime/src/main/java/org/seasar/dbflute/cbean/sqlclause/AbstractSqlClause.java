@@ -82,7 +82,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // The resources that are not often used to are lazy-loaded for performance.
     // - - - - - - - - - -/
     /** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}} */
-    protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
+    protected final Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
 
     /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
     protected Map<String, Map<String, String>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
@@ -93,12 +93,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
     protected Map<String, String> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
-    // [DBFLUTE-666]: unfinished
-    ///** Specified derive column type map. (Nullable: This is lazy-loaded) */
-    //protected Map<String, Class<?>> _specifiedDerivedColumnTypeMap; // [DBFlute-0.9.6.7]
-
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
-    protected Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>(); // Without linked!
+    protected final Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>(); // order no needed
 
     /** The type of select clause. (NotNull) */
     protected SelectClauseType _selectClauseType = DEFAULT_SELECT_CLAUSE_TYPE;
@@ -116,16 +112,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected boolean _useSelectIndex = true;
 
     /** The map of outer join. */
-    protected Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
+    protected final Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
 
     /** Is inner-join effective? Default value is false. */
     protected boolean _innerJoinEffective = false;
 
     /** The list of where clause. */
-    protected List<String> _whereList = new ArrayList<String>();
+    protected final List<String> _whereList = new ArrayList<String>();
 
     /** The list of in-line where clause for base table. */
-    protected List<String> _baseTableInlineWhereList = new ArrayList<String>(2); // because of minor
+    protected final List<String> _baseTableInlineWhereList = new ArrayList<String>(2); // because of minor
 
     /** The clause of order-by. (NotNull) */
     protected final OrderByClause _orderByClause = new OrderByClause();
@@ -380,7 +376,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
         final boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
-        Integer selectIndex = 0;
+        Integer selectIndex = 0; // because 1 origin in JDBC
         if (_useSelectIndex) {
             _selectIndexMap = createSelectIndexMap();
         }
@@ -767,8 +763,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         String orderByClause = null;
         if (hasUnionQuery()) {
             if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.isEmpty()) {
-                String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: "
-                        + toString();
+                String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists.";
                 throw new IllegalStateException(msg);
             }
             orderByClause = _orderByClause.getOrderByClause(_selectClauseRealColumnAliasMap);
