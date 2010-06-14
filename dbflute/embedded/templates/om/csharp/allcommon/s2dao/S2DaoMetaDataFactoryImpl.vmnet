@@ -564,6 +564,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             IPropertyType pt = res.CurrentPropertyType;
             Object value = null;
             if (res.ContainsRelKeyValueIfExists(columnName)) {
+                // if this column is relation key, it gets the value from relation key values
+                // for performance and avoiding twice getting same column value
                 value = res.ExtractRelKeyValue(columnName);
             } else {
                 IValueType valueType = pt.ValueType;
