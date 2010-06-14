@@ -1070,6 +1070,9 @@ public class ForeignKey {
     // ===================================================================================
     //                                                                             Display
     //                                                                             =======
+    // -----------------------------------------------------
+    //                                               Foreign
+    //                                               -------
     public String getForeignDispForJavaDoc() {
         return doGetForeignDispForJavaDoc("    ");
     }
@@ -1082,7 +1085,7 @@ public class ForeignKey {
         final StringBuilder sb = new StringBuilder();
         sb.append(getForeignSimpleDisp()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
-            final String comment = getDocumentProperties().resolveTextForJavaDoc(_comment, indent);
+            final String comment = resolveCommentForJavaDoc(_comment, indent);
             sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
         }
         return sb.toString();
@@ -1096,6 +1099,9 @@ public class ForeignKey {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                         ReferrerAsOne
+    //                                         -------------
     public String getReferrerDispAsOneForJavaDoc() {
         return doGetReferrerDispAsOneForJavaDoc("    ");
     }
@@ -1108,7 +1114,7 @@ public class ForeignKey {
         final StringBuilder sb = new StringBuilder();
         sb.append(getReferrerSimpleDispAsOne()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
-            final String comment = getDocumentProperties().resolveTextForJavaDoc(_comment, indent);
+            final String comment = resolveCommentForJavaDoc(_comment, indent);
             sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
         }
         return sb.toString();
@@ -1122,6 +1128,9 @@ public class ForeignKey {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                              Referrer
+    //                                              --------
     public String getReferrerDispForJavaDoc() {
         return doGetReferrerDispForJavaDoc("    ");
     }
@@ -1134,7 +1143,7 @@ public class ForeignKey {
         final StringBuilder sb = new StringBuilder();
         sb.append(getReferrerSimpleDisp()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
-            final String comment = getDocumentProperties().resolveTextForJavaDoc(_comment, indent);
+            final String comment = resolveCommentForJavaDoc(_comment, indent);
             sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
         }
         return sb.toString();
@@ -1146,6 +1155,13 @@ public class ForeignKey {
         sb.append(getTable().getName());
         sb.append(" as '").append(getReferrerJavaBeansRulePropertyName()).append("'");
         return sb.toString();
+    }
+
+    // -----------------------------------------------------
+    //                                         Common Helper
+    //                                         -------------
+    protected String resolveCommentForJavaDoc(String comment, String indent) {
+        return getDocumentProperties().resolveTextForJavaDoc(comment, indent);
     }
 
     // ===================================================================================

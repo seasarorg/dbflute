@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.doc.schemahtml;
 
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -19,20 +20,34 @@ public class DfSchemaHtmlBuilder {
         final StringBuilder sb = new StringBuilder();
         sb.append(delimiter);
         final String baseTitle = fk.getName();
+        final String comment = fk.getComment();
         final String contentName;
         if (fk.isAdditionalForeignKey()) {
             final String addtionalBaseTitle = baseTitle;
+            final String fixedCondition = fk.getFixedCondition();
+            final StringBuilder titleSb = new StringBuilder();
+            titleSb.append(addtionalBaseTitle);
+            boolean comma = false;
             if (fk.hasFixedCondition()) {
-                final String fixedCondition = fk.getFixedCondition();
-                final String title = resolveTitle(addtionalBaseTitle + ": fixedCondition=\"" + fixedCondition + "\"");
-                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\" title=\"" + title + "\">");
-            } else {
-                final String title = resolveTitle(addtionalBaseTitle);
-                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\" title=\"" + title + "\">");
+                titleSb.append(comma ? ", " : ": ");
+                titleSb.append("fixedCondition=\"").append(fixedCondition).append("\"");
+                comma = true;
             }
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+                titleSb.append(comma ? ", " : ": ");
+                titleSb.append("comment=").append(comment);
+                comma = true;
+            }
+            final String title = resolveTitle(titleSb.toString());
+            sb.append("<a href=\"#" + name + "\" class=\"additionalfk\" title=\"" + title + "\">");
             contentName = name + (fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         } else {
-            final String title = resolveTitle(baseTitle);
+            final StringBuilder titleSb = new StringBuilder();
+            titleSb.append(baseTitle);
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+                titleSb.append(": comment=").append(comment);
+            }
+            final String title = resolveTitle(titleSb.toString());
             sb.append("<a href=\"#" + name + "\" title=\"" + title + "\">");
             contentName = name;
         }
