@@ -19,38 +19,44 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
 public abstract class TnAbstractMapResultSetHandler implements TnResultSetHandler {
 
-    protected TnPropertyType[] createPropertyTypes(ResultSetMetaData rsmd) throws SQLException {
+    protected Map<String, ValueType> createPropertyTypeMap(ResultSetMetaData rsmd) throws SQLException {
         final int count = rsmd.getColumnCount();
-        final TnPropertyType[] propertyTypes = new TnPropertyType[count];
+        final Map<String, ValueType> propertyTypeMap = DfCollectionUtil.newLinkedHashMap();
         for (int i = 0; i < count; ++i) {
             final String propertyName = rsmd.getColumnLabel(i + 1);
 
             // because it can only use by-JDBC-type value type here 
             final ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
 
-            propertyTypes[i] = new TnPropertyTypeImpl(propertyName, valueType);
+            propertyTypeMap.put(propertyName, valueType);
         }
-        return propertyTypes;
+        return propertyTypeMap;
     }
 
-    protected Map<String, Object> createRow(ResultSet rs, TnPropertyType[] propertyTypes) throws SQLException {
+    protected Map<String, Object> createRow(ResultSet rs, Map<String, ValueType> propertyTypeMap) throws SQLException {
         final Map<String, Object> row = StringKeyMap.createAsFlexibleOrdered();
-        for (int i = 0; i < propertyTypes.length; ++i) {
-            final Object value = propertyTypes[i].getValueType().getValue(rs, i + 1);
-            row.put(propertyTypes[i].getPropertyName(), value);
+        final Set<Entry<String, ValueType>> entrySet = propertyTypeMap.entrySet();
+        int index = 0;
+        for (Entry<String, ValueType> entry : entrySet) {
+            final String propertyName = entry.getKey();
+            final ValueType valueType = entry.getValue();
+            final Object value = valueType.getValue(rs, index + 1);
+            row.put(propertyName, value);
+            ++index;
         }
         return row;
     }

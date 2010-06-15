@@ -90,8 +90,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
                 continue;
             }
 
-            final String yourKey = rpt.getYourKey(i);
-            final TnPropertyMapping mapping = bmd.getPropertyTypeByColumnName(yourKey);
+            final TnPropertyMapping mapping = bmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
             setValue(res, mapping, dbmeta, value);
         }
     }
@@ -219,13 +218,14 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         return 2; // for Compatible (old parameter)
     }
 
+    @Override
     protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
-            Set<String> selectColumnSet, Map<String, Object> relKeyValues,
+            Map<String, String> selectColumnMap, Map<String, Object> relKeyValues,
             Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
         res.setResultSet(rs);
         res.setRelationPropertyType(rpt);
-        res.setSelectColumnSet(selectColumnSet);
+        res.setSelectColumnMap(selectColumnMap);
         res.setRelKeyValues(relKeyValues);
         res.setRelationPropertyCache(relationPropertyCache);
         res.setBaseSuffix("");// as Default
@@ -237,12 +237,13 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         return res;
     }
 
+    @Override
     protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
-            Set<String> selectColumnSet, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
+            Map<String, String> selectColumnMap, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
             String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
         res.setRelationPropertyType(rpt);
-        res.setSelectColumnSet(selectColumnSet);
+        res.setSelectColumnMap(selectColumnMap);
         res.setRelationPropertyCache(relationPropertyCache);
         res.setBaseSuffix(baseSuffix);
         res.setRelationNoSuffix(relationNoSuffix);

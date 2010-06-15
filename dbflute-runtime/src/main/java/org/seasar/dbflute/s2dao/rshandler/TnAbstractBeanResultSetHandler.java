@@ -65,7 +65,8 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @return The map of row property cache. Map{String(columnName), PropertyMapping} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, TnPropertyMapping> createPropertyCache(Set<String> selectColumnSet) throws SQLException {
+    protected Map<String, TnPropertyMapping> createPropertyCache(Map<String, String> selectColumnSet)
+            throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
@@ -90,28 +91,28 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
     }
 
     /**
-     * @param selectColumnSet The name set of select column. (NotNull)
-     * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
+     * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
+     * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(Set<String> selectColumnSet)
-            throws SQLException {
-        return relationRowCreator.createPropertyCache(selectColumnSet, beanMetaData);
+    protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(
+            Map<String, String> selectColumnMap) throws SQLException {
+        return relationRowCreator.createPropertyCache(selectColumnMap, beanMetaData);
     }
 
     /**
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
-     * @param selectColumnSet The name set of select column. (NotNull)
+     * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
      * @param relKeyValues The map of relation key values. The key is relation column name. (Nullable)
-     * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
+     * @param relationPropertyCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException
      */
-    protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> selectColumnSet,
+    protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache)
             throws SQLException {
-        return relationRowCreator.createRelationRow(rs, rpt, selectColumnSet, relKeyValues, relationPropertyCache);
+        return relationRowCreator.createRelationRow(rs, rpt, selectColumnMap, relKeyValues, relationPropertyCache);
     }
 
     /**
@@ -130,8 +131,8 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
     // ===================================================================================
     //                                                                       Select Column
     //                                                                       =============
-    protected Set<String> createSelectColumnSet(ResultSet rs) throws SQLException {
-        return ResourceContext.createSelectColumnSet(rs);
+    protected Map<String, String> createSelectColumnMap(ResultSet rs) throws SQLException {
+        return ResourceContext.createSelectColumnMap(rs);
     }
 
     // ===================================================================================

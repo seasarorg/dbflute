@@ -21,15 +21,15 @@ package org.seasar.dbflute.s2dao.metadata;
  */
 public interface TnRelationPropertyType extends TnPropertyType {
 
-    public int getRelationNo();
+    int getRelationNo();
 
-    public int getKeySize();
+    int getKeySize();
 
-    public String getMyKey(int index);
+    String getMyKey(int index);
 
-    public String getYourKey(int index);
+    String getYourKey(int index);
 
-    public boolean isYourKey(String columnName);
+    boolean isYourKey(String columnName);
 
-    public TnBeanMetaData getBeanMetaData();
+    TnBeanMetaData getBeanMetaData();
 }

@@ -55,14 +55,15 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     //                                                                  OuterJoin Override
     //                                                                  ==================
     @Override
-    public void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap) {
+    public void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
+            Map<String, String> joinOnMap) {
         final String fixedConditionKey = getFixedConditionKey();
         final String fixedCondition = joinOnMap.get(fixedConditionKey);
         if (fixedCondition != null) {
             // because fixed condition for join-on is unsupported at MS Access 
             joinOnMap.remove(fixedConditionKey);
         }
-        super.registerOuterJoin(joinTableDbName, aliasName, joinOnMap);
+        super.registerOuterJoin(baseTableDbName, joinTableDbName, aliasName, joinOnMap);
         if (fixedCondition != null) {
             final String clause = Srl.replace(fixedCondition, aliasName + ".", "");
             registerOuterJoinInlineWhereClause(aliasName, clause, false);

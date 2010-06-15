@@ -18,7 +18,6 @@ package org.seasar.dbflute.s2dao.rowcreator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Set;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
@@ -40,11 +39,11 @@ public interface TnRowCreator {
             throws SQLException;
 
     /**
-     * @param selectColumnSet The name set of select column. (NotNull)
+     * @param selectColumnMap The name map of select column. {flexible-name = column-DB-name} (NotNull)
      * @param beanMetaData Bean meta data. (NotNull)
      * @return The map of row property cache. The key is String(columnName) and the value is a PropertyMapping. (NotNull)
      * @throws SQLException
      */
-    Map<String, TnPropertyMapping> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData beanMetaData)
+    Map<String, TnPropertyMapping> createPropertyCache(Map<String, String> selectColumnMap, TnBeanMetaData beanMetaData)
             throws SQLException;
 }

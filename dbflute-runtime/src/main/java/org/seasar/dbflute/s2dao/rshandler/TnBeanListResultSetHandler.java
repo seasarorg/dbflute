@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
@@ -77,7 +76,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
 
     protected void mappingBean(ResultSet rs, BeanRowHandler handler) throws SQLException {
         // Lazy initialization because if the result is zero, the resources are unused.
-        Set<String> selectColumnSet = null;
+        Map<String, String> selectColumnSet = null;
         Map<String, TnPropertyMapping> propertyCache = null;
         Map<String, Map<String, TnPropertyMapping>> relationPropertyCache = null; // key is relationNoSuffix, columnName
         TnRelationRowCache relRowCache = null;
@@ -99,7 +98,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
 
         while (rs.next()) {
             if (selectColumnSet == null) {
-                selectColumnSet = createSelectColumnSet(rs);
+                selectColumnSet = createSelectColumnMap(rs);
             }
             if (propertyCache == null) {
                 propertyCache = createPropertyCache(selectColumnSet);
@@ -170,21 +169,22 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * Create the key of relation.
      * @param rs The result set. (NotNull)
      * @param rpt The property type of relation. (NotNull)
-     * @param columnNames The names of columns. (NotNull)
+     * @param selectColumnMap The name map of select column. {flexible-name = column-DB-name} (NotNull)
      * @param relKeyValues The values of relation keys. The key is relation column name. (NotNull)
      * @param selectIndexMap The map of select index. (Nullable: If it's null, it doesn't use select index.)
      * @return The key of relation. (NotNull)
      * @throws SQLException
      */
-    protected TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
-            Map<String, Object> relKeyValues, Map<String, Integer> selectIndexMap) throws SQLException {
+    protected TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt,
+            Map<String, String> selectColumnMap, Map<String, Object> relKeyValues, Map<String, Integer> selectIndexMap)
+            throws SQLException {
         final List<Object> keyList = new ArrayList<Object>();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
-            final ValueType valueType;
             final TnPropertyType pt = rpt.getBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
             final String relationNoSuffix = buildRelationNoSuffix(rpt);
-            final String columnName = pt.getColumnName() + relationNoSuffix;
-            if (columnNames.contains(columnName)) {
+            final String columnName = pt.getColumnDbName() + relationNoSuffix;
+            final ValueType valueType;
+            if (selectColumnMap.containsKey(columnName)) {
                 valueType = pt.getValueType();
             } else {
                 // basically unreachable

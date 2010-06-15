@@ -167,12 +167,12 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         if (!dbmeta.hasForeign(pd.getPropertyName())) {
             return null;
         }
-        ForeignInfo foreignInfo = dbmeta.findForeignInfo(pd.getPropertyName());
-        Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap = foreignInfo.getLocalForeignColumnInfoMap();
-        Set<ColumnInfo> keySet = localForeignColumnInfoMap.keySet();
-        StringBuilder sb = new StringBuilder();
+        final ForeignInfo foreignInfo = dbmeta.findForeignInfo(pd.getPropertyName());
+        final Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap = foreignInfo.getLocalForeignColumnInfoMap();
+        final Set<ColumnInfo> keySet = localForeignColumnInfoMap.keySet();
+        final StringBuilder sb = new StringBuilder();
         for (ColumnInfo localColumnInfo : keySet) {
-            ColumnInfo foreignColumnInfo = localForeignColumnInfoMap.get(localColumnInfo);
+            final ColumnInfo foreignColumnInfo = localForeignColumnInfoMap.get(localColumnInfo);
             if (sb.length() > 0) {
                 sb.append(", ");
             }

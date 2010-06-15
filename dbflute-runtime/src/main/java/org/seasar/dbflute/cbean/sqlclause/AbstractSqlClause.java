@@ -435,11 +435,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
             boolean finishedForeignIndent = false;
             for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
-                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
+                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnDbName())) {
                     continue;
                 }
 
-                final String realColumnName = selectColumnInfo.buildRealColumnName();
+                final String realColumnName = selectColumnInfo.buildRealColumnSqlName();
                 final String columnAliasName = selectColumnInfo.getColumnAliasName();
                 final String onQueryName;
                 ++selectIndex;
@@ -562,13 +562,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _selectIndexMap;
     }
 
-    protected <VALUE> Map<String, VALUE> createSelectIndexMap() {
-        // must be case insensitive because it treats result set column
-        // (and it does not need to be ordered)
-        // so it uses case insensitive non-ordered map 
-        return StringKeyMap.createAsCaseInsensitive();
-    }
-
     public Map<String, String> getSelectIndexReverseMap() {
         if (_selectIndexReverseMap != null) {
             return _selectIndexReverseMap;
@@ -576,20 +569,28 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_selectIndexMap == null) {
             return null;
         }
-        _selectIndexReverseMap = createSelectIndexMap(); // same style as select index map 
-        for (String columnName : _selectIndexMap.keySet()) {
-            final Integer selectIndex = _selectIndexMap.get(columnName);
+        _selectIndexReverseMap = createSelectIndexMap(); // same style as select index map
+        final Set<Entry<String, Integer>> entrySet = _selectIndexMap.entrySet();
+        for (Entry<String, Integer> entry : entrySet) {
+            final String columnName = entry.getKey();
+            final Integer selectIndex = entry.getValue();
             _selectIndexReverseMap.put(buildSelectIndexAliasName(selectIndex), columnName);
         }
         return _selectIndexReverseMap;
     }
 
-    public void disableSelectIndex() {
-        _useSelectIndex = false;
+    protected <VALUE> Map<String, VALUE> createSelectIndexMap() {
+        // flexible for resolving non-compilable connectors and reservation words
+        // (and it does not need to be ordered)
+        return StringKeyMap.createAsFlexible();
     }
 
     protected String buildSelectIndexAliasName(Integer selectIndex) {
         return "c" + selectIndex;
+    }
+
+    public void disableSelectIndex() {
+        _useSelectIndex = false;
     }
 
     // -----------------------------------------------------
@@ -647,7 +648,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             } else {
                 sb.append(" left outer join "); // is main!
             }
-            final String joinTableSqlName = findDBMeta(joinTableDbName).getTableSqlName();
+            final DBMeta joinDBMeta = findDBMeta(joinTableDbName);
+            final String joinTableSqlName = joinDBMeta.getTableSqlName();
             final List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(joinTableSqlName);
@@ -674,7 +676,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     if (count > 0) {
                         sb.append(" and ");
                     }
-                    sb.append(localColumnName).append(" = ").append(foreignColumnName);
+                    final DBMeta baseDBMeta = findDBMeta(joinInfo.getBaseTableDbName());
+                    final String localSqlName = toSqlName(baseDBMeta, localColumnName);
+                    final String foreignSqlName = toSqlName(joinDBMeta, foreignColumnName);
+                    sb.append(localSqlName).append(" = ").append(foreignSqlName);
                 }
                 ++count;
             }
@@ -820,9 +825,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<ColumnInfo> columnInfoList = foreignDBMeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
+            final String columnSqlName = columnInfo.getColumnSqlName();
             final SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
             selectColumnInfo.setTableAliasName(foreignTableAliasName);
-            selectColumnInfo.setColumnName(columnDbName);
+            selectColumnInfo.setColumnDbName(columnDbName);
+            selectColumnInfo.setColumnSqlName(columnSqlName);
             selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
             resultMap.put(columnDbName, selectColumnInfo);
         }
@@ -831,14 +838,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public static class SelectedSelectColumnInfo {
         protected String tableAliasName;
-        protected String columnName;
+        protected String columnDbName;
+        protected String columnSqlName;
         protected String columnAliasName;
 
-        public String buildRealColumnName() {
+        public String buildRealColumnSqlName() {
             if (tableAliasName != null) {
-                return tableAliasName + "." + columnName;
+                return tableAliasName + "." + columnSqlName;
             } else {
-                return columnName;
+                return columnSqlName;
             }
         }
 
@@ -850,12 +858,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             this.tableAliasName = tableAliasName;
         }
 
-        public String getColumnName() {
-            return columnName;
+        public String getColumnDbName() {
+            return columnDbName;
         }
 
-        public void setColumnName(String columnName) {
-            this.columnName = columnName;
+        public void setColumnDbName(String columnName) {
+            this.columnDbName = columnName;
+        }
+
+        public String getColumnSqlName() {
+            return columnSqlName;
+        }
+
+        public void setColumnSqlName(String columnSqlName) {
+            this.columnSqlName = columnSqlName;
         }
 
         public String getColumnAliasName() {
@@ -873,11 +889,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap) {
+    public void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
+            Map<String, String> joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
         final LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
         joinInfo.setAliasName(aliasName);
+        joinInfo.setBaseTableDbName(baseTableDbName);
         joinInfo.setJoinTableDbName(joinTableDbName);
         joinInfo.setJoinOnMap(joinOnMap);
         if (_innerJoinEffective) { // basically false
@@ -915,6 +933,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected static class LeftOuterJoinInfo {
         protected String _aliasName;
+        protected String _baseTableDbName;
         protected String _joinTableDbName;
         protected final List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected final List<String> _additionalOnClauseList = new ArrayList<String>();
@@ -931,6 +950,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         public void setAliasName(String value) {
             _aliasName = value;
+        }
+
+        public String getBaseTableDbName() {
+            return _baseTableDbName;
+        }
+
+        public void setBaseTableDbName(String value) {
+            _baseTableDbName = value;
         }
 
         public String getJoinTableDbName() {
@@ -2410,6 +2437,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
         _cachedDBMetaMap.put(tableDbName, dbmeta);
         return dbmeta;
+    }
+
+    protected String toSqlName(DBMeta dbmeta, String name) {
+        final int dotIndex = name.lastIndexOf(".");
+        final String prefix = name.substring(0, dotIndex);
+        final String pureName = name.substring(dotIndex + ".".length());
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(pureName);
+        return prefix + "." + columnInfo.getColumnSqlName();
     }
 
     // ===================================================================================

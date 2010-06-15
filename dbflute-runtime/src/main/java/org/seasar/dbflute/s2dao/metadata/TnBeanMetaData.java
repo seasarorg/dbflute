@@ -84,7 +84,9 @@ public interface TnBeanMetaData {
 
     int getPrimaryKeySize();
 
-    String getPrimaryKey(int index);
+    String getPrimaryKeyDbName(int index);
+
+    String getPrimaryKeySqlName(int index);
 
     int getIdentifierGeneratorSize();
 

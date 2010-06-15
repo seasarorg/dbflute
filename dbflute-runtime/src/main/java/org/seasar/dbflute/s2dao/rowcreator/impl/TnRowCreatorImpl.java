@@ -18,7 +18,6 @@ package org.seasar.dbflute.s2dao.rowcreator.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -26,7 +25,6 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -50,45 +48,40 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
     /**
      * {@inheritDoc}
      */
-    public Map<String, TnPropertyMapping> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData beanMetaData)
-            throws SQLException {
+    public Map<String, TnPropertyMapping> createPropertyCache(Map<String, String> selectColumnMap,
+            TnBeanMetaData beanMetaData) throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
         final Map<String, TnPropertyMapping> proprertyCache = newPropertyCache();
-        setupPropertyCache(proprertyCache, selectColumnSet, beanMetaData);
+        setupPropertyCache(proprertyCache, selectColumnMap, beanMetaData);
         return proprertyCache;
     }
 
-    protected void setupPropertyCache(Map<String, TnPropertyMapping> proprertyCache, Set<String> selectColumnSet,
-            TnBeanMetaData beanMetaData) throws SQLException {
+    protected void setupPropertyCache(Map<String, TnPropertyMapping> proprertyCache,
+            Map<String, String> selectColumnMap, TnBeanMetaData beanMetaData) throws SQLException {
         final List<TnPropertyType> ptList = beanMetaData.getPropertyTypeList();
-        for (TnPropertyType pt : ptList) { // already been filtered as target only
-            setupPropertyCacheElement(proprertyCache, selectColumnSet, pt);
+        for (TnPropertyType pt : ptList) { // already been filtered as data properties only
+            setupPropertyCacheElement(proprertyCache, selectColumnMap, pt);
         }
     }
 
     protected void setupPropertyCacheElement(Map<String, TnPropertyMapping> proprertyCache,
-            Set<String> selectColumnSet, TnPropertyType pt) throws SQLException {
-        if (selectColumnSet.contains(pt.getColumnName())) {
-            proprertyCache.put(pt.getColumnName(), pt);
-        } else if (selectColumnSet.contains(pt.getPropertyName())) {
-            proprertyCache.put(pt.getPropertyName(), pt);
-        } else if (!pt.isPersistent()) {
-            // basically derived column properties defined at extended entity
-            setupPropertyCacheNotPersistentElement(proprertyCache, selectColumnSet, pt);
-        }
-    }
-
-    protected void setupPropertyCacheNotPersistentElement(Map<String, TnPropertyMapping> proprertyCache,
-            Set<String> selectColumnSet, TnPropertyType pt) throws SQLException {
-        for (String columnName : selectColumnSet) {
-            String columnNameNotUnsco = Srl.replace(columnName, "_", "");
-            if (columnNameNotUnsco.equalsIgnoreCase(pt.getColumnName())) {
-                proprertyCache.put(columnName, pt);
-                break;
+            Map<String, String> selectColumnMap, TnPropertyType pt) throws SQLException {
+        final String columnDbName = pt.getColumnDbName();
+        if (pt.isPersistent()) {
+            if (selectColumnMap.containsKey(columnDbName)) { // basically true if persistent
+                // the column DB name is same as selected name
+                proprertyCache.put(columnDbName, pt);
+            }
+        } else {
+            if (selectColumnMap.containsKey(columnDbName)) {
+                // for example, the column DB name is property name when derived-referrer
+                // so you should switch the name to selected name
+                proprertyCache.put(selectColumnMap.get(columnDbName), pt);
             }
         }
+        // only a column that is not persistent and non-selected property
     }
 
     // -----------------------------------------------------

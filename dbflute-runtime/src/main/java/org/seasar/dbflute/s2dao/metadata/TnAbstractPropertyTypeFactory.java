@@ -52,15 +52,10 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     }
 
     protected TnPropertyType createPropertyType(DfPropertyDesc propertyDesc) {
-        final String columnName = getColumnName(propertyDesc);
         final ValueType valueType = getValueType(propertyDesc);
-        return new TnPropertyTypeImpl(propertyDesc, valueType, columnName);
-    }
-
-    protected String getColumnName(DfPropertyDesc propertyDesc) {
-        final String propertyName = propertyDesc.getPropertyName();
-        final String name = _beanAnnotationReader.getColumnAnnotation(propertyDesc);
-        return name != null ? name : propertyName;
+        final String columnDbName = getColumnDbName(propertyDesc);
+        final String columnSqlName = getColumnSqlName(columnDbName);
+        return new TnPropertyTypeImpl(propertyDesc, valueType, columnDbName, columnSqlName);
     }
 
     protected ValueType getValueType(DfPropertyDesc propertyDesc) {
@@ -72,6 +67,14 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
         }
         return TnValueTypes.getValueType(propertyType);
     }
+
+    protected String getColumnDbName(DfPropertyDesc propertyDesc) {
+        final String propertyName = propertyDesc.getPropertyName();
+        final String name = _beanAnnotationReader.getColumnAnnotation(propertyDesc);
+        return name != null ? name : propertyName;
+    }
+
+    protected abstract String getColumnSqlName(String columnDbName);
 
     protected ValueType findValueTypeByName(String propertyName, Class<?> propertyType, String keyName) {
         final ValueType valueType = TnValueTypes.getPluginValueType(keyName);

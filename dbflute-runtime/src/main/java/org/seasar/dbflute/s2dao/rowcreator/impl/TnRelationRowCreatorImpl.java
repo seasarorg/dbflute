@@ -18,7 +18,6 @@ package org.seasar.dbflute.s2dao.rowcreator.impl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -41,19 +40,19 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     /**
      * {@inheritDoc}
      */
-    public Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> selectColumnSet,
+    public Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
-        final TnRelationRowCreationResource res = createResourceForRow(rs, rpt, selectColumnSet, relKeyValues,
+        final TnRelationRowCreationResource res = createResourceForRow(rs, rpt, selectColumnMap, relKeyValues,
                 relationPropertyCache);
         return createRelationRow(res);
     }
 
     protected abstract TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
-            Set<String> selectColumnSet, Map<String, Object> relKeyValues,
+            Map<String, String> selectColumnMap, Map<String, Object> relKeyValues,
             Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) throws SQLException;
 
     /**
@@ -178,7 +177,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     /**
      * {@inheritDoc}
      */
-    public Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Set<String> selectColumnSet,
+    public Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
             TnBeanMetaData bmd) throws SQLException {
         // - - - - - - - 
         // Entry Point!
@@ -188,7 +187,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
             final TnRelationPropertyType rpt = bmd.getRelationPropertyType(i);
             final String baseSuffix = "";
             final String relationNoSuffix = buildRelationNoSuffix(rpt);
-            final TnRelationRowCreationResource res = createResourceForPropertyCache(rpt, selectColumnSet,
+            final TnRelationRowCreationResource res = createResourceForPropertyCache(rpt, selectColumnMap,
                     relationPropertyCache, baseSuffix, relationNoSuffix, getLimitRelationNestLevel());
             if (rpt == null) {
                 continue;
@@ -199,7 +198,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected abstract TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
-            Set<String> selectColumnSet, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
+            Map<String, String> selectColumnMap, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
             String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException;
 
     protected abstract void setupPropertyCache(TnRelationRowCreationResource res) throws SQLException;

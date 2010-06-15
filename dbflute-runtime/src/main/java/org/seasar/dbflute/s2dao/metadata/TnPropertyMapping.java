@@ -30,5 +30,7 @@ public interface TnPropertyMapping {
 
     String getPropertyName();
 
-    String getColumnName();
+    String getColumnDbName();
+
+    String getColumnSqlName();
 }

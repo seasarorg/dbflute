@@ -125,7 +125,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             } else {
                 sb.append(", ");
             }
-            final String keyName = bmd.getPrimaryKey(i);
+            final String keyName = bmd.getPrimaryKeyDbName(i);
             sb.append(keyName).append("=");
             sb.append(bmd.getPropertyTypeByColumnName(keyName).getPropertyDesc().getValue(bean));
             if (i == size - 1) {
@@ -155,7 +155,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
-            final String columnName = pt.getColumnName();
+            final String columnName = pt.getColumnSqlName();
             if (i > 0) {
                 sb.append(", ");
             }
@@ -174,16 +174,16 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         }
         sb.append(getLineSeparator()).append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) { // never zero loop
-            sb.append(bmd.getPrimaryKey(i)).append(" = ? and ");
+            sb.append(bmd.getPrimaryKeySqlName(i)).append(" = ? and ");
         }
         sb.setLength(sb.length() - 5); // for deleting extra ' and '
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             TnPropertyType pt = bmd.getVersionNoPropertyType();
-            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
+            sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
         if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             TnPropertyType pt = bmd.getTimestampPropertyType();
-            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
+            sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
         return sb.toString();
     }

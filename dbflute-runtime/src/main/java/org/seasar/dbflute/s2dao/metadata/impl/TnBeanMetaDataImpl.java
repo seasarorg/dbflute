@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -110,7 +112,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     }
 
     protected void setupTableName(DfBeanDesc beanDesc) {
-        String ta = _beanAnnotationReader.getTableAnnotation();
+        final String ta = _beanAnnotationReader.getTableAnnotation();
         if (ta != null) {
             _tableName = ta;
         } else {
@@ -119,16 +121,16 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     }
 
     protected void setupProperty() {
-        TnPropertyType[] propertyTypes = _propertyTypeFactory.createBeanPropertyTypes();
+        final TnPropertyType[] propertyTypes = _propertyTypeFactory.createBeanPropertyTypes();
         for (int i = 0; i < propertyTypes.length; i++) {
             TnPropertyType pt = propertyTypes[i];
             addPropertyType(pt);
-            _columnPropertyTypeMap.put(pt.getColumnName(), pt);
+            _columnPropertyTypeMap.put(pt.getColumnDbName(), pt);
         }
 
-        TnRelationPropertyType[] relationPropertyTypes = _relationPropertyTypeFactory.createRelationPropertyTypes();
-        for (int i = 0; i < relationPropertyTypes.length; i++) {
-            TnRelationPropertyType rpt = relationPropertyTypes[i];
+        final TnRelationPropertyType[] rpTypes = _relationPropertyTypeFactory.createRelationPropertyTypes();
+        for (int i = 0; i < rpTypes.length; i++) {
+            TnRelationPropertyType rpt = rpTypes[i];
             addRelationPropertyType(rpt);
         }
     }
@@ -200,9 +202,18 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     }
 
     public TnPropertyType getPropertyTypeByColumnName(String columnName) {
-        TnPropertyType propertyType = (TnPropertyType) _columnPropertyTypeMap.get(columnName);
+        final TnPropertyType propertyType = _columnPropertyTypeMap.get(columnName);
         if (propertyType == null) {
-            String msg = "The column was not found in the table: table=" + _tableName + " column=" + columnName;
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The column was not found in the table.");
+            br.addItem("Column");
+            br.addElement(_tableName + "." + columnName);
+            br.addItem("Mapping");
+            final Set<Entry<String, TnPropertyType>> entrySet = _columnPropertyTypeMap.entrySet();
+            for (Entry<String, TnPropertyType> entry : entrySet) {
+                br.addElement(entry.getKey() + ": " + entry.getValue());
+            }
+            final String msg = br.buildExceptionMessage();
             throw new IllegalStateException(msg);
         }
         return propertyType;
@@ -317,8 +328,12 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         return _primaryKeys.length;
     }
 
-    public String getPrimaryKey(int index) {
-        return _primaryKeys[index].getColumnName();
+    public String getPrimaryKeyDbName(int index) {
+        return _primaryKeys[index].getColumnDbName();
+    }
+
+    public String getPrimaryKeySqlName(int index) {
+        return _primaryKeys[index].getColumnSqlName();
     }
 
     public int getIdentifierGeneratorSize() {

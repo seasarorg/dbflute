@@ -31,44 +31,29 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DfPropertyDesc propertyDesc;
-
-    private final String propertyName;
-
-    private String columnName;
-
-    private final ValueType valueType;
-
-    private boolean primaryKey = false;
-
-    private boolean persistent = true;
+    protected final DfPropertyDesc _propertyDesc;
+    protected final String _propertyName;
+    protected final String _columnDbName;
+    protected final String _columnSqlName;
+    protected final ValueType _valueType;
+    protected boolean _primaryKey = false;
+    protected boolean _persistent = true;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
-        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName());
+        // for non persistent property (for example, relation)
+        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), propertyDesc.getPropertyName());
     }
 
-    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType) {
-        this(propertyDesc, valueType, propertyDesc.getPropertyName());
-    }
-
-    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnName) {
-        this.propertyDesc = propertyDesc;
-        this.propertyName = propertyDesc.getPropertyName();
-        this.valueType = valueType;
-        this.columnName = columnName;
-    }
-
-    public TnPropertyTypeImpl(String propertyName, ValueType valueType) {
-        this(propertyName, valueType, propertyName);
-    }
-
-    public TnPropertyTypeImpl(String propertyName, ValueType valueType, String columnName) {
-        this.propertyName = propertyName;
-        this.valueType = valueType;
-        this.columnName = columnName;
+    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnDbName,
+            String columnSqlName) {
+        this._propertyDesc = propertyDesc;
+        this._propertyName = propertyDesc.getPropertyName();
+        this._valueType = valueType;
+        this._columnDbName = columnDbName;
+        this._columnSqlName = columnSqlName;
     }
 
     // ===================================================================================
@@ -76,50 +61,50 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                      ==============
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{" + propertyName + "(" + columnName + "), "
-                + DfTypeUtil.toClassTitle(valueType) + ", " + primaryKey + ", " + persistent + "}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + _propertyName + "(" + _columnDbName + "), "
+                + DfTypeUtil.toClassTitle(_valueType) + ", " + _primaryKey + ", " + _persistent + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public DfPropertyAccessor getPropertyAccessor() {
-        return propertyDesc;
+        return _propertyDesc;
     }
 
     public DfPropertyDesc getPropertyDesc() {
-        return propertyDesc;
+        return _propertyDesc;
     }
 
     public String getPropertyName() {
-        return propertyName;
+        return _propertyName;
     }
 
-    public String getColumnName() {
-        return columnName;
+    public String getColumnDbName() {
+        return _columnDbName;
     }
 
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
+    public String getColumnSqlName() {
+        return _columnSqlName;
     }
 
     public ValueType getValueType() {
-        return valueType;
+        return _valueType;
     }
 
     public boolean isPrimaryKey() {
-        return primaryKey;
+        return _primaryKey;
     }
 
     public void setPrimaryKey(boolean primaryKey) {
-        this.primaryKey = primaryKey;
+        this._primaryKey = primaryKey;
     }
 
     public boolean isPersistent() {
-        return persistent;
+        return _persistent;
     }
 
     public void setPersistent(boolean persistent) {
-        this.persistent = persistent;
+        this._persistent = persistent;
     }
 }

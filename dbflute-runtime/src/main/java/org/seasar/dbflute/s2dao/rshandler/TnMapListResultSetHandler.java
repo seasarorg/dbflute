@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.jdbc.ValueType;
 
 /**
  * @author jflute
@@ -29,10 +29,10 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 public class TnMapListResultSetHandler extends TnAbstractMapResultSetHandler {
 
     public Object handle(ResultSet rs) throws SQLException {
-        final TnPropertyType[] propertyTypes = createPropertyTypes(rs.getMetaData());
+        final Map<String, ValueType> propertyTypeMap = createPropertyTypeMap(rs.getMetaData());
         final List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         while (rs.next()) {
-            list.add(createRow(rs, propertyTypes));
+            list.add(createRow(rs, propertyTypeMap));
         }
         return list;
     }

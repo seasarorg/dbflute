@@ -18,7 +18,6 @@ package org.seasar.dbflute.s2dao.rowcreator.impl;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -43,8 +42,8 @@ public class TnRelationRowCreationResource {
     /** Relation property type. */
     protected TnRelationPropertyType _relationPropertyType;
 
-    /** The name set of select column. */
-    protected Set<String> _selectColumnSet;
+    /** The name map of select column. */
+    protected Map<String, String> _selectColumnMap;
 
     /** The map of relation key values. The key is relation column name. */
     protected Map<String, Object> _relKeyValues;
@@ -129,7 +128,7 @@ public class TnRelationRowCreationResource {
     //                                       selectColumnSet
     //                                       ---------------
     public boolean containsSelectColumn(String columnName) {
-        return _selectColumnSet.contains(columnName);
+        return _selectColumnMap.containsKey(columnName);
     }
 
     // -----------------------------------------------------
@@ -184,7 +183,7 @@ public class TnRelationRowCreationResource {
     //                                                suffix
     //                                                ------
     public String buildRelationColumnName() {
-        return _currentPropertyMapping.getColumnName() + _relationNoSuffix;
+        return _currentPropertyMapping.getColumnDbName() + _relationNoSuffix;
     }
 
     public void addRelationNoSuffix(String additionalRelationNoSuffix) {
@@ -274,12 +273,12 @@ public class TnRelationRowCreationResource {
         this._resultSet = resultSet;
     }
 
-    public Set<String> getSelectColumnSet() {
-        return _selectColumnSet;
+    public Map<String, String> getSelectColumnMap() {
+        return _selectColumnMap;
     }
 
-    public void setSelectColumnSet(Set<String> selectColumnSet) {
-        this._selectColumnSet = selectColumnSet;
+    public void setSelectColumnMap(Map<String, String> selectColumnMap) {
+        this._selectColumnMap = selectColumnMap;
     }
 
     public Map<String, Object> getRelKeyValues() {

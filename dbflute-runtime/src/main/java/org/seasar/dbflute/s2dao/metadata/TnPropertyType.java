@@ -25,8 +25,6 @@ public interface TnPropertyType extends TnPropertyMapping {
 
     DfPropertyDesc getPropertyDesc();
 
-    void setColumnName(String columnName);
-
     boolean isPrimaryKey();
 
     void setPrimaryKey(boolean primaryKey);

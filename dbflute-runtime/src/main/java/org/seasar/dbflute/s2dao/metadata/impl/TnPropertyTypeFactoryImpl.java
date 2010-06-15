@@ -109,11 +109,12 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
         return list.toArray(new TnPropertyType[list.size()]);
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected boolean isColumn(DfPropertyDesc propertyDesc) {
-        if (!hasDBMeta()) { // no DBMeta means the property is NOT column
-            return false;
-        }
-        return _dbmeta.hasColumn(propertyDesc.getPropertyName());
+        // no DBMeta means the property is NOT column (for example, derived-column)
+        return hasDBMeta() ? _dbmeta.hasColumn(propertyDesc.getPropertyName()) : false;
     }
 
     protected boolean isClassification(DfPropertyDesc propertyDesc) {
@@ -149,20 +150,23 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     protected boolean isPersistent(TnPropertyType propertyType) {
         final String propertyName = propertyType.getPropertyName();
         final DfPropertyDesc propertyDesc = propertyType.getPropertyDesc();
-        if ((hasDBMeta() && _dbmeta.hasColumn(propertyName)) || hasColumnAnnotation(propertyDesc)) {
-            return true;
-        }
-        return false;
+        return (hasDBMeta() && _dbmeta.hasColumn(propertyName)) || hasColumnAnnotation(propertyDesc);
     }
 
     protected boolean hasColumnAnnotation(DfPropertyDesc propertyDesc) {
         return _beanAnnotationReader.getColumnAnnotation(propertyDesc) != null;
     }
 
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
     protected boolean hasDBMeta() {
         return _dbmeta != null;
+    }
+
+    @Override
+    protected String getColumnSqlName(String columnDbName) {
+        if (hasDBMeta() && _dbmeta.hasColumn(columnDbName)) {
+            return _dbmeta.findColumnInfo(columnDbName).getColumnSqlName();
+        } else {
+            return columnDbName;
+        }
     }
 }

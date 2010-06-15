@@ -64,11 +64,11 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     //                                                                             Execute
     //                                                                             =======
     public int execute(Object[] args) {
-        Connection connection = getConnection();
+        Connection conn = getConnection();
         try {
-            return execute(connection, args[0]);
+            return execute(conn, args[0]);
         } finally {
-            close(connection);
+            close(conn);
         }
     }
 
@@ -76,11 +76,11 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         return execute(args);
     }
 
-    protected int execute(Connection connection, Object bean) {
+    protected int execute(Connection conn, Object bean) {
         preUpdateBean(bean);
         setupBindVariables(bean);
         logSql(bindVariables, getArgTypes(bindVariables));
-        PreparedStatement ps = prepareStatement(connection);
+        PreparedStatement ps = prepareStatement(conn);
         int ret = -1;
         try {
             bindArgs(ps, bindVariables, bindVariableValueTypes);
@@ -177,22 +177,22 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     }
 
     protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {
-        TnBeanMetaData bmd = getBeanMetaData();
+        final TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
-            TnPropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKey(i));
-            DfPropertyDesc pd = pt.getPropertyDesc();
+            final TnPropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKeyDbName(i));
+            final DfPropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
-            TnPropertyType pt = bmd.getVersionNoPropertyType();
-            DfPropertyDesc pd = pt.getPropertyDesc();
+            final TnPropertyType pt = bmd.getVersionNoPropertyType();
+            final DfPropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
         if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
-            TnPropertyType pt = bmd.getTimestampPropertyType();
-            DfPropertyDesc pd = pt.getPropertyDesc();
+            final TnPropertyType pt = bmd.getTimestampPropertyType();
+            final DfPropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
@@ -200,14 +200,14 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
 
     protected void updateTimestampIfNeed(Object bean) {
         if (getTimestamp() != null) {
-            DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
+            final DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
             pd.setValue(bean, getTimestamp());
         }
     }
 
     protected void updateVersionNoIfNeed(Object bean) {
         if (getVersionNo() != null) {
-            DfPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
+            final DfPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
             pd.setValue(bean, getVersionNo());
         }
     }

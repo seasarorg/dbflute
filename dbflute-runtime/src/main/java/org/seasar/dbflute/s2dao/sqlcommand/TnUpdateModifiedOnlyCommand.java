@@ -50,16 +50,17 @@ public class TnUpdateModifiedOnlyCommand extends TnUpdateAutoDynamicCommand {
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyNames.length; ++i) {
             final TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
-            if (pt.isPrimaryKey() == false) {
-                final String propertyName = pt.getPropertyName();
-                if (propertyName.equalsIgnoreCase(timestampPropertyName)
-                        || propertyName.equalsIgnoreCase(versionNoPropertyName)
-                        || modifiedPropertyNames.contains(propertyName)) {
-                    types.add(pt);
-                }
+            if (pt.isPrimaryKey()) {
+                continue;
+            }
+            final String propertyName = pt.getPropertyName();
+            if (propertyName.equalsIgnoreCase(timestampPropertyName)
+                    || propertyName.equalsIgnoreCase(versionNoPropertyName)
+                    || modifiedPropertyNames.contains(propertyName)) {
+                types.add(pt);
             }
         }
-        final TnPropertyType[] propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
+        final TnPropertyType[] propertyTypes = types.toArray(new TnPropertyType[types.size()]);
         return propertyTypes;
     }
 }

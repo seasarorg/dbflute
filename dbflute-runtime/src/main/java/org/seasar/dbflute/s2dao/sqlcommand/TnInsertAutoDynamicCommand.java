@@ -72,7 +72,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         sb.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
-            final String columnName = pt.getColumnName();
+            final String columnName = pt.getColumnSqlName();
             if (i > 0) {
                 sb.append(", ");
             }

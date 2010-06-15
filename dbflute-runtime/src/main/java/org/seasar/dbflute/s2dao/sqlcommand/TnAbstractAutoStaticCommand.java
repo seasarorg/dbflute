@@ -136,7 +136,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
             if (isInsertTarget(pt)) {
-                sb.append(pt.getColumnName());
+                sb.append(pt.getColumnSqlName());
                 sb.append(", ");
             }
         }
@@ -163,10 +163,10 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName) && !versionNoAutoIncrementOnMemory) {
-                sb.append(pt.getColumnName()).append(" = ").append(pt.getColumnName()).append(" + 1, ");
+                sb.append(pt.getColumnSqlName()).append(" = ").append(pt.getColumnSqlName()).append(" + 1, ");
                 continue;
             }
-            sb.append(pt.getColumnName()).append(" = ?, ");
+            sb.append(pt.getColumnSqlName()).append(" = ?, ");
         }
         sb.setLength(sb.length() - 2);
         setupUpdateWhere(sb);
@@ -195,16 +195,16 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         TnBeanMetaData bmd = getBeanMetaData();
         sb.append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
-            sb.append(bmd.getPrimaryKey(i)).append(" = ? and ");
+            sb.append(bmd.getPrimaryKeySqlName(i)).append(" = ? and ");
         }
         sb.setLength(sb.length() - 5);
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             TnPropertyType pt = bmd.getVersionNoPropertyType();
-            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
+            sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
         if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             TnPropertyType pt = bmd.getTimestampPropertyType();
-            sb.append(" and ").append(pt.getColumnName()).append(" = ?");
+            sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
     }
 }

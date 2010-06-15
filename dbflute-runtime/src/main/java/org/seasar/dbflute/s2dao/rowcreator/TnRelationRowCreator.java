@@ -18,7 +18,6 @@ package org.seasar.dbflute.s2dao.rowcreator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Set;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
@@ -33,23 +32,22 @@ public interface TnRelationRowCreator {
     /**
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
-     * @param columnNames The set of column name. (NotNull)
+     * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
      * @param relKeyValues The map of relation key values. The key is relation column name. (Nullable)
-     * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
+     * @param relationPropertyCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException
      */
-    Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
+    Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache)
             throws SQLException;
 
     /**
-     * @param columnNames The set of column name. (NotNull)
+     * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
      * @param bmd Bean meta data of base object. (NotNull)
-     * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
+     * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @throws SQLException
      */
-    Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
-            throws SQLException;
-
+    Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
+            TnBeanMetaData bmd) throws SQLException;
 }

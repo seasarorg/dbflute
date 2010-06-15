@@ -20,9 +20,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.seasar.dbflute.AccessContext;
 import org.seasar.dbflute.DBDef;
@@ -34,7 +32,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
-import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
@@ -253,33 +251,34 @@ public class ResourceContext {
     // -----------------------------------------------------
     //                                         Select Column
     //                                         -------------
-    public static Set<String> createSelectColumnSet(ResultSet rs) throws SQLException {
+    public static Map<String, String> createSelectColumnMap(ResultSet rs) throws SQLException {
         final ResultSetMetaData rsmd = rs.getMetaData();
         final int count = rsmd.getColumnCount();
-        final Set<String> columnSet = new HashSet<String>();
-        for (int i = 0; i < count; ++i) {
-            final String columnLabel = rsmd.getColumnLabel(i + 1);
-            final int pos = columnLabel.lastIndexOf('.'); // for SQLite
-            if (-1 < pos) {
-                columnSet.add(columnLabel.substring(pos + 1));
-            } else {
-                columnSet.add(columnLabel);
-            }
-        }
         final Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
-        if (selectIndexReverseMap == null) {
-            return columnSet;
-        }
-        final Set<String> realColumnSet = StringSet.createAsCaseInsensitive();
-        for (String columnName : columnSet) {
-            final String realColumnName = selectIndexReverseMap.get(columnName);
-            if (realColumnName != null) { // mainly true
-                realColumnSet.add(realColumnName);
-            } else { // for derived columns and so on
-                realColumnSet.add(columnName);
+
+        // flexible for resolving non-compilable connectors and reservation words
+        final Map<String, String> columnMap = StringKeyMap.createAsFlexible();
+
+        for (int i = 0; i < count; ++i) {
+            String columnLabel = rsmd.getColumnLabel(i + 1);
+            final int dotIndex = columnLabel.lastIndexOf('.');
+            if (dotIndex >= 0) { // basically for SQLite
+                columnLabel = columnLabel.substring(dotIndex + 1);
             }
+            final String realColumnName;
+            if (selectIndexReverseMap != null) {
+                final String mappedName = selectIndexReverseMap.get(columnLabel);
+                if (mappedName != null) { // mainly true
+                    realColumnName = mappedName; // switch select indexes to column DB names
+                } else { // for derived columns and so on
+                    realColumnName = columnLabel;
+                }
+            } else {
+                realColumnName = columnLabel;
+            }
+            columnMap.put(realColumnName, realColumnName);
         }
-        return realColumnSet;
+        return columnMap;
     }
 
     // -----------------------------------------------------
