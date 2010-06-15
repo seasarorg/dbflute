@@ -73,6 +73,7 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
@@ -1262,7 +1263,16 @@ public class Column {
     }
 
     protected String filterJavaNameNonCompilableConnector(String javaName) {
-        return getBasicProperties().filterJavaNameNonCompilableConnector(javaName);
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.filterJavaNameNonCompilableConnector(javaName, new NonCompilableChecker() {
+            public String name() {
+                return getName();
+            }
+
+            public String disp() {
+                return getTable().getName() + "." + getName() + ": " + getColumnDefinitionLineDisp();
+            }
+        });
     }
 
     /**

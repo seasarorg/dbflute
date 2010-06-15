@@ -82,6 +82,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -459,7 +460,7 @@ public class Table {
     //                                               -------
     public String getBasicInfoDispString() {
         final String type = getType();
-        return getAliasExpression() + getName() + (type != null ? " for " + getType() : "");
+        return getAliasExpression() + getName() + (type != null ? " as " + type : "");
     }
 
     public String getTitleForSchemaHtml() {
@@ -1667,7 +1668,16 @@ public class Table {
     }
 
     protected String filterJavaNameNonCompilableConnector(String javaName) {
-        return getBasicProperties().filterJavaNameNonCompilableConnector(javaName);
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.filterJavaNameNonCompilableConnector(javaName, new NonCompilableChecker() {
+            public String name() {
+                return getName();
+            }
+
+            public String disp() {
+                return getBasicInfoDispString();
+            }
+        });
     }
 
     /**

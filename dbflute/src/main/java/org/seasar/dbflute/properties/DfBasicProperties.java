@@ -1,7 +1,6 @@
 package org.seasar.dbflute.properties;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -14,8 +13,6 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * Basic properties.
@@ -429,20 +426,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             return true;
         }
         return isProperty("isJavaNameOfColumnSameAsDbName", defaultProperty); // old style or default
-    }
-
-    public String filterJavaNameNonCompilableConnector(String javaName) { // non property
-        // these non-compilable marks in Java or C# are also unsupported in DBFlute
-        // but only a select statement of outside-SQL is supported so it replaces them here
-        final List<String> connectorList = getNonCompilableConnectorList();
-        for (String connector : connectorList) {
-            javaName = Srl.replace(javaName, connector, "_");
-        }
-        return javaName;
-    }
-
-    public List<String> getNonCompilableConnectorList() {
-        return DfCollectionUtil.newArrayList("-", " "); // non property
     }
 
     // ===================================================================================

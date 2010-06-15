@@ -6,7 +6,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -246,9 +249,59 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return beginQuote + name + endQuote;
     }
 
+    // -----------------------------------------------------
+    //                                        Non Compilable
+    //                                        --------------
+    public boolean isSuppressNonCompilableConnectorLimiter() { // It's closet
+        return isProperty("isSuppressNonCompilableConnectorLimiter", false);
+    }
+
+    public String filterJavaNameNonCompilableConnector(String javaName, NonCompilableChecker checker) {
+        checkNonCompilableConnector(checker.name(), checker.disp());
+        final List<String> connectorList = getNonCompilableConnectorList();
+        for (String connector : connectorList) {
+            javaName = Srl.replace(javaName, connector, "_");
+        }
+        return javaName;
+    }
+
+    public static interface NonCompilableChecker {
+        String name();
+
+        String disp();
+    }
+
+    public void checkNonCompilableConnector(String name, String disp) {
+        if (isSuppressNonCompilableConnectorLimiter()) {
+            return;
+        }
+        if (containsNonCompilableConnector(name)) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Non-compilable connectors in a table/column name were found.");
+            br.addItem("Advice");
+            br.addElement("Non-compilable connectors are unsupported.");
+            br.addElement("For example, 'HYPHEN-TABLE' and 'SPACE COLUMN' and so on...");
+            br.addElement("You should change the names like this:");
+            br.addElement("  'HYPHEN-TABLE' -> HYPHEN_TABLE");
+            br.addElement("  'SPACE COLUMN' -> SPACE_COLUMN");
+            br.addElement("");
+            br.addElement("If you cannot change by any possibility, you can suppress its limiter.");
+            br.addElement(" -> isSuppressNonCompilableConnectorLimiter in littleAdjustmentMap.dfprop.");
+            br.addElement("However several functions may not work. It's a restriction.");
+            br.addItem("Target Object");
+            br.addElement(disp);
+            final String msg = br.buildExceptionMessage();
+            throw new DfTableColumnNameNonCompilableConnectorException(msg);
+        }
+    }
+
     protected boolean containsNonCompilableConnector(String tableName) {
-        final List<String> connectorList = getBasicProperties().getNonCompilableConnectorList();
+        final List<String> connectorList = getNonCompilableConnectorList();
         return Srl.containsAny(tableName, connectorList.toArray(new String[] {}));
+    }
+
+    protected List<String> getNonCompilableConnectorList() {
+        return DfCollectionUtil.newArrayList("-", " "); // non property
     }
 
     // ===================================================================================
