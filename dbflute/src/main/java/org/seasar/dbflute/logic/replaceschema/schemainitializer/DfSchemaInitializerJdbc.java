@@ -29,6 +29,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
@@ -37,6 +38,7 @@ import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * The schema initializer with JDBC.
@@ -518,7 +520,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         //if (_useFullQualifiedTableName && _unifiedSchema.hasSchema()) {
         //    tableName = _unifiedSchema.buildFullQualifiedName(tableName);
         //}
+        DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        tableName = prop.quoteTableNameIfNeeds(tableName, true);
         return tableName;
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

@@ -276,6 +276,48 @@ public class Table {
     }
 
     // -----------------------------------------------------
+    //                                           Custom Name
+    //                                           -----------
+    /**
+     * Get annotation table name. (for S2Dao)
+     * @return Annotation table name. (NotNull)
+     */
+    public String getAnnotationTableName() {
+        return getTableSqlName();
+    }
+
+    /**
+     * Get table SQL name.
+     * @return Table SQL name. (NotNull)
+     */
+    public String getTableSqlName() {
+        final String tableName = quoteTableNameIfNeeds(_name);
+        return filterSchemaSqlPrefix(tableName);
+    }
+
+    public String getTableSqlNameDirectUse() {
+        final String tableName = quoteTableNameIfNeedsDirectUse(_name);
+        return filterSchemaSqlPrefix(tableName);
+    }
+
+    protected String filterSchemaSqlPrefix(String tableName) {
+        if (hasSchema()) {
+            return _unifiedSchema.buildSqlName(tableName);
+        }
+        return tableName;
+    }
+
+    protected String quoteTableNameIfNeeds(String tableName) {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.quoteTableNameIfNeeds(tableName);
+    }
+
+    protected String quoteTableNameIfNeedsDirectUse(String tableName) {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.quoteTableNameIfNeeds(tableName, true);
+    }
+
+    // -----------------------------------------------------
     //                                            Alias Name
     //                                            ----------
     public boolean hasAlias() {
@@ -431,48 +473,6 @@ public class Table {
         sb.append(", columnCount=").append(getColumns().length);
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         return " title=\"" + prop.resolveAttributeForSchemaHtml(sb.toString()) + "\"";
-    }
-
-    // -----------------------------------------------------
-    //                                   Especial Table Name
-    //                                   -------------------
-    /**
-     * Get annotation table name. (for S2Dao)
-     * @return Annotation table name. (NotNull)
-     */
-    public String getAnnotationTableName() {
-        return getTableSqlName();
-    }
-
-    /**
-     * Get table SQL name.
-     * @return Table SQL name. (NotNull)
-     */
-    public String getTableSqlName() {
-        final String tableName = quoteTableNameIfNeeds(_name);
-        return filterSchemaSqlPrefix(tableName);
-    }
-
-    public String getTableSqlNameDirectUse() {
-        final String tableName = quoteTableNameIfNeedsDirectUse(_name);
-        return filterSchemaSqlPrefix(tableName);
-    }
-
-    protected String filterSchemaSqlPrefix(String tableName) {
-        if (hasSchema()) {
-            return _unifiedSchema.buildSqlName(tableName);
-        }
-        return tableName;
-    }
-
-    protected String quoteTableNameIfNeeds(String tableName) {
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.quoteTableNameIfNeeds(tableName);
-    }
-
-    protected String quoteTableNameIfNeedsDirectUse(String tableName) {
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.quoteTableNameIfNeeds(tableName, true);
     }
 
     // -----------------------------------------------------
@@ -1642,14 +1642,16 @@ public class Table {
      * Get name to use in Java sources
      */
     public String getJavaName() {
-        if (_javaName == null) {
-            if (needsJavaNameConvert()) {
-                _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
-            } else {
-                _javaName = getName(); // for sql2entity mainly
-            }
-            _javaName = filterBuriJavaNameIfNeeds(_javaName);
+        if (_javaName != null) {
+            return _javaName;
         }
+        if (needsJavaNameConvert()) {
+            _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
+        } else {
+            _javaName = getName(); // for sql2entity mainly
+        }
+        _javaName = filterBuriJavaNameIfNeeds(_javaName);
+        _javaName = filterJavaNameNonCompilableConnector(_javaName);
         return _javaName;
     }
 
@@ -1662,6 +1664,10 @@ public class Table {
             }
         }
         return javaName;
+    }
+
+    protected String filterJavaNameNonCompilableConnector(String javaName) {
+        return getBasicProperties().filterJavaNameNonCompilableConnector(javaName);
     }
 
     /**
@@ -1854,7 +1860,13 @@ public class Table {
     }
 
     public String getBehaviorComponentName() {
-        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Bhv";
+        final String uncapName = getUncapitalisedJavaName();
+        final String componentName = getDatabase().filterComponentNameWithProjectPrefix(uncapName) + "Bhv";
+
+        // remove "$" because a component name that has a dollar mark may be unsupported
+        // for example, in Spring Framework case:
+        //   -> SAXParseException: Attribute value FOO$BAR of type ID must be a name.
+        return Srl.replace(componentName, "$", "");
     }
 
     public String getBehaviorApComponentName() {

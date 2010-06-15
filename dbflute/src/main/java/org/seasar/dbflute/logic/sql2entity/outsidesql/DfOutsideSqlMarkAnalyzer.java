@@ -61,7 +61,7 @@ public class DfOutsideSqlMarkAnalyzer {
         final List<String> retLs = new ArrayList<String>();
         String primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "--*", "*");
         if (primaryKeyColumnNameSeparatedString == null || primaryKeyColumnNameSeparatedString.trim().length() == 0) {
-            primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "-- *", "*");// for MySQL.
+            primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "-- *", "*"); // for MySQL.
         }
         if (primaryKeyColumnNameSeparatedString != null && primaryKeyColumnNameSeparatedString.trim().length() != 0) {
             final StringTokenizer st = new StringTokenizer(primaryKeyColumnNameSeparatedString, ",;/\t");

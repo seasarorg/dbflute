@@ -858,7 +858,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             throw new IllegalArgumentException(msg);
         }
         if (columnName.contains("_")) {
-            return true; // contains connector!
+            return true; // contains (supported) connector!
         }
         // here 'BIRHDATE' or 'birthdate' or 'Birthdate'
         // or 'memberStatus' or 'MemberStatus'

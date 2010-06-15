@@ -276,6 +276,14 @@ public class Column {
     }
 
     // -----------------------------------------------------
+    //                                           Custom Name
+    //                                           -----------
+    public String getColumnSqlName() {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.quoteColumnNameIfNeeds(getName());
+    }
+
+    // -----------------------------------------------------
     //                                            Alias Name
     //                                            ----------
     public boolean hasAlias() {
@@ -1227,20 +1235,22 @@ public class Column {
         return _needsJavaNameConvert;
     }
 
-    public String getJavaName() {
-        if (_javaName == null) {
-            if (needsJavaNameConvert()) {
-                _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
-            } else {
-                // initial-capitalize only
-                _javaName = initCap(getName());
-            }
-            _javaName = filterBuriJavaNameIfNeeds(_javaName); // for Buri
+    public String getJavaName() { // lazy load
+        if (_javaName != null) {
+            return _javaName;
         }
+        if (needsJavaNameConvert()) {
+            _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
+        } else {
+            // initial-capitalize only
+            _javaName = initCap(getName());
+        }
+        _javaName = filterJavaNameBuriStyleIfNeeds(_javaName); // for Buri
+        _javaName = filterJavaNameNonCompilableConnector(_javaName); // for example, "SPACE EXISTS"
         return _javaName;
     }
 
-    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
+    protected String filterJavaNameBuriStyleIfNeeds(String javaName) { // for Buri
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
         if (buriProperties.isUseBuri() && getTable().isBuriInternal()) {
             final String arranged = buriProperties.arrangeBuriColumnJavaName(_javaName);
@@ -1249,6 +1259,10 @@ public class Column {
             }
         }
         return javaName;
+    }
+
+    protected String filterJavaNameNonCompilableConnector(String javaName) {
+        return getBasicProperties().filterJavaNameNonCompilableConnector(javaName);
     }
 
     /**

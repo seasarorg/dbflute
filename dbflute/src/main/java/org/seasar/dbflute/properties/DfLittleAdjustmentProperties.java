@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -175,6 +176,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                               Quote
     //                                                                               =====
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
     protected Set<String> _quoteTableNameSet;
 
     protected Set<String> getQuoteTableNameSet() { // It's closet!
@@ -201,9 +205,35 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String quoteTableNameIfNeeds(String tableName, boolean directUse) {
-        if (!isQuoteTable(tableName)) {
+        if (!isQuoteTable(tableName) && !containsNonCompilableConnector(tableName)) {
             return tableName;
         }
+        return doQuoteName(tableName, directUse);
+    }
+
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
+    // *basically unsupported about column's quotation
+    public boolean isQuoteColumn(String tableName) { // non property
+        return false; // fixed
+    }
+
+    public String quoteColumnNameIfNeeds(String columnName) { // non property
+        return quoteColumnNameIfNeeds(columnName, false);
+    }
+
+    public String quoteColumnNameIfNeeds(String columnName, boolean directUse) {
+        if (!isQuoteColumn(columnName) && !containsNonCompilableConnector(columnName)) {
+            return columnName;
+        }
+        return doQuoteName(columnName, directUse);
+    }
+
+    // -----------------------------------------------------
+    //                                                 Quote
+    //                                                 -----
+    protected String doQuoteName(String name, boolean directUse) {
         final String beginQuote;
         final String endQuote;
         if (getBasicProperties().isDatabaseSQLServer()) {
@@ -213,7 +243,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             beginQuote = directUse ? "\"" : "\\\"";
             endQuote = beginQuote;
         }
-        return beginQuote + tableName + endQuote;
+        return beginQuote + name + endQuote;
+    }
+
+    protected boolean containsNonCompilableConnector(String tableName) {
+        final List<String> connectorList = getBasicProperties().getNonCompilableConnectorList();
+        return Srl.containsAny(tableName, connectorList.toArray(new String[] {}));
     }
 
     // ===================================================================================
