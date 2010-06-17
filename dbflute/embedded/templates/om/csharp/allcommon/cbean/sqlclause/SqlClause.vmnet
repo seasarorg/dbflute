@@ -191,6 +191,8 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
+    bool isCheckInvalidQuery();
+    void checkInvalidQuery();
     Map<String, ${glConditionKey}> getInvalidQueryColumnMap();
     void registerInvalidQueryColumn(String columnFullName, ${glConditionKey} key);
 

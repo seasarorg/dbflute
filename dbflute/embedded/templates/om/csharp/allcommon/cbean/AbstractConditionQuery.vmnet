@@ -258,34 +258,71 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          Normal Query
     //                                          ------------
     protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
     }
 	
 	protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName, ${glConditionOption} option) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
     }
 
-    protected virtual bool isValidRegistration(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
+    protected virtual bool isValidQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
         String realColumnName = getRealColumnName(colName);
         if (key.isValidRegistration(cvalue, value, realColumnName)) {
             return true;
         } else {
-            getSqlClause().registerInvalidQueryColumn(realColumnName, key);
-            return false;
+            if (getSqlClause().isCheckInvalidQuery()) {
+                throwInvalidQueryRegisteredException(key, cvalue, realColumnName);
+                return false; // unreachable
+            } else {
+                getSqlClause().registerInvalidQueryColumn(realColumnName, key);
+                return false;
+            }
         }
+    }
+
+    protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, String realColumnName) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "An invalid query was registered. (check is working)" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "You should not set an invalid query when you set the check valid."  + ln();
+        msg = msg + "For example:"  + ln();
+        msg = msg + "  (x):"  + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();"  + ln();
+        msg = msg + "    cb.CheckInvalidQuery();"  + ln();
+        msg = msg + "    cb.Query().SetMemberId_Equal(null); // exception"  + ln();
+        msg = msg + "  (o):"  + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();"  + ln();
+        msg = msg + "    cb.CheckInvalidQuery();"  + ln();
+        msg = msg + "    cb.Query().SetMemberId_Equal(3);"  + ln();
+        msg = msg + "  (o):"  + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();"  + ln();
+        msg = msg + "    cb.Query().SetMemberId_Equal(null);"  + ln();
+        msg = msg + ln();
+        msg = msg + "[Column]" + ln();
+        msg = msg + realColumnName + ln();
+        msg = msg + ln();
+        msg = msg + "[Condition Key]" + ln();
+        msg = msg + key.getConditionKey() + ln();
+        msg = msg + ln();
+        msg = msg + "[Registered Value]" + ln();
+        msg = msg + value + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new ${glInvalidQueryRegisteredException}(msg);
     }
 
     // -----------------------------------------------------
     //                                         InScope Query
     //                                         -------------
     protected void regINS<ELEMENT>(${glConditionKey} key, System.Collections.IList value, ${glConditionValue} cvalue, String colName) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         int inScopeLimit = getSqlClause().getInScopeLimit();
@@ -373,14 +410,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         {
             ${glConditionKey} fromKey = option.getFromDateConditionKey();
             DateTime? filteredFromDate = option.filterFromDate(fromDate);
-            if (isValidRegistration(fromKey, filteredFromDate, cvalue, colName)) {
+            if (isValidQuery(fromKey, filteredFromDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
             }
         }
         {
             ${glConditionKey} toKey = option.getToDateConditionKey();
             DateTime? filteredToDate = option.filterToDate(toDate);
-            if (isValidRegistration(toKey, filteredToDate, cvalue, colName)) {
+            if (isValidQuery(toKey, filteredToDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
             }
         }
@@ -406,7 +443,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             throwLikeSearchOptionNotFoundException(colName, value);
             return;// Unreachable!
         }
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         if (xsuppressEscape()) {
@@ -440,7 +477,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String beanName = GetType().Name;
         String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
         msg = msg + "    " + beanName + "." + methodName + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
+        msg = msg + "* * * * * * * * * */";
         throw new ${glRequiredOptionNotFoundException}(msg);
     }
 
@@ -448,7 +485,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          Inline Query
     //                                          ------------
     protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
@@ -464,7 +501,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                , String colName, ${glConditionOption} option) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());

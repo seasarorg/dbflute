@@ -103,7 +103,11 @@
 	<h3>Add Table</h3>
 	<ul class="table-content">
 #foreach ($tableDiff in $schemaDiff.addedTableDiffList)
+#if ($schemaDiff.isLatest())
+		<li><a href="./${database.schemaHtmlFileName}#${tableDiff.tableName}">${tableDiff.tableName}</a></li>
+#else
 		<li>${tableDiff.tableName}</li>
+#end 
 #end
 	</ul>
 #end
@@ -111,7 +115,11 @@
 	<h3>Change Table</h3>
 	<div class="table-content">
 #foreach ($tableDiff in $schemaDiff.changedTableDiffList)
+#if ($schemaDiff.isLatest())
+		<h4><a href="./${database.schemaHtmlFileName}#${tableDiff.tableName}">${tableDiff.tableName}</a></h4>
+#else
 		<h4>${tableDiff.tableName}</h4>
+#end
 		<div class="change-table-content">
 #foreach ($handler in $tableDiff.nextPreviousValidList)
 			<h5>$handler.titleName()</h5>

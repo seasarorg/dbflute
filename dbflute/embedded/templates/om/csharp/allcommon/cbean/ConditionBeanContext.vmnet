@@ -5,6 +5,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonS2DaoInternalSqlParser};
 using ${glPackageBaseCommonUtil};
@@ -67,13 +70,13 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + ln();
             if (searchKey4Log != null && searchKey4Log is ${glConditionBean}) {
                 ${glConditionBean} cb = (${glConditionBean})searchKey4Log;
-                String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
+                String dispalySql = cb.ToDisplaySql();
                 msg = msg + "[Display SQL]" + ln() + dispalySql + ln();
             } else {
                 msg = msg + "[Search Condition]" + ln() + searchKey4Log + ln();
             }
-            msg = msg + "* * * * * * * * * */" + ln();
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+            msg = msg + "* * * * * * * * * */";
+            throw new ${glEntityAlreadyDeletedException}(msg);
         }
 
         public static void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
@@ -87,31 +90,63 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + ln();
             if (searchKey4Log != null && searchKey4Log is ${glConditionBean}) {
                 ${glConditionBean} cb = (${glConditionBean})searchKey4Log;
-                String dispalySql = FilterDisplaySql(cb.ToDisplaySql(), cb.TableDbName);
+                String dispalySql = cb.ToDisplaySql();
                 msg = msg + "[Display SQL]" + ln() + dispalySql + ln();
             } else {
                 msg = msg + "[Search Condition]" + ln() + searchKey4Log + ln();
             }
-            msg = msg + "* * * * * * * * * */" + ln();
+            msg = msg + "* * * * * * * * * */";
             if (cause != null) {
-                throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg, cause);
+                throw new ${glEntityDuplicatedException}(msg, cause);
             } else {
-                throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+                throw new ${glEntityDuplicatedException}(msg);
             }
         }
 
-        private static String FilterDisplaySql(String displaySql, String tableDbName) {
-            if (displaySql == null || displaySql.Trim().Length == 0) {
-                return null;
+        public static void throwSelectEntityConditionNotFoundException(${glConditionBean} cb) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "The condition for selecting an entity was not found!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Confirm your search condition. Does it really select the only one?" + ln();
+            msg = msg + "You have to set a valid query or fetch-first as 1." + ln();
+            msg = msg + "For example:" + ln();
+            msg = msg + "  (x):" + ln();
+            msg = msg + "    MemberCB cb = MemberCB();" + ln();
+            msg = msg + "    ... = memberBhv.SelectEntity(cb); // exception" + ln();
+            msg = msg + "  (x):" + ln();
+            msg = msg + "    MemberCB cb = MemberCB();" + ln();
+            msg = msg + "    cb.Query().SetMemberId_Equal(null);" + ln();
+            msg = msg + "    ... = memberBhv.SelectEntity(cb); // exception" + ln();
+            msg = msg + "  (o):" + ln();
+            msg = msg + "    MemberCB cb = MemberCB();" + ln();
+            msg = msg + "    cb.Query().SetMemberId_Equal(3);" + ln();
+            msg = msg + "    ... = memberBhv.SelectEntity(cb);" + ln();
+            msg = msg + "  (o):" + ln();
+            msg = msg + "    MemberCB cb = MemberCB();" + ln();
+            msg = msg + "    cb.FetchFirst(1);" + ln();
+            msg = msg + "    ... = memberBhv.SelectEntity(cb);" + ln();
+            msg = msg + ln();
+            msg = msg + "[Invalid Query]" + ln();
+            Map<String, ConditionKey> invalidQueryColumnMap = cb.SqlClause.getInvalidQueryColumnMap();
+            if (invalidQueryColumnMap != null && !invalidQueryColumnMap.isEmpty()) {
+                Set<String> keySet invalidQueryColumnMap.keySet();
+                foreach (String columnFullName : keySet) {
+                    ${glConditionKey} key = invalidQueryColumnMap.get(columnFullName);
+                    msg = msg + columnFullName + " : " + key.getConditionKey() + ln();
+                }
+            } else {
+                msg = msg + "*no invalid" + ln();
             }
-            if (displaySql.IndexOf(ln()) >= 0) {
-                return displaySql;
-            }
-            int basePointIndex = displaySql.IndexOf(" from " + tableDbName);
-            if (basePointIndex < 0) {
-                return displaySql;
-            }
-            return displaySql.Substring(0, basePointIndex) + ln() + " " + displaySql.Substring(basePointIndex);
+            msg = msg + ln();
+            msg = msg + "[Fetch Size]" + ln();
+            msg = msg + cb.FetchSize + ln();
+            msg = msg + ln();
+            msg = msg + "[Display SQL]" + ln();
+            msg = msg + cb.ToDisplaySql() + ln();
+            msg = msg + "* * * * * * * * * */";
+            throw new ${glSelectEntityConditionNotFoundException}(msg);
         }
 
         // -----------------------------------------------------

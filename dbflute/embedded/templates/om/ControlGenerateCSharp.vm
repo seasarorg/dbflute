@@ -253,10 +253,12 @@ $database.checkProperties()
 #set ($glIfCommentConditionNotFoundException = "${glProjectPrefix}IfCommentConditionNotFoundException")
 #set ($glIfCommentNotBooleanResultException = "${glProjectPrefix}IfCommentNotBooleanResultException")
 #set ($glIfCommentWrongExpressionException = "${glProjectPrefix}IfCommentWrongExpressionException")
+#set ($glInvalidQueryRegisteredException = "${glProjectPrefix}InvalidQueryRegisteredException")
 #set ($glOutsideSqlNotFoundException = "${glProjectPrefix}OutsideSqlNotFoundException")
 #set ($glRequiredOptionNotFoundException = "${glProjectPrefix}RequiredOptionNotFoundException")
 #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
 #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
+#set ($glSelectEntityConditionNotFoundException = "${glProjectPrefix}SelectEntityConditionNotFoundException")
 #set ($glSQLFailureException = "${glProjectPrefix}SQLFailureException")
 
 ## [Allcommon-Helper]
@@ -1072,6 +1074,10 @@ $database.info("    parse('IfCommentWrongExpressionException');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glIfCommentWrongExpressionException}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/exception/IfCommentWrongExpressionException.${glTemplateFileExtension}",$path,"", "")
 
+$database.info("    parse('InvalidQueryRegisteredException');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glInvalidQueryRegisteredException}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/exception/InvalidQueryRegisteredException.${glTemplateFileExtension}",$path,"", "")
+
 $database.info("    parse('DangerousResultSizeException');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glDangerousResultSizeException}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/exception/DangerousResultSizeException.${glTemplateFileExtension}",$path,"", "")
@@ -1099,6 +1105,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/exception/OutsideSqlNotFou
 $database.info("    parse('RequiredOptionNotFoundException');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glRequiredOptionNotFoundException}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/exception/RequiredOptionNotFoundException.${glTemplateFileExtension}",$path,"", "")
+
+$database.info("    parse('SelectEntityConditionNotFoundException');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glSelectEntityConditionNotFoundException}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/exception/SelectEntityConditionNotFoundException.${glTemplateFileExtension}",$path,"", "")
 
 ## DBFlute-0.7.7
 $database.info("    parse('SQLFailureException');")

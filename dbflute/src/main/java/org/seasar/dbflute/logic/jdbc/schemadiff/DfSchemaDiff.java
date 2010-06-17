@@ -112,6 +112,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                          ==========
     public static final String DIFF_DATE_KEY = "diffDate";
     public static final String DIFF_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    public static final String COMMENT_KEY = "comment";
     public static final String TABLE_COUNT_KEY = "tableCount";
     public static final String TABLE_DIFF_KEY = "tableDiff";
 
@@ -131,6 +132,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                 Basic
     //                                                 -----
     protected Date _diffDate; // not null after loading next schema
+    protected String _comment; // after restoring
     protected DfNextPreviousDiff _tableCountDiff; // not null after next loading
 
     // -----------------------------------------------------
@@ -157,6 +159,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
         });
     }
+
+    // -----------------------------------------------------
+    //                                             Meta Info
+    //                                             ---------
+    protected boolean _latest;
 
     // ===================================================================================
     //                                                                         Load Schema
@@ -871,6 +878,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
             if (DIFF_DATE_KEY.equals(key)) {
                 _diffDate = DfTypeUtil.toDate(value, DIFF_DATE_PATTERN);
                 assertDiffDateExists(key, _diffDate, schemaDiffMap);
+            } else if (COMMENT_KEY.equals(key)) {
+                _comment = (String) value; // nullable
             } else if (TABLE_COUNT_KEY.equals(key)) {
                 _tableCountDiff = restoreNextPreviousDiff(schemaDiffMap, key);
                 assertTableCountExists(key, _tableCountDiff, schemaDiffMap);
@@ -968,6 +977,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN);
     }
 
+    public boolean hasComment() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_comment);
+    }
+
+    public String getComment() {
+        return _comment;
+    }
+
     public DfNextPreviousDiff getTableCount() {
         return _tableCountDiff;
     }
@@ -1005,5 +1022,16 @@ public class DfSchemaDiff extends DfAbstractDiff {
             msg = msg + " tableDiff=" + tableDiff;
             throw new IllegalStateException(msg);
         }
+    }
+
+    // -----------------------------------------------------
+    //                                             Meta Info
+    //                                             ---------
+    public void setLatest(boolean latest) {
+        _latest = latest;
+    }
+
+    public boolean isLatest() {
+        return _latest;
     }
 }

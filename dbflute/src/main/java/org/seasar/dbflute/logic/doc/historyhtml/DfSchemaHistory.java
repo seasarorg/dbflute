@@ -130,15 +130,20 @@ public class DfSchemaHistory {
 
     protected void acceptDiffMap(Map<String, Object> diffMap) {
         final Set<Entry<String, Object>> entrySet = diffMap.entrySet();
+        int index = 0;
         for (Entry<String, Object> entry : entrySet) {
             final String key = entry.getKey(); // diffDate
             final Object value = entry.getValue();
             assertDiffElementMap(key, value);
             @SuppressWarnings("unchecked")
             final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
-            DfSchemaDiff schemaDiff = new DfSchemaDiff();
+            final DfSchemaDiff schemaDiff = new DfSchemaDiff();
             schemaDiff.acceptSchemaDiffMap(schemaDiffMap);
+            if (index == 0) {
+                schemaDiff.setLatest(true);
+            }
             _schemaDiffList.add(schemaDiff);
+            ++index;
         }
     }
 

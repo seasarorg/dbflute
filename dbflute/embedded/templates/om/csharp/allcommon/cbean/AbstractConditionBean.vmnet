@@ -221,6 +221,13 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         // ===============================================================================
+        //                                                                    InvalidQuery
+        //                                                                    ============
+        public void CheckInvalidQuery() {
+            this.SqlClause.checkInvalidQuery();
+        }
+
+        // ===============================================================================
         //                                                                Statement Config
         //                                                                ================
         public void Configure(${glStatementConfig} statementConfig) {

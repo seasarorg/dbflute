@@ -93,6 +93,9 @@ namespace ${glPackageExtendedBhv} {
         #region Entity Select
         public virtual ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
+            if (!cb.HasWhereClause() && cb.FetchSize != 1) { // if no condition for one
+                throwSelectEntityConditionNotFoundException(cb);
+            }
             int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
             IList<${myExtendedObjectClassName}> ls = null;
             try {

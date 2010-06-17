@@ -47,7 +47,12 @@ namespace ${glPackageBaseCommonCBean} {
         ${glConditionBean} xsetupSelectCountIgnoreFetchScope();
         ${glConditionBean} xafterCareSelectCountIgnoreFetchScope();
         bool IsSelectCountIgnoreFetchScope();
-		
+
+        // ===============================================================================
+        //                                                                    InvalidQuery
+        //                                                                    ============
+        void CheckInvalidQuery();
+
         // ===============================================================================
         //                                                                Statement Config
         //                                                                ================

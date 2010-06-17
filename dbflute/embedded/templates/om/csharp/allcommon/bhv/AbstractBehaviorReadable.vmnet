@@ -115,6 +115,10 @@ namespace ${glPackageBaseCommonBhv} {
             ${glConditionBeanContext}.ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause);
         }
 
+        protected void throwSelectEntityConditionNotFoundException(${ConditionBean} cb) {
+            ${glConditionBeanContext}.throwSelectEntityConditionNotFoundException(cb);
+        }
+
         // ===============================================================================
         //                                                                  Various Select
         //                                                                  ==============

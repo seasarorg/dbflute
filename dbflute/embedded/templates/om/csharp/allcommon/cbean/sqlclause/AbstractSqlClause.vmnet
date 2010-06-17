@@ -122,6 +122,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // -----------------------------------------------------
     //                                    Invalid Query Info
     //                                    ------------------
+    /** Does it check an invalid query? */
+    protected bool _checkInvalidQuery;
+
     /** The map of invalid query column. */
     protected Map<String, ${glConditionKey}> _invalidQueryColumnMap;
 
@@ -2016,6 +2019,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
+    public bool isCheckInvalidQuery() {
+        return _checkInvalidQuery;
+    }
+
+    public void checkInvalidQuery() {
+        _checkInvalidQuery = true;
+    }
+
     public Map<String, ${glConditionKey}> getInvalidQueryColumnMap() {
         if (_invalidQueryColumnMap != null) {
             return _invalidQueryColumnMap;
