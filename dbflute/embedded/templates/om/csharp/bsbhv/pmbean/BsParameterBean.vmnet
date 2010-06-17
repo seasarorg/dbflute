@@ -195,7 +195,11 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
+#if ($database.isPmbMetaDataPropertyJavaNativeStringObject($pmbClassName, $propertyName))
             this.${database.initCap($propertyName)} = ${glCDef}.${classificationName}.${classificationMap.get('name')}.Code;
+#else
+            this.${database.initCap($propertyName)} = ${propertyType}.Parse(${glCDef}.${classificationName}.${classificationMap.get('name')}.Code);
+#end
         }
 #end
 #end

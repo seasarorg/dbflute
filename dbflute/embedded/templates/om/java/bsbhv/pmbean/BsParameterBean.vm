@@ -160,7 +160,16 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return ShortCharHandlingMode.${database.shortCharHandlingMode};
     }
 
-    protected Date convertToUtilDate(Date date) {
+    @SuppressWarnings("unchecked")
+    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
+        return (NUMBER)DfTypeUtil.toNumber(obj, type);
+    }
+
+    protected Boolean toBoolean(Object obj) {
+        return DfTypeUtil.toBoolean(obj);
+    }
+
+    protected Date toUtilDate(Date date) {
         return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
     }
 
@@ -170,7 +179,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #else
         String pattern = "yyyy-MM-dd";
 #end
-        return date != null ? new java.text.SimpleDateFormat(pattern).format(date) : null;
+        return DfTypeUtil.toString(date, pattern);
     }
 
     protected String formatByteArray(byte[] bytes) {
@@ -245,7 +254,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #end
 #else
 #if ($propertyType.equals("Date"))
-        return convertToUtilDate(${variableName});
+        return toUtilDate(${variableName});
 #else
         return ${variableName};
 #end
@@ -346,7 +355,13 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
+#if ($database.isPmbMetaDataPropertyJavaNativeNumberObject($pmbClassName, $propertyName))
+        ${variableName} = toNumber(${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code(), ${propertyType}.class);
+#elseif ($database.isPmbMetaDataPropertyJavaNativeBooleanObject($pmbClassName, $propertyName))
+        ${variableName} = toBoolean(${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code());
+#else
         ${variableName} = ${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code();
+#end
     }
 #end
 #end

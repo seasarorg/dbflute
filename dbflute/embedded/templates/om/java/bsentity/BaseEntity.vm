@@ -158,12 +158,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @param cdef The instance of classification definition (as ENUM type). (Nullable)
      */
     public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
-#if ($col.isJavaNativeStringObject())
-        set${col.javaName}(cdef != null ? cdef.code() : null);
-#elseif ($col.isJavaNativeBooleanObject())
-        set${col.javaName}(cdef != null ? Boolean.valueOf(cdef.code()) : null);
-#else
+#if ($col.isJavaNativeNumberObject())
         set${col.javaName}(cdef != null ? InternalUtil.toNumber(cdef.code(), ${col.javaNative}.class) : null);
+#elseif ($col.isJavaNativeBooleanObject())
+        set${col.javaName}(cdef != null ? InternalUtil.toBoolean(cdef.code()) : null);
+#else
+        set${col.javaName}(cdef != null ? cdef.code() : null);
 #end
     }
 

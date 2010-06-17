@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -49,20 +50,35 @@ public class DfPmbPropertyOptionClassification {
         return extractClassificationNameFromOption(_className, _propertyName, true);
     }
 
+    public String getPmbMetaDataPropertyOptionClassificationCodeType() {
+        final String classificationName = getPmbMetaDataPropertyOptionClassificationName();
+        final Map<String, Map<String, String>> allMap = _classificationProperties.getClassificationTopDefinitionMap();
+        final Map<String, String> elementMap = allMap.get(classificationName);
+        if (elementMap == null) {
+            throwClassificationNotFoundException(classificationName);
+        }
+        final String codeType = elementMap.get(DfClassificationTop.KEY_CODE_TYPE);
+        return codeType != null ? codeType : DfClassificationTop.DEFAULT_CODE_TYPE;
+    }
+
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList() {
         final String classificationName = extractClassificationNameFromOption(_className, _propertyName, true);
         final List<Map<String, String>> classificationMapList = _classificationProperties
                 .getClassificationMapList(classificationName);
         if (classificationMapList == null) {
-            String msg = "Look the message below:" + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
-            msg = msg + "The classification was not found:" + ln();
-            msg = msg + " " + _className + " " + _propertyName;
-            msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg);
+            throwClassificationNotFoundException(classificationName);
         }
         return classificationMapList;
+    }
+
+    protected void throwClassificationNotFoundException(String classificationName) {
+        String msg = "Look the message below:" + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
+        msg = msg + "The classification was not found:" + ln();
+        msg = msg + " " + _className + " " + _propertyName;
+        msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalStateException(msg);
     }
 
     protected String extractClassificationNameFromOption(String className, String propertyName, boolean check) {

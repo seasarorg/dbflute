@@ -14,6 +14,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -116,6 +117,24 @@ public class DfPmbBasicHandler {
         assertArgumentPmbMetaDataClassName(className);
         final DfPmbMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameTypeMap();
+    }
+
+    public boolean isPmbMetaDataPropertyJavaNativeStringObject(String className, String propertyName) {
+        final String propertyType = getPropertyType(className, propertyName);
+        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+        return prop.isJavaNativeStringObject(propertyType);
+    }
+
+    public boolean isPmbMetaDataPropertyJavaNativeNumberObject(String className, String propertyName) {
+        final String propertyType = getPropertyType(className, propertyName);
+        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+        return prop.isJavaNativeNumberObject(propertyType);
+    }
+
+    public boolean isPmbMetaDataPropertyJavaNativeBooleanObject(String className, String propertyName) {
+        final String propertyType = getPropertyType(className, propertyName);
+        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+        return prop.isJavaNativeBooleanObject(propertyType);
     }
 
     // ===================================================================================
@@ -468,6 +487,13 @@ public class DfPmbBasicHandler {
 
     protected DfPmbPropertyOptionFinder createPropertyOptionFinder(String className, String propertyName) {
         return new DfPmbPropertyOptionFinder(className, propertyName, _pmbMetaDataMap);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 
     // ===================================================================================

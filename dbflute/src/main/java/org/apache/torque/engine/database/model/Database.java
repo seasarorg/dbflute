@@ -356,6 +356,18 @@ public class Database {
         return getPmbBasicHandler().getPropertyColumnName(className, propertyName);
     }
 
+    public boolean isPmbMetaDataPropertyJavaNativeStringObject(String className, String propertyName) {
+        return getPmbBasicHandler().isPmbMetaDataPropertyJavaNativeStringObject(className, propertyName);
+    }
+
+    public boolean isPmbMetaDataPropertyJavaNativeNumberObject(String className, String propertyName) {
+        return getPmbBasicHandler().isPmbMetaDataPropertyJavaNativeNumberObject(className, propertyName);
+    }
+
+    public boolean isPmbMetaDataPropertyJavaNativeBooleanObject(String className, String propertyName) {
+        return getPmbBasicHandler().isPmbMetaDataPropertyJavaNativeBooleanObject(className, propertyName);
+    }
+
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
@@ -468,6 +480,10 @@ public class Database {
     }
 
     public String getPmbMetaDataPropertyOptionClassificationName(String className, String propertyName) {
+        return getPmbBasicHandler().getPropertyOptionClassificationName(className, propertyName, _sql2entitySchemaData);
+    }
+
+    protected String getPmbMetaDataPropertyOptionClassificationCodeType(String className, String propertyName) {
         return getPmbBasicHandler().getPropertyOptionClassificationName(className, propertyName, _sql2entitySchemaData);
     }
 
