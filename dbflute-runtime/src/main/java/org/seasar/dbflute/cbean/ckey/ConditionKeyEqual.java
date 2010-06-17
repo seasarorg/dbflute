@@ -60,7 +60,8 @@ public class ConditionKeyEqual extends ConditionKey {
         }
         if (conditionValue.hasEqual()) {
             if (conditionValue.equalEqual(value)) {
-                _log.debug("The value has already registered at " + callerName + ": value=" + value);
+                final String target = callerName + "." + _conditionKey;
+                _log.debug("The value has already registered at " + target + ": value=" + value);
                 return false;
             } else {
                 conditionValue.overrideEqual(value);

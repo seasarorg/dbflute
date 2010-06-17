@@ -405,14 +405,26 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Normal Query
     //                                          ------------
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
         }
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
     }
 
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
+    }
+
+    protected boolean isValidRegistration(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
+        final String realColumnName = getRealColumnName(colName);
+        if (key.isValidRegistration(cvalue, value, realColumnName)) {
+            return true;
+        } else {
+            getSqlClause().registerInvalidQueryColumn(realColumnName, key);
+            return false;
         }
     }
 
@@ -420,46 +432,47 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         InScope Query
     //                                         -------------
     protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String colName) {
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
         final int inScopeLimit = getSqlClause().getInScopeLimit();
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            if (inScopeLimit > 0 && value.size() > inScopeLimit) {
-                // if the key is for inScope, it should be split as 'or'
-                // (if the key is for notInScope, it should be split as 'and')
-                final boolean alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+        if (inScopeLimit > 0 && value.size() > inScopeLimit) {
+            // if the key is for inScope, it should be split as 'or'
+            // (if the key is for notInScope, it should be split as 'and')
+            final boolean alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+            if (isConditionKeyInScope(key)) {
+                // if or-scope query has already been effective, create new or-scope
+                getSqlClause().makeOrScopeQueryEffective();
+            } else {
+                if (alreadyOrScopeQuery) {
+                    getSqlClause().beginOrScopeQueryAndPart();
+                }
+            }
+
+            try {
+                // split the condition
+                @SuppressWarnings("unchecked")
+                final List<Object> objectList = (List<Object>) value;
+                final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
+                for (int i = 0; i < valueList.size(); i++) {
+                    final List<Object> currentValue = valueList.get(i);
+                    if (i == 0) {
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                    } else {
+                        invokeQuery(colName, key.getConditionKey(), currentValue);
+                    }
+                }
+            } finally {
                 if (isConditionKeyInScope(key)) {
-                    // if or-scope query has already been effective, create new or-scope
-                    getSqlClause().makeOrScopeQueryEffective();
+                    getSqlClause().closeOrScopeQuery();
                 } else {
                     if (alreadyOrScopeQuery) {
-                        getSqlClause().beginOrScopeQueryAndPart();
+                        getSqlClause().endOrScopeQueryAndPart();
                     }
                 }
-
-                try {
-                    // split the condition
-                    @SuppressWarnings("unchecked")
-                    final List<Object> objectList = (List<Object>) value;
-                    final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
-                    for (int i = 0; i < valueList.size(); i++) {
-                        final List<Object> currentValue = valueList.get(i);
-                        if (i == 0) {
-                            setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
-                        } else {
-                            invokeQuery(colName, key.getConditionKey(), currentValue);
-                        }
-                    }
-                } finally {
-                    if (isConditionKeyInScope(key)) {
-                        getSqlClause().closeOrScopeQuery();
-                    } else {
-                        if (alreadyOrScopeQuery) {
-                            getSqlClause().endOrScopeQueryAndPart();
-                        }
-                    }
-                }
-            } else {
-                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
             }
+        } else {
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
         }
     }
 
@@ -473,18 +486,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue, String colName,
             FromToOption option) {
         {
-            final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
             final ConditionKey fromKey = option.getFromDateConditionKey();
-            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of "
-                    + getRealAliasName() + "." + colName)) {
+            final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
+            if (isValidRegistration(fromKey, filteredFromDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
             }
         }
         {
-            final java.util.Date filteredToDate = option.filterToDate(toDate);
             final ConditionKey toKey = option.getToDateConditionKey();
-            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName()
-                    + "." + colName)) {
+            final java.util.Date filteredToDate = option.filterToDate(toDate);
+            if (isValidRegistration(toKey, filteredToDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
             }
         }
@@ -499,8 +510,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void registerLikeSearchQuery(ConditionKey key, String value, ConditionValue cvalue, String colName,
             LikeSearchOption option) {
-        final String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
-        if (!key.isValidRegistration(cvalue, value, validationMsg)) {
+        if (!isValidRegistration(key, value, cvalue, colName)) {
             return;
         }
         if (option == null) {
@@ -588,32 +598,34 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Inline Query
     //                                          ------------
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
         final String propertyName = dbmeta.findPropertyName(colName);
         final String uncapPropName = initUncap(propertyName);
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
-            if (isBaseQuery()) {
-                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
-            } else {
-                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue,
-                        _onClauseInline);
-            }
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
+        if (isBaseQuery()) {
+            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
+        } else {
+            getSqlClause()
+                    .registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
         }
     }
 
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
         final String propertyName = dbmeta.findPropertyName(colName);
         final String uncapPropName = initUncap(propertyName);
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
-            if (isBaseQuery()) {
-                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
-            } else {
-                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option,
-                        _onClauseInline);
-            }
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
+        if (isBaseQuery()) {
+            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
+        } else {
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option,
+                    _onClauseInline);
         }
     }
 

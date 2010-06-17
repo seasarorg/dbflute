@@ -555,6 +555,17 @@ public interface SqlClause {
      */
     void clearSpecifiedSelectColumn();
 
+    // ===================================================================================
+    //                                                                  Invalid Query Info
+    //                                                                  ==================
+    /**
+     * Get the map of invalid query column. (basically for logging)
+     * @return The map of invalid query column. (NotNull)
+     */
+    Map<String, ConditionKey> getInvalidQueryColumnMap();
+
+    void registerInvalidQueryColumn(String columnFullName, ConditionKey key);
+
     // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                                        Query Update

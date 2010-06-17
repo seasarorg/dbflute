@@ -60,7 +60,8 @@ public class ConditionKeyGreaterThan extends ConditionKey {
         }
         if (conditionValue.hasGreaterThan()) {
             if (conditionValue.equalGreaterThan(value)) {
-                _log.debug("The value has already registered at " + callerName + ": value=" + value);
+                final String target = callerName + "." + _conditionKey;
+                _log.debug("The value has already registered at " + target + ": value=" + value);
                 return false;
             } else {
                 conditionValue.overrideGreaterThan(value);

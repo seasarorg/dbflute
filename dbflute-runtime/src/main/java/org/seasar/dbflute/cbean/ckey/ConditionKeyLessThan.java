@@ -60,7 +60,8 @@ public class ConditionKeyLessThan extends ConditionKey {
         }
         if (conditionValue.hasLessThan()) {
             if (conditionValue.equalLessThan(value)) {
-                _log.debug("The value has already registered at " + callerName + ": value=" + value);
+                final String target = callerName + "." + _conditionKey;
+                _log.debug("The value has already registered at " + target + ": value=" + value);
                 return false;
             } else {
                 conditionValue.overrideLessThan(value);

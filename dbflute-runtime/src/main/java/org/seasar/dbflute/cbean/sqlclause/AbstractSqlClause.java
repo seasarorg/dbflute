@@ -172,6 +172,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected Map<String, String> _selectedForeignInfo;
 
     // -----------------------------------------------------
+    //                                    Invalid Query Info
+    //                                    ------------------
+    /** The map of invalid query column. */
+    protected Map<String, ConditionKey> _invalidQueryColumnMap;
+
+    // -----------------------------------------------------
     //                                         Optional Info
     //                                         -------------
     protected boolean _formatClause = true;
@@ -1994,9 +2000,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return "#df:unionWhereFirstCondition#";
     }
 
-    // =====================================================================================
-    //                                                            Where Clause Simple Filter
-    //                                                            ==========================
+    // ===================================================================================
+    //                                                          Where Clause Simple Filter
+    //                                                          ==========================
     public void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter) {
         if (_whereClauseSimpleFilterList == null) {
             _whereClauseSimpleFilterList = new ArrayList<WhereClauseSimpleFilter>();
@@ -2020,9 +2026,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return clauseElement;
     }
 
-    // =====================================================================================
-    //                                                                 Selected Foreign Info
-    //                                                                 =====================
+    // ===================================================================================
+    //                                                               Selected Foreign Info
+    //                                                               =====================
     public boolean isSelectedForeignInfoEmpty() {
         if (_selectedForeignInfo == null) {
             return true;
@@ -2266,6 +2272,23 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             _specifiedSelectColumnMap.clear();
             _specifiedSelectColumnMap = null;
         }
+    }
+
+    // ===================================================================================
+    //                                                                  Invalid Query Info
+    //                                                                  ==================
+    public Map<String, ConditionKey> getInvalidQueryColumnMap() {
+        if (_invalidQueryColumnMap != null) {
+            return _invalidQueryColumnMap;
+        }
+        return new HashMap<String, ConditionKey>();
+    }
+
+    public void registerInvalidQueryColumn(String columnFullName, ConditionKey key) {
+        if (_invalidQueryColumnMap == null) {
+            _invalidQueryColumnMap = new LinkedHashMap<String, ConditionKey>();
+        }
+        _invalidQueryColumnMap.put(columnFullName, key);
     }
 
     // [DBFlute-0.7.5]
