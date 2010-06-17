@@ -115,6 +115,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
             InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
+        if (!cb.hasWhereClause() && cb.getFetchSize() != 1) { // if no condition for one
+            throwSelectEntityConditionNotFoundException(cb);
+        }
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
         final List<ENTITY> ls;
         try {
@@ -262,6 +265,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
         createBhvExThrower().throwSelectEntityDuplicatedException(resultCountExp, searchKey, cause);
+    }
+
+    protected void throwSelectEntityConditionNotFoundException(ConditionBean cb) {
+        createBhvExThrower().throwSelectEntityConditionNotFoundException(cb);
     }
 
     // ===================================================================================

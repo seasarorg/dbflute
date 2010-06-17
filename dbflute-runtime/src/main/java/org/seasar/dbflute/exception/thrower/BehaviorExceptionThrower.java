@@ -15,11 +15,17 @@
  */
 package org.seasar.dbflute.exception.thrower;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
+import org.seasar.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
@@ -78,6 +84,43 @@ public class BehaviorExceptionThrower {
             br.addItem("Search Condition");
             br.addElement(searchKey);
         }
+    }
+
+    public void throwSelectEntityConditionNotFoundException(ConditionBean cb) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The condition for selecting an entity was not found!");
+        br.addItem("Advice");
+        br.addElement("Confirm your search condition. Does it really select the only one?");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = MemberCB();");
+        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = MemberCB();");
+        br.addElement("    cb.query().setMemberId_Equal(null);");
+        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = MemberCB();");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = MemberCB();");
+        br.addElement("    cb.fetchFirst(1);");
+        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addItem("Invalid Query");
+        final Map<String, ConditionKey> invalidQueryColumnMap = cb.getSqlClause().getInvalidQueryColumnMap();
+        if (invalidQueryColumnMap != null && !invalidQueryColumnMap.isEmpty()) {
+            final Set<Entry<String, ConditionKey>> entrySet = invalidQueryColumnMap.entrySet();
+            for (Entry<String, ConditionKey> entry : entrySet) {
+                br.addElement(entry.getKey() + " : " + entry.getValue().getConditionKey());
+            }
+        } else {
+            br.addElement("*no invalid");
+        }
+        br.addItem("Display SQL");
+        br.addElement(cb.toDisplaySql());
+        final String msg = br.buildExceptionMessage();
+        throw new SelectEntityConditionNotFoundException(msg);
     }
 
     // ===================================================================================

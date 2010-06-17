@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the entity has been duplicated.
+ * The exception of when the condition for selecting an entity is not found.
  * @author jflute
  */
-public class EntityDuplicatedException extends RecordHasOverlappedException {
+public class SelectEntityConditionNotFoundException extends RecordHasOverlappedException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class EntityDuplicatedException extends RecordHasOverlappedException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EntityDuplicatedException(String msg) {
+    public SelectEntityConditionNotFoundException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class EntityDuplicatedException extends RecordHasOverlappedException {
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public EntityDuplicatedException(String msg, Throwable cause) {
+    public SelectEntityConditionNotFoundException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

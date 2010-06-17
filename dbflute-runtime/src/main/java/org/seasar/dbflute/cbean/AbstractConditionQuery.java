@@ -510,12 +510,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void registerLikeSearchQuery(ConditionKey key, String value, ConditionValue cvalue, String colName,
             LikeSearchOption option) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
-            return;
-        }
         if (option == null) {
             throwLikeSearchOptionNotFoundException(colName, value);
             return; // unreachable
+        }
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
         }
         if (xsuppressEscape()) {
             option.notEscape();

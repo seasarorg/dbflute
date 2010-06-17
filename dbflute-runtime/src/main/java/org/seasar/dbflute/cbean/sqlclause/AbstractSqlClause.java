@@ -177,11 +177,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The map of invalid query column. */
     protected Map<String, ConditionKey> _invalidQueryColumnMap;
 
-    // -----------------------------------------------------
-    //                                         Optional Info
-    //                                         -------------
-    protected boolean _formatClause = true;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
