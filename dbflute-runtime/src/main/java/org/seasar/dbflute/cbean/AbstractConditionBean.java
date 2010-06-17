@@ -123,42 +123,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected abstract DBMetaProvider getDBMetaProvider();
 
     // ===================================================================================
-    //                                                                     Embed Condition
-    //                                                                     ===============
-    /**
-     * Embed conditions in their variables on where clause (and 'on' clause). <br />
-     * You should not use this normally. It's a final weapon! <br />
-     * And that this method is not perfect so be attention! <br />
-     * If the same-name-columns exist in your conditions, both are embedded.
-     * @param embeddedColumnInfoSet The set of embedded target column information. (NotNull)
-     * @param quote Should the conditions value be quoted?
-     * @deprecated You should not use this easily. It's a dangerous function.
-     */
-    public void embedCondition(Set<ColumnInfo> embeddedColumnInfoSet, boolean quote) {
-        if (embeddedColumnInfoSet == null) {
-            String msg = "The argument[embedCondition] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (quote) {
-            addWhereClauseSimpleFilter(newToEmbeddedQuotedSimpleFilter(embeddedColumnInfoSet));
-        } else {
-            addWhereClauseSimpleFilter(newToEmbeddedSimpleFilter(embeddedColumnInfoSet));
-        }
-    }
-
-    private WhereClauseSimpleFilter newToEmbeddedQuotedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
-        return new WhereClauseSimpleFilter.WhereClauseToEmbeddedQuotedSimpleFilter(embeddedColumnInfoSet);
-    }
-
-    private WhereClauseSimpleFilter newToEmbeddedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
-        return new WhereClauseSimpleFilter.WhereClauseToEmbeddedSimpleFilter(embeddedColumnInfoSet);
-    }
-
-    private void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter) {
-        this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
-    }
-
-    // ===================================================================================
     //                                                                   Accept PrimaryKey
     //                                                                   =================
     /**
@@ -613,6 +577,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
+    //                                                                        InvalidQuery
+    //                                                                        ============
+    /**
+     * {@inheritDoc}
+     */
+    public void checkInvalidQuery() {
+        getSqlClause().checkInvalidQuery();
+    }
+
+    // ===================================================================================
     //                                                                     StatementConfig
     //                                                                     ===============
     /**
@@ -627,6 +601,42 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public StatementConfig getStatementConfig() {
         return _statementConfig;
+    }
+
+    // ===================================================================================
+    //                                                                     Embed Condition
+    //                                                                     ===============
+    /**
+     * Embed conditions in their variables on where clause (and 'on' clause). <br />
+     * You should not use this normally. It's a final weapon! <br />
+     * And that this method is not perfect so be attention! <br />
+     * If the same-name-columns exist in your conditions, both are embedded.
+     * @param embeddedColumnInfoSet The set of embedded target column information. (NotNull)
+     * @param quote Should the conditions value be quoted?
+     * @deprecated You should not use this easily. It's a dangerous function.
+     */
+    public void embedCondition(Set<ColumnInfo> embeddedColumnInfoSet, boolean quote) {
+        if (embeddedColumnInfoSet == null) {
+            String msg = "The argument[embedCondition] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (quote) {
+            addWhereClauseSimpleFilter(newToEmbeddedQuotedSimpleFilter(embeddedColumnInfoSet));
+        } else {
+            addWhereClauseSimpleFilter(newToEmbeddedSimpleFilter(embeddedColumnInfoSet));
+        }
+    }
+
+    private WhereClauseSimpleFilter newToEmbeddedQuotedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
+        return new WhereClauseSimpleFilter.WhereClauseToEmbeddedQuotedSimpleFilter(embeddedColumnInfoSet);
+    }
+
+    private WhereClauseSimpleFilter newToEmbeddedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
+        return new WhereClauseSimpleFilter.WhereClauseToEmbeddedSimpleFilter(embeddedColumnInfoSet);
+    }
+
+    private void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter) {
+        this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
     }
 
     // ===================================================================================

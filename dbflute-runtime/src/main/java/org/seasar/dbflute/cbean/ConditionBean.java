@@ -127,6 +127,11 @@ public interface ConditionBean extends PagingBean {
     boolean isSelectCountIgnoreFetchScope();
 
     // ===================================================================================
+    //                                                                        InvalidQuery
+    //                                                                        ============
+    void checkInvalidQuery();
+
+    // ===================================================================================
     //                                                                    Statement Config
     //                                                                    ================
     /**

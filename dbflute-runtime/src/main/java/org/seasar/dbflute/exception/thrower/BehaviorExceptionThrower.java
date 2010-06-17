@@ -91,14 +91,15 @@ public class BehaviorExceptionThrower {
         br.addNotice("The condition for selecting an entity was not found!");
         br.addItem("Advice");
         br.addElement("Confirm your search condition. Does it really select the only one?");
+        br.addElement("You have to set a valid query or fetch-first as 1.");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = MemberCB();");
-        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("    ... = memberBhv.selectEntity(cb); // exception");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(null);");
-        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("    ... = memberBhv.selectEntity(cb); // exception");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(3);");
@@ -117,6 +118,8 @@ public class BehaviorExceptionThrower {
         } else {
             br.addElement("*no invalid");
         }
+        br.addItem("Fetch Size");
+        br.addElement(cb.getFetchSize());
         br.addItem("Display SQL");
         br.addElement(cb.toDisplaySql());
         final String msg = br.buildExceptionMessage();

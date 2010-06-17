@@ -174,6 +174,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                    Invalid Query Info
     //                                    ------------------
+    /** Does it check an invalid query? */
+    protected boolean _checkInvalidQuery;
+
     /** The map of invalid query column. */
     protected Map<String, ConditionKey> _invalidQueryColumnMap;
 
@@ -2272,6 +2275,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
+    public boolean isCheckInvalidQuery() {
+        return _checkInvalidQuery;
+    }
+
+    public void checkInvalidQuery() {
+        _checkInvalidQuery = true;
+    }
+
     public Map<String, ConditionKey> getInvalidQueryColumnMap() {
         if (_invalidQueryColumnMap != null) {
             return _invalidQueryColumnMap;

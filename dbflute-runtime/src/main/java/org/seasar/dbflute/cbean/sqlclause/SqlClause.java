@@ -558,6 +558,10 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
+    boolean isCheckInvalidQuery();
+
+    void checkInvalidQuery();
+
     /**
      * Get the map of invalid query column. (basically for logging)
      * @return The map of invalid query column. (NotNull)

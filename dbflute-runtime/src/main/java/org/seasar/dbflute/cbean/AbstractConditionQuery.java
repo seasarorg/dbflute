@@ -36,7 +36,9 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
@@ -405,34 +407,66 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Normal Query
     //                                          ------------
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
     }
 
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
     }
 
-    protected boolean isValidRegistration(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
+    protected boolean isValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
         final String realColumnName = getRealColumnName(colName);
         if (key.isValidRegistration(cvalue, value, realColumnName)) {
             return true;
         } else {
-            getSqlClause().registerInvalidQueryColumn(realColumnName, key);
-            return false;
+            if (getSqlClause().isCheckInvalidQuery()) {
+                throwInvalidQueryRegisteredException(key, cvalue, realColumnName);
+                return false; // unreachable
+            } else {
+                getSqlClause().registerInvalidQueryColumn(realColumnName, key);
+                return false;
+            }
         }
+    }
+
+    protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, String realColumnName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("An invalid query was registered. (check is working)");
+        br.addItem("Advice");
+        br.addElement("You should not set an invalid query when you set the check valid.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.checkInvalidQuery();");
+        br.addElement("    cb.query().setMemberId_Equal(null); // exception");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.checkInvalidQuery();");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.query().setMemberId_Equal(null);");
+        br.addItem("Column");
+        br.addElement(realColumnName);
+        br.addItem("Condition Key");
+        br.addElement(key.getConditionKey());
+        br.addItem("Registered Value");
+        br.addElement(value);
+        final String msg = br.buildExceptionMessage();
+        throw new InvalidQueryRegisteredException(msg);
     }
 
     // -----------------------------------------------------
     //                                         InScope Query
     //                                         -------------
     protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String colName) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         final int inScopeLimit = getSqlClause().getInScopeLimit();
@@ -488,14 +522,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         {
             final ConditionKey fromKey = option.getFromDateConditionKey();
             final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
-            if (isValidRegistration(fromKey, filteredFromDate, cvalue, colName)) {
+            if (isValidQuery(fromKey, filteredFromDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
             }
         }
         {
             final ConditionKey toKey = option.getToDateConditionKey();
             final java.util.Date filteredToDate = option.filterToDate(toDate);
-            if (isValidRegistration(toKey, filteredToDate, cvalue, colName)) {
+            if (isValidQuery(toKey, filteredToDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
             }
         }
@@ -514,7 +548,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throwLikeSearchOptionNotFoundException(colName, value);
             return; // unreachable
         }
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         if (xsuppressEscape()) {
@@ -598,7 +632,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Inline Query
     //                                          ------------
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
@@ -614,7 +648,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
-        if (!isValidRegistration(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
