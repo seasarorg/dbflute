@@ -258,14 +258,26 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          Normal Query
     //                                          ------------
     protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
         }
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
     }
 	
 	protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName, ${glConditionOption} option) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
+    }
+
+    protected virtual bool isValidRegistration(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
+        String realColumnName = getRealColumnName(colName);
+        if (key.isValidRegistration(cvalue, value, realColumnName)) {
+            return true;
+        } else {
+            getSqlClause().registerInvalidQueryColumn(realColumnName, key);
+            return false;
         }
     }
 
@@ -273,45 +285,46 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                         InScope Query
     //                                         -------------
     protected void regINS<ELEMENT>(${glConditionKey} key, System.Collections.IList value, ${glConditionValue} cvalue, String colName) {
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
         int inScopeLimit = getSqlClause().getInScopeLimit();
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            if (inScopeLimit > 0 && value.Count > inScopeLimit) {
-                // if the key is for inScope, it should be split as 'or'
-                // (if the key is for notInScope, it should be split as 'and')
-                bool alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+        if (inScopeLimit > 0 && value.Count > inScopeLimit) {
+            // if the key is for inScope, it should be split as 'or'
+            // (if the key is for notInScope, it should be split as 'and')
+            bool alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+            if (isConditionKeyInScope(key)) {
+                // if or-scope query has already been effective, create new or-scope
+                getSqlClause().makeOrScopeQueryEffective();
+            } else {
+                if (alreadyOrScopeQuery) {
+                    getSqlClause().beginOrScopeQueryAndPart();
+                }
+            }
+
+            try {
+                // split the condition
+                List<Object> objectList = convertToJavaList(value);
+                List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
+                for (int i = 0; i < valueList.size(); i++) {
+                    System.Collections.IList currentValue = convertToEmbeddedList<ELEMENT>(valueList.get(i));
+                    if (i == 0) {
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                    } else {
+                        invokeQuery(colName, key.getConditionKey(), currentValue);
+                    }
+                }
+            } finally {
                 if (isConditionKeyInScope(key)) {
-                    // if or-scope query has already been effective, create new or-scope
-                    getSqlClause().makeOrScopeQueryEffective();
+                    getSqlClause().closeOrScopeQuery();
                 } else {
                     if (alreadyOrScopeQuery) {
-                        getSqlClause().beginOrScopeQueryAndPart();
+                        getSqlClause().endOrScopeQueryAndPart();
                     }
                 }
-
-                try {
-                    // split the condition
-                    List<Object> objectList = convertToJavaList(value);
-                    List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
-                    for (int i = 0; i < valueList.size(); i++) {
-                        System.Collections.IList currentValue = convertToEmbeddedList<ELEMENT>(valueList.get(i));
-                        if (i == 0) {
-                            setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
-                        } else {
-                            invokeQuery(colName, key.getConditionKey(), currentValue);
-                        }
-                    }
-                } finally {
-                    if (isConditionKeyInScope(key)) {
-                        getSqlClause().closeOrScopeQuery();
-                    } else {
-                        if (alreadyOrScopeQuery) {
-                            getSqlClause().endOrScopeQueryAndPart();
-                        }
-                    }
-                }
-            } else {
-                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
             }
+        } else {
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
         }
     }
 
@@ -358,16 +371,16 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          ------------
     protected void regFTQ(DateTime? fromDate, DateTime? toDate, ${glConditionValue} cvalue, String colName, ${glFromToOption} option) {
         {
-            DateTime? filteredFromDate = option.filterFromDate(fromDate);
             ${glConditionKey} fromKey = option.getFromDateConditionKey();
-            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            DateTime? filteredFromDate = option.filterFromDate(fromDate);
+            if (isValidRegistration(fromKey, filteredFromDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
             }
         }
         {
-            DateTime? filteredToDate = option.filterToDate(toDate);
             ${glConditionKey} toKey = option.getToDateConditionKey();
-            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            DateTime? filteredToDate = option.filterToDate(toDate);
+            if (isValidRegistration(toKey, filteredToDate, cvalue, colName)) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
             }
         }
@@ -389,13 +402,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                          , ${glConditionValue} cvalue
                                          , String colName
                                          , ${glLikeSearchOption} option) {
-        String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
-        if (!key.isValidRegistration(cvalue, value, validationMsg)) {
-            return;
-        }
         if (option == null) {
             throwLikeSearchOptionNotFoundException(colName, value);
             return;// Unreachable!
+        }
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
         }
         if (xsuppressEscape()) {
             option.NotEscape();
@@ -436,31 +448,33 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          Inline Query
     //                                          ------------
     protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If CSharp, it is necessary to use capPropName!
-            if (isBaseQuery()) {
-                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
-            } else {
-                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
-            }
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If CSharp, it is necessary to use capPropName!
+        if (isBaseQuery()) {
+            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
+        } else {
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
         }
     }
 
     protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                , String colName, ${glConditionOption} option) {
+        if (!isValidRegistration(key, value, cvalue, colName)) {
+            return;
+        }
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
-            if (isBaseQuery()) {
-                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
-            } else {
-				getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option, _onClauseInline);
-            }
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
+        if (isBaseQuery()) {
+            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
+        } else {
+			getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option, _onClauseInline);
         }
     }
 

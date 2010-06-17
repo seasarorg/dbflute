@@ -118,11 +118,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                 ---------------------
     /** The information of selected foreign table. */
     protected Map<String, String> _selectedForeignInfo;
-    
+
     // -----------------------------------------------------
-    //                                         Optional Info
-    //                                         -------------
-    protected bool _formatClause;
+    //                                    Invalid Query Info
+    //                                    ------------------
+    /** The map of invalid query column. */
+    protected Map<String, ${glConditionKey}> _invalidQueryColumnMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -2010,6 +2011,23 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     public void clearSpecifiedSelectColumn() {
         if (_specifiedSelectColumnMap != null) { _specifiedSelectColumnMap.clear(); _specifiedSelectColumnMap = null; }
+    }
+
+    // ===================================================================================
+    //                                                                  Invalid Query Info
+    //                                                                  ==================
+    public Map<String, ${glConditionKey}> getInvalidQueryColumnMap() {
+        if (_invalidQueryColumnMap != null) {
+            return _invalidQueryColumnMap;
+        }
+        return new HashMap<String, ${glConditionKey}>();
+    }
+
+    public void registerInvalidQueryColumn(String columnFullName, ${glConditionKey} key) {
+        if (_invalidQueryColumnMap == null) {
+            _invalidQueryColumnMap = new LinkedHashMap<String, ${glConditionKey}>();
+        }
+        _invalidQueryColumnMap.put(columnFullName, key);
     }
 
     // [DBFlute-0.7.9]

@@ -188,6 +188,12 @@ public interface ${myClassName} {
     String getSpecifiedColumnNameAsOne();
     void clearSpecifiedSelectColumn();
 
+    // ===================================================================================
+    //                                                                  Invalid Query Info
+    //                                                                  ==================
+    Map<String, ${glConditionKey}> getInvalidQueryColumnMap();
+    void registerInvalidQueryColumn(String columnFullName, ${glConditionKey} key);
+
     // [DBFlute-0.7.9]
     // ===================================================================================
     //                                                                        Query Update
