@@ -46,14 +46,7 @@ public class BehaviorExceptionThrower {
         br.addElement("Does the target record really created before this operation?");
         br.addElement("Has the target record been deleted by other thread?");
         br.addElement("It is precondition that the record exists on your database.");
-        if (searchKey != null && searchKey instanceof ConditionBean) {
-            final ConditionBean cb = (ConditionBean) searchKey;
-            br.addItem("Display SQL");
-            br.addElement(cb.toDisplaySql());
-        } else {
-            br.addItem("Search Condition");
-            br.addElement(searchKey);
-        }
+        setupSearchKeyElement(br, searchKey);
         final String msg = br.buildExceptionMessage();
         throw new EntityAlreadyDeletedException(msg);
     }
@@ -78,6 +71,7 @@ public class BehaviorExceptionThrower {
     protected void setupSearchKeyElement(ExceptionMessageBuilder br, Object searchKey) {
         if (searchKey != null && searchKey instanceof ConditionBean) {
             final ConditionBean cb = (ConditionBean) searchKey;
+            setupInvalidQueryElement(br, cb);
             br.addItem("Display SQL");
             br.addElement(cb.toDisplaySql());
         } else {
@@ -108,6 +102,16 @@ public class BehaviorExceptionThrower {
         br.addElement("    MemberCB cb = MemberCB();");
         br.addElement("    cb.fetchFirst(1);");
         br.addElement("    ... = memberBhv.selectEntity(cb);");
+        setupInvalidQueryElement(br, cb);
+        br.addItem("Fetch Size");
+        br.addElement(cb.getFetchSize());
+        br.addItem("Display SQL");
+        br.addElement(cb.toDisplaySql());
+        final String msg = br.buildExceptionMessage();
+        throw new SelectEntityConditionNotFoundException(msg);
+    }
+
+    protected void setupInvalidQueryElement(ExceptionMessageBuilder br, ConditionBean cb) {
         br.addItem("Invalid Query");
         final Map<String, ConditionKey> invalidQueryColumnMap = cb.getSqlClause().getInvalidQueryColumnMap();
         if (invalidQueryColumnMap != null && !invalidQueryColumnMap.isEmpty()) {
@@ -118,12 +122,6 @@ public class BehaviorExceptionThrower {
         } else {
             br.addElement("*no invalid");
         }
-        br.addItem("Fetch Size");
-        br.addElement(cb.getFetchSize());
-        br.addItem("Display SQL");
-        br.addElement(cb.toDisplaySql());
-        final String msg = br.buildExceptionMessage();
-        throw new SelectEntityConditionNotFoundException(msg);
     }
 
     // ===================================================================================
