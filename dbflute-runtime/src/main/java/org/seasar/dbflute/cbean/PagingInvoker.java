@@ -48,6 +48,8 @@ public class PagingInvoker<ENTITY> {
      * Invoke select-page by handler.
      * @param handler The handler of paging. (NotNull)
      * @return The result bean of paging. (NotNull)
+     * @exception org.seasar.dbflute.exception.PagingStatusInvalidException When the paging status is invalid.
+     * @exception org.seasar.dbflute.exception.PagingOverSafetySizeException When the paging is over safety size.
      */
     public PagingResultBean<ENTITY> invokePaging(PagingHandler<ENTITY> handler) {
         assertObjectNotNull("handler", handler);

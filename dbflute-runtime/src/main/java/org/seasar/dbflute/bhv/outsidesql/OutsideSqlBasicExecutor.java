@@ -79,6 +79,9 @@ public class OutsideSqlBasicExecutor {
     /** The default configuration of statement. (Nullable) */
     protected final StatementConfig _defaultStatementConfig;
 
+    /** The option of outside-SQL. (NotNull) */
+    protected final OutsideSqlOption _outsideSqlOption;
+
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
 
@@ -98,11 +101,22 @@ public class OutsideSqlBasicExecutor {
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig) {
-        this._behaviorCommandInvoker = behaviorCommandInvoker;
-        this._tableDbName = tableDbName;
-        this._currentDBDef = currentDBDef;
-        this._defaultStatementConfig = defaultStatementConfig;
+            DBDef currentDBDef, StatementConfig defaultStatementConfig) { // for entry call
+        _behaviorCommandInvoker = behaviorCommandInvoker;
+        _tableDbName = tableDbName;
+        _currentDBDef = currentDBDef;
+        _defaultStatementConfig = defaultStatementConfig;
+        _outsideSqlOption = new OutsideSqlOption();
+        _outsideSqlOption.setTableDbName(tableDbName); // as information
+    }
+
+    public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) { // for nested call
+        _behaviorCommandInvoker = behaviorCommandInvoker;
+        _tableDbName = tableDbName;
+        _currentDBDef = currentDBDef;
+        _defaultStatementConfig = defaultStatementConfig;
+        _outsideSqlOption = outsideSqlOption;
     }
 
     // ===================================================================================
@@ -163,14 +177,6 @@ public class OutsideSqlBasicExecutor {
             throw new IllegalStateException(msg, e);
         }
         createBhvExThrower().throwDangerousResultSizeException((FetchBean) pmb, e);
-    }
-
-    protected OutsideSqlSelectListCallback createSelectListCallback() {
-        return new OutsideSqlSelectListCallback() {
-            public <ENTITY> ListResultBean<ENTITY> callbackSelectList(String path, Object pmb, Class<ENTITY> entityType) {
-                return doSelectList(path, pmb, entityType);
-            }
-        };
     }
 
     // ===================================================================================
@@ -261,7 +267,7 @@ public class OutsideSqlBasicExecutor {
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
         command.setParameterBean(pmb);
-        command.setOutsideSqlOption(createOutsideSqlOption());
+        command.setOutsideSqlOption(_outsideSqlOption);
         command.setCurrentDBDef(_currentDBDef);
         return command;
     }
@@ -296,9 +302,8 @@ public class OutsideSqlBasicExecutor {
      * @return The executor of paging that the paging mode is manual. (NotNull)
      */
     public OutsideSqlPagingExecutor manualPaging() {
-        final OutsideSqlOption option = createOutsideSqlOption();
-        option.manualPaging();
-        return createOutsideSqlPagingExecutor(option);
+        _outsideSqlOption.manualPaging();
+        return createOutsideSqlPagingExecutor();
     }
 
     /**
@@ -318,14 +323,13 @@ public class OutsideSqlBasicExecutor {
      * @return The executor of paging that the paging mode is auto. (NotNull)
      */
     public OutsideSqlPagingExecutor autoPaging() {
-        final OutsideSqlOption option = createOutsideSqlOption();
-        option.autoPaging();
-        return createOutsideSqlPagingExecutor(option);
+        _outsideSqlOption.autoPaging();
+        return createOutsideSqlPagingExecutor();
     }
 
-    protected OutsideSqlPagingExecutor createOutsideSqlPagingExecutor(OutsideSqlOption option) {
-        return new OutsideSqlPagingExecutor(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef,
-                _defaultStatementConfig, createSelectListCallback());
+    protected OutsideSqlPagingExecutor createOutsideSqlPagingExecutor() {
+        return new OutsideSqlPagingExecutor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _defaultStatementConfig, _outsideSqlOption);
     }
 
     // ===================================================================================
@@ -339,11 +343,12 @@ public class OutsideSqlBasicExecutor {
      * @return The cursor executor of outside-SQL. (NotNull)
      */
     public OutsideSqlCursorExecutor<Object> cursorHandling() {
-        return createOutsideSqlCursorExecutor(createOutsideSqlOption());
+        return createOutsideSqlCursorExecutor();
     }
 
-    protected OutsideSqlCursorExecutor<Object> createOutsideSqlCursorExecutor(OutsideSqlOption option) {
-        return new OutsideSqlCursorExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+    protected OutsideSqlCursorExecutor<Object> createOutsideSqlCursorExecutor() {
+        return new OutsideSqlCursorExecutor<Object>(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _outsideSqlOption);
     }
 
     /**
@@ -354,12 +359,12 @@ public class OutsideSqlBasicExecutor {
      * @return The cursor executor of outside-SQL. (NotNull)
      */
     public OutsideSqlEntityExecutor<Object> entityHandling() {
-        return createOutsideSqlEntityExecutor(createOutsideSqlOption());
+        return createOutsideSqlEntityExecutor();
     }
 
-    protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor(OutsideSqlOption option) {
-        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef,
-                createSelectListCallback());
+    protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor() {
+        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _defaultStatementConfig, _outsideSqlOption);
     }
 
     // ===================================================================================
@@ -375,7 +380,7 @@ public class OutsideSqlBasicExecutor {
      * @deprecated You does not need to call this to set bind variable in embedded variable.
      */
     public OutsideSqlBasicExecutor dynamicBinding() {
-        _dynamicBinding = true;
+        _outsideSqlOption.dynamicBinding();
         return this;
     }
 
@@ -387,7 +392,7 @@ public class OutsideSqlBasicExecutor {
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor removeBlockComment() {
-        _removeBlockComment = true;
+        _outsideSqlOption.removeBlockComment();
         return this;
     }
 
@@ -396,7 +401,7 @@ public class OutsideSqlBasicExecutor {
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor removeLineComment() {
-        _removeLineComment = true;
+        _outsideSqlOption.removeLineComment();
         return this;
     }
 
@@ -409,7 +414,7 @@ public class OutsideSqlBasicExecutor {
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor formatSql() {
-        _formatSql = true;
+        _outsideSqlOption.formatSql();
         return this;
     }
 
@@ -422,7 +427,7 @@ public class OutsideSqlBasicExecutor {
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor configure(StatementConfig statementConfig) {
-        _statementConfig = statementConfig;
+        _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
 
@@ -431,27 +436,5 @@ public class OutsideSqlBasicExecutor {
     //                                                                    ================
     protected BehaviorExceptionThrower createBhvExThrower() {
         return _behaviorCommandInvoker.createBehaviorExceptionThrower();
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected OutsideSqlOption createOutsideSqlOption() {
-        final OutsideSqlOption option = new OutsideSqlOption();
-        if (_dynamicBinding) {
-            option.dynamicBinding();
-        }
-        if (_removeBlockComment) {
-            option.removeBlockComment();
-        }
-        if (_removeLineComment) {
-            option.removeLineComment();
-        }
-        if (_formatSql) {
-            option.formatSql();
-        }
-        option.setStatementConfig(_statementConfig);
-        option.setTableDbName(_tableDbName);// as information
-        return option;
     }
 }

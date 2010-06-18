@@ -36,24 +36,24 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     /** The invoker of behavior command. (NotNull) */
     protected final BehaviorCommandInvoker _behaviorCommandInvoker;
 
-    /** The option of outside-SQL. (NotNull) */
-    protected final OutsideSqlOption _outsideSqlOption;
-
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
     /** The current database definition. (NotNull) */
     protected DBDef _currentDBDef;
 
+    /** The option of outside-SQL. (NotNull) */
+    protected final OutsideSqlOption _outsideSqlOption;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
-            String tableDbName, DBDef currentDBDef) {
+    public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, OutsideSqlOption outsideSqlOption) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
-        this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
         this._currentDBDef = currentDBDef;
+        this._outsideSqlOption = outsideSqlOption;
     }
 
     // ===================================================================================

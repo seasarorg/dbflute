@@ -40,28 +40,28 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     /** The invoker of behavior command. (NotNull) */
     protected final BehaviorCommandInvoker _behaviorCommandInvoker;
 
-    /** The option of outside-SQL. (NotNull) */
-    protected final OutsideSqlOption _outsideSqlOption;
-
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
     /** The current database definition. (NotNull) */
     protected DBDef _currentDBDef;
 
-    /** The call-back for selecting list. (NotNull) */
-    protected OutsideSqlSelectListCallback _callback;
+    /** The default configuration of statement. (Nullable) */
+    protected final StatementConfig _defaultStatementConfig;
+
+    /** The option of outside-SQL. (NotNull) */
+    protected final OutsideSqlOption _outsideSqlOption;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlEntityExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
-            String tableDbName, DBDef currentDBDef, OutsideSqlSelectListCallback callback) {
-        this._behaviorCommandInvoker = behaviorCommandInvoker;
-        this._outsideSqlOption = outsideSqlOption;
-        this._tableDbName = tableDbName;
-        this._currentDBDef = currentDBDef;
-        this._callback = callback;
+    public OutsideSqlEntityExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+        _behaviorCommandInvoker = behaviorCommandInvoker;
+        _tableDbName = tableDbName;
+        _currentDBDef = currentDBDef;
+        _defaultStatementConfig = defaultStatementConfig;
+        _outsideSqlOption = outsideSqlOption;
     }
 
     // ===================================================================================
@@ -94,7 +94,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOneIfNeed(pmb);
         final List<ENTITY> ls;
         try {
-            ls = _callback.callbackSelectList(path, pmb, entityType);
+            ls = doSelectList(path, pmb, entityType);
         } catch (DangerousResultSizeException e) {
             final String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
@@ -110,6 +110,15 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
             throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
         return ls.get(0);
+    }
+
+    protected <ENTITY> List<ENTITY> doSelectList(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+        return createBasicExecutor().selectList(path, pmb, entityType);
+    }
+
+    protected OutsideSqlBasicExecutor createBasicExecutor() {
+        return new OutsideSqlBasicExecutor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _defaultStatementConfig, _outsideSqlOption);
     }
 
     /**

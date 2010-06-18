@@ -24,6 +24,7 @@ import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -41,9 +42,6 @@ public class OutsideSqlPagingExecutor {
     /** The invoker of behavior command. (NotNull) */
     protected final BehaviorCommandInvoker _behaviorCommandInvoker;
 
-    /** The option of outside-SQL. (NotNull) */
-    protected final OutsideSqlOption _outsideSqlOption;
-
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
@@ -53,21 +51,19 @@ public class OutsideSqlPagingExecutor {
     /** The default configuration of statement. (Nullable) */
     protected final StatementConfig _defaultStatementConfig;
 
-    /** The call-back for selecting list. (NotNull) */
-    protected OutsideSqlSelectListCallback _callback;
+    /** The option of outside-SQL. (NotNull) */
+    protected final OutsideSqlOption _outsideSqlOption;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
-            OutsideSqlSelectListCallback callback) {
-        this._behaviorCommandInvoker = behaviorCommandInvoker;
-        this._outsideSqlOption = outsideSqlOption;
-        this._tableDbName = tableDbName;
-        this._currentDBDef = currentDBDef;
-        this._defaultStatementConfig = defaultStatementConfig;
-        this._callback = callback;
+    public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+        _behaviorCommandInvoker = behaviorCommandInvoker;
+        _tableDbName = tableDbName;
+        _currentDBDef = currentDBDef;
+        _defaultStatementConfig = defaultStatementConfig;
+        _outsideSqlOption = outsideSqlOption;
     }
 
     // ===================================================================================
@@ -172,8 +168,8 @@ public class OutsideSqlPagingExecutor {
 
     protected OutsideSqlEntityExecutor<PagingBean> createCountExecutor() {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
-        return new OutsideSqlEntityExecutor<PagingBean>(_behaviorCommandInvoker, countOption, _tableDbName,
-                _currentDBDef, _callback);
+        return new OutsideSqlEntityExecutor<PagingBean>(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _defaultStatementConfig, countOption);
     }
 
     protected <ENTITY> PagingInvoker<ENTITY> createPagingInvoker() {
@@ -258,7 +254,17 @@ public class OutsideSqlPagingExecutor {
 
     protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
-        return _callback.callbackSelectList(path, pmb, entityType);
+        try {
+            return createBasicExecutor().selectList(path, pmb, entityType);
+        } catch (FetchingOverSafetySizeException e) {
+            createBhvExThrower().throwDangerousResultSizeException(pmb, e);
+            return null; // unreachable
+        }
+    }
+
+    protected OutsideSqlBasicExecutor createBasicExecutor() {
+        return new OutsideSqlBasicExecutor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _defaultStatementConfig, _outsideSqlOption);
     }
 
     // ===================================================================================
