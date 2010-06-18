@@ -7,9 +7,9 @@ import java.util.*;
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #else
-import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #end
+import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
