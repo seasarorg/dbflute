@@ -129,6 +129,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             throw new ${glDangerousResultSizeException}(msg, safetyMaxResultSize);
         }
 
+        protected virtual String ln() {
+            return Environment.NewLine;
+        }
+
         // ===============================================================================
         //                                                            Fetch Narrowing Bean
         //                                                            ====================
