@@ -132,26 +132,25 @@ public class Srl {
      * @return The information of index. (Nullable: if delimiter not found)
      */
     public static IndexOfInfo indexOfFirst(final String str, final String... delimiters) {
-        int minIndex = -1;
-        String targetDelimiter = null;
-        for (String delimiter : delimiters) {
-            final int index = str.indexOf(delimiter);
-            if (index < 0) {
-                continue;
-            }
-            if (minIndex < 0 || minIndex > index) {
-                minIndex = index;
-                targetDelimiter = delimiter;
-            }
-        }
-        if (minIndex < 0) {
-            return null;
-        }
-        final IndexOfInfo info = new IndexOfInfo();
-        info.setBaseString(str);
-        info.setIndex(minIndex);
-        info.setDelimiter(targetDelimiter);
-        return info;
+        return doIndexOfFirst(false, str, delimiters);
+    }
+
+    /**
+     * Get the index of the first-found delimiter ignoring case.
+     * <pre>
+     * indexOfFirst("foo.bar/baz.qux", "A", "U")
+     * returns the index of "ar/baz..."
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The information of index. (Nullable: if delimiter not found)
+     */
+    public static IndexOfInfo indexOfFirstIgnoreCase(final String str, final String... delimiters) {
+        return doIndexOfFirst(true, str, delimiters);
+    }
+
+    protected static IndexOfInfo doIndexOfFirst(final boolean ignoreCase, final String str, final String... delimiters) {
+        return doIndexOf(ignoreCase, false, str, delimiters);
     }
 
     /**
@@ -165,24 +164,64 @@ public class Srl {
      * @return The information of index. (Nullable: if delimiter not found)
      */
     public static IndexOfInfo indexOfLast(final String str, final String... delimiters) {
-        int maxIndex = -1;
+        return doIndexOfLast(false, str, delimiters);
+    }
+
+    /**
+     * Get the index of the last-found delimiter ignoring case.
+     * <pre>
+     * indexOfLast("foo.bar/baz.qux", "A", "U")
+     * returns the index of "ux"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The information of index. (Nullable: if delimiter not found)
+     */
+    public static IndexOfInfo indexOfLastIgnoreCase(final String str, final String... delimiters) {
+        return doIndexOfLast(true, str, delimiters);
+    }
+
+    protected static IndexOfInfo doIndexOfLast(final boolean ignoreCase, final String str, final String... delimiters) {
+        return doIndexOf(ignoreCase, true, str, delimiters);
+    }
+
+    protected static IndexOfInfo doIndexOf(final boolean ignoreCase, final boolean last, final String str,
+            final String... delimiters) {
+        final String filteredStr;
+        if (ignoreCase) {
+            filteredStr = str.toLowerCase();
+        } else {
+            filteredStr = str;
+        }
+        int targetIndex = -1;
         String targetDelimiter = null;
         for (String delimiter : delimiters) {
-            final int index = str.lastIndexOf(delimiter);
+            final String filteredDelimiter;
+            if (ignoreCase) {
+                filteredDelimiter = delimiter.toLowerCase();
+            } else {
+                filteredDelimiter = delimiter;
+            }
+            final int index;
+            if (last) {
+                index = filteredStr.lastIndexOf(filteredDelimiter);
+            } else {
+                index = filteredStr.indexOf(filteredDelimiter);
+            }
             if (index < 0) {
                 continue;
             }
-            if (maxIndex < 0 || maxIndex < index) {
-                maxIndex = index;
+            if (targetIndex < 0 || (last ? targetIndex < index : targetIndex > index)) {
+                targetIndex = index;
                 targetDelimiter = delimiter;
             }
         }
-        if (maxIndex < 0) {
+        if (targetIndex < 0) {
             return null;
         }
         final IndexOfInfo info = new IndexOfInfo();
         info.setBaseString(str);
-        info.setIndex(maxIndex);
+        info.setIndex(targetIndex);
         info.setDelimiter(targetDelimiter);
         return info;
     }
@@ -232,11 +271,22 @@ public class Srl {
      */
     public static final String substringFirstFront(final String str, final String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfFirst(str, delimiters);
-        if (info == null) {
-            return str;
-        }
-        return str.substring(0, info.getIndex());
+        return doSubstringFirstRear(false, false, false, str, delimiters);
+    }
+
+    /**
+     * Extract front sub-string from first-found delimiter ignoring case.
+     * <pre>
+     * substringFirstFront("foo.bar/baz.qux", "A", "U")
+     * returns "foo.b"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
+    public static final String substringFirstFrontIgnoreCase(final String str, final String... delimiters) {
+        assertStringNotNull(str);
+        return doSubstringFirstRear(false, false, true, str, delimiters);
     }
 
     /**
@@ -251,11 +301,22 @@ public class Srl {
      */
     public static final String substringFirstRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfFirst(str, delimiters);
-        if (info == null) {
-            return str;
-        }
-        return str.substring(info.getIndex() + info.getDelimiter().length());
+        return doSubstringFirstRear(false, true, false, str, delimiters);
+    }
+
+    /**
+     * Extract rear sub-string from first-found delimiter ignoring case.
+     * <pre>
+     * substringFirstRear("foo.bar/baz.qux", "A", "U")
+     * returns "ar/baz.qux"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
+    public static final String substringFirstRearIgnoreCase(String str, String... delimiters) {
+        assertStringNotNull(str);
+        return doSubstringFirstRear(false, true, true, str, delimiters);
     }
 
     /**
@@ -270,11 +331,22 @@ public class Srl {
      */
     public static final String substringLastFront(String str, String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfLast(str, delimiters);
-        if (info == null) {
-            return str;
-        }
-        return str.substring(0, info.getIndex());
+        return doSubstringFirstRear(true, false, false, str, delimiters);
+    }
+
+    /**
+     * Extract front sub-string from last-found delimiter ignoring case.
+     * <pre>
+     * substringLastFront("foo.bar/baz.qux", "A", "U")
+     * returns "foo.bar/baz.q"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
+    public static final String substringLastFrontIgnoreCase(String str, String... delimiters) {
+        assertStringNotNull(str);
+        return doSubstringFirstRear(true, false, true, str, delimiters);
     }
 
     /**
@@ -289,11 +361,49 @@ public class Srl {
      */
     public static final String substringLastRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        final IndexOfInfo info = indexOfLast(str, delimiters);
+        return doSubstringFirstRear(true, true, false, str, delimiters);
+    }
+
+    /**
+     * Extract rear sub-string from last-found delimiter ignoring case.
+     * <pre>
+     * substringLastRear("foo.bar/baz.qux", "A", "U")
+     * returns "x"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param delimiters The array of delimiters. (NotNull) 
+     * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
+     */
+    public static final String substringLastRearIgnoreCase(String str, String... delimiters) {
+        assertStringNotNull(str);
+        return doSubstringFirstRear(true, true, true, str, delimiters);
+    }
+
+    protected static final String doSubstringFirstRear(final boolean last, final boolean rear,
+            final boolean ignoreCase, final String str, String... delimiters) {
+        assertStringNotNull(str);
+        final IndexOfInfo info;
+        if (ignoreCase) {
+            if (last) {
+                info = indexOfLastIgnoreCase(str, delimiters);
+            } else {
+                info = indexOfFirstIgnoreCase(str, delimiters);
+            }
+        } else {
+            if (last) {
+                info = indexOfLast(str, delimiters);
+            } else {
+                info = indexOfFirst(str, delimiters);
+            }
+        }
         if (info == null) {
             return str;
         }
-        return str.substring(info.getIndex() + info.getDelimiter().length());
+        if (rear) {
+            return str.substring(info.getIndex() + info.getDelimiter().length());
+        } else {
+            return str.substring(0, info.getIndex());
+        }
     }
 
     // ===================================================================================
@@ -366,7 +476,7 @@ public class Srl {
         } while (true);
     }
 
-    public static final String replace(String str, Map<String, String> fromToMap) {
+    public static final String replaceBy(String str, Map<String, String> fromToMap) {
         assertStringNotNull(str);
         assertFromToMapNotNull(fromToMap);
         final Set<Entry<String, String>> entrySet = fromToMap.entrySet();

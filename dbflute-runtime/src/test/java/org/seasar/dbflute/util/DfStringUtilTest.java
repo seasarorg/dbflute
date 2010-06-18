@@ -55,7 +55,9 @@ import static org.seasar.dbflute.util.Srl.hasSuffixAllIgnoreCase;
 import static org.seasar.dbflute.util.Srl.hasSuffixAny;
 import static org.seasar.dbflute.util.Srl.hasSuffixAnyIgnoreCase;
 import static org.seasar.dbflute.util.Srl.indexOfFirst;
+import static org.seasar.dbflute.util.Srl.indexOfFirstIgnoreCase;
 import static org.seasar.dbflute.util.Srl.indexOfLast;
+import static org.seasar.dbflute.util.Srl.indexOfLastIgnoreCase;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
 import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.removeBlockComment;
@@ -69,9 +71,13 @@ import static org.seasar.dbflute.util.Srl.splitListTrimmed;
 import static org.seasar.dbflute.util.Srl.startsWith;
 import static org.seasar.dbflute.util.Srl.startsWithIgnoreCase;
 import static org.seasar.dbflute.util.Srl.substringFirstFront;
+import static org.seasar.dbflute.util.Srl.substringFirstFrontIgnoreCase;
 import static org.seasar.dbflute.util.Srl.substringFirstRear;
+import static org.seasar.dbflute.util.Srl.substringFirstRearIgnoreCase;
 import static org.seasar.dbflute.util.Srl.substringLastFront;
+import static org.seasar.dbflute.util.Srl.substringLastFrontIgnoreCase;
 import static org.seasar.dbflute.util.Srl.substringLastRear;
+import static org.seasar.dbflute.util.Srl.substringLastRearIgnoreCase;
 import static org.seasar.dbflute.util.Srl.trim;
 import static org.seasar.dbflute.util.Srl.unquoteDouble;
 import static org.seasar.dbflute.util.Srl.unquoteSingle;
@@ -150,11 +156,29 @@ public class DfStringUtilTest extends PlainTestCase {
     public void test_indexOfFirst_basic() {
         assertEquals(3, indexOfFirst("foo.bar/baz.qux", ".", "/").getIndex());
         assertEquals(3, indexOfFirst("foo/bar.baz/qux", ".", "/").getIndex());
+        assertNull(indexOfFirst("foo.bar/baz.qux", "O", "A"));
+    }
+
+    public void test_indexOfFirstIgnoreCase_basic() {
+        assertEquals(5, indexOfFirstIgnoreCase("foo.bar/baz.qux", "A", "U").getIndex());
+        assertEquals(4, indexOfFirstIgnoreCase("foo/bar.baz/qux", "z", "B").getIndex());
+        assertEquals("B", indexOfFirstIgnoreCase("foo/bar.baz/qux", "z", "B").getDelimiter());
+        assertEquals("foo/bar.baz/qux", indexOfFirstIgnoreCase("foo/bar.baz/qux", "z", "B").getBaseString());
+        assertNull(indexOfFirstIgnoreCase("foo.bar/baz.qux", "*", "@"));
     }
 
     public void test_indexOfLast_basic() {
         assertEquals(11, indexOfLast("foo.bar/baz.qux", ".", "/").getIndex());
         assertEquals(11, indexOfLast("foo/bar.baz/qux", ".", "/").getIndex());
+        assertNull(indexOfLast("foo.bar/baz.qux", "O", "A"));
+    }
+
+    public void test_indexOfLastIgnoreCase_basic() {
+        assertEquals(13, indexOfLastIgnoreCase("foo.bar/baz.qux", "A", "U").getIndex());
+        assertEquals(12, indexOfLastIgnoreCase("foo/bar.baz/qux", "z", "Q").getIndex());
+        assertEquals("Q", indexOfLastIgnoreCase("foo/bar.baz/qux", "z", "Q").getDelimiter());
+        assertEquals("foo/bar.baz/qux", indexOfLastIgnoreCase("foo/bar.baz/qux", "z", "Q").getBaseString());
+        assertNull(indexOfLastIgnoreCase("foo.bar/baz.qux", "@", "-"));
     }
 
     // ===================================================================================
@@ -171,6 +195,13 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("foo", substringFirstFront("foo.bar.don.moo", "/", "."));
     }
 
+    public void test_substringFirstFrontIgnoreCase_basic() {
+        assertEquals("foo.b", substringFirstFrontIgnoreCase("foo.bar", "A"));
+        assertEquals("foo.bar/ba", substringFirstFrontIgnoreCase("foo.bar/baz.qux", "Z", "U"));
+        assertEquals("foo.baR/bAz.qux", substringFirstFrontIgnoreCase("foo.baR/bAz.qux", "C"));
+        assertEquals("fOo.", substringFirstFrontIgnoreCase("fOo.baR/bAz.qux", "B"));
+    }
+
     public void test_substringFirstRear_basic() {
         assertEquals("bar", substringFirstRear("foo.bar", "."));
         assertEquals("bar.don", substringFirstRear("foo.bar.don", "."));
@@ -180,6 +211,11 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("bar.don.moo", substringFirstRear("foo/bar.don.moo", ".", "/"));
         assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", ".", "/"));
         assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", "/", "."));
+    }
+
+    public void test_substringFirstRearIgnoreCase_basic() {
+        assertEquals("r", substringFirstRearIgnoreCase("foo.bar", "A"));
+        assertEquals(".qux", substringFirstRearIgnoreCase("foo.bar/baz.qux", "Z", "U"));
     }
 
     public void test_substringLastFront_basic() {
@@ -194,6 +230,11 @@ public class DfStringUtilTest extends PlainTestCase {
 
     }
 
+    public void test_substringLastFrontIgnoreCase_basic() {
+        assertEquals("fo", substringLastFrontIgnoreCase("foo.bar", "O"));
+        assertEquals("foo.bar/baz.q", substringLastFrontIgnoreCase("foo.bar/baz.qux", "Z", "U"));
+    }
+
     public void test_substringLastRear_basic() {
         assertEquals("bar", substringLastRear("foo.bar", "."));
         assertEquals("don", substringLastRear("foo.bar.don", "."));
@@ -203,6 +244,11 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("moo", substringLastRear("foo.bar.don/moo", ".", "/"));
         assertEquals("moo", substringLastRear("foo.bar.don.moo", ".", "/"));
         assertEquals("moo", substringLastRear("foo.bar.don.moo", "/", "."));
+    }
+
+    public void test_substringLastRearIgnoreCase_basic() {
+        assertEquals("r", substringLastRearIgnoreCase("foo.bar", "A"));
+        assertEquals("x", substringLastRearIgnoreCase("foo.bar/baz.qux", "Z", "U"));
     }
 
     // ===================================================================================
