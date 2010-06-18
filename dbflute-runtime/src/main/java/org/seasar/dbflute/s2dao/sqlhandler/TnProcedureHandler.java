@@ -23,8 +23,10 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.s2dao.jdbc.TnFetchAssistResultSet;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType;
@@ -153,7 +155,7 @@ public class TnProcedureHandler extends TnBasicHandler {
                 if (rs == null) {
                     break;
                 }
-                final TnResultSetHandler handler = createResultSetHandler(ppt, rs);
+                final TnResultSetHandler handler = createResultSetHandler(pmb, ppt, rs);
                 final Object beanList = handler.handle(rs);
                 ppt.setValue(pmb, beanList);
                 if (!cs.getMoreResults()) {
@@ -185,7 +187,7 @@ public class TnProcedureHandler extends TnBasicHandler {
                 Object value = valueType.getValue(cs, index + 1);
                 if (value instanceof ResultSet) {
                     final ResultSet rs = (ResultSet) value;
-                    final TnResultSetHandler handler = createResultSetHandler(ppt, rs);
+                    final TnResultSetHandler handler = createResultSetHandler(pmb, ppt, rs);
                     try {
                         value = handler.handle(rs);
                     } finally {
@@ -232,7 +234,18 @@ public class TnProcedureHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                    ResultSetHandler
     //                                                                    ================
-    protected TnResultSetHandler createResultSetHandler(TnProcedureParameterType ppt, ResultSet rs) {
+    protected TnResultSetHandler createResultSetHandler(Object pmb, TnProcedureParameterType ppt, ResultSet rs) {
+        if (pmb instanceof FetchBean) {
+            final FetchBean fcbean = (FetchBean) pmb;
+            final int safetyMaxResultSize = fcbean.getSafetyMaxResultSize();
+            if (safetyMaxResultSize > 0) { // wrap for check safety
+                rs = createFunctionalResultSet(rs, fcbean);
+            }
+        }
         return _resultSetHandlerProvider.provideResultSetHandler(ppt, rs);
+    }
+
+    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean) {
+        return new TnFetchAssistResultSet(rs, fcbean, false, false);
     }
 }

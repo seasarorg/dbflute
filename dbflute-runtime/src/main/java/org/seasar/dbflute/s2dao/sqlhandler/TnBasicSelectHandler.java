@@ -142,9 +142,9 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         return false;
     }
 
-    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet resultSet, FetchBean fcbean,
-            boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
-        return new TnFetchAssistResultSet(resultSet, fcbean, offsetByCursorForcedly, limitByCursorForcedly);
+    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean, boolean offset,
+            boolean limit) {
+        return new TnFetchAssistResultSet(rs, fcbean, offset, limit);
     }
 
     // ===================================================================================
