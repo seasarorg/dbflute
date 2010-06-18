@@ -21,7 +21,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
-import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -93,7 +93,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         final List<ENTITY> ls;
         try {
             ls = invoke(createSelectListCommand(path, pmb, entityType));
-        } catch (DangerousResultSizeException e) {
+        } catch (FetchingOverSafetySizeException e) {
             final String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
