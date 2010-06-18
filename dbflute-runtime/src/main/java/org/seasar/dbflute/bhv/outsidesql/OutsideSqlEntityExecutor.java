@@ -18,10 +18,8 @@ package org.seasar.dbflute.bhv.outsidesql;
 import java.util.List;
 
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
-import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
+import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -51,15 +49,19 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     /** The current database definition. (NotNull) */
     protected DBDef _currentDBDef;
 
+    /** The call-back for selecting list. (NotNull) */
+    protected OutsideSqlSelectListCallback _callback;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlEntityExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
-            String tableDbName, DBDef currentDBDef) {
+            String tableDbName, DBDef currentDBDef, OutsideSqlSelectListCallback callback) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
         this._currentDBDef = currentDBDef;
+        this._callback = callback;
     }
 
     // ===================================================================================
@@ -92,8 +94,8 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOneIfNeed(pmb);
         final List<ENTITY> ls;
         try {
-            ls = invoke(createSelectListCommand(path, pmb, entityType));
-        } catch (FetchingOverSafetySizeException e) {
+            ls = _callback.callbackSelectList(path, pmb, entityType);
+        } catch (DangerousResultSizeException e) {
             final String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
@@ -169,41 +171,6 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
 
     protected void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
         createBhvExThrower().throwSelectEntityDuplicatedException(resultCountExp, searchKey, cause);
-    }
-
-    // ===================================================================================
-    //                                                                    Behavior Command
-    //                                                                    ================
-    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, PARAMETER_BEAN pmb,
-            Class<ENTITY> entityType) {
-        final OutsideSqlSelectListCommand<ENTITY> newed = newOutsideSqlSelectListCommand();
-        return xsetupCommand(newed, path, pmb, entityType);
-    }
-
-    protected <ENTITY> OutsideSqlSelectListCommand<ENTITY> newOutsideSqlSelectListCommand() {
-        return new OutsideSqlSelectListCommand<ENTITY>();
-    }
-
-    protected <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command,
-            String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        command.setTableDbName(_tableDbName);
-        _behaviorCommandInvoker.injectComponentProperty(command);
-        command.setOutsideSqlPath(path);
-        command.setParameterBean(pmb);
-        command.setOutsideSqlOption(_outsideSqlOption);
-        command.setCurrentDBDef(_currentDBDef);
-        command.setEntityType(entityType);
-        return command;
-    }
-
-    /**
-     * Invoke the command of behavior.
-     * @param <RESULT> The type of result.
-     * @param behaviorCommand The command of behavior. (NotNull)
-     * @return The instance of result. (Nullable)
-     */
-    protected <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
-        return _behaviorCommandInvoker.invoke(behaviorCommand);
     }
 
     // ===================================================================================

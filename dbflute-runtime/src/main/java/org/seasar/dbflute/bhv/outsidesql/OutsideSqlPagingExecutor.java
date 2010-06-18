@@ -18,16 +18,12 @@ package org.seasar.dbflute.bhv.outsidesql;
 import java.util.List;
 
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
-import org.seasar.dbflute.cbean.ResultBeanBuilder;
-import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -57,16 +53,21 @@ public class OutsideSqlPagingExecutor {
     /** The default configuration of statement. (Nullable) */
     protected final StatementConfig _defaultStatementConfig;
 
+    /** The call-back for selecting list. (NotNull) */
+    protected OutsideSqlSelectListCallback _callback;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig) {
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
+            OutsideSqlSelectListCallback callback) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
         this._currentDBDef = currentDBDef;
         this._defaultStatementConfig = defaultStatementConfig;
+        this._callback = callback;
     }
 
     // ===================================================================================
@@ -172,7 +173,7 @@ public class OutsideSqlPagingExecutor {
     protected OutsideSqlEntityExecutor<PagingBean> createCountExecutor() {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
         return new OutsideSqlEntityExecutor<PagingBean>(_behaviorCommandInvoker, countOption, _tableDbName,
-                _currentDBDef);
+                _currentDBDef, _callback);
     }
 
     protected <ENTITY> PagingInvoker<ENTITY> createPagingInvoker() {
@@ -257,52 +258,7 @@ public class OutsideSqlPagingExecutor {
 
     protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
-        try {
-            final List<ENTITY> selectedList = invoke(createSelectListCommand(path, pmb, entityType));
-            return createListResultBean(selectedList);
-        } catch (FetchingOverSafetySizeException e) {
-            createBhvExThrower().throwDangerousResultSizeException(pmb, e);
-            return null; // unreachable
-        }
-    }
-
-    protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
-        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(selectedList);
-    }
-
-    // ===================================================================================
-    //                                                                    Behavior Command
-    //                                                                    ================
-    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb,
-            Class<ENTITY> entityType) {
-        final OutsideSqlSelectListCommand<ENTITY> newed = newOutsideSqlSelectListCommand();
-        return xsetupCommand(newed, path, pmb, entityType);
-    }
-
-    protected <ENTITY> OutsideSqlSelectListCommand<ENTITY> newOutsideSqlSelectListCommand() {
-        return new OutsideSqlSelectListCommand<ENTITY>();
-    }
-
-    protected <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command,
-            String path, Object pmb, Class<ENTITY> entityType) {
-        command.setTableDbName(_tableDbName);
-        _behaviorCommandInvoker.injectComponentProperty(command);
-        command.setOutsideSqlPath(path);
-        command.setParameterBean(pmb);
-        command.setOutsideSqlOption(_outsideSqlOption);
-        command.setCurrentDBDef(_currentDBDef);
-        command.setEntityType(entityType);
-        return command;
-    }
-
-    /**
-     * Invoke the command of behavior.
-     * @param <RESULT> The type of result.
-     * @param behaviorCommand The command of behavior. (NotNull)
-     * @return The instance of result. (Nullable)
-     */
-    protected <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
-        return _behaviorCommandInvoker.invoke(behaviorCommand);
+        return _callback.callbackSelectList(path, pmb, entityType);
     }
 
     // ===================================================================================

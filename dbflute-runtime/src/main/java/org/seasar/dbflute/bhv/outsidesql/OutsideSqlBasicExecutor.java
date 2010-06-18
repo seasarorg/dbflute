@@ -139,6 +139,10 @@ public class OutsideSqlBasicExecutor {
      * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
+        return doSelectList(path, pmb, entityType);
+    }
+
+    protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, Object pmb, Class<ENTITY> entityType) {
         try {
             List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
             return createListResultBean(resultList);
@@ -159,6 +163,14 @@ public class OutsideSqlBasicExecutor {
             throw new IllegalStateException(msg, e);
         }
         createBhvExThrower().throwDangerousResultSizeException((FetchBean) pmb, e);
+    }
+
+    protected OutsideSqlSelectListCallback createSelectListCallback() {
+        return new OutsideSqlSelectListCallback() {
+            public <ENTITY> ListResultBean<ENTITY> callbackSelectList(String path, Object pmb, Class<ENTITY> entityType) {
+                return doSelectList(path, pmb, entityType);
+            }
+        };
     }
 
     // ===================================================================================
@@ -313,7 +325,7 @@ public class OutsideSqlBasicExecutor {
 
     protected OutsideSqlPagingExecutor createOutsideSqlPagingExecutor(OutsideSqlOption option) {
         return new OutsideSqlPagingExecutor(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef,
-                _defaultStatementConfig);
+                _defaultStatementConfig, createSelectListCallback());
     }
 
     // ===================================================================================
@@ -346,7 +358,8 @@ public class OutsideSqlBasicExecutor {
     }
 
     protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor(OutsideSqlOption option) {
-        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
+        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef,
+                createSelectListCallback());
     }
 
     // ===================================================================================
