@@ -83,6 +83,9 @@
 	span.dt {
 		font-size: 80%;
 	}
+	p.comment {
+		margin-left: 23em;
+	}
 	p.tablecount {
 		margin-left: 23em;
 	}
@@ -95,6 +98,9 @@
 #foreach ($schemaDiff in $database.schemaDiffList)
 <div class="section">
 	<h2><span class="dt">Diff Date: </span>${schemaDiff.diffDate}</h2>
+#if ($schemaDiff.hasComment())
+	<p class="comment">${schemaDiff.comment}</p>
+#end
 #if ($schemaDiff.tableCount.hasDiff())
 	<p class="tablecount"><span class="dt">table count: </span>${schemaDiff.tableCount.displayForHtml}</p>
 #end

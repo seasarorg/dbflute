@@ -131,8 +131,8 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "[Invalid Query]" + ln();
             Map<String, ConditionKey> invalidQueryColumnMap = cb.SqlClause.getInvalidQueryColumnMap();
             if (invalidQueryColumnMap != null && !invalidQueryColumnMap.isEmpty()) {
-                Set<String> keySet invalidQueryColumnMap.keySet();
-                foreach (String columnFullName : keySet) {
+                Set<String> keySet = invalidQueryColumnMap.keySet();
+                foreach (String columnFullName in keySet) {
                     ${glConditionKey} key = invalidQueryColumnMap.get(columnFullName);
                     msg = msg + columnFullName + " : " + key.getConditionKey() + ln();
                 }

@@ -115,7 +115,7 @@ namespace ${glPackageBaseCommonBhv} {
             ${glConditionBeanContext}.ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause);
         }
 
-        protected void throwSelectEntityConditionNotFoundException(${ConditionBean} cb) {
+        protected void throwSelectEntityConditionNotFoundException(${glConditionBean} cb) {
             ${glConditionBeanContext}.throwSelectEntityConditionNotFoundException(cb);
         }
 
