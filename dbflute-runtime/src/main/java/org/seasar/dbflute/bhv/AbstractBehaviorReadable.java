@@ -213,13 +213,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                       Internal Helper
     //                                       ---------------
     protected static interface InternalSelectListCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        List<ENTITY> callbackSelectList(CB cb);
+        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
     }
 
     protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
-            InternalSelectListCallback<ENTITY, CB> callback) {
+            Class<ENTITY> entityType, InternalSelectListCallback<ENTITY, CB> callback) {
         try {
-            return createListResultBean(cb, callback.callbackSelectList(cb));
+            return createListResultBean(cb, callback.callbackSelectList(cb, entityType));
         } catch (FetchingOverSafetySizeException e) {
             createBhvExThrower().throwDangerousResultSizeException(cb, e);
             return null; // unreachable
