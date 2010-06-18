@@ -54,7 +54,7 @@ public class TnProcedureHandler extends TnBasicHandler {
     }
 
     public static interface TnProcedureResultSetHandlerProvider { // is needed to construct an instance
-        TnResultSetHandler provideResultSetHandler(TnProcedureParameterType ppt, ResultSet rs);
+        TnResultSetHandler provideResultSetHandler(TnProcedureParameterType ppt);
     }
 
     // ===================================================================================
@@ -155,7 +155,8 @@ public class TnProcedureHandler extends TnBasicHandler {
                 if (rs == null) {
                     break;
                 }
-                final TnResultSetHandler handler = createResultSetHandler(pmb, ppt, rs);
+                rs = wrapResultSetIfNeeds(pmb, rs);
+                final TnResultSetHandler handler = createResultSetHandler(pmb, ppt);
                 final Object beanList = handler.handle(rs);
                 ppt.setValue(pmb, beanList);
                 if (!cs.getMoreResults()) {
@@ -186,8 +187,8 @@ public class TnProcedureHandler extends TnBasicHandler {
             if (ppt.isOutType()) {
                 Object value = valueType.getValue(cs, index + 1);
                 if (value instanceof ResultSet) {
-                    final ResultSet rs = (ResultSet) value;
-                    final TnResultSetHandler handler = createResultSetHandler(pmb, ppt, rs);
+                    final ResultSet rs = wrapResultSetIfNeeds(pmb, (ResultSet) value);
+                    final TnResultSetHandler handler = createResultSetHandler(pmb, ppt);
                     try {
                         value = handler.handle(rs);
                     } finally {
@@ -234,18 +235,18 @@ public class TnProcedureHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                    ResultSetHandler
     //                                                                    ================
-    protected TnResultSetHandler createResultSetHandler(Object pmb, TnProcedureParameterType ppt, ResultSet rs) {
+    protected TnResultSetHandler createResultSetHandler(Object pmb, TnProcedureParameterType ppt) {
+        return _resultSetHandlerProvider.provideResultSetHandler(ppt);
+    }
+
+    protected ResultSet wrapResultSetIfNeeds(Object pmb, ResultSet rs) {
         if (pmb instanceof FetchBean) {
             final FetchBean fcbean = (FetchBean) pmb;
             final int safetyMaxResultSize = fcbean.getSafetyMaxResultSize();
             if (safetyMaxResultSize > 0) { // wrap for check safety
-                rs = createFunctionalResultSet(rs, fcbean);
+                return new TnFetchAssistResultSet(rs, fcbean, false, false);
             }
         }
-        return _resultSetHandlerProvider.provideResultSetHandler(ppt, rs);
-    }
-
-    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean) {
-        return new TnFetchAssistResultSet(rs, fcbean, false, false);
+        return rs;
     }
 }

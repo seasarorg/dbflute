@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 
@@ -128,7 +127,7 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
 
     protected TnProcedureResultSetHandlerProvider createProcedureResultSetHandlerFactory() {
         return new TnProcedureResultSetHandlerProvider() {
-            public TnResultSetHandler provideResultSetHandler(TnProcedureParameterType ppt, ResultSet rs) {
+            public TnResultSetHandler provideResultSetHandler(TnProcedureParameterType ppt) {
                 final Class<?> parameterType = ppt.getParameterType();
                 if (!List.class.isAssignableFrom(parameterType)) {
                     String msg = "The parameter type for result set should be List:";

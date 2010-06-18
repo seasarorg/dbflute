@@ -42,6 +42,12 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     /** The bean of fetch. (NotNull) */
     protected final FetchBean _fetchBean;
 
+    /** The max size of safety result. (derived from fetchBean) */
+    protected final int _safetyResultMaxSize;
+
+    /** Is the safety check valid? (derived from fetchBean) */
+    protected final boolean _safetyCheckValid;
+
     /** The bean of fetch narrowing. (Nullable) */
     protected final FetchNarrowingBean _fetchNarrowingBean;
 
@@ -82,6 +88,11 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
 
         _resultSet = resultSet;
         _fetchBean = fetchBean;
+
+        // derived before fetching for performance
+        _safetyResultMaxSize = fetchBean.getSafetyMaxResultSize();
+        _safetyCheckValid = _safetyResultMaxSize > 0;
+
         _fetchNarrowingBean = fetchBean instanceof FetchNarrowingBean ? (FetchNarrowingBean) fetchBean : null;
         _offsetByCursorForcedly = offsetByCursorForcedly;
         _limitByCursorForcedly = limitByCursorForcedly;
@@ -159,7 +170,9 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
         final boolean hasNext = super.next();
         ++_requestCounter;
         if (!isAvailableLimitLoopCount()) {
-            checkSafetyResultIfNeed(hasNext);
+            if (_safetyCheckValid) {
+                checkSafetyResult(hasNext);
+            }
             return hasNext;
         }
 
@@ -167,7 +180,9 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
         final int loopCount = getFetchNarrowingLoopCount();
         if (hasNext && _fetchCounter < skipStartIndex + loopCount) {
             ++_fetchCounter;
-            checkSafetyResultIfNeed(true);
+            if (_safetyCheckValid) {
+                checkSafetyResult(true);
+            }
             return true;
         } else {
             return false;
@@ -187,27 +202,16 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
         return false;
     }
 
-    protected void checkSafetyResultIfNeed(boolean hasNext) {
-        final int safetyMaxResultSize = getSafetyMaxResultSize();
-        if (hasNext && safetyMaxResultSize > 0 && _requestCounter > safetyMaxResultSize) {
-            throwFetchingOverSafetySizeException(safetyMaxResultSize);
+    protected void checkSafetyResult(boolean hasNext) {
+        if (hasNext && _requestCounter > _safetyResultMaxSize) {
+            throwFetchingOverSafetySizeException();
         }
     }
 
-    protected void throwFetchingOverSafetySizeException(int safetyMaxResultSize) {
+    protected void throwFetchingOverSafetySizeException() {
         // here simple message because an entry method catches this
-        String msg = "The fetching was over the specified safety size: " + safetyMaxResultSize;
-        throw new FetchingOverSafetySizeException(msg, safetyMaxResultSize);
-    }
-
-    // ===================================================================================
-    //                                                                          Fetch Bean
-    //                                                                          ==========
-    /**
-     * @return The max size of safety result.
-     */
-    public int getSafetyMaxResultSize() {
-        return _fetchBean.getSafetyMaxResultSize();
+        String msg = "The fetching was over the specified safety size: " + _safetyResultMaxSize;
+        throw new FetchingOverSafetySizeException(msg, _safetyResultMaxSize);
     }
 
     // ===================================================================================
