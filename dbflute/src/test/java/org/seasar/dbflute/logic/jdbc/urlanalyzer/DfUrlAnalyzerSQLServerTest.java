@@ -22,13 +22,13 @@ public class DfUrlAnalyzerSQLServerTest extends PlainTestCase {
     @Test
     public void test_extractCatalog_caseInsensitive() throws Exception {
         // ## Arrange ##
-        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlserver://localhost:1433;databaseName=exampledb;");
+        DfUrlAnalyzer analyzer = createTarget("jdbc:sqlserver://localhost:1433;databaseName=exampLeDb;");
 
         // ## Act ##
         String catalog = analyzer.extractCatalog();
 
         // ## Assert ##
-        assertEquals("exampledb", catalog);
+        assertEquals("exampLeDb", catalog);
     }
 
     @Test
