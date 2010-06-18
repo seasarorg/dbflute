@@ -356,6 +356,10 @@ public class Database {
         return getPmbBasicHandler().getPropertyColumnName(className, propertyName);
     }
 
+    public String getPmbMetaDataPropertyTypeRemovedCSharpNullable(String className, String propertyName) {
+        return getPmbBasicHandler().getPropertyTypeRemovedCSharpNullable(className, propertyName);
+    }
+
     public boolean isPmbMetaDataPropertyJavaNativeStringObject(String className, String propertyName) {
         return getPmbBasicHandler().isPmbMetaDataPropertyJavaNativeStringObject(className, propertyName);
     }

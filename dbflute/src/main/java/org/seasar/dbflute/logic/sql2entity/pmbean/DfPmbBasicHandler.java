@@ -119,6 +119,13 @@ public class DfPmbBasicHandler {
         return metaData.getPropertyNameTypeMap();
     }
 
+    public String getPropertyTypeRemovedCSharpNullable(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassName(className);
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        final String propertyType = getPropertyType(className, propertyName);
+        return propertyType.endsWith("?") ? Srl.substringLastFront(propertyType, "?") : propertyType;
+    }
+
     public boolean isPmbMetaDataPropertyJavaNativeStringObject(String className, String propertyName) {
         final String propertyType = getPropertyType(className, propertyName);
         final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
