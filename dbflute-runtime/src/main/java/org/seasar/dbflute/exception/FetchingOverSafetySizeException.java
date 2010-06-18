@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the result size is dangerous.
+ * The exception of when the fetching is over safety size.
  * @author jflute
  */
-public class DangerousResultSizeException extends RuntimeException {
+public class FetchingOverSafetySizeException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -32,7 +32,7 @@ public class DangerousResultSizeException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
-    public DangerousResultSizeException(String msg, int safetyMaxResultSize) {
+    public FetchingOverSafetySizeException(String msg, int safetyMaxResultSize) {
         super(msg);
         this._safetyMaxResultSize = safetyMaxResultSize;
     }
@@ -43,7 +43,7 @@ public class DangerousResultSizeException extends RuntimeException {
      * @param cause Throwable. (Nullable)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
-    public DangerousResultSizeException(String msg, Throwable cause, int safetyMaxResultSize) {
+    public FetchingOverSafetySizeException(String msg, Throwable cause, int safetyMaxResultSize) {
         super(msg, cause);
         this._safetyMaxResultSize = safetyMaxResultSize;
     }

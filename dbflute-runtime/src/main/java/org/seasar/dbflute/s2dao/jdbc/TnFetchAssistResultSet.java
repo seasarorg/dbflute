@@ -20,12 +20,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
-import org.seasar.dbflute.exception.DangerousResultSizeException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.PlainResultSetWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
 
@@ -192,24 +190,14 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     protected void checkSafetyResultIfNeed(boolean hasNext) {
         final int safetyMaxResultSize = getSafetyMaxResultSize();
         if (hasNext && safetyMaxResultSize > 0 && _requestCounter > safetyMaxResultSize) {
-            throwDangerousResultSizeException(safetyMaxResultSize);
+            throwFetchingOverSafetySizeException(safetyMaxResultSize);
         }
     }
 
-    protected void throwDangerousResultSizeException(int safetyMaxResultSize) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("You've already been in DANGER ZONE. (check is working)");
-        br.addItem("Safety Max Result Size");
-        br.addElement(safetyMaxResultSize);
-        if (_fetchBean instanceof ConditionBean) {
-            br.addItem("Display SQL");
-            br.addElement(((ConditionBean) _fetchBean).toDisplaySql());
-        } else {
-            br.addItem("Fetch Bean");
-            br.addElement(_fetchBean);
-        }
-        final String msg = br.buildExceptionMessage();
-        throw new DangerousResultSizeException(msg, safetyMaxResultSize);
+    protected void throwFetchingOverSafetySizeException(int safetyMaxResultSize) {
+        // here simple message because an entry method catches this
+        String msg = "The fetching was over the specified safety size: " + safetyMaxResultSize;
+        throw new FetchingOverSafetySizeException(msg, safetyMaxResultSize);
     }
 
     // ===================================================================================

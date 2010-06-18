@@ -40,13 +40,19 @@ import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingHandler;
+import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
+import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -203,6 +209,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
     }
 
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected static interface InternalSelectListCallback<ENTITY extends Entity, CB extends ConditionBean> {
+        List<ENTITY> callbackSelectList(CB cb);
+    }
+
+    protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
+            InternalSelectListCallback<ENTITY, CB> callback) {
+        try {
+            return createListResultBean(cb, callback.callbackSelectList(cb));
+        } catch (FetchingOverSafetySizeException e) {
+            createBhvExThrower().throwDangerousResultSizeException(cb, e);
+            return null; // unreachable
+        }
+    }
+
+    protected <ENTITY extends Entity> ListResultBean<ENTITY> createListResultBean(ConditionBean cb,
+            List<ENTITY> selectedList) {
+        return new ResultBeanBuilder<ENTITY>(getTableDbName()).buildListResultBean(cb, selectedList);
+    }
+
     // ===================================================================================
     //                                                                           Page Read
     //                                                                           =========
@@ -215,6 +243,48 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);
+
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected static interface InternalSelectPageCallback<ENTITY extends Entity, CB extends ConditionBean> {
+        int callbackSelectCount(CB cb);
+
+        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
+    }
+
+    protected <ENTITY extends Entity, CB extends ConditionBean> PagingResultBean<ENTITY> helpSelectPageInternally(
+            CB cb, Class<ENTITY> entityType, InternalSelectPageCallback<ENTITY, CB> callback) {
+        try {
+            final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType, callback);
+            final PagingInvoker<ENTITY> invoker = createPagingInvoker();
+            return invoker.invokePaging(handler);
+        } catch (PagingOverSafetySizeException e) {
+            createBhvExThrower().throwDangerousResultSizeException(cb, e);
+            return null; // unreachable
+        }
+    }
+
+    protected <ENTITY extends Entity, CB extends ConditionBean> PagingHandler<ENTITY> createPagingHandler(final CB cb,
+            final Class<ENTITY> entityType, final InternalSelectPageCallback<ENTITY, CB> callback) {
+        return new PagingHandler<ENTITY>() {
+            public PagingBean getPagingBean() {
+                return cb;
+            }
+
+            public int count() {
+                return callback.callbackSelectCount(cb);
+            }
+
+            public List<ENTITY> paging() {
+                return callback.callbackSelectList(cb, entityType);
+            }
+        };
+    }
+
+    protected <ENTITY extends Entity> PagingInvoker<ENTITY> createPagingInvoker() {
+        return new PagingInvoker<ENTITY>(getTableDbName());
+    }
 
     // ===================================================================================
     //                                                              Entity Result Handling

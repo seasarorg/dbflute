@@ -23,8 +23,8 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.cbean.FetchAssistContext;
-import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
+import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.jdbc.TnFetchAssistResultSet;

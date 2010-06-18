@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the result size is dangerous.
+ * The exception of when the paging is over safety size.
  * @author jflute
  */
-public class DangerousResultSizeException extends RuntimeException {
+public class PagingOverSafetySizeException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -27,12 +27,15 @@ public class DangerousResultSizeException extends RuntimeException {
     /** The max size of safety result. */
     protected int _safetyMaxResultSize;
 
+    /** The count of all records. */
+    protected int _allRecordCount;
+
     /**
      * Constructor.
      * @param msg Exception message. (NotNull)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
-    public DangerousResultSizeException(String msg, int safetyMaxResultSize) {
+    public PagingOverSafetySizeException(String msg, int safetyMaxResultSize) {
         super(msg);
         this._safetyMaxResultSize = safetyMaxResultSize;
     }
@@ -43,9 +46,34 @@ public class DangerousResultSizeException extends RuntimeException {
      * @param cause Throwable. (Nullable)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
-    public DangerousResultSizeException(String msg, Throwable cause, int safetyMaxResultSize) {
+    public PagingOverSafetySizeException(String msg, Throwable cause, int safetyMaxResultSize) {
         super(msg, cause);
         this._safetyMaxResultSize = safetyMaxResultSize;
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
+     * @param allRecordCount The count of all records. (NotZero, ZotMinus, GraeterThanMaxSize)
+     */
+    public PagingOverSafetySizeException(String msg, int safetyMaxResultSize, int allRecordCount) {
+        super(msg);
+        this._safetyMaxResultSize = safetyMaxResultSize;
+        this._allRecordCount = allRecordCount;
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (Nullable)
+     * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
+     * @param allRecordCount The count of all records. (NotZero, ZotMinus, GraeterThanMaxSize)
+     */
+    public PagingOverSafetySizeException(String msg, Throwable cause, int safetyMaxResultSize, int allRecordCount) {
+        super(msg);
+        this._safetyMaxResultSize = safetyMaxResultSize;
+        this._allRecordCount = allRecordCount;
     }
 
     /**
@@ -54,5 +82,13 @@ public class DangerousResultSizeException extends RuntimeException {
      */
     public int getSafetyMaxResultSize() {
         return _safetyMaxResultSize;
+    }
+
+    /**
+     * Get the count of all records.
+     * @return The count of all records. (If the value is minus, it means it's unknown)
+     */
+    public int getAllRecordCount() {
+        return _allRecordCount;
     }
 }

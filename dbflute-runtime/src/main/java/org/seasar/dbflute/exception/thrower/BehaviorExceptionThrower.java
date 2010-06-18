@@ -22,11 +22,13 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -72,8 +74,7 @@ public class BehaviorExceptionThrower {
         if (searchKey != null && searchKey instanceof ConditionBean) {
             final ConditionBean cb = (ConditionBean) searchKey;
             setupInvalidQueryElement(br, cb);
-            br.addItem("Display SQL");
-            br.addElement(cb.toDisplaySql());
+            setupDisplaySqlElement(br, cb);
         } else {
             br.addItem("Search Condition");
             br.addElement(searchKey);
@@ -103,12 +104,32 @@ public class BehaviorExceptionThrower {
         br.addElement("    cb.fetchFirst(1);");
         br.addElement("    ... = memberBhv.selectEntity(cb);");
         setupInvalidQueryElement(br, cb);
-        br.addItem("Fetch Size");
-        br.addElement(cb.getFetchSize());
-        br.addItem("Display SQL");
-        br.addElement(cb.toDisplaySql());
+        setupFetchSizeElement(br, cb);
+        setupDisplaySqlElement(br, cb);
         final String msg = br.buildExceptionMessage();
         throw new SelectEntityConditionNotFoundException(msg);
+    }
+
+    public void throwDangerousResultSizeException(FetchBean fetchBean, Throwable cause) {
+        final int safetyMaxResultSize = fetchBean.getSafetyMaxResultSize();
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("You've already been in DANGER ZONE. (check is working)");
+        br.addItem("Advice");
+        br.addElement("The selected size is over the specified safety size.");
+        br.addElement("Confirm your conditions and table records.");
+        br.addItem("Safety Max Result Size");
+        br.addElement(safetyMaxResultSize);
+        if (fetchBean instanceof ConditionBean) {
+            final ConditionBean cb = ((ConditionBean) fetchBean);
+            setupInvalidQueryElement(br, cb);
+            setupFetchSizeElement(br, cb);
+            setupDisplaySqlElement(br, cb);
+        } else {
+            br.addItem("Fetch Bean");
+            br.addElement(fetchBean);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DangerousResultSizeException(msg, cause, safetyMaxResultSize);
     }
 
     protected void setupInvalidQueryElement(ExceptionMessageBuilder br, ConditionBean cb) {
@@ -122,6 +143,16 @@ public class BehaviorExceptionThrower {
         } else {
             br.addElement("*no invalid");
         }
+    }
+
+    protected void setupFetchSizeElement(ExceptionMessageBuilder br, ConditionBean cb) {
+        br.addItem("Fetch Size");
+        br.addElement(cb.getFetchSize());
+    }
+
+    protected void setupDisplaySqlElement(ExceptionMessageBuilder br, ConditionBean cb) {
+        br.addItem("Display SQL");
+        br.addElement(cb.toDisplaySql());
     }
 
     // ===================================================================================

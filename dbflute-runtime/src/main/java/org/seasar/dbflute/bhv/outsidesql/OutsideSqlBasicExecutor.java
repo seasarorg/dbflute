@@ -26,6 +26,9 @@ import org.seasar.dbflute.bhv.core.command.OutsideSqlExecuteCommand;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
+import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
+import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
@@ -133,14 +136,29 @@ public class OutsideSqlBasicExecutor {
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
-        List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
-        return createListResultBean(resultList);
+        try {
+            List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
+            return createListResultBean(resultList);
+        } catch (FetchingOverSafetySizeException e) { // occurs only when fetch-bean
+            throwDangerousResultSizeException(pmb, e);
+            return null; // unreachable
+        }
     }
 
     protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
         return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(selectedList);
+    }
+
+    protected void throwDangerousResultSizeException(Object pmb, FetchingOverSafetySizeException e) {
+        if (!(pmb instanceof FetchBean)) { // no way
+            String msg = "The exception should be thrown only when the parameter-bean is instance of fetch-bean:";
+            msg = msg + " pmb=" + (pmb != null ? pmb.getClass().getName() : null);
+            throw new IllegalStateException(msg, e);
+        }
+        createBhvExThrower().throwDangerousResultSizeException((FetchBean) pmb, e);
     }
 
     // ===================================================================================
@@ -184,7 +202,11 @@ public class OutsideSqlBasicExecutor {
         if (pmb == null) {
             throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!");
         }
-        invoke(createCallCommand(pmb.getProcedureName(), pmb));
+        try {
+            invoke(createCallCommand(pmb.getProcedureName(), pmb));
+        } catch (FetchingOverSafetySizeException e) { // occurs only when fetch-bean
+            throwDangerousResultSizeException(pmb, e);
+        }
     }
 
     // ===================================================================================
@@ -389,6 +411,13 @@ public class OutsideSqlBasicExecutor {
     public OutsideSqlBasicExecutor configure(StatementConfig statementConfig) {
         _statementConfig = statementConfig;
         return this;
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        return _behaviorCommandInvoker.createBehaviorExceptionThrower();
     }
 
     // ===================================================================================

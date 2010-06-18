@@ -27,6 +27,9 @@ import org.seasar.dbflute.cbean.PagingHandler;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
+import org.seasar.dbflute.exception.PagingOverSafetySizeException;
+import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
@@ -133,11 +136,17 @@ public class OutsideSqlPagingExecutor {
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> PagingResultBean<ENTITY> selectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
-        final PagingHandler<ENTITY> handler = createPagingHandler(path, pmb, entityType);
-        final PagingInvoker<ENTITY> invoker = createPagingInvoker();
-        return invoker.invokePaging(handler);
+        try {
+            final PagingHandler<ENTITY> handler = createPagingHandler(path, pmb, entityType);
+            final PagingInvoker<ENTITY> invoker = createPagingInvoker();
+            return invoker.invokePaging(handler);
+        } catch (PagingOverSafetySizeException e) {
+            createBhvExThrower().throwDangerousResultSizeException(pmb, e);
+            return null; // unreachable
+        }
     }
 
     protected <ENTITY> PagingHandler<ENTITY> createPagingHandler(final String path, final PagingBean pmb,
@@ -240,6 +249,7 @@ public class OutsideSqlPagingExecutor {
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paged list. (NotNull)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
         return doSelectList(path, pmb, entityType);
@@ -247,8 +257,13 @@ public class OutsideSqlPagingExecutor {
 
     protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
-        final List<ENTITY> selectedList = invoke(createSelectListCommand(path, pmb, entityType));
-        return createListResultBean(selectedList);
+        try {
+            final List<ENTITY> selectedList = invoke(createSelectListCommand(path, pmb, entityType));
+            return createListResultBean(selectedList);
+        } catch (FetchingOverSafetySizeException e) {
+            createBhvExThrower().throwDangerousResultSizeException(pmb, e);
+            return null; // unreachable
+        }
     }
 
     protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
@@ -340,5 +355,12 @@ public class OutsideSqlPagingExecutor {
     public OutsideSqlPagingExecutor configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        return _behaviorCommandInvoker.createBehaviorExceptionThrower();
     }
 }

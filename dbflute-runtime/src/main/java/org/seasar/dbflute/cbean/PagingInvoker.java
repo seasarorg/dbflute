@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.util.List;
 
 import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.PagingStatusInvalidException;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -194,11 +195,15 @@ public class PagingInvoker<ENTITY> {
      */
     protected void checkSafetyResultIfNeed(int safetyMaxResultSize, int allRecordCount) {
         if (safetyMaxResultSize > 0 && allRecordCount > safetyMaxResultSize) {
-            String msg = "You've been in Danger Zone:";
-            msg = msg + " safetyMaxResultSize=" + safetyMaxResultSize;
-            msg = msg + " allRecordCount=" + allRecordCount;
-            throw new DangerousResultSizeException(msg, safetyMaxResultSize, allRecordCount);
+            throwPagingOverSafetySizeException(safetyMaxResultSize, allRecordCount);
         }
+    }
+
+    protected void throwPagingOverSafetySizeException(int safetyMaxResultSize, int allRecordCount) {
+        // here simple message because an entry method catches this
+        String msg = "The paging was over the specified safety size:";
+        msg = msg + " " + allRecordCount + " > " + safetyMaxResultSize;
+        throw new PagingOverSafetySizeException(msg, safetyMaxResultSize, allRecordCount);
     }
 
     // ===================================================================================
