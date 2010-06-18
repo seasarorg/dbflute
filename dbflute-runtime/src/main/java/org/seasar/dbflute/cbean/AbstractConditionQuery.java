@@ -36,9 +36,6 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
-import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
-import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
@@ -426,7 +423,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return true;
         } else {
             if (getSqlClause().isCheckInvalidQuery()) {
-                throwInvalidQueryRegisteredException(key, cvalue, realColumnName);
+                throwInvalidQueryRegisteredException(key, value, realColumnName);
                 return false; // unreachable
             } else {
                 getSqlClause().registerInvalidQueryColumn(realColumnName, key);
@@ -436,30 +433,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, String realColumnName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("An invalid query was registered. (check is working)");
-        br.addItem("Advice");
-        br.addElement("You should not set an invalid query when you set the check valid.");
-        br.addElement("For example:");
-        br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.checkInvalidQuery();");
-        br.addElement("    cb.query().setMemberId_Equal(null); // exception");
-        br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.checkInvalidQuery();");
-        br.addElement("    cb.query().setMemberId_Equal(3);");
-        br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.query().setMemberId_Equal(null);");
-        br.addItem("Column");
-        br.addElement(realColumnName);
-        br.addItem("Condition Key");
-        br.addElement(key.getConditionKey());
-        br.addItem("Registered Value");
-        br.addElement(value);
-        final String msg = br.buildExceptionMessage();
-        throw new InvalidQueryRegisteredException(msg);
+        createCBExThrower().throwInvalidQueryRegisteredException(key, value, realColumnName);
     }
 
     // -----------------------------------------------------
@@ -610,18 +584,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
         final DBMeta dbmeta = getDBMetaProvider().provideDBMeta(getTableDbName());
-        final String capPropName = initCap(dbmeta.findPropertyName(colName));
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The likeSearchOption was not found! (Should not be null!)" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your method call:" + ln();
-        final String beanName = DfTypeUtil.toClassTitle(this);
-        final String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
-        msg = msg + "    " + beanName + "." + methodName + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
-        throw new RequiredOptionNotFoundException(msg);
+        createCBExThrower().throwLikeSearchOptionNotFoundException(colName, value, dbmeta);
     }
 
     protected void invokeQueryLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
