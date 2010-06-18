@@ -340,8 +340,8 @@ public class Database {
         return getPmbBasicHandler().getSuperClassDefinition(className);
     }
 
-    public boolean hasPmbMetaDataSafetyResultDefitinion(String className) {
-        return getPmbBasicHandler().hasSafetyResultDefitinion(className);
+    public boolean hasPmbMetaDataCheckSafetyResult(String className) {
+        return getPmbBasicHandler().hasPmbMetaDataCheckSafetyResult(className);
     }
 
     public Set<String> getPmbMetaDataPropertySet(String className) {

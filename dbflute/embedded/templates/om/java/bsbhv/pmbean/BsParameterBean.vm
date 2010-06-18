@@ -7,7 +7,7 @@ import java.util.*;
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #else
-import org.seasar.dbflute.cbean.FetchBean;
+import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #end
 import org.seasar.dbflute.jdbc.ParameterUtil;
@@ -30,7 +30,7 @@ import ${glPackageExtendedCustomizeEntity}.*;
  * @author ${database.classAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-public class ${myClassName} implements ProcedurePmb, Serializable {
+public class ${myClassName} implements ProcedurePmb, FetchBean, Serializable {
 #else
 public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean, FetchBean, Serializable {
 #end
@@ -95,7 +95,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
 #end
 #end
-#if ($database.hasPmbMetaDataSafetyResultDefitinion($pmbClassName))
+#if (!$database.hasPmbMetaDataCheckSafetyResult($pmbClassName))
     /** The max size of safety result. */
     protected int _safetyMaxResultSize;
 
@@ -125,7 +125,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      }
 
 #end
-#if ($database.hasPmbMetaDataSafetyResultDefitinion($pmbClassName))
+#if (!$database.hasPmbMetaDataCheckSafetyResult($pmbClassName))
     // ===================================================================================
     //                                                                       Safety Result
     //                                                                       =============

@@ -106,10 +106,27 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected void CheckSafetyResult(bool hasNext) {
             int safetyMaxResultSize = GetSafetyMaxResultSize();
             if (hasNext && safetyMaxResultSize > 0 && _requestCounter > safetyMaxResultSize) {
-                String msg = "You've been in Danger Zone:";
-                msg = msg + " safetyMaxResultSize=" + safetyMaxResultSize;
-                throw new ${glDangerousResultSizeException}(msg, safetyMaxResultSize);
+                throwDangerousResultSizeException(safetyMaxResultSize);
             }
+        }
+
+        protected void throwDangerousResultSizeException(int safetyMaxResultSize) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "You've already been in DANGER ZONE. (check is working)" + ln();
+            msg = msg + ln();
+            msg = msg + "[Safety Max Result Size]" + ln();
+            msg = msg + safetyMaxResultSize + ln();
+            msg = msg + ln();
+            if (_fetchNarrowingBean is ${glConditionBean}) {
+                msg = msg + "[Display SQL]" + ln();
+                msg = msg + ((${glConditionBean}) _fetchNarrowingBean).ToDisplaySql() + ln();
+            } else {
+                msg = msg + "[Fetch Bean]" + ln();
+                msg = msg + _fetchNarrowingBean + ln();
+            }
+            msg = msg + "* * * * * * * * * */";
+            throw new ${glDangerousResultSizeException}(msg, safetyMaxResultSize);
         }
 
         // ===============================================================================

@@ -11,11 +11,7 @@ import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.ListResultBean;
-import org.seasar.dbflute.cbean.PagingBean;
-import org.seasar.dbflute.cbean.PagingHandler;
-import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
-import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyArranger;
@@ -286,6 +282,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected list. (NotNull)
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public ListResultBean<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         return doSelectList(cb, ${myExtendedObjectClassName}.class);
@@ -294,11 +291,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     protected <ENTITY extends ${myExtendedObjectClassName}> ListResultBean<ENTITY> doSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
         assertCBNotNull(cb); assertObjectNotNull("entityType", entityType);
         assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
-        return createListResultBean(cb, delegateSelectList(cb, entityType));
-    }
-
-    protected <ENTITY extends ${myExtendedObjectClassName}> ListResultBean<ENTITY> createListResultBean(${myConditionBeanClassName} cb, List<ENTITY> selectedList) {
-        return new ResultBeanBuilder<ENTITY>(getTableDbName()).buildListResultBean(cb, selectedList);
+        return helpSelectListInternally(cb, entityType, new InternalSelectListCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return delegateSelectList(cb, entityType); } });
     }
 
     @Override
@@ -329,6 +323,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected page. (NotNull)
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public PagingResultBean<${myExtendedObjectClassName}> selectPage(${myConditionBeanClassName} cb) {
         return doSelectPage(cb, ${myExtendedObjectClassName}.class);
@@ -336,21 +331,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     protected <ENTITY extends ${myExtendedObjectClassName}> PagingResultBean<ENTITY> doSelectPage(${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
         assertCBNotNull(cb); assertObjectNotNull("entityType", entityType);
-        final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType);
-        final PagingInvoker<ENTITY> invoker = createPagingInvoker();
-        return invoker.invokePaging(handler);
-    }
-
-    protected <ENTITY extends ${myExtendedObjectClassName}> PagingHandler<ENTITY> createPagingHandler(final ${myConditionBeanClassName} cb, final Class<ENTITY> entityType) {
-        return new PagingHandler<ENTITY>() {
-            public PagingBean getPagingBean() { return cb; }
-            public int count() { return doSelectCount(cb); }
-            public List<ENTITY> paging() { return doSelectList(cb, entityType); }
-        };
-    }
-
-    protected <ENTITY extends ${myExtendedObjectClassName}> PagingInvoker<ENTITY> createPagingInvoker() {
-        return new PagingInvoker<ENTITY>(getTableDbName());
+        return helpSelectPageInternally(cb, entityType, new InternalSelectPageCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public int callbackSelectCount(${myConditionBeanClassName} cb) { return doSelectCount(cb); }
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); }
+        });
     }
 
     @Override

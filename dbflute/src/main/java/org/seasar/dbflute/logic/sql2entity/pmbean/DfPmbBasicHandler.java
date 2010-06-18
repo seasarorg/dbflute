@@ -75,12 +75,9 @@ public class DfPmbBasicHandler {
         return " " + languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName;
     }
 
-    public boolean hasSafetyResultDefitinion(String className) {
-        if (isForProcedure(className)) {
-            return false;
-        }
-        final String classDefinition = getSuperClassDefinition(className);
-        return classDefinition == null || classDefinition.trim().length() == 0;
+    public boolean hasPmbMetaDataCheckSafetyResult(String className) {
+        final String definition = getSuperClassDefinition(className);
+        return definition.contains("SimplePagingBean");
     }
 
     public Map<String, String> getPropertyNameOptionMap(String className) {
