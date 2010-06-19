@@ -273,35 +273,10 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                     Entity Handling
     //                                                                     ===============  
-    // -----------------------------------------------------
-    //                                                Accept
-    //                                                ------
     public void acceptPrimaryKeyMap(Entity e, Map<String, ? extends Object> m)
     { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})e, m, _epsMap); }
-    public void acceptPrimaryKeyMapString(Entity e, String s)
-    { MapStringUtil.acceptPrimaryKeyMapString(s, e); }
-    public void acceptColumnValueMap(Entity e, Map<String, ? extends Object> m)
-    { doAcceptColumnValueMap((${myExtendedObjectClassName})e, m, _epsMap); }
-    public void acceptColumnValueMapString(Entity e, String s)
-    { MapStringUtil.acceptColumnValueMapString(s, e); }
-
-    // -----------------------------------------------------
-    //                                               Extract
-    //                                               -------
-    public String extractPrimaryKeyMapString(Entity e) { return MapStringUtil.extractPrimaryKeyMapString(e); }
-    public String extractPrimaryKeyMapString(Entity e, String sb, String eb, String dl, String eq)
-    { return doExtractPrimaryKeyMapString(e, sb, eb, dl, eq); }
-    public String extractColumnValueMapString(Entity e) { return MapStringUtil.extractColumnValueMapString(e); }
-    public String extractColumnValueMapString(Entity e, String sb, String eb, String dl, String eq)
-    { return doExtractColumnValueMapString(e, sb, eb, dl, eq); }
-
-    // -----------------------------------------------------
-    //                                               Convert
-    //                                               -------
-    public List<Object> convertToColumnValueList(Entity e) { return newArrayList(convertToColumnValueMap(e).values()); }
-    public Map<String, Object> convertToColumnValueMap(Entity e) { return doConvertToColumnValueMap(e); }
-    public List<String> convertToColumnStringValueList(Entity e) { return newArrayList(convertToColumnStringValueMap(e).values()); }
-    public Map<String, String> convertToColumnStringValueMap(Entity e) { return doConvertToColumnStringValueMap(e); }
+    public Map<String, Object> extractPrimaryKeyMap(Entity e) { return doExtractPrimaryKeyMap(e); }
+    public Map<String, Object> extractAllColumnMap(Entity e) { return doExtractAllColumnMap(e); }
 
     // ===================================================================================
     //                                                               Entity Property Setup

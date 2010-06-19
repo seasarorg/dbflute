@@ -1,8 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCB};
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
-import java.util.Map;
-
 import org.seasar.dbflute.cbean.AbstractConditionBean;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
@@ -77,40 +75,6 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
 #end
-    public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
-#if ($table.hasPrimaryKey())
-        assertPrimaryKeyMap(primaryKeyMap);
-#foreach ($col in $table.primaryKey)
-        {
-            Object obj = primaryKeyMap.get("${col.name}");
-            if (obj instanceof ${col.javaNative}) {
-                query().invokeQuery("${col.name}", "equal", obj);
-            } else {
-#if ($col.isJavaNativeStringObject())
-                xcheckTypeString(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class);
-                query().invokeQueryEqual("${col.name}", obj);
-#elseif ($col.isJavaNativeNumberObject())
-                query().invokeQueryEqual("${col.name}", xparseNumber(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
-#elseif ($col.isJavaNativeDateObject())
-                query().invokeQueryEqual("${col.name}", xparseDate(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
-#elseif ($col.isJavaNativeBooleanObject())
-                query().invokeQueryEqual("${col.name}", xparseBoolean(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
-#elseif ($col.isJavaNativeBinaryObject())
-                throw new UnsupportedOperationException("This method does not support binary type");
-#elseif ($col.isJavaNativeUUIDObject())
-                query().invokeQueryEqual("${col.name}", xparseUUID(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
-#else
-                query().invokeQueryEqual("${col.name}", new ${col.javaNative}((String)obj));
-#end
-            }
-        }
-#end
-#else
-        String msg = "This table has no primary-keys: " + getTableDbName();
-        throw new UnsupportedOperationException(msg);
-#end
-    }
-
     public ConditionBean addOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)
@@ -118,7 +82,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
         return this;
 #else
-        String msg = "This table has no primary-keys: " + getTableDbName();
+        String msg = "The table has no primary-keys: " + getTableDbName();
         throw new UnsupportedOperationException(msg);
 #end
     }
@@ -130,7 +94,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
         return this;
 #else
-        String msg = "This table has no primary-keys: " + getTableDbName();
+        String msg = "The table has no primary-keys: " + getTableDbName();
         throw new UnsupportedOperationException(msg);
 #end
     }
@@ -217,6 +181,7 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     public ${myConditionQueryClassName} getConditionQuery() { // public for parameter comment
+        assertQueryPurpose();
         if (_conditionQuery == null) {
             _conditionQuery = createLocalCQ();
         }
@@ -435,12 +400,13 @@ public class ${myClassName} extends AbstractConditionBean {
      * @return The instance of specification. (NotNull)
      */
     public HpSpecification specify() {
+        assertSpecifyPurpose();
         if (_specification == null) { _specification = new HpSpecification(this
             , new HpSpQyCall<${myConditionQueryClassName}>() {
                 public boolean has() { return true; }
                 public ${myConditionQueryClassName} qy() { return query(); }
             }
-            , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, getDBMetaProvider()); }
+            , _purpose, getDBMetaProvider()); }
         return _specification;
     }
 
@@ -453,7 +419,6 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     public static class HpSpecification extends HpAbstractSpecification<${myConditionQueryClassName}> {
-        protected HpSpQyCall<${myConditionQueryClassName}> _myQyCall;
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
@@ -467,13 +432,13 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
 #end
         public HpSpecification(ConditionBean baseCB, HpSpQyCall<${myConditionQueryClassName}> qyCall
-                             , boolean forDeriveReferrer, boolean forScalarSelect, boolean forScalarSubQuery
-                             , DBMetaProvider dbmetaProvider)
-        { super(baseCB, qyCall, forDeriveReferrer, forScalarSelect, forScalarSubQuery, dbmetaProvider); _myQyCall = qyCall; }
+                             , HpCBPurpose purpose, DBMetaProvider dbmetaProvider)
+        { super(baseCB, qyCall, purpose, dbmetaProvider); }
 #foreach ($col in $table.columns)
         /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
         public void column${col.javaName}() { doColumn("${col.name}"); }
 #end
+        @Override
         protected void doSpecifyRequiredColumn() {
 #foreach ($col in $table.primaryKey)
             column${col.javaName}(); // PK
@@ -482,8 +447,8 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #if ($fk.hasLocalColumnExceptPrimaryKey())
-            if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
-                    || _myQyCall.qy().getReferrerQuery() instanceof ${fk.foreignTableExtendedConditionQueryClassName}) {
+            if (_qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
+                    || _qyCall.qy().getReferrerQuery() instanceof ${fk.foreignTableExtendedConditionQueryClassName}) {
 #foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
                 column${col.javaName}(); // FK or one-to-one referrer
@@ -493,6 +458,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
 #end
         }
+        @Override
         protected String getTableDbName() { return "$table.name"; }
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
@@ -505,17 +471,16 @@ public class ${myClassName} extends AbstractConditionBean {
          * @return The instance for specification for relation table to specify. (NotNull)
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
-            assertForeign("${tmpPropertyName}");
+            assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
                 _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
-                    public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    public boolean has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 #if ($fk.hasDynamicFixedCondition())
-                    public ${tmpCQClassName} qy() { return _myQyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
+                    public ${tmpCQClassName} qy() { return _qyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
 #else
-                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
+                    public ${tmpCQClassName} qy() { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
 #end
-                    , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _dbmetaProvider);
-                    if (_forGeneralOneSpecificaion) { _${tmpPropertyName}.xsetupForGeneralOneSpecification(null); }
+                    , _purpose, _dbmetaProvider);
             }
             return _${tmpPropertyName};
         }
@@ -532,13 +497,12 @@ public class ${myClassName} extends AbstractConditionBean {
          * @return The instance for specification for relation table to specify. (NotNull)
          */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
-            assertForeign("${tmpPropertyName}");
+            assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
                 _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
-                    public boolean has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                    public ${tmpCQClassName} qy() { return _myQyCall.qy().query${tmpPropertyNameInitCap}(); } }
-                    , _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _dbmetaProvider);
-                if (_forGeneralOneSpecificaion) { _${tmpPropertyName}.xsetupForGeneralOneSpecification(null); }
+                    public boolean has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    public ${tmpCQClassName} qy() { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
+                    , _purpose, _dbmetaProvider);
             }
             return _${tmpPropertyName};
         }
@@ -564,16 +528,13 @@ public class ${myClassName} extends AbstractConditionBean {
          * @return The object to set up a function for referrer table. (NotNull)
          */
         public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
-            return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
+            assertDerived("${tmpPropertyName}");
+            return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
                 public void setup(String function, SubQuery<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) {
                     cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); } }, _dbmetaProvider);
         }
 #end
 #end
-
-        public void xsetupForGeneralOneSpecification(HpSpQyCall<${myConditionQueryClassName}> qyCall) {
-            if (qyCall != null) { _myQyCall = qyCall; _qyCall = qyCall; } _forGeneralOneSpecificaion = true;
-        }
     }
 
     // [DBFlute-0.9.5.3]
@@ -600,14 +561,19 @@ public class ${myClassName} extends AbstractConditionBean {
     public HpColQyOperand<${myConditionBeanClassName}> columnQuery(final SpecifyQuery<${myConditionBeanClassName}> leftSpecifyQuery) {
         return new HpColQyOperand<${myConditionBeanClassName}>(new HpColQyHandler<${myConditionBeanClassName}>() {
             public void handle(SpecifyQuery<${myConditionBeanClassName}> rightSp, String operand) {
-                ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-                cb.specify().xsetupForGeneralOneSpecification(new HpSpQyCall<${myConditionQueryClassName}>() {
-                    public boolean has() { return true; }
-                    public ${myConditionQueryClassName} qy() { return query(); }
-                });
-                xcolqy(cb, leftSpecifyQuery, rightSp, operand);
+                xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), leftSpecifyQuery, rightSp, operand);
             }
         });
+    }
+
+    protected ${myConditionBeanClassName} xcreateColumnQueryCB() {
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+        cb.xsetupForColumnQuery();
+        cb.specify().xswitchQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
+            public boolean has() { return true; }
+            public ${myConditionQueryClassName} qy() { return query(); }
+        });
+        return cb;
     }
 
     // [DBFlute-0.9.6.3]
