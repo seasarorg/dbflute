@@ -15,15 +15,11 @@
  */
 package org.seasar.dbflute.bhv;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.bhv.batch.TokenFileReflectionFailure;
-import org.seasar.dbflute.bhv.batch.TokenFileReflectionOption;
-import org.seasar.dbflute.bhv.batch.TokenFileReflectionResult;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.command.AbstractEntityCommand;
 import org.seasar.dbflute.bhv.core.command.AbstractListEntityCommand;
@@ -46,38 +42,12 @@ import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.mapstring.ColumnMapString;
-import org.seasar.dbflute.helper.mapstring.impl.ColumnMapStringImpl;
-import org.seasar.dbflute.helper.token.file.FileToken;
-import org.seasar.dbflute.helper.token.file.FileTokenizingCallback;
-import org.seasar.dbflute.helper.token.file.FileTokenizingHeaderInfo;
-import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
-import org.seasar.dbflute.helper.token.file.FileTokenizingRowResource;
-import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 
 /**
  * The abstract class of writable behavior.
  * @author jflute
  */
 public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable implements BehaviorWritable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Map-string map-mark. */
-    private static final String MAP_STRING_MAP_MARK = "map:";
-
-    /** Map-string start-brace. */
-    private static final String MAP_STRING_START_BRACE = "@{";
-
-    /** Map-string end-brace. */
-    private static final String MAP_STRING_END_BRACE = "@}";
-
-    /** Map-string delimiter. */
-    private static final String MAP_STRING_DELIMITER = "@;";
-
-    /** Map-string equal. */
-    private static final String MAP_STRING_EQUAL = "@=";
 
     // =====================================================================================
     //                                                                             Attribute
@@ -239,7 +209,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             }
             if (exception != null) {
                 final CB_TYPE cb = callback.callbackNewMyConditionBean();
-                cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+                cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
                 if (callback.callbackSelectCount(cb) == 0) {
                     callback.callbackInsert(entity);
                 } else {
@@ -377,179 +347,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         // basically property(column) type is same as next value type
         // so there is NOT type conversion cost when writing to the entity
         dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
-    }
-
-    // =====================================================================================
-    //                                                                            Token File
-    //                                                                            ==========
-    /**
-     * Get the executor of token file reflection.
-     * @return The executor of token file output. (NotNull)
-     */
-    public TokenFileReflectionExecutor tokenFileReflection() {
-        return new TokenFileReflectionExecutor();
-    }
-
-    /**
-     * The executor of token file reflection.
-     */
-    public class TokenFileReflectionExecutor {
-
-        /**
-         * Reflect(insert or update) token file to this table. <br />
-         * The supported column types are String, Number and Date.
-         * @param filename The name of the file. (NotNull and NotEmpty)
-         * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-         * @return The result of token file reflection. (NotNull)
-         * @throws java.io.FileNotFoundException The file is not found.
-         * @throws java.io.IOException The IO exception occurred.
-         */
-        public TokenFileReflectionResult reflectTokenFile(String filename,
-                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException, IOException {
-            assertStringNotNullAndNotTrimmedEmpty("filename", filename);
-            assertFileTokenReflectionOption(tokenFileReflectionOption);
-
-            final TokenFileReflectionResult result = buildTokenFileReflectionResult();
-            final FileTokenizingCallback fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(
-                    tokenFileReflectionOption, result);
-            final FileTokenizingOption fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
-            final FileToken fileToken = new FileTokenImpl();
-            fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
-            return result;
-        }
-
-        /**
-         * Reflect(insert or update) token file to this table. <br />
-         * The supported column types are String, Number and Date.
-         * @param inputStream The input stream. (NotNull and NotClosed)
-         * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-         * @return The result of token file reflection. (NotNull)
-         * @throws java.io.FileNotFoundException The file is not found.
-         * @throws java.io.IOException The IO exception occurred.
-         */
-        public TokenFileReflectionResult reflectTokenFile(java.io.InputStream inputStream,
-                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException, IOException {
-            assertObjectNotNull("inputStream", inputStream);
-            assertFileTokenReflectionOption(tokenFileReflectionOption);
-
-            final TokenFileReflectionResult result = buildTokenFileReflectionResult();
-            final FileTokenizingCallback fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(
-                    tokenFileReflectionOption, result);
-            final FileTokenizingOption fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
-            final FileToken fileToken = new FileTokenImpl();
-            fileToken.tokenize(inputStream, fileTokenizingCallback, fileTokenizingOption);
-            return result;
-        }
-
-        protected void assertFileTokenReflectionOption(TokenFileReflectionOption tokenFileReflectionOption) {
-            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
-
-            final String encoding = tokenFileReflectionOption.getEncoding();
-            final String delimiter = tokenFileReflectionOption.getDelimiter();
-            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-            assertObjectNotNull("delimiter", delimiter);
-        }
-
-        protected TokenFileReflectionResult buildTokenFileReflectionResult() {
-            final TokenFileReflectionResult result = new TokenFileReflectionResult();
-            final java.util.List<TokenFileReflectionFailure> failureList = new java.util.ArrayList<TokenFileReflectionFailure>();
-            result.setFailureList(failureList);
-            return result;
-        }
-
-        protected FileTokenizingCallback buildFileTokenReflectionFileTokenizingCallback(
-                TokenFileReflectionOption tokenFileReflectionOption, final TokenFileReflectionResult result)
-                throws java.io.FileNotFoundException, java.io.IOException {
-            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
-
-            final String encoding = tokenFileReflectionOption.getEncoding();
-            final String delimiter = tokenFileReflectionOption.getDelimiter();
-            final boolean interruptIfError = tokenFileReflectionOption.isInterruptIfError();
-            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-            assertObjectNotNull("delimiter", delimiter);
-            final java.util.List<TokenFileReflectionFailure> failureList = result.getFailureList();
-            assertObjectNotNull("failureList", failureList);
-
-            final FileTokenizingCallback fileTokenizingCallback = new FileTokenizingCallback() {
-                public void handleRowResource(FileTokenizingRowResource fileTokenizingRowResource) {
-                    final FileTokenizingHeaderInfo fileTokenizingHeaderInfo = fileTokenizingRowResource
-                            .getFileTokenizingHeaderInfo();
-                    final java.util.List<String> columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
-                    final java.util.List<String> valueList = fileTokenizingRowResource.getValueList();
-
-                    // Set up columnNameList of result object.
-                    if (result.getColumnNameList() == null) {
-                        result.setColumnNameList(columnNameList);
-                    }
-
-                    Entity entity = null;
-                    try {
-                        // Create entity by the list of value composed of String.
-                        entity = createEntityByStringValueList(columnNameList, valueList);
-
-                        // Create or modify as non-strict.
-                        doCreateOrUpdateNonstrict(entity);
-
-                        // Increment successCount of result object.
-                        result.incrementSuccessCount();
-                    } catch (RuntimeException e) {
-                        if (interruptIfError) {
-                            throw e;
-                        }
-                        final TokenFileReflectionFailure failure = new TokenFileReflectionFailure();
-                        failure.setColumnNameList(columnNameList);
-                        failure.setValueList(valueList);
-                        failure.setRowString(fileTokenizingRowResource.getRowString());
-                        failure.setRowNumber(fileTokenizingRowResource.getRowNumber());
-                        failure.setLineNumber(fileTokenizingRowResource.getLineNumber());
-                        if (entity != null) {
-                            failure.setEntity(entity);
-                        }
-                        failure.setException(e);
-                        failureList.add(failure);
-                    }
-                }
-            };
-            return fileTokenizingCallback;
-        }
-
-        protected Entity createEntityByStringValueList(List<String> columnNameList, java.util.List<String> valueList) {
-            final ColumnMapString columnMapString = createColumnMapString(columnNameList);
-            final String mapString = columnMapString.buildMapString(valueList);
-            final Entity entity = getDBMeta().newEntity();
-            getDBMeta().acceptColumnValueMapString(entity, mapString);
-            return entity;
-        }
-
-        protected ColumnMapString createColumnMapString(List<String> columnNameList) {
-            final ColumnMapStringImpl impl = new ColumnMapStringImpl();
-            impl.setMapMark(MAP_STRING_MAP_MARK);
-            impl.setStartBrace(MAP_STRING_START_BRACE);
-            impl.setEndBrace(MAP_STRING_END_BRACE);
-            impl.setDelimiter(MAP_STRING_DELIMITER);
-            impl.setEqual(MAP_STRING_EQUAL);
-            impl.setColumnNameList(columnNameList);
-            return impl;
-        }
-
-        protected FileTokenizingOption buildFileTokenReflectionFileTokenizingOption(
-                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException,
-                java.io.IOException {
-            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
-
-            final String encoding = tokenFileReflectionOption.getEncoding();
-            final String delimiter = tokenFileReflectionOption.getDelimiter();
-            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-            assertObjectNotNull("delimiter", delimiter);
-
-            final FileTokenizingOption fileTokenizingOption = new FileTokenizingOption();
-            fileTokenizingOption.setEncoding(encoding);
-            fileTokenizingOption.setDelimiter(delimiter);
-            if (tokenFileReflectionOption.isHandleEmptyAsNull()) {
-                fileTokenizingOption.handleEmptyAsNull();
-            }
-            return fileTokenizingOption;
-        }
     }
 
     // =====================================================================================
@@ -928,16 +725,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return command;
     }
 
-    protected QueryDeleteCBCommand createQueryDeleteCBCommand(ConditionBean cb) {
-        assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
-        final QueryDeleteCBCommand cmd = new QueryDeleteCBCommand();
-        cmd.setTableDbName(getTableDbName());
-        _behaviorCommandInvoker.injectComponentProperty(cmd);
-        cmd.setConditionBeanType(cb.getClass());
-        cmd.setConditionBean(cb);
-        return cmd;
-    }
-
     protected QueryUpdateEntityCBCommand createQueryUpdateEntityCBCommand(Entity entity, ConditionBean cb) {
         assertBehaviorCommandInvoker("createQueryUpdateEntityCBCommand");
         final QueryUpdateEntityCBCommand cmd = new QueryUpdateEntityCBCommand();
@@ -947,6 +734,16 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         cmd.setConditionBean(cb);
         cmd.setEntityType(entity.getClass());
         cmd.setEntity(entity);
+        return cmd;
+    }
+
+    protected QueryDeleteCBCommand createQueryDeleteCBCommand(ConditionBean cb) {
+        assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
+        final QueryDeleteCBCommand cmd = new QueryDeleteCBCommand();
+        cmd.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(cmd);
+        cmd.setConditionBeanType(cb.getClass());
+        cmd.setConditionBean(cb);
         return cmd;
     }
 

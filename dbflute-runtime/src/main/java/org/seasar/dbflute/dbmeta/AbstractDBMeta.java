@@ -41,10 +41,6 @@ import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.mapstring.ColumnMapString;
-import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.impl.ColumnMapStringImpl;
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
@@ -679,10 +675,14 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                Accept
     //                                                ------
     protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity,
-            Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
-        MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
+            Map<String, ? extends Object> primaryKeyMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+        if (primaryKeyMap == null || primaryKeyMap.isEmpty()) {
+            String msg = "The argument 'primaryKeyMap' should not be null or empty:";
+            msg = msg + " primaryKeyMap=" + primaryKeyMap;
+            throw new IllegalArgumentException(msg);
+        }
         entity.clearModifiedPropertyNames();
-        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
+        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(primaryKeyMap);
         final List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnName = columnInfo.getColumnDbName();
@@ -711,112 +711,135 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected <ENTITY extends Entity> void doAcceptColumnValueMap(ENTITY entity,
-            Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
-        MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
-        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
-        final List<ColumnInfo> columnInfoList = getColumnInfoList();
-        for (ColumnInfo columnInfo : columnInfoList) {
-            final String columnName = columnInfo.getColumnDbName();
-            final String propertyName = columnInfo.getPropertyName();
-            final String uncapPropName = initUncap(propertyName);
-            final Class<?> propertyType = columnInfo.getPropertyType();
-            if (analyzer.init(columnName, uncapPropName, propertyName)) {
-                final Object value;
-                if (String.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeString(propertyType);
-                } else if (Number.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeNumber(propertyType);
-                } else if (Date.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeDate(propertyType);
-                } else if (Boolean.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeBoolean(propertyType);
-                } else if (byte[].class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeBinary(propertyType);
-                } else if (UUID.class.isAssignableFrom(propertyType)) {
-                    value = analyzer.analyzeUUID(propertyType);
-                } else {
-                    value = analyzer.analyzeOther(propertyType);
-                }
-                findEps(entityPropertySetupperMap, propertyName).setup(entity, value);
-            }
-        }
+    // -----------------------------------------------------
+    //                                               Extract
+    //                                               -------
+    protected Map<String, Object> doExtractPrimaryKeyMap(Entity entity) {
+        return doConvertToColumnValueMap(entity, true);
     }
 
-    protected String doExtractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter,
-            String equal) {
-        List<ColumnInfo> uniqueColumnList = getPrimaryUniqueInfo().getUniqueColumnList();
-        return doExtractValueMapMapString(entity, uniqueColumnList, startBrace, endBrace, delimiter, equal);
+    protected Map<String, Object> doExtractAllColumnMap(Entity entity) {
+        return doConvertToColumnValueMap(entity, false);
     }
 
-    protected String doExtractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter,
-            String equal) {
-        List<ColumnInfo> columnInfoList = getColumnInfoList();
-        return doExtractValueMapMapString(entity, columnInfoList, startBrace, endBrace, delimiter, equal);
-    }
-
-    protected String doExtractValueMapMapString(Entity entity, List<ColumnInfo> columnInfoList, String startBrace,
-            String endBrace, String delimiter, String equal) {
-        String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
-        StringBuilder sb = new StringBuilder();
+    protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly) {
+        final Map<String, Object> valueMap = newLinkedHashMap();
         try {
-            for (ColumnInfo columnInfo : columnInfoList) {
-                String columnName = columnInfo.getColumnDbName();
-                Method getterMethod = columnInfo.reader();
-                Object value = getterMethod.invoke(entity, (Object[]) null);
-                value = filterClassificationValueIfNeeds(value);
-                helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
+            final List<ColumnInfo> columnInfoList;
+            if (pkOnly) {
+                columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+            } else {
+                columnInfoList = getColumnInfoList();
             }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+            for (ColumnInfo columnInfo : columnInfoList) {
+                final String columnName = columnInfo.getColumnDbName();
+                final Object value = columnInfo.read(entity);
+                valueMap.put(columnName, value);
+            }
+        } catch (RuntimeException e) {
+            String msg = "Failed to convert to column value map:";
+            msg = msg + " entity=" + entity;
+            throw new IllegalStateException(msg, e);
         }
-        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-        return sb.toString();
-    }
-
-    protected Object filterClassificationValueIfNeeds(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Classification) {
-            value = ((Classification) value).code();
-        }
-        return value;
+        return valueMap;
     }
 
     // -----------------------------------------------------
-    //                                               Convert
-    //                                               -------
-    protected Map<String, Object> doConvertToColumnValueMap(Entity entity) {
-        Map<String, Object> valueMap = newLinkedHashMap();
-        try {
-            List<ColumnInfo> columnInfoList = getColumnInfoList();
-            for (ColumnInfo columnInfo : columnInfoList) {
-                String columnName = columnInfo.getColumnDbName();
-                Method getterMethod = columnInfo.reader();
-                Object value = getterMethod.invoke(entity, (Object[]) null);
-                valueMap.put(columnName, value);
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        return valueMap;
-    }
+    //                                              Analyzer
+    //                                              --------
+    /**
+     * This class is for internal. Don't use this!
+     */
+    protected static class MapStringValueAnalyzer {
+        protected Map<String, ? extends Object> _valueMap;
+        protected String _columnName;
+        protected String _uncapPropName;
+        protected String _propertyName;
 
-    protected Map<String, String> doConvertToColumnStringValueMap(Entity entity) {
-        Map<String, String> valueMap = newLinkedHashMap();
-        try {
-            List<ColumnInfo> columnInfoList = getColumnInfoList();
-            for (ColumnInfo columnInfo : columnInfoList) {
-                String columnName = columnInfo.getColumnDbName();
-                Method getterMethod = columnInfo.reader();
-                Object value = getterMethod.invoke(entity, (Object[]) null);
-                valueMap.put(columnName, helpGettingColumnStringValue(value));
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        public MapStringValueAnalyzer(Map<String, ? extends Object> valueMap) {
+            this._valueMap = valueMap;
         }
-        return valueMap;
+
+        public boolean init(String columnName, String uncapPropName, String propertyName) {
+            this._columnName = columnName;
+            this._uncapPropName = uncapPropName;
+            this._propertyName = propertyName;
+            return _valueMap.containsKey(_columnName);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeString(Class<PROPERTY> javaType) {
+            final Object obj = getColumnValue();
+            return (PROPERTY) DfTypeUtil.toString(obj);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeNumber(Class<PROPERTY> javaType) {
+            final Object obj = getColumnValue();
+            return (PROPERTY) DfTypeUtil.toNumber(obj, javaType);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeDate(Class<PROPERTY> javaType) {
+            final Object obj = getColumnValue();
+            if (Time.class.isAssignableFrom(javaType)) {
+                return (PROPERTY) DfTypeUtil.toTime(obj);
+            } else if (Timestamp.class.isAssignableFrom(javaType)) {
+                return (PROPERTY) DfTypeUtil.toTimestamp(obj);
+            } else {
+                return (PROPERTY) DfTypeUtil.toDate(obj);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeBoolean(Class<PROPERTY> javaType) {
+            final Object obj = getColumnValue();
+            return (PROPERTY) DfTypeUtil.toBoolean(obj);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeBinary(Class<PROPERTY> javaType) {
+            final Object obj = getColumnValue();
+            if (obj == null) {
+                return null;
+            }
+            if (obj instanceof Serializable) {
+                return (PROPERTY) DfTypeUtil.toBinary((Serializable) obj);
+            }
+            throw new UnsupportedOperationException("unsupported binary type: " + obj.getClass());
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeUUID(Class<PROPERTY> javaType) {
+            final Object obj = getColumnValue();
+            return (PROPERTY) DfTypeUtil.toUUID(obj);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeOther(Class<PROPERTY> javaType) {
+            final Object obj = getColumnValue();
+            if (obj == null) {
+                return null;
+            }
+            if (Classification.class.isAssignableFrom(javaType)) {
+                final Class<?>[] argTypes = new Class[] { Object.class };
+                final Method method = DfReflectionUtil.getPublicMethod(javaType, "codeOf", argTypes);
+                return (PROPERTY) DfReflectionUtil.invokeStatic(method, new Object[] { obj });
+            }
+            return (PROPERTY) obj;
+        }
+
+        protected Object getColumnValue() {
+            final Object value = _valueMap.get(_columnName);
+            return filterClassificationValue(value);
+        }
+
+        protected Object filterClassificationValue(Object value) {
+            if (value != null && value instanceof Classification) {
+                value = ((Classification) value).code();
+            }
+            return value;
+        }
     }
 
     // ===================================================================================
@@ -909,264 +932,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // ===================================================================================
-    //                                                                          Util Class
-    //                                                                          ==========
-    /**
-     * This class is for Internal. Don't use this!
-     */
-    protected static class MapStringUtil {
-
-        public static void acceptPrimaryKeyMapString(String primaryKeyMapString, Entity entity) {
-            if (primaryKeyMapString == null) {
-                String msg = "The argument[primaryKeyMapString] should not be null.";
-                throw new IllegalArgumentException(msg);
-            }
-            final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
-            final String suffix = MAP_STRING_END_BRACE;
-            if (!primaryKeyMapString.trim().startsWith(prefix)) {
-                primaryKeyMapString = prefix + primaryKeyMapString;
-            }
-            if (!primaryKeyMapString.trim().endsWith(suffix)) {
-                primaryKeyMapString = primaryKeyMapString + suffix;
-            }
-            final MapListString mapListString = createMapListString();
-            entity.getDBMeta().acceptPrimaryKeyMap(entity, mapListString.generateMap(primaryKeyMapString));
-        }
-
-        public static void acceptColumnValueMapString(String columnValueMapString, Entity entity) {
-            if (columnValueMapString == null) {
-                String msg = "The argument[columnValueMapString] should not be null.";
-                throw new IllegalArgumentException(msg);
-            }
-            final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
-            final String suffix = MAP_STRING_END_BRACE;
-            if (!columnValueMapString.trim().startsWith(prefix)) {
-                columnValueMapString = prefix + columnValueMapString;
-            }
-            if (!columnValueMapString.trim().endsWith(suffix)) {
-                columnValueMapString = columnValueMapString + suffix;
-            }
-            final MapListString mapListString = createMapListString();
-            entity.getDBMeta().acceptColumnValueMap(entity, mapListString.generateMap(columnValueMapString));
-        }
-
-        public static String extractPrimaryKeyMapString(Entity entity) {
-            final String startBrace = MAP_STRING_START_BRACE;
-            final String endBrace = MAP_STRING_END_BRACE;
-            final String delimiter = MAP_STRING_DELIMITER;
-            final String equal = MAP_STRING_EQUAL;
-            return entity.getDBMeta().extractPrimaryKeyMapString(entity, startBrace, endBrace, delimiter, equal);
-        }
-
-        public static String extractColumnValueMapString(Entity entity) {
-            final String startBrace = MAP_STRING_START_BRACE;
-            final String endBrace = MAP_STRING_END_BRACE;
-            final String delimiter = MAP_STRING_DELIMITER;
-            final String equal = MAP_STRING_EQUAL;
-            return entity.getDBMeta().extractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
-        }
-
-        public static void checkTypeString(Object value, String propertyName, String typeName) {
-            if (value == null) {
-                throw new IllegalArgumentException("The value should not be null: " + propertyName);
-            }
-            if (!(value instanceof String)) {
-                String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
-                msg = msg + "valueType=" + value.getClass() + " value=" + value;
-                throw new IllegalArgumentException(msg);
-            }
-        }
-
-        public static long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
-            checkTypeString(value, propertyName, typeName);
-            try {
-                final String valueString = filterTimestampValue(((String) value).trim());
-                return java.sql.Timestamp.valueOf(valueString).getTime();
-            } catch (RuntimeException e) {
-                String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
-                throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-            }
-        }
-
-        public static String filterTimestampValue(String value) {
-            value = value.trim();
-            if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
-                value = value.replaceAll("/", "-");
-            }
-            if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
-                if (value.length() == "2007-07-09".length()) {
-                    value = value + " 00:00:00";
-                }
-            }
-            return value;
-        }
-
-        public static String formatDate(java.util.Date value) {
-            return getFormatDateFormat().format(value);
-        }
-
-        public static String formatTimestamp(java.sql.Timestamp value) {
-            return getFormatDateFormat().format(value);
-        }
-
-        public static java.text.DateFormat getParseDateFormat() {
-            return java.text.DateFormat.getDateInstance();
-        }
-
-        public static java.text.DateFormat getFormatDateFormat() {
-            return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        }
-
-        public static MapListString createMapListString() {
-            final MapListStringImpl impl = new MapListStringImpl();
-            impl.setMapMark(MAP_STRING_MAP_MARK);
-            impl.setListMark(MAP_STRING_LIST_MARK);
-            impl.setStartBrace(MAP_STRING_START_BRACE);
-            impl.setEndBrace(MAP_STRING_END_BRACE);
-            impl.setEqual(MAP_STRING_EQUAL);
-            impl.setDelimiter(MAP_STRING_DELIMITER);
-            return impl;
-        }
-
-        public static ColumnMapString createColumnMapString(List<String> columnNameList) {
-            final ColumnMapStringImpl impl = new ColumnMapStringImpl();
-            impl.setMapMark(MAP_STRING_MAP_MARK);
-            impl.setStartBrace(MAP_STRING_START_BRACE);
-            impl.setEndBrace(MAP_STRING_END_BRACE);
-            impl.setEqual(MAP_STRING_EQUAL);
-            impl.setDelimiter(MAP_STRING_DELIMITER);
-            impl.setColumnNameList(columnNameList);
-            return impl;
-        }
-    }
-
-    /**
-     * This class is for Internal. Don't use this!
-     */
-    protected static class MapAssertUtil {
-        public static void assertPrimaryKeyMapNotNullAndNotEmpty(java.util.Map<String, ? extends Object> primaryKeyMap) {
-            if (primaryKeyMap == null) {
-                String msg = "The argument[primaryKeyMap] should not be null.";
-                throw new IllegalArgumentException(msg);
-            }
-            if (primaryKeyMap.isEmpty()) {
-                String msg = "The argument[primaryKeyMap] should not be empty.";
-                throw new IllegalArgumentException(msg);
-            }
-        }
-
-        public static void assertColumnExistingInPrimaryKeyMap(java.util.Map<String, ? extends Object> primaryKeyMap,
-                String columnName) {
-            if (!primaryKeyMap.containsKey(columnName)) {
-                String msg = "The primaryKeyMap must have the value of " + columnName;
-                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
-            }
-        }
-
-        public static void assertColumnValueMapNotNullAndNotEmpty(java.util.Map<String, ? extends Object> columnValueMap) {
-            if (columnValueMap == null) {
-                String msg = "The argument[columnValueMap] should not be null.";
-                throw new IllegalArgumentException(msg);
-            }
-            if (columnValueMap.isEmpty()) {
-                String msg = "The argument[columnValueMap] should not be empty.";
-                throw new IllegalArgumentException(msg);
-            }
-        }
-    }
-
-    /**
-     * This class is for Internal. Don't use this!
-     */
-    protected static class MapStringValueAnalyzer {
-        protected Map<String, ? extends Object> _valueMap;
-        protected String _columnName;
-        protected String _uncapPropName;
-        protected String _propertyName;
-
-        public MapStringValueAnalyzer(Map<String, ? extends Object> valueMap) {
-            this._valueMap = valueMap;
-        }
-
-        public boolean init(String columnName, String uncapPropName, String propertyName) {
-            this._columnName = columnName;
-            this._uncapPropName = uncapPropName;
-            this._propertyName = propertyName;
-            return _valueMap.containsKey(_columnName);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeString(Class<PROPERTY> javaType) {
-            final Object obj = _valueMap.get(_columnName);
-            if (obj == null) {
-                return null;
-            }
-            helpCheckingTypeString(obj, _uncapPropName, javaType.getName());
-            return (PROPERTY) obj;
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeNumber(Class<PROPERTY> javaType) {
-            final Object obj = _valueMap.get(_columnName);
-            return (PROPERTY) DfTypeUtil.toNumber(obj, javaType);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeDate(Class<PROPERTY> javaType) {
-            final Object obj = _valueMap.get(_columnName);
-            if (Time.class.isAssignableFrom(javaType)) {
-                return (PROPERTY) DfTypeUtil.toTime(obj);
-            } else if (Timestamp.class.isAssignableFrom(javaType)) {
-                return (PROPERTY) DfTypeUtil.toTimestamp(obj);
-            } else {
-                return (PROPERTY) DfTypeUtil.toDate(obj);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeBoolean(Class<PROPERTY> javaType) {
-            final Object obj = _valueMap.get(_columnName);
-            return (PROPERTY) DfTypeUtil.toBoolean(obj);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeBinary(Class<PROPERTY> javaType) {
-            final Object obj = _valueMap.get(_columnName);
-            if (obj == null) {
-                return null;
-            }
-            if (obj instanceof Serializable) {
-                return (PROPERTY) DfTypeUtil.toBinary((Serializable) obj);
-            }
-            throw new UnsupportedOperationException("unsupported binary type: " + obj.getClass());
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeUUID(Class<PROPERTY> javaType) {
-            final Object obj = _valueMap.get(_columnName);
-            return (PROPERTY) DfTypeUtil.toUUID(obj);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeOther(Class<PROPERTY> javaType) {
-            final Object obj = _valueMap.get(_columnName);
-            if (obj == null) {
-                return null;
-            }
-            if (Classification.class.isAssignableFrom(javaType)) {
-                final Class<?>[] argTypes = new Class[] { Object.class };
-                final Method method = DfReflectionUtil.getPublicMethod(javaType, "codeOf", argTypes);
-                return (PROPERTY) DfReflectionUtil.invokeStatic(method, new Object[] { obj });
-            }
-            return (PROPERTY) obj;
-        }
-
-        private void helpCheckingTypeString(Object value, String uncapPropName, String typeName) {
-            MapStringUtil.checkTypeString(value, uncapPropName, typeName);
-        }
-    }
-
-    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     @SuppressWarnings("unchecked")
@@ -1184,30 +949,6 @@ public abstract class AbstractDBMeta implements DBMeta {
             String msg = "The entity should be " + titleName + " but it was: " + targetType;
             throw new IllegalStateException(msg);
         }
-    }
-
-    protected void helpAppendingColumnValueString(StringBuilder sb, String delimiter, String equal, String colName,
-            Object value) {
-        sb.append(delimiter).append(colName).append(equal);
-        sb.append(helpGettingColumnStringValue(value));
-    }
-
-    protected String helpGettingColumnStringValue(Object value) {
-        if (value instanceof java.sql.Timestamp) {
-            return helpFormatingTimestamp((java.sql.Timestamp) value);
-        } else if (value instanceof java.util.Date) {
-            return helpFormatingDate((java.util.Date) value);
-        } else {
-            return value != null ? value.toString() : "";
-        }
-    }
-
-    protected String helpFormatingDate(java.util.Date date) {
-        return MapStringUtil.formatDate(date);
-    }
-
-    protected String helpFormatingTimestamp(java.sql.Timestamp timestamp) {
-        return MapStringUtil.formatTimestamp(timestamp);
     }
 
     protected Map<String, String> setupKeyToLowerMap(boolean dbNameKey) {

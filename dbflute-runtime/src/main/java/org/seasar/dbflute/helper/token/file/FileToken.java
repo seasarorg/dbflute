@@ -15,6 +15,11 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * File-Token.
  * @author jflute
@@ -30,7 +35,7 @@ public interface FileToken {
      * @throws java.io.IOException
      */
     public void tokenize(String filename, FileTokenizingCallback fileTokenizingCallback,
-            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException;
+            FileTokenizingOption fileTokenizingOption) throws FileNotFoundException, IOException;
 
     /**
      * Tokenize token-file data of a specified file.
@@ -44,8 +49,8 @@ public interface FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(java.io.InputStream inputStream, FileTokenizingCallback fileTokenizingCallback,
-            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void tokenize(InputStream inputStream, FileTokenizingCallback fileTokenizingCallback,
+            FileTokenizingOption fileTokenizingOption) throws FileNotFoundException, IOException;
 
     /**
      * Make token-file from specified row resources.
@@ -56,7 +61,7 @@ public interface FileToken {
      * @throws java.io.IOException
      */
     public void make(String filename, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
-            throws java.io.FileNotFoundException, java.io.IOException;
+            throws FileNotFoundException, IOException;
 
     /**
      * Make token-file from specified row resources.
@@ -70,6 +75,6 @@ public interface FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(java.io.OutputStream outputStream, FileMakingCallback fileMakingCallback,
-            FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void make(OutputStream outputStream, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
+            throws FileNotFoundException, IOException;
 }

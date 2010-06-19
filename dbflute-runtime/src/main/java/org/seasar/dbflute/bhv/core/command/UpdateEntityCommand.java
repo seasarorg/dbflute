@@ -23,7 +23,7 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateModifiedOnlyCommand;
 /**
  * @author jflute
  */
-public class UpdateEntityCommand extends AbstractEntityCommand {
+public class UpdateEntityCommand extends AbstractUpdateEntityCommand {
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -52,7 +52,7 @@ public class UpdateEntityCommand extends AbstractEntityCommand {
 
     protected TnUpdateModifiedOnlyCommand createUpdateModifiedOnlyCommand(TnBeanMetaData bmd, String[] propertyNames) {
         final TnUpdateModifiedOnlyCommand cmd = new TnUpdateModifiedOnlyCommand(_dataSource, _statementFactory);
-        cmd.setBeanMetaData(bmd);// Extension Point!
+        cmd.setBeanMetaData(bmd); // extension point
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling());

@@ -16,15 +16,12 @@
 package org.seasar.dbflute.cbean;
 
 import java.lang.reflect.Method;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+import java.util.Map.Entry;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
@@ -35,8 +32,6 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
-import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
@@ -242,91 +237,17 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
-        if (primaryKeyMapString == null) {
-            String msg = "The argument[primaryKeyMapString] should not be null.";
-            throw new IllegalArgumentException(msg);
+    public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
+        if (!getDBMeta().hasPrimaryKey()) {
+            String msg = "The table has no primary-keys: " + getTableDbName();
+            throw new UnsupportedOperationException(msg);
         }
-        final String prefix = DBMeta.MAP_STRING_MAP_MARK + DBMeta.MAP_STRING_START_BRACE;
-        final String suffix = DBMeta.MAP_STRING_END_BRACE;
-        if (!primaryKeyMapString.trim().startsWith(prefix)) {
-            primaryKeyMapString = prefix + primaryKeyMapString;
-        }
-        if (!primaryKeyMapString.trim().endsWith(suffix)) {
-            primaryKeyMapString = primaryKeyMapString + suffix;
-        }
-        final MapListString mapListString = xcreateMapListString();
-        acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
-    }
-
-    protected MapListString xcreateMapListString() {
-        final MapListStringImpl impl = new MapListStringImpl();
-        impl.setMapMark(DBMeta.MAP_STRING_MAP_MARK);
-        impl.setListMark(DBMeta.MAP_STRING_LIST_MARK);
-        impl.setDelimiter(DBMeta.MAP_STRING_DELIMITER);
-        impl.setStartBrace(DBMeta.MAP_STRING_START_BRACE);
-        impl.setEndBrace(DBMeta.MAP_STRING_END_BRACE);
-        impl.setEqual(DBMeta.MAP_STRING_EQUAL);
-        return impl;
-    }
-
-    protected void xcheckTypeString(Object value, String propertyName, Class<?> type) {
-        if (value == null) {
-            throw new IllegalArgumentException("The value should not be null: " + propertyName);
-        }
-        if (!(value instanceof String)) {
-            String typeName = DfTypeUtil.toClassTitle(type);
-            String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
-            msg = msg + "valueType=" + value.getClass() + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <NUMBER extends Number> NUMBER xparseNumber(Object obj, String propertyName, Class<NUMBER> type) {
-        xcheckTypeString(obj, propertyName, type);
-        return (NUMBER) DfTypeUtil.toNumber(obj, type);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <DATE extends Date> DATE xparseDate(Object obj, String propertyName, Class<DATE> type) {
-        xcheckTypeString(obj, propertyName, type);
-        if (Time.class.isAssignableFrom(type)) {
-            return (DATE) DfTypeUtil.toTime(obj);
-        } else if (Timestamp.class.isAssignableFrom(type)) {
-            return (DATE) DfTypeUtil.toTimestamp(obj);
-        } else { // basically Date
-            return (DATE) DfTypeUtil.toDate(obj);
-        }
-    }
-
-    protected Boolean xparseBoolean(Object obj, String propertyName, Class<?> type) {
-        xcheckTypeString(obj, propertyName, type);
-        return DfTypeUtil.toBoolean(obj);
-    }
-
-    protected UUID xparseUUID(Object obj, String propertyName, Class<?> type) {
-        xcheckTypeString(obj, propertyName, type);
-        return DfTypeUtil.toUUID(obj);
-    }
-
-    protected void assertPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
-        if (primaryKeyMap == null) {
-            String msg = "The argument[primaryKeyMap] must not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (primaryKeyMap.isEmpty()) {
-            String msg = "The argument[primaryKeyMap] must not be empty.";
-            throw new IllegalArgumentException(msg);
-        }
-        final DBMeta dbmeta = getDBMeta();
-        final List<ColumnInfo> columnInfoList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
-        for (ColumnInfo columnInfo : columnInfoList) {
-            final String columnDbName = columnInfo.getColumnDbName();
-            if (!primaryKeyMap.containsKey(columnDbName)) {
-                String msg = "The primaryKeyMap must have the value of " + columnDbName;
-                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
-            }
+        final Entity entity = getDBMeta().newEntity();
+        getDBMeta().acceptPrimaryKeyMap(entity, primaryKeyMap);
+        final Map<String, Object> filteredMap = getDBMeta().extractPrimaryKeyMap(entity);
+        final Set<Entry<String, Object>> entrySet = filteredMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            localCQ().invokeQuery(entry.getKey(), "equal", entry.getValue());
         }
     }
 

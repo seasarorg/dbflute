@@ -21,50 +21,7 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
-    public void acceptColumnValueMap(Entity entity, Map<String, ? extends Object> columnValueMap) {
-    }
-
-    public void acceptColumnValueMapString(Entity entity, String columnValueMapString) {
-    }
-
     public void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap) {
-    }
-
-    public void acceptPrimaryKeyMapString(Entity entity, String primaryKeyMapString) {
-    }
-
-    public List<String> convertToColumnStringValueList(Entity entity) {
-        return null;
-    }
-
-    public Map<String, String> convertToColumnStringValueMap(Entity entity) {
-        return null;
-    }
-
-    public List<Object> convertToColumnValueList(Entity entity) {
-        return null;
-    }
-
-    public Map<String, Object> convertToColumnValueMap(Entity entity) {
-        return null;
-    }
-
-    public String extractColumnValueMapString(Entity entity) {
-        return null;
-    }
-
-    public String extractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter,
-            String equal) {
-        return null;
-    }
-
-    public String extractPrimaryKeyMapString(Entity entity) {
-        return null;
-    }
-
-    public String extractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter,
-            String equal) {
-        return null;
     }
 
     public String findDbName(String flexibleName) {
@@ -157,6 +114,14 @@ public class MockDBMeta extends AbstractDBMeta {
 
     @Override
     protected List<ColumnInfo> ccil() {
+        return null;
+    }
+
+    public Map<String, Object> extractPrimaryKeyMap(Entity entity) {
+        return null;
+    }
+
+    public Map<String, Object> extractAllColumnMap(Entity entity) {
         return null;
     }
 }

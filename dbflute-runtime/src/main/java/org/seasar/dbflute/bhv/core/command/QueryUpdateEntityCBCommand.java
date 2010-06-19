@@ -26,7 +26,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
+public class QueryUpdateEntityCBCommand extends AbstractUpdateEntityCommand {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -65,6 +65,7 @@ public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
+    @Override
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
         final String main = _tableDbName + ":" + getCommandName();
@@ -84,27 +85,32 @@ public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
     }
 
     protected SqlExecution createQueryUpdateEntityCBExecution(Class<? extends ConditionBean> cbType) {
-        TnUpdateQueryAutoDynamicCommand sqlCommand = new TnUpdateQueryAutoDynamicCommand(_dataSource, _statementFactory);
+        final TnUpdateQueryAutoDynamicCommand sqlCommand = new TnUpdateQueryAutoDynamicCommand(_dataSource,
+                _statementFactory);
         sqlCommand.setBeanMetaData(createBeanMetaData());
         return sqlCommand;
     }
 
+    @Override
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _conditionBean, _entity };
+        return new Object[] { _conditionBean, _entity, _updateOption };
     }
 
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
+    @Override
     public ConditionBean getConditionBean() {
         return _conditionBean;
     }
 
+    @Override
     public String getOutsideSqlPath() {
         return null;
     }
 
+    @Override
     public OutsideSqlOption getOutsideSqlOption() {
         return null;
     }

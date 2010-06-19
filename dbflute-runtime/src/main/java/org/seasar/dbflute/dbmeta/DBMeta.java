@@ -398,118 +398,28 @@ public interface DBMeta {
     //                                                Accept
     //                                                ------
     /**
-     * Accept primary-key map.
-     * The column that column-value map-string doesn't have the value of is reflected as null.
-     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
+     * Accept the map of primary-keys. map:{[column-name] = [value]}
      * @param entity Target entity. (NotNull)
-     * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
+     * @param primaryKeyMap The value map of primary-keys. (NotNull and NotEmpty)
      */
     void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap);
-
-    /**
-     * Accept primary-key map-string.
-     * The column that column-value map-string doesn't have the value of is reflected as null.
-     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
-     * @param entity Target entity. (NotNull)
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     */
-    void acceptPrimaryKeyMapString(Entity entity, String primaryKeyMapString);
-
-    /**
-     * Accept column-value map.
-     * The column that column-value map-string doesn't have the value of is reflected as null.
-     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
-     * @param entity Target entity. (NotNull)
-     * @param columnValueMap Column-value map. (NotNull and NotEmpty)
-     */
-    void acceptColumnValueMap(Entity entity, Map<String, ? extends Object> columnValueMap);
-
-    /**
-     * Accept column-value map-string.
-     * The column that column-value map-string doesn't have the value of is reflected as null.
-     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
-     * @param entity Target entity. (NotNull)
-     * @param columnValueMapString Column-value map-string. (NotNull)
-     */
-    void acceptColumnValueMapString(Entity entity, String columnValueMapString);
 
     // -----------------------------------------------------
     //                                               Extract
     //                                               -------
     /**
-     * Extract primary-key map-string. Delimiter is at-mark and semicolon.
-     * <p>
-     * <pre>
-     * ex) Uses that this method have.
-     *   final String primaryKeyMapString = LdBookDbm.extractPrimaryKeyMapString(entity);
-     *   final LdBook entity = dao.selectEntity(new LdBookCB().acceptPrimaryKeyMapString(primaryKeyMapString));
-     *   ... // as primary key for condition.
-     * </pre>
-     * 
+     * Extract the map of primary-keys. map:{[column-name] = [value]}
      * @param entity Target entity. (NotNull)
-     * @return Primary-key map-string. (NotNull)
+     * @return The value map of primary-keys. (NotNull)
      */
-    String extractPrimaryKeyMapString(Entity entity);
+    Map<String, Object> extractPrimaryKeyMap(Entity entity);
 
     /**
-     * Extract primary-key map-string.
+     * Extract The map of all columns. map:{[column-name] = [value]}
      * @param entity Target entity. (NotNull)
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Primary-key map-string. (NotNull)
+     * @return The map of all columns. (NotNull)
      */
-    String extractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter, String equal);
-
-    /**
-     * Extract column-value map-string. Delimiter is at-mark and semicolon.
-     * @param entity Target entity. (NotNull)
-     * @return Column-value map-string. (NotNull)
-     */
-    String extractColumnValueMapString(Entity entity);
-
-    /**
-     * Extract column-value map-string.
-     * @param entity Target entity. (NotNull)
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Column-value map-string. (NotNull)
-     */
-    String extractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter, String equal);
-
-    // -----------------------------------------------------
-    //                                               Convert
-    //                                               -------
-    /**
-     * Convert entity to column value as list.
-     * @param entity Target entity. (NotNull)
-     * @return The list of column value. (NotNull)
-     */
-    List<Object> convertToColumnValueList(Entity entity);
-
-    /**
-     * Convert entity to column value as map.
-     * @param entity Target entity. (NotNull)
-     * @return The map of column value. (NotNull)
-     */
-    Map<String, Object> convertToColumnValueMap(Entity entity);
-
-    /**
-     * Convert entity to column string-value as list.
-     * @param entity Target entity. (NotNull)
-     * @return The list of column string-value. (NotNull)
-     */
-    List<String> convertToColumnStringValueList(Entity entity);
-
-    /**
-     * Convert entity to column string-value as map.
-     * @param entity Target entity. (NotNull)
-     * @return The map of column string-value. (NotNull)
-     */
-    Map<String, String> convertToColumnStringValueMap(Entity entity);
+    Map<String, Object> extractAllColumnMap(Entity entity);
 
     // ===================================================================================
     //                                                               Entity Property Setup

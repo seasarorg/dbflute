@@ -59,16 +59,10 @@ public interface ConditionBean extends PagingBean {
     //                                                                 PrimaryKey Handling
     //                                                                 ===================
     /**
-     * Accept primary-key map-string.
-     * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
+     * Accept the map of primary-keys. map:{[column-name] = [value]}
+     * @param primaryKeyMap The map of primary-keys. (NotNull and NotEmpty)
      */
     void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap);
-
-    /**
-     * Accept primary-key map-string. Delimiter is at-mark and semicolon.
-     * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
-     */
-    void acceptPrimaryKeyMapString(String primaryKeyMapString);
 
     /**
      * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}

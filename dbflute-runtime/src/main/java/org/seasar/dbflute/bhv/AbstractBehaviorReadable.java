@@ -26,8 +26,6 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.bhv.batch.TokenFileOutputOption;
-import org.seasar.dbflute.bhv.batch.TokenFileOutputResult;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.AbstractBehaviorCommand;
@@ -48,7 +46,6 @@ import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
@@ -56,10 +53,6 @@ import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
-import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
-import org.seasar.dbflute.helper.token.file.FileMakingOption;
-import org.seasar.dbflute.helper.token.file.FileMakingSimpleFacade;
-import org.seasar.dbflute.helper.token.file.impl.FileMakingSimpleFacadeImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -756,62 +749,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         boolean hasRf(); // hasReferrer()
 
         void setRfLs(FOREIGN_ENTITY foreignEntity, List<LOCAL_ENTITY> localList); // setReferrerList()
-    }
-
-    // ===================================================================================
-    //                                                                          Token File
-    //                                                                          ==========
-    /**
-     * Get the executor of token file output.
-     * @return The executor of token file output. (NotNull)
-     */
-    public TokenFileOutputExecutor tokenFileOutput() {
-        return new TokenFileOutputExecutor();
-    }
-
-    /**
-     * The executor of token file output.
-     */
-    public class TokenFileOutputExecutor {
-
-        /**
-         * Output token file from the table records. <br />
-         * The supported column types are String, Number and Date. <br />
-         * The search result is on memory temporarily so don't use this method if you have enormous records.
-         * @param cb The condition-bean. (NotNull: The setupSelect_Xxx() is ignored.)
-         * @param filename The name of the file. (NotNull and NotEmpty)
-         * @param tokenFileOutputOption The option of token file output. (NotNull and Required{delimiter and encoding})
-         * @return The result of token file output. (NotNull)
-         * @throws java.io.FileNotFoundException The file is not found.
-         * @throws java.io.IOException The IO exception occurred.
-         */
-        public TokenFileOutputResult outputTokenFile(ConditionBean cb, String filename,
-                TokenFileOutputOption tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
-            assertCBNotNull(cb);
-            assertStringNotNullAndNotTrimmedEmpty("filename", filename);
-            assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
-
-            final List<? extends Entity> entityList = readList(cb);
-            final List<List<String>> rowList = new ArrayList<List<String>>();
-            for (Entity entity : entityList) {
-                final List<String> valueList = getDBMeta().convertToColumnStringValueList(entity);
-                rowList.add(valueList);
-            }
-            final FileMakingSimpleFacade fileMakingSimpleFacade = new FileMakingSimpleFacadeImpl();
-            final FileMakingOption fileMakingOption = tokenFileOutputOption.getFileMakingOption();
-            final FileMakingHeaderInfo fileMakingHeaderInfo = new FileMakingHeaderInfo();
-            final List<String> columnDbNameList = new ArrayList<String>();
-            for (final java.util.Iterator<ColumnInfo> ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext();) {
-                final ColumnInfo columnInfo = ite.next();
-                columnDbNameList.add(columnInfo.getColumnDbName());
-            }
-            fileMakingHeaderInfo.setColumnNameList(columnDbNameList);
-            fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
-            fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
-            final TokenFileOutputResult tokeFileOutputResult = new TokenFileOutputResult();
-            tokeFileOutputResult.setSelectedList(entityList);
-            return tokeFileOutputResult;
-        }
     }
 
     // ===================================================================================
