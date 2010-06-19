@@ -253,7 +253,7 @@ public class ConditionBeanExceptionThrower {
     //                                                                             =======
     public void throwSpecifyIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for column specification.");
+        br.addNotice("The purpose was illegal to specify.");
         br.addItem("Advice");
         br.addElement("This condition-bean is not allowed to specify.");
         br.addElement("Because this is for " + purpose + ".");
