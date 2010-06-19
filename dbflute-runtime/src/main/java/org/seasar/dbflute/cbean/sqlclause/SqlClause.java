@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -604,6 +605,14 @@ public interface SqlClause {
     public static enum SelectClauseType {
         COLUMNS, COUNT, MAX, MIN, SUM, AVG
     }
+
+    // [DBFlute-0.9.7.2]
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    HpCBPurpose getPurpose();
+
+    void setPurpose(HpCBPurpose purpose);
 
     // [DBFlute-0.9.4]
     // ===================================================================================

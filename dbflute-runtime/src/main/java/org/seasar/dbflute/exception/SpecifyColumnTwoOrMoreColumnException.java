@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the method of set-up-select is called after union.
+ * The exception of when the column specification is called twice.
  * @author jflute
  */
-public class SetupSelectAfterUnionException extends RuntimeException {
+public class SpecifyColumnTwoOrMoreColumnException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class SetupSelectAfterUnionException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public SetupSelectAfterUnionException(String msg) {
+    public SpecifyColumnTwoOrMoreColumnException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class SetupSelectAfterUnionException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public SetupSelectAfterUnionException(String msg, Throwable cause) {
+    public SpecifyColumnTwoOrMoreColumnException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

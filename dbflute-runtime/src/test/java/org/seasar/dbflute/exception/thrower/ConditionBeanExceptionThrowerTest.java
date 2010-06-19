@@ -1,9 +1,8 @@
 package org.seasar.dbflute.exception.thrower;
 
 import org.seasar.dbflute.exception.SetupSelectAfterUnionException;
-import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.mock.MockConditionBean;
 import org.seasar.dbflute.unit.PlainTestCase;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -12,21 +11,18 @@ public class ConditionBeanExceptionThrowerTest extends PlainTestCase {
 
     public void test_throwSetupSelectAfterUnionException() {
         // ## Arrange ##
-        String className = "foo";
+        MockConditionBean mock = new MockConditionBean();
         String foreignPropertyName = "bar";
 
         // ## Act ##
         try {
-            createTarget().throwSetupSelectAfterUnionException(className, foreignPropertyName);
+            createTarget().throwSetupSelectAfterUnionException(mock, foreignPropertyName);
 
             // ## Assert ##
             fail();
         } catch (SetupSelectAfterUnionException e) {
             // OK
             log(e.getMessage());
-            assertTrue(e.getMessage().contains(className));
-            String methodName = "setupSelect_" + Srl.initCap(foreignPropertyName) + "()";
-            assertTrue(e.getMessage().contains(methodName));
         }
     }
 

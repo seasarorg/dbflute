@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -179,6 +180,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     /** The map of invalid query column. */
     protected Map<String, ConditionKey> _invalidQueryColumnMap;
+
+    // -----------------------------------------------------
+    //                                          Purpose Type
+    //                                          ------------
+    /** The purpose of condition-bean for check at condition-query. (NotNull) */
+    protected HpCBPurpose _purpose = HpCBPurpose.NORMAL; // as default
 
     // ===================================================================================
     //                                                                         Constructor
@@ -2431,6 +2438,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void rollbackSelectClauseType() {
         _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
+    }
+
+    // [DBFlute-0.9.7.2]
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    public HpCBPurpose getPurpose() {
+        return _purpose;
+    }
+
+    public void setPurpose(HpCBPurpose purpose) {
+        _purpose = purpose;
     }
 
     // [DBFlute-0.9.4]

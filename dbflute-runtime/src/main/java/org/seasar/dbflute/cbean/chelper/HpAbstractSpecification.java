@@ -16,14 +16,12 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                           Attribute
     //                                                                           =========
     protected final ConditionBean _baseCB;
-    protected HpSpQyCall<CQ> _qyCall; // overridden when GeneralOneSpecification
-    protected final boolean _forDerivedReferrer;
-    protected final boolean _forScalarSelect;
-    protected final boolean _forScalarSubQuery;
+    protected HpSpQyCall<CQ> _qyCall; // not final because it may be switched
+    protected final HpCBPurpose _purpose;
     protected final DBMetaProvider _dbmetaProvider;
     protected CQ _query;
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
-    protected boolean _forGeneralOneSpecificaion;
+    protected int _specifyColumnCount;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -31,18 +29,14 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     /**
      * @param baseCB The condition-bean of base level. (NotNull)
      * @param qyCall The call-back for condition-query. (NotNull)
-     * @param forDerivedReferrer Is this for derive referrer?
-     * @param forScalarSelect Is this for scalar select?
-     * @param forScalarSubQuery  Is this for scalar sub-query?
+     * @param purpose The purpose of condition-bean. (NotNull)
      * @param dbmetaProvider The provider of DB meta. (NotNull)
      */
-    protected HpAbstractSpecification(ConditionBean baseCB, HpSpQyCall<CQ> qyCall, boolean forDerivedReferrer,
-            boolean forScalarSelect, boolean forScalarSubQuery, DBMetaProvider dbmetaProvider) {
+    protected HpAbstractSpecification(ConditionBean baseCB, HpSpQyCall<CQ> qyCall, HpCBPurpose purpose,
+            DBMetaProvider dbmetaProvider) {
         _baseCB = baseCB;
         _qyCall = qyCall;
-        _forDerivedReferrer = forDerivedReferrer;
-        _forScalarSelect = forScalarSelect;
-        _forScalarSubQuery = forScalarSubQuery;
+        _purpose = purpose;
         _dbmetaProvider = dbmetaProvider;
     }
 
@@ -50,6 +44,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                Column Specification
     //                                                                ====================
     protected void doColumn(String columnName) {
+        ++_specifyColumnCount;
         assertColumn(columnName);
         if (_query == null) {
             _query = _qyCall.qy();
@@ -68,26 +63,39 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         _baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName, _query.getTableDbName());
     }
 
-    protected boolean isRequiredColumnSpecificationEnabled() {
-        return !_forGeneralOneSpecificaion && !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery
-                && !_alreadySpecifiedRequiredColumn;
-    }
-
     protected void assertColumn(String columnName) {
-        if (_forGeneralOneSpecificaion || _forDerivedReferrer) {
-            return;
+        if (_purpose.isNoSpecifyTwice()) {
+            if (_specifyColumnCount > 1) {
+                throwSpecifyColumnTwoOrMoreColumnException(columnName);
+            }
+            // no specification is checked at an other timing
         }
-        if (_query == null && !_qyCall.has()) { // setupSelect check!
-            throwSpecifyColumnNotSetupSelectColumnException(columnName);
+        if (_purpose.isAny(HpCBPurpose.NORMAL)) {
+            if (_query == null && !_qyCall.has()) { // setupSelect check!
+                throwSpecifyColumnNotSetupSelectColumnException(columnName);
+            }
         }
     }
 
-    protected void assertForeign(String foreignPropertyName) {
-        if (_forScalarSelect) {
-            throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
+    protected boolean isRequiredColumnSpecificationEnabled() {
+        if (_alreadySpecifiedRequiredColumn) {
+            return false;
         }
-        if (_forScalarSubQuery) {
-            throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
+        return HpCBPurpose.NORMAL.equals(_purpose); // only normal purpose needs
+    }
+
+    protected void assertRelation(String relationName) {
+        if (_purpose.isAny(HpCBPurpose.SCALAR_SELECT)) {
+            throwScalarSelectInvalidForeignSpecificationException(relationName);
+        }
+        if (_purpose.isAny(HpCBPurpose.SCALAR_CONDITION)) {
+            throwScalarSubQueryInvalidForeignSpecificationException(relationName);
+        }
+    }
+
+    protected void assertDerived(String referrerName) {
+        if (_purpose.isNoSpecifyDerivedReferrer()) {
+            throwSpecifyDerivedReferrerIllegalPurposeException(referrerName);
         }
     }
 
@@ -98,20 +106,24 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     // ===================================================================================
     //                                                                  Exception Throwing
     //                                                                  ==================
+    protected void throwSpecifyColumnTwoOrMoreColumnException(String columnName) {
+        createCBExThrower().throwSpecifyColumnTwoOrMoreColumnException(_purpose, _baseCB, columnName);
+    }
+
     protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
-        createCBExThrower().throwSpecifyColumnNotSetupSelectColumnException(_baseCB, getTableDbName(), columnName);
+        createCBExThrower().throwSpecifyColumnNotSetupSelectColumnException(_baseCB, columnName);
     }
 
-    protected void throwDerivedReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
-        createCBExThrower().throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
+    protected void throwScalarSelectInvalidForeignSpecificationException(String relationName) {
+        createCBExThrower().throwScalarSelectInvalidForeignSpecificationException(relationName);
     }
 
-    protected void throwScalarSelectInvalidForeignSpecificationException(String foreignPropertyName) {
-        createCBExThrower().throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
+    protected void throwScalarSubQueryInvalidForeignSpecificationException(String relationName) {
+        createCBExThrower().throwScalarSubQueryInvalidForeignSpecificationException(relationName);
     }
 
-    protected void throwScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
-        createCBExThrower().throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
+    protected void throwSpecifyDerivedReferrerIllegalPurposeException(String referrerName) {
+        createCBExThrower().throwSpecifyDerivedReferrerIllegalPurposeException(_purpose, _baseCB, referrerName);
     }
 
     // ===================================================================================
@@ -135,7 +147,11 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         return _alreadySpecifiedRequiredColumn;
     }
 
-    public boolean isForGeneralOneSpecificaion() {
-        return _forGeneralOneSpecificaion;
+    public void xswitchQyCall(HpSpQyCall<CQ> qyCall) {
+        if (qyCall == null) {
+            String msg = "The argument 'qyCall' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        _qyCall = qyCall;
     }
 }

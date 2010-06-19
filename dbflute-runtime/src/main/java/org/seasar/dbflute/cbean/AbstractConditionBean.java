@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
+import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.WhereClauseSimpleFilter;
@@ -80,12 +81,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                          Purpose Type
     //                                          ------------
-    protected boolean _forDerivedReferrer;
-    protected boolean _forScalarSelect;
-    protected boolean _forScalarSubQuery;
-    protected boolean _forUnion;
-    protected boolean _forExistsSubQuery;
-    protected boolean _forInScopeSubQuery;
+    /** The purpose of condition-bean. (NotNull) */
+    protected HpCBPurpose _purpose = HpCBPurpose.NORMAL; // as default
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -121,6 +118,123 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * @return The provider of DB meta. (NotNull)
      */
     protected abstract DBMetaProvider getDBMetaProvider();
+
+    // ===================================================================================
+    //                                                                        Setup Select
+    //                                                                        ============
+    protected void doSetupSelect(SsCall callback) {
+        final String foreignPropertyName = callback.qf().getForeignPropertyName();
+        assertSetupSelectPurpose(foreignPropertyName);
+        assertSetupSelectBeforeUnion(foreignPropertyName);
+        final String foreignTableAliasName = callback.qf().getRealAliasName();
+        final String localRelationPath = localCQ().getRelationPath();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
+                localRelationPath);
+        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
+    }
+
+    protected static interface SsCall {
+        public ConditionQuery qf();
+    }
+
+    protected void assertSetupSelectPurpose(String foreignPropertyName) {
+        if (_purpose.isNoSetupSelect()) {
+            final String titleName = DfTypeUtil.toClassTitle(this);
+            throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
+        }
+    }
+
+    protected void throwSetupSelectIllegalPurposeException(String className, String foreignPropertyName) {
+        createCBExThrower().throwSetupSelectIllegalPurposeException(_purpose, this, foreignPropertyName);
+    }
+
+    protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
+        if (hasUnionQueryOrUnionAllQuery()) {
+            throwSetupSelectAfterUnionException(foreignPropertyName);
+        }
+    }
+
+    protected void throwSetupSelectAfterUnionException(String foreignPropertyName) {
+        createCBExThrower().throwSetupSelectAfterUnionException(this, foreignPropertyName);
+    }
+
+    // [DBFlute-0.9.5.3]
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    protected abstract boolean hasSpecifiedColumn();
+
+    protected abstract HpAbstractSpecification<? extends ConditionQuery> localSp();
+
+    protected void assertSpecifyPurpose() {
+        if (_purpose.isNoSpecify()) {
+            throwSpecifyIllegalPurposeException();
+        }
+    }
+
+    protected void throwSpecifyIllegalPurposeException() {
+        createCBExThrower().throwSpecifyIllegalPurposeException(_purpose, this);
+    }
+
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+    protected void assertQueryPurpose() {
+        if (_purpose.isNoQuery()) {
+            throwQueryIllegalPurposeException();
+        }
+    }
+
+    protected void throwQueryIllegalPurposeException() {
+        createCBExThrower().throwQueryIllegalPurposeException(_purpose, this);
+    }
+
+    // [DBFlute-0.9.5.3]
+    // ===================================================================================
+    //                                                                         ColumnQuery
+    //                                                                         ===========
+    protected <CB extends ConditionBean> void xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
+            SpecifyQuery<CB> rightSp, String operand) {
+        // Specify left column
+        leftSp.specify(leftCB);
+        final String leftColumn = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        if (leftColumn == null) {
+            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
+        }
+        // Specify right column
+        rightSp.specify(rightCB);
+        final String rightColumn = rightCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        if (rightColumn == null) {
+            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
+        }
+
+        // Register where clause
+        String clause = leftColumn + " " + operand + " " + rightColumn;
+        getSqlClause().registerWhereClause(clause);
+    }
+
+    // [DBFlute-0.9.6.3]
+    // ===================================================================================
+    //                                                                        OrScopeQuery
+    //                                                                        ============
+    protected <CB extends ConditionBean> void xorSQ(CB cb, OrQuery<CB> orQuery) {
+        getSqlClause().makeOrScopeQueryEffective();
+        try {
+            orQuery.query(cb);
+        } finally {
+            getSqlClause().closeOrScopeQuery();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        InvalidQuery
+    //                                                                        ============
+    /**
+     * {@inheritDoc}
+     */
+    public void checkInvalidQuery() {
+        getSqlClause().checkInvalidQuery();
+    }
 
     // ===================================================================================
     //                                                                   Accept PrimaryKey
@@ -194,6 +308,26 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected UUID xparseUUID(Object obj, String propertyName, Class<?> type) {
         xcheckTypeString(obj, propertyName, type);
         return DfTypeUtil.toUUID(obj);
+    }
+
+    protected void assertPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
+        if (primaryKeyMap == null) {
+            String msg = "The argument[primaryKeyMap] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (primaryKeyMap.isEmpty()) {
+            String msg = "The argument[primaryKeyMap] must not be empty.";
+            throw new IllegalArgumentException(msg);
+        }
+        final DBMeta dbmeta = getDBMeta();
+        final List<ColumnInfo> columnInfoList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            final String columnDbName = columnInfo.getColumnDbName();
+            if (!primaryKeyMap.containsKey(columnDbName)) {
+                String msg = "The primaryKeyMap must have the value of " + columnDbName;
+                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+            }
+        }
     }
 
     // ===================================================================================
@@ -530,62 +664,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return _isSelectCountIgnoreFetchScope;
     }
 
-    // [DBFlute-0.9.5.3]
-    // ===================================================================================
-    //                                                                             Specify
-    //                                                                             =======
-    protected abstract boolean hasSpecifiedColumn();
-
-    protected abstract HpAbstractSpecification<? extends ConditionQuery> localSp();
-
-    // [DBFlute-0.9.5.3]
-    // ===================================================================================
-    //                                                                         ColumnQuery
-    //                                                                         ===========
-    protected <CB extends ConditionBean> void xcolqy(CB cb, SpecifyQuery<CB> leftSp, SpecifyQuery<CB> rightSp,
-            String operand) {
-        // Specify left column
-        leftSp.specify(cb);
-        String leftColumn = cb.getSqlClause().removeSpecifiedColumnRealNameAsOne();
-        if (leftColumn == null) {
-            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
-        }
-        // Specify right column
-        cb.getSqlClause().clearSpecifiedSelectColumn(); // recycle
-        rightSp.specify(cb);
-        String rightColumn = cb.getSqlClause().removeSpecifiedColumnRealNameAsOne();
-        if (rightColumn == null) {
-            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
-        }
-
-        // Register where clause
-        String clause = leftColumn + " " + operand + " " + rightColumn;
-        getSqlClause().registerWhereClause(clause);
-    }
-
-    // [DBFlute-0.9.6.3]
-    // ===================================================================================
-    //                                                                        OrScopeQuery
-    //                                                                        ============
-    protected <CB extends ConditionBean> void xorSQ(CB cb, OrQuery<CB> orQuery) {
-        getSqlClause().makeOrScopeQueryEffective();
-        try {
-            orQuery.query(cb);
-        } finally {
-            getSqlClause().closeOrScopeQuery();
-        }
-    }
-
-    // ===================================================================================
-    //                                                                        InvalidQuery
-    //                                                                        ============
-    /**
-     * {@inheritDoc}
-     */
-    public void checkInvalidQuery() {
-        getSqlClause().checkInvalidQuery();
-    }
-
     // ===================================================================================
     //                                                                     StatementConfig
     //                                                                     ===============
@@ -771,45 +849,49 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
-    public void xsetupForDerivedReferrer() { // very internal
-        _forDerivedReferrer = true;
+    // very internal
+    public void xsetupForUnion() {
+        xchangePurposeSqlClause(HpCBPurpose.UNION);
     }
 
-    public void xsetupForScalarSelect() { // very internal
-        _forScalarSelect = true;
+    public void xsetupForExistsSubQuery() {
+        xchangePurposeSqlClause(HpCBPurpose.EXISTS_REFERRER);
     }
 
-    public void xsetupForScalarSubQuery() { // very internal
-        _forScalarSubQuery = true;
+    public void xsetupForInScopeSubQuery() {
+        xchangePurposeSqlClause(HpCBPurpose.INSCOPE_RELATION);
     }
 
-    public void xsetupForUnion() { // very internal
-        _forUnion = true;
+    public void xsetupForDerivedReferrer() {
+        xchangePurposeSqlClause(HpCBPurpose.DERIVED_REFERRER);
     }
 
-    public void xsetupForExistsSubQuery() { // very internal
-        _forExistsSubQuery = true;
+    public void xsetupForScalarSelect() {
+        xchangePurposeSqlClause(HpCBPurpose.SCALAR_SELECT);
     }
 
-    public void xsetupForInScopeSubQuery() { // very internal
-        _forInScopeSubQuery = true;
+    public void xsetupForScalarSubQuery() {
+        xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION);
+    }
+
+    public void xsetupForColumnQuery() {
+        xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
+    }
+
+    public void xsetupForVaryingUpdate() {
+        xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
+    }
+
+    protected void xchangePurposeSqlClause(HpCBPurpose purpose) {
+        _purpose = purpose;
+        getSqlClause().setPurpose(purpose); // synchronize
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected void doSetupSelect(SsCall callback) {
-        String foreignPropertyName = callback.qf().getForeignPropertyName();
-        assertSetupSelectBeforeUnion(foreignPropertyName);
-        String foreignTableAliasName = callback.qf().getRealAliasName();
-        String localRelationPath = localCQ().getRelationPath();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
-                localRelationPath);
-        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
-    }
-
-    protected static interface SsCall {
-        public ConditionQuery qf();
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected ConditionBeanExceptionThrower createCBExThrower() {
+        return new ConditionBeanExceptionThrower();
     }
 
     // ===================================================================================
@@ -844,44 +926,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
-    }
-
-    protected void assertPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
-        if (primaryKeyMap == null) {
-            String msg = "The argument[primaryKeyMap] must not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (primaryKeyMap.isEmpty()) {
-            String msg = "The argument[primaryKeyMap] must not be empty.";
-            throw new IllegalArgumentException(msg);
-        }
-        final DBMeta dbmeta = getDBMeta();
-        final List<ColumnInfo> columnInfoList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
-        for (ColumnInfo columnInfo : columnInfoList) {
-            final String columnDbName = columnInfo.getColumnDbName();
-            if (!primaryKeyMap.containsKey(columnDbName)) {
-                String msg = "The primaryKeyMap must have the value of " + columnDbName;
-                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
-            }
-        }
-    }
-
-    protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
-        if (hasUnionQueryOrUnionAllQuery()) {
-            final String titleName = DfTypeUtil.toClassTitle(this);
-            throwSetupSelectAfterUnionException(titleName, foreignPropertyName);
-        }
-    }
-
-    protected void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
-        createCBExThrower().throwSetupSelectAfterUnionException(className, foreignPropertyName);
-    }
-
-    // ===================================================================================
-    //                                                                    Exception Helper
-    //                                                                    ================
-    protected ConditionBeanExceptionThrower createCBExThrower() {
-        return new ConditionBeanExceptionThrower();
     }
 
     // ===================================================================================

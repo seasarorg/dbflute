@@ -29,7 +29,7 @@ import org.seasar.dbflute.util.Srl;
  * @since 0.9.7.2 (2010/06/18 Friday)
  * @param <CB> The type of condition-bean for specification.
  */
-public class VaryingOption<CB extends ConditionBean> {
+public class UpdateOption<CB extends ConditionBean> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -41,13 +41,17 @@ public class VaryingOption<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public VaryingOption() {
+    public UpdateOption() {
     }
 
     // ===================================================================================
     //                                                                    Self Calculation
     //                                                                    ================
     public SelfSpecification<CB> self(SpecifyQuery<CB> specifyQuery) {
+        if (specifyQuery == null) {
+            String msg = "The argument 'specifyQuery' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         final SelfSpecification<CB> specification = new SelfSpecification<CB>();
         specification.setSpecifyQuery(specifyQuery);
         _selfSpecificationList.add(specification);
@@ -61,9 +65,13 @@ public class VaryingOption<CB extends ConditionBean> {
         for (SelfSpecification<CB> specification : _selfSpecificationList) {
             final SpecifyQuery<CB> specifyQuery = specification.getSpecifyQuery();
             specifyQuery.specify(cb);
-            final String columnName = cb.getSqlClause().getSpecifiedColumnNameAsOne();
+            final String columnName = getSpecifiedColumnNameAsOne(cb);
             _selfSpecificationMap.put(Srl.substringLastRear(columnName, "."), specification);
         }
+    }
+
+    protected String getSpecifiedColumnNameAsOne(CB cb) {
+        return cb.getSqlClause().getSpecifiedColumnNameAsOne();
     }
 
     // ===================================================================================
@@ -81,7 +89,8 @@ public class VaryingOption<CB extends ConditionBean> {
     protected String doBuildSelfStatement(String columnName, SelfSpecification<CB> specification) {
         final List<SelfCalculation> calculationList = specification.getCalculationList();
         if (calculationList.isEmpty()) {
-            return null; // should be exception?
+            String msg = "Not found calculation of the columnName: " + columnName;
+            throw new IllegalStateException(msg);
         }
         final StringBuilder sb = new StringBuilder();
         sb.append(columnName);
@@ -91,6 +100,7 @@ public class VaryingOption<CB extends ConditionBean> {
                 sb.insert(0, "(").append(")");
             }
             sb.append(" ").append(calculation.getCalculationType().operand());
+            sb.append(" ").append(calculation.getCalculationValue());
             ++index;
         }
         return sb.toString();
@@ -101,12 +111,24 @@ public class VaryingOption<CB extends ConditionBean> {
     //                                                                       =============
     public static class SelfSpecification<CB extends ConditionBean> {
         protected SpecifyQuery<CB> _specifyQuery;
-        protected List<SelfCalculation> _calculationList = DfCollectionUtil.newArrayList();
+        protected final List<SelfCalculation> _calculationList = DfCollectionUtil.newArrayList();
 
         public SelfSpecification<CB> plus(Integer plusValue) {
+            return register(CalculationType.PLUS, plusValue);
+        }
+
+        public SelfSpecification<CB> minus(Integer minusValue) {
+            return register(CalculationType.MINUS, minusValue);
+        }
+
+        public SelfSpecification<CB> multiply(Integer multiplyValue) {
+            return register(CalculationType.MULTIPLY, multiplyValue);
+        }
+
+        protected SelfSpecification<CB> register(CalculationType type, Integer value) {
             final SelfCalculation calculation = new SelfCalculation();
-            calculation.setCalculationType(CalculationType.PLUS);
-            calculation.setCalculationValue(plusValue);
+            calculation.setCalculationType(type);
+            calculation.setCalculationValue(value);
             _calculationList.add(calculation);
             return this;
         }
@@ -121,10 +143,6 @@ public class VaryingOption<CB extends ConditionBean> {
 
         public List<SelfCalculation> getCalculationList() {
             return _calculationList;
-        }
-
-        public void setCalculationList(List<SelfCalculation> calculationList) {
-            this._calculationList = calculationList;
         }
     }
 

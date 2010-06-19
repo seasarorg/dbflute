@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the foreign specification of derived referrer is invalid.
+ * The exception of when the purpose of condition-bean is illegal for order-by.
  * @author jflute
  */
-public class DerivedReferrerInvalidForeignSpecificationException extends RuntimeException {
+public class OrderByIllegalPurposeException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class DerivedReferrerInvalidForeignSpecificationException extends Runtime
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public DerivedReferrerInvalidForeignSpecificationException(String msg) {
+    public OrderByIllegalPurposeException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class DerivedReferrerInvalidForeignSpecificationException extends Runtime
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public DerivedReferrerInvalidForeignSpecificationException(String msg, Throwable cause) {
+    public OrderByIllegalPurposeException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

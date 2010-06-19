@@ -1303,11 +1303,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void regOBA(String columnName) {
+        assertOrderByPurpose(columnName);
         registerOrderBy(columnName, true);
     }
 
     protected void regOBD(String columnName) {
+        assertOrderByPurpose(columnName);
         registerOrderBy(columnName, false);
+    }
+
+    protected void assertOrderByPurpose(String columnName) {
+        if (getSqlClause().getPurpose().isNoOrderBy()) {
+            throwOrderByIllegalPurposeException(columnName);
+        }
+    }
+
+    protected void throwOrderByIllegalPurposeException(String columnName) {
+        createCBExThrower().throwOrderByIllegalPurposeException(getSqlClause().getPurpose(), getTableDbName(),
+                columnName);
     }
 
     // ===================================================================================
