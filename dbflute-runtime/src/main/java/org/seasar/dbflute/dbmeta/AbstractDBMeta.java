@@ -724,22 +724,16 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly) {
         final Map<String, Object> valueMap = newLinkedHashMap();
-        try {
-            final List<ColumnInfo> columnInfoList;
-            if (pkOnly) {
-                columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
-            } else {
-                columnInfoList = getColumnInfoList();
-            }
-            for (ColumnInfo columnInfo : columnInfoList) {
-                final String columnName = columnInfo.getColumnDbName();
-                final Object value = columnInfo.read(entity);
-                valueMap.put(columnName, value);
-            }
-        } catch (RuntimeException e) {
-            String msg = "Failed to convert to column value map:";
-            msg = msg + " entity=" + entity;
-            throw new IllegalStateException(msg, e);
+        final List<ColumnInfo> columnInfoList;
+        if (pkOnly) {
+            columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+        } else {
+            columnInfoList = getColumnInfoList();
+        }
+        for (ColumnInfo columnInfo : columnInfoList) {
+            final String columnName = columnInfo.getColumnDbName();
+            final Object value = columnInfo.read(entity);
+            valueMap.put(columnName, value);
         }
         return valueMap;
     }
@@ -751,7 +745,7 @@ public abstract class AbstractDBMeta implements DBMeta {
      * This class is for internal. Don't use this!
      */
     protected static class MapStringValueAnalyzer {
-        protected Map<String, ? extends Object> _valueMap;
+        protected final Map<String, ? extends Object> _valueMap;
         protected String _columnName;
         protected String _uncapPropName;
         protected String _propertyName;
@@ -1019,7 +1013,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key, VALUE value) {
-        ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
+        final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
         map.put(key, value);
         return map;
     }
@@ -1029,7 +1023,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
-        LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
+        final LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
         map.put(key, value);
         return map;
     }
@@ -1039,7 +1033,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT element) {
-        ArrayList<ELEMENT> arrayList = new ArrayList<ELEMENT>();
+        final ArrayList<ELEMENT> arrayList = new ArrayList<ELEMENT>();
         arrayList.add(element);
         return arrayList;
     }
