@@ -1982,21 +1982,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
-        if (!sql.contains(getSubQueryBeginMarkPrefix())) {
+        final String beginMarkPrefix = getSubQueryBeginMarkPrefix();
+        if (!sql.contains(beginMarkPrefix)) {
             return sql;
         }
         final String[] lines = sql.split(ln());
-        final String beginMarkPrefix = getSubQueryBeginMarkPrefix();
         final String endMarkPrefix = getSubQueryEndMarkPrefix();
         final String identityTerminal = getSubQueryIdentityTerminal();
         final int terminalLength = identityTerminal.length();
-        StringBuilder mainSb = new StringBuilder();
+        final StringBuilder mainSb = new StringBuilder();
         StringBuilder subSb = null;
         boolean throughBegin = false;
         boolean throughBeginFirst = false;
         String subQueryIdentity = null;
         String indent = null;
-        for (String line : lines) {
+        for (final String line : lines) {
             if (!throughBegin) {
                 if (line.contains(beginMarkPrefix)) {
                     throughBegin = true;
