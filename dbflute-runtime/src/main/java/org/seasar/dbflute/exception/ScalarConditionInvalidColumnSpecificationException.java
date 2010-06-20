@@ -19,7 +19,7 @@ package org.seasar.dbflute.exception;
  * The exception of when the column specification of scalar sub-query is invalid.
  * @author jflute
  */
-public class ScalarSubQueryInvalidColumnSpecificationException extends RuntimeException {
+public class ScalarConditionInvalidColumnSpecificationException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class ScalarSubQueryInvalidColumnSpecificationException extends RuntimeEx
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public ScalarSubQueryInvalidColumnSpecificationException(String msg) {
+    public ScalarConditionInvalidColumnSpecificationException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class ScalarSubQueryInvalidColumnSpecificationException extends RuntimeEx
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public ScalarSubQueryInvalidColumnSpecificationException(String msg, Throwable cause) {
+    public ScalarConditionInvalidColumnSpecificationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

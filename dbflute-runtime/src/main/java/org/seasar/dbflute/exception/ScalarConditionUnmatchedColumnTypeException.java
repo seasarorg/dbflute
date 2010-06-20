@@ -19,7 +19,7 @@ package org.seasar.dbflute.exception;
  * The exception of when the column type of scalar sub-query is unmatched with the target column.
  * @author jflute
  */
-public class ScalarSubQueryUnmatchedColumnTypeException extends RuntimeException {
+public class ScalarConditionUnmatchedColumnTypeException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class ScalarSubQueryUnmatchedColumnTypeException extends RuntimeException
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public ScalarSubQueryUnmatchedColumnTypeException(String msg) {
+    public ScalarConditionUnmatchedColumnTypeException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class ScalarSubQueryUnmatchedColumnTypeException extends RuntimeException
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public ScalarSubQueryUnmatchedColumnTypeException(String msg, Throwable cause) {
+    public ScalarConditionUnmatchedColumnTypeException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

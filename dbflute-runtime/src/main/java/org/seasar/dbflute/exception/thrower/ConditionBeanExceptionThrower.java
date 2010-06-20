@@ -29,11 +29,11 @@ import org.seasar.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificati
 import org.seasar.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.QueryIllegalPurposeException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
+import org.seasar.dbflute.exception.ScalarConditionInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.ScalarConditionInvalidForeignSpecificationException;
+import org.seasar.dbflute.exception.ScalarConditionUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidForeignSpecificationException;
-import org.seasar.dbflute.exception.ScalarSubQueryInvalidColumnSpecificationException;
-import org.seasar.dbflute.exception.ScalarSubQueryInvalidForeignSpecificationException;
-import org.seasar.dbflute.exception.ScalarSubQueryUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.SetupSelectAfterUnionException;
 import org.seasar.dbflute.exception.SetupSelectIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifiedDerivedOrderByAliasNameNotFoundException;
@@ -689,7 +689,7 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                    Scalar Condition
     //                                                                    ================
-    public void throwScalarSubQueryInvalidForeignSpecificationException(String relationName) {
+    public void throwScalarConditionInvalidForeignSpecificationException(String relationName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "You specified a foreign table column in spite of scalar-condition!" + ln();
@@ -719,10 +719,10 @@ public class ConditionBeanExceptionThrower {
         msg = msg + ln();
         msg = msg + "[Specified Relation]" + ln() + relationName + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new ScalarSubQueryInvalidForeignSpecificationException(msg);
+        throw new ScalarConditionInvalidForeignSpecificationException(msg);
     }
 
-    public void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
+    public void throwScalarConditionInvalidColumnSpecificationException(String function) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The specified the column for scalar-condition was INVALID!" + ln();
@@ -764,10 +764,10 @@ public class ConditionBeanExceptionThrower {
         msg = msg + ln();
         msg = msg + "[Function Method]" + ln() + xconvertFunctionToMethod(function) + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new ScalarSubQueryInvalidColumnSpecificationException(msg);
+        throw new ScalarConditionInvalidColumnSpecificationException(msg);
     }
 
-    public void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName,
+    public void throwScalarConditionUnmatchedColumnTypeException(String function, String deriveColumnName,
             Class<?> deriveColumnType) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -784,7 +784,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + ln();
         msg = msg + "[Derive Column]" + ln() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new ScalarSubQueryUnmatchedColumnTypeException(msg);
+        throw new ScalarConditionUnmatchedColumnTypeException(msg);
     }
 
     // ===================================================================================

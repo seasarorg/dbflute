@@ -11,7 +11,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
  * @author jflute
  * @since 0.9.7.2 (2010/06/20 Sunday)
  */
-public class QueryDerivedSubQuery extends DerivedSubQuery {
+public class QueryDerivedReferrer extends DerivedReferrer {
 
     protected final String _operand;
     protected final Object _value;
@@ -20,7 +20,7 @@ public class QueryDerivedSubQuery extends DerivedSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public QueryDerivedSubQuery(SqlClause sqlClause, SubQueryPath subQueryPath,
+    public QueryDerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
             int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
             DBMeta subQueryDBMeta, String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
@@ -35,7 +35,7 @@ public class QueryDerivedSubQuery extends DerivedSubQuery {
     //                                                                        Build Clause
     //                                                                        ============
     @Override
-    protected String doBuildDerivedSubQuery(String function, ColumnRealName columnRealName,
+    protected String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent) {
         final String parameter = "/*pmb." + _parameterPath + "*/null";

@@ -33,11 +33,11 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
-import org.seasar.dbflute.cbean.sqlclause.subquery.ExistsSubQuery;
-import org.seasar.dbflute.cbean.sqlclause.subquery.InScopeSubQuery;
-import org.seasar.dbflute.cbean.sqlclause.subquery.QueryDerivedSubQuery;
-import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarSubQuery;
-import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedSubQuery;
+import org.seasar.dbflute.cbean.sqlclause.subquery.ExistsReferrer;
+import org.seasar.dbflute.cbean.sqlclause.subquery.InScopeRelation;
+import org.seasar.dbflute.cbean.sqlclause.subquery.QueryDerivedReferrer;
+import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarCondition;
+import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryLevelReflector;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -700,15 +700,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
-        final ExistsSubQuery existsSubQuery = new ExistsSubQuery(sqlClause, subQueryPath, localRealNameProvider,
+        final ExistsReferrer existsReferrer = new ExistsReferrer(sqlClause, subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector, subQueryIdentity, subQueryDBMeta);
-        final String clause = existsSubQuery.buildExistsSubQuery(columnDbName, relatedColumnDbName, existsOption);
+        final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, existsOption);
         registerWhereClause(clause);
     }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    // *Unsupported ExistsSubQuery as in-line because it's so dangerous.
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     // -----------------------------------------------------
     //                                       InScopeRelation
@@ -741,10 +737,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final boolean suppressLocalAliasName = isInScopeRelationSuppressLocalAliasName();
-        final InScopeSubQuery inScopeSubQuery = new InScopeSubQuery(sqlClause, subQueryPath, localRealNameProvider,
+        final InScopeRelation inScopeRelation = new InScopeRelation(sqlClause, subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector, subQueryIdentity, subQueryDBMeta,
                 suppressLocalAliasName);
-        final String clause = inScopeSubQuery.buildInScopeSubQuery(columnDbName, relatedColumnDbName, inScopeOption);
+        final String clause = inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName, inScopeOption);
         registerWhereClause(clause);
     }
 
@@ -775,10 +771,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-        final SpecifyDerivedSubQuery derivedSubQuery = new SpecifyDerivedSubQuery(sqlClause, subQueryPath,
+        final SpecifyDerivedReferrer derivedReferrer = new SpecifyDerivedReferrer(sqlClause, subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
-        final String clause = derivedSubQuery.buildDerivedSubQuery(function, columnDbName, relatedColumnDbName);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName);
         getSqlClause().specifyDerivingSubQuery(aliasName, clause);
     }
 
@@ -805,10 +801,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final String parameterPath = getLocation(parameterPropertyName);
-        final QueryDerivedSubQuery derivedSubQuery = new QueryDerivedSubQuery(sqlClause, subQueryPath,
+        final QueryDerivedReferrer derivedReferrer = new QueryDerivedReferrer(sqlClause, subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
-        final String clause = derivedSubQuery.buildDerivedSubQuery(function, columnDbName, relatedColumnDbName);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName);
         registerWhereClause(clause);
     }
 
@@ -833,10 +829,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-        final ScalarSubQuery scalarSubQuery = new ScalarSubQuery(sqlClause, subQueryPath, localRealNameProvider,
+        final ScalarCondition scalarCondition = new ScalarCondition(sqlClause, subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector, subQueryIdentity, subQueryDBMeta,
                 mainSubQueryIdentity, operand);
-        final String clause = scalarSubQuery.buildScalarSubQuery(function);
+        final String clause = scalarCondition.buildScalarCondition(function);
         registerWhereClause(clause);
     }
 

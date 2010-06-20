@@ -89,7 +89,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             throwScalarSelectInvalidForeignSpecificationException(relationName);
         }
         if (_purpose.isAny(HpCBPurpose.SCALAR_CONDITION)) {
-            throwScalarSubQueryInvalidForeignSpecificationException(relationName);
+            throwScalarConditionInvalidForeignSpecificationException(relationName);
         }
     }
 
@@ -118,8 +118,8 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         createCBExThrower().throwScalarSelectInvalidForeignSpecificationException(relationName);
     }
 
-    protected void throwScalarSubQueryInvalidForeignSpecificationException(String relationName) {
-        createCBExThrower().throwScalarSubQueryInvalidForeignSpecificationException(relationName);
+    protected void throwScalarConditionInvalidForeignSpecificationException(String relationName) {
+        createCBExThrower().throwScalarConditionInvalidForeignSpecificationException(relationName);
     }
 
     protected void throwSpecifyDerivedReferrerIllegalPurposeException(String referrerName) {

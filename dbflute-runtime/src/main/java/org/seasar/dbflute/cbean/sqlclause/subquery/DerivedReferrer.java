@@ -12,7 +12,7 @@ import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
  * @author jflute
  * @since 0.9.7.2 (2010/06/20 Sunday)
  */
-public abstract class DerivedSubQuery extends AbstractSubQuery {
+public abstract class DerivedReferrer extends AbstractSubQuery {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -22,7 +22,7 @@ public abstract class DerivedSubQuery extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DerivedSubQuery(SqlClause sqlClause, SubQueryPath subQueryPath,
+    public DerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
             int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
             DBMeta subQueryDBMeta, String mainSubQueryIdentity) {
@@ -34,23 +34,24 @@ public abstract class DerivedSubQuery extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildDerivedSubQuery(String function, String columnDbName, String relatedColumnDbName) {
+    public String buildDerivedReferrer(String function, String columnDbName, String relatedColumnDbName) {
         reflectLocalSubQueryLevel();
         final ColumnRealName columnRealName = _localRealNameProvider.provide(columnDbName);
         final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
-        final String subQueryClause = getSubQuerySql(function, columnRealName, relatedColumnSqlName);
+        final String subQueryClause = getSubQueryClause(function, columnRealName, relatedColumnSqlName);
         final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
-        return doBuildDerivedSubQuery(function, columnRealName, relatedColumnSqlName, subQueryClause, beginMark,
+        return doBuildDerivedReferrer(function, columnRealName, relatedColumnSqlName, subQueryClause, beginMark,
                 endMark, endIndent);
     }
 
-    protected abstract String doBuildDerivedSubQuery(String function, ColumnRealName columnRealName,
+    protected abstract String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent);
 
-    protected String getSubQuerySql(String function, ColumnRealName columnRealName, ColumnSqlName relatedColumnSqlName) {
+    protected String getSubQueryClause(String function, ColumnRealName columnRealName,
+            ColumnSqlName relatedColumnSqlName) {
         if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
@@ -78,7 +79,7 @@ public abstract class DerivedSubQuery extends AbstractSubQuery {
         }
         _subQueryClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         if (_subQueryClause.hasUnionQuery()) {
-            return getUnionSubQuerySql(function, columnRealName, relatedColumnSqlName, tableAliasName,
+            return getUnionSubQueryClause(function, columnRealName, relatedColumnSqlName, tableAliasName,
                     derivedColumnRealName, derivedColumnSqlName);
         } else {
             final String connect = buildFunctionConnector(function);
@@ -89,7 +90,7 @@ public abstract class DerivedSubQuery extends AbstractSubQuery {
         }
     }
 
-    protected String getUnionSubQuerySql(String function, ColumnRealName columnRealName,
+    protected String getUnionSubQueryClause(String function, ColumnRealName columnRealName,
             ColumnSqlName relatedColumnSqlName, String tableAliasName, ColumnRealName derivedColumnRealName,
             ColumnSqlName derivedColumnSqlName) {
         final String connect = buildFunctionConnector(function);

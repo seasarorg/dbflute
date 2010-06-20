@@ -14,12 +14,12 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.7.2 (2010/06/20 Sunday)
  */
-public class ExistsSubQuery extends AbstractSubQuery {
+public class ExistsReferrer extends AbstractSubQuery {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ExistsSubQuery(SqlClause sqlClause, SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+    public ExistsReferrer(SqlClause sqlClause, SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause,
             SubQueryLevelReflector reflector, String subQueryIdentity, DBMeta subQueryDBMeta) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
@@ -29,7 +29,7 @@ public class ExistsSubQuery extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildExistsSubQuery(String columnDbName, String relatedColumnDbName, String existsOption) {
+    public String buildExistsReferrer(String columnDbName, String relatedColumnDbName, String existsOption) {
         existsOption = existsOption != null ? existsOption + " " : "";
         reflectLocalSubQueryLevel();
 

@@ -19,7 +19,7 @@ package org.seasar.dbflute.exception;
  * The exception of when the foreign specification of scalar sub-query is invalid.
  * @author jflute
  */
-public class ScalarSubQueryInvalidForeignSpecificationException extends RuntimeException {
+public class ScalarConditionInvalidForeignSpecificationException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class ScalarSubQueryInvalidForeignSpecificationException extends RuntimeE
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public ScalarSubQueryInvalidForeignSpecificationException(String msg) {
+    public ScalarConditionInvalidForeignSpecificationException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class ScalarSubQueryInvalidForeignSpecificationException extends RuntimeE
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public ScalarSubQueryInvalidForeignSpecificationException(String msg, Throwable cause) {
+    public ScalarConditionInvalidForeignSpecificationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

@@ -11,6 +11,9 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
  */
 public class LeftOuterJoinInfo {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _aliasName;
     protected String _baseTableDbName;
     protected String _joinTableDbName;
@@ -20,6 +23,9 @@ public class LeftOuterJoinInfo {
     protected String _fixedCondition;
     protected boolean _innerJoin;
 
+    // ===================================================================================
+    //                                                                        Judge Status
+    //                                                                        ============
     public boolean hasInlineOrOnClause() {
         return !_inlineWhereClauseList.isEmpty() || !_additionalOnClauseList.isEmpty();
     }
@@ -28,6 +34,9 @@ public class LeftOuterJoinInfo {
         return _fixedCondition != null && _fixedCondition.trim().length() > 0;
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getAliasName() {
         return _aliasName;
     }

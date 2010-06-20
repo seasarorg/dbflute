@@ -12,7 +12,7 @@ import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
  * @author jflute
  * @since 0.9.7.2 (2010/06/20 Sunday)
  */
-public class ScalarSubQuery extends AbstractSubQuery {
+public class ScalarCondition extends AbstractSubQuery {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -24,7 +24,7 @@ public class ScalarSubQuery extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ScalarSubQuery(SqlClause sqlClause, SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+    public ScalarCondition(SqlClause sqlClause, SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause,
             SubQueryLevelReflector reflector, String subQueryIdentity, DBMeta subQueryDBMeta,
             String mainSubQueryIdentity, String operand) {
@@ -37,7 +37,7 @@ public class ScalarSubQuery extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildScalarSubQuery(String function) {
+    public String buildScalarCondition(String function) {
         reflectLocalSubQueryLevel();
 
         // Get the specified column before it disappears at sub-query making.
@@ -45,19 +45,19 @@ public class ScalarSubQuery extends AbstractSubQuery {
         {
             final String columnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
             if (columnDbName == null || columnDbName.trim().length() == 0) {
-                throwScalarSubQueryInvalidColumnSpecificationException(function);
+                throwScalarConditionInvalidColumnSpecificationException(function);
             }
             columnRealName = _localRealNameProvider.provide(columnDbName);
         }
 
-        final String subQueryClause = getSubQuerySql(function);
+        final String subQueryClause = getSubQueryClause(function);
         final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
         return columnRealName + " " + _operand + " (" + beginMark + subQueryClause + ln() + endIndent + ") " + endMark;
     }
 
-    protected String getSubQuerySql(String function) {
+    protected String getSubQueryClause(String function) {
         if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The scalar-condition is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
@@ -66,11 +66,11 @@ public class ScalarSubQuery extends AbstractSubQuery {
         final String tableAliasName = "dfsublocal_" + _subQueryLevel;
         final String derivedColumnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
         if (derivedColumnDbName == null) {
-            throwScalarSubQueryInvalidColumnSpecificationException(function);
+            throwScalarConditionInvalidColumnSpecificationException(function);
         }
         final ColumnSqlName derivedColumnSqlName = _subQueryClause.getSpecifiedColumnSqlNameAsOne();
         final ColumnRealName derivedColumnRealName = new ColumnRealName(tableAliasName, derivedColumnSqlName);
-        assertScalarSubQueryColumnType(function, derivedColumnDbName);
+        assertScalarConditionColumnType(function, derivedColumnDbName);
         _subQueryClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         if (_subQueryClause.hasUnionQuery()) {
             return getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName);
@@ -98,22 +98,22 @@ public class ScalarSubQuery extends AbstractSubQuery {
                 + ln() + "       ) dfsubquerymain" + endMark;
     }
 
-    protected void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
-        createCBExThrower().throwScalarSubQueryInvalidColumnSpecificationException(function);
+    protected void throwScalarConditionInvalidColumnSpecificationException(String function) {
+        createCBExThrower().throwScalarConditionInvalidColumnSpecificationException(function);
     }
 
-    protected void assertScalarSubQueryColumnType(String function, String derivedColumnDbName) {
+    protected void assertScalarConditionColumnType(String function, String derivedColumnDbName) {
         final Class<?> deriveColumnType = _subQueryDBMeta.findColumnInfo(derivedColumnDbName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(deriveColumnType)) {
-                throwScalarSubQueryUnmatchedColumnTypeException(function, derivedColumnDbName, deriveColumnType);
+                throwScalarConditionUnmatchedColumnTypeException(function, derivedColumnDbName, deriveColumnType);
             }
         }
     }
 
-    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+    protected void throwScalarConditionUnmatchedColumnTypeException(String function, String derivedColumnDbName,
             Class<?> derivedColumnType) {
-        createCBExThrower().throwScalarSubQueryUnmatchedColumnTypeException(function, derivedColumnDbName,
+        createCBExThrower().throwScalarConditionUnmatchedColumnTypeException(function, derivedColumnDbName,
                 derivedColumnType);
     }
 }

@@ -11,7 +11,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
  * @author jflute
  * @since 0.9.7.2 (2010/06/20 Sunday)
  */
-public class InScopeSubQuery extends AbstractSubQuery {
+public class InScopeRelation extends AbstractSubQuery {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -21,7 +21,7 @@ public class InScopeSubQuery extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InScopeSubQuery(SqlClause sqlClause, SubQueryPath subQueryPath,
+    public InScopeRelation(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
             int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
             DBMeta subQueryDBMeta, boolean suppressLocalAliasName) {
@@ -33,11 +33,11 @@ public class InScopeSubQuery extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildInScopeSubQuery(String columnDbName, String relatedColumnDbName, String inScopeOption) {
+    public String buildInScopeRelation(String columnDbName, String relatedColumnDbName, String inScopeOption) {
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         reflectLocalSubQueryLevel();
         final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
-        final String subQueryClause = getSubQuerySql(relatedColumnSqlName);
+        final String subQueryClause = getSubQueryClause(relatedColumnSqlName);
         final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
@@ -54,7 +54,7 @@ public class InScopeSubQuery extends AbstractSubQuery {
                 + endMark;
     }
 
-    protected String getSubQuerySql(ColumnSqlName relatedColumnSqlName) {
+    protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName) {
         final String tableAliasName = _sqlClause.getLocalTableAliasName();
         final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
         final String selectClause = "select " + relatedColumnRealName;
