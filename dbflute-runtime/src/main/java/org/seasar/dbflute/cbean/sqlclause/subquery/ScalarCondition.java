@@ -24,10 +24,10 @@ public class ScalarCondition extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ScalarCondition(SqlClause sqlClause, SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause,
-            SubQueryLevelReflector reflector, String subQueryIdentity, DBMeta subQueryDBMeta,
-            String mainSubQueryIdentity, String operand) {
+    public ScalarCondition(SqlClause sqlClause, SubQueryPath subQueryPath,
+            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
+            int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
+            DBMeta subQueryDBMeta, String mainSubQueryIdentity, String operand) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
                 reflector, subQueryIdentity, subQueryDBMeta);
         _mainSubQueryIdentity = mainSubQueryIdentity;
