@@ -21,6 +21,8 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.UpdateOption;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -42,25 +44,31 @@ public class TnUpdateModifiedOnlyCommand extends TnUpdateAutoDynamicCommand {
     //                                                                 No.1 Point Override
     //                                                                 ===================
     @Override
-    protected TnPropertyType[] createUpdatePropertyTypes(final TnBeanMetaData bmd, final Object bean,
-            final String[] propertyNames) {
+    protected TnPropertyType[] createUpdatePropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames,
+            UpdateOption<ConditionBean> option) {
         final Set<?> modifiedPropertyNames = getBeanMetaData().getModifiedPropertyNames(bean);
         final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
-        final String timestampPropertyName = bmd.getTimestampPropertyName();
-        final String versionNoPropertyName = bmd.getVersionNoPropertyName();
+        final String timestampProp = bmd.getTimestampPropertyName();
+        final String versionNoProp = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyNames.length; ++i) {
             final TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
                 continue;
             }
+            if (option != null && option.hasStatement(pt.getColumnDbName())) {
+                continue;
+            }
             final String propertyName = pt.getPropertyName();
-            if (propertyName.equalsIgnoreCase(timestampPropertyName)
-                    || propertyName.equalsIgnoreCase(versionNoPropertyName)
+            if (isOptimisticLockProperty(timestampProp, versionNoProp, propertyName)
                     || modifiedPropertyNames.contains(propertyName)) {
                 types.add(pt);
             }
         }
         final TnPropertyType[] propertyTypes = types.toArray(new TnPropertyType[types.size()]);
         return propertyTypes;
+    }
+
+    protected boolean isOptimisticLockProperty(String timestampProp, String versionNoProp, String propertyName) {
+        return propertyName.equalsIgnoreCase(timestampProp) || propertyName.equalsIgnoreCase(versionNoProp);
     }
 }

@@ -18,6 +18,8 @@ package org.seasar.dbflute.cbean;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 
 /**
@@ -42,11 +44,18 @@ public interface ConditionQuery {
     String getRealAliasName();
 
     /**
-     * Get real column name (with real alias name).
-     * @param columnName Column name without alias name. (NotNull)
-     * @return Real column name. (NotNull)
+     * Convert to the column real name. (with real alias name)
+     * @param columnDbName The DB name of column. (NotNull)
+     * @return the column real name. (NotNull)
      */
-    String getRealColumnName(String columnName);
+    ColumnRealName toColumnRealName(String columnDbName);
+
+    /**
+     * Convert to the column SQL name.
+     * @param columnDbName The DB name of column. (NotNull)
+     * @return the column SQL name. (NotNull)
+     */
+    ColumnSqlName toColumnSqlName(String columnDbName);
 
     /**
      * Get the referrer query.

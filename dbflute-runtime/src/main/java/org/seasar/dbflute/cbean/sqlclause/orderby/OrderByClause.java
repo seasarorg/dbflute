@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.sqlclause;
+package org.seasar.dbflute.cbean.sqlclause.orderby;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class OrderByClause implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<OrderByElement> _orderByList = new ArrayList<OrderByElement>();
+    protected final List<OrderByElement> _orderByList = new ArrayList<OrderByElement>(3);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -233,42 +233,6 @@ public class OrderByClause implements Serializable {
         }
         OrderByElement element = (OrderByElement) _orderByList.get(0);
         String actualColumnName = element.getColumnName();
-        if (actualColumnName != null && expectedColumnName != null) {
-            return actualColumnName.equalsIgnoreCase(expectedColumnName);
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param expectedAliasName Expected alias-name. (Nullable)
-     * @return Determination.
-     */
-    public boolean isSameAsFirstElementRegisteredAliasName(String expectedAliasName) {
-        if (isEmpty()) {
-            String msg = "This order-by clause is empty: " + toString();
-            throw new RuntimeException(msg);
-        }
-        OrderByElement element = (OrderByElement) _orderByList.get(0);
-        String actualAliasName = element.getRegisteredAliasName();
-        if (actualAliasName != null && expectedAliasName != null) {
-            return actualAliasName.equalsIgnoreCase(expectedAliasName);
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param expectedColumnName Expected column-name. (Nullable)
-     * @return Determination.
-     */
-    public boolean isSameAsFirstElementRegisteredColumnName(String expectedColumnName) {
-        if (isEmpty()) {
-            String msg = "This order-by clause is empty: " + toString();
-            throw new RuntimeException(msg);
-        }
-        OrderByElement element = (OrderByElement) _orderByList.get(0);
-        String actualColumnName = element.getRegisteredColumnName();
         if (actualColumnName != null && expectedColumnName != null) {
             return actualColumnName.equalsIgnoreCase(expectedColumnName);
         } else {

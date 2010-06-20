@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.PluginValueTypeNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
@@ -54,7 +55,7 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     protected TnPropertyType createPropertyType(DfPropertyDesc propertyDesc) {
         final ValueType valueType = getValueType(propertyDesc);
         final String columnDbName = getColumnDbName(propertyDesc);
-        final String columnSqlName = getColumnSqlName(columnDbName);
+        final ColumnSqlName columnSqlName = getColumnSqlName(columnDbName);
         return new TnPropertyTypeImpl(propertyDesc, valueType, columnDbName, columnSqlName);
     }
 
@@ -74,7 +75,7 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
         return name != null ? name : propertyName;
     }
 
-    protected abstract String getColumnSqlName(String columnDbName);
+    protected abstract ColumnSqlName getColumnSqlName(String columnDbName);
 
     protected ValueType findValueTypeByName(String propertyName, Class<?> propertyType, String keyName) {
         final ValueType valueType = TnValueTypes.getPluginValueType(keyName);

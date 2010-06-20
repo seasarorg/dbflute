@@ -59,7 +59,7 @@ public class DisplaySqlBuilder {
         if (args == null || args.length == 0) {
             return sql;
         }
-        StringBuilder buf = new StringBuilder(sql.length() + args.length * 15);
+        StringBuilder sb = new StringBuilder(sql.length() + args.length * 15);
         int pos = 0;
         int pos2 = 0;
         int pos3 = 0;
@@ -75,10 +75,10 @@ public class DisplaySqlBuilder {
             pos6 = sql.indexOf("*/", pos5 + 1);
             if (pos > 0) {
                 if (pos3 >= 0 && pos3 < pos && pos < pos4) {
-                    buf.append(sql.substring(pos2, pos4 + 1));
+                    sb.append(sql.substring(pos2, pos4 + 1));
                     pos2 = pos4 + 1;
                 } else if (pos5 >= 0 && pos5 < pos && pos < pos6) {
-                    buf.append(sql.substring(pos2, pos6 + 1));
+                    sb.append(sql.substring(pos2, pos6 + 1));
                     pos2 = pos6 + 1;
                 } else {
                     if (args.length <= index) {
@@ -86,17 +86,17 @@ public class DisplaySqlBuilder {
                         msg = msg + " size=" + args.length + " sql=" + sql;
                         throw new IllegalStateException(msg);
                     }
-                    buf.append(sql.substring(pos2, pos));
-                    buf.append(getBindVariableText(args[index], valueTypes[index], logDateFormat, logTimestampFormat));
+                    sb.append(sql.substring(pos2, pos));
+                    sb.append(getBindVariableText(args[index], valueTypes[index], logDateFormat, logTimestampFormat));
                     pos2 = pos + 1;
                     index++;
                 }
             } else {
-                buf.append(sql.substring(pos2));
+                sb.append(sql.substring(pos2));
                 break;
             }
         }
-        return buf.toString();
+        return sb.toString();
     }
 
     // ===================================================================================

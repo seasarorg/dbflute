@@ -17,7 +17,9 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 import java.util.List;
 
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier;
 
 /**
@@ -169,29 +171,29 @@ public class SqlClauseMySql extends AbstractSqlClause {
             throw new IllegalArgumentException("The argument 'aliasName' should not be null or trimmed-empty: "
                     + aliasName);
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         int index = 0;
         for (ColumnInfo columnInfo : textColumnList) {
             if (columnInfo == null) {
                 continue;
             }
-            String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
+            final String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
             if (!tableOfColumn.equalsIgnoreCase(tableDbName)) {
                 String msg = "The table of the text column should be '" + tableDbName + "'";
                 msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
                 throw new IllegalArgumentException(msg);
             }
-            Class<?> propertyType = columnInfo.getPropertyType();
+            final Class<?> propertyType = columnInfo.getPropertyType();
             if (!String.class.isAssignableFrom(propertyType)) {
                 String msg = "The text column should be String type:";
                 msg = msg + " type=" + propertyType + " column=" + columnInfo;
                 throw new IllegalArgumentException(msg);
             }
-            String columnDbName = columnInfo.getColumnSqlName();
+            final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
             if (index > 0) {
                 sb.append(",");
             }
-            sb.append(aliasName).append(".").append(columnDbName);
+            sb.append(aliasName).append(".").append(columnSqlName);
             ++index;
         }
         sb.insert(0, "match(").append(") against ('").append(conditionValue).append("'");

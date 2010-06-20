@@ -24,12 +24,13 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
-import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.WhereClauseSimpleFilter;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseSimpleFilter;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -190,21 +191,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                         ===========
     protected <CB extends ConditionBean> void xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
             SpecifyQuery<CB> rightSp, String operand) {
-        // Specify left column
+        // specify left column
         leftSp.specify(leftCB);
-        final String leftColumn = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        final ColumnRealName leftColumn = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
         if (leftColumn == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
-        // Specify right column
+        // specify right column
         rightSp.specify(rightCB);
-        final String rightColumn = rightCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        final ColumnRealName rightColumn = rightCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
         if (rightColumn == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
-
-        // Register where clause
-        String clause = leftColumn + " " + operand + " " + rightColumn;
+        // register where clause
+        final String clause = leftColumn + " " + operand + " " + rightColumn;
         getSqlClause().registerWhereClause(clause);
     }
 

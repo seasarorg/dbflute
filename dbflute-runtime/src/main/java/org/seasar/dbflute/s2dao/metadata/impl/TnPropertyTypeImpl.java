@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -34,7 +35,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     protected final DfPropertyDesc _propertyDesc;
     protected final String _propertyName;
     protected final String _columnDbName;
-    protected final String _columnSqlName;
+    protected final ColumnSqlName _columnSqlName;
     protected final ValueType _valueType;
     protected boolean _primaryKey = false;
     protected boolean _persistent = true;
@@ -44,11 +45,12 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                         ===========
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
         // for non persistent property (for example, relation)
-        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), propertyDesc.getPropertyName());
+        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), new ColumnSqlName(propertyDesc
+                .getPropertyName()));
     }
 
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnDbName,
-            String columnSqlName) {
+            ColumnSqlName columnSqlName) {
         this._propertyDesc = propertyDesc;
         this._propertyName = propertyDesc.getPropertyName();
         this._valueType = valueType;
@@ -84,7 +86,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         return _columnDbName;
     }
 
-    public String getColumnSqlName() {
+    public ColumnSqlName getColumnSqlName() {
         return _columnSqlName;
     }
 

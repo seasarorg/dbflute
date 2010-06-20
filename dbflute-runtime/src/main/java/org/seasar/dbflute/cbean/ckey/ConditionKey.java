@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
  * The abstract class of condition-key.
@@ -105,53 +106,53 @@ public abstract class ConditionKey implements Serializable {
     /**
      * Add where clause.
      * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
      * @return this.
      */
-    public ConditionKey addWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
+    public ConditionKey addWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
         if (value == null) {
-            String msg = "Argument[value] must not be null:";
-            throw new IllegalArgumentException(msg + " value=null this.toString()=" + toString());
+            String msg = "The argument 'value' should not be null.";
+            throw new IllegalArgumentException(msg);
         }
-        doAddWhereClause(conditionList, columnName, value);
+        doAddWhereClause(conditionList, columnRealName.toString(), value);
         return this;
     }
 
     /**
      * Add where clause.
      * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      * @return this.
      */
-    public ConditionKey addWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+    public ConditionKey addWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
             ConditionOption option) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=null this.toString()=" + toString());
         }
-        doAddWhereClause(conditionList, columnName, value, option);
+        doAddWhereClause(conditionList, columnRealName.toString(), value, option);
         return this;
     }
 
     /**
      * Do add where clause.
      * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
+     * @param columnFullName The full name of name. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnFullName, ConditionValue value);
 
     /**
      * Do add where clause.
      * @param conditionList Condition list. (NotNull)
-     * @param columnName Column name. (NotNull)
+     * @param columnFullName The full name of column. (NotNull)
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnFullName, ConditionValue value,
             ConditionOption option);
 
     // ===================================================================================
@@ -214,44 +215,45 @@ public abstract class ConditionKey implements Serializable {
     //                                                                         ===========
     /**
      * Build bind clause.
-     * @param columnName Column name. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @param location Location. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClause(String columnName, String location) {
-        return columnName + " " + getOperand() + " " + buildBindExpression(location, null);
+    protected String buildBindClause(String columnRealName, String location) {
+        return columnRealName + " " + getOperand() + " " + buildBindExpression(location, null);
     }
 
     /**
      * Build bind clause. (basically for like-search)
-     * @param columnName Column name. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @param operand Operand. (NotNull)
      * @param location Location. (NotNull)
      * @param rearOption Rear option. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClauseWithRearOption(String columnName, String operand, String location, String rearOption) {
-        return columnName + " " + operand + " " + buildBindExpression(location, null) + rearOption;
+    protected String buildBindClauseWithRearOption(String columnRealName, String operand, String location,
+            String rearOption) {
+        return columnRealName + " " + operand + " " + buildBindExpression(location, null) + rearOption;
     }
 
     /**
      * Build bind clause.
-     * @param columnName Column name. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @param location Location. (NotNull)
      * @param dummyValue Dummy value. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClause(String columnName, String location, String dummyValue) {
-        return columnName + " " + getOperand() + " " + buildBindExpression(location, dummyValue);
+    protected String buildBindClause(String columnRealName, String location, String dummyValue) {
+        return columnRealName + " " + getOperand() + " " + buildBindExpression(location, dummyValue);
     }
 
     /**
      * Build clause without value.
-     * @param columnName Column name. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @return Clause without value. (NotNull)
      */
-    protected String buildClauseWithoutValue(String columnName) {
-        return columnName + " " + getOperand();
+    protected String buildClauseWithoutValue(String columnRealName) {
+        return columnRealName + " " + getOperand();
     }
 
     protected String buildBindExpression(String location, String dummyValue) {

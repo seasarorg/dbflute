@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
@@ -134,10 +135,10 @@ public class BehaviorExceptionThrower {
 
     protected void setupInvalidQueryElement(ExceptionMessageBuilder br, ConditionBean cb) {
         br.addItem("Invalid Query");
-        final Map<String, ConditionKey> invalidQueryColumnMap = cb.getSqlClause().getInvalidQueryColumnMap();
+        final Map<ColumnRealName, ConditionKey> invalidQueryColumnMap = cb.getSqlClause().getInvalidQueryColumnMap();
         if (invalidQueryColumnMap != null && !invalidQueryColumnMap.isEmpty()) {
-            final Set<Entry<String, ConditionKey>> entrySet = invalidQueryColumnMap.entrySet();
-            for (Entry<String, ConditionKey> entry : entrySet) {
+            final Set<Entry<ColumnRealName, ConditionKey>> entrySet = invalidQueryColumnMap.entrySet();
+            for (Entry<ColumnRealName, ConditionKey> entry : entrySet) {
                 br.addElement(entry.getKey() + " : " + entry.getValue().getConditionKey());
             }
         } else {

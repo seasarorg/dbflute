@@ -17,6 +17,8 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.util.Srl;
 
@@ -56,14 +58,8 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     //                                                                  ==================
     @Override
     public void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<String, String> joinOnMap) {
-        final String fixedConditionKey = getFixedConditionKey();
-        final String fixedCondition = joinOnMap.get(fixedConditionKey);
-        if (fixedCondition != null) {
-            // because fixed condition for join-on is unsupported at MS Access 
-            joinOnMap.remove(fixedConditionKey);
-        }
-        super.registerOuterJoin(baseTableDbName, joinTableDbName, aliasName, joinOnMap);
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition) {
+        super.registerOuterJoin(baseTableDbName, joinTableDbName, aliasName, joinOnMap, null);
         if (fixedCondition != null) {
             final String clause = Srl.replace(fixedCondition, aliasName + ".", "");
             registerOuterJoinInlineWhereClause(aliasName, clause, false);

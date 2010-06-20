@@ -31,8 +31,8 @@ public class TnBasicUpdateHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBasicUpdateHandler(DataSource dataSource, String sql, StatementFactory statementFactory) {
-        super(dataSource, sql, statementFactory);
+    public TnBasicUpdateHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
+        super(dataSource, statementFactory, sql);
     }
 
     // ===================================================================================

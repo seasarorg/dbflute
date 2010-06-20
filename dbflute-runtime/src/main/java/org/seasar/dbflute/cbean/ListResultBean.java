@@ -27,7 +27,7 @@ import org.seasar.dbflute.cbean.grouping.GroupingRowEndDeterminer;
 import org.seasar.dbflute.cbean.grouping.GroupingRowResource;
 import org.seasar.dbflute.cbean.grouping.GroupingRowSetupper;
 import org.seasar.dbflute.cbean.mapping.EntityDtoMapper;
-import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 
 /**
  * The result bean for list.

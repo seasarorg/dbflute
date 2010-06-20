@@ -435,7 +435,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
 
         protected void assertScalarSelectRequiredSpecifyColumn() {
-            final String columnName = _conditionBean.getSqlClause().getSpecifiedColumnNameAsOne();
+            final String columnName = _conditionBean.getSqlClause().getSpecifiedColumnDbNameAsOne();
             if (columnName == null) {
                 throwScalarSelectInvalidColumnSpecificationException();
             }

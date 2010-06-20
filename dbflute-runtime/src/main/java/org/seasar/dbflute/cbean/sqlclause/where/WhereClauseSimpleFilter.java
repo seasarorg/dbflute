@@ -13,13 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.sqlclause;
+package org.seasar.dbflute.cbean.sqlclause.where;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -82,8 +83,8 @@ public interface WhereClauseSimpleFilter {
             return clauseElement;
         }
 
-        protected boolean isTargetClause(String clauseElement, final String columnDbName) {
-            return clauseElement.indexOf("." + columnDbName + " ") >= 0;
+        protected boolean isTargetClause(String clauseElement, final ColumnSqlName columnSqlName) {
+            return clauseElement.indexOf("." + columnSqlName + " ") >= 0;
         }
 
         protected String toEmbedded(String clauseElement) {

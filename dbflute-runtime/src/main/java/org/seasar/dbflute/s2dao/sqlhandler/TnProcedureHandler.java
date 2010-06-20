@@ -46,9 +46,9 @@ public class TnProcedureHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnProcedureHandler(final DataSource dataSource, final String sql, final StatementFactory statementFactory,
-            final TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerProvider resultSetHandlerProvider) {
-        super(dataSource, sql, statementFactory);
+    public TnProcedureHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
+            TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerProvider resultSetHandlerProvider) {
+        super(dataSource, statementFactory, sql);
         this._procedureMetaData = procedureMetaData;
         this._resultSetHandlerProvider = resultSetHandlerProvider;
     }

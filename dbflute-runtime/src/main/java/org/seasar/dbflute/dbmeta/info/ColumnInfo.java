@@ -28,6 +28,7 @@ import java.util.UUID;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -47,7 +48,7 @@ public class ColumnInfo {
     //                                                                           =========
     protected final DBMeta _dbmeta;
     protected final String _columnDbName;
-    protected final String _columnSqlName;
+    protected final ColumnSqlName _columnSqlName;
     protected final String _columnAlias;
     protected final boolean _notNull;
     protected final String _propertyName;
@@ -79,7 +80,7 @@ public class ColumnInfo {
         assertObjectNotNull("propertyType", propertyType);
         this._dbmeta = dbmeta;
         this._columnDbName = columnDbName;
-        this._columnSqlName = columnSqlName;
+        this._columnSqlName = new ColumnSqlName(columnSqlName);
         this._columnAlias = columnAlias;
         this._notNull = notNull;
         this._propertyName = propertyName;
@@ -234,7 +235,7 @@ public class ColumnInfo {
      * Get the SQL name of the column.
      * @return The SQL name of the column. (NotNull)
      */
-    public String getColumnSqlName() {
+    public ColumnSqlName getColumnSqlName() {
         return this._columnSqlName;
     }
 

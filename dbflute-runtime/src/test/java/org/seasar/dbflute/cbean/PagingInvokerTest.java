@@ -18,7 +18,7 @@ public class PagingInvokerTest extends PlainTestCase {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -60,7 +60,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -96,7 +96,7 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -139,7 +139,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -182,7 +182,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -218,7 +218,7 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -261,7 +261,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         pagingBean.fetchPage(2);
         PagingInvoker<String> tgt = createTarget();
@@ -298,7 +298,7 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -341,7 +341,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         pagingBean.fetchPage(3);
         PagingInvoker<String> tgt = createTarget();
@@ -385,7 +385,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true);
         pagingBean.fetchFirst(20);
         pagingBean.fetchPage(3);
         PagingInvoker<String> tgt = createTarget();

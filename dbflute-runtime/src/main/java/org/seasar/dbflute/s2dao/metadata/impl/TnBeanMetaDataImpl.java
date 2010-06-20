@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
@@ -332,7 +333,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         return _primaryKeys[index].getColumnDbName();
     }
 
-    public String getPrimaryKeySqlName(int index) {
+    public ColumnSqlName getPrimaryKeySqlName(int index) {
         return _primaryKeys[index].getColumnSqlName();
     }
 

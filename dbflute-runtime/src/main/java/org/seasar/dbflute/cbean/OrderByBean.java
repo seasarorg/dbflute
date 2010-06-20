@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.cbean;
 
-import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 
 /**
  * The order-by-bean.

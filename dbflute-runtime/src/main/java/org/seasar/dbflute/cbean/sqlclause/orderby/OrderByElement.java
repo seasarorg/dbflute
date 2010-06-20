@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.sqlclause;
+package org.seasar.dbflute.cbean.sqlclause.orderby;
 
 import java.io.Serializable;
 import java.util.List;
@@ -40,12 +40,6 @@ public class OrderByElement implements Serializable {
 
     /** The value of column name. */
     protected String _columnName;
-
-    /** The value of registered alias name. */
-    protected String _registeredAliasName;
-
-    /** The value of registered column name. */
-    protected String _registeredColumnName;
 
     /** The value of ascDesc. */
     protected String _ascDesc = "asc";
@@ -237,8 +231,6 @@ public class OrderByElement implements Serializable {
         final StringBuilder sb = new StringBuilder();
         sb.append("{aliasName=").append(_aliasName);
         sb.append(" columnName=").append(_columnName);
-        sb.append(" registeredAliasName=").append(_registeredAliasName);
-        sb.append(" registeredColumnName=").append(_registeredColumnName);
         sb.append(" ascDesc=").append(_ascDesc).append("}");
         return sb.toString();
     }
@@ -250,36 +242,20 @@ public class OrderByElement implements Serializable {
         return _aliasName;
     }
 
-    public String getColumnName() {
-        return _columnName;
-    }
-
-    public String getRegisteredAliasName() {
-        return _registeredAliasName;
-    }
-
-    public String getRegisteredColumnName() {
-        return _registeredColumnName;
-    }
-
-    public String getAscDesc() {
-        return _ascDesc;
-    }
-
     public void setAliasName(String value) {
         _aliasName = value;
+    }
+
+    public String getColumnName() {
+        return _columnName;
     }
 
     public void setColumnName(String value) {
         _columnName = value;
     }
 
-    public void setRegisteredAliasName(String value) {
-        _registeredAliasName = value;
-    }
-
-    public void setRegisteredColumnName(String value) {
-        _registeredColumnName = value;
+    public String getAscDesc() {
+        return _ascDesc;
     }
 
     public void setAscDesc(String value) {

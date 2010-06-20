@@ -20,7 +20,7 @@ import java.util.List;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 
 /**

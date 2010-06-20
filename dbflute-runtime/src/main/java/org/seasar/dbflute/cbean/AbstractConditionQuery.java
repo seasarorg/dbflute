@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
@@ -30,12 +32,22 @@ import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
+import org.seasar.dbflute.cbean.sqlclause.subquery.ExistsSubQuery;
+import org.seasar.dbflute.cbean.sqlclause.subquery.InScopeSubQuery;
+import org.seasar.dbflute.cbean.sqlclause.subquery.QueryDerivedSubQuery;
+import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarSubQuery;
+import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedSubQuery;
+import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryLevelReflector;
+import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
@@ -136,6 +148,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     protected abstract DBMetaProvider getDBMetaProvider();
 
+    /**
+     * Find the DB meta.
+     * @param tableFlexibleName The table flexible name. (NotNull)
+     * @return The DB meta of the table. (NotNull)
+     */
     protected DBMeta findDBMeta(String tableFlexibleName) {
         return getDBMetaProvider().provideDBMetaChecked(tableFlexibleName);
     }
@@ -205,19 +222,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
-    public String getRealColumnName(String columnName) {
-        assertColumnName(columnName);
-        return buildRealColumnName(getRealAliasName(), columnName);
+    public ColumnRealName toColumnRealName(String columnDbName) {
+        return new ColumnRealName(getRealAliasName(), toColumnSqlName(columnDbName));
     }
 
     /**
-     * Build real column name.
-     * @param aliasName Alias name. (NotNull)
-     * @param columnName Column name. (NotNull)
-     * @return Real column name. (NotNull)
+     * {@inheritDoc}
      */
-    protected String buildRealColumnName(String aliasName, String columnName) {
-        return aliasName + "." + columnName;
+    public ColumnSqlName toColumnSqlName(String columnDbName) {
+        return findDBMeta(getTableDbName()).findColumnInfo(columnDbName).getColumnSqlName();
     }
 
     // -----------------------------------------------------
@@ -250,17 +263,30 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                            Location
     //                                                                            ========
     /**
-     * Get location.
-     * @param columnPropertyName Column property name.
-     * @param key Condition key.
-     * @return Next nest level.
+     * Get the location of the property.
+     * @param propertyName The name of property. (NotNull)
+     * @return The location of the property as path. (NotNull)
      */
-    protected String getLocation(String columnPropertyName, ConditionKey key) {
-        return getLocationBase(columnPropertyName) + "." + key.getConditionKey();
+    protected String getLocation(String propertyName) {
+        return getLocationBase() + propertyName;
     }
 
+    /**
+     * Get the location of the property and the key.
+     * @param propertyName The name of property. (NotNull)
+     * @param key Condition key. (NotNull)
+     * @return The location of the property and the key as path. (NotNull)
+     */
+    protected String getLocation(String propertyName, ConditionKey key) {
+        return getLocation(propertyName) + "." + key.getConditionKey();
+    }
+
+    /**
+     * Get the base location of this condition-query.
+     * @return The base location of this condition-query. (NotNull)
+     */
     protected String getLocationBase() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         ConditionQuery query = this;
         while (true) {
             if (query.isBaseQuery()) {
@@ -278,10 +304,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             query = query.getReferrerQuery();
         }
         return sb.toString();
-    }
-
-    protected String getLocationBase(String columnPropertyName) {
-        return getLocationBase() + columnPropertyName;
     }
 
     // ===================================================================================
@@ -302,20 +324,31 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    protected String ppFxCd(String fixedCondition, String localAliasName, String foreignAliasName) { // prepareFixedCondition
-        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
-        return fixedCondition;
-    }
-
-    protected String fxcKey() { // getFixedConditionKey()
-        return getSqlClause().getFixedConditionKey();
-    }
-
     protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
-        getSqlClause().registerOuterJoin(getTableDbName(), cq.getTableDbName(), cq.getRealAliasName(), joinOnMap);
+        registerOuterJoin(cq, joinOnMap, null);
+    }
+
+    protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
+        final String localDbName = getTableDbName();
+        final String foreignDbName = cq.getTableDbName();
+        final String localAliasName = getRealAliasName();
+        final String foreignAliasName = cq.getRealAliasName();
+        // resolve variables of fixed condition
+        if (fixedCondition != null) {
+            fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
+            fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
+            fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+            fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
+        }
+        // translate join-on map using column real name
+        final Map<ColumnRealName, ColumnRealName> joinOnRealMap = newLinkedHashMap();
+        final Set<Entry<String, String>> entrySet = joinOnMap.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            final String local = entry.getKey();
+            final String foreign = entry.getValue();
+            joinOnRealMap.put(toColumnRealName(local), cq.toColumnRealName(foreign));
+        }
+        getSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnRealMap, fixedCondition);
     }
 
     // ===================================================================================
@@ -403,44 +436,46 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Normal Query
     //                                          ------------
-    protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
-        if (!isValidQuery(key, value, cvalue, colName)) {
+    protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
-        setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
     }
 
-    protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
-        if (!isValidQuery(key, value, cvalue, colName)) {
+    protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
+            ConditionOption option) {
+        if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
-        setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
     }
 
-    protected boolean isValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
-        final String realColumnName = getRealColumnName(colName);
-        if (key.isValidRegistration(cvalue, value, realColumnName)) {
+    protected boolean isValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        // not uses SQL name because of only logging used
+        final ColumnRealName columnRealName = toColumnRealName(columnDbName);
+        if (key.isValidRegistration(cvalue, value, columnRealName.toString())) {
             return true;
         } else {
             if (getSqlClause().isCheckInvalidQuery()) {
-                throwInvalidQueryRegisteredException(key, value, realColumnName);
+                throwInvalidQueryRegisteredException(key, value, columnRealName);
                 return false; // unreachable
             } else {
-                getSqlClause().registerInvalidQueryColumn(realColumnName, key);
+                getSqlClause().registerInvalidQueryColumn(columnRealName, key);
                 return false;
             }
         }
     }
 
-    protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, String realColumnName) {
-        createCBExThrower().throwInvalidQueryRegisteredException(key, value, realColumnName);
+    protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, ColumnRealName columnRealName) {
+        createCBExThrower().throwInvalidQueryRegisteredException(key, value, columnRealName);
     }
 
     // -----------------------------------------------------
     //                                         InScope Query
     //                                         -------------
-    protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String colName) {
-        if (!isValidQuery(key, value, cvalue, colName)) {
+    protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String columnDbName) {
+        if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
         final int inScopeLimit = getSqlClause().getInScopeLimit();
@@ -465,9 +500,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 for (int i = 0; i < valueList.size(); i++) {
                     final List<Object> currentValue = valueList.get(i);
                     if (i == 0) {
-                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, columnDbName);
                     } else {
-                        invokeQuery(colName, key.getConditionKey(), currentValue);
+                        invokeQuery(columnDbName, key.getConditionKey(), currentValue);
                     }
                 }
             } finally {
@@ -480,7 +515,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
             }
         } else {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
         }
     }
 
@@ -491,20 +526,20 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
-    protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue, String colName,
+    protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue, String columnDbName,
             FromToOption option) {
         {
             final ConditionKey fromKey = option.getFromDateConditionKey();
             final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
-            if (isValidQuery(fromKey, filteredFromDate, cvalue, colName)) {
-                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
+            if (isValidQuery(fromKey, filteredFromDate, cvalue, columnDbName)) {
+                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
             }
         }
         {
             final ConditionKey toKey = option.getToDateConditionKey();
             final java.util.Date filteredToDate = option.filterToDate(toDate);
-            if (isValidQuery(toKey, filteredToDate, cvalue, colName)) {
-                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
+            if (isValidQuery(toKey, filteredToDate, cvalue, columnDbName)) {
+                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
             }
         }
     }
@@ -512,17 +547,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
-    protected void regLSQ(ConditionKey key, String value, ConditionValue cvalue, String colName, LikeSearchOption option) {
-        registerLikeSearchQuery(key, value, cvalue, colName, option);
+    protected void regLSQ(ConditionKey key, String value, ConditionValue cvalue, String columnDbName,
+            LikeSearchOption option) {
+        registerLikeSearchQuery(key, value, cvalue, columnDbName, option);
     }
 
-    protected void registerLikeSearchQuery(ConditionKey key, String value, ConditionValue cvalue, String colName,
+    protected void registerLikeSearchQuery(ConditionKey key, String value, ConditionValue cvalue, String columnDbName,
             LikeSearchOption option) {
         if (option == null) {
-            throwLikeSearchOptionNotFoundException(colName, value);
+            throwLikeSearchOptionNotFoundException(columnDbName, value);
             return; // unreachable
         }
-        if (!isValidQuery(key, value, cvalue, colName)) {
+        if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
         if (xsuppressEscape()) {
@@ -530,7 +566,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         if (value == null || !option.isSplit()) {
             // as normal condition
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
             return;
         }
         // - - - - - - - - -
@@ -546,7 +582,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             try {
                 for (int i = 0; i < strArray.length; i++) {
                     final String currentValue = strArray[i];
-                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
+                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, columnDbName, option);
                 }
             } finally {
                 if (alreadyOrScopeQuery) {
@@ -565,9 +601,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 for (int i = 0; i < strArray.length; i++) {
                     final String currentValue = strArray[i];
                     if (i == 0) {
-                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, columnDbName, option);
                     } else {
-                        invokeQueryLikeSearch(colName, currentValue, option);
+                        invokeQueryLikeSearch(columnDbName, currentValue, option);
                     }
                 }
             } finally {
@@ -582,9 +618,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return false; // as default
     }
 
-    protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
+    protected void throwLikeSearchOptionNotFoundException(String columnDbName, String value) {
         final DBMeta dbmeta = getDBMetaProvider().provideDBMeta(getTableDbName());
-        createCBExThrower().throwLikeSearchOptionNotFoundException(colName, value, dbmeta);
+        createCBExThrower().throwLikeSearchOptionNotFoundException(columnDbName, value, dbmeta);
     }
 
     protected void invokeQueryLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
@@ -594,564 +630,230 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Inline Query
     //                                          ------------
-    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
-        if (!isValidQuery(key, value, cvalue, colName)) {
+    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final String propertyName = dbmeta.findPropertyName(colName);
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
+        final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
+        // If Java, it is necessary to use uncapPropName!
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));
+        final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
+            getSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue);
         } else {
-            getSqlClause()
-                    .registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
+            final String aliasName = getRealAliasName();
+            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, _onClauseInline);
         }
     }
 
-    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
-        if (!isValidQuery(key, value, cvalue, colName)) {
+    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
+            ConditionOption option) {
+        if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final String propertyName = dbmeta.findPropertyName(colName);
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
+        final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
+        // If Java, it is necessary to use uncapPropName!
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);
+        final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
+            getSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, option);
         } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option,
+            final String aliasName = getRealAliasName();
+            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, option,
                     _onClauseInline);
         }
     }
 
     // -----------------------------------------------------
-    //                                        ExistsSubQuery
+    //                                        ExistsReferrer
     //                                        --------------
     // {Modified at DBFlute-0.7.5}
-    protected void registerExistsSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+    protected void registerExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName) {
-        registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
+        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, null);
     }
 
-    protected void registerNotExistsSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+    protected void registerNotExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName) {
-        registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
+        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, "not");
     }
 
-    protected void registerExistsSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
-            String propertyName, String existsOption) {
-        assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
-        existsOption = existsOption != null ? existsOption + " " : "";
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
-
-        String subQueryClause;
-        if (columnName.contains(",") && relatedColumnName.contains(",")) {
-            // Two-or-More Primary Keys
-            final List<String> columnNameSplit = Srl.splitList(columnName, ",");
-            final String[] realColumnNames = new String[columnNameSplit.size()];
-            for (int i = 0; i < columnNameSplit.size(); i++) {
-                realColumnNames[i] = getExistsSubQueryRealColumnName(columnNameSplit.get(i).trim());
-            }
-            final List<String> relatedColumnSplit = Srl.splitList(relatedColumnName, ",");
-            final String[] relatedColumnNames = new String[columnNameSplit.size()];
-            for (int i = 0; i < relatedColumnSplit.size(); i++) {
-                relatedColumnNames[i] = relatedColumnSplit.get(i).trim();
-            }
-            subQueryClause = getExistsSubQuerySql(subQuery, realColumnNames, relatedColumnNames, propertyName);
-        } else {
-            // Normal
-            final String realColumnName = getExistsSubQueryRealColumnName(columnName);
-            subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
-        }
-
+    protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String existsOption) {
+        assertObjectNotNull("ExistsReferrer(" + columnDbName + ")", subQuery);
+        final SqlClause sqlClause = getSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.getSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        final String endIndent = "       ";
-        final String clause = existsOption + "exists (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
+        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
+            public ColumnSqlName provide(String columnDbName) {
+                return subQuery.toColumnSqlName(columnDbName);
+            }
+        };
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final ExistsSubQuery existsSubQuery = new ExistsSubQuery(sqlClause, subQueryPath, localRealNameProvider,
+                subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector, subQueryIdentity, subQueryDBMeta);
+        final String clause = existsSubQuery.buildExistsSubQuery(columnDbName, relatedColumnDbName, existsOption);
         registerWhereClause(clause);
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    // *Unsupport ExistsSubQuery as inline because it's so dangerous.
+    // *Unsupported ExistsSubQuery as in-line because it's so dangerous.
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-    protected String getExistsSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
-    }
-
-    protected String getExistsSubQuerySql(ConditionQuery subQuery, String realColumnName, String relatedColumnName,
-            String propertyName) {
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final String tableAliasName = "dfsublocal_" + subQueryLevel;
-        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
-        final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName,
-                propertyName, selectClause, tableAliasName, realColumnName);
-        return selectClause + " " + fromWhereClause;
-    }
-
-    protected String getExistsSubQuerySql(ConditionQuery subQuery, String[] realColumnNames,
-            String[] relatedColumnNames, String propertyName) {
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final String tableAliasName = "dfsublocal_" + subQueryLevel;
-
-        // Because sub-query may be only allowed to return a single column.
-        final String selectClause = "select " + tableAliasName + "." + relatedColumnNames[0];
-
-        final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnNames,
-                propertyName, selectClause, tableAliasName, realColumnNames);
-        return selectClause + " " + fromWhereClause;
-    }
 
     // -----------------------------------------------------
-    //                                       InScopeSubQuery
+    //                                       InScopeRelation
     //                                       ---------------
     // {Modified at DBFlute-0.7.5}
-    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+    protected void registerInScopeRelation(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName) {
-        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
+        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, null);
     }
 
-    protected void registerNotInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+    protected void registerNotInScopeRelation(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName) {
-        registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
+        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, "not");
     }
 
-    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
-            String propertyName, String inScopeOption) {
-        assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
-        inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
-        final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
+    protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String inScopeOption) {
+        assertObjectNotNull("InScopeRelation(" + columnDbName + ")", subQuery);
+        final SqlClause sqlClause = getSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        final String endIndent = "       ";
-        final String clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln()
-                + endIndent + ")" + endMark;
+        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
+            public ColumnSqlName provide(String columnDbName) {
+                return subQuery.toColumnSqlName(columnDbName);
+            }
+        };
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final boolean suppressLocalAliasName = isInScopeRelationSuppressLocalAliasName();
+        final InScopeSubQuery inScopeSubQuery = new InScopeSubQuery(sqlClause, subQueryPath, localRealNameProvider,
+                subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector, subQueryIdentity, subQueryDBMeta,
+                suppressLocalAliasName);
+        final String clause = inScopeSubQuery.buildInScopeSubQuery(columnDbName, relatedColumnDbName, inScopeOption);
         registerWhereClause(clause);
     }
 
-    protected String getInScopeSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
-    }
-
-    protected String getInScopeSubQuerySql(ConditionQuery subQuery, String relatedColumnName, String propertyName) {
-        final String tableAliasName = getSqlClause().getLocalTableAliasName();
-        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
-        final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
-                selectClause, tableAliasName);
-        return selectClause + " " + fromWhereClause;
+    protected boolean isInScopeRelationSuppressLocalAliasName() {
+        // no alias name at InlineView
+        return false; // as default
     }
 
     // [DBFlute-0.7.4]
     // -----------------------------------------------------
     //                              (Specify)DerivedReferrer
     //                              ------------------------
-    protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnName,
-            String relatedColumnName, String propertyName, String aliasName) {
+    protected void registerSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String aliasName) {
         assertObjectNotNull("SpecifyDerivedReferrer(function)", function);
-        assertObjectNotNull("SpecifyDerivedReferrer(" + columnName + ")", subQuery);
-        final String realColumnName = getSpecifyDerivedReferrerRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        final String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
-                relatedColumnName, propertyName, aliasName);
+        assertObjectNotNull("SpecifyDerivedReferrer(" + columnDbName + ")", subQuery);
+        final SqlClause sqlClause = getSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.getSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        final String endIndent = "       ";
-        final String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + aliasName + endMark;
+        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
+            public ColumnSqlName provide(String columnDbName) {
+                return subQuery.toColumnSqlName(columnDbName);
+            }
+        };
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+        final SpecifyDerivedSubQuery derivedSubQuery = new SpecifyDerivedSubQuery(sqlClause, subQueryPath,
+                localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
+                subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
+        final String clause = derivedSubQuery.buildDerivedSubQuery(function, columnDbName, relatedColumnDbName);
         getSqlClause().specifyDerivingSubQuery(aliasName, clause);
-    }
-
-    protected String getSpecifyDerivedReferrerRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
-    }
-
-    protected String getSpecifyDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery,
-            String realColumnName, String relatedColumnName, String propertyName, String aliasName) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        final String tableAliasName = "dfsublocal_" + subQueryLevel;
-        final String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-        if (specifiedColumnName == null || specifiedColumnName.trim().length() == 0) {
-            throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
-        }
-        final String deriveColumnName;
-        {
-            final String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
-            if (!specifiedColumnRealName.startsWith(subQuery.getSqlClause().getLocalTableAliasName())) {
-                // The column is on related table.
-                deriveColumnName = specifiedColumnRealName;
-            } else {
-                // The column is on local table.
-                deriveColumnName = tableAliasName + "." + specifiedColumnName;
-
-                // Assert about column type when local table only.
-                assertSpecifyDerivedReferrerColumnType(function, subQuery, deriveColumnName);
-            }
-        }
-        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        final String connect = xbuildFunctionConnector(function);
-        if (subQuery.getSqlClause().hasUnionQuery()) {
-            final String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-            if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
-                String msg = "The derived-referrer is unavailable when no primary key or two-or-more primary keys:";
-                msg = msg + " table=" + subQuery.getTableDbName();
-                throw new IllegalConditionBeanOperationException(msg);
-            }
-            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-            final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
-                    + relatedColumnName + ", " + deriveColumnName;
-            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
-                    selectClause, tableAliasName);
-            final String mainSql = selectClause + " " + fromWhereClause;
-            final String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
-            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln() + "  from ("
-                    + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where "
-                    + joinCondition;
-        } else {
-            final String selectClause = "select " + function + connect + deriveColumnName + ")";
-            final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName,
-                    propertyName, selectClause, tableAliasName, realColumnName);
-            return selectClause + " " + fromWhereClause;
-        }
-    }
-
-    protected void throwSpecifyDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
-        createCBExThrower().throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
-    }
-
-    protected void assertSpecifyDerivedReferrerColumnType(String function, ConditionQuery subQuery,
-            String deriveColumnName) {
-        if (deriveColumnName.contains(".")) {
-            deriveColumnName = deriveColumnName.substring(deriveColumnName.lastIndexOf(".") + ".".length());
-        }
-        final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-        final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
-        if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
-            if (!Number.class.isAssignableFrom(deriveColumnType)) {
-                throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
-            }
-        }
-    }
-
-    protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
-            Class<?> deriveColumnType) {
-        createCBExThrower().throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
-                deriveColumnType);
     }
 
     // [DBFlute-0.8.8.1]
     // -----------------------------------------------------
     //                                (Query)DerivedReferrer
     //                                ----------------------
-    protected void registerQueryDerivedReferrer(String function, ConditionQuery subQuery, String columnName,
-            String relatedColumnName, String propertyName, String operand, Object value, String parameterPropertyName) {
+    protected void registerQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String operand, Object value, String parameterPropertyName) {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
-        assertObjectNotNull("QueryDerivedReferrer(" + columnName + ")", subQuery);
-        final String realColumnName = getQueryDerivedReferrerRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        final String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
-                relatedColumnName, propertyName, value);
+        assertObjectNotNull("QueryDerivedReferrer(" + columnDbName + ")", subQuery);
+        final SqlClause sqlClause = getSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.getSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        final String endIndent = "       ";
-        final String parameter = "/*pmb." + getLocationBase(parameterPropertyName) + "*/null";
-        final String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") " + operand + " " + parameter
-                + " " + endMark;
+        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
+            public ColumnSqlName provide(String columnDbName) {
+                return subQuery.toColumnSqlName(columnDbName);
+            }
+        };
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+        final String parameterPath = getLocation(parameterPropertyName);
+        final QueryDerivedSubQuery derivedSubQuery = new QueryDerivedSubQuery(sqlClause, subQueryPath,
+                localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
+                subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
+        final String clause = derivedSubQuery.buildDerivedSubQuery(function, columnDbName, relatedColumnDbName);
         registerWhereClause(clause);
-    }
-
-    protected String getQueryDerivedReferrerRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
-    }
-
-    protected String getQueryDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery,
-            String realColumnName, String relatedColumnName, String propertyName, Object value) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        final String tableAliasName = "dfsublocal_" + subQueryLevel;
-        final String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-        if (specifiedColumnName == null || specifiedColumnName.trim().length() == 0) {
-            throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
-        }
-        final String deriveColumnName;
-        {
-            final String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
-            if (!specifiedColumnRealName.startsWith(subQuery.getSqlClause().getLocalTableAliasName())) {
-                // the column is on related table.
-                deriveColumnName = specifiedColumnRealName;
-            } else {
-                // the column is on local table.
-                deriveColumnName = tableAliasName + "." + specifiedColumnName;
-
-                // Assert about column type when local table only.
-                assertQueryDerivedReferrerColumnType(function, subQuery, deriveColumnName, value);
-            }
-        }
-        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        final String connect = xbuildFunctionConnector(function);
-        if (subQuery.getSqlClause().hasUnionQuery()) {
-            final String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-            if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
-                String msg = "The derived-referrer is unavailable when no primary key or two-or-more primary keys:";
-                msg = msg + " table=" + subQuery.getTableDbName();
-                throw new IllegalConditionBeanOperationException(msg);
-            }
-            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-            final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
-                    + relatedColumnName + ", " + deriveColumnName;
-            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
-                    selectClause, tableAliasName);
-            final String mainSql = selectClause + " " + fromWhereClause;
-            final String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
-            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln() + "  from ("
-                    + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where "
-                    + joinCondition;
-        } else {
-            final String selectClause = "select " + function + connect + deriveColumnName + ")";
-            final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName,
-                    propertyName, selectClause, tableAliasName, realColumnName);
-            return selectClause + " " + fromWhereClause;
-        }
-    }
-
-    protected void throwQueryDerivedReferrerInvalidColumnSpecificationException(String function) {
-        createCBExThrower().throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
-    }
-
-    protected void assertQueryDerivedReferrerColumnType(String function, ConditionQuery subQuery,
-            String deriveColumnName, Object value) {
-        if (deriveColumnName.contains(".")) {
-            deriveColumnName = deriveColumnName.substring(deriveColumnName.lastIndexOf(".") + ".".length());
-        }
-        final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-        final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
-        if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
-            if (!Number.class.isAssignableFrom(deriveColumnType)) {
-                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
-                        value);
-            }
-        }
-        if (value != null) {
-            final Class<?> parameterType = value.getClass();
-            if (String.class.isAssignableFrom(deriveColumnType)) {
-                if (!String.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
-                            value);
-                }
-            }
-            if (Number.class.isAssignableFrom(deriveColumnType)) {
-                if (!Number.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
-                            value);
-                }
-            }
-            if (java.util.Date.class.isAssignableFrom(deriveColumnType)) {
-                if (!java.util.Date.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
-                            value);
-                }
-            }
-        }
-    }
-
-    protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
-            Class<?> deriveColumnType, Object value) {
-        createCBExThrower().throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
-                deriveColumnType, value);
     }
 
     // [DBFlute-0.8.8]
     // -----------------------------------------------------
-    //                                        ScalarSubQuery
-    //                                        --------------
-    protected void registerScalarSubQuery(String function, ConditionQuery subQuery, String propertyName, String operand) {
-        assertObjectNotNull("ScalarSubQuery(" + propertyName + ")", subQuery);
-
-        // Get the specified column before it disappears at sub-query making.
-        final String deriveRealColumnName;
-        {
-            String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-            if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
-                throwScalarSubQueryInvalidColumnSpecificationException(function);
-            }
-            deriveRealColumnName = getScalarSubQueryRealColumnName(deriveColumnName);
-        }
-
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        final String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
+    //                                       ScalarCondition
+    //                                       ---------------
+    protected void registerScalarCondition(String function, final ConditionQuery subQuery, String propertyName,
+            String operand) {
+        assertObjectNotNull("ScalarCondition(" + propertyName + ")", subQuery);
+        final SqlClause sqlClause = getSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.getSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        final String endIndent = "       ";
-        final String clause = deriveRealColumnName + " " + operand + " (" + beginMark + subQueryClause + ln()
-                + endIndent + ") " + endMark;
-        registerWhereClause(clause);
-    }
-
-    protected String getScalarSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
-    }
-
-    protected String getScalarSubQuerySql(String function, ConditionQuery subQuery, String propertyName) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        final String tableAliasName = "dfsublocal_" + subQueryLevel;
-        final String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-        if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
-            throwScalarSubQueryInvalidColumnSpecificationException(function);
-        }
-        assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
-        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-        if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
-            String msg = "The scalar-sub-query is unavailable when no primary key or two-or-more primary keys:";
-            msg = msg + " table=" + subQuery.getTableDbName();
-            throw new IllegalConditionBeanOperationException(msg);
-        }
-        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-        if (subQuery.getSqlClause().hasUnionQuery()) {
-            final String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
-                    + deriveColumnName;
-            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
-                    selectClause, tableAliasName);
-            final String mainSql = selectClause + " " + fromWhereClause;
-            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln() + "  from (" + beginMark
-                    + mainSql + ln() + "       ) dfsubquerymain" + endMark;
-        } else {
-            final String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
-            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
-                    selectClause, tableAliasName);
-            return selectClause + " " + fromWhereClause;
-        }
-    }
-
-    protected void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
-        createCBExThrower().throwScalarSubQueryInvalidColumnSpecificationException(function);
-    }
-
-    protected void assertScalarSubQueryColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
-        final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-        final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
-        if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
-            if (!Number.class.isAssignableFrom(deriveColumnType)) {
-                throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
+            public ColumnSqlName provide(String columnDbName) {
+                return subQuery.toColumnSqlName(columnDbName);
             }
-        }
-    }
-
-    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName,
-            Class<?> deriveColumnType) {
-        createCBExThrower().throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName,
-                deriveColumnType);
+        };
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+        final ScalarSubQuery scalarSubQuery = new ScalarSubQuery(sqlClause, subQueryPath, localRealNameProvider,
+                subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector, subQueryIdentity, subQueryDBMeta,
+                mainSubQueryIdentity, operand);
+        final String clause = scalarSubQuery.buildScalarSubQuery(function);
+        registerWhereClause(clause);
     }
 
     // -----------------------------------------------------
     //                                       SubQuery Common
     //                                       ---------------
-    protected String buildPlainSubQueryFromWhereClause(ConditionQuery subQuery, String relatedColumnName,
-            String propertyName, String selectClause, String tableAliasName) {
-        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
-
-        // Replace the alias names for local table with alias name of sub-query unique.
-        // However when it's inScope this replacement is unnecessary so comment out here. 
-        // (Override base alias name at sub-query on SQL)
-        // So if the argument 'tableAliasName' is not null, replace it. 
-        if (tableAliasName != null) {
-            fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+    protected class GeneralColumnRealNameProvider implements ColumnRealNameProvider {
+        public ColumnRealName provide(String columnDbName) {
+            return toColumnRealName(columnDbName);
         }
-
-        // Resolve the location path for the condition-query of sub-query. 
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");
-
-        // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "");
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), "");
-        return fromWhereClause;
     }
 
-    protected String buildCorrelationSubQueryFromWhereClause(ConditionQuery subQuery, String relatedColumnName,
-            String propertyName, String selectClause, String tableAliasName, String realColumnName) {
-        String clause = xprepareCorrelationSubQueryFromWhereClause(subQuery, propertyName, tableAliasName);
-        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
-        clause = xreplaceCorrelationSubQueryFromWhereClause(clause, selectClause, joinCondition);
-        return clause;
-    }
-
-    protected String buildCorrelationSubQueryFromWhereClause(ConditionQuery subQuery, String[] relatedColumnNames,
-            String propertyName, String selectClause, String tableAliasName, String[] realColumnNames) {
-        String clause = xprepareCorrelationSubQueryFromWhereClause(subQuery, propertyName, tableAliasName);
-
-        final String joinCondition;
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < relatedColumnNames.length; i++) {
-            if (sb.length() > 0) {
-                sb.append(ln()).append("   and ");
+    protected class GeneralSubQueryLevelReflector implements SubQueryLevelReflector {
+        public void reflect(int subQueryLevel) {
+            if (_subQueryLevel <= subQueryLevel) {
+                _subQueryLevel = subQueryLevel + 1;
             }
-            sb.append(tableAliasName).append(".").append(relatedColumnNames[i]);
-            sb.append(" = ").append(realColumnNames[i]);
-        }
-        joinCondition = sb.toString();
-
-        clause = xreplaceCorrelationSubQueryFromWhereClause(clause, selectClause, joinCondition);
-        return clause;
-    }
-
-    protected String xprepareCorrelationSubQueryFromWhereClause(ConditionQuery subQuery, String propertyName,
-            String tableAliasName) {
-        String clause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
-
-        // Replace the alias names for local table with alias name of sub-query unique. 
-        clause = replaceString(clause, "dflocal", tableAliasName);
-
-        // Resolve the location path for the condition-query of sub-query. 
-        clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");
-
-        return clause;
-    }
-
-    protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String selectClause, String joinCondition) {
-        // Replace template marks. These are very important!
-        final String firstConditionAfter = ln() + "   and ";
-        final SqlClause sc = getSqlClause();
-        clause = replaceString(clause, sc.getWhereClauseMark(), "where " + joinCondition);
-        clause = replaceString(clause, sc.getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        clause = replaceString(clause, sc.getUnionSelectClauseMark(), selectClause);
-        clause = replaceString(clause, sc.getUnionWhereClauseMark(), "where " + joinCondition);
-        clause = replaceString(clause, sc.getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        return clause;
-    }
-
-    protected void xincrementLocalSubQueryLevelIfNeeds(ConditionQuery subQuery) { // Very Internal
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        if (_subQueryLevel <= subQueryLevel) {
-            _subQueryLevel = subQueryLevel + 1;
-        }
-    }
-
-    protected String xbuildFunctionConnector(String function) {
-        if (function != null && function.endsWith("(distinct")) { // For example 'count(distinct'
-            return " ";
-        } else {
-            return "(";
         }
     }
 
@@ -1159,27 +861,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Where Clause
     //                                          ------------
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
-            String colName) {
+            String columnDbName) {
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final ColumnInfo columnInfo = dbmeta.findColumnInfo(colName);
-        final String columnSqlName = columnInfo.getColumnSqlName();
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));
-        getSqlClause().registerWhereClause(getRealColumnName(columnSqlName), key, cvalue);
+        getSqlClause().registerWhereClause(toColumnRealName(columnInfo.getColumnDbName()), key, cvalue);
     }
 
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
-            String colName, ConditionOption option) {
+            String columnDbName, ConditionOption option) {
         final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final ColumnInfo columnInfo = dbmeta.findColumnInfo(colName);
-        final String columnSqlName = columnInfo.getColumnSqlName();
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);
-        getSqlClause().registerWhereClause(getRealColumnName(columnSqlName), key, cvalue, option);
+        getSqlClause().registerWhereClause(toColumnRealName(columnInfo.getColumnDbName()), key, cvalue, option);
     }
 
     protected void registerWhereClause(String whereClause) {
@@ -1254,6 +954,31 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
+    protected void registerOrderBy(String columnDbName, boolean ascOrDesc) {
+        getSqlClause().registerOrderBy(toColumnRealName(columnDbName).toString(), ascOrDesc);
+    }
+
+    protected void regOBA(String columnName) {
+        assertOrderByPurpose(columnName);
+        registerOrderBy(columnName, true);
+    }
+
+    protected void regOBD(String columnName) {
+        assertOrderByPurpose(columnName);
+        registerOrderBy(columnName, false);
+    }
+
+    protected void assertOrderByPurpose(String columnName) {
+        if (getSqlClause().getPurpose().isNoOrderBy()) {
+            throwOrderByIllegalPurposeException(columnName);
+        }
+    }
+
+    protected void throwOrderByIllegalPurposeException(String columnName) {
+        createCBExThrower().throwOrderByIllegalPurposeException(getSqlClause().getPurpose(), getTableDbName(),
+                columnName);
+    }
+
     /**
      * Order with the keyword 'nulls first'.
      */
@@ -1284,43 +1009,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (!getSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        getSqlClause().registerOrderBy(aliasName, null, true);
+        getSqlClause().registerOrderBy(aliasName, true);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Desc(String aliasName) {
         if (!getSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        getSqlClause().registerOrderBy(aliasName, null, false);
+        getSqlClause().registerOrderBy(aliasName, false);
     }
 
     protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
         createCBExThrower().throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
-    }
-
-    protected void registerOrderBy(String columnName, boolean ascOrDesc) {
-        getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
-    }
-
-    protected void regOBA(String columnName) {
-        assertOrderByPurpose(columnName);
-        registerOrderBy(columnName, true);
-    }
-
-    protected void regOBD(String columnName) {
-        assertOrderByPurpose(columnName);
-        registerOrderBy(columnName, false);
-    }
-
-    protected void assertOrderByPurpose(String columnName) {
-        if (getSqlClause().getPurpose().isNoOrderBy()) {
-            throwOrderByIllegalPurposeException(columnName);
-        }
-    }
-
-    protected void throwOrderByIllegalPurposeException(String columnName) {
-        createCBExThrower().throwOrderByIllegalPurposeException(getSqlClause().getPurpose(), getTableDbName(),
-                columnName);
     }
 
     // ===================================================================================

@@ -25,6 +25,7 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.dbmeta.name.TableSqlName;
 
 /**
  * The interface of DB meta.
@@ -81,7 +82,7 @@ public interface DBMeta {
      * Get the SQL name of table.
      * @return The SQL name of table. (NotNull)
      */
-    String getTableSqlName();
+    TableSqlName getTableSqlName();
 
     /**
      * Get the alias of the table.

@@ -18,6 +18,7 @@ package org.seasar.dbflute.s2dao.metadata;
 import java.util.List;
 import java.util.Set;
 
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 
 /**
@@ -86,7 +87,7 @@ public interface TnBeanMetaData {
 
     String getPrimaryKeyDbName(int index);
 
-    String getPrimaryKeySqlName(int index);
+    ColumnSqlName getPrimaryKeySqlName(int index);
 
     int getIdentifierGeneratorSize();
 

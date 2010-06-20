@@ -22,7 +22,11 @@ import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
+import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseSimpleFilter;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 
 /**
  * The interface of SQL clause.
@@ -83,16 +87,14 @@ public interface SqlClause {
     String getSelectClause();
 
     /**
-     * Get the map of select index.
-     * @return The map of select index. {key:columnName, value:selectIndex}
-     *         (Nullable: Null means select index is disabled.)
+     * Get the map of select index. map:{columnAliasName = selectIndex(AliasName)}
+     * @return The map of select index. (Nullable: null means select index is disabled)
      */
     Map<String, Integer> getSelectIndexMap();
 
     /**
-     * Get the reverse map of select index.
-     * @return The reverse map of select index. {key:selectIndex(AliasName), value:columnName}
-     *         (Nullable: Null means select index is disabled.)
+     * Get the reverse map of select index. map:{selectIndex(AliasName) = columnAliasName}
+     * @return The reverse map of select index. (Nullable: null means select index is disabled)
      */
     Map<String, String> getSelectIndexReverseMap();
 
@@ -149,12 +151,12 @@ public interface SqlClause {
     /**
      * Register selected-select-column.
      * @param foreignTableAliasName The alias name of foreign table. (NotNull)
-     * @param localTableName The table name of local. (NotNull)
+     * @param localTableDbName The table DB name of local. (NotNull)
      * @param foreignPropertyName The property name of foreign table. (NotNull)
      * @param localRelationPath The path of local relation. (Nullable)
      */
-    void registerSelectedSelectColumn(String foreignTableAliasName, String localTableName, String foreignPropertyName,
-            String localRelationPath);
+    void registerSelectedSelectColumn(String foreignTableAliasName, String localTableDbName,
+            String foreignPropertyName, String localRelationPath);
 
     // ===================================================================================
     //                                                                           OuterJoin
@@ -164,10 +166,11 @@ public interface SqlClause {
      * @param baseTableDbName The DB name of base table. {[baseTableName] left outer join} (NotNull)
      * @param joinTableDbName The DB name of join table. {left outer join [joinTableName]} (NotNull)
      * @param aliasName The alias name of join table. {left outer join joinTableName [aliasName]} (NotNull and Unique per invoking method)
-     * @param joinOnMap Map that has conditions of on-clause. (NotNull)
+     * @param joinOnMap The map of join condition on on-clause. (NotNull)
+     * @param fixedCondition The fixed condition on on-clause. (Nullable: if null, means no fixed condition)
      */
     void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<String, String> joinOnMap);
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition);
 
     /**
      * Change the join type for the relation to inner join.
@@ -179,27 +182,26 @@ public interface SqlClause {
 
     SqlClause backToOuterJoin();
 
-    String getFixedConditionKey();
-
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
     /**
      * Register 'where' clause.
-     * @param columnFullName The full name of column. {[table-name].[column-name]}. (NotNull)
+     * @param columnRealName The real name of column. {[alias-name].[column-name]}. (NotNull)
      * @param key Condition-key. (NotNull)
      * @param value Condition-value. (NotNull)
      */
-    void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value);
+    void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value);
 
     /**
      * Register 'where' clause.
-     * @param columnFullName The full name of column. {[table-name].[column-name]}. (NotNull)
+     * @param columnRealName The real name of column. {[alias-name].[column-name]}. (NotNull)
      * @param key Condition-key. (NotNull)
      * @param value Condition-value. (NotNull)
      * @param option Condition-option. (NotNull)
      */
-    void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value, ConditionOption option);
+    void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
+            ConditionOption option);
 
     /**
      * Register 'where' clause.
@@ -222,17 +224,17 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value);
+    void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value);
 
-    void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value,
+    void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
             ConditionOption option);
 
     void registerBaseTableInlineWhereClause(String value);
 
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
+    void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
             ConditionValue value, boolean onClause);
 
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
+    void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
             ConditionValue value, ConditionOption option, boolean onClause);
 
     void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause);
@@ -273,23 +275,21 @@ public interface SqlClause {
 
     SqlClause clearOrderBy();
 
-    SqlClause ignoreOrderBy();
-
     SqlClause makeOrderByEffective();
 
-    /**
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
-     * @param ascOrDesc Is it ascend or descend?
-     */
-    void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    SqlClause ignoreOrderBy();
 
     /**
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
+     * @param orderByProperty Order-by-property. 'aliasName.columnSqlName/aliasName.columnSqlName/...' (NotNull)
      * @param ascOrDesc Is it ascend or descend?
      */
-    void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    void registerOrderBy(String orderByProperty, boolean ascOrDesc);
+
+    /**
+     * @param orderByProperty Order-by-property. 'aliasName.columnSqlName/aliasName.columnSqlName/...' (NotNull)
+     * @param ascOrDesc Is it ascend or descend?
+     */
+    void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, boolean ascOrDesc);
 
     void addNullsFirstToPreviousOrderBy();
 
@@ -509,37 +509,25 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
-    void specifySelectColumn(String tableAliasName, String columnName, String tableDbName);
-
-    void specifyDerivingSubQuery(String aliasName, String deriveSubQuery);
-
-    boolean hasSpecifiedDerivingSubQuery(String aliasName);
-
-    List<String> getSpecifiedDerivingAliasList();
+    void specifySelectColumn(String tableAliasName, String columnDbName, String tableDbName);
 
     /**
-     * Get the name of only one specified column.
-     * @return The name of only one specified column. (Nullable: If it's not found or duplicated, it returns null)
+     * Get the DB name of only one specified column.
+     * @return The DB name of only one specified column. (Nullable: if not found or duplicated, returns null)
      */
-    String getSpecifiedColumnNameAsOne();
+    String getSpecifiedColumnDbNameAsOne();
 
     /**
-     * Get the table DB name of only one specified column.
-     * @return The table DB name of only one specified column. (Nullable: If it's not found or duplicated, it returns null)
+     * Get the SQL name of only one specified column.
+     * @return The SQL name of only one specified column. (Nullable: if not found or duplicated, returns null)
      */
-    String getSpecifiedColumnTableDbNameAsOne();
+    ColumnSqlName getSpecifiedColumnSqlNameAsOne();
 
     /**
-     * Get the name of only one specified column with alias name.
-     * @return The name of only one specified column with alias name. (Nullable: If it's not found or duplicated, it returns null)
+     * Get the real name of only one specified column.
+     * @return The real name of only one specified column. (Nullable: if not found or duplicated, returns null)
      */
-    String getSpecifiedColumnRealNameAsOne();
-
-    /**
-     * Remove the only one specified column.
-     * @return The only one specified column with alias name. (Nullable: If it's not found or duplicated, it returns null)
-     */
-    String removeSpecifiedColumnRealNameAsOne();
+    ColumnRealName getSpecifiedColumnRealNameAsOne();
 
     /**
      * Back up specified select columns.
@@ -556,6 +544,12 @@ public interface SqlClause {
      */
     void clearSpecifiedSelectColumn();
 
+    void specifyDerivingSubQuery(String aliasName, String deriveSubQuery);
+
+    boolean hasSpecifiedDerivingSubQuery(String aliasName);
+
+    List<String> getSpecifiedDerivingAliasList();
+
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
@@ -567,9 +561,9 @@ public interface SqlClause {
      * Get the map of invalid query column. (basically for logging)
      * @return The map of invalid query column. (NotNull)
      */
-    Map<String, ConditionKey> getInvalidQueryColumnMap();
+    Map<ColumnRealName, ConditionKey> getInvalidQueryColumnMap();
 
-    void registerInvalidQueryColumn(String columnFullName, ConditionKey key);
+    void registerInvalidQueryColumn(ColumnRealName columnRealName, ConditionKey key);
 
     // [DBFlute-0.7.5]
     // ===================================================================================

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**

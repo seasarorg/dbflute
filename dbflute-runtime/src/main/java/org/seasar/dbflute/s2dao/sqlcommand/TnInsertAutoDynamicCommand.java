@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -72,11 +73,11 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         sb.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
-            final String columnName = pt.getColumnSqlName();
+            final ColumnSqlName columnSqlName = pt.getColumnSqlName();
             if (i > 0) {
                 sb.append(", ");
             }
-            sb.append(columnName);
+            sb.append(columnSqlName);
         }
         sb.append(")").append(ln()).append(" values (");
         for (int i = 0; i < propertyTypes.length; ++i) {

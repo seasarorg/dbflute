@@ -12,6 +12,7 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.dbmeta.name.TableSqlName;
 
 public class MockDBMeta extends AbstractDBMeta {
 
@@ -88,8 +89,7 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
-    public String getTableSqlName() {
-
+    public TableSqlName getTableSqlName() {
         return null;
     }
 

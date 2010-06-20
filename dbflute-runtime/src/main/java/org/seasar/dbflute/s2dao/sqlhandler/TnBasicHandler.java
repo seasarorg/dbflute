@@ -46,34 +46,33 @@ public class TnBasicHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DataSource dataSource;
-    private String sql;
-    private StatementFactory statementFactory;
-    private Object[] exceptionMessageSqlArgs;
+    protected final DataSource _dataSource;
+    protected final StatementFactory _statementFactory;
+    protected String _sql;
+    protected Object[] _exceptionMessageSqlArgs;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
      * Constructor. You need to set SQL later.
-     * @param ds The data source. (NotNull)
+     * @param dataSource The data source. (NotNull)
      * @param statementFactory The factory of statement. (NotNull)
      */
-    public TnBasicHandler(DataSource ds, StatementFactory statementFactory) {
-        setDataSource(ds);
-        setStatementFactory(statementFactory);
+    public TnBasicHandler(DataSource dataSource, StatementFactory statementFactory) {
+        this(dataSource, statementFactory, null);
     }
 
     /**
      * Constructor. (full property parameter)
-     * @param ds The data source. (NotNull)
-     * @param sql The SQL string. (NotNull)
+     * @param dataSource The data source. (NotNull)
      * @param statementFactory The factory of statement. (NotNull)
+     * @param sql The SQL string. (NotNull)
      */
-    public TnBasicHandler(DataSource ds, String sql, StatementFactory statementFactory) {
-        setDataSource(ds);
+    public TnBasicHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
+        _dataSource = dataSource;
+        _statementFactory = statementFactory;
         setSql(sql);
-        setStatementFactory(statementFactory);
     }
 
     // ===================================================================================
@@ -194,7 +193,7 @@ public class TnBasicHandler {
     protected String getDisplaySql(Object[] args) {
         String logDateFormat = ResourceContext.getLogDateFormat();
         String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return DisplaySqlBuilder.buildDisplaySql(sql, args, logDateFormat, logTimestampFormat);
+        return DisplaySqlBuilder.buildDisplaySql(_sql, args, logDateFormat, logTimestampFormat);
     }
 
     protected SqlLogHandler getSqlLogHander() {
@@ -212,7 +211,7 @@ public class TnBasicHandler {
     }
 
     protected boolean isContainsLineSeparatorInSql() {
-        return sql != null ? sql.contains(getLineSeparator()) : false;
+        return _sql != null ? _sql.contains(getLineSeparator()) : false;
     }
 
     // -----------------------------------------------------
@@ -232,7 +231,7 @@ public class TnBasicHandler {
     }
 
     protected void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid) {
-        final String executedSql = sql;
+        final String executedSql = _sql;
         final String displaySql = buildExceptionMessageSql();
         createSQLExceptionHandler().handleSQLException(e, st, uniqueConstraintValid, executedSql, displaySql);
     }
@@ -243,9 +242,9 @@ public class TnBasicHandler {
 
     protected String buildExceptionMessageSql() {
         String displaySql = null;
-        if (sql != null && exceptionMessageSqlArgs != null) {
+        if (_sql != null && _exceptionMessageSqlArgs != null) {
             try {
-                displaySql = getDisplaySql(exceptionMessageSqlArgs);
+                displaySql = getDisplaySql(_exceptionMessageSqlArgs);
             } catch (RuntimeException ignored) {
             }
         }
@@ -256,11 +255,11 @@ public class TnBasicHandler {
     //                                                                      JDBC Delegator
     //                                                                      ==============
     protected Connection getConnection() {
-        if (dataSource == null) {
+        if (_dataSource == null) {
             throw new IllegalStateException("The dataSource should not be null!");
         }
         try {
-            return dataSource.getConnection();
+            return _dataSource.getConnection();
         } catch (SQLException e) {
             handleSQLException(e, null);
             return null;// unreachable
@@ -268,10 +267,10 @@ public class TnBasicHandler {
     }
 
     protected PreparedStatement prepareStatement(Connection conn) {
-        if (sql == null) {
+        if (_sql == null) {
             throw new IllegalStateException("The sql should not be null!");
         }
-        return statementFactory.createPreparedStatement(conn, sql);
+        return _statementFactory.createPreparedStatement(conn, _sql);
     }
 
     protected int executeUpdate(PreparedStatement ps) {
@@ -349,30 +348,22 @@ public class TnBasicHandler {
     //                                                                            Accessor
     //                                                                            ========
     public DataSource getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
+        return _dataSource;
     }
 
     public StatementFactory getStatementFactory() {
-        return statementFactory;
+        return _statementFactory;
     }
 
-    public void setStatementFactory(StatementFactory statementFactory) {
-        this.statementFactory = statementFactory;
+    public String getSql() {
+        return _sql;
+    }
+
+    public void setSql(String sql) {
+        this._sql = sql;
     }
 
     public void setExceptionMessageSqlArgs(Object[] exceptionMessageSqlArgs) {
-        this.exceptionMessageSqlArgs = exceptionMessageSqlArgs;
+        this._exceptionMessageSqlArgs = exceptionMessageSqlArgs;
     }
 }

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+
 /**
  * SqlClause for DB2.
  * @author jflute

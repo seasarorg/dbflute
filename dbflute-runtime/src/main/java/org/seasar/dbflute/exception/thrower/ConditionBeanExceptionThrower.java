@@ -20,6 +20,7 @@ import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
 import org.seasar.dbflute.exception.OrderByIllegalPurposeException;
@@ -149,7 +150,7 @@ public class ConditionBeanExceptionThrower {
         throw new QueryIllegalPurposeException(msg);
     }
 
-    public void throwInvalidQueryRegisteredException(ConditionKey key, Object value, String realColumnName) {
+    public void throwInvalidQueryRegisteredException(ConditionKey key, Object value, ColumnRealName columnRealName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("An invalid query was registered. (check is working)");
         br.addItem("Advice");
@@ -167,7 +168,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(null);");
         br.addItem("Column");
-        br.addElement(realColumnName);
+        br.addElement(columnRealName);
         br.addItem("Condition Key");
         br.addElement(key.getConditionKey());
         br.addItem("Registered Value");
@@ -555,8 +556,8 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerInvalidColumnSpecificationException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
-            Class<?> deriveColumnType) {
+    public void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+            Class<?> derivedColumnType) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The type of the specified the column unmatched with the function!" + ln();
@@ -571,7 +572,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + ln();
         msg = msg + "[Function]" + ln() + function + ln();
         msg = msg + ln();
-        msg = msg + "[Derive Column]" + ln() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + ln();
+        msg = msg + "[Derive Column]" + ln() + derivedColumnDbName + "(" + derivedColumnType.getName() + ")" + ln();
         msg = msg + "* * * * * * * * * */";
         throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
     }
@@ -662,8 +663,8 @@ public class ConditionBeanExceptionThrower {
         throw new QueryDerivedReferrerInvalidColumnSpecificationException(msg);
     }
 
-    public void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
-            Class<?> deriveColumnType, Object value) {
+    public void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+            Class<?> derivedColumnType, Object value) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The type of the specified the column unmatched with the function or the parameter!" + ln();
@@ -678,7 +679,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + ln();
         msg = msg + "[Function Method]" + ln() + xconvertFunctionToMethod(function) + ln();
         msg = msg + ln();
-        msg = msg + "[Derive Column]" + ln() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + ln();
+        msg = msg + "[Derived Column]" + ln() + derivedColumnDbName + "(" + derivedColumnType.getName() + ")" + ln();
         msg = msg + ln();
         msg = msg + "[Parameter Type]" + ln() + (value != null ? value.getClass() : null) + ln();
         msg = msg + "* * * * * * * * * */";

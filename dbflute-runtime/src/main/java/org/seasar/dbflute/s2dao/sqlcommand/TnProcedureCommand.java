@@ -82,7 +82,7 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
 
     protected TnProcedureHandler createProcedureHandler(Object pmb) {
         final String sql = buildSql(pmb);
-        return new TnProcedureHandler(_dataSource, sql, _statementFactory, _procedureMetaData,
+        return new TnProcedureHandler(_dataSource, _statementFactory, sql, _procedureMetaData,
                 createProcedureResultSetHandlerFactory());
     }
 
