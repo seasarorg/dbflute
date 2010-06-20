@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
  * The condition-key of notInScope.
@@ -62,14 +63,14 @@ public class ConditionKeyNotInScope extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
-        conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
+        conditionList.add(buildBindClause(columnRealName, value.getNotInScopeLocation(), "('a1', 'a2')"));
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
             ConditionOption option) {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }

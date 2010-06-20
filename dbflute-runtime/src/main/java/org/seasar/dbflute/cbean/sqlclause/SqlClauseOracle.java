@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseArranger;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 
 /**
@@ -202,8 +203,8 @@ public class SqlClauseOracle extends AbstractSqlClause {
     }
 
     protected static class FullTextSearchClauseArranger implements WhereClauseArranger {
-        public String arrange(String columnName, String operand, String bindExpression, String rearOption) {
-            return "contains(" + columnName + ", " + bindExpression + ") > 0";
+        public String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption) {
+            return "contains(" + columnRealName + ", " + bindExpression + ") > 0";
         }
     }
 

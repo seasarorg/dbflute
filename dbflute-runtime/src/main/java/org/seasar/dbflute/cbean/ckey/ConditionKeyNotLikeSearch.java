@@ -21,6 +21,7 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseArranger;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 
 /**
@@ -62,22 +63,24 @@ public class ConditionKeyNotLikeSearch extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
         throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
             ConditionOption option) {
         if (option == null) {
-            String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
+            String msg = "The argument 'option' should not be null:";
+            msg = msg + " columnName=" + columnRealName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
         if (!(option instanceof LikeSearchOption)) {
-            String msg = "The argument[option] should be LikeSearchOption: columnName=" + columnName + " value="
-                    + value;
+            String msg = "The argument 'option' should be LikeSearchOption:";
+            msg = msg + " columnName=" + columnRealName + " value=" + value;
+            msg = msg + " option=" + option;
             throw new IllegalArgumentException(msg);
         }
         final String location = value.getNotLikeSearchLocation(); // from NotLikeSearch
@@ -93,9 +96,9 @@ public class ConditionKeyNotLikeSearch extends ConditionKey {
         final WhereClauseArranger arranger = myOption.getWhereClauseArranger();
         final String clause;
         if (arranger != null) {
-            clause = arranger.arrange(columnName, operand, buildBindExpression(location, null), rearOption);
+            clause = arranger.arrange(columnRealName, operand, buildBindExpression(location, null), rearOption);
         } else {
-            clause = buildBindClauseWithRearOption(columnName, operand, location, rearOption);
+            clause = buildBindClauseWithRearOption(columnRealName, operand, location, rearOption);
         }
         conditionList.add(clause);
     }

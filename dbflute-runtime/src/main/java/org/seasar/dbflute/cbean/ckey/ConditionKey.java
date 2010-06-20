@@ -115,7 +115,7 @@ public abstract class ConditionKey implements Serializable {
             String msg = "The argument 'value' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        doAddWhereClause(conditionList, columnRealName.toString(), value);
+        doAddWhereClause(conditionList, columnRealName, value);
         return this;
     }
 
@@ -133,27 +133,28 @@ public abstract class ConditionKey implements Serializable {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=null this.toString()=" + toString());
         }
-        doAddWhereClause(conditionList, columnRealName.toString(), value, option);
+        doAddWhereClause(conditionList, columnRealName, value, option);
         return this;
     }
 
     /**
      * Do add where clause.
      * @param conditionList Condition list. (NotNull)
-     * @param columnFullName The full name of name. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnFullName, ConditionValue value);
+    abstract protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName,
+            ConditionValue value);
 
     /**
      * Do add where clause.
      * @param conditionList Condition list. (NotNull)
-     * @param columnFullName The full name of column. (NotNull)
+     * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnFullName, ConditionValue value,
-            ConditionOption option);
+    abstract protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName,
+            ConditionValue value, ConditionOption option);
 
     // ===================================================================================
     //                                                                     Condition Value
@@ -219,7 +220,7 @@ public abstract class ConditionKey implements Serializable {
      * @param location Location. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClause(String columnRealName, String location) {
+    protected String buildBindClause(ColumnRealName columnRealName, String location) {
         return columnRealName + " " + getOperand() + " " + buildBindExpression(location, null);
     }
 
@@ -231,7 +232,7 @@ public abstract class ConditionKey implements Serializable {
      * @param rearOption Rear option. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClauseWithRearOption(String columnRealName, String operand, String location,
+    protected String buildBindClauseWithRearOption(ColumnRealName columnRealName, String operand, String location,
             String rearOption) {
         return columnRealName + " " + operand + " " + buildBindExpression(location, null) + rearOption;
     }
@@ -243,7 +244,7 @@ public abstract class ConditionKey implements Serializable {
      * @param dummyValue Dummy value. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClause(String columnRealName, String location, String dummyValue) {
+    protected String buildBindClause(ColumnRealName columnRealName, String location, String dummyValue) {
         return columnRealName + " " + getOperand() + " " + buildBindExpression(location, dummyValue);
     }
 
@@ -252,7 +253,7 @@ public abstract class ConditionKey implements Serializable {
      * @param columnRealName The real name of column. (NotNull)
      * @return Clause without value. (NotNull)
      */
-    protected String buildClauseWithoutValue(String columnRealName) {
+    protected String buildClauseWithoutValue(ColumnRealName columnRealName) {
         return columnRealName + " " + getOperand();
     }
 

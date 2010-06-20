@@ -20,6 +20,7 @@ import java.util.List;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.InScopeOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
  * The condition-key of inScope.
@@ -63,24 +64,27 @@ public class ConditionKeyInScope extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
-        conditionList.add(buildBindClause(columnName, value.getInScopeLocation(), "('a1', 'a2')"));
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
+        conditionList.add(buildBindClause(columnRealName, value.getInScopeLocation(), "('a1', 'a2')"));
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
             ConditionOption option) {
         if (option == null) {
-            String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
+            String msg = "The argument 'option' should not be null:";
+            msg = msg + " columnName=" + columnRealName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
         if (!(option instanceof InScopeOption)) {
-            String msg = "The argument[option] should be InScopeOption: columnName=" + columnName + " value=" + value;
+            String msg = "The argument 'option' should be InScopeOption:";
+            msg = msg + " columnName=" + columnRealName + " value=" + value;
+            msg = msg + " option=" + option;
             throw new IllegalArgumentException(msg);
         }
-        conditionList.add(buildBindClause(columnName, value.getInScopeLocation(), "('a1', 'a2')"));
+        conditionList.add(buildBindClause(columnRealName, value.getInScopeLocation(), "('a1', 'a2')"));
     }
 
     /**

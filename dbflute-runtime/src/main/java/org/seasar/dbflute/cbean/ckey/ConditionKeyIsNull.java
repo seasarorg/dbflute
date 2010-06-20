@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
  * The condition-key of isNull.
@@ -66,14 +67,14 @@ public class ConditionKeyIsNull extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
-        conditionList.add(buildClauseWithoutValue(columnName));
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
+        conditionList.add(buildClauseWithoutValue(columnRealName));
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
             ConditionOption option) {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }
