@@ -775,11 +775,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.UNION);
     }
 
-    public void xsetupForExistsSubQuery() {
+    public void xsetupForExistsReferrer() {
         xchangePurposeSqlClause(HpCBPurpose.EXISTS_REFERRER);
     }
 
-    public void xsetupForInScopeSubQuery() {
+    public void xsetupForInScopeRelation() {
         xchangePurposeSqlClause(HpCBPurpose.INSCOPE_RELATION);
     }
 
@@ -791,7 +791,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_SELECT);
     }
 
-    public void xsetupForScalarSubQuery() {
+    public void xsetupForScalarCondition() {
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION);
     }
 

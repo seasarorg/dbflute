@@ -32,7 +32,6 @@ public class ExistsReferrer extends AbstractSubQuery {
     public String buildExistsReferrer(String columnDbName, String relatedColumnDbName, String existsOption) {
         existsOption = existsOption != null ? existsOption + " " : "";
         reflectLocalSubQueryLevel();
-
         final String subQueryClause;
         if (columnDbName.contains(",") && relatedColumnDbName.contains(",")) {
             // two-or-more primary keys
@@ -53,7 +52,6 @@ public class ExistsReferrer extends AbstractSubQuery {
             final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(columnDbName);
             subQueryClause = getSubQueryClause(relatedColumnSqlName, correlatedColumnRealName);
         }
-
         final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
@@ -68,8 +66,11 @@ public class ExistsReferrer extends AbstractSubQuery {
      */
     protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName, ColumnRealName correlatedColumnRealName) {
         final String tableAliasName = "dfsublocal_" + _subQueryLevel;
-        final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
-        final String selectClause = "select " + relatedColumnRealName;
+        final String selectClause;
+        {
+            final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
+            selectClause = "select " + relatedColumnRealName;
+        }
         final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
                 relatedColumnSqlName, correlatedColumnRealName);
         return selectClause + " " + fromWhereClause;
@@ -83,11 +84,12 @@ public class ExistsReferrer extends AbstractSubQuery {
      */
     protected String getSubQueryClause(ColumnSqlName[] relatedColumnSqlNames, ColumnRealName[] correlatedColumnNames) {
         final String tableAliasName = "dfsublocal_" + _subQueryLevel;
-
-        // Because sub-query may be only allowed to return a single column.
-        final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlNames[0]);
-        final String selectClause = "select " + tableAliasName + "." + relatedColumnRealName;
-
+        final String selectClause;
+        {
+            // because sub-query may be only allowed to return a single column.
+            final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlNames[0]);
+            selectClause = "select " + tableAliasName + "." + relatedColumnRealName;
+        }
         final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
                 relatedColumnSqlNames, correlatedColumnNames);
         return selectClause + " " + fromWhereClause;

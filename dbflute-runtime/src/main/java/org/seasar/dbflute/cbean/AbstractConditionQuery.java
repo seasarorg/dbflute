@@ -706,6 +706,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         registerWhereClause(clause);
     }
 
+    // *unsupported ExistsReferrer as in-line because it's so dangerous
+
     // -----------------------------------------------------
     //                                       InScopeRelation
     //                                       ---------------
