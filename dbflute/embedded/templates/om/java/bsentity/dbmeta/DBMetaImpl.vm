@@ -8,6 +8,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;
 import org.seasar.dbflute.dbmeta.info.*;
+import org.seasar.dbflute.dbmeta.name.*;
 import org.seasar.dbflute.helper.StringKeyMap;
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
@@ -36,21 +37,26 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
-    public String getTableDbName() { return "$table.name"; }
-    public String getTablePropertyName() { return "$table.javaBeansRulePropertyName"; }
-    public String getTableSqlName() { return "$table.tableSqlName"; }
+    protected final String _tableDbName = "$table.name";
+    protected final String _tablePropertyName = "$table.javaBeansRulePropertyName";
+    protected final TableSqlName _tableSqlName = new TableSqlName("$table.tableSqlName");
+    public String getTableDbName() { return _tableDbName; }
+    public String getTablePropertyName() { return _tablePropertyName; }
+    public TableSqlName getTableSqlName() { return _tableSqlName; }
 #if ($table.hasAlias())
-    public String getTableAlias() { return "$table.alias"; }
+    protected final String _tableAlias = "$table.alias";
+    public String getTableAlias() { return _tableAlias; }
 #end
 #if ($table.isCommentForDBMetaValid())
-    public String getTableComment() { return "$table.commentForDBMeta"; }
+    protected final String _tableComment = "$table.commentForDBMeta";
+    public String getTableComment() { return _tableComment; }
 #end
 
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
-    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
+    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
 #end
 
 #foreach ($col in $table.columns)
