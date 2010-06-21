@@ -1113,7 +1113,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
         ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+        cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
         return selectEntity(cb);
     }
 
