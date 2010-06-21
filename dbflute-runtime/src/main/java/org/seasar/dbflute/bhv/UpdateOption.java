@@ -24,14 +24,16 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
 import org.seasar.dbflute.exception.VaryingUpdateInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.VaryingUpdateNotFoundCalculationException;
 import org.seasar.dbflute.exception.VaryingUpdateOptimisticLockSpecificationException;
 import org.seasar.dbflute.exception.VaryingUpdatePrimaryKeySpecificationException;
+import org.seasar.dbflute.exception.VaryingUpdateUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
- * The option of update for varying values.
+ * The option of update for varying-update.
  * @author jflute
  * @since 0.9.7.2 (2010/06/18 Friday)
  * @param <CB> The type of condition-bean for specification.
@@ -71,7 +73,7 @@ public class UpdateOption<CB extends ConditionBean> {
     /**
      * Specify a self calculation as update value. <br />
      * You can specify a column except PK column, common column and optimistic-lock column.
-     * And you can specify only one column that is integer type.
+     * And you can specify only one column that is a number type.
      * <pre>
      * Purchase purchase = new Purchase();
      * purchase.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -125,6 +127,11 @@ public class UpdateOption<CB extends ConditionBean> {
         if (columnInfo.isOptimisticLock()) {
             throwVaryingUpdateOptimisticLockSpecificationException(columnInfo);
         }
+        if (!Number.class.isAssignableFrom(columnInfo.getPropertyType())) {
+            // *simple message because other types may be supported at the future
+            String msg = "Not number column specified: " + columnInfo;
+            throw new VaryingUpdateUnsupportedColumnTypeException(msg);
+        }
     }
 
     protected void throwVaryingUpdateInvalidColumnSpecificationException(CB cb) {
@@ -135,22 +142,22 @@ public class UpdateOption<CB extends ConditionBean> {
         br.addElement("For example:");
         br.addElement("");
         br.addElement("  (x):");
-        br.addElement("    option.self(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            // *No! It's empty!");
+        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
+        br.addElement("        public void specify(PurchaseCB cb) {");
+        br.addElement("            // *no, empty");
         br.addElement("        }");
         br.addElement("    });");
         br.addElement("  (x):");
-        br.addElement("    option.self(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().columnBirthdate();");
-        br.addElement("            cb.specify().columnRegisterDatetime(); // *No! It's duplicated!");
+        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
+        br.addElement("        public void specify(PurchaseCB cb) {");
+        br.addElement("            cb.specify().columnPurchaseCount();");
+        br.addElement("            cb.specify().columnPurchasePrice(); // *no, duplicated");
         br.addElement("        }");
         br.addElement("    });");
         br.addElement("  (o)");
-        br.addElement("    option.self(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().columnBirthdate(); // OK");
+        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
+        br.addElement("        public void specify(PurchaseCB cb) {");
+        br.addElement("            cb.specify().columnPurchaseCount(); // OK");
         br.addElement("        }");
         br.addElement("    });");
         br.addItem("Target Table");
@@ -214,12 +221,41 @@ public class UpdateOption<CB extends ConditionBean> {
         if (statement == null) {
             return null;
         }
-        return statement.buildStatement(columnSqlName);
+        final String exp = statement.buildStatement(columnSqlName);
+        if (exp == null) { // means non-calculation
+            throwVaryingUpdateNotFoundCalculationException(columnDbName);
+        }
+        return exp;
     }
 
     protected SpecificationStatement findSpecification(String columnDbName) {
         // only "self" supported
         return _selfSpecificationMap.get(columnDbName);
+    }
+
+    protected void throwVaryingUpdateNotFoundCalculationException(String columnDbName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("A calculation of specified column for varying-update was not found.");
+        br.addItem("Advice");
+        br.addElement("You should call plus()/minus()/... methods after specification.");
+        br.addElement("For example:");
+        br.addElement("");
+        br.addElement("  (x):");
+        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
+        br.addElement("        public void specify(PurchaseCB cb) {");
+        br.addElement("            cb.specify().columnPurchaseCount();");
+        br.addElement("        }");
+        br.addElement("    }); // *no!");
+        br.addElement("  (o):");
+        br.addElement("    option.self(new SpecifyQuery<PurchaseCB>() {");
+        br.addElement("        public void specify(PurchaseCB cb) {");
+        br.addElement("            cb.specify().columnPurchaseCount();");
+        br.addElement("        }");
+        br.addElement("    }).plus(1); // OK");
+        br.addItem("Specified Column");
+        br.addElement(columnDbName);
+        final String msg = br.buildExceptionMessage();
+        throw new VaryingUpdateNotFoundCalculationException(msg);
     }
 
     // ===================================================================================
@@ -239,31 +275,31 @@ public class UpdateOption<CB extends ConditionBean> {
 
         /**
          * Plus the specified column with the value. (+)
-         * @param plusValue The integer value for plus. (NotNull)
+         * @param plusValue The number value for plus. (NotNull)
          * @return this. (NotNull)
          */
-        SpecificationCalculation plus(int plusValue);
+        SpecificationCalculation plus(Number plusValue);
 
         /**
          * Minus the specified column with the value. (-)
-         * @param minusValue The integer value for minus. (NotNull)
+         * @param minusValue The number value for minus. (NotNull)
          * @return this. (NotNull)
          */
-        SpecificationCalculation minus(int minusValue);
+        SpecificationCalculation minus(Number minusValue);
 
         /**
          * Multiply the value to the specified column. (*)
-         * @param multiplyValue The integer value for multiply. (NotNull)
+         * @param multiplyValue The number value for multiply. (NotNull)
          * @return this. (NotNull)
          */
-        SpecificationCalculation multiply(int multiplyValue);
+        SpecificationCalculation multiply(Number multiplyValue);
 
         /**
          * Divide the specified column by the value. (/)
-         * @param divideValue The integer value for divide. (NotNull)
+         * @param divideValue The number value for divide. (NotNull)
          * @return this. (NotNull)
          */
-        SpecificationCalculation divide(int divideValue);
+        SpecificationCalculation divide(Number divideValue);
     }
 
     public static class SelfSpecification<CB extends ConditionBean> implements SpecificationCalculation,
@@ -274,32 +310,36 @@ public class UpdateOption<CB extends ConditionBean> {
         /**
          * {@inheritDoc}
          */
-        public SpecificationCalculation plus(int plusValue) {
+        public SpecificationCalculation plus(Number plusValue) {
             return register(CalculationType.PLUS, plusValue);
         }
 
         /**
          * {@inheritDoc}
          */
-        public SpecificationCalculation minus(int minusValue) {
+        public SpecificationCalculation minus(Number minusValue) {
             return register(CalculationType.MINUS, minusValue);
         }
 
         /**
          * {@inheritDoc}
          */
-        public SpecificationCalculation multiply(int multiplyValue) {
+        public SpecificationCalculation multiply(Number multiplyValue) {
             return register(CalculationType.MULTIPLY, multiplyValue);
         }
 
         /**
          * {@inheritDoc}
          */
-        public SpecificationCalculation divide(int divideValue) {
+        public SpecificationCalculation divide(Number divideValue) {
             return register(CalculationType.DIVIDE, divideValue);
         }
 
-        protected SelfSpecification<CB> register(CalculationType type, Integer value) {
+        protected SelfSpecification<CB> register(CalculationType type, Number value) {
+            if (value == null) {
+                String msg = "The null value was specified as " + type + ": " + _specifyQuery;
+                throw new IllegalArgumentException(msg);
+            }
             final SelfCalculation calculation = new SelfCalculation();
             calculation.setCalculationType(type);
             calculation.setCalculationValue(value);
@@ -310,8 +350,7 @@ public class UpdateOption<CB extends ConditionBean> {
         public String buildStatement(ColumnSqlName columnSqlName) {
             final List<SelfCalculation> calculationList = getCalculationList();
             if (calculationList.isEmpty()) {
-                String msg = "Not found calculation of the columnName: " + columnSqlName;
-                throw new IllegalStateException(msg);
+                return null;
             }
             final StringBuilder sb = new StringBuilder();
             sb.append(columnSqlName);
@@ -342,7 +381,7 @@ public class UpdateOption<CB extends ConditionBean> {
 
     public static class SelfCalculation {
         protected CalculationType _calculationType;
-        protected Integer _calculationValue;
+        protected Number _calculationValue;
 
         public CalculationType getCalculationType() {
             return _calculationType;
@@ -352,11 +391,11 @@ public class UpdateOption<CB extends ConditionBean> {
             this._calculationType = calculationType;
         }
 
-        public Integer getCalculationValue() {
+        public Number getCalculationValue() {
             return _calculationValue;
         }
 
-        public void setCalculationValue(Integer calculationValue) {
+        public void setCalculationValue(Number calculationValue) {
             this._calculationValue = calculationValue;
         }
     }
