@@ -1219,6 +1219,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($database.isAvailableDatabaseDependency())
 #if ($database.isDatabaseMySQL())
 
+    // ===================================================================================
+    //                                                                    Full Text Search
+    //                                                                    ================
     /**
      * Match for full-text search. <br />
      * Bind variable is unused because the condition value should be literal in MySQL.
@@ -1229,7 +1232,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn
                     , String conditionValue
                     , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
-        if (conditionValue == null || conditionValue.length() == 0) { return; }
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue, modifier);
     }
@@ -1244,21 +1246,20 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
                     , String conditionValue
                     , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
-        if (conditionValue == null || conditionValue.length() == 0) { return; }
-        String conditionString = ((org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql)getSqlClause())
-                .buildMatchCondition(textColumnList, conditionValue, modifier, getTableDbName(), getRealAliasName());
-        registerWhereClause(conditionString);
+        xdoMatchForMySQL(textColumnList, conditionValue, modifier);
     }
 #end
 #if ($database.isDatabasePostgreSQL())
 
+    // ===================================================================================
+    //                                                                    Full Text Search
+    //                                                                    ================
     /**
      * Match for full-text search. <br />
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (Nullable: If the value is null or empty, it does not make condition!)
      */
     public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
-        if (conditionValue == null || conditionValue.length() == 0) { return; }
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1269,53 +1270,35 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param conditionValue The condition value. (Nullable: If the value is null or empty, it does not make condition!)
      */
     public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
-        if (conditionValue == null || conditionValue.length() == 0) { return; }
-        assertObjectNotNull("textColumnList", textColumnList);
-        if (textColumnList.isEmpty()) {
-            throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
-        }
-        int index = 0;
-        getSqlClause().makeOrScopeQueryEffective();
-        try {
-            for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
-                if (columnInfo == null) {
-                    continue;
-                }
-                String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
-                if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
-                    String msg = "The table of the text column should be '" + getTableDbName() + "'";
-                    msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
-                    throw new IllegalArgumentException(msg);
-                }
-                Class<?> propertyType = columnInfo.getPropertyType();
-                if (!String.class.isAssignableFrom(propertyType)) {
-                    String msg = "The text column should be String type:";
-                    msg = msg + " type=" + propertyType + " column=" + columnInfo;
-                    throw new IllegalArgumentException(msg);
-                }
-                invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
-                    private static final long serialVersionUID = 1L;
-                    @Override
-                    public org.seasar.dbflute.dbway.ExtensionOperand getExtensionOperand() {
-                        return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
-                    }
-                });
-                ++index;
-            }
-        } finally {
-            getSqlClause().closeOrScopeQuery();
-        }
+        xdoMatchByLikeSearch(textColumnList, conditionValue);
+    }
+
+    @Override
+    protected String xescapeFullTextSearchValue(String conditionValue) {
+        return conditionValue; // non escape
+    }
+
+    @Override
+    protected LikeSearchOption xcreateMatchLikeSearch() {
+        return new PostgreSQLMatchLikeSearch();
+    }
+
+    @Override
+    protected org.seasar.dbflute.dbway.ExtensionOperand xgetPostgreSQLMatchOperand() {
+        return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
     }
 #end
 #if ($database.isDatabaseOracle())
 
+    // ===================================================================================
+    //                                                                    Full Text Search
+    //                                                                    ================
     /**
      * Match for full-text search. <br />
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (Nullable: If the value is null or empty, it does not make condition!)
      */
     public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
-        if (conditionValue == null || conditionValue.length() == 0) { return; }
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1327,49 +1310,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param conditionValue The condition value. (Nullable: If the value is null or empty, it does not make condition!)
      */
     public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
-        if (conditionValue == null || conditionValue.length() == 0) { return; }
-        assertObjectNotNull("textColumnList", textColumnList);
-        if (textColumnList.isEmpty()) {
-            throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
-        }
-        conditionValue = escapeFullTextSearchValue(conditionValue);
-        int index = 0;
-        getSqlClause().makeOrScopeQueryEffective();
-        try {
-            for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
-                if (columnInfo == null) {
-                    continue;
-                }
-                String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
-                if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
-                    String msg = "The table of the text column should be '" + getTableDbName() + "'";
-                    msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
-                    throw new IllegalArgumentException(msg);
-                }
-                Class<?> propertyType = columnInfo.getPropertyType();
-                if (!String.class.isAssignableFrom(propertyType)) {
-                    String msg = "The text column should be String type:";
-                    msg = msg + " type=" + propertyType + " column=" + columnInfo;
-                    throw new IllegalArgumentException(msg);
-                }
-                invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
-                    private static final long serialVersionUID = 1L;
-                    @Override
-                    public org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger getWhereClauseArranger() {
-                        return ((org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause())
-                               .createFullTextSearchClauseArranger();
-                    }
-                });
-                ++index;
-            }
-        } finally {
-            getSqlClause().closeOrScopeQuery();
-        }
+        xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 
-    protected String escapeFullTextSearchValue(String conditionValue) {
-        return ((org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause())
-               .escapeFullTextSearchValue(conditionValue);
+    @Override
+    protected String xescapeFullTextSearchValue(String conditionValue) {
+        return xescapeOracleFullTextSearchValue(conditionValue);
+    }
+
+    @Override
+    protected LikeSearchOption xcreateMatchLikeSearch() {
+        return new OracleMatchLikeSearch();
     }
 #end
 #end
