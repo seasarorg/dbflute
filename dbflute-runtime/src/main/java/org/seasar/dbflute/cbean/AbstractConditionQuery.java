@@ -1478,7 +1478,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new PostgreSQLMatchLikeSearch();
     }
 
-    protected class PostgreSQLMatchLikeSearch extends LikeSearchOption {
+    public class PostgreSQLMatchLikeSearch extends LikeSearchOption {
         private static final long serialVersionUID = 1L;
 
         @Override
@@ -1496,7 +1496,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new OracleMatchLikeSearch();
     }
 
-    protected class OracleMatchLikeSearch extends LikeSearchOption {
+    public class OracleMatchLikeSearch extends LikeSearchOption {
         private static final long serialVersionUID = 1L;
 
         @Override
