@@ -357,7 +357,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                ------
     /**
      * Process before insert.
-     * @param entity Entity that the type is entity interface. (NotNull)
+     * @param entity The entity for insert. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeInsert(Entity entity) {
@@ -372,8 +372,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     /**
-     * Determine execution of insert.
-     * @param entity Entity. (NotNull)
+     * Determine execution of insert. (for extension)
+     * @param entity The entity for insert. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean determineExecuteInsert(Entity entity) {
@@ -382,21 +382,21 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     /**
      * {Framework Method} Filter the entity of insert.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * @param entity The entity for insert. (NotNull)
      */
-    protected void frameworkFilterEntityOfInsert(Entity targetEntity) {
-        injectSequenceToPrimaryKeyIfNeeds(targetEntity);
-        setupCommonColumnOfInsertIfNeeds(targetEntity);
+    protected void frameworkFilterEntityOfInsert(Entity entity) {
+        injectSequenceToPrimaryKeyIfNeeds(entity);
+        setupCommonColumnOfInsertIfNeeds(entity);
     }
 
     /**
      * Set up common columns of insert if it needs.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * @param entity The entity for insert. (NotNull)
      */
-    protected void setupCommonColumnOfInsertIfNeeds(Entity targetEntity) {
+    protected void setupCommonColumnOfInsertIfNeeds(Entity entity) {
         final CommonColumnAutoSetupper setupper = getCommonColumnAutoSetupper();
         assertCommonColumnAutoSetupperNotNull();
-        setupper.handleCommonColumnOfInsertIfNeeds(targetEntity);
+        setupper.handleCommonColumnOfInsertIfNeeds(entity);
     }
 
     private void assertCommonColumnAutoSetupperNotNull() {
@@ -418,15 +418,15 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     /**
-     * Filter the entity of insert.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * Filter the entity of insert. (for extension)
+     * @param entity The entity for insert. (NotNull)
      */
-    protected void filterEntityOfInsert(Entity targetEntity) {
+    protected void filterEntityOfInsert(Entity entity) {
     }
 
     /**
-     * Assert the entity of insert.
-     * @param entity Entity that the type is entity interface. (NotNull)
+     * Assert the entity of insert. (for extension)
+     * @param entity The entity for insert. (NotNull)
      */
     protected void assertEntityOfInsert(Entity entity) {
     }
@@ -436,7 +436,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                ------
     /**
      * Process before update.
-     * @param entity Entity that the type is entity interface. (NotNull)
+     * @param entity The entity for update that has primary key. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeUpdate(Entity entity) {
@@ -451,8 +451,26 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     /**
-     * Determine execution of update.
-     * @param entity Entity. (NotNull)
+     * Process before query-update.
+     * @param entity The entity for update that is not needed primary key. (NotNull)
+     * @param cb The condition-bean for query. (NotNull) 
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean processBeforeQueryUpdate(Entity entity, ConditionBean cb) {
+        if (!determineExecuteUpdate(entity)) {
+            return false;
+        }
+        assertEntityNotNull(entity); // query-update doesn't need primary key
+        assertCBNotNull(cb);
+        frameworkFilterEntityOfUpdate(entity);
+        filterEntityOfUpdate(entity);
+        assertEntityOfUpdate(entity);
+        return true;
+    }
+
+    /**
+     * Determine execution of update. (for extension)
+     * @param entity The entity for update. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean determineExecuteUpdate(Entity entity) {
@@ -461,34 +479,42 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     /**
      * {Framework Method} Filter the entity of update.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * @param entity The entity for update. (NotNull)
      */
-    protected void frameworkFilterEntityOfUpdate(Entity targetEntity) {
-        setupCommonColumnOfUpdateIfNeeds(targetEntity);
+    protected void frameworkFilterEntityOfUpdate(Entity entity) {
+        setupCommonColumnOfUpdateIfNeeds(entity);
     }
 
     /**
      * Set up common columns of update if it needs.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * @param entity The entity for update. (NotNull)
      */
-    protected void setupCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
+    protected void setupCommonColumnOfUpdateIfNeeds(Entity entity) {
         final CommonColumnAutoSetupper setupper = getCommonColumnAutoSetupper();
         assertCommonColumnAutoSetupperNotNull();
-        setupper.handleCommonColumnOfUpdateIfNeeds(targetEntity);
+        setupper.handleCommonColumnOfUpdateIfNeeds(entity);
     }
 
     /**
-     * Filter the entity of update.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * Filter the entity of update. (for extension)
+     * @param entity The entity for update. (NotNull)
      */
-    protected void filterEntityOfUpdate(Entity targetEntity) {
+    protected void filterEntityOfUpdate(Entity entity) {
     }
 
     /**
-     * Assert the entity of update.
-     * @param entity Entity that the type is entity interface. (NotNull)
+     * Assert the entity of update. (for extension)
+     * @param entity The entity for update. (NotNull)
      */
     protected void assertEntityOfUpdate(Entity entity) {
+    }
+
+    /**
+     * Assert that the update option is not null.
+     * @param option The option of update. (NotNull)
+     */
+    protected void assertUpdateOptionNotNull(UpdateOption<? extends ConditionBean> option) {
+        assertObjectNotNull("option", option);
     }
 
     // -----------------------------------------------------
@@ -496,7 +522,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                ------
     /**
      * Process before delete.
-     * @param entity Entity that the type is entity interface. (NotNull)
+     * @param entity The entity for delete that has primary key. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeDelete(Entity entity) {
@@ -511,8 +537,18 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     /**
-     * Determine execution of delete.
-     * @param entity Entity. (NotNull)
+     * Process before query-delete.
+     * @param cb The condition-bean for query. (NotNull)
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean processBeforeQueryDelete(ConditionBean cb) {
+        assertCBNotNull(cb);
+        return true;
+    }
+
+    /**
+     * Determine execution of delete. (for extension) {not called if query-delete}
+     * @param entity The entity for delete that has primary key. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean determineExecuteDelete(Entity entity) {
@@ -520,26 +556,29 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     /**
-     * {Framework Method} Filter the entity of delete.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * {Framework Method} Filter the entity of delete. {not called if query-delete}
+     * @param entity The entity for delete that has primary key. (NotNull)
      */
-    protected void frameworkFilterEntityOfDelete(Entity targetEntity) {
+    protected void frameworkFilterEntityOfDelete(Entity entity) {
     }
 
     /**
-     * Filter the entity of delete.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * Filter the entity of delete. (for extension) {not called if query-delete}
+     * @param entity The entity for delete that has primary key. (NotNull)
      */
-    protected void filterEntityOfDelete(Entity targetEntity) {
+    protected void filterEntityOfDelete(Entity entity) {
     }
 
     /**
-     * Assert the entity of delete.
-     * @param entity Entity that the type is entity interface. (NotNull)
+     * Assert the entity of delete. (for extension) {not called if query-delete}
+     * @param entity The entity for delete that has primary key. (NotNull)
      */
     protected void assertEntityOfDelete(Entity entity) {
     }
 
+    // -----------------------------------------------------
+    //                                                 Batch
+    //                                                 -----
     /**
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Inserted count.
@@ -744,6 +783,30 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setConditionBeanType(cb.getClass());
         cmd.setConditionBean(cb);
+        return cmd;
+    }
+
+    protected UpdateEntityCommand createVaryingUpdateEntityCommand(Entity entity,
+            UpdateOption<? extends ConditionBean> option) {
+        assertBehaviorCommandInvoker("createVaryingUpdateEntityCommand");
+        final UpdateEntityCommand cmd = createUpdateEntityCommand(entity);
+        cmd.setUpdateOption(option);
+        return cmd;
+    }
+
+    protected UpdateNonstrictEntityCommand createVaryingUpdateNonstrictEntityCommand(Entity entity,
+            UpdateOption<? extends ConditionBean> option) {
+        assertBehaviorCommandInvoker("createVaryingUpdateNonstrictEntityCommand");
+        final UpdateNonstrictEntityCommand cmd = createUpdateNonstrictEntityCommand(entity);
+        cmd.setUpdateOption(option);
+        return cmd;
+    }
+
+    protected QueryUpdateEntityCBCommand createVaryingQueryUpdateEntityCBCommand(Entity entity, ConditionBean cb,
+            UpdateOption<? extends ConditionBean> option) {
+        assertBehaviorCommandInvoker("createVaryingQueryUpdateEntityCBCommand");
+        final QueryUpdateEntityCBCommand cmd = createQueryUpdateEntityCBCommand(entity, cb);
+        cmd.setUpdateOption(option);
         return cmd;
     }
 

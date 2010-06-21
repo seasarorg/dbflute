@@ -45,7 +45,7 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
     public Object execute(Object[] args) {
         final TnAbstractBatchAutoHandler handler = createBatchAutoHandler();
         handler.setOptimisticLockHandling(optimisticLockHandling);
-        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
+        handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
         // The logging message SQL of procedure is unnecessary.
         // handler.setLoggingMessageSqlArgs(args);

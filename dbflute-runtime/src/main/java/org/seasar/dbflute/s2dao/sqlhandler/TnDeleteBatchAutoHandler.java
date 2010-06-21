@@ -31,9 +31,8 @@ public class TnDeleteBatchAutoHandler extends TnAbstractBatchAutoHandler {
     //                                                                         Constructor
     //                                                                         ===========
     public TnDeleteBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
-
-        super(dataSource, statementFactory, beanMetaData, propertyTypes);
+            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
     }
 
     // ===================================================================================

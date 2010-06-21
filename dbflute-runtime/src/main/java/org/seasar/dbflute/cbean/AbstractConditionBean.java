@@ -191,6 +191,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                         ===========
     protected <CB extends ConditionBean> void xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
             SpecifyQuery<CB> rightSp, String operand) {
+        assertQueryPurpose();
         // specify left column
         leftSp.specify(leftCB);
         final ColumnRealName leftColumn = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
@@ -213,6 +214,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        OrScopeQuery
     //                                                                        ============
     protected <CB extends ConditionBean> void xorSQ(CB cb, OrQuery<CB> orQuery) {
+        assertQueryPurpose();
         getSqlClause().makeOrScopeQueryEffective();
         try {
             orQuery.query(cb);
@@ -795,13 +797,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION);
     }
 
-    public void xsetupForColumnQuery() {
-        xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
-    }
+    // *defined at base condition-bean
+    //public void xsetupForColumnQuery() {
+    //    xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
+    //}
 
-    public void xsetupForVaryingUpdate() {
-        xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
-    }
+    // *defined at base condition-bean
+    //public void xsetupForVaryingUpdate() {
+    //    xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
+    //}
 
     protected void xchangePurposeSqlClause(HpCBPurpose purpose) {
         _purpose = purpose;

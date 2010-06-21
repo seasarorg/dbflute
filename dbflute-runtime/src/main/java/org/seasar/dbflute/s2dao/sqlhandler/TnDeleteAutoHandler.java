@@ -31,8 +31,8 @@ public class TnDeleteAutoHandler extends TnAbstractAutoHandler {
     //                                                                         Constructor
     //                                                                         ===========
     public TnDeleteAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            TnPropertyType[] propertyTypes) {
-        super(dataSource, statementFactory, beanMetaData, propertyTypes);
+            TnPropertyType[] boundPropTypes) {
+        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
     }
 
     // ===================================================================================
@@ -41,6 +41,6 @@ public class TnDeleteAutoHandler extends TnAbstractAutoHandler {
     @Override
     protected void setupBindVariables(Object bean) {
         setupDeleteBindVariables(bean);
-        setExceptionMessageSqlArgs(bindVariables);
+        setExceptionMessageSqlArgs(_bindVariables);
     }
 }

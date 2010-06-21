@@ -20,12 +20,18 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
+import org.seasar.dbflute.exception.VaryingUpdateInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.VaryingUpdateOptimisticLockSpecificationException;
+import org.seasar.dbflute.exception.VaryingUpdatePrimaryKeySpecificationException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
+ * The option of update for varying values.
  * @author jflute
  * @since 0.9.7.2 (2010/06/18 Friday)
  * @param <CB> The type of condition-bean for specification.
@@ -41,12 +47,46 @@ public class UpdateOption<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor.
+     * <pre>
+     * Purchase purchase = new Purchase();
+     * purchase.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #FD4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
+     * option.<span style="color: #FD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     *     public void specify(PurchaseCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnPurchaseCount()</span>;
+     *     }
+     * }).<span style="color: #FD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     * purchaseBhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(purchase, option);
+     * </pre>
+     */
     public UpdateOption() {
     }
 
     // ===================================================================================
     //                                                                    Self Calculation
     //                                                                    ================
+    /**
+     * Specify a self calculation as update value. <br />
+     * You can specify a column except PK column, common column and optimistic-lock column.
+     * And you can specify only one column that is integer type.
+     * <pre>
+     * Purchase purchase = new Purchase();
+     * purchase.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * UpdateOption&lt;PurchaseCB&gt; option = new UpdateOption&lt;PurchaseCB&gt;();
+     * option.<span style="color: #FD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     *     public void specify(PurchaseCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnPurchaseCount()</span>;
+     *     }
+     * }).<span style="color: #FD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     * purchaseBhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(purchase, option);
+     * </pre>
+     * @param specifyQuery The query for specification that specifies only one column. (NotNull)
+     * @return The calculation of specification for the specified column. (NotNull)
+     */
     public SpecificationCalculation self(SpecifyQuery<CB> specifyQuery) {
         if (specifyQuery == null) {
             String msg = "The argument 'specifyQuery' should not be null.";
@@ -61,16 +101,104 @@ public class UpdateOption<CB extends ConditionBean> {
     // ===================================================================================
     //                                                               Resolve Specification
     //                                                               =====================
-    public void resolveSpeicification(CB cb) {
+    public void resolveSpecification(CB cb) {
         for (SelfSpecification<CB> specification : _selfSpecificationList) {
             final SpecifyQuery<CB> specifyQuery = specification.getSpecifyQuery();
             specifyQuery.specify(cb);
-            final String columnDbName = getSpecifiedColumnNameAsOne(cb);
-            _selfSpecificationMap.put(Srl.substringLastRear(columnDbName, "."), specification);
+            final String columnDbName = getSpecifiedColumnDbNameAsOne(cb);
+            assertSpecifiedColumn(cb, columnDbName);
+            _selfSpecificationMap.put(columnDbName, specification);
         }
     }
 
-    protected String getSpecifiedColumnNameAsOne(CB cb) {
+    protected void assertSpecifiedColumn(CB cb, String columnDbName) {
+        if (columnDbName == null) {
+            throwVaryingUpdateInvalidColumnSpecificationException(cb);
+        }
+        final ColumnInfo columnInfo = cb.getDBMeta().findColumnInfo(columnDbName);
+        if (columnInfo.isPrimary()) {
+            throwVaryingUpdatePrimaryKeySpecificationException(columnInfo);
+        }
+        if (columnInfo.isCommonColumn()) {
+            throwVaryingUpdateCommonColumnSpecificationException(columnInfo);
+        }
+        if (columnInfo.isOptimisticLock()) {
+            throwVaryingUpdateOptimisticLockSpecificationException(columnInfo);
+        }
+    }
+
+    protected void throwVaryingUpdateInvalidColumnSpecificationException(CB cb) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The specified column for varying-update was invalid.");
+        br.addItem("Advice");
+        br.addElement("You should call specify().column[TargetColumn]() only once.");
+        br.addElement("For example:");
+        br.addElement("");
+        br.addElement("  (x):");
+        br.addElement("    option.self(new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            // *No! It's empty!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (x):");
+        br.addElement("    option.self(new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.specify().columnBirthdate();");
+        br.addElement("            cb.specify().columnRegisterDatetime(); // *No! It's duplicated!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (o)");
+        br.addElement("    option.self(new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.specify().columnBirthdate(); // OK");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addItem("Target Table");
+        br.addElement(cb.getTableDbName());
+        final String msg = br.buildExceptionMessage();
+        throw new VaryingUpdateInvalidColumnSpecificationException(msg);
+    }
+
+    protected void throwVaryingUpdatePrimaryKeySpecificationException(ColumnInfo columnInfo) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The primary key column was specified.");
+        br.addItem("Advice");
+        br.addElement("Varying-update is not allowed to specify a PK column.");
+        br.addItem("Target Table");
+        br.addElement(columnInfo.getDBMeta().getTableDbName());
+        br.addItem("Specified Column");
+        br.addElement(columnInfo);
+        final String msg = br.buildExceptionMessage();
+        throw new VaryingUpdatePrimaryKeySpecificationException(msg);
+    }
+
+    protected void throwVaryingUpdateCommonColumnSpecificationException(ColumnInfo columnInfo) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column for optimistic lock was specified.");
+        br.addItem("Advice");
+        br.addElement("Varying-update is not allowed to specify a optimistic-lock column.");
+        br.addItem("Target Table");
+        br.addElement(columnInfo.getDBMeta().getTableDbName());
+        br.addItem("Specified Column");
+        br.addElement(columnInfo);
+        final String msg = br.buildExceptionMessage();
+        throw new VaryingUpdateCommonColumnSpecificationException(msg);
+    }
+
+    protected void throwVaryingUpdateOptimisticLockSpecificationException(ColumnInfo columnInfo) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column for optimistic lock was specified.");
+        br.addItem("Advice");
+        br.addElement("Varying-update is not allowed to specify a optimistic-lock column.");
+        br.addItem("Target Table");
+        br.addElement(columnInfo.getDBMeta().getTableDbName());
+        br.addItem("Specified Column");
+        br.addElement(columnInfo);
+        final String msg = br.buildExceptionMessage();
+        throw new VaryingUpdateOptimisticLockSpecificationException(msg);
+    }
+
+    protected String getSpecifiedColumnDbNameAsOne(CB cb) {
         return cb.getSqlClause().getSpecifiedColumnDbNameAsOne(); // it's column DB name
     }
 
@@ -98,17 +226,44 @@ public class UpdateOption<CB extends ConditionBean> {
     //                                                                       Related Class
     //                                                                       =============
     public static interface SpecificationStatement {
-        String buildStatement(ColumnSqlName columnSqlsName);
+
+        /**
+         * Build the statement as update value.
+         * @param columnSqlName The SQL name of column. (NotNull)
+         * @return The statement as update value. (Nullable: if null, means the column is not specified)
+         */
+        String buildStatement(ColumnSqlName columnSqlName);
     }
 
     public static interface SpecificationCalculation {
-        SpecificationCalculation plus(Integer plusValue);
 
-        SpecificationCalculation minus(Integer minusValue);
+        /**
+         * Plus the specified column with the value. (+)
+         * @param plusValue The integer value for plus. (NotNull)
+         * @return this. (NotNull)
+         */
+        SpecificationCalculation plus(int plusValue);
 
-        SpecificationCalculation multiply(Integer multiplyValue);
+        /**
+         * Minus the specified column with the value. (-)
+         * @param minusValue The integer value for minus. (NotNull)
+         * @return this. (NotNull)
+         */
+        SpecificationCalculation minus(int minusValue);
 
-        SpecificationCalculation divide(Integer divideValue);
+        /**
+         * Multiply the value to the specified column. (*)
+         * @param multiplyValue The integer value for multiply. (NotNull)
+         * @return this. (NotNull)
+         */
+        SpecificationCalculation multiply(int multiplyValue);
+
+        /**
+         * Divide the specified column by the value. (/)
+         * @param divideValue The integer value for divide. (NotNull)
+         * @return this. (NotNull)
+         */
+        SpecificationCalculation divide(int divideValue);
     }
 
     public static class SelfSpecification<CB extends ConditionBean> implements SpecificationCalculation,
@@ -116,19 +271,31 @@ public class UpdateOption<CB extends ConditionBean> {
         protected SpecifyQuery<CB> _specifyQuery;
         protected final List<SelfCalculation> _calculationList = DfCollectionUtil.newArrayList();
 
-        public SpecificationCalculation plus(Integer plusValue) {
+        /**
+         * {@inheritDoc}
+         */
+        public SpecificationCalculation plus(int plusValue) {
             return register(CalculationType.PLUS, plusValue);
         }
 
-        public SpecificationCalculation minus(Integer minusValue) {
+        /**
+         * {@inheritDoc}
+         */
+        public SpecificationCalculation minus(int minusValue) {
             return register(CalculationType.MINUS, minusValue);
         }
 
-        public SpecificationCalculation multiply(Integer multiplyValue) {
+        /**
+         * {@inheritDoc}
+         */
+        public SpecificationCalculation multiply(int multiplyValue) {
             return register(CalculationType.MULTIPLY, multiplyValue);
         }
 
-        public SpecificationCalculation divide(Integer divideValue) {
+        /**
+         * {@inheritDoc}
+         */
+        public SpecificationCalculation divide(int divideValue) {
             return register(CalculationType.DIVIDE, divideValue);
         }
 

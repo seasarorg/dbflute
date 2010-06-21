@@ -32,8 +32,8 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
     //                                                                         Constructor
     //                                                                         ===========
     public TnInsertAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            TnPropertyType[] propertyTypes) {
-        super(dataSource, statementFactory, beanMetaData, propertyTypes);
+            TnPropertyType[] boundPropTypes) {
+        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
         setOptimisticLockHandling(false);
     }
 
@@ -43,7 +43,7 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
     @Override
     protected void setupBindVariables(Object bean) {
         setupInsertBindVariables(bean);
-        setExceptionMessageSqlArgs(bindVariables);
+        setExceptionMessageSqlArgs(_bindVariables);
     }
 
     @Override

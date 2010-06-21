@@ -266,8 +266,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected String deleteUnionWhereTemplateMark(String unionClause) {
         if (unionClause != null && unionClause.trim().length() > 0) {
-            unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");
-            unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");
+            unionClause = replace(unionClause, getUnionWhereClauseMark(), "");
+            unionClause = replace(unionClause, getUnionWhereFirstConditionMark(), "");
         }
         return unionClause;
     }
@@ -2132,9 +2132,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
 
         // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
-        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+        fromWhereClause = replace(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replace(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replace(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         final StringBuilder sb = new StringBuilder();
         String ln = ln();
@@ -2173,8 +2173,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = processSubQueryIndent(fromWhereClause);
-            subQuery = replaceString(subQuery, aliasName + ".", "");
-            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = replace(subQuery, aliasName + ".", "");
+            subQuery = replace(subQuery, " " + aliasName + " ", " ");
             int whereIndex = subQuery.indexOf("where ");
             if (whereIndex < 0) {
                 return sb.toString();
@@ -2194,9 +2194,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
 
         // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
-        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+        fromWhereClause = replace(fromWhereClause, getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replace(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replace(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
             final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
@@ -2220,8 +2220,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = processSubQueryIndent(fromWhereClause);
-            subQuery = replaceString(subQuery, aliasName + ".", "");
-            subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
+            subQuery = replace(subQuery, aliasName + ".", "");
+            subQuery = replace(subQuery, " " + aliasName + " ", " ");
             subQuery = subQuery.substring(subQuery.indexOf("from "));
             return "delete " + subQuery;
         }
@@ -2317,7 +2317,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String replaceString(String text, String fromText, String toText) {
+    protected String replace(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
     }
 

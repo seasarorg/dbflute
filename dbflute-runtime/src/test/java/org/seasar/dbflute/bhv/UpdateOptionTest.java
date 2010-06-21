@@ -25,7 +25,7 @@ public class UpdateOptionTest extends PlainTestCase {
         }).plus(1);
 
         // ## Act ##
-        option.resolveSpeicification(new MockConditionBean());
+        option.resolveSpecification(new MockConditionBean());
         String actual = option.buildStatement(columnDbName, new ColumnSqlName(columnDbName));
 
         // ## Arrange ##
@@ -46,7 +46,7 @@ public class UpdateOptionTest extends PlainTestCase {
         }).minus(3);
 
         // ## Act ##
-        option.resolveSpeicification(new MockConditionBean());
+        option.resolveSpecification(new MockConditionBean());
         String actual = option.buildStatement(columnDbName, new ColumnSqlName("\"" + columnDbName + "\""));
 
         // ## Arrange ##
@@ -67,7 +67,7 @@ public class UpdateOptionTest extends PlainTestCase {
         }).multiply(100);
 
         // ## Act ##
-        option.resolveSpeicification(new MockConditionBean());
+        option.resolveSpecification(new MockConditionBean());
         String actual = option.buildStatement(columnDbName, new ColumnSqlName(columnDbName));
 
         // ## Arrange ##
@@ -88,7 +88,7 @@ public class UpdateOptionTest extends PlainTestCase {
         }).multiply(2).plus(1);
 
         // ## Act ##
-        option.resolveSpeicification(new MockConditionBean());
+        option.resolveSpecification(new MockConditionBean());
         String actual = option.buildStatement(columnDbName, new ColumnSqlName(columnDbName));
 
         // ## Arrange ##
@@ -109,7 +109,7 @@ public class UpdateOptionTest extends PlainTestCase {
         }).multiply(2).plus(1).minus(3);
 
         // ## Act ##
-        option.resolveSpeicification(new MockConditionBean());
+        option.resolveSpecification(new MockConditionBean());
         String actual = option.buildStatement(columnDbName, new ColumnSqlName(columnDbName));
 
         // ## Arrange ##
@@ -121,7 +121,12 @@ public class UpdateOptionTest extends PlainTestCase {
     protected UpdateOption<MockConditionBean> createTarget(final Stack<String> columnStack) {
         return new UpdateOption<MockConditionBean>() {
             @Override
-            protected String getSpecifiedColumnNameAsOne(MockConditionBean cb) {
+            protected void assertSpecifiedColumn(MockConditionBean cb, String columnDbName) {
+                // no check
+            }
+
+            @Override
+            protected String getSpecifiedColumnDbNameAsOne(MockConditionBean cb) {
                 return columnStack.pop();
             }
         };

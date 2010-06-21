@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
@@ -43,20 +45,20 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory
-            .getLog(TnAbstractBatchAutoHandler.class);
+    private static final Log _log = LogFactory.getLog(TnAbstractBatchAutoHandler.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
-        super(dataSource, statementFactory, beanMetaData, propertyTypes);
+            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
+    @Override
     public int execute(Object[] args) {
         List<?> list = null;
         if (args[0] instanceof Object[]) {
@@ -163,7 +165,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         }
         final int entityCount = list.size();
         if (updateCount < entityCount) {
-            if (isOptimisticLockHandling()) {
+            if (_optimisticLockHandling) {
                 throw new BatchEntityAlreadyUpdatedException(list.get(0), 0, updateCount);
             } else {
                 String msg = "The entity have already deleted:";
@@ -204,7 +206,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             for (int oneUpdateCount : updatedCountArray) {
                 updateCount = updateCount + oneUpdateCount;
             }
-            if (isOptimisticLockHandling()) {
+            if (_optimisticLockHandling) {
                 throw new BatchEntityAlreadyUpdatedException(list.get(index), 0, updateCount);
             } else {
                 String msg = "The entity have already deleted:";

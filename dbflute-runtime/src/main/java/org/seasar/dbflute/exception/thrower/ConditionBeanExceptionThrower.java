@@ -129,18 +129,23 @@ public class ConditionBeanExceptionThrower {
         br.addNotice("The purpose was illegal for query.");
         br.addItem("Advice");
         br.addElement("This condition-bean is not allowed to set query.");
+        br.addElement("(contains OrScopeQuery and ColumnQuery)");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ColumnQuery)");
         br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB>() {");
         br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.query().set...(); // *no!");
+        br.addElement("            cb.query().set...();  // *no!");
+        br.addElement("            cb.columnQuery(...);  // *no!");
+        br.addElement("            cb.orScopeQuery(...); // *no!");
         br.addElement("        }");
         br.addElement("    })...");
         br.addElement("  (x): (VaryingUpdate)");
         br.addElement("    UpdateOption option = new UpdateOption().self(new SpecifyQuery<MemberCB>() {");
         br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.query().set...(); // *no!");
+        br.addElement("            cb.query().set...();  // *no!");
+        br.addElement("            cb.columnQuery(...);  // *no!");
+        br.addElement("            cb.orScopeQuery(...); // *no!");
         br.addElement("        }");
         br.addElement("    });");
         // don't use displaySql because of illegal CB's state

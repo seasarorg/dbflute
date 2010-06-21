@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -49,44 +50,55 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource dataSource;
-    protected StatementFactory statementFactory;
-    private TnBeanMetaData beanMetaData;
+    protected final DataSource _dataSource;
+    protected final StatementFactory _statementFactory;
+    protected TnBeanMetaData _beanMetaData;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnUpdateQueryAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
-        this.dataSource = dataSource;
-        this.statementFactory = statementFactory;
+        this._dataSource = dataSource;
+        this._statementFactory = statementFactory;
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
-        ConditionBean cb = extractConditionBeanWithCheck(args);
-        Entity entity = extractEntityWithCheck(args);
-        String[] argNames = new String[] { "pmb", "entity" };
-        Class<?>[] argTypes = new Class<?>[] { cb.getClass(), entity.getClass() };
-        List<TnPropertyType> propertyTypeList = new ArrayList<TnPropertyType>();
-        String twoWaySql = buildQueryUpdateTwoWaySql(entity, cb, propertyTypeList);
-        if (twoWaySql == null) {
-            return 0; // No execute!
+        // analyze arguments
+        final ConditionBean cb = extractConditionBeanWithCheck(args);
+        final Entity entity = extractEntityWithCheck(args);
+        final UpdateOption<ConditionBean> option = extractUpdateOptionWithCheck(args);
+
+        // arguments for execution (not contains an option)
+        final String[] argNames = new String[] { "pmb", "entity" };
+        final Class<?>[] argTypes = new Class<?>[] { cb.getClass(), entity.getClass() };
+
+        // build SQL
+        final List<TnPropertyType> boundPropTypeList = new ArrayList<TnPropertyType>();
+        final String twoWaySql = buildQueryUpdateTwoWaySql(entity, cb, option, boundPropTypeList);
+        if (twoWaySql == null) { // means non-modification
+            return 0; // non execute
         }
-        CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
-        TnCommandContextHandler handler = createCommandContextHandler(context);
+
+        // execute
+        final CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        final TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setExceptionMessageSqlArgs(context.getBindVariables());
-        handler.setPropertyTypeList(propertyTypeList);
-        int rows = handler.execute(args);
+        handler.setBoundPropTypeList(boundPropTypeList);
+        final int rows = handler.execute(args);
         return Integer.valueOf(rows);
     }
 
+    // ===================================================================================
+    //                                                                    Analyze Argument
+    //                                                                    ================
     protected ConditionBean extractConditionBeanWithCheck(Object[] args) {
         assertArgument(args);
         Object fisrtArg = args[0];
         if (!(fisrtArg instanceof ConditionBean)) {
-            String msg = "The type of first argument should be " + ConditionBean.class + "! But:";
+            String msg = "The type of first argument should be " + ConditionBean.class + ":";
             msg = msg + " type=" + fisrtArg.getClass();
             throw new IllegalArgumentException(msg);
         }
@@ -97,51 +109,80 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         assertArgument(args);
         Object secondArg = args[1];
         if (!(secondArg instanceof Entity)) {
-            String msg = "The type of second argument should be " + Entity.class + "! But:";
+            String msg = "The type of second argument should be " + Entity.class + ":";
             msg = msg + " type=" + secondArg.getClass();
             throw new IllegalArgumentException(msg);
         }
         return (Entity) secondArg;
     }
 
+    protected UpdateOption<ConditionBean> extractUpdateOptionWithCheck(Object[] args) {
+        assertArgument(args);
+        if (args.length < 3) {
+            return null;
+        }
+        final Object secondArg = args[2];
+        if (secondArg == null) {
+            return null;
+        }
+        if (!(secondArg instanceof UpdateOption<?>)) {
+            String msg = "The type of third argument should be " + UpdateOption.class + ":";
+            msg = msg + " type=" + secondArg.getClass();
+            throw new IllegalArgumentException(msg);
+        }
+        @SuppressWarnings("unchecked")
+        final UpdateOption<ConditionBean> option = (UpdateOption<ConditionBean>) secondArg;
+        return option;
+    }
+
     protected void assertArgument(Object[] args) {
         if (args == null || args.length <= 1) {
-            String msg = "The arguments should have two argument! But:";
+            String msg = "The arguments should have two argument at least! But:";
             msg = msg + " args=" + (args != null ? args.length : null);
             throw new IllegalArgumentException(msg);
         }
     }
 
-    protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
-        return new TnCommandContextHandler(dataSource, statementFactory, context);
-    }
-
+    // ===================================================================================
+    //                                                                           Build SQL
+    //                                                                           =========
     /**
      * @param entity Entity. (NotNull)
      * @param cb Condition-bean. (NotNull)
-     * @param propertyTypeList The list of property type. (NotNull, ShouldBeEmpty)
-     * @return The two-way SQL of query update. (Nullable: If the set of modified properties is empty, return null.)
+     * @param option The option of update. (Nullable)
+     * @param boundPropTypeList The type list of bound property. (NotNull, Empty)
+     * @return The two-way SQL of query update. (Nullable: if non-modification, return null.)
      */
-    protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb, List<TnPropertyType> propertyTypeList) {
+    protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb, UpdateOption<ConditionBean> option,
+            List<TnPropertyType> boundPropTypeList) {
         final Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
         final DBMeta dbmeta = entity.getDBMeta();
         final Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
-        if (modifiedPropertyNames.isEmpty()) {
-            return null;
-        }
-        for (String propertyName : modifiedPropertyNames) {
-            final ColumnInfo columnInfo = dbmeta.findColumnInfo(propertyName);
-            final String columnName = columnInfo.getColumnDbName();
-            final Object value = columnInfo.read(entity);
-            if (value != null) {
-                columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
-
-                // Add property type
-                TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
-                propertyTypeList.add(propertyType);
-            } else {
-                columnParameterMap.put(columnName, "null");
+        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            final String columnDbName = columnInfo.getColumnDbName();
+            if (option != null && option.hasStatement(columnDbName)) {
+                final String statement = option.buildStatement(columnDbName, columnInfo.getColumnSqlName());
+                columnParameterMap.put(columnDbName, statement);
+                continue;
             }
+            final String propertyName = columnInfo.getPropertyName();
+            if (modifiedPropertyNames.contains(propertyName)) {
+                final Object value = columnInfo.read(entity);
+                if (value != null) {
+                    columnParameterMap.put(columnDbName, "/*entity." + propertyName + "*/null");
+
+                    // Add property type
+                    TnPropertyType propertyType = _beanMetaData.getPropertyType(propertyName);
+                    boundPropTypeList.add(propertyType);
+                } else {
+                    columnParameterMap.put(columnDbName, "null");
+                }
+                continue;
+            }
+        }
+        if (columnParameterMap.isEmpty()) {
+            return null;
         }
         if (dbmeta.hasVersionNo()) {
             final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
@@ -156,12 +197,14 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
             columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
 
             // add property type
-            final TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
-            propertyTypeList.add(propertyType);
+            boundPropTypeList.add(_beanMetaData.getPropertyType(propertyName));
         }
         return cb.getSqlClause().getClauseQueryUpdate(columnParameterMap);
     }
 
+    // ===================================================================================
+    //                                                                     Command Context
+    //                                                                     ===============
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
             Object[] args) {
         CommandContext context;
@@ -179,6 +222,10 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         return ResourceContext.createSqlAnalyzer(sql, true);
     }
 
+    protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
+        return new TnCommandContextHandler(_dataSource, _statementFactory, context);
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
@@ -194,10 +241,10 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     //                                                                            Accessor
     //                                                                            ========
     public TnBeanMetaData getBeanMetaData() {
-        return beanMetaData;
+        return _beanMetaData;
     }
 
     public void setBeanMetaData(TnBeanMetaData beanMetaData) {
-        this.beanMetaData = beanMetaData;
+        this._beanMetaData = beanMetaData;
     }
 }

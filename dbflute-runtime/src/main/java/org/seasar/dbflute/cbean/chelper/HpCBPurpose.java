@@ -12,8 +12,14 @@ public enum HpCBPurpose {
     , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noOrderBy()) // DerivedReferrer
     , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noOrderBy()) // ScalarSelect
     , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noOrderBy()) // ScalarCondition
+
+    // A purpose that can specify but not allowed to query
+    // needs to switch condition-bean used in specification
+    // to non-checked condition-bean.
+    // Because specification uses query internally.
     , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noQuery()) // ColumnQuery
     , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
+
     // QueryUpdate and QueryDelete are not defined here
     // because their condition-beans are created by an application
     // (not call-back style)

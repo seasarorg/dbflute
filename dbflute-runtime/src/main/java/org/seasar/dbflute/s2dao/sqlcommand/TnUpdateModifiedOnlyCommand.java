@@ -55,12 +55,11 @@ public class TnUpdateModifiedOnlyCommand extends TnUpdateAutoDynamicCommand {
             if (pt.isPrimaryKey()) {
                 continue;
             }
-            if (option != null && option.hasStatement(pt.getColumnDbName())) {
-                continue;
-            }
             final String propertyName = pt.getPropertyName();
+            final String columnDbName = pt.getColumnDbName();
             if (isOptimisticLockProperty(timestampProp, versionNoProp, propertyName)
-                    || modifiedPropertyNames.contains(propertyName)) {
+                    || isModifiedProperty(modifiedPropertyNames, propertyName)
+                    || isStatementProperty(option, columnDbName)) {
                 types.add(pt);
             }
         }
@@ -70,5 +69,13 @@ public class TnUpdateModifiedOnlyCommand extends TnUpdateAutoDynamicCommand {
 
     protected boolean isOptimisticLockProperty(String timestampProp, String versionNoProp, String propertyName) {
         return propertyName.equalsIgnoreCase(timestampProp) || propertyName.equalsIgnoreCase(versionNoProp);
+    }
+
+    protected boolean isStatementProperty(UpdateOption<ConditionBean> option, String columnDbName) {
+        return option != null && option.hasStatement(columnDbName);
+    }
+
+    protected boolean isModifiedProperty(Set<?> modifiedPropertyNames, String propertyName) {
+        return modifiedPropertyNames.contains(propertyName);
     }
 }

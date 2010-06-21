@@ -67,7 +67,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
         // Remove select-hint comment from select clause of union
         // for fetch-scope with union().
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        selectClause = replaceString(selectClause, SELECT_HINT, "");
+        selectClause = replace(selectClause, SELECT_HINT, "");
         return super.prepareUnionClause(selectClause);
     }
 

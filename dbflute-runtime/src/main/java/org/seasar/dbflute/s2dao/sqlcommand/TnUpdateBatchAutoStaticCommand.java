@@ -50,14 +50,10 @@ public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCom
 
     @Override
     protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
-        TnUpdateBatchAutoHandler handler = newInternalBatchAutoHandler();
-        handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
+        final TnUpdateBatchAutoHandler handler = new TnUpdateBatchAutoHandler(getDataSource(), getStatementFactory(),
+                getBeanMetaData(), getPropertyTypes());
+        handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         return handler;
-    }
-
-    protected TnUpdateBatchAutoHandler newInternalBatchAutoHandler() {
-        return new TnUpdateBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(),
-                getPropertyTypes());
     }
 
     @Override

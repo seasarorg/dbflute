@@ -39,16 +39,16 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     //                                                                          Definition
     //                                                                          ==========
     /** The result for no update as normal execution. */
-    private static final Integer NO_UPDATE = Integer.valueOf(1);
+    private static final Integer NON_UPDATE = Integer.valueOf(1);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private TnBeanMetaData _beanMetaData;
-    private DBMeta _targetDBMeta;
-    private String[] _propertyNames;
-    private boolean _optimisticLockHandling;
-    private boolean _versionNoAutoIncrementOnMemory;
+    protected TnBeanMetaData _beanMetaData;
+    protected DBMeta _targetDBMeta;
+    protected String[] _propertyNames;
+    protected boolean _optimisticLockHandling;
+    protected boolean _versionNoAutoIncrementOnMemory;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -69,12 +69,12 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         final TnPropertyType[] propertyTypes = createUpdatePropertyTypes(bmd, bean, getPropertyNames(), option);
         if (propertyTypes.length == 0) {
             if (isLogEnabled()) {
-                log(createNoUpdateLogMessage(bean, bmd));
+                log(createNonUpdateLogMessage(bean, bmd));
             }
-            return NO_UPDATE;
+            return NON_UPDATE;
         }
-        final TnUpdateAutoHandler handler = createUpdateAutoHandler(bmd, propertyTypes);
-        handler.setSql(createUpdateSql(bmd, propertyTypes, bean, option));
+        final String sql = createUpdateSql(bmd, propertyTypes, bean, option);
+        final TnUpdateAutoHandler handler = createUpdateAutoHandler(bmd, propertyTypes, sql, option);
         final Object[] realArgs = new Object[] { bean };
         handler.setExceptionMessageSqlArgs(realArgs);
         final int result = handler.execute(realArgs);
@@ -87,11 +87,14 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         return Integer.valueOf(result);
     }
 
-    protected TnUpdateAutoHandler createUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
+    protected TnUpdateAutoHandler createUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] boundPropTypes,
+            String sql, UpdateOption<ConditionBean> option) {
         final TnUpdateAutoHandler handler = new TnUpdateAutoHandler(getDataSource(), getStatementFactory(), bmd,
-                propertyTypes);
+                boundPropTypes);
+        handler.setSql(sql);
         handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
+        handler.setUpdateOption(option);
         return handler;
     }
 
@@ -99,9 +102,10 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     protected abstract TnPropertyType[] createUpdatePropertyTypes(TnBeanMetaData bmd, Object bean,
             String[] propertyNames, UpdateOption<ConditionBean> option);
 
-    protected String createNoUpdateLogMessage(final Object bean, final TnBeanMetaData bmd) {
+    protected String createNonUpdateLogMessage(final Object bean, final TnBeanMetaData bmd) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("...Skipping update because of no modification: table=").append(_targetDBMeta.getTableSqlName());
+        final String tableDbName = _targetDBMeta.getTableDbName();
+        sb.append("...Skipping update because of non-modification: table=").append(tableDbName);
         final int size = bmd.getPrimaryKeySize();
         for (int i = 0; i < size; i++) {
             if (i == 0) {
@@ -116,8 +120,7 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
                 sb.append("}");
             }
         }
-        final String s = new String(sb);
-        return s;
+        return sb.toString();
     }
 
     /**
@@ -146,11 +149,6 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             if (i > 0) {
                 sb.append(", ");
             }
-            if (option != null && option.hasStatement(columnDbName)) {
-                final String statement = option.buildStatement(columnDbName, columnSqlName);
-                sb.append(columnSqlName).append(" = ").append(statement);
-                continue;
-            }
             if (propertyName.equalsIgnoreCase(versionNoPropertyName)) {
                 if (!isVersionNoAutoIncrementOnMemory()) {
                     setupVersionNoAutoIncrementOnQuery(sb, columnSqlName);
@@ -161,6 +159,11 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
                     setupVersionNoAutoIncrementOnQuery(sb, columnSqlName);
                     continue;
                 }
+            }
+            if (option != null && option.hasStatement(columnDbName)) {
+                final String statement = option.buildStatement(columnDbName, columnSqlName);
+                sb.append(columnSqlName).append(" = ").append(statement);
+                continue;
             }
             sb.append(columnSqlName).append(" = ?");
         }

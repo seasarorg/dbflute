@@ -36,8 +36,8 @@ public class TnCommandContextHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected CommandContext commandContext;
-    protected List<TnPropertyType> propertyTypeList;
+    protected CommandContext _commandContext;
+    protected List<TnPropertyType> _boundPropTypeList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -45,7 +45,7 @@ public class TnCommandContextHandler extends TnBasicHandler {
     public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory,
             CommandContext commandContext) {
         super(dataSource, statementFactory);
-        this.commandContext = commandContext;
+        this._commandContext = commandContext;
         setSql(commandContext.getSql());
     }
 
@@ -55,7 +55,7 @@ public class TnCommandContextHandler extends TnBasicHandler {
     public int execute(Object[] args) {
         final Connection connection = getConnection();
         try {
-            return execute(connection, commandContext);
+            return execute(connection, _commandContext);
         } finally {
             close(connection);
         }
@@ -82,14 +82,14 @@ public class TnCommandContextHandler extends TnBasicHandler {
     }
 
     protected boolean hasPropertyTypeList() {
-        return propertyTypeList != null && !propertyTypeList.isEmpty();
+        return _boundPropTypeList != null && !_boundPropTypeList.isEmpty();
     }
 
     protected int bindFirstScope(PreparedStatement ps, Object[] bindVariables, Class<?>[] bindVariableTypes) {
         final List<Object> firstVariableList = new ArrayList<Object>();
         final List<ValueType> firstValueTypeList = new ArrayList<ValueType>();
         int index = 0;
-        for (TnPropertyType propertyType : propertyTypeList) {
+        for (TnPropertyType propertyType : _boundPropTypeList) {
             firstVariableList.add(bindVariables[index]);
             firstValueTypeList.add(propertyType.getValueType());
             ++index;
@@ -105,11 +105,11 @@ public class TnCommandContextHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public List<TnPropertyType> getPropertyTypeList() {
-        return propertyTypeList;
+    public List<TnPropertyType> getBoundPropTypeList() {
+        return _boundPropTypeList;
     }
 
-    public void setPropertyTypeList(List<TnPropertyType> propertyTypeList) {
-        this.propertyTypeList = propertyTypeList;
+    public void setBoundPropTypeList(List<TnPropertyType> boundPropTypeList) {
+        this._boundPropTypeList = boundPropTypeList;
     }
 }

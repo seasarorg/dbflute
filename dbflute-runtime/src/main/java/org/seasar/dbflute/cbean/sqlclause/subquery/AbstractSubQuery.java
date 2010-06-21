@@ -99,7 +99,7 @@ public abstract class AbstractSubQuery {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected final String replaceString(String text, String fromText, String toText) {
+    protected final String replace(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
     }
 
