@@ -32,6 +32,8 @@ import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.subquery.ExistsReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.InScopeRelation;
@@ -40,6 +42,7 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarCondition;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryLevelReflector;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
+import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseArranger;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -47,6 +50,8 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
+import org.seasar.dbflute.dbway.ExtensionOperand;
+import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
@@ -1390,13 +1395,114 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     ===============
     // handleShortChar()
     protected String hSC(String columnName, String value, Integer size, String modeCode) {
-        ShortCharHandlingMode mode = ShortCharHandlingMode.codeOf(modeCode);
+        final ShortCharHandlingMode mode = ShortCharHandlingMode.codeOf(modeCode);
         if (mode == null) {
             String msg = "The mode was not found by the code: ";
             msg = msg + " columnName=" + columnName + " modeCode=" + modeCode;
             throw new IllegalStateException(msg);
         }
         return ParameterUtil.handleShortChar(columnName, value, size, mode);
+    }
+
+    // ===================================================================================
+    //                                                                    Full Text Search
+    //                                                                    ================
+    // -----------------------------------------------------
+    //                                                 MySQL
+    //                                                 -----
+    protected void xdoMatchForMySQL(List<ColumnInfo> textColumnList, String conditionValue,
+            WayOfMySQL.FullTextSearchModifier modifier) {
+        if (conditionValue == null || conditionValue.length() == 0) {
+            return;
+        }
+        final String clause = ((SqlClauseMySql) getSqlClause()).buildMatchCondition(textColumnList, conditionValue,
+                modifier, getTableDbName(), getRealAliasName());
+        registerWhereClause(clause);
+    }
+
+    // -----------------------------------------------------
+    //                                     PostgreSQL/Oracle
+    //                                     -----------------
+    protected void xdoMatchByLikeSearch(List<ColumnInfo> textColumnList, String conditionValue) {
+        if (conditionValue == null || conditionValue.length() == 0) {
+            return;
+        }
+        assertObjectNotNull("textColumnList", textColumnList);
+        if (textColumnList.isEmpty()) {
+            String msg = "The argument 'textColumnList' should not be empty list.";
+            throw new IllegalArgumentException(msg);
+        }
+        conditionValue = xescapeFullTextSearchValue(conditionValue);
+        int index = 0;
+        getSqlClause().makeOrScopeQueryEffective();
+        try {
+            for (ColumnInfo columnInfo : textColumnList) {
+                if (columnInfo == null) {
+                    continue;
+                }
+                final String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
+                if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
+                    String msg = "The table of the text column should be '" + getTableDbName() + "'";
+                    msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
+                    throw new IllegalArgumentException(msg);
+                }
+                final Class<?> propertyType = columnInfo.getPropertyType();
+                if (!String.class.isAssignableFrom(propertyType)) {
+                    String msg = "The text column should be String type:";
+                    msg = msg + " type=" + propertyType + " column=" + columnInfo;
+                    throw new IllegalArgumentException(msg);
+                }
+                invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, xcreateMatchLikeSearch());
+                ++index;
+            }
+        } finally {
+            getSqlClause().closeOrScopeQuery();
+        }
+    }
+
+    protected String xescapeFullTextSearchValue(String conditionValue) {
+        String msg = "You should override this method.";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    protected String xescapeOracleFullTextSearchValue(String conditionValue) {
+        return ((SqlClauseOracle) getSqlClause()).escapeFullTextSearchValue(conditionValue);
+    }
+
+    protected LikeSearchOption xcreateMatchLikeSearch() {
+        String msg = "You should override this method.";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    protected LikeSearchOption xcreatePostgreSQLMatchLikeSearch() {
+        return new PostgreSQLMatchLikeSearch();
+    }
+
+    protected class PostgreSQLMatchLikeSearch extends LikeSearchOption {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public ExtensionOperand getExtensionOperand() {
+            return xgetPostgreSQLMatchOperand();
+        }
+    }
+
+    protected ExtensionOperand xgetPostgreSQLMatchOperand() {
+        String msg = "You should override this method.";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    protected LikeSearchOption xcreateOracleMatchLikeSearch() {
+        return new OracleMatchLikeSearch();
+    }
+
+    protected class OracleMatchLikeSearch extends LikeSearchOption {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public WhereClauseArranger getWhereClauseArranger() {
+            return ((SqlClauseOracle) getSqlClause()).createFullTextSearchClauseArranger();
+        }
     }
 
     // ===================================================================================
