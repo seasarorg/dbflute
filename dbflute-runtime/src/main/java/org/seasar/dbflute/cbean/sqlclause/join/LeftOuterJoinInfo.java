@@ -1,5 +1,6 @@
 package org.seasar.dbflute.cbean.sqlclause.join;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,13 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 /**
  * @author jflute
  */
-public class LeftOuterJoinInfo {
+public class LeftOuterJoinInfo implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

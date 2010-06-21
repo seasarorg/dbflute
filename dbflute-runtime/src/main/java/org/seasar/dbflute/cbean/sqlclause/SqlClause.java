@@ -503,7 +503,7 @@ public interface SqlClause {
 
     String resolveSubQueryEndMark(String subQueryIdentity);
 
-    String filterSubQueryIndent(String sql);
+    String processSubQueryIndent(String sql);
 
     // [DBFlute-0.7.4]
     // ===================================================================================
