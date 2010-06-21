@@ -683,7 +683,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
-     * ${myEntityVariableName}.setBar...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * <span style="color: #3F7E5E">// if exclusive control, the value of exclusive control column is required</span>
      * ${myEntityVariableName}.<span style="color: #FD4747">setVersionNo</span>(value);
      * try {
@@ -711,13 +711,13 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         update(downcast(entity));
     }
 #if ($table.hasOptimisticLock())
-    
+
     /**
      * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
-     * ${myEntityVariableName}.setBar...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
      * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
@@ -868,7 +868,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Batch Update
     //                                                                        ============
     /**
-     * Batch insert the list. This method uses 'Batch Update' of java.sql.PreparedStatement.
+     * Batch-insert the list. This method uses 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of inserted count.
      */
@@ -878,7 +878,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Batch update the list. <br />
+     * Batch-update the list. <br />
      * All columns are update target. {NOT modified only} <br />
      * This method uses 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
@@ -896,7 +896,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Batch update the list non-strictly. <br />
+     * Batch-update the list non-strictly. <br />
      * All columns are update target. {NOT modified only} <br />
      * This method uses 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
@@ -910,7 +910,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     /**
-     * Batch delete the list. <br />
+     * Batch-delete the list. <br />
      * This method uses 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
@@ -927,7 +927,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Batch delete the list non-strictly. <br />
+     * Batch-delete the list non-strictly. <br />
      * This method uses 'Batch Update' of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
@@ -943,7 +943,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Query Update
     //                                                                        ============
     /**
-     * Query update the several entities non-strictly modified-only. {NonExclusiveControl}
+     * Query-update the several entities non-strictly modified-only. {NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * <span style="color: #3F7E5E">// you don't need to set PK value</span>
@@ -961,14 +961,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The updated count.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
-        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBNotNull(cb);
-        setupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
-        filterEntityOfUpdate(${myEntityVariableName}); assertEntityOfUpdate(${myEntityVariableName});
-        return invoke(createQueryUpdateEntityCBCommand(${myEntityVariableName}, cb));
+        return delegateQueryUpdate(${myEntityVariableName}, cb);
     }
 
     /**
-     * Query delete the several entities. {NonExclusiveControl}
+     * Query-delete the several entities. {NonExclusiveControl}
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
@@ -978,8 +975,111 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The deleted count.
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
-        assertCBNotNull(cb);
-        return invoke(createQueryDeleteCBCommand(cb));
+        return delegateQueryDelete(cb);
+    }
+
+    /**
+     * Varying-update the entity modified-only. {UpdateCountZeroException, ExclusiveControl}
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * ${myEntityVariableName}.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// if exclusive control, the value of exclusive control column is required</span>
+     * ${myEntityVariableName}.<span style="color: #FD4747">setVersionNo</span>(value);
+     * try {
+     *     UpdateOption&lt;${myConditionBeanClassName}&gt; option = new UpdateOption&lt;${myConditionBeanClassName}&gt;();
+     *     option.self(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *         public void specify(${myConditionBeanClassName} cb) {
+     *             cb.specify().<span style="color: #FD4747">columnXxxCount()</span>;
+     *         }
+     *     }).plus(1); <span style="color: #3F7E5E">// XXX_COUNT = XXX_COUNT + 1</span>
+     *     ${myEntityVariableName}Bhv.<span style="color: #FD4747">varyingUpdate</span>(${myEntityVariableName}, option);
+     * } catch (EntityAlreadyUpdatedException e) { <span style="color: #3F7E5E">// if concurrent update</span>
+     *     ...
+     * }
+     * </pre>
+     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+     * @param option The option of update for varying values. (NotNull)
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void varyingUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
+        processVaryingUpdate(option);
+        helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateVaryingUpdate(entity, option); } });
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Varying-update the entity non-strictly modified-only. {UpdateCountZeroException, NonExclusiveControl}
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * ${myEntityVariableName}.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * UpdateOption&lt;${myConditionBeanClassName}&gt; option = new UpdateOption&lt;${myConditionBeanClassName}&gt;();
+     * option.self(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void specify(${myConditionBeanClassName} cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFooCount()</span>;
+     *     }
+     * }).plus(1); <span style="color: #3F7E5E">// FOO_COUNT = FOO_COUNT + 1</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(${myEntityVariableName}, option);
+     * </pre>
+     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
+     * @param option The option of update for varying values. (NotNull)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void varyingUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
+        processVaryingUpdate(option);
+        helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { return delegateVaryingUpdateNonstrict(entity, option); } });
+    }
+#end
+
+    /**
+     * Varying-query-update the several entities non-strictly modified-only. {NonExclusiveControl}
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * <span style="color: #3F7E5E">// you don't need to set PK value</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
+     * ${myEntityVariableName}.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * UpdateOption&lt;${myConditionBeanClassName}&gt; option = new UpdateOption&lt;${myConditionBeanClassName}&gt;();
+     * option.self(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void specify(${myConditionBeanClassName} cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFooCount()</span>;
+     *     }
+     * }).plus(1); <span style="color: #3F7E5E">// FOO_COUNT = FOO_COUNT + 1</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">varyingQueryUpdate</span>(${myEntityVariableName}, cb, option);
+     * </pre>
+     * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param option The option of update for varying values. (NotNull)
+     * @return The updated count.
+     */
+    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, final UpdateOption<${myConditionBeanClassName}> option) {
+        processVaryingUpdate(option);
+        return delegateVaryingQueryUpdate(${myEntityVariableName}, cb, option);
+    }
+
+    protected void processVaryingUpdate(UpdateOption<${myConditionBeanClassName}> option) {
+        assertUpdateOptionNotNull(option);
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.xsetupForVaryingUpdate();
+        option.resolveSpecification(cb);
     }
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
@@ -1182,6 +1282,24 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls)
     { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
 #end
+
+    protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb)
+    { if (!processBeforeQueryUpdate(e, cb)) { return 0; } return invoke(createQueryUpdateEntityCBCommand(e, cb));  }
+    protected int delegateQueryDelete(${myConditionBeanClassName} cb)
+    { if (!processBeforeQueryDelete(cb)) { return 0; } return invoke(createQueryDeleteCBCommand(cb));  }
+
+    protected int delegateVaryingUpdate(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
+#if ($table.hasOptimisticLock())
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createVaryingUpdateEntityCommand(e, op)); }
+#else
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createVaryingUpdateNonstrictEntityCommand(e, op)); }
+#end
+#if ($table.hasOptimisticLock())
+    protected int delegateVaryingUpdateNonstrict(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createVaryingUpdateNonstrictEntityCommand(e, op)); }
+#end
+    protected int delegateVaryingQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeQueryUpdate(e, cb)) { return 0; } return invoke(createVaryingQueryUpdateEntityCBCommand(e, cb, op));  }
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
     protected int delegateInsert(${myExtendedObjectClassName} e) {

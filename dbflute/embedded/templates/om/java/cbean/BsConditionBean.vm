@@ -568,11 +568,7 @@ public class ${myClassName} extends AbstractConditionBean {
 
     protected ${myConditionBeanClassName} xcreateColumnQueryCB() {
         ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForColumnQuery();
-        cb.specify().xswitchQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
-            public boolean has() { return true; }
-            public ${myConditionQueryClassName} qy() { return query(); }
-        });
+        cb.xsetupForColumnQuery((${myConditionBeanClassName})this);
         return cb;
     }
 
@@ -613,6 +609,32 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                          ==========================
     public boolean hasUnionQueryOrUnionAllQuery() {
         return query().hasUnionQueryOrUnionAllQuery();
+    }
+
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    public void xsetupForColumnQuery(final ${myConditionBeanClassName} cb) {
+        xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
+
+        // inherits a parent query to synchronize real name
+        // (and also for suppressing query check) 
+        specify().xswitchQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
+            public boolean has() { return true; }
+            public ${myConditionQueryClassName} qy() { return cb.query(); }
+        });
+    }
+
+    public void xsetupForVaryingUpdate() {
+        xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
+
+        // for suppressing query check
+        final ${myConditionBeanClassName} nonCheckCB = new ${myConditionBeanClassName}();
+        specify().xswitchQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
+            public boolean has() { return true; }
+            public ${myConditionQueryClassName} qy() { return nonCheckCB.query(); }
+        });
     }
 
     // ===================================================================================
