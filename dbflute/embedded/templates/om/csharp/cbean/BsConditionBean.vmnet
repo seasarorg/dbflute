@@ -276,7 +276,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
@@ -298,7 +298,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
