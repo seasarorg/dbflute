@@ -214,12 +214,12 @@ namespace ${glPackageBaseCB} {
 
             // inherits a parent query to synchronize real name
             // (and also for suppressing query check) 
-            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall<${myConditionQueryClassName}>());
+            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall());
             Specify().xsetupForColumnQuery();
         }
     }
 
-    public class ${myConditionBeanClassName}ColQySpQyCall<${myConditionQueryClassName}> : SpQyCall {
+    public class ${myConditionBeanClassName}ColQySpQyCall : SpQyCall<${myConditionQueryClassName}> {
         protected ${myConditionBeanClassName} _conditionBean;
         public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} conditionBean) {
             _conditionBean = conditionBean;

@@ -593,7 +593,7 @@ namespace ${glPackageBaseCommonCBean} {
             return _alreadySpecifiedRequiredColumn;
         }}
 
-        public void xswitchQyCall(HpSpQyCall<CQ> qyCall) {
+        public void xswitchQyCall(SpQyCall<CQ> qyCall) {
             if (qyCall == null) {
                 String msg = "The argument 'qyCall' should not be null.";
                 throw new SystemException(msg);
@@ -619,23 +619,23 @@ namespace ${glPackageBaseCommonCBean} {
             _handler = handler;
         }
 
-        public void Equal({glSpecifyQuery}<CB> rightSpecifyQuery) {
+        public void Equal(${glSpecifyQuery}<CB> rightSpecifyQuery) {
             _handler.Invoke(rightSpecifyQuery, "=");
         }
 
-        public void GreaterThan({glSpecifyQuery}<CB> rightSpecifyQuery) {
+        public void GreaterThan(${glSpecifyQuery}<CB> rightSpecifyQuery) {
             _handler.Invoke(rightSpecifyQuery, ">");
         }
 
-        public void GreaterEqual({glSpecifyQuery}<CB> rightSpecifyQuery) {
+        public void GreaterEqual(${glSpecifyQuery}<CB> rightSpecifyQuery) {
             _handler.Invoke(rightSpecifyQuery, ">=");
         }
 
-        public void LessThan({glSpecifyQuery}<CB> rightSpecifyQuery) {
+        public void LessThan(${glSpecifyQuery}<CB> rightSpecifyQuery) {
             _handler.Invoke(rightSpecifyQuery, "<");
         }
 
-        public void LessEqual({glSpecifyQuery}<CB> rightSpecifyQuery) {
+        public void LessEqual(${glSpecifyQuery}<CB> rightSpecifyQuery) {
             _handler.Invoke(rightSpecifyQuery, "<=");
         }
     }
