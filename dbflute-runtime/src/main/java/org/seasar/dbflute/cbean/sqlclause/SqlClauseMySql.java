@@ -183,10 +183,9 @@ public class SqlClauseMySql extends AbstractSqlClause {
                 msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
                 throw new IllegalArgumentException(msg);
             }
-            final Class<?> propertyType = columnInfo.getPropertyType();
-            if (!String.class.isAssignableFrom(propertyType)) {
+            if (!columnInfo.isPropertyTypeString()) {
                 String msg = "The text column should be String type:";
-                msg = msg + " type=" + propertyType + " column=" + columnInfo;
+                msg = msg + " column=" + columnInfo;
                 throw new IllegalArgumentException(msg);
             }
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();

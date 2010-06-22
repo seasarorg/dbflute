@@ -25,7 +25,6 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
-import org.seasar.dbflute.cbean.chelper.HpCalcStatement;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -35,6 +34,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -196,21 +196,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
             SpecifyQuery<CB> rightSp, final String operand) {
         assertQueryPurpose();
-        // specify left column
         leftSp.specify(leftCB);
         final ColumnRealName leftColumn = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
         if (leftColumn == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
-        // specify right column
-        rightSp.specify(rightCB);
-        final ColumnRealName rightColumn = rightCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
-        if (rightColumn == null) {
-            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
-        }
-        // register where clause
         final HpCalcSpecification<CB> calcSp = xcreateCalcSpecification(rightSp);
-        final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, rightColumn, calcSp);
+        calcSp.specify(rightCB);
+        final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, calcSp);
         getSqlClause().registerWhereClause(queryClause);
         return calcSp;
     }
@@ -219,15 +212,29 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new HpCalcSpecification<CB>(rightSp);
     }
 
-    protected QueryClause xcreateColQyClause(final ColumnRealName leftColumn, final String operand,
-            final ColumnRealName rightColumn, final HpCalcStatement calcSt) {
+    protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final ColumnRealName leftColumn,
+            final String operand, final HpCalcSpecification<CB> rightCalcSp) {
+        final ColumnRealName rightColumn = rightCalcSp.getSpecifiedColumnRealName();
+        if (rightColumn == null) {
+            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
+        }
         return new QueryClause() {
             @Override
             public String toString() {
                 final StringBuilder sb = new StringBuilder();
                 sb.append(leftColumn).append(" ").append(operand).append(" ");
-                final String statement = calcSt.buildStatement(rightColumn);
-                sb.append(statement != null ? statement : rightColumn);
+                final String statement = rightCalcSp.buildStatementAsRealName();
+                if (statement != null) { // exists calculation
+                    final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
+                    if (!columnInfo.isPropertyTypeNumber()) {
+                        // *simple message because other types may be supported at the future
+                        String msg = "Not number column specified: " + columnInfo;
+                        throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
+                    }
+                    sb.append(statement);
+                } else {
+                    sb.append(rightColumn);
+                }
                 return sb.toString();
             }
         };

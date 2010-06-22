@@ -26,6 +26,7 @@ import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 
@@ -516,25 +517,16 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                        Specify Column
+    //                                        --------------
+    /**
+     * Specify select columns.
+     * @param tableAliasName The alias name of table. (NotNull)
+     * @param columnDbName The DB name of column. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
+     */
     void specifySelectColumn(String tableAliasName, String columnDbName, String tableDbName);
-
-    /**
-     * Get the DB name of only one specified column.
-     * @return The DB name of only one specified column. (Nullable: if not found or duplicated, returns null)
-     */
-    String getSpecifiedColumnDbNameAsOne();
-
-    /**
-     * Get the SQL name of only one specified column.
-     * @return The SQL name of only one specified column. (Nullable: if not found or duplicated, returns null)
-     */
-    ColumnSqlName getSpecifiedColumnSqlNameAsOne();
-
-    /**
-     * Get the real name of only one specified column.
-     * @return The real name of only one specified column. (Nullable: if not found or duplicated, returns null)
-     */
-    ColumnRealName getSpecifiedColumnRealNameAsOne();
 
     /**
      * Back up specified select columns.
@@ -551,6 +543,36 @@ public interface SqlClause {
      */
     void clearSpecifiedSelectColumn();
 
+    // -----------------------------------------------------
+    //                                      Specified as One
+    //                                      ----------------
+    /**
+     * Get the DB name of only one specified column.
+     * @return The instance as string. (Nullable: if not found or duplicated, returns null)
+     */
+    String getSpecifiedColumnDbNameAsOne();
+
+    /**
+     * Get the information of only one specified column.
+     * @return An instance as a type for information of column. (Nullable: if not found or duplicated, returns null)
+     */
+    ColumnInfo getSpecifiedColumnInfoAsOne();
+
+    /**
+     * Get the real name of only one specified column.
+     * @return An instance as a type for real name of column. (Nullable: if not found or duplicated, returns null)
+     */
+    ColumnRealName getSpecifiedColumnRealNameAsOne();
+
+    /**
+     * Get the SQL name of only one specified column.
+     * @return An instance as a type for SQL name of column. (Nullable: if not found or duplicated, returns null)
+     */
+    ColumnSqlName getSpecifiedColumnSqlNameAsOne();
+
+    // -----------------------------------------------------
+    //                                      Specify Deriving
+    //                                      ----------------
     void specifyDerivingSubQuery(String aliasName, String deriveSubQuery);
 
     boolean hasSpecifiedDerivingSubQuery(String aliasName);

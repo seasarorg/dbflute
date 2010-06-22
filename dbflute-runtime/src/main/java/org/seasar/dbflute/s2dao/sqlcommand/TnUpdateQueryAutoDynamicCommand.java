@@ -162,7 +162,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
             if (option != null && option.hasStatement(columnDbName)) {
-                final String statement = option.buildStatement(columnDbName, columnInfo.getColumnSqlName());
+                final String statement = option.buildStatement(columnDbName);
                 columnParameterMap.put(columnDbName, statement);
                 continue;
             }

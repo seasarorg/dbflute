@@ -799,6 +799,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 sb.append(ln()).append("  ");
                 sb.append(" and ").append(clauseElement);
             }
+            ++count;
         }
     }
 
@@ -1220,9 +1221,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
 
             int count = 0;
-            for (final Iterator<String> ite = orderByList.iterator(); ite.hasNext();) {
-                final String orderBy = ite.next();
-
+            for (String orderBy : orderByList) {
                 _orderByEffective = true;
                 String aliasName = null;
                 String columnName = null;
@@ -1244,7 +1243,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 }
                 _orderByClause.addOrderByElement(element);
 
-                count++;
+                ++count;
             }
         } catch (RuntimeException e) {
             String msg = "Failed to register order-by:";
@@ -1705,49 +1704,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         elementMap.put(columnDbName, tableDbName); // this tableDbName is unused actually, this is for future
     }
 
-    public String getSpecifiedColumnDbNameAsOne() {
-        final Map<String, String> elementMap = getSpecifiedColumnElementMapAsOne();
-        return (elementMap != null && elementMap.size() == 1) ? elementMap.keySet().iterator().next() : null;
-    }
-
-    public ColumnSqlName getSpecifiedColumnSqlNameAsOne() {
-        final String columnDbName = getSpecifiedColumnDbNameAsOne();
-        if (columnDbName == null) {
-            return null;
-        }
-        final String tableDbName = getSpecifiedColumnTableDbNameAsOne(); // must exist
-        return toColumnSqlName(tableDbName, columnDbName);
-    }
-
-    public ColumnRealName getSpecifiedColumnRealNameAsOne() {
-        final String columnDbName = getSpecifiedColumnDbNameAsOne();
-        if (columnDbName == null) {
-            return null;
-        }
-        final String tableDbName = getSpecifiedColumnTableDbNameAsOne(); // must exist
-        final String tableAliasName = getSpecifiedColumnTableAliasNameAsOne(); // must exist
-        return new ColumnRealName(tableAliasName, toColumnSqlName(tableDbName, columnDbName));
-    }
-
-    protected String getSpecifiedColumnTableAliasNameAsOne() {
-        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
-            return _specifiedSelectColumnMap.keySet().iterator().next();
-        }
-        return null;
-    }
-
-    protected Map<String, String> getSpecifiedColumnElementMapAsOne() {
-        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
-            return _specifiedSelectColumnMap.values().iterator().next();
-        }
-        return null;
-    }
-
-    protected String getSpecifiedColumnTableDbNameAsOne() {
-        final Map<String, String> elementMap = getSpecifiedColumnElementMapAsOne();
-        return (elementMap != null && elementMap.size() == 1) ? elementMap.values().iterator().next() : null;
-    }
-
     public void backupSpecifiedSelectColumn() {
         _backupSpecifiedSelectColumnMap = _specifiedSelectColumnMap;
     }
@@ -1762,6 +1718,52 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             _specifiedSelectColumnMap.clear();
             _specifiedSelectColumnMap = null;
         }
+    }
+
+    // -----------------------------------------------------
+    //                                      Specified as One
+    //                                      ----------------
+    public String getSpecifiedColumnDbNameAsOne() {
+        final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
+        return columnInfo != null ? columnInfo.getColumnDbName() : null;
+    }
+
+    public ColumnInfo getSpecifiedColumnInfoAsOne() {
+        final Map<String, String> elementMap = getSpecifiedColumnElementMapAsOne();
+        if (elementMap == null) {
+            return null;
+        }
+        final String columnDbName = elementMap.keySet().iterator().next();
+        final String tableDbName = elementMap.values().iterator().next();
+        return toColumnInfo(tableDbName, columnDbName);
+    }
+
+    public ColumnRealName getSpecifiedColumnRealNameAsOne() {
+        final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
+        if (columnSqlName == null) {
+            return null;
+        }
+        final String tableAliasName = getSpecifiedColumnTableAliasNameAsOne(); // must exist
+        return new ColumnRealName(tableAliasName, columnSqlName);
+    }
+
+    public ColumnSqlName getSpecifiedColumnSqlNameAsOne() {
+        final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
+        return columnInfo != null ? columnInfo.getColumnSqlName() : null;
+    }
+
+    protected String getSpecifiedColumnTableAliasNameAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            return _specifiedSelectColumnMap.keySet().iterator().next();
+        }
+        return null;
+    }
+
+    protected Map<String, String> getSpecifiedColumnElementMapAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            return _specifiedSelectColumnMap.values().iterator().next();
+        }
+        return null;
     }
 
     // -----------------------------------------------------
@@ -2019,8 +2021,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return dbmeta;
     }
 
+    protected ColumnInfo toColumnInfo(String tableDbName, String columnDbName) {
+        return findDBMeta(tableDbName).findColumnInfo(columnDbName);
+    }
+
     protected ColumnSqlName toColumnSqlName(String tableDbName, String columnDbName) {
-        return findDBMeta(tableDbName).findColumnInfo(columnDbName).getColumnSqlName();
+        return toColumnInfo(tableDbName, columnDbName).getColumnSqlName();
     }
 
     // ===================================================================================

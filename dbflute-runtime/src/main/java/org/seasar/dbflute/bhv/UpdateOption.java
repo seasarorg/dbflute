@@ -23,13 +23,12 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
-import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.exception.VaryingUpdateCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
 import org.seasar.dbflute.exception.VaryingUpdateInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.VaryingUpdateNotFoundCalculationException;
 import org.seasar.dbflute.exception.VaryingUpdateOptimisticLockSpecificationException;
 import org.seasar.dbflute.exception.VaryingUpdatePrimaryKeySpecificationException;
-import org.seasar.dbflute.exception.VaryingUpdateUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -106,9 +105,8 @@ public class UpdateOption<CB extends ConditionBean> {
     //                                                               =====================
     public void resolveSpecification(CB cb) {
         for (HpCalcSpecification<CB> specification : _selfSpecificationList) {
-            final SpecifyQuery<CB> specifyQuery = specification.getSpecifyQuery();
-            specifyQuery.specify(cb);
-            final String columnDbName = getSpecifiedColumnDbNameAsOne(cb);
+            specification.specify(cb);
+            final String columnDbName = specification.getSpecifiedColumnInfo().getColumnDbName();
             assertSpecifiedColumn(cb, columnDbName);
             _selfSpecificationMap.put(columnDbName, specification);
         }
@@ -128,10 +126,10 @@ public class UpdateOption<CB extends ConditionBean> {
         if (columnInfo.isOptimisticLock()) {
             throwVaryingUpdateOptimisticLockSpecificationException(columnInfo);
         }
-        if (!Number.class.isAssignableFrom(columnInfo.getPropertyType())) {
+        if (!columnInfo.isPropertyTypeNumber()) {
             // *simple message because other types may be supported at the future
             String msg = "Not number column specified: " + columnInfo;
-            throw new VaryingUpdateUnsupportedColumnTypeException(msg);
+            throw new VaryingUpdateCalculationUnsupportedColumnTypeException(msg);
         }
     }
 
@@ -207,7 +205,7 @@ public class UpdateOption<CB extends ConditionBean> {
     }
 
     protected String getSpecifiedColumnDbNameAsOne(CB cb) {
-        return cb.getSqlClause().getSpecifiedColumnDbNameAsOne(); // it's column DB name
+        return cb.getSqlClause().getSpecifiedColumnDbNameAsOne();
     }
 
     // ===================================================================================
@@ -217,16 +215,16 @@ public class UpdateOption<CB extends ConditionBean> {
         return findSpecification(columnDbName) != null;
     }
 
-    public String buildStatement(String columnDbName, ColumnSqlName columnSqlName) {
-        final HpCalcSpecification<CB> statement = findSpecification(columnDbName);
-        if (statement == null) {
+    public String buildStatement(String columnDbName) {
+        final HpCalcSpecification<CB> calcSp = findSpecification(columnDbName);
+        if (calcSp == null) {
             return null;
         }
-        final String exp = statement.buildStatement(columnSqlName);
-        if (exp == null) { // means non-calculation
+        final String statement = calcSp.buildStatementAsSqlName();
+        if (statement == null) { // means non-calculation
             throwVaryingUpdateNotFoundCalculationException(columnDbName);
         }
-        return exp;
+        return statement;
     }
 
     protected HpCalcSpecification<CB> findSpecification(String columnDbName) {

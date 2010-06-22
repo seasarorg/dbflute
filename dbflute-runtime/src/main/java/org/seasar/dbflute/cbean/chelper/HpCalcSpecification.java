@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -18,6 +19,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     //                                                                           Attribute
     //                                                                           =========
     protected final SpecifyQuery<CB> _specifyQuery;
+    protected CB _cb;
     protected final List<CalculationElement> _calculationList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
@@ -25,6 +27,26 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     //                                                                         ===========
     public HpCalcSpecification(SpecifyQuery<CB> specifyQuery) {
         _specifyQuery = specifyQuery;
+    }
+
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    public void specify(CB cb) {
+        _specifyQuery.specify(cb);
+        _cb = cb; // saves for handling the specified column
+    }
+
+    public ColumnInfo getSpecifiedColumnInfo() {
+        return _cb.getSqlClause().getSpecifiedColumnInfoAsOne();
+    }
+
+    public ColumnRealName getSpecifiedColumnRealName() {
+        return _cb.getSqlClause().getSpecifiedColumnRealNameAsOne();
+    }
+
+    public ColumnSqlName getSpecifiedColumnSqlName() {
+        return _cb.getSqlClause().getSpecifiedColumnSqlNameAsOne();
     }
 
     // ===================================================================================
@@ -76,18 +98,26 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public String buildStatement(ColumnSqlName columnSqlName) {
-        return doBuildStatement(columnSqlName.toString());
+    public String buildStatementAsSqlName() {
+        return doBuildStatement(false);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String buildStatement(ColumnRealName columnRealName) {
-        return doBuildStatement(columnRealName.toString());
+    public String buildStatementAsRealName() {
+        return doBuildStatement(true);
     }
 
-    protected String doBuildStatement(String columnExp) {
+    protected String doBuildStatement(boolean real) {
+        final String columnExp;
+        if (real) {
+            final ColumnRealName columnRealName = getSpecifiedColumnRealName();
+            columnExp = columnRealName.toString();
+        } else {
+            final ColumnSqlName columnSqlName = getSpecifiedColumnSqlName();
+            columnExp = columnSqlName.toString();
+        }
         final List<CalculationElement> calculationList = getCalculationList();
         if (calculationList.isEmpty()) {
             return null;

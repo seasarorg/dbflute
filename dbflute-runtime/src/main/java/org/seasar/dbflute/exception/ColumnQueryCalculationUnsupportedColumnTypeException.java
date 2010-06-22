@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the column that is an unsupported type is specified.
+ * The exception of when the column that is an unsupported type for calculation is specified.
  * @author jflute
  */
-public class VaryingUpdateUnsupportedColumnTypeException extends RuntimeException {
+public class ColumnQueryCalculationUnsupportedColumnTypeException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class VaryingUpdateUnsupportedColumnTypeException extends RuntimeExceptio
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public VaryingUpdateUnsupportedColumnTypeException(String msg) {
+    public ColumnQueryCalculationUnsupportedColumnTypeException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class VaryingUpdateUnsupportedColumnTypeException extends RuntimeExceptio
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public VaryingUpdateUnsupportedColumnTypeException(String msg, Throwable cause) {
+    public ColumnQueryCalculationUnsupportedColumnTypeException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

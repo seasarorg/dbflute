@@ -1446,10 +1446,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
                     throw new IllegalArgumentException(msg);
                 }
-                final Class<?> propertyType = columnInfo.getPropertyType();
-                if (!String.class.isAssignableFrom(propertyType)) {
+                if (!columnInfo.isPropertyTypeString()) {
                     String msg = "The text column should be String type:";
-                    msg = msg + " type=" + propertyType + " column=" + columnInfo;
+                    msg = msg + " column=" + columnInfo;
                     throw new IllegalArgumentException(msg);
                 }
                 invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, xcreateMatchLikeSearch());

@@ -161,7 +161,7 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
                 }
             }
             if (option != null && option.hasStatement(columnDbName)) {
-                final String statement = option.buildStatement(columnDbName, columnSqlName);
+                final String statement = option.buildStatement(columnDbName);
                 sb.append(columnSqlName).append(" = ").append(statement);
                 continue;
             }

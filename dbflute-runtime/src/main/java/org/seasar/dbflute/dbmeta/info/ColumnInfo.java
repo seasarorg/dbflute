@@ -209,7 +209,8 @@ public class ColumnInfo {
     }
 
     public String toString() {
-        return _dbmeta.getTableDbName() + "." + _columnDbName;
+        return _dbmeta.getTableDbName() + "." + _columnDbName + "(" + _columnDbType + ", "
+                + DfTypeUtil.toClassTitle(_propertyType) + ")";
     }
 
     // ===================================================================================
@@ -269,6 +270,30 @@ public class ColumnInfo {
      */
     public Class<?> getPropertyType() {
         return this._propertyType;
+    }
+
+    /**
+     * Is the property type String? (assignable from)
+     * @return Determination.
+     */
+    public boolean isPropertyTypeString() {
+        return String.class.isAssignableFrom(getPropertyType());
+    }
+
+    /**
+     * Is the property type Number? (assignable from)
+     * @return Determination.
+     */
+    public boolean isPropertyTypeNumber() {
+        return Number.class.isAssignableFrom(getPropertyType());
+    }
+
+    /**
+     * Is the property type Date? (assignable from)
+     * @return Determination.
+     */
+    public boolean isPropertyTypeDate() {
+        return Date.class.isAssignableFrom(getPropertyType());
     }
 
     /**
