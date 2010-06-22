@@ -217,14 +217,14 @@ namespace ${glPackageBaseCommonCBean} {
             leftSp.Invoke(leftCB);
             String leftColumn = leftCB.SqlClause.getSpecifiedColumnRealNameAsOne();
             if (leftColumn == null) {
-                String msg = "The left column for ColumnQuery was not found: " + typeof(leftCB);
+                String msg = "The left column for ColumnQuery was not found: " + leftCB.GetType();
                 throw new SystemException(msg);
             }
             // specify right column
             rightSp.Invoke(rightCB);
             String rightColumn = rightCB.SqlClause.getSpecifiedColumnRealNameAsOne();
             if (rightColumn == null) {
-                String msg = "The right column for ColumnQuery was not found: " + typeof(rightCB);
+                String msg = "The right column for ColumnQuery was not found: " + rightCB.GetType();
                 throw new SystemException(msg);
             }
             // register where clause

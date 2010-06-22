@@ -214,7 +214,7 @@ namespace ${glPackageBaseCB} {
 
             // inherits a parent query to synchronize real name
             // (and also for suppressing query check) 
-            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall());
+            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall(cb));
             Specify().xsetupForColumnQuery();
         }
     }
