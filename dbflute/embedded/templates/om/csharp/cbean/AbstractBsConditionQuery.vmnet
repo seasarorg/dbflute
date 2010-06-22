@@ -50,7 +50,7 @@ namespace ${glPackageBaseCQ} {
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.ClassificationMapList)
         /// <summary>
-        /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { != }
+        /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { &lt;&gt; }
         /// $database.buildClassificationApplicationComment($classificationMap)
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
@@ -270,7 +270,7 @@ namespace ${glPackageBaseCQ} {
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.classificationMapList)
         /// <summary>
-        /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { != }
+        /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { &lt;&gt; }
         /// $database.buildClassificationApplicationComment($classificationMap)
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
@@ -512,29 +512,33 @@ namespace ${glPackageBaseCQ} {
         public SSQFunction<${myConditionBeanClassName}> Scalar_Equal() {
             return xcreateSSQFunction("=");
         }
-    
+
+        public SSQFunction<${myConditionBeanClassName}> Scalar_NotEqual() {
+            return xcreateSSQFunction("<>");
+        }
+
         public SSQFunction<${myConditionBeanClassName}> Scalar_GreaterEqual() {
             return xcreateSSQFunction(">=");
         }
-    
+
         public SSQFunction<${myConditionBeanClassName}> Scalar_GreaterThan() {
             return xcreateSSQFunction(">");
         }
-    
+
         public SSQFunction<${myConditionBeanClassName}> Scalar_LessEqual() {
             return xcreateSSQFunction("<=");
         }
-        
+
         public SSQFunction<${myConditionBeanClassName}> Scalar_LessThan() {
             return xcreateSSQFunction("<");
         }
-        
+
         protected SSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(String operand) {
             return new SSQFunction<${myConditionBeanClassName}>(delegate(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery) {
                 xscalarSubQuery(function, subQuery, operand);
             });
         }
-    
+
         protected void xscalarSubQuery(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery, String operand) {
             assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarSubQuery(); subQuery.Invoke(cb);

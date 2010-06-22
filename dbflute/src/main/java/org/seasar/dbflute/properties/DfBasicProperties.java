@@ -173,10 +173,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isDatabaseMSAccess();
     }
 
-    public boolean isDatabaseAsTraditionalNotEqualUnsupported() {
-        return isDatabaseMSAccess();
-    }
-
     // ===================================================================================
     //                                                                            Language
     //                                                                            ========

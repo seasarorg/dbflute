@@ -112,7 +112,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringNotEqual()})
 
     /**
-     * NotEqual(!=). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -121,7 +121,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringEmptyString()})
 
     /**
-     * NotEqual(!=). As the empty-string. And OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). As the empty-string. And OnlyOnceRegistered.
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual_EmptyString() {
         doSet${tmpJavaName}_NotEqual("");
@@ -135,7 +135,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * NotEqual(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
@@ -147,7 +147,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($classificationMap in $col.ClassificationMapList)
 
     /**
-     * NotEqual(!=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
+     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
@@ -572,7 +572,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberNotEqual()})
 
     /**
-     * NotEqual(!=). And NullIgnored, OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -586,7 +586,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * NotEqual(!=). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
+     * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
@@ -598,7 +598,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($classificationMap in $col.classificationMapList)
 
     /**
-     * NotEqual(!=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
+     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
@@ -953,7 +953,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateNotEqual()})
 
     /**
-     * NotEqual(!=). And NullIgnored, OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -1114,7 +1114,24 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_Equal() {
-        return xcreateSSQFunction("=");
+        return xcreateSSQFunction(CK_EQ.getOperand());
+    }
+
+    /**
+     * Prepare ScalarCondition as equal. <br />
+     * {where FOO &lt;&gt; (select max(BAR) from ...)
+     * <pre>
+     * cb.query().<span style="color: #FD4747">scalar_NotEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} subCB) {
+     *         subCB.specify().setXxx... // derived column for function
+     *         subCB.query().setYyy...
+     *     }
+     * });
+     * </pre>
+     * @return The object to set up a function. (NotNull)
+     */
+    public HpSSQFunction<${myConditionBeanClassName}> scalar_NotEqual() {
+        return xcreateSSQFunction(CK_NES.getOperand());
     }
 
     /**
@@ -1131,7 +1148,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterThan() {
-        return xcreateSSQFunction(">");
+        return xcreateSSQFunction(CK_GT.getOperand());
     }
 
     /**
@@ -1148,7 +1165,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_LessThan() {
-        return xcreateSSQFunction("<");
+        return xcreateSSQFunction(CK_LT.getOperand());
     }
 
     /**
@@ -1165,7 +1182,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterEqual() {
-        return xcreateSSQFunction(">=");
+        return xcreateSSQFunction(CK_GE.getOperand());
     }
 
     /**
@@ -1182,7 +1199,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_LessEqual() {
-        return xcreateSSQFunction("<=");
+        return xcreateSSQFunction(CK_LE.getOperand());
     }
 
     protected HpSSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {

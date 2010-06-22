@@ -108,10 +108,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isMakeConditionQueryNotEqualAsStandard() { // It's closet!
-        // DBFlute has used tradition for a long time
-        // so default value is false here except DBMS that tradition is unsupported
-        final boolean defalutValue = getBasicProperties().isDatabaseAsTraditionalNotEqualUnsupported();
-        return isProperty("isMakeConditionQueryNotEqualAsStandard", defalutValue);
+        // DBFlute had used tradition for a long time
+        // but default value is true (uses standard) since 0.9.7.2
+        return isProperty("isMakeConditionQueryNotEqualAsStandard", true);
     }
 
     public String getConditionQueryNotEqualDefinitionName() {

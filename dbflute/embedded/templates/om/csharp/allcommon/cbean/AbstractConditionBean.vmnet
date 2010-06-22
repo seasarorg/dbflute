@@ -628,6 +628,10 @@ namespace ${glPackageBaseCommonCBean} {
             _handler.Invoke(rightSpecifyQuery, "=");
         }
 
+        public void NotEqual(${glSpecifyQuery}<CB> rightSpecifyQuery) {
+            _handler.Invoke(rightSpecifyQuery, "<>");
+        }
+
         public void GreaterThan(${glSpecifyQuery}<CB> rightSpecifyQuery) {
             _handler.Invoke(rightSpecifyQuery, ">");
         }
