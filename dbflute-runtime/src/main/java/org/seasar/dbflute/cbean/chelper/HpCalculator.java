@@ -6,28 +6,28 @@ package org.seasar.dbflute.cbean.chelper;
 public interface HpCalculator {
 
     /**
-     * Plus the specified column with the value. {+}
+     * Plus the specified column with the value. (+)
      * @param plusValue The number value for plus. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator plus(Number plusValue);
 
     /**
-     * Minus the specified column with the value. {-}
+     * Minus the specified column with the value. (-)
      * @param minusValue The number value for minus. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator minus(Number minusValue);
 
     /**
-     * Multiply the value to the specified column. {*}
+     * Multiply the value to the specified column. (*)
      * @param multiplyValue The number value for multiply. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator multiply(Number multiplyValue);
 
     /**
-     * Divide the specified column by the value. {/}
+     * Divide the specified column by the value. (/)
      * @param divideValue The number value for divide. (NotNull)
      * @return this. (NotNull)
      */

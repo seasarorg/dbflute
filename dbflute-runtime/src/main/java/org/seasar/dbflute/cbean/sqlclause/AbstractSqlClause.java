@@ -1859,8 +1859,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         fromWhereClause = replace(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         final StringBuilder sb = new StringBuilder();
-        String ln = ln();
-        sb.append("update ").append(tableSqlName).append(ln);
+        sb.append("update ").append(tableSqlName).append(ln());
         int index = 0;
         // It is guaranteed that the map has one or more elements.
         final Set<Entry<String, String>> entrySet = columnParameterMap.entrySet();
@@ -1870,16 +1869,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
             if (index == 0) {
-                sb.append("   set ").append(columnSqlName).append(" = ").append(parameter).append(ln);
+                sb.append("   set ").append(columnSqlName).append(" = ").append(parameter).append(ln());
             } else {
-                sb.append("     , ").append(columnSqlName).append(" = ").append(parameter).append(ln);
+                sb.append("     , ").append(columnSqlName).append(" = ").append(parameter).append(ln());
             }
             ++index;
         }
         if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
             final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
             sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            sb.append(" in (").append(ln()).append(subQuery).append(ln()).append(")");
             return sb.toString();
         } else {
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
@@ -1923,10 +1922,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
             final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
             final StringBuilder sb = new StringBuilder();
-            String ln = ln();
-            sb.append("delete from ").append(tableSqlName).append(ln);
+            sb.append("delete from ").append(tableSqlName).append(ln());
             sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            sb.append(" in (").append(ln()).append(subQuery).append(ln()).append(")");
             return sb.toString();
         } else { // unsupported or two-or-more primary keys
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {

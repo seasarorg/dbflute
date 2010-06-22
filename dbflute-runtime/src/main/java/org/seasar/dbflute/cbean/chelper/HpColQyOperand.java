@@ -26,50 +26,128 @@ public class HpColQyOperand<CB extends ConditionBean> {
     //                                                                          Comparison
     //                                                                          ==========
     /**
-     * Equal. {=}
+     * Equal(=).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO = BAR</span>
+     * cb.<span style="color: #FD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #FD4747">equal</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
      */
-    public void equal(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ConditionKey.CK_EQUAL.getOperand());
+    public HpCalculator equal(SpecifyQuery<CB> rightSpecifyQuery) {
+        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_EQUAL.getOperand());
     }
 
     /**
-     * NotEqual. {&lt;&gt;}
+     * NotEqual(&lt;&gt;).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt;&gt; BAR</span>
+     * cb.<span style="color: #FD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #FD4747">notEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
      */
-    public void notEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand());
+    public HpCalculator notEqual(SpecifyQuery<CB> rightSpecifyQuery) {
+        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand());
     }
 
     /**
-     * GreaterThan. {&gt;}
+     * GreaterThan(&gt;).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &gt; BAR</span>
+     * cb.<span style="color: #FD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #FD4747">greaterThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
      */
-    public void greaterThan(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_THAN.getOperand());
+    public HpCalculator greaterThan(SpecifyQuery<CB> rightSpecifyQuery) {
+        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_THAN.getOperand());
     }
 
     /**
-     * LessThan. {&lt;}
+     * LessThan(&lt;).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt; BAR</span>
+     * cb.<span style="color: #FD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #FD4747">lessThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
      */
-    public void lessThan(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_THAN.getOperand());
+    public HpCalculator lessThan(SpecifyQuery<CB> rightSpecifyQuery) {
+        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_THAN.getOperand());
     }
 
     /**
-     * GreaterEqual. {&gt;=}
+     * GreaterEqual(&gt;=).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &gt;= BAR</span>
+     * cb.<span style="color: #FD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #FD4747">greaterEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
      */
-    public void greaterEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_EQUAL.getOperand());
+    public HpCalculator greaterEqual(SpecifyQuery<CB> rightSpecifyQuery) {
+        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_EQUAL.getOperand());
     }
 
     /**
-     * LessThan. {&lt;=}
+     * LessThan(&lt;=).
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt;= BAR</span>
+     * cb.<span style="color: #FD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).<span style="color: #FD4747">lessEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         cb.specify().<span style="color: #FD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @return The calculator for right column. (NotNull)
      */
-    public void lessEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL.getOperand());
+    public HpCalculator lessEqual(SpecifyQuery<CB> rightSpecifyQuery) {
+        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL.getOperand());
     }
 }

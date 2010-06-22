@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -76,12 +77,23 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * {@inheritDoc}
      */
     public String buildStatement(ColumnSqlName columnSqlName) {
+        return doBuildStatement(columnSqlName.toString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String buildStatement(ColumnRealName columnRealName) {
+        return doBuildStatement(columnRealName.toString());
+    }
+
+    protected String doBuildStatement(String columnExp) {
         final List<CalculationElement> calculationList = getCalculationList();
         if (calculationList.isEmpty()) {
             return null;
         }
         final StringBuilder sb = new StringBuilder();
-        sb.append(columnSqlName);
+        sb.append(columnExp);
         int index = 0;
         for (CalculationElement calculation : calculationList) {
             if (index > 0) {

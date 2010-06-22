@@ -24,8 +24,12 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.chelper.HpCalcStatement;
+import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -189,8 +193,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                         ColumnQuery
     //                                                                         ===========
-    protected <CB extends ConditionBean> void xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
-            SpecifyQuery<CB> rightSp, String operand) {
+    protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
+            SpecifyQuery<CB> rightSp, final String operand) {
         assertQueryPurpose();
         // specify left column
         leftSp.specify(leftCB);
@@ -205,8 +209,28 @@ public abstract class AbstractConditionBean implements ConditionBean {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
         // register where clause
-        final String clause = leftColumn + " " + operand + " " + rightColumn;
-        getSqlClause().registerWhereClause(clause);
+        final HpCalcSpecification<CB> calcSp = xcreateCalcSpecification(rightSp);
+        final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, rightColumn, calcSp);
+        getSqlClause().registerWhereClause(queryClause);
+        return calcSp;
+    }
+
+    protected <CB extends ConditionBean> HpCalcSpecification<CB> xcreateCalcSpecification(SpecifyQuery<CB> rightSp) {
+        return new HpCalcSpecification<CB>(rightSp);
+    }
+
+    protected QueryClause xcreateColQyClause(final ColumnRealName leftColumn, final String operand,
+            final ColumnRealName rightColumn, final HpCalcStatement calcSt) {
+        return new QueryClause() {
+            @Override
+            public String toString() {
+                final StringBuilder sb = new StringBuilder();
+                sb.append(leftColumn).append(" ").append(operand).append(" ");
+                final String statement = calcSt.buildStatement(rightColumn);
+                sb.append(statement != null ? statement : rightColumn);
+                return sb.toString();
+            }
+        };
     }
 
     // [DBFlute-0.9.6.3]

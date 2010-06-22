@@ -12,7 +12,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected HpQDRSetupper<CB> _setupper;
+    protected final HpQDRSetupper<CB> _setupper;
 
     // ===================================================================================
     //                                                                         Constructor

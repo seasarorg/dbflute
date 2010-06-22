@@ -7,7 +7,7 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 
 /**
- * The function of specify derived-referrer.
+ * The function of specify-derived-referrer.
  * @author jflute
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <LOCAL_CQ> The type of local condition-query.
@@ -17,10 +17,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ConditionBean _baseCB;
-    protected LOCAL_CQ _localCQ;
-    protected HpSDRSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
-    protected DBMetaProvider _dbmetaProvider;
+    protected final ConditionBean _baseCB;
+    protected final LOCAL_CQ _localCQ;
+    protected final HpSDRSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
+    protected final DBMetaProvider _dbmetaProvider;
 
     // ===================================================================================
     //                                                                         Constructor
