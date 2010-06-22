@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the purpose for specify-derived-referrer is illegal.
+ * The exception of when the purpose for specify-relation is illegal.
  * @author jflute
  */
-public class SpecifyDerivedReferrerIllegalPurposeException extends RuntimeException {
+public class SpecifyRelationIllegalPurposeException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class SpecifyDerivedReferrerIllegalPurposeException extends RuntimeExcept
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public SpecifyDerivedReferrerIllegalPurposeException(String msg) {
+    public SpecifyRelationIllegalPurposeException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class SpecifyDerivedReferrerIllegalPurposeException extends RuntimeExcept
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public SpecifyDerivedReferrerIllegalPurposeException(String msg, Throwable cause) {
+    public SpecifyRelationIllegalPurposeException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

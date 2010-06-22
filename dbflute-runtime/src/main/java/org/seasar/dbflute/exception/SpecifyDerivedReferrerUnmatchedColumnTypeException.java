@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the column type of specify derived referrer is unmatched with the target column.
+ * The exception of when the column type of specify-derived-referrer is unmatched with the target column.
  * @author jflute
  */
 public class SpecifyDerivedReferrerUnmatchedColumnTypeException extends RuntimeException {

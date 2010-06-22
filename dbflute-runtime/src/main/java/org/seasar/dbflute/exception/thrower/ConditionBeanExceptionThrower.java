@@ -43,6 +43,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameExcept
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.SpecifyIllegalPurposeException;
+import org.seasar.dbflute.exception.SpecifyRelationIllegalPurposeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -382,7 +383,7 @@ public class ConditionBeanExceptionThrower {
         br.addItem("Specified Relation");
         br.addElement(relationName);
         final String msg = br.buildExceptionMessage();
-        throw new SpecifyDerivedReferrerIllegalPurposeException(msg);
+        throw new SpecifyRelationIllegalPurposeException(msg);
     }
 
     public void throwSpecifyDerivedReferrerIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,

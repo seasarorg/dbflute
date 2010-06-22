@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the column specification of specify derived referrer is invalid.
+ * The exception of when the column specification of specify-derived-referrer is invalid.
  * @author jflute
  */
 public class SpecifyDerivedReferrerInvalidColumnSpecificationException extends RuntimeException {
