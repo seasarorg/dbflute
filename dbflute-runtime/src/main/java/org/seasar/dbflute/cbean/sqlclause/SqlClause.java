@@ -24,6 +24,7 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseFilter;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -205,9 +206,15 @@ public interface SqlClause {
 
     /**
      * Register 'where' clause.
-     * @param clause The clause of 'where'. (NotNull)
+     * @param clause The string clause of 'where'. (NotNull)
      */
     void registerWhereClause(String clause);
+
+    /**
+     * Register 'where' clause.
+     * @param clause The query clause of 'where'. (NotNull)
+     */
+    void registerWhereClause(QueryClause clause);
 
     /**
      * Exchange first The clause of 'where' for last one.

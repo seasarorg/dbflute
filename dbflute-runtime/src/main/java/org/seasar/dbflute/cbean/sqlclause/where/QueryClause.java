@@ -16,7 +16,7 @@
 package org.seasar.dbflute.cbean.sqlclause.where;
 
 /**
- * The interface of where clause.
+ * The interface of query clause.
  * @author jflute
  */
 public interface QueryClause {
