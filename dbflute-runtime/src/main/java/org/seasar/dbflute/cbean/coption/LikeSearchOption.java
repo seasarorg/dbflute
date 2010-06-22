@@ -17,7 +17,7 @@ package org.seasar.dbflute.cbean.coption;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
-import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -262,7 +262,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * Get the arranger of where clause.
      * @return The arranger of where clause. (Nullable: If the value is null, it means no arrangement)
      */
-    public WhereClauseArranger getWhereClauseArranger() { // for application extension
+    public QueryClauseArranger getWhereClauseArranger() { // for application extension
         return null; // as default
     }
 

@@ -24,7 +24,7 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
-import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseSimpleFilter;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseFilter;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 
@@ -485,7 +485,7 @@ public interface SqlClause {
     // ===================================================================================
     //                                                          Where Clause Simple Filter
     //                                                          ==========================
-    void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter);
+    void addWhereClauseSimpleFilter(QueryClauseFilter whereClauseSimpleFilter);
 
     // ===================================================================================
     //                                                               Selected Foreign Info

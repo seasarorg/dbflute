@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.where.StringQueryClause;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
@@ -110,7 +112,8 @@ public abstract class ConditionKey implements Serializable {
      * @param value Condition value. (NotNull)
      * @return this.
      */
-    public ConditionKey addWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
+    public ConditionKey addWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+            ConditionValue value) {
         if (value == null) {
             String msg = "The argument 'value' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -127,8 +130,8 @@ public abstract class ConditionKey implements Serializable {
      * @param option Condition option. (NotNull)
      * @return this.
      */
-    public ConditionKey addWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
-            ConditionOption option) {
+    public ConditionKey addWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+            ConditionValue value, ConditionOption option) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=null this.toString()=" + toString());
@@ -143,7 +146,7 @@ public abstract class ConditionKey implements Serializable {
      * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName,
+    abstract protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value);
 
     /**
@@ -153,7 +156,7 @@ public abstract class ConditionKey implements Serializable {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName,
+    abstract protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ConditionOption option);
 
     // ===================================================================================
@@ -220,8 +223,10 @@ public abstract class ConditionKey implements Serializable {
      * @param location Location. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClause(ColumnRealName columnRealName, String location) {
-        return columnRealName + " " + getOperand() + " " + buildBindExpression(location, null);
+    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location) {
+        final String bindExpression = buildBindExpression(location, null);
+        final String clause = columnRealName + " " + getOperand() + " " + bindExpression;
+        return new StringQueryClause(clause);
     }
 
     /**
@@ -232,9 +237,11 @@ public abstract class ConditionKey implements Serializable {
      * @param rearOption Rear option. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClauseWithRearOption(ColumnRealName columnRealName, String operand, String location,
+    protected QueryClause buildBindClause(ColumnRealName columnRealName, String operand, String location,
             String rearOption) {
-        return columnRealName + " " + operand + " " + buildBindExpression(location, null) + rearOption;
+        final String bindExpression = buildBindExpression(location, null);
+        final String clause = columnRealName + " " + operand + " " + bindExpression + rearOption;
+        return new StringQueryClause(clause);
     }
 
     /**
@@ -244,8 +251,10 @@ public abstract class ConditionKey implements Serializable {
      * @param dummyValue Dummy value. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClause(ColumnRealName columnRealName, String location, String dummyValue) {
-        return columnRealName + " " + getOperand() + " " + buildBindExpression(location, dummyValue);
+    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, String dummyValue) {
+        final String bindExpression = buildBindExpression(location, dummyValue);
+        final String clause = columnRealName + " " + getOperand() + " " + bindExpression;
+        return new StringQueryClause(clause);
     }
 
     /**
@@ -253,8 +262,9 @@ public abstract class ConditionKey implements Serializable {
      * @param columnRealName The real name of column. (NotNull)
      * @return Clause without value. (NotNull)
      */
-    protected String buildClauseWithoutValue(ColumnRealName columnRealName) {
-        return columnRealName + " " + getOperand();
+    protected QueryClause buildClauseWithoutValue(ColumnRealName columnRealName) {
+        final String clause = columnRealName + " " + getOperand();
+        return new StringQueryClause(clause);
     }
 
     protected String buildBindExpression(String location, String dummyValue) {

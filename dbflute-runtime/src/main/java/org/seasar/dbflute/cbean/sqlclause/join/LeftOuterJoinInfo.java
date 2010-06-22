@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
@@ -24,8 +25,8 @@ public class LeftOuterJoinInfo implements Serializable {
     protected String _aliasName;
     protected String _baseTableDbName;
     protected String _joinTableDbName;
-    protected final List<String> _inlineWhereClauseList = new ArrayList<String>();
-    protected final List<String> _additionalOnClauseList = new ArrayList<String>();
+    protected final List<QueryClause> _inlineWhereClauseList = new ArrayList<QueryClause>();
+    protected final List<QueryClause> _additionalOnClauseList = new ArrayList<QueryClause>();
     protected Map<ColumnRealName, ColumnRealName> _joinOnMap;
     protected String _fixedCondition;
     protected boolean _innerJoin;
@@ -68,19 +69,19 @@ public class LeftOuterJoinInfo implements Serializable {
         _joinTableDbName = joinTableDbName;
     }
 
-    public List<String> getInlineWhereClauseList() {
+    public List<QueryClause> getInlineWhereClauseList() {
         return _inlineWhereClauseList;
     }
 
-    public void addInlineWhereClause(String inlineWhereClause) {
+    public void addInlineWhereClause(QueryClause inlineWhereClause) {
         _inlineWhereClauseList.add(inlineWhereClause);
     }
 
-    public List<String> getAdditionalOnClauseList() {
+    public List<QueryClause> getAdditionalOnClauseList() {
         return _additionalOnClauseList;
     }
 
-    public void addAdditionalOnClause(String additionalOnClause) {
+    public void addAdditionalOnClause(QueryClause additionalOnClause) {
         _additionalOnClauseList.add(additionalOnClause);
     }
 

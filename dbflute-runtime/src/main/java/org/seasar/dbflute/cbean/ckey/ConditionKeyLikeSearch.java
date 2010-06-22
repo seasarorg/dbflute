@@ -20,7 +20,9 @@ import java.util.List;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.where.StringQueryClause;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseArranger;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 
@@ -63,15 +65,15 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
         throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
-            ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+            ConditionValue value, ConditionOption option) {
         if (option == null) {
             String msg = "The argument 'option' should not be null:";
             msg = msg + " columnName=" + columnRealName + " value=" + value;
@@ -91,12 +93,14 @@ public class ConditionKeyLikeSearch extends ConditionKey {
         if (operand == null || operand.trim().length() == 0) {
             operand = getOperand();
         }
-        final WhereClauseArranger arranger = myOption.getWhereClauseArranger();
-        final String clause;
+        final QueryClauseArranger arranger = myOption.getWhereClauseArranger();
+        final QueryClause clause;
         if (arranger != null) {
-            clause = arranger.arrange(columnRealName, operand, buildBindExpression(location, null), rearOption);
+            final String bindExpression = buildBindExpression(location, null);
+            final String arranged = arranger.arrange(columnRealName, operand, bindExpression, rearOption);
+            clause = new StringQueryClause(arranged);
         } else {
-            clause = buildBindClauseWithRearOption(columnRealName, operand, location, rearOption);
+            clause = buildBindClause(columnRealName, operand, location, rearOption);
         }
         conditionList.add(clause);
     }

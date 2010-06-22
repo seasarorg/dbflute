@@ -42,7 +42,7 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarCondition;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryLevelReflector;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
-import org.seasar.dbflute.cbean.sqlclause.where.WhereClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseArranger;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -77,10 +77,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected static final ConditionKey CK_EQ = ConditionKey.CK_EQUAL;
     protected static final ConditionKey CK_NES = ConditionKey.CK_NOT_EQUAL_STANDARD;
     protected static final ConditionKey CK_NET = ConditionKey.CK_NOT_EQUAL_TRADITION;
-    protected static final ConditionKey CK_GE = ConditionKey.CK_GREATER_EQUAL;
     protected static final ConditionKey CK_GT = ConditionKey.CK_GREATER_THAN;
-    protected static final ConditionKey CK_LE = ConditionKey.CK_LESS_EQUAL;
     protected static final ConditionKey CK_LT = ConditionKey.CK_LESS_THAN;
+    protected static final ConditionKey CK_GE = ConditionKey.CK_GREATER_EQUAL;
+    protected static final ConditionKey CK_LE = ConditionKey.CK_LESS_EQUAL;
     protected static final ConditionKey CK_INS = ConditionKey.CK_IN_SCOPE;
     protected static final ConditionKey CK_NINS = ConditionKey.CK_NOT_IN_SCOPE;
     protected static final ConditionKey CK_LS = ConditionKey.CK_LIKE_SEARCH;
@@ -1500,7 +1500,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public WhereClauseArranger getWhereClauseArranger() {
+        public QueryClauseArranger getWhereClauseArranger() {
             return ((SqlClauseOracle) getSqlClause()).createFullTextSearchClauseArranger();
         }
     }

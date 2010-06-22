@@ -15,13 +15,19 @@
  */
 package org.seasar.dbflute.cbean.sqlclause.where;
 
-import org.seasar.dbflute.dbmeta.name.ColumnRealName;
-
 /**
- * The arranger of where clause.
  * @author jflute
  */
-public interface WhereClauseArranger {
+public class StringQueryClause implements QueryClause {
 
-    String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption);
+    protected String _clause;
+
+    public StringQueryClause(String clause) {
+        _clause = clause;
+    }
+
+    @Override
+    public String toString() {
+        return _clause;
+    }
 }

@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
@@ -77,15 +78,15 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
         conditionList.add(buildBindClause(columnRealName, value.getNotEqualLocation()));
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<String> conditionList, ColumnRealName columnRealName, ConditionValue value,
-            ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+            ConditionValue value, ConditionOption option) {
         throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
     }
 

@@ -24,10 +24,10 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * The simple filter for where clause.
+ * The simple filter for query clause.
  * @author jflute
  */
-public interface WhereClauseSimpleFilter {
+public interface QueryClauseFilter {
 
     public static final String BIND_COMMENT_BEGIN_PART = "/*pmb";
     public static final String BIND_COMMENT_END_PART = "*/null";
@@ -45,24 +45,24 @@ public interface WhereClauseSimpleFilter {
     String filterClauseElement(String clauseElement);
 
     /**
-     * The simple filter for where clause to embedded. <br />
+     * The simple filter for query clause to embedded. <br />
      * Attention: Searching column is not perfect. This class determines by column name only!
      * So when there are same-name column between tables, both are target!
      * @author jflute
      */
-    public static class WhereClauseToEmbeddedSimpleFilter implements WhereClauseSimpleFilter, Serializable {
+    public static class QueryClauseToEmbeddedSimpleFilter implements QueryClauseFilter, Serializable {
 
         /** Serial version UID. (Default) */
         private static final long serialVersionUID = 1L;
 
-        protected Set<ColumnInfo> _filterTargetColumnInfoSet;
+        protected final Set<ColumnInfo> _filterTargetColumnInfoSet;
 
-        public WhereClauseToEmbeddedSimpleFilter(ColumnInfo filterTargetColumnInfo) {
+        public QueryClauseToEmbeddedSimpleFilter(ColumnInfo filterTargetColumnInfo) {
             this._filterTargetColumnInfoSet = new HashSet<ColumnInfo>();
             this._filterTargetColumnInfoSet.add(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEmbeddedSimpleFilter(Set<ColumnInfo> filterTargetColumnInfoSet) {
+        public QueryClauseToEmbeddedSimpleFilter(Set<ColumnInfo> filterTargetColumnInfoSet) {
             this._filterTargetColumnInfoSet = filterTargetColumnInfoSet;
         }
 
@@ -99,21 +99,21 @@ public interface WhereClauseSimpleFilter {
     }
 
     /**
-     * The simple filter for where clause to embedded and quoted. <br />
+     * The simple filter for query clause to embedded and quoted. <br />
      * Attention: Searching column is not perfect. This class determines by column name only!
      * So when there are same-name column between tables, both are target!
      * @author jflute
      */
-    public static class WhereClauseToEmbeddedQuotedSimpleFilter extends WhereClauseToEmbeddedSimpleFilter {
+    public static class QueryClauseToEmbeddedQuotedSimpleFilter extends QueryClauseToEmbeddedSimpleFilter {
 
         /** Serial version UID. (Default) */
         private static final long serialVersionUID = 1L;
 
-        public WhereClauseToEmbeddedQuotedSimpleFilter(ColumnInfo filterTargetColumnInfo) {
+        public QueryClauseToEmbeddedQuotedSimpleFilter(ColumnInfo filterTargetColumnInfo) {
             super(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEmbeddedQuotedSimpleFilter(Set<ColumnInfo> filterTargetColumnInfoSet) {
+        public QueryClauseToEmbeddedQuotedSimpleFilter(Set<ColumnInfo> filterTargetColumnInfoSet) {
             super(filterTargetColumnInfoSet);
         }
 

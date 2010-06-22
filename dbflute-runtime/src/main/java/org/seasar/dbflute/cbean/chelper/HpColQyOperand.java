@@ -2,6 +2,7 @@ package org.seasar.dbflute.cbean.chelper;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
 
 /**
  * @author jflute
@@ -12,7 +13,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected HpColQyHandler<CB> _handler;
+    protected final HpColQyHandler<CB> _handler;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -29,7 +30,15 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void equal(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, "=");
+        _handler.handle(rightSpecifyQuery, ConditionKey.CK_EQUAL.getOperand());
+    }
+
+    /**
+     * NotEqual. {&lt;&gt;}
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     */
+    public void notEqual(SpecifyQuery<CB> rightSpecifyQuery) {
+        _handler.handle(rightSpecifyQuery, ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand());
     }
 
     /**
@@ -37,7 +46,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void greaterThan(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ">");
+        _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_THAN.getOperand());
     }
 
     /**
@@ -45,7 +54,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void lessThan(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, "<");
+        _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_THAN.getOperand());
     }
 
     /**
@@ -53,7 +62,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void greaterEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ">=");
+        _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_EQUAL.getOperand());
     }
 
     /**
@@ -61,6 +70,6 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void lessEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, "<=");
+        _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL.getOperand());
     }
 }
