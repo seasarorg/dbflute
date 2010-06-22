@@ -70,7 +70,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             }
             // no specification is checked at an other timing
         }
-        if (_purpose.isAny(HpCBPurpose.NORMAL_USE)) {
+        if (isNormalUse()) { // only normal purpose needs
             if (_query == null && !_qyCall.has()) { // setupSelect check!
                 throwSpecifyColumnNotSetupSelectColumnException(columnName);
             }
@@ -81,7 +81,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         if (_alreadySpecifiedRequiredColumn) {
             return false;
         }
-        return HpCBPurpose.NORMAL_USE.equals(_purpose); // only normal purpose needs
+        return isNormalUse(); // only normal purpose needs
     }
 
     protected void assertRelation(String relationName) {
@@ -94,6 +94,10 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         if (_purpose.isNoSpecifyDerivedReferrer()) {
             throwSpecifyDerivedReferrerIllegalPurposeException(referrerName);
         }
+    }
+
+    protected boolean isNormalUse() {
+        return HpCBPurpose.NORMAL_USE.equals(_purpose);
     }
 
     protected abstract void doSpecifyRequiredColumn();
