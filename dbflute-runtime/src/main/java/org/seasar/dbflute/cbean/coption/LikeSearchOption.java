@@ -17,7 +17,7 @@ package org.seasar.dbflute.cbean.coption;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.util.DfTypeUtil;

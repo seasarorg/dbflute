@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
 
 /**
  * @author jflute

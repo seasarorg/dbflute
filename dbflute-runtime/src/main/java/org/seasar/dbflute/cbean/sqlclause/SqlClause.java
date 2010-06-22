@@ -24,8 +24,8 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseFilter;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 

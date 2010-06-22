@@ -20,9 +20,9 @@ import java.util.List;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.where.StringQueryClause;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 

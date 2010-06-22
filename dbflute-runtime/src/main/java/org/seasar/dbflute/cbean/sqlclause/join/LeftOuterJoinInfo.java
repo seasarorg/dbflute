@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**

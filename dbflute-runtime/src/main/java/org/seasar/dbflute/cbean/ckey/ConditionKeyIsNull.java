@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**

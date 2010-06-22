@@ -26,7 +26,7 @@ import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseFilter;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;

@@ -39,10 +39,10 @@ import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo
 import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryReflector;
 import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQuerySetupper;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
+import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseFilter;
-import org.seasar.dbflute.cbean.sqlclause.where.StringQueryClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;

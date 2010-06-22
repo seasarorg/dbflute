@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;

@@ -17,7 +17,6 @@ package org.seasar.dbflute.cbean.sqlclause.query;
 
 import java.util.List;
 
-import org.seasar.dbflute.cbean.sqlclause.where.QueryClause;
 
 /**
  * @author jflute

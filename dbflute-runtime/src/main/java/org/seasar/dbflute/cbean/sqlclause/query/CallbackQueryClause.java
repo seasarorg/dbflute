@@ -13,21 +13,25 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.sqlclause.where;
+package org.seasar.dbflute.cbean.sqlclause.query;
 
 /**
  * @author jflute
  */
-public class StringQueryClause implements QueryClause {
+public class CallbackQueryClause implements QueryClause {
 
-    protected String _clause;
+    protected ClauseBuilder _builder;
 
-    public StringQueryClause(String clause) {
-        _clause = clause;
+    public CallbackQueryClause(ClauseBuilder builder) {
+        _builder = builder;
     }
 
     @Override
     public String toString() {
-        return _clause;
+        return _builder.build();
+    }
+
+    public static interface ClauseBuilder {
+        String build();
     }
 }

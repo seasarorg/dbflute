@@ -13,25 +13,15 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.sqlclause.where;
+package org.seasar.dbflute.cbean.sqlclause.query;
+
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
+ * The arranger of where clause.
  * @author jflute
  */
-public class CallbackQueryClause implements QueryClause {
+public interface QueryClauseArranger {
 
-    protected ClauseBuilder _builder;
-
-    public CallbackQueryClause(ClauseBuilder builder) {
-        _builder = builder;
-    }
-
-    @Override
-    public String toString() {
-        return _builder.build();
-    }
-
-    public static interface ClauseBuilder {
-        String build();
-    }
+    String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption);
 }
