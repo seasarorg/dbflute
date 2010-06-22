@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
@@ -43,8 +45,8 @@ public class UpdateOption<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<SelfSpecification<CB>> _selfSpecificationList = DfCollectionUtil.newArrayList();
-    protected final Map<String, SelfSpecification<CB>> _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
+    protected final List<HpCalcSpecification<CB>> _selfSpecificationList = DfCollectionUtil.newArrayList();
+    protected final Map<String, HpCalcSpecification<CB>> _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -89,13 +91,12 @@ public class UpdateOption<CB extends ConditionBean> {
      * @param specifyQuery The query for specification that specifies only one column. (NotNull)
      * @return The calculation of specification for the specified column. (NotNull)
      */
-    public SpecificationCalculation self(SpecifyQuery<CB> specifyQuery) {
+    public HpCalculator self(SpecifyQuery<CB> specifyQuery) {
         if (specifyQuery == null) {
             String msg = "The argument 'specifyQuery' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        final SelfSpecification<CB> specification = new SelfSpecification<CB>();
-        specification.setSpecifyQuery(specifyQuery);
+        final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(specifyQuery);
         _selfSpecificationList.add(specification);
         return specification;
     }
@@ -104,7 +105,7 @@ public class UpdateOption<CB extends ConditionBean> {
     //                                                               Resolve Specification
     //                                                               =====================
     public void resolveSpecification(CB cb) {
-        for (SelfSpecification<CB> specification : _selfSpecificationList) {
+        for (HpCalcSpecification<CB> specification : _selfSpecificationList) {
             final SpecifyQuery<CB> specifyQuery = specification.getSpecifyQuery();
             specifyQuery.specify(cb);
             final String columnDbName = getSpecifiedColumnDbNameAsOne(cb);
@@ -217,7 +218,7 @@ public class UpdateOption<CB extends ConditionBean> {
     }
 
     public String buildStatement(String columnDbName, ColumnSqlName columnSqlName) {
-        final SpecificationStatement statement = findSpecification(columnDbName);
+        final HpCalcSpecification<CB> statement = findSpecification(columnDbName);
         if (statement == null) {
             return null;
         }
@@ -228,7 +229,7 @@ public class UpdateOption<CB extends ConditionBean> {
         return exp;
     }
 
-    protected SpecificationStatement findSpecification(String columnDbName) {
+    protected HpCalcSpecification<CB> findSpecification(String columnDbName) {
         // only "self" supported
         return _selfSpecificationMap.get(columnDbName);
     }
@@ -256,160 +257,5 @@ public class UpdateOption<CB extends ConditionBean> {
         br.addElement(columnDbName);
         final String msg = br.buildExceptionMessage();
         throw new VaryingUpdateNotFoundCalculationException(msg);
-    }
-
-    // ===================================================================================
-    //                                                                       Related Class
-    //                                                                       =============
-    public static interface SpecificationStatement {
-
-        /**
-         * Build the statement as update value.
-         * @param columnSqlName The SQL name of column. (NotNull)
-         * @return The statement as update value. (Nullable: if null, means the column is not specified)
-         */
-        String buildStatement(ColumnSqlName columnSqlName);
-    }
-
-    public static interface SpecificationCalculation {
-
-        /**
-         * Plus the specified column with the value. (+)
-         * @param plusValue The number value for plus. (NotNull)
-         * @return this. (NotNull)
-         */
-        SpecificationCalculation plus(Number plusValue);
-
-        /**
-         * Minus the specified column with the value. (-)
-         * @param minusValue The number value for minus. (NotNull)
-         * @return this. (NotNull)
-         */
-        SpecificationCalculation minus(Number minusValue);
-
-        /**
-         * Multiply the value to the specified column. (*)
-         * @param multiplyValue The number value for multiply. (NotNull)
-         * @return this. (NotNull)
-         */
-        SpecificationCalculation multiply(Number multiplyValue);
-
-        /**
-         * Divide the specified column by the value. (/)
-         * @param divideValue The number value for divide. (NotNull)
-         * @return this. (NotNull)
-         */
-        SpecificationCalculation divide(Number divideValue);
-    }
-
-    public static class SelfSpecification<CB extends ConditionBean> implements SpecificationCalculation,
-            SpecificationStatement {
-        protected SpecifyQuery<CB> _specifyQuery;
-        protected final List<SelfCalculation> _calculationList = DfCollectionUtil.newArrayList();
-
-        /**
-         * {@inheritDoc}
-         */
-        public SpecificationCalculation plus(Number plusValue) {
-            return register(CalculationType.PLUS, plusValue);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public SpecificationCalculation minus(Number minusValue) {
-            return register(CalculationType.MINUS, minusValue);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public SpecificationCalculation multiply(Number multiplyValue) {
-            return register(CalculationType.MULTIPLY, multiplyValue);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public SpecificationCalculation divide(Number divideValue) {
-            return register(CalculationType.DIVIDE, divideValue);
-        }
-
-        protected SelfSpecification<CB> register(CalculationType type, Number value) {
-            if (value == null) {
-                String msg = "The null value was specified as " + type + ": " + _specifyQuery;
-                throw new IllegalArgumentException(msg);
-            }
-            final SelfCalculation calculation = new SelfCalculation();
-            calculation.setCalculationType(type);
-            calculation.setCalculationValue(value);
-            _calculationList.add(calculation);
-            return this;
-        }
-
-        public String buildStatement(ColumnSqlName columnSqlName) {
-            final List<SelfCalculation> calculationList = getCalculationList();
-            if (calculationList.isEmpty()) {
-                return null;
-            }
-            final StringBuilder sb = new StringBuilder();
-            sb.append(columnSqlName);
-            int index = 0;
-            for (SelfCalculation calculation : calculationList) {
-                if (index > 0) {
-                    sb.insert(0, "(").append(")");
-                }
-                sb.append(" ").append(calculation.getCalculationType().operand());
-                sb.append(" ").append(calculation.getCalculationValue());
-                ++index;
-            }
-            return sb.toString();
-        }
-
-        public SpecifyQuery<CB> getSpecifyQuery() {
-            return _specifyQuery;
-        }
-
-        public void setSpecifyQuery(SpecifyQuery<CB> specifyQuery) {
-            this._specifyQuery = specifyQuery;
-        }
-
-        public List<SelfCalculation> getCalculationList() {
-            return _calculationList;
-        }
-    }
-
-    public static class SelfCalculation {
-        protected CalculationType _calculationType;
-        protected Number _calculationValue;
-
-        public CalculationType getCalculationType() {
-            return _calculationType;
-        }
-
-        public void setCalculationType(CalculationType calculationType) {
-            this._calculationType = calculationType;
-        }
-
-        public Number getCalculationValue() {
-            return _calculationValue;
-        }
-
-        public void setCalculationValue(Number calculationValue) {
-            this._calculationValue = calculationValue;
-        }
-    }
-
-    public static enum CalculationType {
-        PLUS("+"), MINUS("-"), MULTIPLY("*"), DIVIDE("/");
-        private String _operand;
-
-        private CalculationType(String operand) {
-            _operand = operand;
-        }
-
-        public String operand() {
-            return _operand;
-        }
     }
 }

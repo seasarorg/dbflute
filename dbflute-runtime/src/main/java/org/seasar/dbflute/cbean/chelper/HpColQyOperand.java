@@ -25,6 +25,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
     //                                                                          Comparison
     //                                                                          ==========
     /**
+     * Equal. {=}
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void equal(SpecifyQuery<CB> rightSpecifyQuery) {
@@ -32,6 +33,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
     }
 
     /**
+     * GreaterThan. {&gt;}
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void greaterThan(SpecifyQuery<CB> rightSpecifyQuery) {
@@ -39,13 +41,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
     }
 
     /**
-     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
-     */
-    public void greaterEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        _handler.handle(rightSpecifyQuery, ">=");
-    }
-
-    /**
+     * LessThan. {&lt;}
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void lessThan(SpecifyQuery<CB> rightSpecifyQuery) {
@@ -53,6 +49,15 @@ public class HpColQyOperand<CB extends ConditionBean> {
     }
 
     /**
+     * GreaterEqual. {&gt;=}
+     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     */
+    public void greaterEqual(SpecifyQuery<CB> rightSpecifyQuery) {
+        _handler.handle(rightSpecifyQuery, ">=");
+    }
+
+    /**
+     * LessThan. {&lt;=}
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      */
     public void lessEqual(SpecifyQuery<CB> rightSpecifyQuery) {
