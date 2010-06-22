@@ -182,6 +182,22 @@ namespace ${glPackageBaseCB} {
     		public bool has() { return true; } public ${myConditionQueryClassName} qy() { return _myCB.Query(); }
     	}
 
+        // [DBFlute-0.8.9.18]
+        // ===============================================================================
+        //                                                                     ColumnQuery
+        //                                                                     ===========
+        public HpColQyOperand<${myConditionBeanClassName}> ColumnQuery(${glSpecifyQuery}<${myConditionBeanClassName}> leftSpecifyQuery) {
+            return new HpColQyOperand<${myConditionBeanClassName}>(delegate(${glSpecifyQuery}<${myConditionBeanClassName}> rightSp, String operand) {
+                xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), leftSpecifyQuery, rightSp, operand);
+            });
+        }
+
+        protected ${myConditionBeanClassName} xcreateColumnQueryCB() {
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+            cb.xsetupForColumnQuery((${myConditionBeanClassName})this);
+            return cb;
+        }
+
         // [DBFlute-0.8.9.9]
         // ===============================================================================
         //                                                                    OrScopeQuery
@@ -189,10 +205,30 @@ namespace ${glPackageBaseCB} {
         public void OrScopeQuery(${glOrQuery}<${myConditionBeanClassName}> orQuery) {
             xorQ((${myConditionBeanClassName})this, orQuery);
         }
+
+        // ===============================================================================
+        //                                                                    Purpose Type
+        //                                                                    ============
+        public void xsetupForColumnQuery(${myConditionBeanClassName} cb) {
+            //xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
+
+            // inherits a parent query to synchronize real name
+            // (and also for suppressing query check) 
+            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall<${myConditionQueryClassName}>());
+            Specify().xsetupForColumnQuery();
+        }
     }
-	
+
+    public class ${myConditionBeanClassName}ColQySpQyCall<${myConditionQueryClassName}> : SpQyCall {
+        protected ${myConditionBeanClassName} _conditionBean;
+        public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} conditionBean) {
+            _conditionBean = conditionBean;
+        }
+        public bool has() { return true; } 
+        public ${myConditionQueryClassName} qy() { return _conditionBean.Query(); } 
+    }
+
     public class ${myConditionBeanClassName}Specification : AbstractSpecification<${myConditionQueryClassName}> {
-        protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
@@ -209,7 +245,7 @@ namespace ${glPackageBaseCB} {
 #end
         public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
                                                       , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery)
-        : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect, forScalarSubQuery) { _myQyCall = qyCall; }
+        : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect, forScalarSubQuery) { }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
 #end
@@ -221,8 +257,8 @@ namespace ${glPackageBaseCB} {
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #if ($fk.hasLocalColumnExceptPrimaryKey())
-            if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
-                    || _myQyCall.qy().getReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
+            if (_qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
+                    || _qyCall.qy().getReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
 #foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
                 Column${col.javaName}(); // FK or one-to-one referrer
@@ -240,17 +276,17 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
-		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
-		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
-		    public bool has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+		    protected SpQyCall<${myConditionQueryClassName}> _qyCall;
+		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
+		    public bool has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 #if ($fk.hasDynamicFixedCondition())
-			public ${tmpCQClassName} qy() { return _myQyCall.qy().ConditionQuery${tmpPropertyNameInitCap}; }
+			public ${tmpCQClassName} qy() { return _qyCall.qy().ConditionQuery${tmpPropertyNameInitCap}; }
 #else
-			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
+			public ${tmpCQClassName} qy() { return _qyCall.qy().Query${tmpPropertyNameInitCap}(); }
 #end
 		}
 #end
@@ -262,14 +298,14 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
-		    protected SpQyCall<${myConditionQueryClassName}> _myQyCall;
-		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _myQyCall = myQyCall; }
-		    public bool has() { return _myQyCall.has() && _myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-			public ${tmpCQClassName} qy() { return _myQyCall.qy().Query${tmpPropertyNameInitCap}(); }
+		    protected SpQyCall<${myConditionQueryClassName}> _qyCall;
+		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
+		    public bool has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+			public ${tmpCQClassName} qy() { return _qyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
 #end
 #end
@@ -280,7 +316,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         public RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> Derived${tmpPropertyNameInitCap}() {
-            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), delegate(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) { cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); });
+            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), delegate(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) { cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); });
         }
 #end
 #end

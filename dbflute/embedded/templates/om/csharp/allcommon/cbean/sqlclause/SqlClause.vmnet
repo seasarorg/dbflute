@@ -186,6 +186,7 @@ public interface ${myClassName} {
     void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
     bool hasSpecifiedDeriveSubQuery(String aliasName);
     String getSpecifiedColumnNameAsOne();
+    String getSpecifiedColumnRealNameAsOne();
     void clearSpecifiedSelectColumn();
 
     // ===================================================================================

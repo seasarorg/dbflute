@@ -209,6 +209,31 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         // ===============================================================================
+        //                                                                     ColumnQuery
+        //                                                                     ===========
+        protected <CB extends &{glConditionBean}> void xcolqy(CB leftCB, CB rightCB, ${glSpecifyQuery}<CB> leftSp,
+                ${glSpecifyQuery}<CB> rightSp, String operand) {
+            assertQueryPurpose();
+            // specify left column
+            leftSp.Invoke(leftCB);
+            String leftColumn = leftCB.SqlClause.getSpecifiedColumnRealNameAsOne();
+            if (leftColumn == null) {
+                String msg = "The left column for ColumnQuery was not found: " + typeof(leftCB);
+                throw new SystemException(msg);
+            }
+            // specify right column
+            rightSp.Invoke(rightCB);
+            String rightColumn = rightCB.SqlClause.getSpecifiedColumnRealNameAsOne();
+            if (rightColumn == null) {
+                String msg = "The right column for ColumnQuery was not found: " + typeof(rightCB);
+                throw new SystemException(msg);
+            }
+            // register where clause
+            String clause = leftColumn + " " + operand + " " + rightColumn;
+            this.SqlClause.registerWhereClause(clause);
+        }
+
+        // ===============================================================================
         //                                                                    OrScopeQuery
         //                                                                    ============
         protected void xorQ<CB>(CB cb, ${glOrQuery}<CB> orQuery) where CB : ${glConditionBean} {
@@ -412,6 +437,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected bool _forDerivedReferrer;
         protected bool _forScalarSelect;
         protected bool _forScalarSubQuery;
+        protected bool _forColumnQuery; // is set by method (temporary fix until using purpose type)
         protected CQ _query;
         protected bool _alreadySpecifiedRequiredColumn;
 
@@ -442,7 +468,10 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         protected bool isRequiredColumnSpecificationEnabled() {
-            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_alreadySpecifiedRequiredColumn;
+            if (_alreadySpecifiedRequiredColumn) {
+                return false;
+            }
+            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_forColumnQuery;
         }
 
         protected void assertColumn(String columnName) {
@@ -552,7 +581,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "* * * * * * * * * */";
             throw new ScalarSelectInvalidForeignSpecificationException(msg);
         }
-        
+
         protected void throwScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
             ${glConditionBeanContext}.ThrowScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
         }
@@ -564,13 +593,56 @@ namespace ${glPackageBaseCommonCBean} {
         public bool IsAlreadySpecifiedRequiredColumn { get {
             return _alreadySpecifiedRequiredColumn;
         }}
+
+        public void xswitchQyCall(HpSpQyCall<CQ> qyCall) {
+            if (qyCall == null) {
+                String msg = "The argument 'qyCall' should not be null.";
+                throw new SystemException(msg);
+            }
+            _qyCall = qyCall;
+        }
+
+        public void xsetupForColumnQuery() {
+            _forColumnQuery = true;
+        }
     }
 
     public interface SpQyCall<CQ> where CQ : ${glConditionQuery} {
         bool has(); 
         CQ qy(); 
     }
-    
+
+    public class HpColQyOperand<CB> where CB : ${glConditionBean} {
+
+        protected HpColQyHandler<CB> _handler;
+
+        public HpColQyOperand(HpColQyHandler<CB> handler) {
+            _handler = handler;
+        }
+
+        public void Equal({glSpecifyQuery}<CB> rightSpecifyQuery) {
+            _handler.Invoke(rightSpecifyQuery, "=");
+        }
+
+        public void GreaterThan({glSpecifyQuery}<CB> rightSpecifyQuery) {
+            _handler.Invoke(rightSpecifyQuery, ">");
+        }
+
+        public void GreaterEqual({glSpecifyQuery}<CB> rightSpecifyQuery) {
+            _handler.Invoke(rightSpecifyQuery, ">=");
+        }
+
+        public void LessThan({glSpecifyQuery}<CB> rightSpecifyQuery) {
+            _handler.Invoke(rightSpecifyQuery, "<");
+        }
+
+        public void LessEqual({glSpecifyQuery}<CB> rightSpecifyQuery) {
+            _handler.Invoke(rightSpecifyQuery, "<=");
+        }
+    }
+
+    public delegate void HpColQyHandler<CB>(${glSpecifyQuery}<CB> rightSp, String operand) where CB : ${glConditionBean};
+
     public class SpecifyColumnNotSetupSelectColumnException : SystemException {
         public SpecifyColumnNotSetupSelectColumnException(String msg) : base(msg) {
         }

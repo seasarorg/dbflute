@@ -2012,6 +2012,17 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return null;
     }
 
+    public String getSpecifiedColumnRealNameAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            String tableAliasName = _specifiedSelectColumnMap.keySet().iterator().next();
+            Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+            if (elementMap != null && elementMap.size() == 1) {
+                return tableAliasName + "." + elementMap.keySet().iterator().next();
+            }
+        }
+        return null;
+    }
+
     public void clearSpecifiedSelectColumn() {
         if (_specifiedSelectColumnMap != null) { _specifiedSelectColumnMap.clear(); _specifiedSelectColumnMap = null; }
     }

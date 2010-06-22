@@ -156,6 +156,7 @@ $database.checkProperties()
 #set ($glConditionKey = "${glProjectPrefix}ConditionKey")
 #set ($glConditionValue = "${glProjectPrefix}ConditionValue")
 #set ($glScalarQuery = "${glProjectPrefix}ScalarQuery")
+#set ($glSpecifyQuery = "${glProjectPrefix}SpecifyQuery")
 #set ($glSubQuery = "${glProjectPrefix}SubQuery")
 #set ($glUnionQuery = "${glProjectPrefix}UnionQuery")
 #set ($glOrQuery = "${glProjectPrefix}OrQuery")
@@ -675,6 +676,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SelectResource.${glT
 $database.info("    parse('ScalarQuery')")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glScalarQuery}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ScalarQuery.${glTemplateFileExtension}",$path ,"", "")
+
+$database.info("    parse('SpecifyQuery')")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glSpecifyQuery}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/SpecifyQuery.${glTemplateFileExtension}",$path ,"", "")
 
 $database.info("    parse('SubQuery')")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glSubQuery}.${glClassFileExtension}" )
