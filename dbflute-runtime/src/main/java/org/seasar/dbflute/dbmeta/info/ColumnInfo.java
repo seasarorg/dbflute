@@ -221,7 +221,7 @@ public class ColumnInfo {
             }
             sb.append(")");
         }
-        sb.append(", ").append(_propertyType);
+        sb.append(", ").append(_propertyType.getName());
         sb.append("}");
         return sb.toString();
     }
