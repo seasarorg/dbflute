@@ -211,9 +211,8 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                     ColumnQuery
         //                                                                     ===========
-        protected <CB extends &{glConditionBean}> void xcolqy(CB leftCB, CB rightCB, ${glSpecifyQuery}<CB> leftSp,
-                ${glSpecifyQuery}<CB> rightSp, String operand) {
-            assertQueryPurpose();
+        protected void xcolqy<CB>(CB leftCB, CB rightCB, ${glSpecifyQuery}<CB> leftSp,
+                ${glSpecifyQuery}<CB> rightSp, String operand) where CB : ${glConditionBean} {
             // specify left column
             leftSp.Invoke(leftCB);
             String leftColumn = leftCB.SqlClause.getSpecifiedColumnRealNameAsOne();
