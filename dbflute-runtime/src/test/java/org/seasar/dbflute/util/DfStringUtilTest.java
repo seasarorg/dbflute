@@ -31,7 +31,6 @@ import static org.seasar.dbflute.util.Srl.containsSuffixAny;
 import static org.seasar.dbflute.util.Srl.containsSuffixAnyIgnoreCase;
 import static org.seasar.dbflute.util.Srl.count;
 import static org.seasar.dbflute.util.Srl.countIgnoreCase;
-import static org.seasar.dbflute.util.Srl.decamelize;
 import static org.seasar.dbflute.util.Srl.endsWith;
 import static org.seasar.dbflute.util.Srl.endsWithIgnoreCase;
 import static org.seasar.dbflute.util.Srl.equalsFlexible;
@@ -1194,22 +1193,23 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("FooNameBarId", DfStringUtil.camelize("FOO NAME BAR ID", " "));
     }
 
-    public void test_decamelize_basic() {
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("FooName"));
-        assertEquals("FOO_NAME", decamelize("fooName"));
-        assertEquals("F", DfStringUtil.decamelize("f"));
-        assertEquals("F_O_O__NAME_BAR", DfStringUtil.decamelize("FOO_NameBar"));
-        assertEquals("FOO__NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
-        assertEquals("F_O_O__N_A_M_E", DfStringUtil.decamelize("FOO_NAME"));
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("foo_name"));
-    }
-
-    public void test_decamelize_delimiter() {
-        assertEquals("FOO-NAME", DfStringUtil.decamelize("FooName", "-"));
-        assertEquals("FOO@NAME", decamelize("fooName", "@"));
-        assertEquals("F", DfStringUtil.decamelize("f", "_"));
-        assertEquals("F*O*O_*NAME*BAR", DfStringUtil.decamelize("FOO_NameBar", "*"));
-    }
+    // *DBFlute doesn't decamelize a table and column name
+    //public void test_decamelize_basic() {
+    //    assertEquals("FOO_NAME", DfStringUtil.doDecamelize("FooName"));
+    //    assertEquals("FOO_NAME", doDecamelize("fooName"));
+    //    assertEquals("F", DfStringUtil.decamelize("f"));
+    //    assertEquals("F_O_O__NAME_BAR", DfStringUtil.decamelize("FOO_NameBar"));
+    //    assertEquals("FOO__NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
+    //    assertEquals("F_O_O__N_A_M_E", DfStringUtil.decamelize("FOO_NAME"));
+    //    assertEquals("FOO_NAME", DfStringUtil.decamelize("foo_name"));
+    //}
+    //
+    //public void test_decamelize_delimiter() {
+    //    assertEquals("FOO-NAME", DfStringUtil.decamelize("FooName", "-"));
+    //    assertEquals("FOO@NAME", decamelize("fooName", "@"));
+    //    assertEquals("F", DfStringUtil.decamelize("f", "_"));
+    //    assertEquals("F*O*O_*NAME*BAR", DfStringUtil.decamelize("FOO_NameBar", "*"));
+    //}
 
     // ===================================================================================
     //                                                                        SQL Handling

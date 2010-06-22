@@ -78,7 +78,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                          Purpose Type
     //                                          ------------
     /** The purpose of condition-bean. (NotNull) */
-    protected HpCBPurpose _purpose = HpCBPurpose.NORMAL; // as default
+    protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -774,7 +774,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        ============
     // very internal
     public void xsetupForUnion() {
-        xchangePurposeSqlClause(HpCBPurpose.UNION);
+        xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);
     }
 
     public void xsetupForExistsReferrer() {
@@ -782,7 +782,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     public void xsetupForInScopeRelation() {
-        xchangePurposeSqlClause(HpCBPurpose.INSCOPE_RELATION);
+        xchangePurposeSqlClause(HpCBPurpose.IN_SCOPE_RELATION);
     }
 
     public void xsetupForDerivedReferrer() {

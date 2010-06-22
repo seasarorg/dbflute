@@ -1,14 +1,16 @@
 package org.seasar.dbflute.cbean.chelper;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  */
 public enum HpCBPurpose {
 
-    NORMAL(new HpSpec()) // basic (all functions can be used)
-    , UNION(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // Union
+    NORMAL_USE(new HpSpec()) // basic (all functions can be used)
+    , UNION_QUERY(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // Union
     , EXISTS_REFERRER(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // ExistsReferrer 
-    , INSCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // InScopeRelation
+    , IN_SCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // InScopeRelation
     , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyDerivedReferrer().noOrderBy()) // DerivedReferrer
     , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noOrderBy()) // ScalarSelect
@@ -74,6 +76,11 @@ public enum HpCBPurpose {
 
     public boolean isNoOrderBy() {
         return _spec.isNoOrderBy();
+    }
+
+    @Override
+    public String toString() {
+        return Srl.camelize(name());
     }
 
     public static class HpSpec {

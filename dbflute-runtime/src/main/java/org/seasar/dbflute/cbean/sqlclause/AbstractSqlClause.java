@@ -198,7 +198,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          Purpose Type
     //                                          ------------
     /** The purpose of condition-bean for check at condition-query. (NotNull) */
-    protected HpCBPurpose _purpose = HpCBPurpose.NORMAL; // as default
+    protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
 
     // ===================================================================================
     //                                                                         Constructor
