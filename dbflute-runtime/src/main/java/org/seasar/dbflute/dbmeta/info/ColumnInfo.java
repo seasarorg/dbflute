@@ -57,7 +57,7 @@ public class ColumnInfo {
     protected final boolean _autoIncrement;
     protected final String _columnDbType;
     protected final Integer _columnSize;
-    protected final Integer _columnDecimalDigits;
+    protected final Integer _decimalDigits;
     protected final boolean _commonColumn;
     protected final OptimisticLockType _optimisticLockType;
     protected final String _columnComment;
@@ -70,9 +70,9 @@ public class ColumnInfo {
     //                                                                         ===========
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnSqlName, String columnAlias, boolean notNull,
             String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType,
-            Integer columnSize, Integer columnDecimalDigits, boolean commonColumn,
-            OptimisticLockType optimisticLockType, String columnComment, List<String> foreignPropList,
-            List<String> referrerPropList, ClassificationMeta classificationMeta) {
+            Integer columnSize, Integer decimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
+            String columnComment, List<String> foreignPropList, List<String> referrerPropList,
+            ClassificationMeta classificationMeta) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("columnSqlName", columnSqlName);
@@ -89,7 +89,7 @@ public class ColumnInfo {
         this._autoIncrement = autoIncrement;
         this._columnSize = columnSize;
         this._columnDbType = columnDbType;
-        this._columnDecimalDigits = columnDecimalDigits;
+        this._decimalDigits = decimalDigits;
         this._commonColumn = commonColumn;
         this._optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
         this._columnComment = columnComment;
@@ -209,8 +209,21 @@ public class ColumnInfo {
     }
 
     public String toString() {
-        return _dbmeta.getTableDbName() + "." + _columnDbName + "(" + _columnDbType + ", "
-                + DfTypeUtil.toClassTitle(_propertyType) + ")";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_dbmeta.getTableDbName());
+        sb.append(".").append(_columnDbName);
+        sb.append(":{");
+        sb.append(_columnDbType);
+        if (_columnSize != null) {
+            sb.append("(").append(_columnSize);
+            if (_decimalDigits != null) {
+                sb.append(", ").append(_decimalDigits);
+            }
+            sb.append(")");
+        }
+        sb.append(", ").append(_propertyType);
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================
@@ -332,8 +345,8 @@ public class ColumnInfo {
      * Get the decimal digits of the column.
      * @return The decimal digits of the column. (Nullable: If the type does not have disits, it returns null.)
      */
-    public Integer getColumnDecimalDigits() {
-        return this._columnDecimalDigits;
+    public Integer getDecimalDigits() {
+        return this._decimalDigits;
     }
 
     /**
