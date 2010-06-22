@@ -296,7 +296,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
-        createCBExThrower().throwPagingPageSizeNotPlusException(pageSize, pageNumber);
+        createCBExThrower().throwPagingPageSizeNotPlusException(this, pageSize, pageNumber);
     }
 
     /**

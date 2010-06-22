@@ -5,20 +5,23 @@ package org.seasar.dbflute.cbean.chelper;
  */
 public enum HpCBPurpose {
 
-    NORMAL(new HpSpec()) // basic
+    NORMAL(new HpSpec()) // basic (all functions can be used)
     , UNION(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // Union
     , EXISTS_REFERRER(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // ExistsReferrer 
     , INSCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // InScopeRelation
-    , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noOrderBy()) // DerivedReferrer
-    , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noOrderBy()) // ScalarSelect
-    , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noOrderBy()) // ScalarCondition
+    , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyDerivedReferrer().noOrderBy()) // DerivedReferrer
+    , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
+            .noSpecifyDerivedReferrer().noOrderBy()) // ScalarSelect
+    , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
+            .noSpecifyDerivedReferrer().noOrderBy()) // ScalarCondition
 
     // A purpose that can specify but not allowed to query
     // needs to switch condition-bean used in specification
     // to non-checked condition-bean.
     // Because specification uses query internally.
-    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noQuery()) // ColumnQuery
-    , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwice().noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
+    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyDerivedReferrer().noQuery()) // ColumnQuery
+    , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
+            .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
 
     // QueryUpdate and QueryDelete are not defined here
     // because their condition-beans are created by an application
@@ -53,8 +56,12 @@ public enum HpCBPurpose {
         return _spec.isNoSpecify();
     }
 
-    public boolean isNoSpecifyTwice() {
-        return _spec.isNoSpecifyTwice();
+    public boolean isNoSpecifyColumnTwoOrMore() {
+        return _spec.isNoSpecifyColumnTwoOrMore();
+    }
+
+    public boolean isNoSpecifyRelation() {
+        return _spec.isNoSpecifyRelation();
     }
 
     public boolean isNoSpecifyDerivedReferrer() {
@@ -72,7 +79,8 @@ public enum HpCBPurpose {
     public static class HpSpec {
         protected boolean _noSetupSelect;
         protected boolean _noSpecify;
-        protected boolean _noSpecifyColumnTwice;
+        protected boolean _noSpecifyColumnTwoOrMore;
+        protected boolean _noSpecifyRelation;
         protected boolean _noSpecifyDerivedReferrer;
         protected boolean _noQuery;
         protected boolean _noOrderBy;
@@ -87,8 +95,13 @@ public enum HpCBPurpose {
             return this;
         }
 
-        public HpSpec noSpecifyColumnTwice() {
-            _noSpecifyColumnTwice = true;
+        public HpSpec noSpecifyColumnTwoOrMore() {
+            _noSpecifyColumnTwoOrMore = true;
+            return this;
+        }
+
+        public HpSpec noSpecifyRelation() {
+            _noSpecifyRelation = true;
             return this;
         }
 
@@ -115,8 +128,12 @@ public enum HpCBPurpose {
             return _noSpecify;
         }
 
-        public boolean isNoSpecifyTwice() {
-            return _noSpecifyColumnTwice;
+        public boolean isNoSpecifyColumnTwoOrMore() {
+            return _noSpecifyColumnTwoOrMore;
+        }
+
+        public boolean isNoSpecifyRelation() {
+            return _noSpecifyRelation;
         }
 
         public boolean isNoSpecifyDerivedReferrer() {

@@ -30,10 +30,8 @@ import org.seasar.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeExcep
 import org.seasar.dbflute.exception.QueryIllegalPurposeException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.exception.ScalarConditionInvalidColumnSpecificationException;
-import org.seasar.dbflute.exception.ScalarConditionInvalidForeignSpecificationException;
 import org.seasar.dbflute.exception.ScalarConditionUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidColumnSpecificationException;
-import org.seasar.dbflute.exception.ScalarSelectInvalidForeignSpecificationException;
 import org.seasar.dbflute.exception.SetupSelectAfterUnionException;
 import org.seasar.dbflute.exception.SetupSelectIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifiedDerivedOrderByAliasNameNotFoundException;
@@ -232,25 +230,23 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                              Paging
     //                                                                              ======
-    public void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Page size for paging should not be minus or zero!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Confirm the value of your parameter 'pageSize'." + ln();
-        msg = msg + "The first parameter of paging() should be a plus value!" + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) - cb.paging(0, 1);" + ln();
-        msg = msg + "    (x) - cb.paging(-3, 2);" + ln();
-        msg = msg + "    (o) - cb.paging(4, 3);" + ln();
-        msg = msg + ln();
-        msg = msg + "[Page Size]" + ln();
-        msg = msg + pageSize + ln();
-        msg = msg + ln();
-        msg = msg + "[Page Number]" + ln();
-        msg = msg + pageNumber + ln();
-        msg = msg + "* * * * * * * * * */";
+    public void throwPagingPageSizeNotPlusException(ConditionBean cb, int pageSize, int pageNumber) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Page size for paging should not be minus or zero.");
+        br.addItem("Advice");
+        br.addElement("Confirm the value of your parameter 'pageSize'.");
+        br.addElement("The first parameter of paging() should be a plus value.");
+        br.addElement("For example:");
+        br.addElement("  (x): cb.paging(0, 1);");
+        br.addElement("  (x): cb.paging(-3, 2);");
+        br.addElement("  (o): cb.paging(20, 3);");
+        br.addItem("ConditionBean");
+        br.addElement(cb.getClass().getName());
+        br.addItem("Page Size");
+        br.addElement(pageSize);
+        br.addItem("Page Number");
+        br.addElement(pageNumber);
+        final String msg = br.buildExceptionMessage();
         throw new PagingPageSizeNotPlusException(msg);
     }
 
@@ -274,6 +270,12 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    cb.union(new UnionQuery<PurchaseCB>() {");
         br.addElement("        public void query(PurchaseCB unionCB) {");
         br.addElement("            unionCB.specify()... // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (o): (ExistsReferrer)");
+        br.addElement("    cb.query().existsPurchaseList(new SubQuery<PurchaseCB>() {");
+        br.addElement("        public void query(PurchaseCB subCB) {");
+        br.addElement("            subCB.query().setPurchaseCount_GreaterEqual(3); // OK");
         br.addElement("        }");
         br.addElement("    });");
         // don't use displaySql because of illegal CB's state
@@ -342,6 +344,47 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
 
+    public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
+            String relationName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The purpose was illegal for relation specification.");
+        br.addItem("Advice");
+        br.addElement("This condition-bean is not allowed to specify a relation.");
+        br.addElement("Because this is for " + purpose + ".");
+        br.addElement("For example:");
+        br.addElement("  (x): (ScalarSelect)");
+        br.addElement("    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
+        br.addElement("        public void query(MemberCB cb) {");
+        br.addElement("            cb.specify().specifyMemberStatus().col.. // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (x): (ScalarCondition)");
+        br.addElement("    cb.query().scalar_Equal().max(Date.class).max(new SubQuery<MemberCB>() {");
+        br.addElement("        public void query(MemberCB subCB) {");
+        br.addElement("            subCB.specify().specifyMemberStatusName().col..; // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (x): (VaryingUpdate)");
+        br.addElement("    UpdateOption option = new UpdateOption().self(new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.specify().specifyMemberStatus().col.. // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (o): (ScalarSelect)");
+        br.addElement("    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
+        br.addElement("        public void query(MemberCB cb) {");
+        br.addElement("            cb.specify().columnBirthdate(); // OK");
+        br.addElement("        }");
+        br.addElement("    });");
+        // don't use displaySql because of illegal CB's state
+        br.addItem("ConditionBean");
+        br.addElement(baseCB.getClass().getName());
+        br.addItem("Specified Relation");
+        br.addElement(relationName);
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyDerivedReferrerIllegalPurposeException(msg);
+    }
+
     public void throwSpecifyDerivedReferrerIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
             String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -354,6 +397,12 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
         br.addElement("        public void query(PurchaseCB subCB) {");
         br.addElement("            subCB.specify().derivedPurchaseList()...; // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (o): (DerivedReferrer)");
+        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
+        br.addElement("        public void query(PurchaseCB subCB) {");
+        br.addElement("            subCB.specify().columnPurchaseCount(); // OK");
         br.addElement("        }");
         br.addElement("    });");
         // don't use displaySql because of illegal CB's state
@@ -408,37 +457,6 @@ public class ConditionBeanExceptionThrower {
         br.addElement(resultType.getName());
         final String msg = br.buildExceptionMessage();
         throw new ScalarSelectInvalidColumnSpecificationException(msg);
-    }
-
-    public void throwScalarSelectInvalidForeignSpecificationException(String relationName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "You specified a foreign table column in spite of scalar select!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "You should specified a local table column at condition-bean for scalar select." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    memberBhv.scalarSelect(Integer.class).max(new ScalarSelect<MemberCB>() {" + ln();
-        msg = msg + "        public void query(MemberCB cb) {" + ln();
-        msg = msg + "            cb.specify().specifyMemberStatus().columnDisplayOrder(); // *No!" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    });" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarSelect() {" + ln();
-        msg = msg + "        public void query(MemberCB cb) {" + ln();
-        msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    });" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified Relation]" + ln() + relationName + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new ScalarSelectInvalidForeignSpecificationException(msg);
     }
 
     // ===================================================================================
@@ -694,39 +712,6 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                    Scalar Condition
     //                                                                    ================
-    public void throwScalarConditionInvalidForeignSpecificationException(String relationName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "You specified a foreign table column in spite of scalar-condition!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "You should specified a local table column at condition-bean for scalar-condition." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
-        msg = msg + "        public void query(MemberCB subCB) {" + ln();
-        msg = msg + "            subCB.specify().specifyMemberStatusName().columnDisplayOrder(); // *No!" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    });" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
-        msg = msg + "        public void query(MemberCB subCB) {" + ln();
-        msg = msg + "            subCB.specify().columnMemberBirthday();// *Point!" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    });" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified Relation]" + ln() + relationName + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new ScalarConditionInvalidForeignSpecificationException(msg);
-    }
-
     public void throwScalarConditionInvalidColumnSpecificationException(String function) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();

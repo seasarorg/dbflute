@@ -64,7 +64,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     }
 
     protected void assertColumn(String columnName) {
-        if (_purpose.isNoSpecifyTwice()) {
+        if (_purpose.isNoSpecifyColumnTwoOrMore()) {
             if (_specifyColumnCount > 1) {
                 throwSpecifyColumnTwoOrMoreColumnException(columnName);
             }
@@ -85,11 +85,8 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     }
 
     protected void assertRelation(String relationName) {
-        if (_purpose.isAny(HpCBPurpose.SCALAR_SELECT)) {
-            throwScalarSelectInvalidForeignSpecificationException(relationName);
-        }
-        if (_purpose.isAny(HpCBPurpose.SCALAR_CONDITION)) {
-            throwScalarConditionInvalidForeignSpecificationException(relationName);
+        if (_purpose.isNoSpecifyRelation()) {
+            throwSpecifyRelationIllegalPurposeException(relationName);
         }
     }
 
@@ -114,12 +111,8 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         createCBExThrower().throwSpecifyColumnNotSetupSelectColumnException(_baseCB, columnName);
     }
 
-    protected void throwScalarSelectInvalidForeignSpecificationException(String relationName) {
-        createCBExThrower().throwScalarSelectInvalidForeignSpecificationException(relationName);
-    }
-
-    protected void throwScalarConditionInvalidForeignSpecificationException(String relationName) {
-        createCBExThrower().throwScalarConditionInvalidForeignSpecificationException(relationName);
+    protected void throwSpecifyRelationIllegalPurposeException(String relationName) {
+        createCBExThrower().throwSpecifyRelationIllegalPurposeException(_purpose, _baseCB, relationName);
     }
 
     protected void throwSpecifyDerivedReferrerIllegalPurposeException(String referrerName) {
