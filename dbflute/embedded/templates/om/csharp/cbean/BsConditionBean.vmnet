@@ -170,7 +170,7 @@ namespace ${glPackageBaseCB} {
         //                                                                         =======
         protected ${myConditionBeanClassName}Specification _specification;
         public ${myConditionBeanClassName}Specification Specify() {
-            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
+            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery); }
             return _specification;
         }
         protected bool HasSpecifiedColumn { get {
@@ -211,11 +211,11 @@ namespace ${glPackageBaseCB} {
         //                                                                    ============
         public void xsetupForColumnQuery(${myConditionBeanClassName} cb) {
             //xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
+            _forColumnQuery = true; // old style
 
             // inherits a parent query to synchronize real name
             // (and also for suppressing query check) 
             Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall(cb));
-            Specify().xsetupForColumnQuery();
         }
     }
 
@@ -244,8 +244,8 @@ namespace ${glPackageBaseCB} {
 #end
 #end
         public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
-                                                      , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery)
-        : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect, forScalarSubQuery) { }
+                                                      , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery, bool forColumnQuery)
+        : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect, forScalarSubQuery, forColumnQuery) { }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
 #end

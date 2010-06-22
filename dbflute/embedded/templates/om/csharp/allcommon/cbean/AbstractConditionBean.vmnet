@@ -25,12 +25,13 @@ namespace ${glPackageBaseCommonCBean} {
         private ${glUnionQuery}<${glConditionBean}> _unionQuerySynchronizer;
     
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
-        protected bool _forDerivedReferrer;
-        protected bool _forScalarSelect;
-        protected bool _forScalarSubQuery;
         protected bool _forUnion;
         protected bool _forExistsSubQuery;
         protected bool _forInScopeSubQuery;
+        protected bool _forDerivedReferrer;
+        protected bool _forScalarSelect;
+        protected bool _forScalarSubQuery;
+        protected bool _forColumnQuery;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -436,17 +437,18 @@ namespace ${glPackageBaseCommonCBean} {
         protected bool _forDerivedReferrer;
         protected bool _forScalarSelect;
         protected bool _forScalarSubQuery;
-        protected bool _forColumnQuery; // is set by method (temporary fix until using purpose type)
+        protected bool _forColumnQuery;
         protected CQ _query;
         protected bool _alreadySpecifiedRequiredColumn;
 
         protected AbstractSpecification(${glConditionBean} baseCB, SpQyCall<CQ> qyCall
-                                      , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery) {
+                                      , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery, bool forColumnQuery) {
             _baseCB = baseCB;
             _qyCall = qyCall;
             _forDerivedReferrer = forDerivedReferrer;
             _forScalarSelect = forScalarSelect;
             _forScalarSubQuery = forScalarSubQuery;
+            _forColumnQuery = forColumnQuery;
         }
 
         protected void doColumn(String columnName) {
@@ -466,21 +468,28 @@ namespace ${glPackageBaseCommonCBean} {
             _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
         }
 
+        protected void assertColumn(String columnName) {
+            if (isNormalUse()) {
+                if (_query == null && !_qyCall.has())
+                { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+            }
+        }
+
         protected bool isRequiredColumnSpecificationEnabled() {
             if (_alreadySpecifiedRequiredColumn) {
                 return false;
             }
-            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_forColumnQuery;
-        }
-
-        protected void assertColumn(String columnName) {
-            if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+            return isNormalUse();
         }
 
         protected void assertForeign(String foreignPropertyName) {
             if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
             if (_forScalarSelect) { throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName); }
             if (_forScalarSubQuery) { throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName); }
+        }
+
+        protected bool isNormalUse() {
+            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_forColumnQuery;
         }
 
         protected abstract void doSpecifyRequiredColumn();
@@ -599,10 +608,6 @@ namespace ${glPackageBaseCommonCBean} {
                 throw new SystemException(msg);
             }
             _qyCall = qyCall;
-        }
-
-        public void xsetupForColumnQuery() {
-            _forColumnQuery = true;
         }
     }
 
