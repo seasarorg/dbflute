@@ -129,7 +129,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "    ... = memberBhv.SelectEntity(cb);" + ln();
             msg = msg + ln();
             msg = msg + "[Invalid Query]" + ln();
-            Map<String, ConditionKey> invalidQueryColumnMap = cb.SqlClause.getInvalidQueryColumnMap();
+            Map<String, ${glConditionKey}> invalidQueryColumnMap = cb.SqlClause.getInvalidQueryColumnMap();
             if (invalidQueryColumnMap != null && !invalidQueryColumnMap.isEmpty()) {
                 Set<String> keySet = invalidQueryColumnMap.keySet();
                 foreach (String columnFullName in keySet) {

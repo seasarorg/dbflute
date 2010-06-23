@@ -286,7 +286,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
     }
 
-    protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, String realColumnName) {
+    protected void throwInvalidQueryRegisteredException(${glConditionKey} key, Object value, String realColumnName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "An invalid query was registered. (check is working)" + ln();
