@@ -11,8 +11,8 @@ namespace ${glPackageBaseCommonUtil} {
         public static String ConvertToPerformanceView(DateTime before, DateTime after) {
             TimeSpan ts = after - before;
             if (ts.TotalMilliseconds < 0 ) {
-                String msg = "Minus result by 'after - before': " + ts;
-                throw new ArgumentException(msg);
+                // no exception because this method is basically for logging
+                return ts.TotalMilliseconds.ToString();
             }
             int min = ((ts.Days * 24) + ts.Hours) * 60) + ts.Minutes;
             String minExp = (min >= 10 ? min.ToString() : min.ToString("00"));
