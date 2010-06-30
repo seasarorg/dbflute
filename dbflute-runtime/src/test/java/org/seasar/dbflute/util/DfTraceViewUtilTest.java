@@ -68,5 +68,6 @@ public class DfTraceViewUtilTest extends PlainTestCase {
         assertEquals("166m47s789ms", DfTraceViewUtil.convertToPerformanceView(10007789L));
         assertEquals("1666m40s000ms", DfTraceViewUtil.convertToPerformanceView(100000000L));
         assertEquals("16666m40s000ms", DfTraceViewUtil.convertToPerformanceView(1000000000L));
+        assertEquals("16666m42s000ms", DfTraceViewUtil.convertToPerformanceView(1000002000L));
     }
 }
