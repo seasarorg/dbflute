@@ -27,8 +27,8 @@ public class DfTraceViewUtil {
      */
     public static String convertToPerformanceView(long after_minus_before) {
         if (after_minus_before < 0) {
-            String msg = "Minus result by 'after - before': " + after_minus_before;
-            throw new IllegalArgumentException(msg);
+            // no exception because this method is basically for logging
+            return String.valueOf(after_minus_before);
         }
 
         // this code was written when jflute was very young

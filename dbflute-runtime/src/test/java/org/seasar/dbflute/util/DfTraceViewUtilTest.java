@@ -35,7 +35,18 @@ public class DfTraceViewUtilTest extends PlainTestCase {
         assertEquals("166m40s000ms", view);
     }
 
+    public void test_convertToPerformanceView_millis_minus() throws Exception {
+        // ## Arrange & Act ##
+        String view = DfTraceViewUtil.convertToPerformanceView(-10000000L);
+
+        // ## Assert ##
+        log(view);
+        assertEquals("-10000000", view);
+    }
+
     public void test_convertToPerformanceView_millis_various() throws Exception {
+        assertEquals("00m00s000ms", DfTraceViewUtil.convertToPerformanceView(0L));
+        assertEquals("00m00s000ms", DfTraceViewUtil.convertToPerformanceView(-0L));
         assertEquals("00m00s001ms", DfTraceViewUtil.convertToPerformanceView(1L));
         assertEquals("00m01s000ms", DfTraceViewUtil.convertToPerformanceView(1000L));
         assertEquals("01m00s000ms", DfTraceViewUtil.convertToPerformanceView(60000L));
