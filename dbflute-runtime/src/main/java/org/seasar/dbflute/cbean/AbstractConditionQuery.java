@@ -60,7 +60,6 @@ import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
-import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
@@ -1528,10 +1527,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
-    }
-
-    protected String convertObjectArrayToStringView(Object[] objArray) {
-        return DfTraceViewUtil.convertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------

@@ -15,29 +15,42 @@
  */
 package org.seasar.dbflute.util;
 
+import java.util.Date;
+
 /**
  * @author jflute
  */
 public class DfTraceViewUtil {
-    // implementation when jflute was young
-    // it remains without refactoring
 
     /**
      * Convert to performance view.
-     * @param afterMinusBefore The value of after-minus-before millisecond.
-     * @return Performance view. (ex. 1m23s456ms) (NotNull)
+     * @param before The date before an action.
+     * @param after The date after an action.
+     * @return The view string to show performance. (ex. 1m23s456ms) (NotNull)
      */
-    public static String convertToPerformanceView(long afterMinusBefore) {
-        if (afterMinusBefore < 0) {
-            return String.valueOf(afterMinusBefore);
+    public static String convertToPerformanceView(Date before, Date after) {
+        return convertToPerformanceView(after.getTime() - before.getTime());
+    }
+
+    /**
+     * Convert to performance view.
+     * @param after_minus_before The value of after-minus-before millisecond.
+     * @return The view string to show performance. (ex. 1m23s456ms) (NotNull)
+     */
+    public static String convertToPerformanceView(long after_minus_before) {
+        if (after_minus_before < 0) {
+            String msg = "Minus result by 'after - before': " + after_minus_before;
+            throw new IllegalArgumentException(msg);
         }
 
-        long sec = afterMinusBefore / 1000;
+        // this code was written when jflute was very young
+        // (it remains without refactoring)
+        long sec = after_minus_before / 1000;
         final long min = sec / 60;
         sec = sec % 60;
-        final long mil = afterMinusBefore % 1000;
+        final long mil = after_minus_before % 1000;
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         if (min >= 10) { // Minute
             sb.append(min).append("m");
         } else if (min < 10 && min >= 0) {
@@ -56,26 +69,6 @@ public class DfTraceViewUtil {
             sb.append("00").append(mil).append("ms");
         }
 
-        return sb.toString();
-    }
-
-    /**
-     * Convert object array to string view.
-     * @param objArray The array of object. (Nullable)
-     * @return The string divided with comma. (NotNull: If the argument is null, returns empty string.)
-     */
-    public static String convertObjectArrayToStringView(Object[] objArray) {
-        if (objArray == null) {
-            return "";
-        }
-        final StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < objArray.length; i++) {
-            if (i == 0) {
-                sb.append(objArray[i]);
-            } else {
-                sb.append(", ").append(objArray[i]);
-            }
-        }
         return sb.toString();
     }
 }
