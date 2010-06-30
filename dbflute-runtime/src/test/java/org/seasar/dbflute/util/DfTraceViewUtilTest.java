@@ -1,8 +1,5 @@
 package org.seasar.dbflute.util;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -10,28 +7,6 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @since 0.9.5.1 (2009/06/20 Saturday)
  */
 public class DfTraceViewUtilTest extends PlainTestCase {
-
-    public void test_convertToPerformanceView_date_basic() throws Exception {
-        // ## Arrange & Act ##
-        Date before = currentDate();
-        Date after = new Timestamp(currentDate().getTime() + 10000L);
-        String view = DfTraceViewUtil.convertToPerformanceView(before, after);
-
-        // ## Assert ##
-        log(view);
-        assertEquals("00m10s000ms", view);
-    }
-
-    public void test_convertToPerformanceView_date_min() throws Exception {
-        // ## Arrange & Act ##
-        Date before = currentDate();
-        Date after = new Timestamp(currentDate().getTime() + 100012L);
-        String view = DfTraceViewUtil.convertToPerformanceView(before, after);
-
-        // ## Assert ##
-        log(view);
-        assertEquals("01m40s012ms", view);
-    }
 
     public void test_convertToPerformanceView_millis_basic() throws Exception {
         // ## Arrange & Act ##

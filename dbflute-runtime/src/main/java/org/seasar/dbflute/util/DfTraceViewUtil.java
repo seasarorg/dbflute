@@ -15,8 +15,6 @@
  */
 package org.seasar.dbflute.util;
 
-import java.util.Date;
-
 /**
  * @author jflute
  */
@@ -24,17 +22,7 @@ public class DfTraceViewUtil {
 
     /**
      * Convert to performance view.
-     * @param before The date before an action.
-     * @param after The date after an action.
-     * @return The view string to show performance. (ex. 1m23s456ms) (NotNull)
-     */
-    public static String convertToPerformanceView(Date before, Date after) {
-        return convertToPerformanceView(after.getTime() - before.getTime());
-    }
-
-    /**
-     * Convert to performance view.
-     * @param after_minus_before The value of after-minus-before millisecond.
+     * @param after_minus_before The difference between before time and after time.
      * @return The view string to show performance. (ex. 1m23s456ms) (NotNull)
      */
     public static String convertToPerformanceView(long after_minus_before) {
