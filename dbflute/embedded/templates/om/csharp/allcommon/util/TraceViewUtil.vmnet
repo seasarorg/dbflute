@@ -8,66 +8,17 @@ namespace ${glPackageBaseCommonUtil} {
 
     public class ${glTraceViewUtil} {
 
-        /// <summary>
-        /// Convert to performance view.
-        /// </summary>
-        /// <param name="before">The value of before millisecond. (NotNull)</param>
-        /// <param name="after">The value of after millisecound. (NotNull)</param>
-        /// <returns>Performance view. (ex. 1m23s456ms) (NotNull)</returns>
         public static String ConvertToPerformanceView(DateTime before, DateTime after) {
-            long beforeMil = 0;
-            {
-                String hour = (before.Hour < 10 ? "0" + before.Hour : "" + before.Hour);
-                String minute = (before.Minute < 10 ? "0" + before.Minute : "" + before.Minute);
-                String secound = (before.Second < 10 ? "0" + before.Second : "" + before.Second);
-                String millisecond = (before.Millisecond < 10 ? "00" + before.Millisecond : (before.Millisecond < 100 ? "0" + before.Millisecond : "" + before.Millisecond));
-                beforeMil = long.Parse(hour + minute + secound + millisecond);
+            TimeSpan ts = after - before;
+            if (ts.TotalMilliseconds < 0 ) {
+                String msg = "Minus result by 'after - before': " + ts;
+                throw new ArgumentException(msg);
             }
-            long afterMil = 0;
-            {
-                String hour = (after.Hour < 10 ? "0" + after.Hour : "" + after.Hour);
-                String minute = (after.Minute < 10 ? "0" + after.Minute : "" + after.Minute);
-                String secound = (after.Second < 10 ? "0" + after.Second : "" + after.Second);
-                String millisecond = (after.Millisecond < 10 ? "00" + after.Millisecond : (after.Millisecond < 100 ? "0" + after.Millisecond : "" + after.Millisecond));
-                afterMil = long.Parse(hour + minute + secound + millisecond);
-            }
-            long mil = afterMil - beforeMil;
-            if (mil < 0) {
-                return "minus mil: " + after + "-" + before;
-            }
-
-            long sec = mil / 1000;
-            long min = sec / 60;
-            sec = sec % 60;
-            mil = mil % 1000;
-
-            StringBuilder sb = new StringBuilder();
-            if (min >= 10) { // Minute
-                sb.Append(min).Append("m");
-            } else if (min < 10 && min >= 0) {
-                sb.Append("0").Append(min).Append("m");
-            }
-            if (sec >= 10) { // Secound
-                sb.Append(sec).Append("s");
-            } else if (sec < 10 && sec >= 0) {
-                sb.Append("0").Append(sec).Append("s");
-            }
-            if (mil >= 100) { // Millisecond
-                sb.Append(mil).Append("ms");
-            } else if (mil < 100 && mil >= 10) {
-                sb.Append("0").Append(mil).Append("ms");
-            } else if (mil < 10 && mil >= 0) {
-                sb.Append("00").Append(mil).Append("ms");
-            }
-
-            return sb.ToString();
+            int min = ((ts.Days * 24) + ts.Hours) * 60) + ts.Minutes;
+            String minExp = (min >= 10 ? min.ToString() : min.ToString("00"));
+            return string.Format("{0}m{1}s{2}ms", minExp, ts.Seconds.ToString("00"), ts.Milliseconds.ToString("000"));
         }
 
-        /// <summary>
-        /// Change object array to string view.
-        /// </summary>
-        /// <param name="objArray">The array of object. (NotNull)</param>
-        /// <returns>The string divided with comma. (NotNull: If the argument is null, returns empty string.)</returns>
         public static String ConvertObjectArrayToStringView(Object[] objArray) {
             if (objArray == null) {
                 return "";
