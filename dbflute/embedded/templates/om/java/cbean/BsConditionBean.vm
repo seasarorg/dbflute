@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
 import org.seasar.dbflute.cbean.AbstractConditionBean;
+import org.seasar.dbflute.cbean.AndQuery;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.OrQuery;
@@ -591,6 +592,28 @@ public class ${myClassName} extends AbstractConditionBean {
      */
     public void orScopeQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
         xorSQ((${myConditionBeanClassName})this, orQuery);
+    }
+
+    /**
+     * Set up the and-part of or-scope.
+     * <pre>
+     * <span style="color: #3F7E5E">// where (FOO = '...' or (BAR = '...' and QUX = '...'))</span>
+     * cb.<span style="color: #FD4747">orScopeQuery</span>(new OrQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} orCB) {
+     *         orCB.query().setFOO_Equal...
+     *         orCB.<span style="color: #FD4747">orScopeQueryAndPart</span>(new AndQuery&lt;${myConditionBeanClassName}&gt;() {
+     *             public void query(${myConditionBeanClassName} andCB) {
+     *                 andCB.query().setBar_...
+     *                 andCB.query().setQux_...
+     *             }
+     *         });
+     *     }
+     * });
+     * </pre>
+     * @param andQuery The query for and-condition. (NotNull)
+     */
+    public void orScopeQueryAndPart(AndQuery<${myConditionBeanClassName}> andQuery) {
+        xorSQAP((${myConditionBeanClassName})this, andQuery);
     }
 
     // ===================================================================================
