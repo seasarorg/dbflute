@@ -53,6 +53,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
+import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
@@ -486,12 +487,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (inScopeLimit > 0 && value.size() > inScopeLimit) {
             // if the key is for inScope, it should be split as 'or'
             // (if the key is for notInScope, it should be split as 'and')
-            final boolean alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+            final boolean orScopeQuery = getSqlClause().isOrScopeQueryEffective();
+            final boolean orScopeQueryAndPart = getSqlClause().isOrScopeQueryAndPartEffective();
+            final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
             if (isConditionKeyInScope(key)) {
                 // if or-scope query has already been effective, create new or-scope
                 getSqlClause().makeOrScopeQueryEffective();
             } else {
-                if (alreadyOrScopeQuery) {
+                if (needsAndPart) {
                     getSqlClause().beginOrScopeQueryAndPart();
                 }
             }
@@ -513,7 +516,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 if (isConditionKeyInScope(key)) {
                     getSqlClause().closeOrScopeQuery();
                 } else {
-                    if (alreadyOrScopeQuery) {
+                    if (needsAndPart) {
                         getSqlClause().endOrScopeQueryAndPart();
                     }
                 }
@@ -577,10 +580,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // Use splitByXxx().
         // - - - - - - - - -
         final String[] strArray = option.generateSplitValueArray(value);
-        final boolean alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+        final boolean orScopeQuery = getSqlClause().isOrScopeQueryEffective();
+        final boolean orScopeQueryAndPart = getSqlClause().isOrScopeQueryAndPartEffective();
         if (!option.isAsOrSplit()) {
             // as 'and' condition
-            if (alreadyOrScopeQuery) {
+            final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
+            if (needsAndPart) {
                 getSqlClause().beginOrScopeQueryAndPart();
             }
             try {
@@ -589,16 +594,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, columnDbName, option);
                 }
             } finally {
-                if (alreadyOrScopeQuery) {
+                if (needsAndPart) {
                     getSqlClause().endOrScopeQueryAndPart();
                 }
             }
         } else {
             // as 'or' condition
-            if (!alreadyOrScopeQuery) {
-                // create new or-scope query only when it has already been begun
-                // because this method would be called as recursive call
-                // (or-clause has no problem)
+            if (orScopeQueryAndPart) {
+                String msg = "The AsOrSplit in and-part is unsupported: " + getTableDbName();
+                throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
+            }
+            final boolean needsNewOrScope = !orScopeQuery;
+            if (needsNewOrScope) {
                 getSqlClause().makeOrScopeQueryEffective();
             }
             try {
@@ -611,7 +618,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     }
                 }
             } finally {
-                if (!alreadyOrScopeQuery) {
+                if (needsNewOrScope) {
                     getSqlClause().closeOrScopeQuery();
                 }
             }

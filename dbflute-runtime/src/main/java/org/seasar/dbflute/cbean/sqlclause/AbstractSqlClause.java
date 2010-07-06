@@ -172,7 +172,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected OrScopeQueryInfo _currentTmpOrScopeQueryInfo;
 
     /** Is or-query scope in and-part?*/
-    protected boolean _orScopeQueryAndPart;
+    protected boolean _orScopeQueryAndPartEffective;
 
     // -----------------------------------------------------
     //                                       SubQuery Indent
@@ -1119,7 +1119,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected void clearOrScopeQuery() {
         _currentTmpOrScopeQueryInfo = null;
         _orScopeQueryEffective = false;
-        _orScopeQueryAndPart = false;
+        _orScopeQueryAndPartEffective = false;
     }
 
     protected void reflectTmpOrClauseToRealObject(OrScopeQueryInfo localInfo) {
@@ -1133,6 +1133,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public boolean isOrScopeQueryEffective() {
         return _orScopeQueryEffective;
+    }
+
+    public boolean isOrScopeQueryAndPartEffective() {
+        return _orScopeQueryAndPartEffective;
     }
 
     protected List<QueryClause> getTmpOrWhereList() {
@@ -1157,16 +1161,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void beginOrScopeQueryAndPart() {
         assertCurrentTmpOrScopeQueryInfo();
-        _orScopeQueryAndPart = true;
+        _orScopeQueryAndPartEffective = true;
     }
 
     public void endOrScopeQueryAndPart() {
         assertCurrentTmpOrScopeQueryInfo();
-        _orScopeQueryAndPart = false;
+        _orScopeQueryAndPartEffective = false;
     }
 
     protected void markOrScopeQueryAndPart(List<QueryClause> clauseList) {
-        if (_orScopeQueryEffective && _orScopeQueryAndPart && !clauseList.isEmpty()) {
+        if (_orScopeQueryEffective && _orScopeQueryAndPartEffective && !clauseList.isEmpty()) {
             final QueryClause original = clauseList.remove(clauseList.size() - 1); // as latest
             clauseList.add(new StringQueryClause(getOrScopeQueryAndPartMark() + original));
         }

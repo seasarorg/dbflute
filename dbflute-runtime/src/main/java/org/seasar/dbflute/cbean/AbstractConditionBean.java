@@ -36,6 +36,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
+import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
@@ -246,11 +247,31 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        ============
     protected <CB extends ConditionBean> void xorSQ(CB cb, OrQuery<CB> orQuery) {
         assertQueryPurpose();
+        if (getSqlClause().isOrScopeQueryAndPartEffective()) {
+            String msg = "The OrScopeQuery in and-part is unsupported: " + getTableDbName();
+            throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
+        }
         getSqlClause().makeOrScopeQueryEffective();
         try {
             orQuery.query(cb);
         } finally {
             getSqlClause().closeOrScopeQuery();
+        }
+    }
+
+    protected <CB extends ConditionBean> void xorSQAP(CB cb, AndQuery<CB> andQuery) {
+        assertQueryPurpose();
+        if (!getSqlClause().isOrScopeQueryEffective()) {
+            createCBExThrower().throwOrScopeQueryAndPartNotOrScopeException(cb);
+        }
+        if (getSqlClause().isOrScopeQueryAndPartEffective()) {
+            createCBExThrower().throwOrScopeQueryAndPartAlreadySetupException(cb);
+        }
+        getSqlClause().beginOrScopeQueryAndPart();
+        try {
+            andQuery.query(cb);
+        } finally {
+            getSqlClause().endOrScopeQueryAndPart();
         }
     }
 

@@ -276,6 +276,12 @@ public interface SqlClause {
      */
     boolean isOrScopeQueryEffective();
 
+    /**
+     * Is and-part of or-scope effective?
+     * @return Determination.
+     */
+    boolean isOrScopeQueryAndPartEffective();
+
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======

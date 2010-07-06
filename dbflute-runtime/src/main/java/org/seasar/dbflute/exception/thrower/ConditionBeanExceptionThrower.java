@@ -23,6 +23,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
+import org.seasar.dbflute.exception.OrScopeQueryAndPartAlreadySetupException;
+import org.seasar.dbflute.exception.OrScopeQueryAndPartNotOrScopeException;
 import org.seasar.dbflute.exception.OrderByIllegalPurposeException;
 import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificationException;
@@ -118,137 +120,6 @@ public class ConditionBeanExceptionThrower {
         br.addElement(foreignPropertyName);
         final String msg = br.buildExceptionMessage();
         throw new SetupSelectAfterUnionException(msg);
-    }
-
-    // ===================================================================================
-    //                                                                               Query
-    //                                                                               =====
-    public void throwQueryIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for query.");
-        br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to set query.");
-        br.addElement("(contains OrScopeQuery and ColumnQuery)");
-        br.addElement("Because this is for " + purpose + ".");
-        br.addElement("For example:");
-        br.addElement("  (x): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.query().set...();  // *no!");
-        br.addElement("            cb.columnQuery(...);  // *no!");
-        br.addElement("            cb.orScopeQuery(...); // *no!");
-        br.addElement("        }");
-        br.addElement("    })...");
-        br.addElement("  (x): (VaryingUpdate)");
-        br.addElement("    UpdateOption option = new UpdateOption().self(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.query().set...();  // *no!");
-        br.addElement("            cb.columnQuery(...);  // *no!");
-        br.addElement("            cb.orScopeQuery(...); // *no!");
-        br.addElement("        }");
-        br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
-        br.addElement(baseCB.getClass().getName());
-        final String msg = br.buildExceptionMessage();
-        throw new QueryIllegalPurposeException(msg);
-    }
-
-    public void throwInvalidQueryRegisteredException(ConditionKey key, Object value, ColumnRealName columnRealName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("An invalid query was registered. (check is working)");
-        br.addItem("Advice");
-        br.addElement("You should not set an invalid query when the check is valid.");
-        br.addElement("For example:");
-        br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.checkInvalidQuery();");
-        br.addElement("    cb.query().setMemberId_Equal(null); // exception");
-        br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.checkInvalidQuery();");
-        br.addElement("    cb.query().setMemberId_Equal(3);");
-        br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.query().setMemberId_Equal(null);");
-        br.addItem("Column");
-        br.addElement(columnRealName);
-        br.addItem("Condition Key");
-        br.addElement(key.getConditionKey());
-        br.addItem("Registered Value");
-        br.addElement(value);
-        final String msg = br.buildExceptionMessage();
-        throw new InvalidQueryRegisteredException(msg);
-    }
-
-    public void throwLikeSearchOptionNotFoundException(String colName, String value, DBMeta dbmeta) {
-        final String capPropName = initCap(dbmeta.findPropertyName(colName));
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The likeSearchOption was not found! (Should not be null!)" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your method call:" + ln();
-        final String beanName = DfTypeUtil.toClassTitle(this);
-        final String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
-        msg = msg + "    " + beanName + "." + methodName + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
-        throw new RequiredOptionNotFoundException(msg);
-    }
-
-    public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, String tableDbName, String columnName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for order-by.");
-        br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to order.");
-        br.addElement("Because this is for " + purpose + ".");
-        br.addElement("For example:");
-        br.addElement("  (x): (ExistsReferrer)");
-        br.addElement("    cb.query().existsXxxList(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.query().addOrderBy...; // *no!");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addElement("  (x): (Union)");
-        br.addElement("    cb.union(new UnionQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB unionCB) {");
-        br.addElement("            unionCB.query().addOrderBy...; // *no!");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addElement("  (x): (DerivedReferrer)");
-        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.query().addOrderBy...; // *no!");
-        br.addElement("        }");
-        br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("Order-By Column");
-        br.addElement(tableDbName + "." + columnName);
-        final String msg = br.buildExceptionMessage();
-        throw new OrderByIllegalPurposeException(msg);
-    }
-
-    // ===================================================================================
-    //                                                                              Paging
-    //                                                                              ======
-    public void throwPagingPageSizeNotPlusException(ConditionBean cb, int pageSize, int pageNumber) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Page size for paging should not be minus or zero.");
-        br.addItem("Advice");
-        br.addElement("Confirm the value of your parameter 'pageSize'.");
-        br.addElement("The first parameter of paging() should be a plus value.");
-        br.addElement("For example:");
-        br.addElement("  (x): cb.paging(0, 1);");
-        br.addElement("  (x): cb.paging(-3, 2);");
-        br.addElement("  (o): cb.paging(20, 3);");
-        br.addItem("ConditionBean");
-        br.addElement(cb.getClass().getName());
-        br.addItem("Page Size");
-        br.addElement(pageSize);
-        br.addItem("Page Number");
-        br.addElement(pageNumber);
-        final String msg = br.buildExceptionMessage();
-        throw new PagingPageSizeNotPlusException(msg);
     }
 
     // ===================================================================================
@@ -711,6 +582,235 @@ public class ConditionBeanExceptionThrower {
     }
 
     // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+    public void throwQueryIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The purpose was illegal for query.");
+        br.addItem("Advice");
+        br.addElement("This condition-bean is not allowed to set query.");
+        br.addElement("(contains OrScopeQuery and ColumnQuery)");
+        br.addElement("Because this is for " + purpose + ".");
+        br.addElement("For example:");
+        br.addElement("  (x): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.query().set...();  // *no!");
+        br.addElement("            cb.columnQuery(...);  // *no!");
+        br.addElement("            cb.orScopeQuery(...); // *no!");
+        br.addElement("        }");
+        br.addElement("    })...");
+        br.addElement("  (x): (VaryingUpdate)");
+        br.addElement("    UpdateOption option = new UpdateOption().self(new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.query().set...();  // *no!");
+        br.addElement("            cb.columnQuery(...);  // *no!");
+        br.addElement("            cb.orScopeQuery(...); // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        // don't use displaySql because of illegal CB's state
+        br.addItem("ConditionBean");
+        br.addElement(baseCB.getClass().getName());
+        final String msg = br.buildExceptionMessage();
+        throw new QueryIllegalPurposeException(msg);
+    }
+
+    public void throwInvalidQueryRegisteredException(ConditionKey key, Object value, ColumnRealName columnRealName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("An invalid query was registered. (check is working)");
+        br.addItem("Advice");
+        br.addElement("You should not set an invalid query when the check is valid.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.checkInvalidQuery();");
+        br.addElement("    cb.query().setMemberId_Equal(null); // exception");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.checkInvalidQuery();");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.query().setMemberId_Equal(null);");
+        br.addItem("Column");
+        br.addElement(columnRealName);
+        br.addItem("Condition Key");
+        br.addElement(key.getConditionKey());
+        br.addItem("Registered Value");
+        br.addElement(value);
+        final String msg = br.buildExceptionMessage();
+        throw new InvalidQueryRegisteredException(msg);
+    }
+
+    public void throwLikeSearchOptionNotFoundException(String colName, String value, DBMeta dbmeta) {
+        final String capPropName = initCap(dbmeta.findPropertyName(colName));
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The likeSearchOption was not found! (Should not be null!)" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your method call:" + ln();
+        final String beanName = DfTypeUtil.toClassTitle(this);
+        final String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
+        msg = msg + "    " + beanName + "." + methodName + ln();
+        msg = msg + "* * * * * * * * * */" + ln();
+        throw new RequiredOptionNotFoundException(msg);
+    }
+
+    public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, String tableDbName, String columnName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The purpose was illegal for order-by.");
+        br.addItem("Advice");
+        br.addElement("This condition-bean is not allowed to order.");
+        br.addElement("Because this is for " + purpose + ".");
+        br.addElement("For example:");
+        br.addElement("  (x): (ExistsReferrer)");
+        br.addElement("    cb.query().existsXxxList(new SubQuery<PurchaseCB>() {");
+        br.addElement("        public void query(PurchaseCB subCB) {");
+        br.addElement("            subCB.query().addOrderBy...; // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (x): (Union)");
+        br.addElement("    cb.union(new UnionQuery<MemberCB>() {");
+        br.addElement("        public void query(MemberCB unionCB) {");
+        br.addElement("            unionCB.query().addOrderBy...; // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (x): (DerivedReferrer)");
+        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
+        br.addElement("        public void query(PurchaseCB subCB) {");
+        br.addElement("            subCB.query().addOrderBy...; // *no!");
+        br.addElement("        }");
+        br.addElement("    });");
+        // don't use displaySql because of illegal CB's state
+        br.addItem("Order-By Column");
+        br.addElement(tableDbName + "." + columnName);
+        final String msg = br.buildExceptionMessage();
+        throw new OrderByIllegalPurposeException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                        Column Query
+    //                                                                        ============
+    public void throwColumnQueryInvalidColumnSpecificationException() {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The specified the column for column query was INVALID!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    (x):" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            // *No! It's empty!" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }).lessThan...;" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + ln();
+        msg = msg + "    (x):" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            cb.specify().columnMemberName();" + ln();
+        msg = msg + "            cb.specify().columnBirthdate();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }).lessThan...;" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            cb.specify().columnBirthdate();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }).lessThan(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            cb.specify().columnFormalizedDatetime();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new ColumnQueryInvalidColumnSpecificationException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                       Function Helper
+    //                                       ---------------
+    protected String xconvertFunctionToMethod(String function) {
+        if (function != null && function.contains("(")) { // For example 'count(distinct'
+            int index = function.indexOf("(");
+            String front = function.substring(0, index);
+            if (function.length() > front.length() + "(".length()) {
+                String rear = function.substring(index + "(".length());
+                function = front + initCap(rear);
+            } else {
+                function = front;
+            }
+        }
+        return function + "()";
+    }
+
+    // ===================================================================================
+    //                                                                        OrScopeQuery
+    //                                                                        ============
+    public void throwOrScopeQueryAndPartNotOrScopeException(ConditionBean cb) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The or-scope query was not set up.");
+        br.addItem("Advice");
+        br.addElement("The and-part of or-scope query works only in or-scope query.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    cb.orScopeQueryAndPart(new AndQuery<MemberCB>() { // *no!");
+        br.addElement("        public void query(MemberCB andCB) {");
+        br.addElement("            ...");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addElement("  (o):");
+        br.addElement("    cb.orScopeQuery(new OrQuery<MemberCB>() {");
+        br.addElement("        public void query(MemberCB orCB) {");
+        br.addElement("            orCB.orScopeQueryAndPart(new AndQuery(MemberCB andCB) {");
+        br.addElement("                public void query(MemberCB andCB) {");
+        br.addElement("                    andCB.query().set...();");
+        br.addElement("                    andCB.query().set...();");
+        br.addElement("                }");
+        br.addElement("            });");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addItem("ConditionBean");
+        br.addElement(cb.getClass().getName());
+        final String msg = br.buildExceptionMessage();
+        throw new OrScopeQueryAndPartNotOrScopeException(msg);
+    }
+
+    public void throwOrScopeQueryAndPartAlreadySetupException(ConditionBean cb) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The and-part of or-scope has already been set up.");
+        br.addItem("Advice");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    cb.orScopeQuery(new OrQuery<MemberCB>() {");
+        br.addElement("        public void query(MemberCB orCB) {");
+        br.addElement("            orCB.orScopeQueryAndPart(new AndQuery(MemberCB andCB) {");
+        br.addElement("                public void query(MemberCB andCB) {");
+        br.addElement("                    andCB.orScopeQueryAndPart(new AndQuery(MemberCB andCB) { // *no!");
+        br.addElement("                        ...");
+        br.addElement("                    }");
+        br.addElement("                }");
+        br.addElement("            });");
+        br.addElement("        }");
+        br.addElement("    });");
+        br.addItem("ConditionBean");
+        br.addElement(cb.getClass().getName());
+        final String msg = br.buildExceptionMessage();
+        throw new OrScopeQueryAndPartAlreadySetupException(msg);
+    }
+
+    // ===================================================================================
     //                                                                    Scalar Condition
     //                                                                    ================
     public void throwScalarConditionInvalidColumnSpecificationException(String function) {
@@ -779,69 +879,26 @@ public class ConditionBeanExceptionThrower {
     }
 
     // ===================================================================================
-    //                                                                        Column Query
-    //                                                                        ============
-    public void throwColumnQueryInvalidColumnSpecificationException() {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The specified the column for column query was INVALID!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
-        msg = msg + "        public void specify(MemberCB cb) {" + ln();
-        msg = msg + "            // *No! It's empty!" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    }).lessThan...;" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
-        msg = msg + "        public void specify(MemberCB cb) {" + ln();
-        msg = msg + "            cb.specify().columnMemberName();" + ln();
-        msg = msg + "            cb.specify().columnBirthdate();" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    }).lessThan...;" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
-        msg = msg + "        public void specify(MemberCB cb) {" + ln();
-        msg = msg + "            cb.specify().columnBirthdate();" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    }).lessThan(new SpecifyQuery<MemberCB>() {" + ln();
-        msg = msg + "        public void specify(MemberCB cb) {" + ln();
-        msg = msg + "            cb.specify().columnFormalizedDatetime();" + ln();
-        msg = msg + "        }" + ln();
-        msg = msg + "    }" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new ColumnQueryInvalidColumnSpecificationException(msg);
-    }
-
-    // -----------------------------------------------------
-    //                                       Function Helper
-    //                                       ---------------
-    protected String xconvertFunctionToMethod(String function) {
-        if (function != null && function.contains("(")) { // For example 'count(distinct'
-            int index = function.indexOf("(");
-            String front = function.substring(0, index);
-            if (function.length() > front.length() + "(".length()) {
-                String rear = function.substring(index + "(".length());
-                function = front + initCap(rear);
-            } else {
-                function = front;
-            }
-        }
-        return function + "()";
+    //                                                                              Paging
+    //                                                                              ======
+    public void throwPagingPageSizeNotPlusException(ConditionBean cb, int pageSize, int pageNumber) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Page size for paging should not be minus or zero.");
+        br.addItem("Advice");
+        br.addElement("Confirm the value of your parameter 'pageSize'.");
+        br.addElement("The first parameter of paging() should be a plus value.");
+        br.addElement("For example:");
+        br.addElement("  (x): cb.paging(0, 1);");
+        br.addElement("  (x): cb.paging(-3, 2);");
+        br.addElement("  (o): cb.paging(20, 3);");
+        br.addItem("ConditionBean");
+        br.addElement(cb.getClass().getName());
+        br.addItem("Page Size");
+        br.addElement(pageSize);
+        br.addItem("Page Number");
+        br.addElement(pageNumber);
+        final String msg = br.buildExceptionMessage();
+        throw new PagingPageSizeNotPlusException(msg);
     }
 
     // ===================================================================================

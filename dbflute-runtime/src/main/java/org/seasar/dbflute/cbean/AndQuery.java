@@ -16,26 +16,31 @@
 package org.seasar.dbflute.cbean;
 
 /**
- * The interface of or-query.
+ * The interface of and-query.
  * <pre>
- * ex) OrScopeQuery
+ * ex) OrScopeQueryAndPart
  * cb.orScopeQuery(new OrQuery&lt;FooCB&gt;() {
  *     public void query(FooCB orCB) {
  *         orCB.query().setFoo...
- *         orCB.query().setBar...
+ *         orCB.orScopeQueryAndPart(new AndQuery&lt;FooCB&gt;() {
+ *             public void query(FooCB andCB) {
+ *                 andCB.query().setBar...
+ *                 andCB.query().setQux...
+ *             }
+ *         });
  *     }
  * }
  * </pre>
  * @author jflute
- * @param <OR_CB> The type of condition-bean for or-query.
+ * @param <AND_CB> The type of condition-bean for and-query.
  */
-public interface OrQuery<OR_CB extends ConditionBean> {
+public interface AndQuery<AND_CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for or-query. <br />
+     * Set up your query condition for and-query. <br />
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
-     * @param orCB The condition-bean for or-query. (NotNull)
+     * @param andCB The condition-bean for and-query. (NotNull)
      */
-    void query(OR_CB orCB);
+    void query(AND_CB andCB);
 }
