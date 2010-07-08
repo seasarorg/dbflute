@@ -18,7 +18,6 @@ package org.seasar.dbflute.cbean.ckey;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.ConditionOption;
-import org.seasar.dbflute.cbean.coption.InScopeOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -52,21 +51,15 @@ public class ConditionKeyInScope extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
-        if (value == null) {
-            return false;
-        }
-        if (value instanceof List<?> && ((List<?>) value).isEmpty()) {
-            return false;
-        }
-        return true;
+    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+        return value != null && value instanceof List<?> && !((List<?>) value).isEmpty();
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
-        conditionList.add(buildBindClause(columnRealName, value.getInScopeLocation(), "('a1', 'a2')"));
+        conditionList.add(buildBindClause(columnRealName, value.getInScopeLatestLocation(), "('a1', 'a2')"));
     }
 
     /**
@@ -74,25 +67,14 @@ public class ConditionKeyInScope extends ConditionKey {
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ConditionOption option) {
-        if (option == null) {
-            String msg = "The argument 'option' should not be null:";
-            msg = msg + " columnName=" + columnRealName + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
-        if (!(option instanceof InScopeOption)) {
-            String msg = "The argument 'option' should be InScopeOption:";
-            msg = msg + " columnName=" + columnRealName + " value=" + value;
-            msg = msg + " option=" + option;
-            throw new IllegalArgumentException(msg);
-        }
-        conditionList.add(buildBindClause(columnRealName, value.getInScopeLocation(), "('a1', 'a2')"));
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setInScope((List<?>) value).setInScopeLocation(location);
+        conditionValue.setupInScope(value, location);
     }
 
     /**
@@ -100,6 +82,6 @@ public class ConditionKeyInScope extends ConditionKey {
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {
-        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 }

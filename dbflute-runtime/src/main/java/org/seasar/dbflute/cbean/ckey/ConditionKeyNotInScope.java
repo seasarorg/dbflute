@@ -51,21 +51,15 @@ public class ConditionKeyNotInScope extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
-        if (value == null) {
-            return false;
-        }
-        if (value instanceof List<?> && ((List<?>) value).isEmpty()) {
-            return false;
-        }
-        return true;
+    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+        return value != null && value instanceof List<?> && !((List<?>) value).isEmpty();
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
-        conditionList.add(buildBindClause(columnRealName, value.getNotInScopeLocation(), "('a1', 'a2')"));
+        conditionList.add(buildBindClause(columnRealName, value.getNotInScopeLatestLocation(), "('a1', 'a2')"));
     }
 
     /**
@@ -73,14 +67,14 @@ public class ConditionKeyNotInScope extends ConditionKey {
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ConditionOption option) {
-        throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setNotInScope((List<?>) value).setNotInScopeLocation(location);
+        conditionValue.setupNotInScope(value, location);
     }
 
     /**
@@ -88,6 +82,6 @@ public class ConditionKeyNotInScope extends ConditionKey {
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {
-        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 }

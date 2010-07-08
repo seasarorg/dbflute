@@ -45,8 +45,16 @@ public class ConditionKeyLikeSearch extends ConditionKey {
      * Constructor.
      */
     protected ConditionKeyLikeSearch() {
-        _conditionKey = "likeSearch";
-        _operand = "like";
+        _conditionKey = defineConditionKey();
+        _operand = defineOperand();
+    }
+
+    protected String defineConditionKey() {
+        return "likeSearch";
+    }
+
+    protected String defineOperand() {
+        return "like";
     }
 
     // ===================================================================================
@@ -55,18 +63,15 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
-        if (value == null) {
-            return false;
-        }
-        return true;
+    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+        return value != null;
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
-        throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -74,6 +79,24 @@ public class ConditionKeyLikeSearch extends ConditionKey {
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ConditionOption option) {
+        assertWhereClauseArgument(columnRealName, value, option);
+        final String location = getLocation(value);
+        final LikeSearchOption myOption = (LikeSearchOption) option;
+        final String rearOption = myOption.getRearOption();
+        final String realOperand = getRealOperand(myOption);
+        final QueryClauseArranger arranger = myOption.getWhereClauseArranger();
+        final QueryClause clause;
+        if (arranger != null) {
+            final String bindExpression = buildBindExpression(location, null);
+            final String arranged = arranger.arrange(columnRealName, realOperand, bindExpression, rearOption);
+            clause = new StringQueryClause(arranged);
+        } else {
+            clause = buildBindClause(columnRealName, realOperand, location, rearOption);
+        }
+        conditionList.add(clause);
+    }
+
+    protected void assertWhereClauseArgument(ColumnRealName columnRealName, ConditionValue value, ConditionOption option) {
         if (option == null) {
             String msg = "The argument 'option' should not be null:";
             msg = msg + " columnName=" + columnRealName + " value=" + value;
@@ -85,31 +108,23 @@ public class ConditionKeyLikeSearch extends ConditionKey {
             msg = msg + " option=" + option;
             throw new IllegalArgumentException(msg);
         }
-        final String location = value.getLikeSearchLocation();
-        final LikeSearchOption myOption = (LikeSearchOption) option;
-        final String rearOption = myOption.getRearOption();
-        final ExtensionOperand extOperand = myOption.getExtensionOperand();
-        String operand = extOperand != null ? extOperand.operand() : null;
-        if (operand == null || operand.trim().length() == 0) {
-            operand = getOperand();
-        }
-        final QueryClauseArranger arranger = myOption.getWhereClauseArranger();
-        final QueryClause clause;
-        if (arranger != null) {
-            final String bindExpression = buildBindExpression(location, null);
-            final String arranged = arranger.arrange(columnRealName, operand, bindExpression, rearOption);
-            clause = new StringQueryClause(arranged);
-        } else {
-            clause = buildBindClause(columnRealName, operand, location, rearOption);
-        }
-        conditionList.add(clause);
+    }
+
+    protected String getLocation(ConditionValue value) {
+        return value.getLikeSearchLatestLocation();
+    }
+
+    protected String getRealOperand(LikeSearchOption option) {
+        final ExtensionOperand extOperand = option.getExtensionOperand();
+        final String operand = extOperand != null ? extOperand.operand() : null;
+        return operand != null ? operand : getOperand();
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        throw new UnsupportedOperationException("doSetupConditionValue without condition-option is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -117,6 +132,6 @@ public class ConditionKeyLikeSearch extends ConditionKey {
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {
-        conditionValue.setLikeSearch((String) value, (LikeSearchOption) option).setLikeSearchLocation(location);
+        conditionValue.setupLikeSearch((String) value, (LikeSearchOption) option, location);
     }
 }

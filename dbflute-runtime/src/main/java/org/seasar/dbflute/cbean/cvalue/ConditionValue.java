@@ -16,9 +16,10 @@
 package org.seasar.dbflute.cbean.cvalue;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 
 /**
@@ -36,30 +37,21 @@ public class ConditionValue implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _utilDateToSqlDate;
+    protected Map<String, Object> _fixedValueMap;
+    protected Map<String, Map<String, Object>> _varyingValueMap;
+    protected boolean _orScopeQuery;
 
     // ===================================================================================
     //                                                                               Equal
     //                                                                               =====
-    /** Value of equal. */
-    protected Object _equalValue;
+    protected String _equalLatestLocation;
+    protected transient ValueHandler _equalValueHandler;
 
-    /**
-     * Get the value of equal.
-     * @return The value of equal. (Nullable)
-     */
-    public Object getEqual() {
-        return filterValue(_equalValue);
-    }
-
-    /**
-     * Set the value of equal.
-     * @param value The value of equal. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setEqual(Object value) {
-        _equalValue = value;
-        return this;
+    protected ValueHandler getEqualValueHandler() {
+        if (_equalValueHandler == null) {
+            _equalValueHandler = new StandardValueHandler(ConditionKey.CK_EQUAL);
+        }
+        return _equalValueHandler;
     }
 
     /**
@@ -67,7 +59,7 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean hasEqual() {
-        return _equalValue != null;
+        return getEqualValueHandler().hasValue();
     }
 
     /**
@@ -76,62 +68,45 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean equalEqual(Object value) {
-        return hasEqual() ? _equalValue.equals(value) : value == null;
+        return getEqualValueHandler().equalValue(value);
     }
 
     /**
      * Override the value of equal.
      * @param value The value of equal. (Nullable)
-     * @return this. (NotNull)
      */
-    public ConditionValue overrideEqual(Object value) {
-        _equalValue = value;
-        return this;
-    }
-
-    /** Location of equal. */
-    protected String _equalLocation;
-
-    /**
-     * Get the location of equal.
-     * @return The location of equal. (Nullable)
-     */
-    public String getEqualLocation() {
-        return _equalLocation;
+    public void overrideEqual(Object value) {
+        getEqualValueHandler().overrideValue(value);
     }
 
     /**
-     * Set the location of equal.
-     * @param location The location of equal. (Nullable)
-     * @return this. (NotNull)
+     * Set up the value of equal.
+     * @param value The value of equal. (Nullable)
+     * @param location The base location of equal. (NotNull)
      */
-    public ConditionValue setEqualLocation(String location) {
-        _equalLocation = location;
-        return this;
+    public void setupEqual(Object value, String location) {
+        _equalLatestLocation = location + "." + getEqualValueHandler().setValue(value);
+    }
+
+    /**
+     * Get the latest location of equal.
+     * @return The latest location of equal. (Nullable)
+     */
+    public String getEqualLatestLocation() {
+        return _equalLatestLocation;
     }
 
     // ===================================================================================
     //                                                                           Not Equal
     //                                                                           =========
-    /** Value of notEqual. */
-    protected Object _notEqualValue;
+    protected String _notEqualLatestLocation;
+    protected transient ValueHandler _notEqualValueHandler;
 
-    /**
-     * Get the value of notEqual.
-     * @return The value of notEqual. (Nullable)
-     */
-    public Object getNotEqual() {
-        return filterValue(_notEqualValue);
-    }
-
-    /**
-     * Set the value of notEqual.
-     * @param value The value of notEqual. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setNotEqual(Object value) {
-        _notEqualValue = value;
-        return this;
+    protected ValueHandler getNotEqualValueHandler() {
+        if (_notEqualValueHandler == null) {
+            _notEqualValueHandler = new StandardValueHandler(ConditionKey.CK_NOT_EQUAL_STANDARD);
+        }
+        return _notEqualValueHandler;
     }
 
     /**
@@ -139,7 +114,7 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean hasNotEqual() {
-        return _notEqualValue != null;
+        return getNotEqualValueHandler().hasValue();
     }
 
     /**
@@ -148,63 +123,45 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean equalNotEqual(Object value) {
-        return hasNotEqual() ? _notEqualValue.equals(value) : value == null;
+        return getNotEqualValueHandler().equalValue(value);
     }
 
     /**
      * Override the value of notEqual.
      * @param value The value of notEqual. (Nullable)
-     * @return this. (NotNull)
      */
-    public ConditionValue overrideNotEqual(Object value) {
-        _notEqualValue = value;
-        return this;
-    }
-
-    /** Location of notEqual. */
-    protected String _notEqualLocation;
-
-    /**
-     * Get the location of notEqual.
-     * @return The location of notEqual. (Nullable)
-     */
-    public String getNotEqualLocation() {
-        return _notEqualLocation;
+    public void overrideNotEqual(Object value) {
+        getNotEqualValueHandler().overrideValue(value);
     }
 
     /**
-     * Set the location of notEqual.
-     * 
-     * @param location The location of notEqual. (Nullable)
-     * @return this. (NotNull)
+     * Set up the value of notEqual.
+     * @param value The value of notEqual. (Nullable)
+     * @param location The base location of notEqual. (NotNull)
      */
-    public ConditionValue setNotEqualLocation(String location) {
-        _notEqualLocation = location;
-        return this;
+    public void setupNotEqual(Object value, String location) {
+        _notEqualLatestLocation = location + "." + getNotEqualValueHandler().setValue(value);
+    }
+
+    /**
+     * Get the latest location of notEqual.
+     * @return The latest location of notEqual. (Nullable)
+     */
+    public String getNotEqualLatestLocation() {
+        return _notEqualLatestLocation;
     }
 
     // ===================================================================================
     //                                                                        Greater Than
     //                                                                        ============
-    /** Value of greaterThan. */
-    protected Object _greaterThanValue;
+    protected String _greaterThanLatestLocation;
+    protected transient ValueHandler _greaterThanValueHandler;
 
-    /**
-     * Get the value of greaterThan.
-     * @return The value of greaterThan. (Nullable)
-     */
-    public Object getGreaterThan() {
-        return filterValue(_greaterThanValue);
-    }
-
-    /**
-     * Set the value of greaterThan.
-     * @param value The value of greaterThan. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setGreaterThan(Object value) {
-        _greaterThanValue = value;
-        return this;
+    protected ValueHandler getGreaterThanValueHandler() {
+        if (_greaterThanValueHandler == null) {
+            _greaterThanValueHandler = new StandardValueHandler(ConditionKey.CK_GREATER_THAN);
+        }
+        return _greaterThanValueHandler;
     }
 
     /**
@@ -212,7 +169,7 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean hasGreaterThan() {
-        return _greaterThanValue != null;
+        return getGreaterThanValueHandler().hasValue();
     }
 
     /**
@@ -221,62 +178,45 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean equalGreaterThan(Object value) {
-        return hasGreaterThan() ? _greaterThanValue.equals(value) : value == null;
+        return getGreaterThanValueHandler().equalValue(value);
     }
 
     /**
      * Override the value of greaterThan.
      * @param value The value of greaterThan. (Nullable)
-     * @return this. (NotNull)
      */
-    public ConditionValue overrideGreaterThan(Object value) {
-        _greaterThanValue = value;
-        return this;
-    }
-
-    /** Location of GreaterThan. */
-    protected String _greaterThanLocation;
-
-    /**
-     * Get the location of greaterThan.
-     * @return The location of greaterThan. (Nullable)
-     */
-    public String getGreaterThanLocation() {
-        return _greaterThanLocation;
+    public void overrideGreaterThan(Object value) {
+        getGreaterThanValueHandler().overrideValue(value);
     }
 
     /**
-     * Set the location of greaterThan.
-     * @param location The location of greaterThan. (Nullable)
-     * @return this. (NotNull)
+     * Set up the value of greaterThan.
+     * @param value The value of greaterThan. (Nullable)
+     * @param location The base location of greaterThan. (NotNull)
      */
-    public ConditionValue setGreaterThanLocation(String location) {
-        _greaterThanLocation = location;
-        return this;
+    public void setupGreaterThan(Object value, String location) {
+        _greaterThanLatestLocation = location + "." + getGreaterThanValueHandler().setValue(value);
+    }
+
+    /**
+     * Get the latest location of greaterThan.
+     * @return The latest location of greaterThan. (Nullable)
+     */
+    public String getGreaterThanLatestLocation() {
+        return _greaterThanLatestLocation;
     }
 
     // ===================================================================================
     //                                                                           Less Than
     //                                                                           =========
-    /** Value of lessThan. */
-    protected Object _lessThanValue;
+    protected String _lessThanLatestLocation;
+    protected transient ValueHandler _lessThanValueHandler;
 
-    /**
-     * Get the value of lessThan.
-     * @return The value of lessThan. (Nullable)
-     */
-    public Object getLessThan() {
-        return filterValue(_lessThanValue);
-    }
-
-    /**
-     * Set the value of lessThan.
-     * @param value The value of lessThan. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setLessThan(Object value) {
-        _lessThanValue = value;
-        return this;
+    protected ValueHandler getLessThanValueHandler() {
+        if (_lessThanValueHandler == null) {
+            _lessThanValueHandler = new StandardValueHandler(ConditionKey.CK_LESS_THAN);
+        }
+        return _lessThanValueHandler;
     }
 
     /**
@@ -284,7 +224,7 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean hasLessThan() {
-        return _lessThanValue != null;
+        return getLessThanValueHandler().hasValue();
     }
 
     /**
@@ -293,62 +233,45 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean equalLessThan(Object value) {
-        return hasLessThan() ? _lessThanValue.equals(value) : value == null;
+        return getLessThanValueHandler().equalValue(value);
     }
 
     /**
      * Override the value of lessThan.
      * @param value The value of lessThan. (Nullable)
-     * @return this. (NotNull)
      */
-    public ConditionValue overrideLessThan(Object value) {
-        _lessThanValue = value;
-        return this;
-    }
-
-    /** Location of lessThan. */
-    protected String _lessThanLocation;
-
-    /**
-     * Get the location of lessThan.
-     * @return The location of lessThan. (Nullable)
-     */
-    public String getLessThanLocation() {
-        return _lessThanLocation;
+    public void overrideLessThan(Object value) {
+        getLessThanValueHandler().overrideValue(value);
     }
 
     /**
-     * Set the location of lessThan.
-     * @param location The location of lessThan. (Nullable)
-     * @return this. (NotNull)
+     * Set up the value of lessThan.
+     * @param value The value of lessThan. (Nullable)
+     * @param location The base location of lessThan. (NotNull)
      */
-    public ConditionValue setLessThanLocation(String location) {
-        _lessThanLocation = location;
-        return this;
+    public void setupLessThan(Object value, String location) {
+        _lessThanLatestLocation = location + "." + getLessThanValueHandler().setValue(value);
+    }
+
+    /**
+     * Get the latest location of lessThan.
+     * @return The latest location of lessThan. (Nullable)
+     */
+    public String getLessThanLatestLocation() {
+        return _lessThanLatestLocation;
     }
 
     // ===================================================================================
     //                                                                       Greater Equal
     //                                                                       =============
-    /** Value of greaterEqual. */
-    protected Object _greaterEqualValue;
+    protected String _greaterEqualLatestLocation;
+    protected transient ValueHandler _greaterEqualValueHandler;
 
-    /**
-     * Get the value of greaterEqual.
-     * @return The value of greaterEqual. (Nullable)
-     */
-    public Object getGreaterEqual() {
-        return filterValue(_greaterEqualValue);
-    }
-
-    /**
-     * Set the value of greaterEqual.
-     * @param value The value of greaterEqual. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setGreaterEqual(Object value) {
-        _greaterEqualValue = value;
-        return this;
+    protected ValueHandler getGreaterEqualValueHandler() {
+        if (_greaterEqualValueHandler == null) {
+            _greaterEqualValueHandler = new StandardValueHandler(ConditionKey.CK_GREATER_EQUAL);
+        }
+        return _greaterEqualValueHandler;
     }
 
     /**
@@ -356,7 +279,7 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean hasGreaterEqual() {
-        return _greaterEqualValue != null;
+        return getGreaterEqualValueHandler().hasValue();
     }
 
     /**
@@ -365,62 +288,45 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean equalGreaterEqual(Object value) {
-        return hasGreaterEqual() ? _greaterEqualValue.equals(value) : value == null;
+        return getGreaterEqualValueHandler().equalValue(value);
     }
 
     /**
      * Override the value of greaterEqual.
      * @param value The value of greaterEqual. (Nullable)
-     * @return this. (NotNull)
      */
-    public ConditionValue overrideGreaterEqual(Object value) {
-        _greaterEqualValue = value;
-        return this;
-    }
-
-    /** Location of greaterEqual. */
-    protected String _greaterEqualLocation;
-
-    /**
-     * Get the location of greaterEqual.
-     * @return The location of greaterEqual. (Nullable)
-     */
-    public String getGreaterEqualLocation() {
-        return _greaterEqualLocation;
+    public void overrideGreaterEqual(Object value) {
+        getGreaterEqualValueHandler().overrideValue(value);
     }
 
     /**
-     * Set the location of greaterEqual.
-     * @param location The location of greaterEqual. (Nullable)
-     * @return this. (NotNull)
+     * Set up the value of greaterEqual.
+     * @param value The value of greaterEqual. (Nullable)
+     * @param location The base location of greaterEqual. (NotNull)
      */
-    public ConditionValue setGreaterEqualLocation(String location) {
-        _greaterEqualLocation = location;
-        return this;
+    public void setupGreaterEqual(Object value, String location) {
+        _greaterEqualLatestLocation = location + "." + getGreaterEqualValueHandler().setValue(value);
+    }
+
+    /**
+     * Get the latest location of greaterEqual.
+     * @return The latest location of greaterEqual. (Nullable)
+     */
+    public String getGreaterEqualLatestLocation() {
+        return _greaterEqualLatestLocation;
     }
 
     // ===================================================================================
     //                                                                          Less Equal
     //                                                                          ==========
-    /** Value of lessEqual. */
-    protected Object _lessEqualValue;
+    protected String _lessEqualLatestLocation;
+    protected transient ValueHandler _lessEqualValueHandler;
 
-    /**
-     * Get the value of lessEqual.
-     * @return The value of lessEqual. (Nullable)
-     */
-    public Object getLessEqual() {
-        return filterValue(_lessEqualValue);
-    }
-
-    /**
-     * Set the value of lessEqual.
-     * @param value The value of lessEqual. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setLessEqual(Object value) {
-        _lessEqualValue = value;
-        return this;
+    protected ValueHandler getLessEqualValueHandler() {
+        if (_lessEqualValueHandler == null) {
+            _lessEqualValueHandler = new StandardValueHandler(ConditionKey.CK_LESS_EQUAL);
+        }
+        return _lessEqualValueHandler;
     }
 
     /**
@@ -428,7 +334,7 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean hasLessEqual() {
-        return _lessEqualValue != null;
+        return getLessEqualValueHandler().hasValue();
     }
 
     /**
@@ -437,437 +343,179 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean equalLessEqual(Object value) {
-        return hasLessEqual() ? _lessEqualValue.equals(value) : value == null;
+        return getLessEqualValueHandler().equalValue(value);
     }
 
     /**
      * Override the value of lessEqual.
      * @param value The value of lessEqual. (Nullable)
-     * @return this. (NotNull)
      */
-    public ConditionValue overrideLessEqual(Object value) {
-        _lessEqualValue = value;
-        return this;
-    }
-
-    /** Location of lessEqual. */
-    protected String _lessEqualLocation;
-
-    /**
-     * Get the location of lessEqual.
-     * @return The location of lessEqual. (Nullable)
-     */
-    public String getLessEqualLocation() {
-        return _lessEqualLocation;
+    public void overrideLessEqual(Object value) {
+        getLessEqualValueHandler().overrideValue(value);
     }
 
     /**
-     * Set the location of lessEqual.
-     * @param location The location of lessEqual. (Nullable)
-     * @return this. (NotNull)
+     * Set up the value of lessEqual.
+     * @param value The value of lessEqual. (Nullable)
+     * @param location The base location of lessEqual. (NotNull)
      */
-    public ConditionValue setLessEqualLocation(String location) {
-        _lessEqualLocation = location;
-        return this;
+    public void setupLessEqual(Object value, String location) {
+        _lessEqualLatestLocation = location + "." + getLessEqualValueHandler().setValue(value);
+    }
+
+    /**
+     * Get the latest location of lessEqual.
+     * @return The latest location of lessEqual. (Nullable)
+     */
+    public String getLessEqualLatestLocation() {
+        return _lessEqualLatestLocation;
     }
 
     // ===================================================================================
     //                                                                            In Scope
     //                                                                            ========
-    /** The value of inScope. */
-    protected List<List<?>> _inScope;
+    protected String _inScopeLatestLocation;
+    protected transient ValueHandler _inScopeValueHandler;
 
-    /** The value of inScope for spare. */
-    protected List<List<?>> _inScope4Spare;
-
-    /**
-     * Get the value of inScope.
-     * @return The value of inScope. (Nullable)
-     */
-    public List<?> getInScope() {
-        if (_inScope == null) {
-            return null;
+    protected ValueHandler getInScopeValueHandler() {
+        if (_inScopeValueHandler == null) {
+            _inScopeValueHandler = new VaryingValueHandler(ConditionKey.CK_IN_SCOPE);
         }
-        if (_inScope.isEmpty() && !_inScope4Spare.isEmpty()) {
-            for (int index = 0; index < _inScope4Spare.size(); index++) {
-                _inScope.add(_inScope4Spare.get(index));
-            }
-        }
-        final List<?> inScopeValue = _inScope.remove(0);
-        return filterValue(inScopeValue);
+        return _inScopeValueHandler;
     }
 
     /**
-     * Set the value of inScope.
+     * Set up the value of inScope.
      * @param value The value of inScope. (Nullable)
-     * @return this. (NotNull)
+     * @param location The base location of inScope. (NotNull)
      */
-    public ConditionValue setInScope(List<?> value) {
-        if (_inScope == null) {
-            _inScope = new ArrayList<List<?>>();
-            _inScope4Spare = new ArrayList<List<?>>();
-        }
-        if (_inScope.isEmpty() && !_inScope4Spare.isEmpty()) {
-            for (int index = 0; index < _inScope4Spare.size(); index++) {
-                _inScope.add(_inScope4Spare.get(index));
-            }
-        }
-        _inScope.add(value);
-        _inScope4Spare.add(value);
-        return this;
-    }
-
-    /** Location of InScope. */
-    protected String _inScopeLocation;
-
-    /**
-     * Get the location of inScope.
-     * @return The location of inScope. (Nullable)
-     */
-    public String getInScopeLocation() {
-        return _inScopeLocation;
+    public void setupInScope(Object value, String location) {
+        final String key = getInScopeValueHandler().setValue(value);
+        _inScopeLatestLocation = location + "." + key;
     }
 
     /**
-     * Set the location of inScope.
-     * @param location The location of inScope. (Nullable)
-     * @return this. (NotNull)
+     * Get the latest location of inScope.
+     * @return The latest location of inScope. (Nullable)
      */
-    public ConditionValue setInScopeLocation(String location) {
-        _inScopeLocation = location;
-        return this;
+    public String getInScopeLatestLocation() {
+        return _inScopeLatestLocation;
     }
 
     // ===================================================================================
     //                                                                        Not In Scope
     //                                                                        ============
-    /** The value of notInScope. */
-    protected List<List<?>> _notInScope;
+    protected String _notInScopeLatestLocation;
+    protected transient ValueHandler _notInScopeValueHandler;
 
-    /** The value of notInScope for spare. */
-    protected List<List<?>> _notInScope4Spare;
-
-    /**
-     * Get the value of notInScope.
-     * @return The value of notInScope. (Nullable)
-     */
-    public List<?> getNotInScope() {
-        if (_notInScope == null) {
-            return null;
+    protected ValueHandler getNotInScopeValueHandler() {
+        if (_notInScopeValueHandler == null) {
+            _notInScopeValueHandler = new VaryingValueHandler(ConditionKey.CK_NOT_IN_SCOPE);
         }
-        if (_notInScope.isEmpty() && !_notInScope4Spare.isEmpty()) {
-            for (int index = 0; index < _notInScope4Spare.size(); index++) {
-                _notInScope.add(_notInScope4Spare.get(index));
-            }
-        }
-        final List<?> notInScopeValue = _notInScope.remove(0);
-        return filterValue(notInScopeValue);
+        return _notInScopeValueHandler;
     }
 
     /**
-     * Set the value of notInScope.
+     * Set up the value of notInScope.
      * @param value The value of notInScope. (Nullable)
-     * @return this. (NotNull)
+     * @param location The base location of notInScope. (NotNull)
      */
-    public ConditionValue setNotInScope(List<?> value) {
-        if (_notInScope == null) {
-            _notInScope = new ArrayList<List<?>>();
-            _notInScope4Spare = new ArrayList<List<?>>();
-        }
-        if (_notInScope.isEmpty() && !_notInScope4Spare.isEmpty()) {
-            for (int index = 0; index < _notInScope4Spare.size(); index++) {
-                _notInScope.add(_notInScope4Spare.get(index));
-            }
-        }
-        _notInScope.add(value);
-        _notInScope4Spare.add(value);
-        return this;
-    }
-
-    /** Location of InScope. */
-    protected String _notInScopeLocation;
-
-    /**
-     * Get the location of notInScope.
-     * @return The location of notInScope. (Nullable)
-     */
-    public String getNotInScopeLocation() {
-        return _notInScopeLocation;
+    public void setupNotInScope(Object value, String location) {
+        final String key = getNotInScopeValueHandler().setValue(value);
+        _notInScopeLatestLocation = location + "." + key;
     }
 
     /**
-     * Set the location of notInScope.
-     * @param location The location of notInScope. (Nullable)
-     * @return this. (NotNull)
+     * Get the latest location of notInScope.
+     * @return The latest location of notInScope. (Nullable)
      */
-    public ConditionValue setNotInScopeLocation(String location) {
-        _notInScopeLocation = location;
-        return this;
+    public String getNotInScopeLatestLocation() {
+        return _notInScopeLatestLocation;
     }
 
     // ===================================================================================
     //                                                                         Like Search
     //                                                                         ===========
-    /** The value of likeSearch. */
-    protected List<LikeSearchValue> _likeSearch;
+    protected String _likeSearchLatestLocation;
+    protected transient ValueHandler _likeSearchValueHandler;
 
-    /** The value of likeSearch for spare. */
-    protected List<LikeSearchValue> _likeSearch4Spare;
-
-    /**
-     * Get the value of likeSearch.
-     * @return The value of likeSearch. (Nullable)
-     */
-    public String getLikeSearch() {
-        if (_likeSearch == null) {
-            return null;
+    protected ValueHandler getLikeSearchValueHandler() {
+        if (_likeSearchValueHandler == null) {
+            _likeSearchValueHandler = new VaryingValueHandler(ConditionKey.CK_LIKE_SEARCH);
         }
-        if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
-            for (int index = 0; index < _likeSearch4Spare.size(); index++) {
-                _likeSearch.add(_likeSearch4Spare.get(index));
-            }
-        }
-        final LikeSearchValue likeSearchValue = _likeSearch.remove(0);
-        return (String) filterValue(likeSearchValue.generateRealValue());
+        return _likeSearchValueHandler;
     }
 
     /**
-     * Set the value of likeSearch.
+     * Set up the value of likeSearch.
      * @param value The value of likeSearch. (Nullable)
-     * @param option The option of likeSearch. (Nullable)
-     * @return this. (NotNull)
+     * @param option The option of likeSearch. (NotNull)
+     * @param location The base location of likeSearch. (NotNull)
      */
-    public ConditionValue setLikeSearch(String value, LikeSearchOption option) {
-        if (_likeSearch == null) {
-            _likeSearch = new ArrayList<LikeSearchValue>();
-            _likeSearch4Spare = new ArrayList<LikeSearchValue>();
-        }
-        if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
-            for (int index = 0; index < _likeSearch4Spare.size(); index++) {
-                _likeSearch.add(_likeSearch4Spare.get(index));
-            }
-        }
-        LikeSearchValue likeSearchValue = new LikeSearchValue(value, option);
-        _likeSearch.add(likeSearchValue);
-        _likeSearch4Spare.add(likeSearchValue);
-        return this;
-    }
-
-    /** Location of likeSearch. */
-    protected String _likeSearchLocation;
-
-    /**
-     * Get the location of likeSearch.
-     * @return The location of likeSearch. (Nullable)
-     */
-    public String getLikeSearchLocation() {
-        return _likeSearchLocation;
+    public void setupLikeSearch(String value, LikeSearchOption option, String location) {
+        final String key = getLikeSearchValueHandler().setValue(option.generateRealValue(value));
+        _likeSearchLatestLocation = location + "." + key;
     }
 
     /**
-     * Set the location of likeSearch.
-     * @param location The location of likeSearch. (Nullable)
-     * @return this. (NotNull)
+     * Get the latest location of likeSearch.
+     * @return The latest location of likeSearch. (Nullable)
      */
-    public ConditionValue setLikeSearchLocation(String location) {
-        _likeSearchLocation = location;
-        return this;
-    }
-
-    protected static class LikeSearchValue {
-        protected String _value;
-        protected LikeSearchOption _option;
-
-        public LikeSearchValue(String value, LikeSearchOption option) {
-            _value = value;
-            _option = option;
-        }
-
-        public String getValue() {
-            return _value;
-        }
-
-        public LikeSearchOption getOption() {
-            return _option;
-        }
-
-        public String generateRealValue() {
-            if (_option == null) {
-                return _value;
-            }
-            return _option.generateRealValue(_value);
-        }
+    public String getLikeSearchLatestLocation() {
+        return _likeSearchLatestLocation;
     }
 
     // ===================================================================================
     //                                                                     Not Like Search
     //                                                                     ===============
-    /** The value of notLikeSearch. */
-    protected List<NotLikeSearchValue> _notLikeSearch;
+    protected String _notLikeSearchLatestLocation;
+    protected transient ValueHandler _notLikeSearchValueHandler;
 
-    /** The value of notLikeSearch for spare. */
-    protected List<NotLikeSearchValue> _notLikeSearch4Spare;
-
-    /**
-     * Get the value of notLikeSearch.
-     * @return The value of notLikeSearch. (Nullable)
-     */
-    public String getNotLikeSearch() {
-        if (_notLikeSearch == null) {
-            return null;
+    protected ValueHandler getNotLikeSearchValueHandler() {
+        if (_notLikeSearchValueHandler == null) {
+            _notLikeSearchValueHandler = new VaryingValueHandler(ConditionKey.CK_NOT_LIKE_SEARCH);
         }
-        if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
-            for (int index = 0; index < _notLikeSearch4Spare.size(); index++) {
-                _notLikeSearch.add(_notLikeSearch4Spare.get(index));
-            }
-        }
-        final NotLikeSearchValue notLikeSearchValue = _notLikeSearch.remove(0);
-        return (String) filterValue(notLikeSearchValue.generateRealValue());
+        return _notLikeSearchValueHandler;
     }
 
     /**
-     * Set the value of notLikeSearch.
+     * Set up the value of notLikeSearch.
      * @param value The value of notLikeSearch. (Nullable)
-     * @param option The option of notLikeSearch. (Nullable)
-     * @return this. (NotNull)
+     * @param option The option of notLikeSearch. (NotNull)
+     * @param location The base location of notLikeSearch. (NotNull)
      */
-    public ConditionValue setNotLikeSearch(String value, LikeSearchOption option) {
-        if (_notLikeSearch == null) {
-            _notLikeSearch = new ArrayList<NotLikeSearchValue>();
-            _notLikeSearch4Spare = new ArrayList<NotLikeSearchValue>();
-        }
-        if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
-            for (int index = 0; index < _notLikeSearch4Spare.size(); index++) {
-                _notLikeSearch.add(_notLikeSearch4Spare.get(index));
-            }
-        }
-        NotLikeSearchValue notLikeSearchValue = new NotLikeSearchValue(value, option);
-        _notLikeSearch.add(notLikeSearchValue);
-        _notLikeSearch4Spare.add(notLikeSearchValue);
-        return this;
-    }
-
-    /** Location of notLikeSearch. */
-    protected String _notLikeSearchLocation;
-
-    /**
-     * Get the location of notLikeSearch.
-     * @return The location of notLikeSearch. (Nullable)
-     */
-    public String getNotLikeSearchLocation() {
-        return _notLikeSearchLocation;
+    public void setupNotLikeSearch(String value, LikeSearchOption option, String location) {
+        final String key = getNotLikeSearchValueHandler().setValue(option.generateRealValue(value));
+        _notLikeSearchLatestLocation = location + "." + key;
     }
 
     /**
-     * Set the location of notLikeSearch.
-     * @param location The location of notLikeSearch. (Nullable)
-     * @return this. (NotNull)
+     * Get the latest location of notLikeSearch.
+     * @return The latest location of notLikeSearch. (Nullable)
      */
-    public ConditionValue setNotLikeSearchLocation(String location) {
-        _notLikeSearchLocation = location;
-        return this;
-    }
-
-    protected static class NotLikeSearchValue {
-        protected String _value;
-        protected LikeSearchOption _option;
-
-        public NotLikeSearchValue(String value, LikeSearchOption option) {
-            _value = value;
-            _option = option;
-        }
-
-        public String getValue() {
-            return _value;
-        }
-
-        public LikeSearchOption getOption() {
-            return _option;
-        }
-
-        public String generateRealValue() {
-            if (_option == null) {
-                return _value;
-            }
-            return _option.generateRealValue(_value);
-        }
-    }
-
-    // ===================================================================================
-    //                                                                             Is Null
-    //                                                                             =======
-    /** Value of isNull. */
-    protected Object _isNullValue;
-
-    /**
-     * Get the value of isNull.
-     * @return The value of isNull. (Nullable)
-     */
-    public Object getIsNull() {
-        return _isNullValue;
-    }
-
-    /**
-     * Set the value of isNull.
-     * @param value The value of isNull. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setIsNull(Object value) {
-        _isNullValue = value;
-        return this;
-    }
-
-    /**
-     * Does it has the value of isNull?
-     * @return Determination. (NotNull)
-     */
-    public boolean hasIsNull() {
-        return _isNullValue != null;
-    }
-
-    /** Location of isNull. */
-    protected String _isNullLocation;
-
-    /**
-     * Get the location of isNull.
-     * @return The location of isNull. (Nullable)
-     */
-    public String getIsNullLocation() {
-        return _isNullLocation;
-    }
-
-    /**
-     * Set the location of isNull.
-     * @param location The location of isNull. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setIsNullLocation(String location) {
-        _isNullLocation = location;
-        return this;
+    public String getNotLikeSearchLatestLocation() {
+        return _notLikeSearchLatestLocation;
     }
 
     // ===================================================================================
     //                                                                         Is Not Null
     //                                                                         ===========
-    /** Value of isNotNull. */
-    protected Object _isNotNullValue;
+    protected transient ValueHandler _isNotNullValueHandler;
 
-    /**
-     * Get the value of isNotNull.
-     * @return The value of isNotNull. (Nullable)
-     */
-    public Object getIsNotNull() {
-        return _isNotNullValue;
+    protected ValueHandler getIsNotNullValueHandler() {
+        if (_isNotNullValueHandler == null) {
+            _isNotNullValueHandler = new StandardValueHandler(ConditionKey.CK_IS_NOT_NULL);
+        }
+        return _isNotNullValueHandler;
     }
 
     /**
      * Set the value of isNotNull.
      * @param value The value of isNotNull. (Nullable)
-     * @return this. (NotNull)
+     * @return The key of value. (NotNull)
      */
-    public ConditionValue setIsNotNull(Object value) {
-        _isNotNullValue = value;
-        return this;
+    public String setIsNotNull(Object value) {
+        return getIsNotNullValueHandler().setValue(value);
     }
 
     /**
@@ -875,56 +523,207 @@ public class ConditionValue implements Serializable {
      * @return Determination. (NotNull)
      */
     public boolean hasIsNotNull() {
-        return _isNotNullValue != null;
+        return getIsNotNullValueHandler().hasValue();
     }
 
-    /** Location of isNotNull. */
-    protected String _isNotNullLocation;
+    // ===================================================================================
+    //                                                                             Is Null
+    //                                                                             =======
+    protected transient ValueHandler _isNullValueHandler;
 
-    /**
-     * Get the location of isNotNull.
-     * @return The location of isNotNull. (Nullable)
-     */
-    public String getIsNotNullLocation() {
-        return _isNotNullLocation;
-    }
-
-    /**
-     * Set the location of isNotNull.
-     * @param location The location of isNotNull. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue setIsNotNullLocation(String location) {
-        _isNotNullLocation = location;
-        return this;
-    }
-
-    // =====================================================================================
-    //                                                                                Filter
-    //                                                                                ======
-    /**
-     * Filter value.
-     * @param value The value. (Nullable)
-     * @return The filtered value. (Nullable)
-     */
-    protected Object filterValue(Object value) {
-        // do nothing but it may use at the future
-        return value;
-    }
-
-    /**
-     * Filter the list of value.
-     * @param valueList The list of value. (Nullable)
-     * @return The filtered list of value. (Nullable)
-     */
-    protected List<?> filterValue(List<?> valueList) {
-        if (valueList == null || valueList.isEmpty()) {
-            return valueList;
+    protected ValueHandler getIsNullValueHandler() {
+        if (_isNullValueHandler == null) {
+            _isNullValueHandler = new StandardValueHandler(ConditionKey.CK_IS_NULL);
         }
-        final List<Object> resultList = new ArrayList<Object>();
-        for (Object value : valueList) {
-            resultList.add(filterValue(value));
+        return _isNullValueHandler;
+    }
+
+    /**
+     * Set the value of isNull.
+     * @param value The value of isNull. (Nullable)
+     * @return The key of value. (NotNull)
+     */
+    public String setIsNull(Object value) {
+        return getIsNullValueHandler().setValue(value);
+    }
+
+    /**
+     * Does it has the value of isNull?
+     * @return Determination. (NotNull)
+     */
+    public boolean hasIsNull() {
+        return getIsNullValueHandler().hasValue();
+    }
+
+    // ===================================================================================
+    //                                                                      Value Handling
+    //                                                                      ==============
+    protected Object getFixedValue(ConditionKey conditionKey) {
+        if (_fixedValueMap == null) {
+            return null;
         }
-        return resultList;
+        return _fixedValueMap.get(conditionKey.getConditionKey());
+    }
+
+    protected String setupFixedValue(ConditionKey conditionKey, Object value) {
+        if (_fixedValueMap == null) {
+            _fixedValueMap = new LinkedHashMap<String, Object>();
+        }
+        final String key = conditionKey.getConditionKey();
+        _fixedValueMap.put(key, value);
+        return "fixed." + key;
+    }
+
+    protected boolean hasFixedValue(ConditionKey conditionKey) {
+        return _fixedValueMap != null && _fixedValueMap.containsKey(conditionKey.getConditionKey());
+    }
+
+    protected Object getVaryingValue(ConditionKey conditionKey) {
+        throw new IllegalStateException();
+    }
+
+    protected String setupVaryingValue(ConditionKey conditionKey, Object value) {
+        if (_varyingValueMap == null) {
+            _varyingValueMap = new LinkedHashMap<String, Map<String, Object>>();
+        }
+        final String key = conditionKey.getConditionKey();
+        Map<String, Object> elementMap = _varyingValueMap.get(key);
+        if (elementMap == null) {
+            elementMap = new LinkedHashMap<String, Object>();
+            _varyingValueMap.put(key, elementMap);
+        }
+        final String elementKey = key + elementMap.size();
+        elementMap.put(elementKey, value);
+        return "varying." + key + "." + elementKey;
+    }
+
+    protected boolean hasVaryingValue(ConditionKey conditionKey) {
+        throw new IllegalStateException();
+    }
+
+    protected static interface ValueHandler {
+        Object getValue();
+
+        String setValue(Object value);
+
+        boolean hasValue();
+
+        boolean equalValue(Object value);
+
+        void overrideValue(Object value);
+    }
+
+    protected class StandardValueHandler implements ValueHandler {
+        protected ConditionKey _conditionKey;
+
+        public StandardValueHandler(ConditionKey conditionKey) {
+            _conditionKey = conditionKey;
+        }
+
+        public Object getValue() {
+            return getStandardValue(_conditionKey);
+        }
+
+        public String setValue(Object value) {
+            return setupStandardValue(_conditionKey, value);
+        }
+
+        public boolean hasValue() {
+            return hasStandardValue(_conditionKey);
+        }
+
+        public boolean equalValue(Object value) {
+            return hasValue() ? getValue().equals(value) : value == null;
+        }
+
+        public void overrideValue(Object value) {
+            setValue(value);
+        }
+
+        protected Object getStandardValue(ConditionKey conditionKey) {
+            return _orScopeQuery ? getVaryingValue(conditionKey) : getFixedValue(conditionKey);
+        }
+
+        protected String setupStandardValue(ConditionKey conditionKey, Object value) {
+            if (_orScopeQuery) {
+                return setupVaryingValue(conditionKey, value);
+            } else {
+                return setupFixedValue(conditionKey, value);
+            }
+        }
+
+        protected boolean hasStandardValue(ConditionKey conditionKey) {
+            return _orScopeQuery ? hasVaryingValue(conditionKey) : hasFixedValue(conditionKey);
+        }
+    }
+
+    protected class VaryingValueHandler implements ValueHandler {
+        protected ConditionKey _conditionKey;
+
+        public VaryingValueHandler(ConditionKey conditionKey) {
+            _conditionKey = conditionKey;
+        }
+
+        public Object getValue() {
+            return getVaryingValue(_conditionKey);
+        }
+
+        public String setValue(Object value) {
+            return setupVaryingValue(_conditionKey, value);
+        }
+
+        public boolean hasValue() {
+            return hasVaryingValue(_conditionKey);
+        }
+
+        public boolean equalValue(Object value) {
+            return hasValue() ? getValue().equals(value) : value == null;
+        }
+
+        public void overrideValue(Object value) {
+            setValue(value);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             Process
+    //                                                                             =======
+    public static interface CallbackProcessor<RESULT> {
+        RESULT process();
+
+        QueryModeProvider getProvider();
+    }
+
+    public static interface QueryModeProvider {
+        boolean isOrScopeQuery();
+
+        boolean isInline();
+
+        boolean isOnClause();
+    }
+
+    public <RESULT> RESULT process(CallbackProcessor<RESULT> processor) {
+        try {
+            // now only or-scope query is independent
+            _orScopeQuery = processor.getProvider().isOrScopeQuery();
+            return processor.process();
+        } finally {
+            _orScopeQuery = false;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isStandardQuery() {
+        return !_orScopeQuery;
+    }
+
+    public Map<String, Object> getFixed() {
+        return _fixedValueMap;
+    }
+
+    public Map<String, Map<String, Object>> getVarying() {
+        return _varyingValueMap;
     }
 }

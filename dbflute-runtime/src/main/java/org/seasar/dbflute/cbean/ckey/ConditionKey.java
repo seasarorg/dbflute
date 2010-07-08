@@ -18,8 +18,12 @@ package org.seasar.dbflute.cbean.ckey;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue.CallbackProcessor;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -35,6 +39,9 @@ public abstract class ConditionKey implements Serializable {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    /** Log-instance. */
+    private static final Log _log = LogFactory.getLog(ConditionKey.class);
 
     // ===================================================================================
     //                                                                          Definition
@@ -95,49 +102,66 @@ public abstract class ConditionKey implements Serializable {
     //                                                                          ==========
     /**
      * Is valid registration?
-     * @param conditionValue Condition value. (NotNull)
+     * @param provider The provider of query mode. (NotNull)
+     * @param cvalue Condition value. (NotNull)
      * @param value Value. (NotNull)
-     * @param callerName Caller name. (NotNull)
+     * @param callerName Caller's real name. (NotNull)
      * @return Determination.
      */
-    abstract public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName);
+    public boolean isValidRegistration(final QueryModeProvider provider, final ConditionValue cvalue,
+            final Object value, final ColumnRealName callerName) {
+        return cvalue.process(new CallbackProcessor<Boolean>() {
+            public Boolean process() {
+                return doIsValidRegistration(cvalue, value, callerName);
+            }
+
+            public QueryModeProvider getProvider() {
+                return provider;
+            }
+        });
+    }
+
+    protected abstract boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName);
 
     // ===================================================================================
     //                                                                        Where Clause
     //                                                                        ============
     /**
      * Add where clause.
+     * @param provider The provider of query mode. (NotNull)
      * @param conditionList Condition list. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
-     * @param value Condition value. (NotNull)
-     * @return this.
+     * @param cvalue Condition value. (NotNull)
      */
-    public ConditionKey addWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value) {
-        if (value == null) {
-            String msg = "The argument 'value' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        doAddWhereClause(conditionList, columnRealName, value);
-        return this;
+    public void addWhereClause(QueryModeProvider provider, List<QueryClause> conditionList,
+            ColumnRealName columnRealName, ConditionValue cvalue) {
+        addWhereClause(provider, conditionList, columnRealName, cvalue, null);
     }
 
     /**
      * Add where clause.
+     * @param provider The provider of query mode. (NotNull)
      * @param conditionList Condition list. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
-     * @param value Condition value. (NotNull)
-     * @param option Condition option. (NotNull)
-     * @return this.
+     * @param cvalue Condition value. (NotNull)
+     * @param option Condition option. (Nullable)
      */
-    public ConditionKey addWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ConditionOption option) {
-        if (value == null) {
-            String msg = "Argument[value] must not be null:";
-            throw new IllegalArgumentException(msg + " value=null this.toString()=" + toString());
-        }
-        doAddWhereClause(conditionList, columnRealName, value, option);
-        return this;
+    public void addWhereClause(final QueryModeProvider provider, final List<QueryClause> conditionList,
+            final ColumnRealName columnRealName, final ConditionValue cvalue, final ConditionOption option) {
+        cvalue.process(new CallbackProcessor<Void>() {
+            public Void process() {
+                if (option != null) {
+                    doAddWhereClause(conditionList, columnRealName, cvalue, option);
+                } else {
+                    doAddWhereClause(conditionList, columnRealName, cvalue);
+                }
+                return null;
+            }
+
+            public QueryModeProvider getProvider() {
+                return provider;
+            }
+        });
     }
 
     /**
@@ -146,7 +170,7 @@ public abstract class ConditionKey implements Serializable {
      * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+    protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value);
 
     /**
@@ -156,7 +180,7 @@ public abstract class ConditionKey implements Serializable {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+    protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ConditionOption option);
 
     // ===================================================================================
@@ -164,36 +188,40 @@ public abstract class ConditionKey implements Serializable {
     //                                                                     ===============
     /**
      * Setup condition value.
+     * @param provider The provider of query mode. (NotNull)
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (Nullable)
      * @param location Location. (Nullable)
-     * @return Condition value. (The same as argument[conditionValue]) (NotNull)
      */
-    public ConditionValue setupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        if (conditionValue == null) {
-            String msg = "Argument[conditionValue] must not be null:";
-            throw new IllegalArgumentException(msg + " value=" + value + " this.toString()=" + toString());
-        }
-        doSetupConditionValue(conditionValue, value, location);
-        return conditionValue;
+    public void setupConditionValue(QueryModeProvider provider, ConditionValue conditionValue, Object value,
+            String location) {
+        setupConditionValue(provider, conditionValue, value, location, null);
     }
 
     /**
      * Setup condition value.
-     * @param conditionValue Condition value. (NotNull)
+     * @param provider The provider of query mode. (NotNull)
+     * @param cvalue Condition value. (NotNull)
      * @param value Value. (Nullable)
      * @param location Location. (Nullable)
-     * @param option Condition option. (NotNull)
-     * @return Condition value. (The same as argument[conditionValue]) (NotNull)
+     * @param option Condition option. (Nullable)
      */
-    public ConditionValue setupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
-        if (conditionValue == null) {
-            String msg = "Argument[conditionValue] must not be null:";
-            throw new IllegalArgumentException(msg + " value=" + value + " this.toString()=" + toString());
-        }
-        doSetupConditionValue(conditionValue, value, location, option);
-        return conditionValue;
+    public void setupConditionValue(final QueryModeProvider provider, final ConditionValue cvalue, final Object value,
+            final String location, final ConditionOption option) {
+        cvalue.process(new CallbackProcessor<Void>() {
+            public Void process() {
+                if (option != null) {
+                    doSetupConditionValue(cvalue, value, location, option);
+                } else {
+                    doSetupConditionValue(cvalue, value, location);
+                }
+                return null;
+            }
+
+            public QueryModeProvider getProvider() {
+                return provider;
+            }
+        });
     }
 
     /**
@@ -202,7 +230,7 @@ public abstract class ConditionKey implements Serializable {
      * @param value Value. (NotNull)
      * @param location Location. (NotNull)
      */
-    abstract protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location);
+    protected abstract void doSetupConditionValue(ConditionValue conditionValue, Object value, String location);
 
     /**
      * Do setup condition value.
@@ -211,7 +239,7 @@ public abstract class ConditionKey implements Serializable {
      * @param location Location. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
+    protected abstract void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option);
 
     // ===================================================================================
@@ -277,6 +305,16 @@ public abstract class ConditionKey implements Serializable {
      */
     protected String getWildCard() {
         return "%";
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected void noticeRegistered(ColumnRealName callerName, Object value) {
+        if (_log.isDebugEnabled()) {
+            final String target = callerName + "." + _conditionKey;
+            _log.debug("The value has already registered at " + target + ": value=" + value);
+        }
     }
 
     // ===================================================================================

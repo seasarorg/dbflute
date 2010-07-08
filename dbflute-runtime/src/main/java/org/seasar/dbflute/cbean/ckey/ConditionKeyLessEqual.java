@@ -17,8 +17,6 @@ package org.seasar.dbflute.cbean.ckey;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -35,9 +33,6 @@ public class ConditionKeyLessEqual extends ConditionKey {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(ConditionKeyLessEqual.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -56,17 +51,16 @@ public class ConditionKeyLessEqual extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
+    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (value == null) {
             return false;
         }
-        if (conditionValue.hasLessEqual()) {
-            if (conditionValue.equalLessEqual(value)) {
-                final String target = callerName + "." + _conditionKey;
-                _log.debug("The value has already registered at " + target + ": value=" + value);
+        if (cvalue.isStandardQuery() && cvalue.hasLessEqual()) {
+            if (cvalue.equalLessEqual(value)) {
+                noticeRegistered(callerName, value);
                 return false;
             } else {
-                conditionValue.overrideLessEqual(value);
+                cvalue.overrideLessEqual(value);
                 return false;
             }
         }
@@ -77,7 +71,7 @@ public class ConditionKeyLessEqual extends ConditionKey {
      * {@inheritDoc}
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
-        conditionList.add(buildBindClause(columnRealName, value.getLessEqualLocation()));
+        conditionList.add(buildBindClause(columnRealName, value.getLessEqualLatestLocation()));
     }
 
     /**
@@ -85,14 +79,14 @@ public class ConditionKeyLessEqual extends ConditionKey {
      */
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ConditionOption option) {
-        throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setLessEqual(value).setLessEqualLocation(location);
+        conditionValue.setupLessEqual(value, location);
     }
 
     /**
@@ -100,6 +94,6 @@ public class ConditionKeyLessEqual extends ConditionKey {
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {
-        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 }

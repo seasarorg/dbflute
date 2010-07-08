@@ -15,22 +15,16 @@
  */
 package org.seasar.dbflute.cbean.ckey;
 
-import java.util.List;
-
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
-import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
-import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
-import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 
 /**
  * The condition-key of notLikeSearch.
  * @author jflute
  */
-public class ConditionKeyNotLikeSearch extends ConditionKey {
+public class ConditionKeyNotLikeSearch extends ConditionKeyLikeSearch {
 
     // ===================================================================================
     //                                                                          Definition
@@ -41,84 +35,35 @@ public class ConditionKeyNotLikeSearch extends ConditionKey {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    protected ConditionKeyNotLikeSearch() {
-        _conditionKey = "notLikeSearch";
-        _operand = "not like";
+    @Override
+    protected String defineConditionKey() {
+        return "notLikeSearch";
+    }
+
+    @Override
+    protected String defineOperand() {
+        return "not like";
     }
 
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
-        if (value == null) {
-            return false;
-        }
-        return true;
+
+    @Override
+    protected String getLocation(ConditionValue value) {
+        return value.getNotLikeSearchLatestLocation();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
-        throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
+    @Override
+    protected String getRealOperand(LikeSearchOption option) {
+        final ExtensionOperand extOperand = option.getExtensionOperand();
+        final String operand = extOperand != null ? extOperand.operand() : null;
+        return operand != null ? "not " + operand : getOperand();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ConditionOption option) {
-        if (option == null) {
-            String msg = "The argument 'option' should not be null:";
-            msg = msg + " columnName=" + columnRealName + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
-        if (!(option instanceof LikeSearchOption)) {
-            String msg = "The argument 'option' should be LikeSearchOption:";
-            msg = msg + " columnName=" + columnRealName + " value=" + value;
-            msg = msg + " option=" + option;
-            throw new IllegalArgumentException(msg);
-        }
-        final String location = value.getNotLikeSearchLocation(); // from NotLikeSearch
-        final LikeSearchOption myOption = (LikeSearchOption) option;
-        final String rearOption = myOption.getRearOption();
-        final ExtensionOperand extOperand = myOption.getExtensionOperand();
-        String operand = extOperand != null ? extOperand.operand() : null;
-        if (operand == null || operand.trim().length() == 0) {
-            operand = getOperand();
-        } else {
-            operand = "not " + operand; // because this is for NotLikeSearch
-        }
-        final QueryClauseArranger arranger = myOption.getWhereClauseArranger();
-        final QueryClause clause;
-        if (arranger != null) {
-            final String bindExpression = buildBindExpression(location, null);
-            final String arranged = arranger.arrange(columnRealName, operand, bindExpression, rearOption);
-            clause = new StringQueryClause(arranged);
-        } else {
-            clause = buildBindClause(columnRealName, operand, location, rearOption);
-        }
-        conditionList.add(clause);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        throw new UnsupportedOperationException("doSetupConditionValue without condition-option is unsupported!!!");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {
-        conditionValue.setNotLikeSearch((String) value, (LikeSearchOption) option).setNotLikeSearchLocation(location);
+        conditionValue.setupNotLikeSearch((String) value, (LikeSearchOption) option, location);
     }
 }

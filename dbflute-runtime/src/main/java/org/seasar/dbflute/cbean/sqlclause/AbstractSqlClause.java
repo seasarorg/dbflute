@@ -32,6 +32,7 @@ import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
@@ -944,17 +945,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                Normal
     //                                                ------
     public void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value) {
-        assertObjectNotNull("columnRealName", columnRealName);
-        final List<QueryClause> clauseList = getWhereClauseList4Register();
-        doRegisterWhereClause(clauseList, columnRealName, key, value);
+        registerWhereClause(columnRealName, key, value, null);
     }
 
     public void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
             ConditionOption option) {
         assertObjectNotNull("columnRealName", columnRealName);
-        assertObjectNotNull("option of " + columnRealName, option);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
-        doRegisterWhereClause(clauseList, columnRealName, key, value, option);
+        doRegisterWhereClause(clauseList, columnRealName, key, value, option, false, false);
     }
 
     public void registerWhereClause(String clause) {
@@ -994,15 +992,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                 Inline for Base Table
     //                                 ---------------------
     public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value) {
-        final List<QueryClause> clauseList = getBaseTableInlineWhereClauseList4Register();
-        doRegisterWhereClause(clauseList, new ColumnRealName(null, columnSqlName), key, value);
+        registerBaseTableInlineWhereClause(columnSqlName, key, value, null);
     }
 
     public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
             ConditionOption option) {
-        assertObjectNotNull("option of " + columnSqlName, option);
         final List<QueryClause> clauseList = getBaseTableInlineWhereClauseList4Register();
-        doRegisterWhereClause(clauseList, new ColumnRealName(null, columnSqlName), key, value, option);
+        doRegisterWhereClause(clauseList, new ColumnRealName(null, columnSqlName), key, value, option, true, false);
     }
 
     public void registerBaseTableInlineWhereClause(String value) {
@@ -1023,10 +1019,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                 ---------------------
     public void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
             ConditionValue value, boolean onClause) {
-        assertNotYetOuterJoin(aliasName);
-        final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
-        final ColumnRealName columnRealName = new ColumnRealName((onClause ? aliasName : ""), columnSqlName);
-        doRegisterWhereClause(clauseList, columnRealName, key, value);
+        registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, value, null, onClause);
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
@@ -1034,7 +1027,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         assertNotYetOuterJoin(aliasName);
         final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
         final ColumnRealName columnRealName = new ColumnRealName((onClause ? aliasName : ""), columnSqlName);
-        doRegisterWhereClause(clauseList, columnRealName, key, value, option);
+        doRegisterWhereClause(clauseList, columnRealName, key, value, option, true, onClause);
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause) {
@@ -1073,14 +1066,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         Assist Helper
     //                                         -------------
     protected void doRegisterWhereClause(List<QueryClause> clauseList, ColumnRealName columnRealName, ConditionKey key,
-            ConditionValue value) {
-        key.addWhereClause(clauseList, columnRealName, value);
-        markOrScopeQueryAndPart(clauseList);
-    }
+            ConditionValue value, ConditionOption option, final boolean inline, final boolean onClause) {
+        key.addWhereClause(new QueryModeProvider() {
+            public boolean isOrScopeQuery() {
+                return isOrScopeQueryEffective();
+            }
 
-    protected void doRegisterWhereClause(List<QueryClause> clauseList, ColumnRealName columnRealName, ConditionKey key,
-            ConditionValue value, ConditionOption option) {
-        key.addWhereClause(clauseList, columnRealName, value, option);
+            public boolean isInline() {
+                return inline;
+            }
+
+            public boolean isOnClause() {
+                return onClause;
+            }
+        }, clauseList, columnRealName, value, option);
         markOrScopeQueryAndPart(clauseList);
     }
 

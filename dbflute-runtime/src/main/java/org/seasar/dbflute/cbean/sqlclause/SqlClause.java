@@ -192,15 +192,7 @@ public interface SqlClause {
      * @param columnRealName The real name of column. {[alias-name].[column-name]}. (NotNull)
      * @param key Condition-key. (NotNull)
      * @param value Condition-value. (NotNull)
-     */
-    void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value);
-
-    /**
-     * Register 'where' clause.
-     * @param columnRealName The real name of column. {[alias-name].[column-name]}. (NotNull)
-     * @param key Condition-key. (NotNull)
-     * @param value Condition-value. (NotNull)
-     * @param option Condition-option. (NotNull)
+     * @param option Condition-option. (Nullable)
      */
     void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
             ConditionOption option);

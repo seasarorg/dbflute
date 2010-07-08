@@ -17,8 +17,6 @@ package org.seasar.dbflute.cbean.ckey;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -35,9 +33,6 @@ public class ConditionKeyGreaterThan extends ConditionKey {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(ConditionKeyGreaterThan.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -56,17 +51,17 @@ public class ConditionKeyGreaterThan extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    public boolean isValidRegistration(ConditionValue conditionValue, Object value, String callerName) {
+    @Override
+    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (value == null) {
             return false;
         }
-        if (conditionValue.hasGreaterThan()) {
-            if (conditionValue.equalGreaterThan(value)) {
-                final String target = callerName + "." + _conditionKey;
-                _log.debug("The value has already registered at " + target + ": value=" + value);
+        if (cvalue.isStandardQuery() && cvalue.hasGreaterThan()) {
+            if (cvalue.equalGreaterThan(value)) {
+                noticeRegistered(callerName, value);
                 return false;
             } else {
-                conditionValue.overrideGreaterThan(value);
+                cvalue.overrideGreaterThan(value);
                 return false;
             }
         }
@@ -76,30 +71,34 @@ public class ConditionKeyGreaterThan extends ConditionKey {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
-        conditionList.add(buildBindClause(columnRealName, value.getGreaterThanLocation()));
+        conditionList.add(buildBindClause(columnRealName, value.getGreaterThanLatestLocation()));
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ConditionOption option) {
-        throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setGreaterThan(value).setGreaterThanLocation(location);
+        conditionValue.setupGreaterThan(value, location);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {
-        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+        throw new UnsupportedOperationException();
     }
 }

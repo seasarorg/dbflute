@@ -31,6 +31,7 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
@@ -124,8 +125,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-    /** Is it the inline for on-clause. (Property for Inline Only) */
-    protected boolean _onClauseInline;
+    /** Is it the in-line. */
+    protected boolean _inline;
+
+    /** Is it on-clause. */
+    protected boolean _onClause;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -260,8 +264,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-    public void xsetOnClauseInline(boolean onClauseInline) {
-        _onClauseInline = onClauseInline;
+    public void xsetOnClause(boolean onClause) {
+        _onClause = onClause;
     }
 
     // ===================================================================================
@@ -274,16 +278,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     protected String getLocation(String propertyName) {
         return getLocationBase() + propertyName;
-    }
-
-    /**
-     * Get the location of the property and the key.
-     * @param propertyName The name of property. (NotNull)
-     * @param key Condition key. (NotNull)
-     * @return The location of the property and the key as path. (NotNull)
-     */
-    protected String getLocation(String propertyName, ConditionKey key) {
-        return getLocation(propertyName) + "." + key.getConditionKey();
     }
 
     /**
@@ -456,10 +450,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
     }
 
-    protected boolean isValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+    protected boolean isValidQuery(final ConditionKey key, final Object value, final ConditionValue cvalue,
+            final String columnDbName) {
         // not uses SQL name because of only logging used
         final ColumnRealName columnRealName = toColumnRealName(columnDbName);
-        if (key.isValidRegistration(cvalue, value, columnRealName.toString())) {
+        if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, columnRealName)) {
             return true;
         } else {
             if (getSqlClause().isCheckInvalidQuery()) {
@@ -470,6 +465,22 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return false;
             }
         }
+    }
+
+    protected QueryModeProvider xcreateQueryModeProvider() {
+        return new QueryModeProvider() {
+            public boolean isOrScopeQuery() {
+                return getSqlClause().isOrScopeQueryEffective();
+            }
+
+            public boolean isInline() {
+                return _inline;
+            }
+
+            public boolean isOnClause() {
+                return _onClause;
+            }
+        };
     }
 
     protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, ColumnRealName columnRealName) {
@@ -650,18 +661,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));
+        key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, getLocation(uncapPropName));
         final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
         if (isBaseQuery()) {
             getSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue);
         } else {
             final String aliasName = getRealAliasName();
-            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, _onClauseInline);
+            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, _onClause);
         }
     }
 
-    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
-            ConditionOption option) {
+    protected void regIQ(final ConditionKey key, final Object value, final ConditionValue cvalue,
+            final String columnDbName, final ConditionOption option) {
         if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
@@ -670,14 +681,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);
+        final String location = getLocation(uncapPropName);
+        key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
         final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
         if (isBaseQuery()) {
             getSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, option);
         } else {
             final String aliasName = getRealAliasName();
-            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, option,
-                    _onClauseInline);
+            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, option, _onClause);
         }
     }
 
@@ -871,24 +882,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          ------------
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
             String columnDbName) {
-        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
-        final String propertyName = columnInfo.getPropertyName();
-        final String uncapPropName = initUncap(propertyName);
-        // If Java, it is necessary to use uncapPropName!
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));
-        getSqlClause().registerWhereClause(toColumnRealName(columnInfo.getColumnDbName()), key, cvalue);
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, null);
     }
 
-    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
-            String columnDbName, ConditionOption option) {
-        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+    protected void setupConditionValueAndRegisterWhereClause(final ConditionKey key, final Object value,
+            final ConditionValue cvalue, final String columnDbName, final ConditionOption option) {
+        final DBMeta dbmeta = findDBMeta(getTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);
-        getSqlClause().registerWhereClause(toColumnRealName(columnInfo.getColumnDbName()), key, cvalue, option);
+        final String location = getLocation(uncapPropName);
+        key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
+        getSqlClause().registerWhereClause(toColumnRealName(columnDbName), key, cvalue, option);
     }
 
     protected void registerWhereClause(String whereClause) {
@@ -899,7 +905,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (isBaseQuery()) {
             getSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClauseInline);
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClause);
         }
     }
 
@@ -1642,6 +1648,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String titleName = DfTypeUtil.toClassTitle(this);
         return titleName + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel + ", subQueryLevel="
                 + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName + ", relationPath=" + _relationPath
-                + ", onClauseInline=" + _onClauseInline + "}";
+                + ", onClauseInline=" + _onClause + "}";
     }
 }
