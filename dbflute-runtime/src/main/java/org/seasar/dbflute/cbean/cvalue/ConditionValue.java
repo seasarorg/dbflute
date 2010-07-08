@@ -40,6 +40,8 @@ public class ConditionValue implements Serializable {
     protected Map<String, Object> _fixedValueMap;
     protected Map<String, Map<String, Object>> _varyingValueMap;
     protected boolean _orScopeQuery;
+    protected boolean _inline;
+    protected boolean _onClause;
 
     // ===================================================================================
     //                                                                               Equal
@@ -641,6 +643,7 @@ public class ConditionValue implements Serializable {
         }
 
         protected Object getStandardValue(ConditionKey conditionKey) {
+            // now only or-scope query is independent
             return _orScopeQuery ? getVaryingValue(conditionKey) : getFixedValue(conditionKey);
         }
 
@@ -704,18 +707,22 @@ public class ConditionValue implements Serializable {
 
     public <RESULT> RESULT process(CallbackProcessor<RESULT> processor) {
         try {
-            // now only or-scope query is independent
-            _orScopeQuery = processor.getProvider().isOrScopeQuery();
+            final QueryModeProvider provider = processor.getProvider();
+            _orScopeQuery = provider.isOrScopeQuery();
+            _inline = provider.isInline();
+            _onClause = provider.isOnClause();
             return processor.process();
         } finally {
             _orScopeQuery = false;
+            _inline = false;
+            _onClause = false;
         }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public boolean isStandardQuery() {
+    public boolean isFixedQuery() {
         return !_orScopeQuery;
     }
 

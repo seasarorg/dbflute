@@ -55,7 +55,7 @@ public class ConditionKeyLessEqual extends ConditionKey {
         if (value == null) {
             return false;
         }
-        if (cvalue.isStandardQuery() && cvalue.hasLessEqual()) {
+        if (cvalue.isFixedQuery() && cvalue.hasLessEqual()) {
             if (cvalue.equalLessEqual(value)) {
                 noticeRegistered(callerName, value);
                 return false;

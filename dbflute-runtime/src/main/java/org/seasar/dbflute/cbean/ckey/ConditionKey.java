@@ -313,7 +313,7 @@ public abstract class ConditionKey implements Serializable {
     protected void noticeRegistered(ColumnRealName callerName, Object value) {
         if (_log.isDebugEnabled()) {
             final String target = callerName + "." + _conditionKey;
-            _log.debug("The value has already registered at " + target + ": value=" + value);
+            _log.debug("*Found the duplicate query: target=" + target + " value=" + value);
         }
     }
 

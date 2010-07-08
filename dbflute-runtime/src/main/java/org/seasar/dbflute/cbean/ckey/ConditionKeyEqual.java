@@ -56,7 +56,7 @@ public class ConditionKeyEqual extends ConditionKey {
         if (value == null) {
             return false;
         }
-        if (cvalue.isStandardQuery() && cvalue.hasEqual()) {
+        if (cvalue.isFixedQuery() && cvalue.hasEqual()) {
             if (cvalue.equalEqual(value)) {
                 noticeRegistered(callerName, value);
                 return false;

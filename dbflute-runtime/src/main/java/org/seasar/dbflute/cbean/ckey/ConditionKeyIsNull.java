@@ -52,7 +52,7 @@ public class ConditionKeyIsNull extends ConditionKey {
      * {@inheritDoc}
      */
     protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        if (cvalue.isStandardQuery() && cvalue.hasIsNull()) {
+        if (cvalue.isFixedQuery() && cvalue.hasIsNull()) {
             noticeRegistered(callerName, value);
             return false;
         }

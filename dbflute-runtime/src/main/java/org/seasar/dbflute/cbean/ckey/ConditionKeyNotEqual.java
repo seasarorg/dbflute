@@ -57,7 +57,7 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
         if (value == null) {
             return false;
         }
-        if (cvalue.isStandardQuery() && cvalue.hasNotEqual()) {
+        if (cvalue.isFixedQuery() && cvalue.hasNotEqual()) {
             if (cvalue.equalNotEqual(value)) {
                 noticeRegistered(callerName, value);
                 return false;

@@ -56,7 +56,7 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
         if (value == null) {
             return false;
         }
-        if (cvalue.isStandardQuery() && cvalue.hasGreaterEqual()) {
+        if (cvalue.isFixedQuery() && cvalue.hasGreaterEqual()) {
             if (cvalue.equalGreaterEqual(value)) {
                 noticeRegistered(callerName, value);
                 return false;
