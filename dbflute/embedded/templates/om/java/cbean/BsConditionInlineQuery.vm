@@ -32,6 +32,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _myCQ = myCQ;
         _foreignPropertyName = _myCQ.getForeignPropertyName(); // accept foreign property name
         _relationPath = _myCQ.getRelationPath(); // accept relation path
+        _inline = true;
     }
 
     // ===================================================================================
@@ -60,7 +61,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     @Override
     protected boolean isInScopeRelationSuppressLocalAliasName() {
-        if (_onClauseInline) {
+        if (_onClause) {
             throw new IllegalConditionBeanOperationException("InScopeRelation on OnClause is unsupported.");
         }
         return true;

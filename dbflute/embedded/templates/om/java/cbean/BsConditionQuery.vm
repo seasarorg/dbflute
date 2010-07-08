@@ -42,7 +42,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      */
     public ${myConditionInlineQueryClassName} inline() {
         if (_inlineQuery == null) { _inlineQuery = createInlineQuery(); }
-        _inlineQuery.xsetOnClauseInline(false); return _inlineQuery;
+        _inlineQuery.xsetOnClause(false); return _inlineQuery;
     }
 
     protected ${myConditionInlineQueryClassName} createInlineQuery()
@@ -59,7 +59,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      */
     public ${myConditionInlineQueryClassName} on() {
         if (isBaseQuery()) { throw new IllegalConditionBeanOperationException("OnClause for local table is unavailable!"); }
-        ${myConditionInlineQueryClassName} inlineQuery = inline(); inlineQuery.xsetOnClauseInline(true); return inlineQuery;
+        ${myConditionInlineQueryClassName} inlineQuery = inline(); inlineQuery.xsetOnClause(true); return inlineQuery;
     }
 
     // ===================================================================================
