@@ -35,10 +35,17 @@ public class ConditionValue implements Serializable {
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
+    public static final String FIXED_KEY_QUERY = "query";
+    public static final String FIXED_KEY_INLINE = "inline";
+    public static final String FIXED_KEY_ONCLAUSE = "onClause";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The map of fixed values. map:{[query or inline or onClause] = map:{[condition-key] = [value]}} */
     protected Map<String, Map<String, Object>> _fixedValueMap;
+
+    /** The map of varying values. map:{[condition-key] = map:{[varying-key] = [value]}} */
     protected Map<String, Map<String, Object>> _varyingValueMap;
 
     // temporary query modes:
@@ -592,12 +599,12 @@ public class ConditionValue implements Serializable {
     protected String getFixedValueKey() {
         if (_inline) {
             if (_onClause) {
-                return "onClause";
+                return FIXED_KEY_ONCLAUSE;
             } else {
-                return "inline";
+                return FIXED_KEY_INLINE;
             }
         } else { // normal query
-            return "query";
+            return FIXED_KEY_QUERY;
         }
     }
 
@@ -764,10 +771,42 @@ public class ConditionValue implements Serializable {
         return !_orScopeQuery;
     }
 
+    /**
+     * Get the map of fixed values. {basically for parameter-comment} <br />
+     * @return The map of fixed values. map:{[query or inline or onClause] = map:{[condition-key] = [value]}} (Nullable)
+     */
     public Map<String, Map<String, Object>> getFixed() {
         return _fixedValueMap;
     }
 
+    /**
+     * Get the map of fixed values for query. {basically for internal tests} <br />
+     * @return A map instance. map:{[condition-key] = [value]} (Nullable)
+     */
+    public Map<String, Object> getFixedQuery() {
+        return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_QUERY) : null;
+    }
+
+    /**
+     * Get the map of fixed values for in-line. {basically for internal tests} <br />
+     * @return A map instance. map:{[condition-key] = [value]} (Nullable)
+     */
+    public Map<String, Object> getFixedInline() {
+        return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_INLINE) : null;
+    }
+
+    /**
+     * Get the map of fixed values for on-clause. {basically for internal tests} <br />
+     * @return A map instance. map:{[condition-key] = [value]} (Nullable)
+     */
+    public Map<String, Object> getFixedOnClause() {
+        return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_ONCLAUSE) : null;
+    }
+
+    /**
+     * Get the map of varying values. {basically for parameter-comment} <br />
+     * @return The map of varying values. map:{[condition-key] = map:{[varying-key] = [value]}} (Nullable)
+     */
     public Map<String, Map<String, Object>> getVarying() {
         return _varyingValueMap;
     }
