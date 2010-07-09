@@ -248,6 +248,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected <CB extends ConditionBean> void xorSQ(CB cb, OrQuery<CB> orQuery) {
         assertQueryPurpose();
         if (getSqlClause().isOrScopeQueryAndPartEffective()) {
+            // limit because of so complex
             String msg = "The OrScopeQuery in and-part is unsupported: " + getTableDbName();
             throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
         }

@@ -612,6 +612,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         } else {
             // as 'or' condition
             if (orScopeQueryAndPart) {
+                // limit because of so complex
                 String msg = "The AsOrSplit in and-part is unsupported: " + getTableDbName();
                 throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
             }
