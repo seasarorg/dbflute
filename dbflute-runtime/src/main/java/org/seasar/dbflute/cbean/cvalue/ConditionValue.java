@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean.cvalue;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,11 +38,11 @@ public class ConditionValue implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Map<String, Object> _fixedValueMap;
+    protected Map<String, Map<String, Object>> _fixedValueMap;
     protected Map<String, Map<String, Object>> _varyingValueMap;
     protected boolean _orScopeQuery;
     protected boolean _inline;
-    protected boolean _onClause;
+    protected boolean _onClause; // if true, in-line is also true
 
     // ===================================================================================
     //                                                                               Equal
@@ -560,33 +561,65 @@ public class ConditionValue implements Serializable {
     // ===================================================================================
     //                                                                      Value Handling
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                                 Fixed
+    //                                                 -----
     protected Object getFixedValue(ConditionKey conditionKey) {
-        if (_fixedValueMap == null) {
+        if (!hasFixedValue(conditionKey)) {
             return null;
         }
-        return _fixedValueMap.get(conditionKey.getConditionKey());
+        return _fixedValueMap.get(getFixedValueKey()).get(conditionKey.getConditionKey());
     }
 
     protected String setupFixedValue(ConditionKey conditionKey, Object value) {
         if (_fixedValueMap == null) {
-            _fixedValueMap = new LinkedHashMap<String, Object>();
+            // query or in-line or on-clause
+            _fixedValueMap = new HashMap<String, Map<String, Object>>(3);
+        }
+        final String fixedValueKey = getFixedValueKey();
+        Map<String, Object> elementMap = _fixedValueMap.get(fixedValueKey);
+        if (elementMap == null) {
+            elementMap = new HashMap<String, Object>(8);
+            _fixedValueMap.put(fixedValueKey, elementMap);
         }
         final String key = conditionKey.getConditionKey();
-        _fixedValueMap.put(key, value);
-        return "fixed." + key;
+        elementMap.put(key, value);
+        return "fixed." + fixedValueKey + "." + key;
+    }
+
+    protected String getFixedValueKey() {
+        if (_inline) {
+            if (_onClause) {
+                return "onClause";
+            } else {
+                return "inline";
+            }
+        } else {
+            return "query";
+        }
     }
 
     protected boolean hasFixedValue(ConditionKey conditionKey) {
-        return _fixedValueMap != null && _fixedValueMap.containsKey(conditionKey.getConditionKey());
+        if (_fixedValueMap == null) {
+            return false;
+        }
+        final Map<String, Object> elementMap = _fixedValueMap.get(getFixedValueKey());
+        if (elementMap == null) {
+            return false;
+        }
+        return elementMap.containsKey(conditionKey.getConditionKey());
     }
 
+    // -----------------------------------------------------
+    //                                               Varying
+    //                                               -------
     protected Object getVaryingValue(ConditionKey conditionKey) {
         throw new IllegalStateException();
     }
 
     protected String setupVaryingValue(ConditionKey conditionKey, Object value) {
         if (_varyingValueMap == null) {
-            _varyingValueMap = new LinkedHashMap<String, Map<String, Object>>();
+            _varyingValueMap = new HashMap<String, Map<String, Object>>(4);
         }
         final String key = conditionKey.getConditionKey();
         Map<String, Object> elementMap = _varyingValueMap.get(key);
@@ -603,6 +636,9 @@ public class ConditionValue implements Serializable {
         throw new IllegalStateException();
     }
 
+    // -----------------------------------------------------
+    //                                                Hanler
+    //                                                ------
     protected static interface ValueHandler {
         Object getValue();
 
@@ -643,7 +679,6 @@ public class ConditionValue implements Serializable {
         }
 
         protected Object getStandardValue(ConditionKey conditionKey) {
-            // now only or-scope query is independent
             return _orScopeQuery ? getVaryingValue(conditionKey) : getFixedValue(conditionKey);
         }
 
@@ -723,10 +758,11 @@ public class ConditionValue implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     public boolean isFixedQuery() {
+        // or-scope query is completely independent
         return !_orScopeQuery;
     }
 
-    public Map<String, Object> getFixed() {
+    public Map<String, Map<String, Object>> getFixed() {
         return _fixedValueMap;
     }
 

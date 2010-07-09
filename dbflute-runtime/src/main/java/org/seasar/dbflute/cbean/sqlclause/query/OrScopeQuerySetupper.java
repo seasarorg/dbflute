@@ -25,8 +25,6 @@ import org.seasar.dbflute.util.Srl;
  */
 public class OrScopeQuerySetupper {
 
-    public static final String AND_PART_MARK = "$$df:AndPart$$";
-
     public void setupOrScopeQuery(List<OrScopeQueryClauseGroup> clauseGroupList, List<QueryClause> realList,
             boolean line) {
         if (clauseGroupList == null || clauseGroupList.isEmpty()) {
@@ -34,9 +32,9 @@ public class OrScopeQuerySetupper {
         }
         final String or = " or ";
         final String and = " and ";
-        final String lnIndentOr = line ? ln() + "   " : "";
+        final String lnIndentOr = line ? ln() + "    " : "";
         final String lnIndentAnd = ""; // no line separator either way
-        final String andPartMark = getOrScopeQueryAndPartMark();
+        final String lnIndentAndLn = line ? ln() + "      " : "";
         final StringBuilder sb = new StringBuilder();
         boolean exists = false;
         int validCount = 0;
@@ -47,26 +45,34 @@ public class OrScopeQuerySetupper {
                 continue; // not increment index
             }
             int listIndex = 0;
-            boolean inAndPart = false;
+            Integer preAndPartIdentity = null;
             for (QueryClause clauseElement : orClauseList) {
-                String orClause = clauseElement.toString();
-                final boolean currentAndPart = orClause.startsWith(andPartMark);
+                final String orClause = clauseElement.toString();
+                OrScopeQueryAndPartQueryClause andPartClause = null;
+                if (clauseElement instanceof OrScopeQueryAndPartQueryClause) {
+                    andPartClause = (OrScopeQueryAndPartQueryClause) clauseElement;
+                }
                 final boolean beginAndPart;
                 final boolean secondAndPart;
-                if (currentAndPart) {
-                    if (inAndPart) { // already begin
-                        beginAndPart = false;
-                        secondAndPart = true;
-                    } else {
+                if (andPartClause != null) {
+                    final int identity = andPartClause.getIdentity();
+                    if (preAndPartIdentity == null) { // first of and-part
+                        preAndPartIdentity = identity;
                         beginAndPart = true;
                         secondAndPart = false;
-                        inAndPart = true;
+                    } else if (preAndPartIdentity == identity) { // same and-part
+                        beginAndPart = false;
+                        secondAndPart = true;
+                    } else { // other and-part
+                        sb.append(")"); // closing a previous and-part
+                        preAndPartIdentity = identity;
+                        beginAndPart = true;
+                        secondAndPart = false;
                     }
-                    orClause = orClause.substring(andPartMark.length());
                 } else {
-                    if (inAndPart) {
-                        sb.append(")");
-                        inAndPart = false;
+                    if (preAndPartIdentity != null) {
+                        sb.append(")"); // closing an and-part
+                        preAndPartIdentity = null;
                     }
                     beginAndPart = false;
                     secondAndPart = false;
@@ -75,7 +81,8 @@ public class OrScopeQuerySetupper {
                     if (listIndex == 0) {
                         sb.append("(");
                     } else {
-                        sb.append(secondAndPart ? lnIndentAnd : lnIndentOr);
+                        final boolean containsLn = orClause.contains(ln());
+                        sb.append(secondAndPart ? (containsLn ? lnIndentAndLn : lnIndentAnd) : lnIndentOr);
                         sb.append(secondAndPart ? and : or);
                     }
                 } else { // second or more list
@@ -85,7 +92,8 @@ public class OrScopeQuerySetupper {
                         sb.append(or);
                         sb.append("(");
                     } else {
-                        sb.append(secondAndPart ? lnIndentAnd : lnIndentOr);
+                        final boolean containsLn = orClause.contains(ln());
+                        sb.append(secondAndPart ? (containsLn ? lnIndentAndLn : lnIndentAnd) : lnIndentOr);
                         sb.append(secondAndPart ? and : or);
                     }
                 }
@@ -97,12 +105,12 @@ public class OrScopeQuerySetupper {
                 }
                 ++listIndex;
             }
-            if (inAndPart) {
-                sb.append(")");
-                inAndPart = false;
+            if (preAndPartIdentity != null) {
+                sb.append(")"); // closing an and-part
+                preAndPartIdentity = null;
             }
             if (groupListIndex > 0) { // second or more list
-                sb.append(")");
+                sb.append(")"); // closing an or-scope
             }
             ++groupListIndex;
         }
@@ -110,10 +118,6 @@ public class OrScopeQuerySetupper {
             sb.append(line && validCount > 1 ? ln() + "       " : "").append(")");
             realList.add(new StringQueryClause(sb.toString()));
         }
-    }
-
-    protected String getOrScopeQueryAndPartMark() {
-        return AND_PART_MARK;
     }
 
     // ===================================================================================

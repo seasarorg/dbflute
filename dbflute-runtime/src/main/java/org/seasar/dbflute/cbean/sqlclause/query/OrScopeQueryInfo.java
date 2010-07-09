@@ -54,7 +54,7 @@ public class OrScopeQueryInfo {
 
     public List<QueryClause> getTmpOrWhereList() {
         if (_tmpOrWhereList == null) {
-            _tmpOrWhereList = new ArrayList<QueryClause>();
+            _tmpOrWhereList = new ArrayList<QueryClause>(4);
         }
         return _tmpOrWhereList;
     }
@@ -65,7 +65,7 @@ public class OrScopeQueryInfo {
 
     public List<QueryClause> getTmpOrBaseTableInlineWhereList() {
         if (_tmpOrBaseTableInlineWhereList == null) {
-            _tmpOrBaseTableInlineWhereList = new ArrayList<QueryClause>();
+            _tmpOrBaseTableInlineWhereList = new ArrayList<QueryClause>(2);
         }
         return _tmpOrBaseTableInlineWhereList;
     }
@@ -76,7 +76,7 @@ public class OrScopeQueryInfo {
 
     public Map<String, List<QueryClause>> getTmpOrAdditionalOnClauseListMap() {
         if (_tmpOrAdditionalOnClauseListMap == null) {
-            _tmpOrAdditionalOnClauseListMap = new LinkedHashMap<String, List<QueryClause>>();
+            _tmpOrAdditionalOnClauseListMap = new LinkedHashMap<String, List<QueryClause>>(2);
         }
         return _tmpOrAdditionalOnClauseListMap;
     }
@@ -87,7 +87,7 @@ public class OrScopeQueryInfo {
 
     public Map<String, List<QueryClause>> getTmpOrOuterJoinInlineClauseListMap() {
         if (_tmpOrOuterJoinInlineClauseListMap == null) {
-            _tmpOrOuterJoinInlineClauseListMap = new LinkedHashMap<String, List<QueryClause>>();
+            _tmpOrOuterJoinInlineClauseListMap = new LinkedHashMap<String, List<QueryClause>>(2);
         }
         return _tmpOrOuterJoinInlineClauseListMap;
     }

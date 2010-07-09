@@ -37,9 +37,9 @@ import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
+import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryAndPartQueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryReflector;
-import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQuerySetupper;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
@@ -89,7 +89,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected DBMetaProvider _dbmetaProvider;
 
     /** The cache map of DB meta for basically related tables. */
-    protected final Map<String, DBMeta> _cachedDBMetaMap = StringKeyMap.createAsFlexible();
+    protected Map<String, DBMeta> _cachedDBMetaMap;
 
     // -----------------------------------------------------
     //                                       Clause Resource
@@ -98,7 +98,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // The resources that are not frequently used to are lazy-loaded for performance.
     // - - - - - - - - - -/
     /** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}} */
-    protected final Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
+    protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap;
 
     /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
     protected Map<String, Map<String, String>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
@@ -110,7 +110,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected Map<String, String> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
-    protected final Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>(); // order no needed
+    protected Map<String, String> _selectClauseRealColumnAliasMap;
 
     /** The type of select clause. (NotNull) */
     protected SelectClauseType _selectClauseType = DEFAULT_SELECT_CLAUSE_TYPE;
@@ -128,19 +128,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected boolean _useSelectIndex = true;
 
     /** The map of outer join. */
-    protected final Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>(4);
+    protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
     /** Is inner-join effective? Default value is false. */
     protected boolean _innerJoinEffective;
 
     /** The list of where clause. */
-    protected final List<QueryClause> _whereList = new ArrayList<QueryClause>(8);
+    protected List<QueryClause> _whereList;
 
     /** The list of in-line where clause for base table. */
-    protected final List<QueryClause> _baseTableInlineWhereList = new ArrayList<QueryClause>(2);
+    protected List<QueryClause> _baseTableInlineWhereList;
 
     /** The clause of order-by. (NotNull) */
-    protected final OrderByClause _orderByClause = new OrderByClause();
+    protected OrderByClause _orderByClause;
 
     /** The list of union clause. (Nullable: This is lazy-loaded) */
     protected List<UnionQueryInfo> _unionQueryInfoList;
@@ -166,19 +166,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                          OrScopeQuery
     //                                          ------------
-    /** Is or-query scope effective?*/
+    /** Is or-scope query effective?*/
     protected boolean _orScopeQueryEffective;
 
-    /** The current temporary information of or-query scope?*/
+    /** The current temporary information of or-scope query?*/
     protected OrScopeQueryInfo _currentTmpOrScopeQueryInfo;
 
-    /** Is or-query scope in and-part?*/
+    /** Is or-scope query in and-part?*/
     protected boolean _orScopeQueryAndPartEffective;
+
+    /** The identity for and-part of or-scope query */
+    protected int _orScopeQueryAndPartIdentity;
 
     // -----------------------------------------------------
     //                                       SubQuery Indent
     //                                       ---------------
-    protected final SubQueryIndentProcessor _subQueryIndentProcessor = new SubQueryIndentProcessor();
+    protected SubQueryIndentProcessor _subQueryIndentProcessor;
 
     // -----------------------------------------------------
     //                                 Selected Foreign Info
@@ -318,7 +321,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String prepareClauseOrderBy() {
-        if (!_orderByEffective || _orderByClause.isEmpty()) {
+        if (!_orderByEffective || !hasOrderByClause()) {
             return "";
         }
         final StringBuilder sb = new StringBuilder();
@@ -412,6 +415,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             _selectIndexMap = createSelectIndexMap();
         }
 
+        final Map<String, String> selectClauseRealColumnAliasMap = getSelectClauseRealColumnAliasMap();
+
         // Columns of local table.
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
@@ -452,13 +457,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 onQueryName = columnSqlName.toString();
             }
             sb.append(realColumnName).append(" as ").append(onQueryName);
-            _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
+            selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
         }
 
         // Columns of foreign tables.
-        final Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
-        for (String tableAliasName : tableAliasNameSet) {
-            final Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
+        final Set<Entry<String, Map<String, SelectedSelectColumnInfo>>> entrySet = getSelectedSelectColumnMap()
+                .entrySet();
+        for (Entry<String, Map<String, SelectedSelectColumnInfo>> entry : entrySet) {
+            final String tableAliasName = entry.getKey();
+            final Map<String, SelectedSelectColumnInfo> map = entry.getValue();
             final Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
             Map<String, String> foreginSpecifiedMap = null;
             if (_specifiedSelectColumnMap != null) {
@@ -486,7 +493,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     finishedForeignIndent = true;
                 }
                 sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
-                _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
+                selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
             }
         }
 
@@ -506,12 +513,26 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                         aliasName = aliasName.substring(0, endIndex);
                     }
                     // for SpecifiedDerivedOrderBy
-                    _selectClauseRealColumnAliasMap.put(aliasName, aliasName);
+                    selectClauseRealColumnAliasMap.put(aliasName, aliasName);
                 }
             }
         }
 
         return sb.toString();
+    }
+
+    protected Map<String, Map<String, SelectedSelectColumnInfo>> getSelectedSelectColumnMap() {
+        if (_selectedSelectColumnMap == null) {
+            _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
+        }
+        return _selectedSelectColumnMap;
+    }
+
+    protected Map<String, String> getSelectClauseRealColumnAliasMap() {
+        if (_selectClauseRealColumnAliasMap == null) {
+            _selectClauseRealColumnAliasMap = new HashMap<String, String>(); // order no needed
+        }
+        return _selectClauseRealColumnAliasMap;
     }
 
     // -----------------------------------------------------
@@ -650,17 +671,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append("from ");
         int tablePos = 7; // basically for in-line view indent
         if (isJoinInParentheses()) {
-            for (int i = 0; i < _outerJoinMap.size(); i++) {
+            for (int i = 0; i < getOuterJoinMap().size(); i++) {
                 sb.append("(");
                 ++tablePos;
             }
         }
         final TableSqlName tableSqlName = getDBMeta().getTableSqlName();
-        if (_baseTableInlineWhereList.isEmpty()) {
-            sb.append(tableSqlName).append(" dflocal");
-        } else {
-            sb.append(getInlineViewClause(tableSqlName, _baseTableInlineWhereList, tablePos));
+        if (hasBaseTableInlineWhereClause()) {
+            final List<QueryClause> baseTableInlineWhereList = getBaseTableInlineWhereList();
+            sb.append(getInlineViewClause(tableSqlName, baseTableInlineWhereList, tablePos));
             sb.append(" dflocal");
+        } else {
+            sb.append(tableSqlName).append(" dflocal");
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -668,13 +690,24 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected String getLeftOuterJoinClause() {
         final StringBuilder sb = new StringBuilder();
-        final Set<Entry<String, LeftOuterJoinInfo>> outerJoinSet = _outerJoinMap.entrySet();
+        final Set<Entry<String, LeftOuterJoinInfo>> outerJoinSet = getOuterJoinMap().entrySet();
         for (Entry<String, LeftOuterJoinInfo> outerJoinEntry : outerJoinSet) {
             final String aliasName = outerJoinEntry.getKey();
             final LeftOuterJoinInfo joinInfo = outerJoinEntry.getValue();
             buildLeftOuterJoinClause(sb, aliasName, joinInfo);
         }
         return sb.toString();
+    }
+
+    protected Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
+        if (_outerJoinMap == null) {
+            _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>(4);
+        }
+        return _outerJoinMap;
+    }
+
+    protected boolean hasOuterJoin() {
+        return _outerJoinMap != null && !_outerJoinMap.isEmpty();
     }
 
     protected void buildLeftOuterJoinClause(StringBuilder sb, String aliasName, LeftOuterJoinInfo joinInfo) {
@@ -774,7 +807,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          Where Clause
     //                                          ------------
     public String getWhereClause() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         buildWhereClause(sb);
         return sb.toString();
     }
@@ -784,14 +817,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void buildWhereClause(StringBuilder sb, boolean template) {
-        if (_whereList.isEmpty()) {
+        final List<QueryClause> whereList = getWhereList();
+        if (whereList.isEmpty()) {
             if (template) {
                 sb.append(getWhereClauseMark());
             }
             return;
         }
         int count = 0;
-        for (QueryClause whereClause : _whereList) {
+        for (QueryClause whereClause : whereList) {
             final String clauseElement = filterWhereClauseSimply(whereClause.toString());
             if (count == 0) {
                 sb.append(ln()).append(" ");
@@ -808,15 +842,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                        OrderBy Clause
     //                                        --------------
     public String getOrderByClause() {
+        final OrderByClause orderBy = getOrderBy();
         String orderByClause = null;
         if (hasUnionQuery()) {
-            if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.isEmpty()) {
-                String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists.";
+            final Map<String, String> selectClauseRealColumnAliasMap = getSelectClauseRealColumnAliasMap();
+            if (selectClauseRealColumnAliasMap.isEmpty()) {
+                String msg = "The selectClauseColumnAliasMap should not be empty when union query exists.";
                 throw new IllegalStateException(msg);
             }
-            orderByClause = _orderByClause.getOrderByClause(_selectClauseRealColumnAliasMap);
+            orderByClause = orderBy.getOrderByClause(selectClauseRealColumnAliasMap);
         } else {
-            orderByClause = _orderByClause.getOrderByClause();
+            orderByClause = orderBy.getOrderByClause();
         }
         if (orderByClause != null && orderByClause.trim().length() > 0) {
             return ln() + " " + orderByClause;
@@ -850,8 +886,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     public void registerSelectedSelectColumn(String foreignTableAliasName, String localTableDbName,
             String foreignPropertyName, String localRelationPath) {
-        _selectedSelectColumnMap.put(foreignTableAliasName, createSelectedSelectColumnInfo(foreignTableAliasName,
-                localTableDbName, foreignPropertyName, localRelationPath));
+        final Map<String, SelectedSelectColumnInfo> columnInfoMap = createSelectedSelectColumnInfo(
+                foreignTableAliasName, localTableDbName, foreignPropertyName, localRelationPath);
+        getSelectedSelectColumnMap().put(foreignTableAliasName, columnInfoMap);
     }
 
     protected Map<String, SelectedSelectColumnInfo> createSelectedSelectColumnInfo(String foreignTableAliasName,
@@ -898,17 +935,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_innerJoinEffective) { // basically false
             joinInfo.setInnerJoin(true);
         }
-        _outerJoinMap.put(aliasName, joinInfo);
+        getOuterJoinMap().put(aliasName, joinInfo);
     }
 
     /**
      * {@inheritDoc}
      */
     public void changeToInnerJoin(String aliasName) {
-        final LeftOuterJoinInfo joinInfo = _outerJoinMap.get(aliasName);
+        final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
+        final LeftOuterJoinInfo joinInfo = outerJoinMap.get(aliasName);
         if (joinInfo == null) {
             String msg = "The aliasName should be registered:";
-            msg = msg + " aliasName=" + aliasName + " outerJoinMap=" + _outerJoinMap.keySet();
+            msg = msg + " aliasName=" + aliasName + " outerJoinMap=" + outerJoinMap;
             throw new IllegalStateException(msg);
         }
         joinInfo.setInnerJoin(true);
@@ -925,7 +963,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void assertAlreadyOuterJoin(String aliasName) {
-        if (_outerJoinMap.containsKey(aliasName)) {
+        if (getOuterJoinMap().containsKey(aliasName)) {
             String msg = "The alias name have already registered in outer join: " + aliasName;
             throw new IllegalStateException(msg);
         }
@@ -971,17 +1009,25 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_orScopeQueryEffective) {
             return getTmpOrWhereList();
         } else {
-            return _whereList;
+            return getWhereList();
         }
     }
 
     public void exchangeFirstWhereClauseForLastOne() {
-        if (_whereList.size() > 1) {
-            final QueryClause first = _whereList.get(0);
-            final QueryClause last = _whereList.get(_whereList.size() - 1);
-            _whereList.set(0, last);
-            _whereList.set(_whereList.size() - 1, first);
+        final List<QueryClause> whereList = getWhereList();
+        if (whereList.size() > 1) {
+            final QueryClause first = whereList.get(0);
+            final QueryClause last = whereList.get(whereList.size() - 1);
+            whereList.set(0, last);
+            whereList.set(whereList.size() - 1, first);
         }
+    }
+
+    protected List<QueryClause> getWhereList() {
+        if (_whereList == null) {
+            _whereList = new ArrayList<QueryClause>(8);
+        }
+        return _whereList;
     }
 
     public boolean hasWhereClause() {
@@ -1010,8 +1056,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_orScopeQueryEffective) {
             return getTmpOrBaseTableInlineWhereList();
         } else {
-            return _baseTableInlineWhereList;
+            return getBaseTableInlineWhereList();
         }
+    }
+
+    protected List<QueryClause> getBaseTableInlineWhereList() {
+        if (_baseTableInlineWhereList == null) {
+            _baseTableInlineWhereList = new ArrayList<QueryClause>(2);
+        }
+        return _baseTableInlineWhereList;
+    }
+
+    protected boolean hasBaseTableInlineWhereClause() {
+        return _baseTableInlineWhereList != null && !_baseTableInlineWhereList.isEmpty();
     }
 
     // -----------------------------------------------------
@@ -1037,7 +1094,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected List<QueryClause> getOuterJoinInlineWhereClauseList4Register(String aliasName, boolean onClause) {
-        final LeftOuterJoinInfo joinInfo = _outerJoinMap.get(aliasName);
+        final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(aliasName);
         final List<QueryClause> clauseList;
         if (onClause) {
             if (_orScopeQueryEffective) {
@@ -1056,7 +1113,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void assertNotYetOuterJoin(String aliasName) {
-        if (!_outerJoinMap.containsKey(aliasName)) {
+        if (!getOuterJoinMap().containsKey(aliasName)) {
             String msg = "The alias name have not registered in outer join yet: " + aliasName;
             throw new IllegalStateException(msg);
         }
@@ -1127,7 +1184,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected OrScopeQueryReflector createOrClauseReflector() {
-        return new OrScopeQueryReflector(_whereList, _baseTableInlineWhereList, _outerJoinMap);
+        return new OrScopeQueryReflector(getWhereList(), getBaseTableInlineWhereList(), getOuterJoinMap());
     }
 
     public boolean isOrScopeQueryEffective() {
@@ -1160,6 +1217,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void beginOrScopeQueryAndPart() {
         assertCurrentTmpOrScopeQueryInfo();
+        ++_orScopeQueryAndPartIdentity;
         _orScopeQueryAndPartEffective = true;
     }
 
@@ -1171,12 +1229,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected void markOrScopeQueryAndPart(List<QueryClause> clauseList) {
         if (_orScopeQueryEffective && _orScopeQueryAndPartEffective && !clauseList.isEmpty()) {
             final QueryClause original = clauseList.remove(clauseList.size() - 1); // as latest
-            clauseList.add(new StringQueryClause(getOrScopeQueryAndPartMark() + original));
+            clauseList.add(new OrScopeQueryAndPartQueryClause(original, _orScopeQueryAndPartIdentity));
         }
-    }
-
-    protected String getOrScopeQueryAndPartMark() {
-        return OrScopeQuerySetupper.AND_PART_MARK;
     }
 
     protected void assertCurrentTmpOrScopeQueryInfo() {
@@ -1191,17 +1245,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                             OrderBy
     //                                                                             =======
     public OrderByClause getSqlComponentOfOrderByClause() {
-        return _orderByClause;
+        return getOrderBy();
     }
 
     public SqlClause clearOrderBy() {
         _orderByEffective = false;
-        _orderByClause.clear();
+        getOrderBy().clear();
         return this;
     }
 
     public SqlClause makeOrderByEffective() {
-        if (!_orderByClause.isEmpty()) {
+        if (hasOrderByClause()) {
             _orderByEffective = true;
         }
         return this;
@@ -1244,7 +1298,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 } else {
                     element.setupDesc();
                 }
-                _orderByClause.addOrderByElement(element);
+                getOrderBy().addOrderByElement(element);
 
                 ++count;
             }
@@ -1258,20 +1312,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, boolean ascOrDesc) {
         _orderByEffective = true;
-        if (!_orderByClause.isSameOrderByColumn(orderByProperty)) {
+        final OrderByClause orderBy = getOrderBy();
+        if (!orderBy.isSameOrderByColumn(orderByProperty)) {
             clearOrderBy();
             registerOrderBy(orderByProperty, ascOrDesc);
         } else {
-            _orderByClause.reverseAll();
+            orderBy.reverseAll();
         }
     }
 
     public void addNullsFirstToPreviousOrderBy() {
-        _orderByClause.addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
+        getOrderBy().addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
     }
 
     public void addNullsLastToPreviousOrderBy() {
-        _orderByClause.addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
+        getOrderBy().addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
     }
 
     protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() { // as default
@@ -1300,7 +1355,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             String msg = "Manual Order with Union is unavailable: " + manumalOrderInfo.getManualValueList();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        _orderByClause.addManualOrderByElement(manumalOrderInfo);
+        getOrderBy().addManualOrderByElement(manumalOrderInfo);
+    }
+
+    protected OrderByClause getOrderBy() {
+        if (_orderByClause == null) {
+            _orderByClause = new OrderByClause();
+        }
+        return _orderByClause;
     }
 
     public boolean hasOrderByClause() {
@@ -1655,11 +1717,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                    Sub Query Indent
     //                                                                    ================
     public String resolveSubQueryBeginMark(String subQueryIdentity) {
-        return _subQueryIndentProcessor.resolveSubQueryBeginMark(subQueryIdentity);
+        return getSubQueryIndentProcessor().resolveSubQueryBeginMark(subQueryIdentity);
     }
 
     public String resolveSubQueryEndMark(String subQueryIdentity) {
-        return _subQueryIndentProcessor.resolveSubQueryEndMark(subQueryIdentity);
+        return getSubQueryIndentProcessor().resolveSubQueryEndMark(subQueryIdentity);
     }
 
     public String processSubQueryIndent(String sql) {
@@ -1667,7 +1729,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String processSubQueryIndent(String sql, String preIndent, String originalSql) {
-        return _subQueryIndentProcessor.processSubQueryIndent(sql, preIndent, originalSql);
+        return getSubQueryIndentProcessor().processSubQueryIndent(sql, preIndent, originalSql);
+    }
+
+    protected SubQueryIndentProcessor getSubQueryIndentProcessor() {
+        if (_subQueryIndentProcessor == null) {
+            _subQueryIndentProcessor = new SubQueryIndentProcessor();
+        }
+        return _subQueryIndentProcessor;
     }
 
     // ===================================================================================
@@ -1886,7 +1955,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             sb.append(" in (").append(ln()).append(subQuery).append(ln()).append(")");
             return sb.toString();
         } else {
-            if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
+            if (hasOuterJoin()) {
                 String msg = "The queryUpdate() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
                 msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
@@ -1932,7 +2001,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             sb.append(" in (").append(ln()).append(subQuery).append(ln()).append(")");
             return sb.toString();
         } else { // unsupported or two-or-more primary keys
-            if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
+            if (hasOuterJoin()) {
                 String msg = "The queryDelete() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
                 msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
@@ -2010,7 +2079,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected DBMeta findDBMeta(String tableDbName) {
-        DBMeta dbmeta = _cachedDBMetaMap.get(tableDbName);
+        DBMeta dbmeta = getCachedDBMetaMap().get(tableDbName);
         if (dbmeta != null) {
             return dbmeta;
         }
@@ -2020,8 +2089,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             throw new IllegalStateException(msg);
         }
         dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
-        _cachedDBMetaMap.put(tableDbName, dbmeta);
+        getCachedDBMetaMap().put(tableDbName, dbmeta);
         return dbmeta;
+    }
+
+    protected Map<String, DBMeta> getCachedDBMetaMap() {
+        if (_cachedDBMetaMap == null) {
+            _cachedDBMetaMap = StringKeyMap.createAsFlexible();
+        }
+        return _cachedDBMetaMap;
     }
 
     protected ColumnInfo toColumnInfo(String tableDbName, String columnDbName) {

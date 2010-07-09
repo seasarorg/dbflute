@@ -325,6 +325,7 @@ public abstract class ConditionKey implements Serializable {
      * Returns hash-code of this condition-key string.
      * @return HashCode.
      */
+    @Override
     public int hashCode() {
         return getConditionKey().hashCode();
     }
@@ -335,6 +336,7 @@ public abstract class ConditionKey implements Serializable {
      * @param other Other entity. (Nullable)
      * @return Comparing result. If other is null, returns false.
      */
+    @Override
     public boolean equals(Object other) {
         if (other instanceof ConditionKey) {
             if (this.getConditionKey().equals(((ConditionKey) other).getConditionKey())) {
@@ -348,8 +350,9 @@ public abstract class ConditionKey implements Serializable {
      * The override.
      * @return View-string of condition key information.
      */
+    @Override
     public String toString() {
-        return "ConditionKey: " + getConditionKey() + " " + getOperand() + " wild-card=[" + getWildCard() + "]";
+        return "ConditionKey:{" + getConditionKey() + " " + getOperand() + "}";
     }
 
     // ===================================================================================
