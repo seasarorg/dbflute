@@ -578,7 +578,8 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                        OrScopeQuery
     //                                                                        ============
     /**
-     * Set up the query for or-scope.
+     * Set up the query for or-scope. <br />
+     * (Same-column-and-same-condition-key conditions are allowed in or-scope)
      * <pre>
      * <span style="color: #3F7E5E">// where (FOO = '...' or BAR = '...')</span>
      * cb.<span style="color: #FD4747">orScopeQuery</span>(new OrQuery&lt;${myConditionBeanClassName}&gt;() {
@@ -595,7 +596,8 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     /**
-     * Set up the and-part of or-scope.
+     * Set up the and-part of or-scope. <br />
+     * (However nested or-scope query and as-or-split of like-search in and-part are unsupported)
      * <pre>
      * <span style="color: #3F7E5E">// where (FOO = '...' or (BAR = '...' and QUX = '...'))</span>
      * cb.<span style="color: #FD4747">orScopeQuery</span>(new OrQuery&lt;${myConditionBeanClassName}&gt;() {

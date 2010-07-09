@@ -1098,7 +1098,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         String or = " or ";
         String and = " and ";
-        String lnIndentOr = line ? ln() + "   " : "";
+        String lnIndentOr = line ? ln() + "    " : "";
         String lnIndentAnd = ""; // no line separator either way
         String andPartMark = getOrScopeQueryAndPartMark();
         StringBuilder sb = new StringBuilder();
