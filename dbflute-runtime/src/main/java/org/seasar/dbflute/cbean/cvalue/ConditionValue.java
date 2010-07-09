@@ -40,9 +40,11 @@ public class ConditionValue implements Serializable {
     //                                                                           =========
     protected Map<String, Map<String, Object>> _fixedValueMap;
     protected Map<String, Map<String, Object>> _varyingValueMap;
-    protected boolean _orScopeQuery;
+
+    // temporary query modes:
+    protected boolean _orScopeQuery; // completely independent
     protected boolean _inline;
-    protected boolean _onClause; // if true, in-line is also true
+    protected boolean _onClause; // can be true, when in-line is true
 
     // ===================================================================================
     //                                                                               Equal
@@ -594,7 +596,7 @@ public class ConditionValue implements Serializable {
             } else {
                 return "inline";
             }
-        } else {
+        } else { // normal query
             return "query";
         }
     }
@@ -733,11 +735,11 @@ public class ConditionValue implements Serializable {
     }
 
     public static interface QueryModeProvider {
-        boolean isOrScopeQuery();
+        boolean isOrScopeQuery(); // completely independent
 
         boolean isInline();
 
-        boolean isOnClause();
+        boolean isOnClause(); // can be true, when in-line is true
     }
 
     public <RESULT> RESULT process(CallbackProcessor<RESULT> processor) {
@@ -758,7 +760,7 @@ public class ConditionValue implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     public boolean isFixedQuery() {
-        // or-scope query is completely independent
+        // only or-scope query is NOT fixed
         return !_orScopeQuery;
     }
 
