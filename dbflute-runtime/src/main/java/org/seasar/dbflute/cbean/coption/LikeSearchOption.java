@@ -16,7 +16,6 @@
 package org.seasar.dbflute.cbean.coption;
 
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -163,43 +162,6 @@ public class LikeSearchOption extends SimpleStringOption {
 
     public boolean isAsOrSplit() {
         return _asOrSplit;
-    }
-
-    // ===================================================================================
-    //                                                                 To Upper/Lower Case
-    //                                                                 ===================
-    public LikeSearchOption toUpperCase() {
-        return (LikeSearchOption) doToUpperCase();
-    }
-
-    public LikeSearchOption toLowerCase() {
-        return (LikeSearchOption) doToLowerCase();
-    }
-
-    // ===================================================================================
-    //                                                                      To Single Byte
-    //                                                                      ==============
-    public LikeSearchOption toSingleByteSpace() {
-        return (LikeSearchOption) doToSingleByteSpace();
-    }
-
-    public LikeSearchOption toSingleByteAlphabetNumber() {
-        return (LikeSearchOption) doToSingleByteAlphabetNumber();
-    }
-
-    public LikeSearchOption toSingleByteAlphabetNumberMark() {
-        return (LikeSearchOption) doToSingleByteAlphabetNumberMark();
-    }
-
-    // ===================================================================================
-    //                                                                      To Double Byte
-    //                                                                      ==============
-
-    // ===================================================================================
-    //                                                                            Japanese
-    //                                                                            ========
-    public JapaneseOptionPartsAgent localJapanese() {
-        return doLocalJapanese();
     }
 
     // ===================================================================================

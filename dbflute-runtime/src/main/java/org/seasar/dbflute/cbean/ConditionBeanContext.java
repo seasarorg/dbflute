@@ -139,7 +139,9 @@ public class ConditionBeanContext {
     //                                                                        ============
     public static void loadCoolClasses() {
         boolean debugEnabled = false; // If you watch the log, set this true.
-        // Against the ClassLoader Headache!
+        // Against the ClassLoader Headache for S2Container's HotDeploy!
+        // However, These classes are in Library since 0.9.0
+        // so this process may not be needed...
         final StringBuilder sb = new StringBuilder();
         {
             final Class<?> clazz = org.seasar.dbflute.cbean.SimplePagingBean.class;
@@ -154,7 +156,6 @@ public class ConditionBeanContext {
             loadClass(org.seasar.dbflute.cbean.EntityRowHandler.class);
             loadClass(org.seasar.dbflute.cbean.coption.FromToOption.class);
             loadClass(org.seasar.dbflute.cbean.coption.LikeSearchOption.class);
-            loadClass(org.seasar.dbflute.cbean.coption.InScopeOption.class);
             loadClass(org.seasar.dbflute.cbean.grouping.GroupingOption.class);
             loadClass(org.seasar.dbflute.cbean.grouping.GroupingRowEndDeterminer.class);
             loadClass(org.seasar.dbflute.cbean.grouping.GroupingRowResource.class);

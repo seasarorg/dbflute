@@ -18,9 +18,6 @@ package org.seasar.dbflute.cbean.coption;
 import java.io.Serializable;
 
 import org.seasar.dbflute.cbean.coption.parts.SplitOptionParts;
-import org.seasar.dbflute.cbean.coption.parts.ToSingleByteOptionParts;
-import org.seasar.dbflute.cbean.coption.parts.ToUpperLowerCaseOptionParts;
-import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -39,9 +36,6 @@ public class SimpleStringOption implements ConditionOption, Serializable {
     //                                                                           Attribute
     //                                                                           =========
     protected SplitOptionParts _splitOptionParts;
-    protected ToUpperLowerCaseOptionParts _toUpperLowerCaseOptionParts;
-    protected ToSingleByteOptionParts _toSingleByteCaseOptionParts;
-    protected JapaneseOptionPartsAgent _japaneseOptionPartsAgent;
 
     // ===================================================================================
     //                                                                         Rear Option
@@ -99,75 +93,9 @@ public class SimpleStringOption implements ConditionOption, Serializable {
     }
 
     // ===================================================================================
-    //                                                                 To Upper/Lower Case
-    //                                                                 ===================
-    protected SimpleStringOption doToUpperCase() {
-        getToUpperLowerCaseOptionParts().toUpperCase();
-        return this;
-    }
-
-    protected SimpleStringOption doToLowerCase() {
-        getToUpperLowerCaseOptionParts().toLowerCase();
-        return this;
-    }
-
-    protected ToUpperLowerCaseOptionParts getToUpperLowerCaseOptionParts() {
-        if (_toUpperLowerCaseOptionParts == null) {
-            _toUpperLowerCaseOptionParts = new ToUpperLowerCaseOptionParts();
-        }
-        return _toUpperLowerCaseOptionParts;
-    }
-
-    // ===================================================================================
-    //                                                                      To Single Byte
-    //                                                                      ==============
-    protected SimpleStringOption doToSingleByteSpace() {
-        getToSingleByteOptionParts().toSingleByteSpace();
-        return this;
-    }
-
-    protected SimpleStringOption doToSingleByteAlphabetNumber() {
-        getToSingleByteOptionParts().toSingleByteAlphabetNumber();
-        return this;
-    }
-
-    protected SimpleStringOption doToSingleByteAlphabetNumberMark() {
-        getToSingleByteOptionParts().toSingleByteAlphabetNumberMark();
-        return this;
-    }
-
-    protected ToSingleByteOptionParts getToSingleByteOptionParts() {
-        if (_toSingleByteCaseOptionParts == null) {
-            _toSingleByteCaseOptionParts = new ToSingleByteOptionParts();
-        }
-        return _toSingleByteCaseOptionParts;
-    }
-
-    // ===================================================================================
-    //                                                                      To Double Byte
-    //                                                                      ==============
-
-    // ===================================================================================
-    //                                                                            Japanese
-    //                                                                            ========
-    protected JapaneseOptionPartsAgent doLocalJapanese() {
-        return getJapaneseOptionPartsAgent();
-    }
-
-    protected JapaneseOptionPartsAgent getJapaneseOptionPartsAgent() {
-        if (_japaneseOptionPartsAgent == null) {
-            _japaneseOptionPartsAgent = new JapaneseOptionPartsAgent();
-        }
-        return _japaneseOptionPartsAgent;
-    }
-
-    // ===================================================================================
     //                                                                          Real Value
     //                                                                          ==========
     public String generateRealValue(String value) {
-        value = getToUpperLowerCaseOptionParts().generateRealValue(value);
-        value = getToSingleByteOptionParts().generateRealValue(value);
-        value = getJapaneseOptionPartsAgent().generateRealValue(value);
         return value;
     }
 
@@ -185,15 +113,6 @@ public class SimpleStringOption implements ConditionOption, Serializable {
         final SimpleStringOption deepCopy = newDeepCopyInstance();
         if (_splitOptionParts != null) {
             deepCopy._splitOptionParts = (SplitOptionParts) _splitOptionParts;
-        }
-        if (_toUpperLowerCaseOptionParts != null) {
-            deepCopy._toUpperLowerCaseOptionParts = (ToUpperLowerCaseOptionParts) _toUpperLowerCaseOptionParts;
-        }
-        if (_toSingleByteCaseOptionParts != null) {
-            deepCopy._toSingleByteCaseOptionParts = (ToSingleByteOptionParts) _toSingleByteCaseOptionParts;
-        }
-        if (_japaneseOptionPartsAgent != null) {
-            deepCopy._japaneseOptionPartsAgent = (JapaneseOptionPartsAgent) _japaneseOptionPartsAgent;
         }
         return deepCopy;
     }
