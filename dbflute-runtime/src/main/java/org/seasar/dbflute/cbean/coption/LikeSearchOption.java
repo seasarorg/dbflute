@@ -234,7 +234,7 @@ public class LikeSearchOption extends SimpleStringOption {
     @Override
     public String toString() {
         final String title = DfTypeUtil.toClassTitle(this);
-        return title + ":{like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit=" + _asOrSplit
-                + "}";
+        final String split = (isSplit() ? (_asOrSplit ? "true(or)" : "true(and)") : "false");
+        return title + ":{like=" + _like + ", escape=" + _escape + ", split=" + split + "}";
     }
 }

@@ -132,7 +132,7 @@ public class LikeSearchOptionTest extends PlainTestCase {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-    public void test_toString() {
+    public void test_toString_basic() {
         // ## Arrange ##
         LikeSearchOption option = createOption();
         option.likePrefix();
@@ -143,6 +143,32 @@ public class LikeSearchOptionTest extends PlainTestCase {
         // ## Assert ##
         log(actual);
         assertTrue(actual.contains("escape=|"));
+    }
+
+    public void test_toString_split_basic() {
+        // ## Arrange ##
+        LikeSearchOption option = createOption();
+        option.likePrefix().splitByPipeLine();
+
+        // ## Act ##
+        String actual = option.toString();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("split=true(and)"));
+    }
+
+    public void test_toString_split_or() {
+        // ## Arrange ##
+        LikeSearchOption option = createOption();
+        option.likePrefix().splitByPipeLine().asOrSplit();
+
+        // ## Act ##
+        String actual = option.toString();
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("split=true(or)"));
     }
 
     // ===================================================================================
