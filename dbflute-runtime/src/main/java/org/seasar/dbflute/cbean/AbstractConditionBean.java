@@ -124,14 +124,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        Setup Select
     //                                                                        ============
     protected void doSetupSelect(SsCall callback) {
-        final String foreignPropertyName = callback.qf().getForeignPropertyName();
+        final String foreignPropertyName = callback.qf().xgetForeignPropertyName();
         assertSetupSelectPurpose(foreignPropertyName);
         assertSetupSelectBeforeUnion(foreignPropertyName);
-        final String foreignTableAliasName = callback.qf().getRealAliasName();
-        final String localRelationPath = localCQ().getRelationPath();
+        final String foreignTableAliasName = callback.qf().xgetRealAliasName();
+        final String localRelationPath = localCQ().xgetRelationPath();
         getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
                 localRelationPath);
-        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
+        getSqlClause().registerSelectedForeignInfo(callback.qf().xgetRelationPath(), foreignPropertyName);
     }
 
     protected static interface SsCall {

@@ -155,7 +155,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Get the provider of DB meta.
      * @return The provider of DB meta. (NotNull)
      */
-    protected abstract DBMetaProvider getDBMetaProvider();
+    protected abstract DBMetaProvider xgetDBMetaProvider();
 
     /**
      * Find the DB meta.
@@ -163,7 +163,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The DB meta of the table. (NotNull)
      */
     protected DBMeta findDBMeta(String tableFlexibleName) {
-        return getDBMetaProvider().provideDBMetaChecked(tableFlexibleName);
+        return xgetDBMetaProvider().provideDBMetaChecked(tableFlexibleName);
     }
 
     // ===================================================================================
@@ -172,35 +172,35 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
-    public ConditionQuery getReferrerQuery() {
+    public ConditionQuery xgetReferrerQuery() {
         return _referrerQuery;
     }
 
     /**
      * {@inheritDoc}
      */
-    public SqlClause getSqlClause() {
+    public SqlClause xgetSqlClause() {
         return _sqlClause;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getAliasName() {
+    public String xgetAliasName() {
         return _aliasName;
     }
 
     /**
      * {@inheritDoc}
      */
-    public int getNestLevel() {
+    public int xgetNestLevel() {
         return _nestLevel;
     }
 
     /**
      * {@inheritDoc}
      */
-    public int getNextNestLevel() {
+    public int xgetNextNestLevel() {
         return _nestLevel + 1;
     }
 
@@ -208,13 +208,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * {@inheritDoc}
      */
     public boolean isBaseQuery() {
-        return (getReferrerQuery() == null);
+        return (xgetReferrerQuery() == null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public int getSubQueryLevel() {
+    public int xgetSubQueryLevel() {
         return _subQueryLevel;
     }
 
@@ -224,15 +224,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
-    public String getRealAliasName() {
-        return getAliasName();
+    public String xgetRealAliasName() {
+        return xgetAliasName();
     }
 
     /**
      * {@inheritDoc}
      */
     public ColumnRealName toColumnRealName(String columnDbName) {
-        return new ColumnRealName(getRealAliasName(), toColumnSqlName(columnDbName));
+        return new ColumnRealName(xgetRealAliasName(), toColumnSqlName(columnDbName));
     }
 
     /**
@@ -245,7 +245,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Foreign Info
     //                                          ------------
-    public String getForeignPropertyName() {
+    public String xgetForeignPropertyName() {
         return _foreignPropertyName;
     }
 
@@ -253,7 +253,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         this._foreignPropertyName = foreignPropertyName;
     }
 
-    public String getRelationPath() {
+    public String xgetRelationPath() {
         return _relationPath;
     }
 
@@ -276,15 +276,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param propertyName The name of property. (NotNull)
      * @return The location of the property as path. (NotNull)
      */
-    protected String getLocation(String propertyName) {
-        return getLocationBase() + propertyName;
+    protected String xgetLocation(String propertyName) {
+        return xgetLocationBase() + propertyName;
     }
 
     /**
      * Get the base location of this condition-query.
      * @return The base location of this condition-query. (NotNull)
      */
-    protected String getLocationBase() {
+    protected String xgetLocationBase() {
         final StringBuilder sb = new StringBuilder();
         ConditionQuery query = this;
         while (true) {
@@ -292,7 +292,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 sb.insert(0, CQ_PROPERTY + ".");
                 break;
             } else {
-                final String foreignPropertyName = query.getForeignPropertyName();
+                final String foreignPropertyName = query.xgetForeignPropertyName();
                 if (foreignPropertyName == null) {
                     String msg = "The foreignPropertyName of the query should not be null:";
                     msg = msg + " query=" + query;
@@ -300,7 +300,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
                 sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
             }
-            query = query.getReferrerQuery();
+            query = query.xgetReferrerQuery();
         }
         return sb.toString();
     }
@@ -309,11 +309,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                  Nested SetupSelect
     //                                                                  ==================
     public void doNss(NssCall callback) { // very internal
-        String foreignPropertyName = callback.qf().getForeignPropertyName();
-        String foreignTableAliasName = callback.qf().getRealAliasName();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
-                getRelationPath());
-        getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
+        String foreignPropertyName = callback.qf().xgetForeignPropertyName();
+        String foreignTableAliasName = callback.qf().xgetRealAliasName();
+        xgetSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
+                xgetRelationPath());
+        xgetSqlClause().registerSelectedForeignInfo(callback.qf().xgetRelationPath(), foreignPropertyName);
     }
 
     public static interface NssCall { // very internal
@@ -330,14 +330,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
         final String localDbName = getTableDbName();
         final String foreignDbName = cq.getTableDbName();
-        final String localAliasName = getRealAliasName();
-        final String foreignAliasName = cq.getRealAliasName();
+        final String localAliasName = xgetRealAliasName();
+        final String foreignAliasName = cq.xgetRealAliasName();
         // resolve variables of fixed condition
         if (fixedCondition != null) {
             fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
             fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
             fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-            fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
+            fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + xgetLocationBase());
         }
         // translate join-on map using column real name
         final Map<ColumnRealName, ColumnRealName> joinOnRealMap = newLinkedHashMap();
@@ -347,7 +347,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             final String foreign = entry.getValue();
             joinOnRealMap.put(toColumnRealName(local), cq.toColumnRealName(foreign));
         }
-        getSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnRealMap, fixedCondition);
+        xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnRealMap, fixedCondition);
     }
 
     // ===================================================================================
@@ -360,7 +360,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Get the map parameter-bean of union query. (for parameter comment) {Internal}
      * @return The instance of map parameter-bean. (NotNull)
      */
-    public SimpleMapPmb<ConditionQuery> getUnionQueryMap() {
+    public SimpleMapPmb<ConditionQuery> getInternalUnionQueryMap() {
         if (_unionQueryMap == null) {
             _unionQueryMap = xcreateUnionMapPmb();
         }
@@ -372,7 +372,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param unionQuery Union query. (NotNull)
      */
     public void xsetUnionQuery(ConditionQuery unionQuery) {
-        xsetupUnion(unionQuery, false, getUnionQueryMap());
+        xsetupUnion(unionQuery, false, getInternalUnionQueryMap());
     }
 
     /** The map parameter-bean of union all query. */
@@ -382,7 +382,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Get the map parameter-bean of union all query. (for parameter comment) {Internal}
      * @return The instance of map parameter-bean. (NotNull)
      */
-    public SimpleMapPmb<ConditionQuery> getUnionAllQueryMap() {
+    public SimpleMapPmb<ConditionQuery> getInternalUnionAllQueryMap() {
         if (_unionAllQueryMap == null) {
             _unionAllQueryMap = xcreateUnionMapPmb();
         }
@@ -398,7 +398,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param unionAllQuery Union all query. (NotNull)
      */
     public void xsetUnionAllQuery(ConditionQuery unionAllQuery) {
-        xsetupUnion(unionAllQuery, true, getUnionAllQueryMap());
+        xsetupUnion(unionAllQuery, true, getInternalUnionAllQueryMap());
     }
 
     protected void xsetupUnion(ConditionQuery unionQuery, boolean unionAll, SimpleMapPmb<ConditionQuery> unionQueryMap) {
@@ -407,9 +407,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new IllegalArgumentException(msg);
         }
         reflectRelationOnUnionQuery(this, unionQuery); // Reflect Relation!
-        String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
+        final String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.addParameter(key, unionQuery);
-        registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
+        final String propName = "internalUnion" + (unionAll ? "All" : "") + "QueryMap." + key;
+        registerUnionQuery(unionQuery, unionAll, propName);
     }
 
     /**
@@ -457,11 +458,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, columnRealName)) {
             return true;
         } else {
-            if (getSqlClause().isCheckInvalidQuery()) {
+            if (xgetSqlClause().isCheckInvalidQuery()) {
                 throwInvalidQueryRegisteredException(key, value, columnRealName);
                 return false; // unreachable
             } else {
-                getSqlClause().registerInvalidQueryColumn(columnRealName, key);
+                xgetSqlClause().registerInvalidQueryColumn(columnRealName, key);
                 return false;
             }
         }
@@ -470,7 +471,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected QueryModeProvider xcreateQueryModeProvider() {
         return new QueryModeProvider() {
             public boolean isOrScopeQuery() {
-                return getSqlClause().isOrScopeQueryEffective();
+                return xgetSqlClause().isOrScopeQueryEffective();
             }
 
             public boolean isInline() {
@@ -494,19 +495,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
-        final int inScopeLimit = getSqlClause().getInScopeLimit();
+        final int inScopeLimit = xgetSqlClause().getInScopeLimit();
         if (inScopeLimit > 0 && value.size() > inScopeLimit) {
             // if the key is for inScope, it should be split as 'or'
             // (if the key is for notInScope, it should be split as 'and')
-            final boolean orScopeQuery = getSqlClause().isOrScopeQueryEffective();
-            final boolean orScopeQueryAndPart = getSqlClause().isOrScopeQueryAndPartEffective();
+            final boolean orScopeQuery = xgetSqlClause().isOrScopeQueryEffective();
+            final boolean orScopeQueryAndPart = xgetSqlClause().isOrScopeQueryAndPartEffective();
             final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
             if (isConditionKeyInScope(key)) {
                 // if or-scope query has already been effective, create new or-scope
-                getSqlClause().makeOrScopeQueryEffective();
+                xgetSqlClause().makeOrScopeQueryEffective();
             } else {
                 if (needsAndPart) {
-                    getSqlClause().beginOrScopeQueryAndPart();
+                    xgetSqlClause().beginOrScopeQueryAndPart();
                 }
             }
 
@@ -525,10 +526,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
             } finally {
                 if (isConditionKeyInScope(key)) {
-                    getSqlClause().closeOrScopeQuery();
+                    xgetSqlClause().closeOrScopeQuery();
                 } else {
                     if (needsAndPart) {
-                        getSqlClause().endOrScopeQueryAndPart();
+                        xgetSqlClause().endOrScopeQueryAndPart();
                     }
                 }
             }
@@ -591,13 +592,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // Use splitByXxx().
         // - - - - - - - - -
         final String[] strArray = option.generateSplitValueArray(value);
-        final boolean orScopeQuery = getSqlClause().isOrScopeQueryEffective();
-        final boolean orScopeQueryAndPart = getSqlClause().isOrScopeQueryAndPartEffective();
+        final boolean orScopeQuery = xgetSqlClause().isOrScopeQueryEffective();
+        final boolean orScopeQueryAndPart = xgetSqlClause().isOrScopeQueryAndPartEffective();
         if (!option.isAsOrSplit()) {
             // as 'and' condition
             final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
             if (needsAndPart) {
-                getSqlClause().beginOrScopeQueryAndPart();
+                xgetSqlClause().beginOrScopeQueryAndPart();
             }
             try {
                 for (int i = 0; i < strArray.length; i++) {
@@ -606,7 +607,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
             } finally {
                 if (needsAndPart) {
-                    getSqlClause().endOrScopeQueryAndPart();
+                    xgetSqlClause().endOrScopeQueryAndPart();
                 }
             }
         } else {
@@ -618,7 +619,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             final boolean needsNewOrScope = !orScopeQuery;
             if (needsNewOrScope) {
-                getSqlClause().makeOrScopeQueryEffective();
+                xgetSqlClause().makeOrScopeQueryEffective();
             }
             try {
                 for (int i = 0; i < strArray.length; i++) {
@@ -631,7 +632,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
             } finally {
                 if (needsNewOrScope) {
-                    getSqlClause().closeOrScopeQuery();
+                    xgetSqlClause().closeOrScopeQuery();
                 }
             }
         }
@@ -642,7 +643,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwLikeSearchOptionNotFoundException(String columnDbName, String value) {
-        final DBMeta dbmeta = getDBMetaProvider().provideDBMeta(getTableDbName());
+        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMeta(getTableDbName());
         createCBExThrower().throwLikeSearchOptionNotFoundException(columnDbName, value, dbmeta);
     }
 
@@ -657,18 +658,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
-        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
-        key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, getLocation(uncapPropName));
+        key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, xgetLocation(uncapPropName));
         final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue);
+            xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue);
         } else {
-            final String aliasName = getRealAliasName();
-            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, _onClause);
+            final String aliasName = xgetRealAliasName();
+            xgetSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, _onClause);
         }
     }
 
@@ -677,19 +678,20 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (!isValidQuery(key, value, cvalue, columnDbName)) {
             return;
         }
-        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
-        final String location = getLocation(uncapPropName);
+        final String location = xgetLocation(uncapPropName);
         key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
         final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, option);
+            xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, option);
         } else {
-            final String aliasName = getRealAliasName();
-            getSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, option, _onClause);
+            final String aliasName = xgetRealAliasName();
+            xgetSqlClause()
+                    .registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, option, _onClause);
         }
     }
 
@@ -710,11 +712,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String existsOption) {
         assertObjectNotNull("ExistsReferrer(" + columnDbName + ")", subQuery);
-        final SqlClause sqlClause = getSqlClause();
-        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final SqlClause sqlClause = xgetSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -748,11 +750,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String inScopeOption) {
         assertObjectNotNull("InScopeRelation(" + columnDbName + ")", subQuery);
-        final SqlClause sqlClause = getSqlClause();
-        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final SqlClause sqlClause = xgetSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -782,11 +784,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String relatedColumnDbName, String propertyName, String aliasName) {
         assertObjectNotNull("SpecifyDerivedReferrer(function)", function);
         assertObjectNotNull("SpecifyDerivedReferrer(" + columnDbName + ")", subQuery);
-        final SqlClause sqlClause = getSqlClause();
-        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final SqlClause sqlClause = xgetSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -800,7 +802,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName);
-        getSqlClause().specifyDerivingSubQuery(aliasName, clause);
+        xgetSqlClause().specifyDerivingSubQuery(aliasName, clause);
     }
 
     // [DBFlute-0.8.8.1]
@@ -811,11 +813,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String relatedColumnDbName, String propertyName, String operand, Object value, String parameterPropertyName) {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
         assertObjectNotNull("QueryDerivedReferrer(" + columnDbName + ")", subQuery);
-        final SqlClause sqlClause = getSqlClause();
-        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final SqlClause sqlClause = xgetSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -825,7 +827,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-        final String parameterPath = getLocation(parameterPropertyName);
+        final String parameterPath = xgetLocation(parameterPropertyName);
         final QueryDerivedReferrer derivedReferrer = new QueryDerivedReferrer(sqlClause, subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
@@ -840,11 +842,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerScalarCondition(String function, final ConditionQuery subQuery, String propertyName,
             String operand) {
         assertObjectNotNull("ScalarCondition(" + propertyName + ")", subQuery);
-        final SqlClause sqlClause = getSqlClause();
-        final SubQueryPath subQueryPath = new SubQueryPath(getLocation(propertyName));
+        final SqlClause sqlClause = xgetSqlClause();
+        final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.getSubQueryLevel();
-        final SqlClause subQueryClause = subQuery.getSqlClause();
+        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final GeneralSubQueryLevelReflector reflector = new GeneralSubQueryLevelReflector();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -893,20 +895,20 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
-        final String location = getLocation(uncapPropName);
+        final String location = xgetLocation(uncapPropName);
         key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
-        getSqlClause().registerWhereClause(toColumnRealName(columnDbName), key, cvalue, option);
+        xgetSqlClause().registerWhereClause(toColumnRealName(columnDbName), key, cvalue, option);
     }
 
     protected void registerWhereClause(String whereClause) {
-        getSqlClause().registerWhereClause(whereClause);
+        xgetSqlClause().registerWhereClause(whereClause);
     }
 
     protected void registerInlineWhereClause(String whereClause) {
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(whereClause);
+            xgetSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClause);
+            xgetSqlClause().registerOuterJoinInlineWhereClause(xgetRealAliasName(), whereClause, _onClause);
         }
     }
 
@@ -914,18 +916,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                           Union Query
     //                                           -----------
     public void registerUnionQuery(ConditionQuery unionQuery, boolean unionAll, String unionQueryPropertyName) {
-        final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
+        final String unionQueryClause = xgetUnionQuerySql(unionQuery, unionQueryPropertyName);
 
         // At the future, building SQL will be moved to sqlClause.
-        getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
+        xgetSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
 
-    protected String getUnionQuerySql(ConditionQuery unionQuery, String unionQueryPropertyName) {
-        final String fromClause = unionQuery.getSqlClause().getFromClause();
-        final String whereClause = unionQuery.getSqlClause().getWhereClause();
+    protected String xgetUnionQuerySql(ConditionQuery unionQuery, String unionQueryPropertyName) {
+        final String fromClause = unionQuery.xgetSqlClause().getFromClause();
+        final String whereClause = unionQuery.xgetSqlClause().getWhereClause();
         final String unionQueryClause;
         if (whereClause.trim().length() <= 0) {
-            unionQueryClause = fromClause + " " + getSqlClause().getUnionWhereClauseMark();
+            unionQueryClause = fromClause + " " + xgetSqlClause().getUnionWhereClauseMark();
         } else {
             final int whereIndex = whereClause.indexOf("where ");
             if (whereIndex < 0) {
@@ -933,7 +935,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 throw new IllegalStateException(msg);
             }
             final int clauseIndex = whereIndex + "where ".length();
-            final String mark = getSqlClause().getUnionWhereFirstConditionMark();
+            final String mark = xgetSqlClause().getUnionWhereFirstConditionMark();
             final String markedClause = whereClause.substring(0, clauseIndex) + mark
                     + whereClause.substring(clauseIndex);
             unionQueryClause = fromClause + " " + markedClause;
@@ -964,14 +966,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
-        getSqlClause().changeToInnerJoin(getRealAliasName());
+        xgetSqlClause().changeToInnerJoin(xgetRealAliasName());
     }
 
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
     protected void registerOrderBy(String columnDbName, boolean ascOrDesc) {
-        getSqlClause().registerOrderBy(toColumnRealName(columnDbName).toString(), ascOrDesc);
+        xgetSqlClause().registerOrderBy(toColumnRealName(columnDbName).toString(), ascOrDesc);
     }
 
     protected void regOBA(String columnName) {
@@ -985,13 +987,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertOrderByPurpose(String columnName) {
-        if (getSqlClause().getPurpose().isNoOrderBy()) {
+        if (xgetSqlClause().getPurpose().isNoOrderBy()) {
             throwOrderByIllegalPurposeException(columnName);
         }
     }
 
     protected void throwOrderByIllegalPurposeException(String columnName) {
-        createCBExThrower().throwOrderByIllegalPurposeException(getSqlClause().getPurpose(), getTableDbName(),
+        createCBExThrower().throwOrderByIllegalPurposeException(xgetSqlClause().getPurpose(), getTableDbName(),
                 columnName);
     }
 
@@ -999,14 +1001,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Order with the keyword 'nulls first'.
      */
     public void withNullsFirst() { // is User Public!
-        getSqlClause().addNullsFirstToPreviousOrderBy();
+        xgetSqlClause().addNullsFirstToPreviousOrderBy();
     }
 
     /**
      * Order with the keyword 'nulls last'.
      */
     public void withNullsLast() { // is User Public!
-        getSqlClause().addNullsLastToPreviousOrderBy();
+        xgetSqlClause().addNullsLastToPreviousOrderBy();
     }
 
     /**
@@ -1018,21 +1020,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertObjectNotNull("withManualOrder(manualValueList)", manualValueList);
         ManumalOrderInfo manumalOrderInfo = new ManumalOrderInfo();
         manumalOrderInfo.setManualValueList(manualValueList);
-        getSqlClause().addManualOrderToPreviousOrderByElement(manumalOrderInfo);
+        xgetSqlClause().addManualOrderToPreviousOrderByElement(manumalOrderInfo);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
-        if (!getSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
+        if (!xgetSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        getSqlClause().registerOrderBy(aliasName, true);
+        xgetSqlClause().registerOrderBy(aliasName, true);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Desc(String aliasName) {
-        if (!getSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
+        if (!xgetSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        getSqlClause().registerOrderBy(aliasName, false);
+        xgetSqlClause().registerOrderBy(aliasName, false);
     }
 
     protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
@@ -1049,15 +1051,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return Resolved join alias name. (NotNull)
      */
     protected String resolveJoinAliasName(String relationPath, int nestLevel) {
-        return getSqlClause().resolveJoinAliasName(relationPath, nestLevel);
+        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
     }
 
     protected String resolveNestLevelExpression(String name) {
-        return getSqlClause().resolveNestLevelExpression(name, getNestLevel());
+        return xgetSqlClause().resolveNestLevelExpression(name, xgetNestLevel());
     }
 
     protected String resolveNextRelationPath(String tableName, String relationPropertyName) {
-        final int relationNo = getSqlClause().resolveRelationNo(tableName, relationPropertyName);
+        final int relationNo = xgetSqlClause().resolveRelationNo(tableName, relationPropertyName);
         String nextRelationPath = "_" + relationNo;
         if (_relationPath != null) {
             nextRelationPath = _relationPath + nextRelationPath;
@@ -1428,8 +1430,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (conditionValue == null || conditionValue.length() == 0) {
             return;
         }
-        final String clause = ((SqlClauseMySql) getSqlClause()).buildMatchCondition(textColumnList, conditionValue,
-                modifier, getTableDbName(), getRealAliasName());
+        final String clause = ((SqlClauseMySql) xgetSqlClause()).buildMatchCondition(textColumnList, conditionValue,
+                modifier, getTableDbName(), xgetRealAliasName());
         registerWhereClause(clause);
     }
 
@@ -1447,7 +1449,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         conditionValue = xescapeFullTextSearchValue(conditionValue);
         int index = 0;
-        getSqlClause().makeOrScopeQueryEffective();
+        xgetSqlClause().makeOrScopeQueryEffective();
         try {
             for (ColumnInfo columnInfo : textColumnList) {
                 if (columnInfo == null) {
@@ -1468,7 +1470,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 ++index;
             }
         } finally {
-            getSqlClause().closeOrScopeQuery();
+            xgetSqlClause().closeOrScopeQuery();
         }
     }
 
@@ -1478,7 +1480,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected String xescapeOracleFullTextSearchValue(String conditionValue) {
-        return ((SqlClauseOracle) getSqlClause()).escapeFullTextSearchValue(conditionValue);
+        return ((SqlClauseOracle) xgetSqlClause()).escapeFullTextSearchValue(conditionValue);
     }
 
     protected LikeSearchOption xcreateMatchLikeSearch() {
@@ -1513,7 +1515,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
         @Override
         public QueryClauseArranger getWhereClauseArranger() {
-            return ((SqlClauseOracle) getSqlClause()).createFullTextSearchClauseArranger();
+            return ((SqlClauseOracle) xgetSqlClause()).createFullTextSearchClauseArranger();
         }
     }
 

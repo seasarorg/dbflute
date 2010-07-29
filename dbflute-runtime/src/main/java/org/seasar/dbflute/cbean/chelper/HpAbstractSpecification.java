@@ -53,12 +53,12 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             _alreadySpecifiedRequiredColumn = true;
             doSpecifyRequiredColumn();
         }
-        final String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
+        final String relationPath = _query.xgetRelationPath() != null ? _query.xgetRelationPath() : "";
         final String tableAliasName;
         if (_query.isBaseQuery()) {
             tableAliasName = _baseCB.getSqlClause().getLocalTableAliasName();
         } else {
-            tableAliasName = _baseCB.getSqlClause().resolveJoinAliasName(relationPath, _query.getNestLevel());
+            tableAliasName = _baseCB.getSqlClause().resolveJoinAliasName(relationPath, _query.xgetNestLevel());
         }
         _baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName, _query.getTableDbName());
     }

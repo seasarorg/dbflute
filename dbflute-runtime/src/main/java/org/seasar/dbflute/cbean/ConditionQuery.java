@@ -37,11 +37,14 @@ public interface ConditionQuery {
      */
     String getTableDbName();
 
+    // internal getter methods start with 'x'
+    // not to be same as column names 
+
     /**
      * Get real alias name (that has nest level mark).
      * @return Real alias name. (NotNull)
      */
-    String getRealAliasName();
+    String xgetRealAliasName();
 
     /**
      * Convert to the column real name. (with real alias name)
@@ -61,31 +64,31 @@ public interface ConditionQuery {
      * Get the referrer query.
      * @return The referrer query. (Nullable: If null, this is base query)
      */
-    ConditionQuery getReferrerQuery();
+    ConditionQuery xgetReferrerQuery();
 
     /**
      * Get the SqlClause.
      * @return The SqlClause. (NotNull)
      */
-    SqlClause getSqlClause();
+    SqlClause xgetSqlClause();
 
     /**
      * Get alias name.
      * @return Alias name. (NotNull)
      */
-    String getAliasName();
+    String xgetAliasName();
 
     /**
      * Get nest level.
      * @return Nest level.
      */
-    int getNestLevel();
+    int xgetNestLevel();
 
     /**
      * Get next nest level.
      * @return Next nest level.
      */
-    int getNextNestLevel();
+    int xgetNextNestLevel();
 
     /**
      * Is this a base query?
@@ -97,19 +100,19 @@ public interface ConditionQuery {
      * Get the level of subQuery.
      * @return The level of subQuery.
      */
-    int getSubQueryLevel();
+    int xgetSubQueryLevel();
 
     /**
      * Get the property name of foreign relation.
      * @return The property name of foreign relation. (NotNull)
      */
-    String getForeignPropertyName();
+    String xgetForeignPropertyName();
 
     /**
      * Get the path of foreign relation.
      * @return The path of foreign relation. (NotNull)
      */
-    String getRelationPath();
+    String xgetRelationPath();
 
     // ===================================================================================
     //                                                                 Reflection Invoking
