@@ -449,7 +449,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #if ($fk.hasLocalColumnExceptPrimaryKey())
             if (_qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
-                    || _qyCall.qy().getReferrerQuery() instanceof ${fk.foreignTableExtendedConditionQueryClassName}) {
+                    || _qyCall.qy().xgetReferrerQuery() instanceof ${fk.foreignTableExtendedConditionQueryClassName}) {
 #foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
                 column${col.javaName}(); // FK or one-to-one referrer

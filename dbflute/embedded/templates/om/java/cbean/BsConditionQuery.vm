@@ -46,7 +46,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     protected ${myConditionInlineQueryClassName} createInlineQuery()
-    { return new ${myConditionInlineQueryClassName}(getReferrerQuery(), getSqlClause(), getAliasName(), getNestLevel(), this); }
+    { return new ${myConditionInlineQueryClassName}(xgetReferrerQuery(), xgetSqlClause(), xgetAliasName(), xgetNestLevel(), this); }
 
     /**
      * Prepare OnClause query. <br />
@@ -517,8 +517,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
     protected ${foreignCQClassName} xcreateQuery${fk.foreignPropertyNameInitCap}() {
         String nrp = resolveNextRelationPath("${table.name}", "${fk.foreignPropertyName}");
-        String jan = resolveJoinAliasName(nrp, getNextNestLevel());
-        ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+        String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
+        ${foreignCQClassName} cq = new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
         cq.xsetForeignPropertyName("${fk.foreignPropertyName}"); cq.xsetRelationPath(nrp); return cq;
     }
     protected void xsetupOuterJoin${fk.foreignPropertyNameInitCap}() {
@@ -561,8 +561,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
     protected ${relatedCQClassName} xcreateQuery${referrer.referrerPropertyNameInitCapAsOne}() {
         String nrp = resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");
-        String jan = resolveJoinAliasName(nrp, getNextNestLevel());
-        ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+        String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
+        ${relatedCQClassName} cq = new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
         cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}"); cq.xsetRelationPath(nrp); return cq;
     }
     protected void xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}() {

@@ -30,8 +30,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
                         , String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);
         _myCQ = myCQ;
-        _foreignPropertyName = _myCQ.getForeignPropertyName(); // accept foreign property name
-        _relationPath = _myCQ.getRelationPath(); // accept relation path
+        _foreignPropertyName = _myCQ.xgetForeignPropertyName(); // accept foreign property name
+        _relationPath = _myCQ.xgetRelationPath(); // accept relation path
         _inline = true;
     }
 
