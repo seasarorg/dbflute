@@ -176,10 +176,14 @@ public class LikeSearchOption extends SimpleStringOption {
             String tmp = replace(value, _escape, _escape + _escape);
             tmp = replace(tmp, "%", _escape + "%");
             tmp = replace(tmp, "_", _escape + "_");
-            if (isCurrentDBDef(DBDef.Oracle)) {
-                tmp = replace(tmp, "\uff05", _escape + "\uff05");
-                tmp = replace(tmp, "\uff3f", _escape + "\uff3f");
-            }
+
+            // escape double-byte wild-cards
+            // Oracle and DB2 treat these symbols as wild-card
+            // but other DBMS ignore unused escape characters
+            // so if-statement does not exist here
+            tmp = replace(tmp, "\uff05", _escape + "\uff05");
+            tmp = replace(tmp, "\uff3f", _escape + "\uff3f");
+
             value = tmp;
         }
         final String wildCard = "%";

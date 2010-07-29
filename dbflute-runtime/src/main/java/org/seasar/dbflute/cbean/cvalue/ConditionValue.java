@@ -465,13 +465,8 @@ public class ConditionValue implements Serializable {
      * @param location The base location of likeSearch. (NotNull)
      */
     public void setupLikeSearch(String value, final LikeSearchOption option, String location) {
-        final String key = getLikeSearchValueHandler().setValue(value);
+        final String key = getLikeSearchValueHandler().setValue(option.generateRealValue(value));
         _likeSearchLatestLocation = location + "." + key;
-        getLikeSearchValueHandler().setValueFilter(new VaryingValueFilter() {
-            public Object filter(Object before) {
-                return option.generateRealValue((String) before);
-            }
-        });
     }
 
     /**
@@ -502,13 +497,8 @@ public class ConditionValue implements Serializable {
      * @param location The base location of notLikeSearch. (NotNull)
      */
     public void setupNotLikeSearch(String value, final LikeSearchOption option, String location) {
-        final String key = getNotLikeSearchValueHandler().setValue(value);
+        final String key = getNotLikeSearchValueHandler().setValue(option.generateRealValue(value));
         _notLikeSearchLatestLocation = location + "." + key;
-        getNotLikeSearchValueHandler().setValueFilter(new VaryingValueFilter() {
-            public Object filter(Object before) {
-                return option.generateRealValue((String) before);
-            }
-        });
     }
 
     /**
@@ -656,8 +646,8 @@ public class ConditionValue implements Serializable {
     }
 
     // -----------------------------------------------------
-    //                                                Hanler
-    //                                                ------
+    //                                               Handler
+    //                                               -------
     protected static interface ValueHandler {
         Object getValue();
 
@@ -716,22 +706,13 @@ public class ConditionValue implements Serializable {
 
     protected class VaryingValueHandler implements ValueHandler {
         protected final ConditionKey _conditionKey;
-        protected VaryingValueFilter _valueFilter;
 
         public VaryingValueHandler(ConditionKey conditionKey) {
             _conditionKey = conditionKey;
         }
 
         public Object getValue() {
-            Object value = getVaryingValue(_conditionKey);
-            if (_valueFilter != null) {
-                // for example, filtering of LikeSearchOption
-                // should be executed at late timing
-                // for Oracle's double byte wild-card
-                // so here it uses filter objects
-                value = _valueFilter.filter(value);
-            }
-            return value;
+            return getVaryingValue(_conditionKey);
         }
 
         public String setValue(Object value) {
@@ -749,14 +730,6 @@ public class ConditionValue implements Serializable {
         public void overrideValue(Object value) {
             setValue(value);
         }
-
-        public void setValueFilter(VaryingValueFilter valueFilter) {
-            _valueFilter = valueFilter;
-        }
-    }
-
-    protected static interface VaryingValueFilter {
-        Object filter(Object before);
     }
 
     // ===================================================================================
