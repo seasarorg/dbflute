@@ -449,9 +449,9 @@ public class ConditionValue implements Serializable {
     //                                                                         Like Search
     //                                                                         ===========
     protected String _likeSearchLatestLocation;
-    protected transient ValueHandler _likeSearchValueHandler;
+    protected transient VaryingValueHandler _likeSearchValueHandler;
 
-    protected ValueHandler getLikeSearchValueHandler() {
+    protected VaryingValueHandler getLikeSearchValueHandler() {
         if (_likeSearchValueHandler == null) {
             _likeSearchValueHandler = new VaryingValueHandler(ConditionKey.CK_LIKE_SEARCH);
         }
@@ -464,9 +464,14 @@ public class ConditionValue implements Serializable {
      * @param option The option of likeSearch. (NotNull)
      * @param location The base location of likeSearch. (NotNull)
      */
-    public void setupLikeSearch(String value, LikeSearchOption option, String location) {
-        final String key = getLikeSearchValueHandler().setValue(option.generateRealValue(value));
+    public void setupLikeSearch(String value, final LikeSearchOption option, String location) {
+        final String key = getLikeSearchValueHandler().setValue(value);
         _likeSearchLatestLocation = location + "." + key;
+        getLikeSearchValueHandler().setValueFilter(new VaryingValueFilter() {
+            public Object filter(Object before) {
+                return option.generateRealValue((String) before);
+            }
+        });
     }
 
     /**
@@ -481,9 +486,9 @@ public class ConditionValue implements Serializable {
     //                                                                     Not Like Search
     //                                                                     ===============
     protected String _notLikeSearchLatestLocation;
-    protected transient ValueHandler _notLikeSearchValueHandler;
+    protected transient VaryingValueHandler _notLikeSearchValueHandler;
 
-    protected ValueHandler getNotLikeSearchValueHandler() {
+    protected VaryingValueHandler getNotLikeSearchValueHandler() {
         if (_notLikeSearchValueHandler == null) {
             _notLikeSearchValueHandler = new VaryingValueHandler(ConditionKey.CK_NOT_LIKE_SEARCH);
         }
@@ -496,9 +501,14 @@ public class ConditionValue implements Serializable {
      * @param option The option of notLikeSearch. (NotNull)
      * @param location The base location of notLikeSearch. (NotNull)
      */
-    public void setupNotLikeSearch(String value, LikeSearchOption option, String location) {
-        final String key = getNotLikeSearchValueHandler().setValue(option.generateRealValue(value));
+    public void setupNotLikeSearch(String value, final LikeSearchOption option, String location) {
+        final String key = getNotLikeSearchValueHandler().setValue(value);
         _notLikeSearchLatestLocation = location + "." + key;
+        getNotLikeSearchValueHandler().setValueFilter(new VaryingValueFilter() {
+            public Object filter(Object before) {
+                return option.generateRealValue((String) before);
+            }
+        });
     }
 
     /**
@@ -661,7 +671,7 @@ public class ConditionValue implements Serializable {
     }
 
     protected class StandardValueHandler implements ValueHandler {
-        protected ConditionKey _conditionKey;
+        protected final ConditionKey _conditionKey;
 
         public StandardValueHandler(ConditionKey conditionKey) {
             _conditionKey = conditionKey;
@@ -705,14 +715,23 @@ public class ConditionValue implements Serializable {
     }
 
     protected class VaryingValueHandler implements ValueHandler {
-        protected ConditionKey _conditionKey;
+        protected final ConditionKey _conditionKey;
+        protected VaryingValueFilter _valueFilter;
 
         public VaryingValueHandler(ConditionKey conditionKey) {
             _conditionKey = conditionKey;
         }
 
         public Object getValue() {
-            return getVaryingValue(_conditionKey);
+            Object value = getVaryingValue(_conditionKey);
+            if (_valueFilter != null) {
+                // for example, filtering of LikeSearchOption
+                // should be executed at late timing
+                // for Oracle's double byte wild-card
+                // so here it uses filter objects
+                value = _valueFilter.filter(value);
+            }
+            return value;
         }
 
         public String setValue(Object value) {
@@ -730,6 +749,14 @@ public class ConditionValue implements Serializable {
         public void overrideValue(Object value) {
             setValue(value);
         }
+
+        public void setValueFilter(VaryingValueFilter valueFilter) {
+            _valueFilter = valueFilter;
+        }
+    }
+
+    protected static interface VaryingValueFilter {
+        Object filter(Object before);
     }
 
     // ===================================================================================
