@@ -1269,14 +1269,6 @@ public class Database {
         return getClassificationProperties().getClassificationNameList();
     }
 
-    public List<String> getClassificationNameListValidNameOnly() {
-        return getClassificationProperties().getClassificationNameListValidNameOnly();
-    }
-
-    public List<String> getClassificationNameListValidAliasOnly() {
-        return getClassificationProperties().getClassificationNameListValidAliasOnly();
-    }
-
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
         return getClassificationProperties()
                 .getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();

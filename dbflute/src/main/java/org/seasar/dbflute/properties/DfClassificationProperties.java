@@ -396,11 +396,16 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return new ArrayList<String>(getClassificationDefinitionMap().keySet());
     }
 
-    public List<String> getClassificationNameListValidNameOnly() {
+    protected List<String> _classificationValidNameOnlyList;
+
+    protected List<String> getClassificationValidNameOnlyList() {
+        if (_classificationValidNameOnlyList != null) {
+            return _classificationValidNameOnlyList;
+        }
         final String codeKey = DfClassificationElement.KEY_CODE;
         final String nameKey = DfClassificationElement.KEY_NAME;
 
-        final List<String> resultList = new ArrayList<String>();
+        _classificationValidNameOnlyList = new ArrayList<String>();
         final Set<String> keySet = getClassificationDefinitionMap().keySet();
 
         classificationNameListLoop: for (String string : keySet) {
@@ -408,21 +413,27 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             for (Map<String, String> map : list) {
                 final String code = map.get(codeKey);
                 final String name = map.get(nameKey);
-                if (!code.equals(name)) {
-                    resultList.add(string);
+                // IgnoreCase because codes and names may be filtered
+                if (!code.equalsIgnoreCase(name)) {
+                    _classificationValidNameOnlyList.add(string);
                     continue classificationNameListLoop;
                 }
             }
         }
-        return resultList;
+        return _classificationValidNameOnlyList;
     }
 
-    public List<String> getClassificationNameListValidAliasOnly() {
+    protected List<String> _classificationValidAliasOnlyList;
+
+    protected List<String> getClassificationValidAliasOnlyList() {
+        if (_classificationValidAliasOnlyList != null) {
+            return _classificationValidAliasOnlyList;
+        }
         final String codeKey = DfClassificationElement.KEY_CODE;
         final String nameKey = DfClassificationElement.KEY_NAME;
         final String aliasKey = DfClassificationElement.KEY_ALIAS;
 
-        final List<String> resultList = new ArrayList<String>();
+        _classificationValidAliasOnlyList = new ArrayList<String>();
         final Set<String> keySet = getClassificationDefinitionMap().keySet();
 
         classificationNameListLoop: for (String string : keySet) {
@@ -431,13 +442,14 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 final String code = map.get(codeKey);
                 final String name = map.get(nameKey);
                 final String alias = map.get(aliasKey);
-                if (!code.equals(alias) && !name.equals(alias)) {
-                    resultList.add(string);
+                // IgnoreCase because codes and names may be filtered
+                if (!code.equalsIgnoreCase(alias) && !name.equalsIgnoreCase(alias)) {
+                    _classificationValidAliasOnlyList.add(string);
                     continue classificationNameListLoop;
                 }
             }
         }
-        return resultList;
+        return _classificationValidAliasOnlyList;
     }
 
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
@@ -662,7 +674,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (classificationName == null) {
             return false;
         }
-        return getClassificationNameListValidNameOnly().contains(classificationName);
+        return getClassificationValidNameOnlyList().contains(classificationName);
     }
 
     public boolean hasClassificationAlias(String tableName, String columnName) {
@@ -674,7 +686,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     public boolean hasClassificationAlias(String classificationName) {
-        return getClassificationNameListValidAliasOnly().contains(classificationName);
+        return getClassificationValidAliasOnlyList().contains(classificationName);
     }
 
     // --------------------------------------
