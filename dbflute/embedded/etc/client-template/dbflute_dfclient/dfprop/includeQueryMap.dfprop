@@ -53,6 +53,8 @@ map:{
     }
     ; Date = map:{
         ; NotEqual = map:{}
+        ; InScope = map:{}
+        ; NotInScope = map:{}
     }
 }
 # ----------------/

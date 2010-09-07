@@ -177,6 +177,14 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable("Date", "FromTo", tableName, columnName);
     }
 
+    public boolean isAvailableDateInScope(String tableName, String columnName) {
+        return isAvailable("Date", "InScope", tableName, columnName);
+    }
+
+    public boolean isAvailableDateNotInScope(String tableName, String columnName) {
+        return isAvailable("Date", "NotInScope", tableName, columnName);
+    }
+
     // ---------------------------------------
     //                                  String Old AsInline
     //                                  ------

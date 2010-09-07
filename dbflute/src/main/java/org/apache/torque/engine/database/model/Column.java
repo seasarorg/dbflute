@@ -1697,7 +1697,12 @@ public class Column {
     }
 
     public boolean isAvailableStringInScope() {
-        // It's available if it's flag because this is so basic comparison.
+        if (isForeignKey() || isPrimaryKey()) {
+            // if PK, it's very basic condition for primary key
+            // if FK, it may be used by LoadReferrer
+            return true;
+        }
+        // It's available even if it's flag because this is so basic comparison.
         return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());
     }
 
@@ -1759,7 +1764,12 @@ public class Column {
     }
 
     public boolean isAvailableNumberInScope() {
-        // It's available if it's flag because this is so basic comparison.
+        if (isForeignKey() || isPrimaryKey()) {
+            // if PK, it's very basic condition for primary key
+            // if FK, it may be used by LoadReferrer
+            return true;
+        }
+        // It's available even if it's flag because this is so basic comparison.
         return getIncludeQueryProperties().isAvailableNumberInScope(getTableName(), getName());
     }
 
@@ -1796,6 +1806,19 @@ public class Column {
 
     public boolean isAvailableDateFromTo() {
         return getIncludeQueryProperties().isAvailableDateFromTo(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateInScope() {
+        if (isForeignKey() || isPrimaryKey()) {
+            // if PK, it's very basic condition for primary key
+            // if FK, it may be used by LoadReferrer
+            return true;
+        }
+        return getIncludeQueryProperties().isAvailableDateInScope(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateNotInScope() {
+        return getIncludeQueryProperties().isAvailableDateNotInScope(getTableName(), getName());
     }
 
     protected DfIncludeQueryProperties getIncludeQueryProperties() {

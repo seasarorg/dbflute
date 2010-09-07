@@ -480,6 +480,12 @@ namespace ${glPackageBaseCQ} {
         { regFTQ(from, to, getCValue${tmpJavaName}(), "${col.name}", option); }
         public void Set${tmpJavaName}_DateFromTo(DateTime? from, DateTime? to) { Set${tmpJavaName}_FromTo(from, to, new ${glDateFromToOption}()); }
 #end
+#if (${col.isAvailableDateInScope()})
+        public void Set${tmpJavaName}_InScope(IList<${col.javaNative}> ls) { regINS<${col.javaNative}>(CK_INS, cTL<${col.javaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
+#end
+#if (${col.isAvailableDateNotInScope()})
+        public void Set${tmpJavaName}_NotInScope(IList<${col.javaNative}> ls) { regINS<${col.javaNative}>(CK_NINS, cTL<${col.javaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
+#end
 #end
 #if (${col.isJavaNativeBooleanObject()})
 
