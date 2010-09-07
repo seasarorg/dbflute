@@ -271,14 +271,18 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 			<tr>
 				<th id="${classificationName}Cls">Code</th>
 				<th>Name</th>
+#if ($database.hasClassificationAlias($classificationName))
 				<th>Alias</th>
+#end
 				<th>Comment</th>
 			</tr>
 #foreach ($classificationMap in $classificationMapList)
 			<tr>
 				<td>$classificationMap.get('code')</td>
 				<td>${classificationMap.get('name')}</td>
+#if ($database.hasClassificationAlias($classificationName))
 				<td>#if ($classificationMap.containsKey('alias'))${classificationMap.get('alias')}#else &nbsp;#end</td>
+#end
 				<td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
 			</tr>
 #end

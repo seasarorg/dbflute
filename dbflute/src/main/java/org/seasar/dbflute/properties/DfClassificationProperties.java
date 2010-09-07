@@ -670,6 +670,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (classificationName == null) {
             return false;
         }
+        return hasClassificationAlias(classificationName);
+    }
+
+    public boolean hasClassificationAlias(String classificationName) {
         return getClassificationNameListValidAliasOnly().contains(classificationName);
     }
 

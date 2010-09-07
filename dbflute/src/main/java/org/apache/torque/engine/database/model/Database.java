@@ -1330,6 +1330,10 @@ public class Database {
         return getClassificationProperties().hasClassificationAlias(tableName, columnName);
     }
 
+    public boolean hasClassificationAlias(String classificationName) {
+        return getClassificationProperties().hasClassificationAlias(classificationName);
+    }
+
     public Map<String, String> getAllColumnClassificationMap() { // for EntityDefinedCommonColumn
         return getClassificationProperties().getAllColumnClassificationMap();
     }
