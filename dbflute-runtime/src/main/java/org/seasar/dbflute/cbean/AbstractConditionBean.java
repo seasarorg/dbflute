@@ -30,7 +30,6 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
-import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -253,10 +252,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         _colQyCBMap.put(key, cb);
         final String from = "/*pmb.conditionQuery.";
         final String to = "/*pmb.colQyCBMap." + key + ".conditionQuery.";
-        final String terminal = SubQueryIndentProcessor.IDENTITY_TERMINAL;
         String result = source;
         result = Srl.replace(result, from, to);
-        result = Srl.replace(result, terminal, "[" + colQyCBIndex + "]" + terminal); // becomes unique
         return result;
     }
 

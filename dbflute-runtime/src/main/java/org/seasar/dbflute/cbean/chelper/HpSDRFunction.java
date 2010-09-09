@@ -157,7 +157,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         if (isPurposeNullAlias()) {
             if (aliasName != null) {
                 String msg = "The aliasName should be null in the purpose: " + _baseCB.getPurpose();
-                new SpecifyDerivedReferrerInvalidAliasNameException(msg);
+                throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
             }
         } else { // normal
             if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {

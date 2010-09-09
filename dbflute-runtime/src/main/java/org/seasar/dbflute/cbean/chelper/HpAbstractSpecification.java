@@ -48,7 +48,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         ++_specifyColumnCount;
         assertColumn(columnName);
         if (_query == null) {
-            _query = currentQyCall().qy();
+            _query = qyCall().qy();
         }
         if (isRequiredColumnSpecificationEnabled()) {
             _alreadySpecifiedRequiredColumn = true;
@@ -72,13 +72,13 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             // no specification is checked at an other timing
         }
         if (isNormalUse()) { // only normal purpose needs
-            if (_query == null && !currentQyCall().has()) { // setupSelect check!
+            if (_query == null && !qyCall().has()) { // setupSelect check!
                 throwSpecifyColumnNotSetupSelectColumnException(columnName);
             }
         }
     }
 
-    protected HpSpQyCall<CQ> currentQyCall() {
+    protected HpSpQyCall<CQ> qyCall() { // basically for SpecifyColumn (NOT DerivedReferrer)
         return _switchedToQyCall != null ? _switchedToQyCall : _qyCall;
     }
 

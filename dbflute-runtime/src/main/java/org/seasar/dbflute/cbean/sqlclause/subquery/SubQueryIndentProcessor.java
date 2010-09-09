@@ -51,7 +51,13 @@ public class SubQueryIndentProcessor implements Serializable {
         boolean throughBeginFirst = false;
         String subQueryIdentity = null;
         String indent = null;
-        for (final String line : lines) {
+        String preRemainder = null;
+        for (String line : lines) {
+            final boolean existsPreRemainder = Srl.is_NotNull_and_NotTrimmedEmpty(preRemainder);
+            if (existsPreRemainder) {
+                line = preRemainder + ln() + (indent != null ? indent : "") + line;
+                preRemainder = null;
+            }
             if (!throughBegin) {
                 if (line.contains(beginMarkPrefix)) {
                     throughBegin = true;
@@ -65,7 +71,13 @@ public class SubQueryIndentProcessor implements Serializable {
                     final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
                     subQueryIdentity = line.substring(markIndex + beginMarkPrefix.length(), terminalIndex);
                     subSb.append(clause);
-                    indent = buildSpaceBar(markIndex - preIndent.length());
+                    if (existsPreRemainder) {
+                        subSb.append(ln());
+                        throughBeginFirst = true;
+                        indent = buildSpaceBar(indent.length() - preIndent.length());
+                    } else {
+                        indent = buildSpaceBar(markIndex - preIndent.length());
+                    }
                 } else {
                     mainSb.append(line).append(ln());
                 }
@@ -80,8 +92,9 @@ public class SubQueryIndentProcessor implements Serializable {
                         String msg = "Identity terminal was not found at the begin line: [" + line + "]";
                         throw new SubQueryIndentFailureException(msg);
                     }
-                    final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
-                    subSb.append(clause).append(ln());
+                    final String clause = line.substring(0, markIndex);
+                    preRemainder = line.substring(terminalIndex + terminalLength);
+                    subSb.append(clause).append(Srl.is_Null_or_TrimmedEmpty(preRemainder) ? ln() : "");
                     final String currentSql = processSubQueryIndent(subSb.toString(), preIndent + indent, originalSql);
                     mainSb.append(currentSql);
                     throughBegin = false;
@@ -95,6 +108,9 @@ public class SubQueryIndentProcessor implements Serializable {
                     }
                 }
             }
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(preRemainder)) {
+            mainSb.append(preRemainder);
         }
         final String filteredSql = mainSb.toString();
 
