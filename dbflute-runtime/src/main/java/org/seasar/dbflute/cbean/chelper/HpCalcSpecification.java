@@ -42,11 +42,29 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     public ColumnRealName getSpecifiedColumnRealName() {
-        return _cb.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        final ColumnRealName columnRealName = _cb.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        if (columnRealName != null) {
+            return columnRealName;
+        }
+        final String subQuery = _cb.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
+        if (subQuery != null) {
+            // basically for (Specify)DerivedReferrer in ColumnQuery
+            return new ColumnRealName(null, new ColumnSqlName(subQuery));
+        }
+        return null;
     }
 
     public ColumnSqlName getSpecifiedColumnSqlName() {
-        return _cb.getSqlClause().getSpecifiedColumnSqlNameAsOne();
+        final ColumnSqlName columnSqlName = _cb.getSqlClause().getSpecifiedColumnSqlNameAsOne();
+        if (columnSqlName != null) {
+            return columnSqlName;
+        }
+        final String subQuery = _cb.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
+        if (subQuery != null) {
+            // basically for (Specify)DerivedReferrer in ColumnQuery
+            return new ColumnSqlName(subQuery);
+        }
+        return null;
     }
 
     // ===================================================================================

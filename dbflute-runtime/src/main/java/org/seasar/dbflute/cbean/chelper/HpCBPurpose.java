@@ -21,7 +21,7 @@ public enum HpCBPurpose {
     // needs to switch condition-bean used in specification
     // to non-checked condition-bean.
     // Because specification uses query internally.
-    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyDerivedReferrer().noQuery()) // ColumnQuery
+    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noQuery()) // ColumnQuery
     , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
 

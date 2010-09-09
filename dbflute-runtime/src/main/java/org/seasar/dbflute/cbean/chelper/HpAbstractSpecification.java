@@ -16,7 +16,8 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                           Attribute
     //                                                                           =========
     protected final ConditionBean _baseCB;
-    protected HpSpQyCall<CQ> _qyCall; // not final because it may be switched
+    protected final HpSpQyCall<CQ> _qyCall; // not final because it may be switched
+    protected HpSpQyCall<CQ> _switchedToQyCall;
     protected final HpCBPurpose _purpose;
     protected final DBMetaProvider _dbmetaProvider;
     protected CQ _query;
@@ -47,7 +48,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         ++_specifyColumnCount;
         assertColumn(columnName);
         if (_query == null) {
-            _query = _qyCall.qy();
+            _query = currentQyCall().qy();
         }
         if (isRequiredColumnSpecificationEnabled()) {
             _alreadySpecifiedRequiredColumn = true;
@@ -71,10 +72,14 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             // no specification is checked at an other timing
         }
         if (isNormalUse()) { // only normal purpose needs
-            if (_query == null && !_qyCall.has()) { // setupSelect check!
+            if (_query == null && !currentQyCall().has()) { // setupSelect check!
                 throwSpecifyColumnNotSetupSelectColumnException(columnName);
             }
         }
+    }
+
+    protected HpSpQyCall<CQ> currentQyCall() {
+        return _switchedToQyCall != null ? _switchedToQyCall : _qyCall;
     }
 
     protected boolean isRequiredColumnSpecificationEnabled() {
@@ -149,6 +154,6 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             String msg = "The argument 'qyCall' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _qyCall = qyCall;
+        _switchedToQyCall = qyCall;
     }
 }

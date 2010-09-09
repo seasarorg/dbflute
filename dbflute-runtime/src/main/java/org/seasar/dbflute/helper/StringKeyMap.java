@@ -73,7 +73,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
 
     /**
      * Create The map of string key as case insensitive. <br />
-     * You can set null value. And plain keys to be set is kept.
+     * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive. (NotNull)
      */
@@ -83,7 +83,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
 
     /**
      * Create The map of string key as case insensitive and concurrent. <br />
-     * You cannot set null value. And plain keys to be set is NOT kept.
+     * You cannot set null key and value. And plain keys to be set is NOT kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive and concurrent. (NotNull)
      */
@@ -93,7 +93,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
 
     /**
      * Create The map of string key as case insensitive and ordered. <br />
-     * You can set null value. And plain keys to be set is kept.
+     * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive and ordered. (NotNull)
      */
@@ -103,7 +103,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
 
     /**
      * Create The map of string key as flexible. <br />
-     * You can set null value. And plain keys to be set is kept.
+     * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as flexible. (NotNull)
      */
@@ -113,7 +113,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
 
     /**
      * Create The map of string key as flexible and concurrent. <br />
-     * You cannot set null value. And plain keys to be set is NOT kept.
+     * You cannot set null key and value. And plain keys to be set is NOT kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as flexible and concurrent. (NotNull)
      */
@@ -123,7 +123,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
 
     /**
      * Create The map of string key as flexible and ordered. <br />
-     * You can set null value. And plain keys to be set is kept.
+     * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as flexible and ordered. (NotNull)
      */
@@ -139,36 +139,27 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     //                                           -----------
     public VALUE get(Object key) {
         final String stringKey = convertStringKey(key);
-        if (stringKey != null) {
-            return _searchMap.get(stringKey);
-        }
-        return null;
+        return _searchMap.get(stringKey);
     }
 
     public VALUE put(String key, VALUE value) {
         final String stringKey = convertStringKey(key);
-        if (stringKey != null) {
-            if (_plainMap != null) { // non thread safe
-                final String plainKey = generatePlainKey(key, stringKey);
-                _plainMap.put(plainKey, value);
-                _searchPlainKeyMap.put(stringKey, plainKey);
-            }
-            return _searchMap.put(stringKey, value);
+        if (_plainMap != null) { // non thread safe
+            final String plainKey = generatePlainKey(key, stringKey);
+            _plainMap.put(plainKey, value);
+            _searchPlainKeyMap.put(stringKey, plainKey);
         }
-        return null;
+        return _searchMap.put(stringKey, value);
     }
 
     public VALUE remove(Object key) {
         final String stringKey = convertStringKey(key);
-        if (stringKey != null) {
-            if (_plainMap != null) { // non thread safe
-                final String plainKey = generatePlainKey(key, stringKey);
-                _plainMap.remove(plainKey);
-                _searchPlainKeyMap.remove(stringKey);
-            }
-            return _searchMap.remove(stringKey);
+        if (_plainMap != null) { // non thread safe
+            final String plainKey = generatePlainKey(key, stringKey);
+            _plainMap.remove(plainKey);
+            _searchPlainKeyMap.remove(stringKey);
         }
-        return null;
+        return _searchMap.remove(stringKey);
     }
 
     protected String generatePlainKey(Object key, String stringKey) {

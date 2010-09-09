@@ -577,6 +577,10 @@ public interface SqlClause {
 
     List<String> getSpecifiedDerivingAliasList();
 
+    String getSpecifiedDerivingAliasNameAsOne();
+
+    String getSpecifiedDerivingSubQueryAsOne();
+
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================

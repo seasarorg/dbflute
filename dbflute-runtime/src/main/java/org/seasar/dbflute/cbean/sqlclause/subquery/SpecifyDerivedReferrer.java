@@ -37,7 +37,8 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     protected String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent) {
-        return "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + _aliasName + endMark;
+        final String aliasExp = _aliasName != null ? " as " + _aliasName : "";
+        return "(" + beginMark + subQueryClause + ln() + endIndent + ")" + aliasExp + endMark;
     }
 
     @Override

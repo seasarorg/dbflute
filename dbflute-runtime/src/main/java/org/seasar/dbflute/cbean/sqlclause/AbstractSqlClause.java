@@ -1861,6 +1861,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return new ArrayList<String>(_specifiedDerivingSubQueryMap.keySet());
     }
 
+    public String getSpecifiedDerivingAliasNameAsOne() {
+        if (_specifiedDerivingSubQueryMap != null && _specifiedDerivingSubQueryMap.size() == 1) {
+            return _specifiedDerivingSubQueryMap.keySet().iterator().next();
+        }
+        return null;
+    }
+
+    public String getSpecifiedDerivingSubQueryAsOne() {
+        if (_specifiedDerivingSubQueryMap != null && _specifiedDerivingSubQueryMap.size() == 1) {
+            return _specifiedDerivingSubQueryMap.values().iterator().next();
+        }
+        return null;
+    }
+
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================

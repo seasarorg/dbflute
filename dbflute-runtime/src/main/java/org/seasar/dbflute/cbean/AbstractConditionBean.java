@@ -825,6 +825,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
+    public HpCBPurpose getPurpose() {
+        return _purpose;
+    }
+
     // very internal
     public void xsetupForUnion() {
         xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);

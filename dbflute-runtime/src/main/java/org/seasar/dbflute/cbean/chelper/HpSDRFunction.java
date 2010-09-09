@@ -4,7 +4,9 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The function of specify-derived-referrer.
@@ -51,7 +53,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      */
     public void count(SubQuery<REFERRER_CB> subQuery, String aliasName) {
         assertAliasName(aliasName);
-        _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
+        _querySetupper.setup("count", subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -69,7 +71,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      */
     public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName) {
         assertAliasName(aliasName);
-        _querySetupper.setup("count(distinct", subQuery, _localCQ, aliasName.trim());
+        _querySetupper.setup("count(distinct", subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -87,7 +89,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      */
     public void max(SubQuery<REFERRER_CB> subQuery, String aliasName) {
         assertAliasName(aliasName);
-        _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());
+        _querySetupper.setup("max", subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -105,7 +107,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      */
     public void min(SubQuery<REFERRER_CB> subQuery, String aliasName) {
         assertAliasName(aliasName);
-        _querySetupper.setup("min", subQuery, _localCQ, aliasName.trim());
+        _querySetupper.setup("min", subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -123,7 +125,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      */
     public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName) {
         assertAliasName(aliasName);
-        _querySetupper.setup("sum", subQuery, _localCQ, aliasName.trim());
+        _querySetupper.setup("sum", subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -141,15 +143,26 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      */
     public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName) {
         assertAliasName(aliasName);
-        _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());
+        _querySetupper.setup("avg", subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected String filterAliasName(String aliasName) {
+        return aliasName != null ? aliasName.trim() : null;
+    }
+
     protected void assertAliasName(String aliasName) {
-        if (aliasName == null || aliasName.trim().length() == 0) {
-            throwSpecifyDerivedReferrerInvalidAliasNameException();
+        if (isPurposeNullAlias()) {
+            if (aliasName != null) {
+                String msg = "The aliasName should be null in the purpose: " + _baseCB.getPurpose();
+                new SpecifyDerivedReferrerInvalidAliasNameException(msg);
+            }
+        } else { // normal
+            if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {
+                throwSpecifyDerivedReferrerInvalidAliasNameException();
+            }
         }
         // *this check was moved to runtime (when creating a behavior command)
         //String tableDbName = _baseCB.getTableDbName();
@@ -169,6 +182,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         //if (!existsSetterMethod) {
         //    throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
         //}
+    }
+
+    protected boolean isPurposeNullAlias() {
+        return _baseCB.getPurpose().equals(HpCBPurpose.COLUMN_QUERY);
     }
 
     protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {

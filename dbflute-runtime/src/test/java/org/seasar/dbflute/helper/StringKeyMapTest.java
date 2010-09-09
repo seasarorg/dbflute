@@ -21,7 +21,27 @@ public class StringKeyMapTest extends PlainTestCase {
     // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
-    public void test_put_null() throws Exception {
+    public void test_put_nullKey() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> mapAsFlexible = StringKeyMap.createAsFlexible();
+        StringKeyMap<Object> mapAsFlexibleConcurrent = StringKeyMap.createAsFlexibleConcurrent();
+
+        // ## Act ##
+        mapAsFlexible.put(null, "foo");
+        try {
+            mapAsFlexibleConcurrent.put(null, "bar");
+            fail();
+        } catch (NullPointerException e) {
+            // OK
+        }
+
+        // ## Assert ##
+        assertEquals("foo", mapAsFlexible.get(null));
+        assertEquals("foo", mapAsFlexible.remove(null));
+        assertEquals(0, mapAsFlexible.size());
+    }
+
+    public void test_put_nullValue() throws Exception {
         // ## Arrange ##
         StringKeyMap<Object> mapAsFlexible = StringKeyMap.createAsFlexible();
         StringKeyMap<Object> mapAsFlexibleConcurrent = StringKeyMap.createAsFlexibleConcurrent();

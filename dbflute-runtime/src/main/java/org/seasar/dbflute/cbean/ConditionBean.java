@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean;
 
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
@@ -206,4 +207,9 @@ public interface ConditionBean extends PagingBean {
      * @param unionQuerySynchronizer The synchronizer of union query. (Nullable)
      */
     void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer);
+
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    HpCBPurpose getPurpose();
 }

@@ -7,6 +7,7 @@ import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.OrderByBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -210,5 +211,9 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public void checkInvalidQuery() {
+    }
+
+    public HpCBPurpose getPurpose() {
+        return null;
     }
 }
