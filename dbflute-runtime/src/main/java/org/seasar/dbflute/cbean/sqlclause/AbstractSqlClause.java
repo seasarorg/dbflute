@@ -508,7 +508,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 final int beginIndex = deriveSubQuery.lastIndexOf(" as ");
                 if (beginIndex >= 0) { // basically true
                     String aliasName = deriveSubQuery.substring(beginIndex + " as ".length());
-                    final int endIndex = aliasName.indexOf("--df:");
+                    final int endIndex = aliasName.indexOf(SubQueryIndentProcessor.END_MARK_PREFIX);
                     if (endIndex >= 0) { // basically true
                         aliasName = aliasName.substring(0, endIndex);
                     }
