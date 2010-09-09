@@ -18,15 +18,15 @@ public class SubQueryIndentProcessor implements Serializable {
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    public static final String BEGIN_MARK_PREFIX = "--df:sqbegin#";
-    public static final String END_MARK_PREFIX = "--df:sqend#";
-    public static final String IDENTITY_TERMINAL = "--df:idterm#";
+    public static final String BEGIN_MARK_PREFIX = "--#df:sqbegin#";
+    public static final String END_MARK_PREFIX = "--#df:sqend#";
+    public static final String IDENTITY_TERMINAL = "#df:idterm#";
 
     // ===================================================================================
     //                                                                    Resolve Identity
     //                                                                    ================
     public String resolveSubQueryBeginMark(String subQueryIdentity) {
-        return END_MARK_PREFIX + subQueryIdentity + IDENTITY_TERMINAL;
+        return BEGIN_MARK_PREFIX + subQueryIdentity + IDENTITY_TERMINAL;
     }
 
     public String resolveSubQueryEndMark(String subQueryIdentity) {

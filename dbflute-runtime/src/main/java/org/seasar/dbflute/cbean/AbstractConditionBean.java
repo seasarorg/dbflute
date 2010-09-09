@@ -40,6 +40,7 @@ import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationExcep
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -194,31 +195,72 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                         ColumnQuery
     //                                                                         ===========
+    protected Map<String, ConditionBean> _colQyCBMap;
+
+    /**
+     * Get the condition-bean map for ColumnQuery. <br />
+     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery.
+     * @return The instance of the map. (Nullable)
+     */
+    public Map<String, ConditionBean> getColQyCBMap() {
+        return _colQyCBMap;
+    }
+
     protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
             SpecifyQuery<CB> rightSp, final String operand) {
         assertQueryPurpose();
         leftSp.specify(leftCB);
-        final ColumnRealName leftColumn = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
-        if (leftColumn == null) {
+        final String leftColumn = xbuildLeftColumn(leftCB);
+        final HpCalcSpecification<CB> rightCalcSp = xcreateCalcSpecification(rightSp);
+        rightCalcSp.specify(rightCB);
+        final String rightColumn = xbuildRightColumn(rightCB, rightCalcSp);
+        final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, rightColumn, rightCalcSp);
+        getSqlClause().registerWhereClause(queryClause);
+        return rightCalcSp;
+    }
+
+    protected <CB extends ConditionBean> String xbuildLeftColumn(CB leftCB) {
+        final String leftSource;
+        {
+            final ColumnRealName realName = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
+            if (realName != null) {
+                leftSource = realName.toString();
+            } else {
+                leftSource = leftCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
+            }
+        }
+        if (leftSource == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
-        final HpCalcSpecification<CB> calcSp = xcreateCalcSpecification(rightSp);
-        calcSp.specify(rightCB);
-        final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, calcSp);
-        getSqlClause().registerWhereClause(queryClause);
-        return calcSp;
+        return xbuildColQyColumn(leftCB, leftSource, "left");
+    }
+
+    protected <CB extends ConditionBean> String xbuildRightColumn(CB rightCB, HpCalcSpecification<CB> rightCalcSp) {
+        final ColumnRealName realName = rightCalcSp.getSpecifiedColumnRealName();
+        if (realName == null) {
+            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
+        }
+        return xbuildColQyColumn(rightCB, realName.toString(), "right");
+    }
+
+    protected <CB extends ConditionBean> String xbuildColQyColumn(CB cb, String source, String keyPrefix) {
+        if (_colQyCBMap == null) {
+            _colQyCBMap = DfCollectionUtil.newHashMap();
+        }
+        final int colQyCBIndex = _colQyCBMap.size();
+        final String key = keyPrefix + colQyCBIndex;
+        _colQyCBMap.put(key, cb);
+        final String from = "/*pmb.conditionQuery.";
+        final String to = "/*pmb.colQyCBMap." + key + ".conditionQuery.";
+        return Srl.replace(source, from, to);
     }
 
     protected <CB extends ConditionBean> HpCalcSpecification<CB> xcreateCalcSpecification(SpecifyQuery<CB> rightSp) {
         return new HpCalcSpecification<CB>(rightSp);
     }
 
-    protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final ColumnRealName leftColumn,
-            final String operand, final HpCalcSpecification<CB> rightCalcSp) {
-        final ColumnRealName rightColumn = rightCalcSp.getSpecifiedColumnRealName();
-        if (rightColumn == null) {
-            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
-        }
+    protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final String leftColumn, final String operand,
+            final String rightColumn, final HpCalcSpecification<CB> rightCalcSp) {
         return new QueryClause() {
             @Override
             public String toString() {
