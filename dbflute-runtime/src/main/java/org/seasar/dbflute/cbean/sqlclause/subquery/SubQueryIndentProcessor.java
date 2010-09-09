@@ -37,7 +37,7 @@ public class SubQueryIndentProcessor implements Serializable {
     //                                                                      Process Indent
     //                                                                      ==============
     public String processSubQueryIndent(final String sql, final String preIndent, final String originalSql) {
-        final String beginMarkPrefix = END_MARK_PREFIX;
+        final String beginMarkPrefix = BEGIN_MARK_PREFIX;
         if (!sql.contains(beginMarkPrefix)) {
             return sql;
         }
