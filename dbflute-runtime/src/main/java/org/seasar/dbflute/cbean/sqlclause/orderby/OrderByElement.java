@@ -180,9 +180,8 @@ public class OrderByElement implements Serializable {
         msg = msg + "The column for order-by was not found in select-clause!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + "If you use 'union()' or 'unionAll()', Check your condition-bean!" + ln();
-        msg = msg + "Order-by for union can use only columns on select-clause." + ln();
-        msg = msg + "So the rule when using union is little difference from the one when NOT using." + ln();
+        msg = msg + "If you use 'union()' or 'unionAll()', check your condition-bean!" + ln();
+        msg = msg + "You can use only order-by columns on select-clause if union." + ln();
         msg = msg + "  For example:" + ln();
         msg = msg + "    [before (x)]" + ln();
         msg = msg + "    AaaCB cb = new AaaCB();" + ln();
@@ -212,7 +211,7 @@ public class OrderByElement implements Serializable {
         msg = msg + ln();
         msg = msg + "[Internal Object]" + ln();
         msg = msg + "selectClauseRealColumnAliasMap=" + selectClauseRealColumnAliasMap + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
+        msg = msg + "* * * * * * * * * */";
         throw new IllegalStateException(msg);
     }
 
