@@ -216,6 +216,11 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
 
+    public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB,
+            String columnName, String referrerName) {
+        // TODO
+    }
+
     public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
             String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -284,6 +289,11 @@ public class ConditionBeanExceptionThrower {
         br.addElement(referrerName);
         final String msg = br.buildExceptionMessage();
         throw new SpecifyDerivedReferrerIllegalPurposeException(msg);
+    }
+
+    public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB,
+            String referrerName) {
+        // TODO
     }
 
     // ===================================================================================

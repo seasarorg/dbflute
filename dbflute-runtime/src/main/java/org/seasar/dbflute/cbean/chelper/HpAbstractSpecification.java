@@ -73,7 +73,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         }
         if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
             if (hasDerivedReferrer()) {
-                // TODO
+                throwSpecifyColumnWithDerivedReferrerException(columnName, null);
             }
         }
         if (isNormalUse()) { // only normal purpose needs
@@ -106,12 +106,12 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         }
         if (_purpose.isNoSpecifyDerivedReferrerTwoOrMore()) {
             if (hasDerivedReferrer()) {
-                // TODO
+                throwSpecifyDerivedReferrerTwoOrMoreException(referrerName);
             }
         }
         if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
             if (_specifyColumnCount > 0) {
-                // TOOD
+                throwSpecifyColumnWithDerivedReferrerException(null, referrerName);
             }
         }
     }
@@ -139,12 +139,20 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         createCBExThrower().throwSpecifyColumnNotSetupSelectColumnException(_baseCB, columnName);
     }
 
+    protected void throwSpecifyColumnWithDerivedReferrerException(String columnName, String referrerName) {
+        createCBExThrower().throwSpecifyColumnWithDerivedReferrerException(_purpose, _baseCB, columnName, referrerName);
+    }
+
     protected void throwSpecifyRelationIllegalPurposeException(String relationName) {
         createCBExThrower().throwSpecifyRelationIllegalPurposeException(_purpose, _baseCB, relationName);
     }
 
     protected void throwSpecifyDerivedReferrerIllegalPurposeException(String referrerName) {
         createCBExThrower().throwSpecifyDerivedReferrerIllegalPurposeException(_purpose, _baseCB, referrerName);
+    }
+
+    protected void throwSpecifyDerivedReferrerTwoOrMoreException(String referrerName) {
+        createCBExThrower().throwSpecifyDerivedReferrerTwoOrMoreException(_purpose, _baseCB, referrerName);
     }
 
     // ===================================================================================
