@@ -10,6 +10,7 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.*;
+import org.seasar.dbflute.cbean.coption.*;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -531,8 +532,8 @@ public class ${myClassName} extends AbstractConditionBean {
         public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
             assertDerived("${tmpPropertyName}");
             return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
-                public void setup(String function, SubQuery<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) {
-                    cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); } }, _dbmetaProvider);
+                public void setup(String function, SubQuery<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName, DerivedReferrerOption option) {
+                    cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName, option); } }, _dbmetaProvider);
         }
 #end
 #end
@@ -669,4 +670,5 @@ public class ${myClassName} extends AbstractConditionBean {
     protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
     protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
     protected String getSubQueryClassNameInternally() { return SubQuery.class.getName(); }
+    protected String getConditionOptionClassNameInternally() { return ConditionOption.class.getName(); }
 }

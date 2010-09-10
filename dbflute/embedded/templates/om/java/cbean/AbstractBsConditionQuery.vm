@@ -480,11 +480,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String aliasName) {
+    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String aliasName, DerivedReferrerOption option) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName, option);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -499,27 +499,27 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
     /**
-     * Get the instance for referrer table to set up derived column as query. <br />
+     * Prepare for (Query)DerivedReferrer. <br />
      * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
      * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
-     * @return The object to set up a function. (NotNull)
+     * @return The object to set up a function for referrer table. (NotNull)
      */
     public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
         return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
-            public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
-                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
+            public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value, DerivedReferrerOption option) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value, option);
             }
         });
     }
-    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
+    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value, DerivedReferrerOption option) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
         String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
-        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName, option);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
     public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
@@ -893,11 +893,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String aliasName) {
+    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String aliasName, DerivedReferrerOption option) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName, option);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
@@ -922,17 +922,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
         return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
-            public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
-                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
+            public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value, DerivedReferrerOption option) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value, option);
             }
         });
     }
-    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
+    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value, DerivedReferrerOption option) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
         String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
-        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName, option);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
     public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
