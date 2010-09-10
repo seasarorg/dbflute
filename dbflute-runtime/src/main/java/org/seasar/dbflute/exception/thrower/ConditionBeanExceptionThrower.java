@@ -250,6 +250,8 @@ public class ConditionBeanExceptionThrower {
         br.addElement(baseCB.getClass().getName());
         br.addItem("Specified Column");
         br.addElement(baseCB.getTableDbName() + "." + columnName);
+        br.addItem("Derived Referrer");
+        br.addElement(referrerName);
         final String msg = br.buildExceptionMessage();
         throw new SpecifyColumnWithDerivedReferrerException(msg);
     }
