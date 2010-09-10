@@ -38,7 +38,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery) {
-        return new HpQDRParameter<CB, Integer>("count", subQuery, _setupper);
+        return count(subQuery, null);
+    }
+
+    public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery, Object coalesce) {
+        return new HpQDRParameter<CB, Integer>("count", coalesce, subQuery, _setupper);
     }
 
     /**
@@ -55,7 +59,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery) {
-        return new HpQDRParameter<CB, Integer>("count(distinct", subQuery, _setupper);
+        return countDistinct(subQuery, null);
+    }
+
+    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery, Object coalesce) {
+        return new HpQDRParameter<CB, Integer>("count(distinct", coalesce, subQuery, _setupper);
     }
 
     /**
@@ -72,7 +80,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery) {
-        return new HpQDRParameter<CB, Object>("max", subQuery, _setupper);
+        return max(subQuery, null);
+    }
+
+    public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery, Object coalesce) {
+        return new HpQDRParameter<CB, Object>("max", coalesce, subQuery, _setupper);
     }
 
     /**
@@ -89,7 +101,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery) {
-        return new HpQDRParameter<CB, Object>("min", subQuery, _setupper);
+        return min(subQuery, null);
+    }
+
+    public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery, Object coalesce) {
+        return new HpQDRParameter<CB, Object>("min", coalesce, subQuery, _setupper);
     }
 
     /**
@@ -106,7 +122,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery) {
-        return new HpQDRParameter<CB, Number>("sum", subQuery, _setupper);
+        return sum(subQuery, null);
+    }
+
+    public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery, Object coalesce) {
+        return new HpQDRParameter<CB, Number>("sum", coalesce, subQuery, _setupper);
     }
 
     /**
@@ -123,6 +143,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery) {
-        return new HpQDRParameter<CB, Number>("avg", subQuery, _setupper);
+        return avg(subQuery, null);
+    }
+
+    public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery, Object coalesce) {
+        return new HpQDRParameter<CB, Number>("avg", coalesce, subQuery, _setupper);
     }
 }

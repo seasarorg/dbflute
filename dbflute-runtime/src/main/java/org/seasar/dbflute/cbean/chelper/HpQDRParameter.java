@@ -14,14 +14,16 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     //                                                                           Attribute
     //                                                                           =========
     protected String _function;
+    protected Object _coalesce;
     protected SubQuery<CB> _subQuery;
     protected HpQDRSetupper<CB> _setupper;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpQDRParameter(String function, SubQuery<CB> subQuery, HpQDRSetupper<CB> setupper) {
+    public HpQDRParameter(String function, Object coalesce, SubQuery<CB> subQuery, HpQDRSetupper<CB> setupper) {
         _function = function;
+        _coalesce = coalesce;
         _subQuery = subQuery;
         _setupper = setupper;
     }
@@ -43,7 +45,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param value The value of parameter. (NotNull) 
      */
     public void equal(PARAMETER value) {
-        _setupper.setup(_function, _subQuery, "=", value);
+        _setupper.setup(_function, _subQuery, _coalesce, "=", value);
     }
 
     /**
@@ -60,7 +62,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param value The value of parameter. (NotNull) 
      */
     public void greaterThan(PARAMETER value) {
-        _setupper.setup(_function, _subQuery, ">", value);
+        _setupper.setup(_function, _subQuery, _coalesce, ">", value);
     }
 
     /**
@@ -77,7 +79,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param value The value of parameter. (NotNull) 
      */
     public void lessThan(PARAMETER value) {
-        _setupper.setup(_function, _subQuery, "<", value);
+        _setupper.setup(_function, _subQuery, _coalesce, "<", value);
     }
 
     /**
@@ -94,7 +96,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param value The value of parameter. (NotNull) 
      */
     public void greaterEqual(PARAMETER value) {
-        _setupper.setup(_function, _subQuery, ">=", value);
+        _setupper.setup(_function, _subQuery, _coalesce, ">=", value);
     }
 
     /**
@@ -111,7 +113,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param value The value of parameter. (NotNull) 
      */
     public void lessEqual(PARAMETER value) {
-        _setupper.setup(_function, _subQuery, "<=", value);
+        _setupper.setup(_function, _subQuery, _coalesce, "<=", value);
     }
 
 }

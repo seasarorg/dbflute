@@ -780,8 +780,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                              (Specify)DerivedReferrer
     //                              ------------------------
-    protected void registerSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, String aliasName) {
+    protected void registerSpecifyDerivedReferrer(String function, Object coalesce, final ConditionQuery subQuery,
+            String columnDbName, String relatedColumnDbName, String propertyName, String aliasName) {
         assertObjectNotNull("SpecifyDerivedReferrer(function)", function);
         assertObjectNotNull("SpecifyDerivedReferrer(" + columnDbName + ")", subQuery);
         final SqlClause sqlClause = xgetSqlClause();
@@ -801,7 +801,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final SpecifyDerivedReferrer derivedReferrer = new SpecifyDerivedReferrer(sqlClause, subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
-        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName,
+                coalesce);
         xgetSqlClause().specifyDerivingSubQuery(aliasName, clause);
     }
 
@@ -809,8 +810,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                (Query)DerivedReferrer
     //                                ----------------------
-    protected void registerQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, String operand, Object value, String parameterPropertyName) {
+    protected void registerQueryDerivedReferrer(String function, Object coalesce, final ConditionQuery subQuery,
+            String columnDbName, String relatedColumnDbName, String propertyName, String operand, Object value,
+            String parameterPropertyName) {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
         assertObjectNotNull("QueryDerivedReferrer(" + columnDbName + ")", subQuery);
         final SqlClause sqlClause = xgetSqlClause();
@@ -831,7 +833,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final QueryDerivedReferrer derivedReferrer = new QueryDerivedReferrer(sqlClause, subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
-        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName,
+                coalesce);
         registerWhereClause(clause);
     }
 

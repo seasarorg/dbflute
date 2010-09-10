@@ -11,5 +11,5 @@ import org.seasar.dbflute.cbean.SubQuery;
  */
 public interface HpSDRSetupper<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
 
-    void setup(String function, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
+    void setup(String function, Object coalesce, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
 }

@@ -52,8 +52,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void count(SubQuery<REFERRER_CB> subQuery, String aliasName) {
+        count(subQuery, aliasName, null);
+    }
+
+    public void count(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
-        _querySetupper.setup("count", subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("count", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -70,8 +74,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName) {
+        countDistinct(subQuery, aliasName, null);
+    }
+
+    public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
-        _querySetupper.setup("count(distinct", subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("count(distinct", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -88,8 +96,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void max(SubQuery<REFERRER_CB> subQuery, String aliasName) {
+        max(subQuery, aliasName, null);
+    }
+
+    public void max(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
-        _querySetupper.setup("max", subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("max", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -106,8 +118,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void min(SubQuery<REFERRER_CB> subQuery, String aliasName) {
+        min(subQuery, aliasName, null);
+    }
+
+    public void min(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
-        _querySetupper.setup("min", subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("min", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -124,8 +140,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName) {
+        sum(subQuery, aliasName, null);
+    }
+
+    public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
-        _querySetupper.setup("sum", subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("sum", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     /**
@@ -142,8 +162,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName) {
+        avg(subQuery, aliasName, null);
+    }
+
+    public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
-        _querySetupper.setup("avg", subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("avg", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
     }
 
     // ===================================================================================
