@@ -2,6 +2,7 @@ package org.seasar.dbflute.cbean.chelper;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 
 /**
  * @author jflute
@@ -44,11 +45,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for count(). So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery, Object coalesce) {
-        return new HpQDRParameter<CB, Integer>("count", coalesce, subQuery, _setupper);
+    public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        return new HpQDRParameter<CB, Integer>("count", subQuery, option, _setupper);
     }
 
     /**
@@ -71,11 +72,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for countDistinct(). So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery, Object coalesce) {
-        return new HpQDRParameter<CB, Integer>("count(distinct", coalesce, subQuery, _setupper);
+    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        return new HpQDRParameter<CB, Integer>("count(distinct", subQuery, option, _setupper);
     }
 
     /**
@@ -98,11 +99,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for max(). So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery, Object coalesce) {
-        return new HpQDRParameter<CB, Object>("max", coalesce, subQuery, _setupper);
+    public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        return new HpQDRParameter<CB, Object>("max", subQuery, option, _setupper);
     }
 
     /**
@@ -125,11 +126,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for min(). So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery, Object coalesce) {
-        return new HpQDRParameter<CB, Object>("min", coalesce, subQuery, _setupper);
+    public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        return new HpQDRParameter<CB, Object>("min", subQuery, option, _setupper);
     }
 
     /**
@@ -152,11 +153,11 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for sum(). So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery, Object coalesce) {
-        return new HpQDRParameter<CB, Number>("sum", coalesce, subQuery, _setupper);
+    public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        return new HpQDRParameter<CB, Number>("sum", subQuery, option, _setupper);
     }
 
     /**
@@ -179,10 +180,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for avg(). So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery, Object coalesce) {
-        return new HpQDRParameter<CB, Number>("avg", coalesce, subQuery, _setupper);
+    public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery, DerivedReferrerOption option) {
+        return new HpQDRParameter<CB, Number>("avg", subQuery, option, _setupper);
     }
 }

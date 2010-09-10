@@ -13,6 +13,9 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
  */
 public class QueryDerivedReferrer extends DerivedReferrer {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final String _operand;
     protected final Object _value;
     protected final String _parameterPath;

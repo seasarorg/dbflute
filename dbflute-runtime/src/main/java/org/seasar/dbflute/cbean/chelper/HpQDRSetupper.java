@@ -2,6 +2,7 @@ package org.seasar.dbflute.cbean.chelper;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 
 /**
  * @author jflute
@@ -9,5 +10,5 @@ import org.seasar.dbflute.cbean.SubQuery;
  */
 public interface HpQDRSetupper<CB extends ConditionBean> {
 
-    void setup(String function, Object coalesce, SubQuery<CB> subQuery, String operand, Object value);
+    void setup(String function, SubQuery<CB> subQuery, String operand, Object value, DerivedReferrerOption option);
 }

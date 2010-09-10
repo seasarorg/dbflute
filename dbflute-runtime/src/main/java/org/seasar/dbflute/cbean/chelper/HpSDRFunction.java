@@ -3,6 +3,7 @@ package org.seasar.dbflute.cbean.chelper;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -56,14 +57,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for count(). So refer to the method's java-doc.
+     * An overload method for count() with an option. So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      */
-    public void count(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
+    public void count(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertAliasName(aliasName);
-        _querySetupper.setup("count", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("count", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     /**
@@ -84,14 +85,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for countDistinct(). So refer to the method's java-doc.
+     * An overload method for countDistinct() with an option. So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      */
-    public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
+    public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertAliasName(aliasName);
-        _querySetupper.setup("count(distinct", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("count(distinct", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     /**
@@ -112,14 +113,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for max(). So refer to the method's java-doc.
+     * An overload method for max() with an option. So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      */
-    public void max(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
+    public void max(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertAliasName(aliasName);
-        _querySetupper.setup("max", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("max", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     /**
@@ -140,14 +141,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for min(). So refer to the method's java-doc.
+     * An overload method for min() with an option. So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      */
-    public void min(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
+    public void min(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertAliasName(aliasName);
-        _querySetupper.setup("min", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("min", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     /**
@@ -168,14 +169,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for sum(). So refer to the method's java-doc.
+     * An overload method for sum() with an option. So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      */
-    public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
+    public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertAliasName(aliasName);
-        _querySetupper.setup("sum", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("sum", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     /**
@@ -196,14 +197,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for avg(). So refer to the method's java-doc.
+     * An overload method for avg() with an option. So refer to the method's java-doc.
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      */
-    public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
+    public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertAliasName(aliasName);
-        _querySetupper.setup("avg", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
+        _querySetupper.setup("avg", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     // ===================================================================================

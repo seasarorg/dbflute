@@ -3,6 +3,7 @@ package org.seasar.dbflute.cbean.chelper;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 
 /**
  * @author jflute
@@ -11,5 +12,6 @@ import org.seasar.dbflute.cbean.SubQuery;
  */
 public interface HpSDRSetupper<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
 
-    void setup(String function, Object coalesce, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
+    void setup(String function, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName,
+            DerivedReferrerOption option);
 }

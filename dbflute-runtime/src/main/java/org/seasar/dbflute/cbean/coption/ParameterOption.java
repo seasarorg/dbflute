@@ -16,14 +16,10 @@
 package org.seasar.dbflute.cbean.coption;
 
 /**
- * The interface of condition-option.
+ * The interface of parameter-option.
  * @author jflute
  */
-public interface ConditionOption {
+public interface ParameterOption {
 
-    /**
-     * Get the string expression of rear option.
-     * @return The string for rear option. (NotNull, AllowedEmpty)
-     */
-    String getRearOption();
+    void acceptParameterKey(String parameterKey, String parameterMapPath);
 }

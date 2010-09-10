@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,8 +29,10 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.cbean.coption.ParameterOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -130,6 +133,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /** Is it on-clause. */
     protected boolean _onClause;
+
+    // -----------------------------------------------------
+    //                                      Parameter Option
+    //                                      ----------------
+    /** The map of parameter option for parameter comment. */
+    protected Map<String, ParameterOption> _parameterOptionMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -780,10 +789,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                              (Specify)DerivedReferrer
     //                              ------------------------
-    protected void registerSpecifyDerivedReferrer(String function, Object coalesce, final ConditionQuery subQuery,
-            String columnDbName, String relatedColumnDbName, String propertyName, String aliasName) {
+    protected void registerSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String aliasName, DerivedReferrerOption option) {
         assertObjectNotNull("SpecifyDerivedReferrer(function)", function);
         assertObjectNotNull("SpecifyDerivedReferrer(" + columnDbName + ")", subQuery);
+        if (option == null) {
+            option = new DerivedReferrerOption(); // as default
+        }
         final SqlClause sqlClause = xgetSqlClause();
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -798,11 +810,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-        final SpecifyDerivedReferrer derivedReferrer = new SpecifyDerivedReferrer(sqlClause, subQueryPath,
+        final SpecifyDerivedReferrer derivedReferrer = option.createSpecifyDerivedReferrer(sqlClause, subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
-        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName,
-                coalesce);
+        registerParameterOption(option);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
         xgetSqlClause().specifyDerivingSubQuery(aliasName, clause);
     }
 
@@ -810,11 +822,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                (Query)DerivedReferrer
     //                                ----------------------
-    protected void registerQueryDerivedReferrer(String function, Object coalesce, final ConditionQuery subQuery,
-            String columnDbName, String relatedColumnDbName, String propertyName, String operand, Object value,
-            String parameterPropertyName) {
+    protected void registerQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String operand, Object value,
+            String parameterPropertyName, DerivedReferrerOption option) {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
         assertObjectNotNull("QueryDerivedReferrer(" + columnDbName + ")", subQuery);
+        if (option == null) {
+            option = new DerivedReferrerOption(); // as default
+        }
         final SqlClause sqlClause = xgetSqlClause();
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -830,11 +845,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final String parameterPath = xgetLocation(parameterPropertyName);
-        final QueryDerivedReferrer derivedReferrer = new QueryDerivedReferrer(sqlClause, subQueryPath,
+        final QueryDerivedReferrer derivedReferrer = option.createQueryDerivedReferrer(sqlClause, subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, reflector,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
-        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName,
-                coalesce);
+        registerParameterOption(option);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
         registerWhereClause(clause);
     }
 
@@ -1523,6 +1538,26 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
+    //                                                                    Option Parameter
+    //                                                                    ================
+    protected void registerParameterOption(ParameterOption option) {
+        if (option == null) {
+            return;
+        }
+        if (_parameterOptionMap == null) {
+            _parameterOptionMap = newHashMap();
+        }
+        final String parameterKey = "option" + _parameterOptionMap.size();
+        _parameterOptionMap.put(parameterKey, option);
+        final String parameterMapPath = xgetLocationBase() + "optionParameterMap";
+        option.acceptParameterKey(parameterKey, parameterMapPath);
+    }
+
+    public Map<String, ParameterOption> getOptionParameterMap() { // for parameter comment
+        return _parameterOptionMap;
+    }
+
+    // ===================================================================================
     //                                                                    Exception Helper
     //                                                                    ================
     protected ConditionBeanExceptionThrower createCBExThrower() {
@@ -1551,6 +1586,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                  Collection Generator
     //                                  --------------------
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
+    }
+
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }

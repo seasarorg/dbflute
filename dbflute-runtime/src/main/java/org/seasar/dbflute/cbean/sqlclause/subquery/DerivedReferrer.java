@@ -1,5 +1,6 @@
 package org.seasar.dbflute.cbean.sqlclause.subquery;
 
+import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -34,11 +35,12 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildDerivedReferrer(String function, String columnDbName, String relatedColumnDbName, Object coalesce) {
+    public String buildDerivedReferrer(String function, String columnDbName, String relatedColumnDbName,
+            DerivedReferrerOption option) {
         reflectLocalSubQueryLevel();
         final ColumnRealName columnRealName = _localRealNameProvider.provide(columnDbName);
         final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
-        final String subQueryClause = getSubQueryClause(function, columnRealName, relatedColumnSqlName, coalesce);
+        final String subQueryClause = getSubQueryClause(function, columnRealName, relatedColumnSqlName, option);
         final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
@@ -51,7 +53,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             String endIndent);
 
     protected String getSubQueryClause(String function, ColumnRealName columnRealName,
-            ColumnSqlName relatedColumnSqlName, Object coalesce) {
+            ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option) {
         if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
@@ -79,10 +81,10 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         }
         _subQueryClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         if (_subQueryClause.hasUnionQuery()) {
-            return getUnionSubQueryClause(function, columnRealName, relatedColumnSqlName, coalesce, tableAliasName,
+            return getUnionSubQueryClause(function, columnRealName, relatedColumnSqlName, option, tableAliasName,
                     derivedColumnRealName, derivedColumnSqlName);
         } else {
-            final String selectClause = "select " + buildFunctionExp(function, derivedColumnRealName, coalesce);
+            final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option);
             final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
                     relatedColumnSqlName, columnRealName);
             return selectClause + " " + fromWhereClause;
@@ -90,7 +92,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     }
 
     protected String getUnionSubQueryClause(String function, ColumnRealName columnRealName,
-            ColumnSqlName relatedColumnSqlName, Object coalesce, String tableAliasName,
+            ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option, String tableAliasName,
             ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName) {
         final String beginMark = _sqlClause.resolveSubQueryBeginMark(_mainSubQueryIdentity) + ln();
         final String endMark = _sqlClause.resolveSubQueryEndMark(_mainSubQueryIdentity);
@@ -105,25 +107,14 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         }
         final String joinCondition = "dfsubquerymain." + relatedColumnSqlName + " = " + columnRealName;
         final ColumnRealName mainDerivedColumnRealName = new ColumnRealName("dfsubquerymain", derivedColumnSqlName);
-        return "select " + buildFunctionExp(function, mainDerivedColumnRealName, coalesce) + ln() + "  from ("
+        return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) + ln() + "  from ("
                 + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where " + joinCondition;
     }
 
-    protected String buildFunctionExp(String function, ColumnRealName columnRealName, Object coalesce) {
-        final String connect = buildFunctionConnector(function);
-        final StringBuilder sb = new StringBuilder();
-        if (coalesce != null) {
-            sb.append("coalesce(");
-        }
-        sb.append(function).append(connect).append(columnRealName).append(")");
-        if (coalesce != null) {
-            if (coalesce instanceof Number) {
-                sb.append(", ").append(coalesce).append(")");
-            } else {
-                sb.append(", '").append(coalesce).append("')");
-            }
-        }
-        return sb.toString();
+    protected String buildFunctionPart(String function, ColumnRealName columnRealName, DerivedReferrerOption option) {
+        final String connector = buildFunctionConnector(function);
+        final String functionExp = function + connector + columnRealName + ")";
+        return option.filterFunction(functionExp);
     }
 
     protected abstract void throwDerivedReferrerInvalidColumnSpecificationException(String function);
