@@ -39,10 +39,12 @@ import org.seasar.dbflute.exception.SetupSelectIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifiedDerivedOrderByAliasNameNotFoundException;
 import org.seasar.dbflute.exception.SpecifyColumnNotSetupSelectColumnException;
 import org.seasar.dbflute.exception.SpecifyColumnTwoOrMoreColumnException;
+import org.seasar.dbflute.exception.SpecifyColumnWithDerivedReferrerException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerEntityPropertyNotFoundException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.SpecifyDerivedReferrerTwoOrMoreException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.SpecifyIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifyRelationIllegalPurposeException;
@@ -218,13 +220,44 @@ public class ConditionBeanExceptionThrower {
 
     public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB,
             String columnName, String referrerName) {
-        // TODO
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("You specified both SpecifyColumn and (Specify)DerivedReferrer!");
+        br.addItem("Advice");
+        br.addElement("This condition-bean is not allowed to specify both functions.");
+        br.addElement("Because the conditoin-bean is for " + purpose + ".");
+        br.addElement("For example:");
+        br.addElement("  (x): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
+        br.addElement("        public void query(MemberCB cb) {");
+        br.addElement("            cb.specify().columnBirthdate();");
+        br.addElement("            cb.specify().derivedPurchaseList().max(...); // *no!");
+        br.addElement("        }");
+        br.addElement("    }).greaterEqual(...);");
+        br.addElement("  (o): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
+        br.addElement("        public void query(MemberCB cb) {");
+        br.addElement("            cb.specify().columnBirthdate(); // OK");
+        br.addElement("        }");
+        br.addElement("    }).greaterEqual(...);");
+        br.addElement("  (o): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
+        br.addElement("        public void query(MemberCB cb) {");
+        br.addElement("            cb.specify().derivedPurchaseList().max(...); // OK");
+        br.addElement("        }");
+        br.addElement("    }).greaterEqual(...);");
+        // don't use displaySql because of illegal CB's state
+        br.addItem("ConditionBean");
+        br.addElement(baseCB.getClass().getName());
+        br.addItem("Specified Column");
+        br.addElement(baseCB.getTableDbName() + "." + columnName);
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyColumnWithDerivedReferrerException(msg);
     }
 
     public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
             String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for relation specification.");
+        br.addNotice("You specified the relation in the purpose that is not allowed to do it.");
         br.addItem("Advice");
         br.addElement("This condition-bean is not allowed to specify a relation.");
         br.addElement("Because this is for " + purpose + ".");
@@ -293,7 +326,34 @@ public class ConditionBeanExceptionThrower {
 
     public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB,
             String referrerName) {
-        // TODO
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The purpose was illegal for derived-referrer specification.");
+        br.addItem("Advice");
+        br.addElement("This condition-bean is not allowed to specify two-or-more derived referrers.");
+        br.addElement("Because this is for " + purpose + ".");
+        br.addElement("For example:");
+        br.addElement("  (x): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
+        br.addElement("        public void query(MemberCB cb) {");
+        br.addElement("            cb.specify().derivedPurchaseList().max(...);");
+        br.addElement("            cb.specify().derivedPurchaseList().max(...); // *no!");
+        br.addElement("        }");
+        br.addElement("    }).greaterEqual(...);");
+        br.addElement("  (o): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
+        br.addElement("        public void query(MemberCB cb) {");
+        br.addElement("            cb.specify().derivedPurchaseList().max(...); // OK");
+        br.addElement("        }");
+        br.addElement("    }).greaterEqual(...);");
+        // don't use displaySql because of illegal CB's state
+        br.addItem("ConditionBean");
+        br.addElement(baseCB.getClass().getName());
+        br.addItem("Specified Referrer");
+        br.addElement(referrerName);
+        br.addItem("Already Registered Referrer");
+        br.addElement(baseCB.getSqlClause().getSpecifiedDerivingAliasList());
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyDerivedReferrerTwoOrMoreException(msg);
     }
 
     // ===================================================================================
