@@ -71,6 +71,11 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             }
             // no specification is checked at an other timing
         }
+        if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
+            if (hasDerivedReferrer()) {
+                // TODO
+            }
+        }
         if (isNormalUse()) { // only normal purpose needs
             if (_query == null && !qyCall().has()) { // setupSelect check!
                 throwSpecifyColumnNotSetupSelectColumnException(columnName);
@@ -99,10 +104,24 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         if (_purpose.isNoSpecifyDerivedReferrer()) {
             throwSpecifyDerivedReferrerIllegalPurposeException(referrerName);
         }
+        if (_purpose.isNoSpecifyDerivedReferrerTwoOrMore()) {
+            if (hasDerivedReferrer()) {
+                // TODO
+            }
+        }
+        if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
+            if (_specifyColumnCount > 0) {
+                // TOOD
+            }
+        }
     }
 
     protected boolean isNormalUse() {
         return HpCBPurpose.NORMAL_USE.equals(_purpose);
+    }
+
+    protected boolean hasDerivedReferrer() {
+        return !_baseCB.getSqlClause().getSpecifiedDerivingAliasList().isEmpty();
     }
 
     protected abstract void doSpecifyRequiredColumn();

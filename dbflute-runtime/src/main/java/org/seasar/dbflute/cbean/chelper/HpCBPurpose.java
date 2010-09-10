@@ -21,7 +21,8 @@ public enum HpCBPurpose {
     // needs to switch condition-bean used in specification
     // to non-checked condition-bean.
     // Because specification uses query internally.
-    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noQuery()) // ColumnQuery
+    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
+            .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
     , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
 
@@ -62,12 +63,20 @@ public enum HpCBPurpose {
         return _spec.isNoSpecifyColumnTwoOrMore();
     }
 
+    public boolean isNoSpecifyColumnWithDerivedReferrer() {
+        return _spec.isNoSpecifyColumnWithDerivedReferrer();
+    }
+
     public boolean isNoSpecifyRelation() {
         return _spec.isNoSpecifyRelation();
     }
 
     public boolean isNoSpecifyDerivedReferrer() {
         return _spec.isNoSpecifyDerivedReferrer();
+    }
+
+    public boolean isNoSpecifyDerivedReferrerTwoOrMore() {
+        return _spec.isNoSpecifyDerivedReferrerTwoOrMore();
     }
 
     public boolean isNoQuery() {
@@ -87,8 +96,10 @@ public enum HpCBPurpose {
         protected boolean _noSetupSelect;
         protected boolean _noSpecify;
         protected boolean _noSpecifyColumnTwoOrMore;
+        protected boolean _noSpecifyColumnWithDerivedReferrer;
         protected boolean _noSpecifyRelation;
         protected boolean _noSpecifyDerivedReferrer;
+        protected boolean _noSpecifyDerivedReferrerTwoOrMore;
         protected boolean _noQuery;
         protected boolean _noOrderBy;
 
@@ -107,6 +118,11 @@ public enum HpCBPurpose {
             return this;
         }
 
+        public HpSpec noSpecifyColumnWithDerivedReferrer() {
+            _noSpecifyColumnWithDerivedReferrer = true;
+            return this;
+        }
+
         public HpSpec noSpecifyRelation() {
             _noSpecifyRelation = true;
             return this;
@@ -114,6 +130,11 @@ public enum HpCBPurpose {
 
         public HpSpec noSpecifyDerivedReferrer() {
             _noSpecifyDerivedReferrer = true;
+            return this;
+        }
+
+        public HpSpec noSpecifyDerivedReferrerTwoOrMore() {
+            _noSpecifyDerivedReferrerTwoOrMore = true;
             return this;
         }
 
@@ -139,12 +160,20 @@ public enum HpCBPurpose {
             return _noSpecifyColumnTwoOrMore;
         }
 
+        public boolean isNoSpecifyColumnWithDerivedReferrer() {
+            return _noSpecifyColumnWithDerivedReferrer;
+        }
+
         public boolean isNoSpecifyRelation() {
             return _noSpecifyRelation;
         }
 
         public boolean isNoSpecifyDerivedReferrer() {
             return _noSpecifyDerivedReferrer;
+        }
+
+        public boolean isNoSpecifyDerivedReferrerTwoOrMore() {
+            return _noSpecifyDerivedReferrerTwoOrMore;
         }
 
         public boolean isNoQuery() {
