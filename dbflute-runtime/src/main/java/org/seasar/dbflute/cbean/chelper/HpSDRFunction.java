@@ -57,7 +57,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for count() with an option. So refer to the method's java-doc.
+     * An overload method for count() with an option. So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.specify().derivePurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
@@ -85,7 +92,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     /**
-     * An overload method for countDistinct() with an option. So refer to the method's java-doc.
+     * An overload method for count() with an option. So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.specify().derivePurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
@@ -114,6 +128,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
 
     /**
      * An overload method for max() with an option. So refer to the method's java-doc.
+     * <pre>
+     * cb.specify().derivePurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
@@ -142,6 +163,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
 
     /**
      * An overload method for min() with an option. So refer to the method's java-doc.
+     * <pre>
+     * cb.specify().derivePurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
@@ -170,6 +198,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
 
     /**
      * An overload method for sum() with an option. So refer to the method's java-doc.
+     * <pre>
+     * cb.specify().derivePurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
@@ -198,6 +233,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
 
     /**
      * An overload method for avg() with an option. So refer to the method's java-doc.
+     * <pre>
+     * cb.specify().derivePurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)

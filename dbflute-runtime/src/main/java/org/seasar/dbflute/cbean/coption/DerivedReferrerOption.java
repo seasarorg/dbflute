@@ -15,6 +15,10 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.Map.Entry;
+
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.subquery.QueryDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
@@ -23,6 +27,8 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The option for DerivedReferrer.
@@ -34,6 +40,9 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                                                           Attribute
     //                                                                           =========
     protected Object _coalesce;
+    protected Integer _round;
+    protected Integer _trunc;
+    protected LinkedHashMap<String, ProcessCallback> _callbackMap;
     protected String _parameterKey;
     protected String _parameterMapPath;
 
@@ -42,11 +51,46 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                                                              ======
     /**
      * Set the value for coalesce function.
-     * @param coalesce An alternate value when group function returns null. (Nullable)
+     * @param coalesce An alternate value when group function returns null. (Nullable: if null, no coalesce)
      * @return this. (NotNull)
      */
     public DerivedReferrerOption coalesce(Object coalesce) {
         _coalesce = coalesce;
+        addProcessCallback("coalesce", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processCoalesce(functionExp);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Set the value for round function.
+     * @param round Decimal digits for round. (Nullable: if null, no round)
+     * @return this. (NotNull)
+     */
+    public DerivedReferrerOption round(Integer round) {
+        _round = round;
+        addProcessCallback("round", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processRound(functionExp);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Set the value for trunc function.
+     * @param trunc Decimal digits for trunc. (Nullable: if null, no trunc)
+     * @return this. (NotNull)
+     */
+    public DerivedReferrerOption trunc(Integer trunc) {
+        _trunc = trunc;
+        addProcessCallback("trunc", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processTrunc(functionExp);
+            }
+        });
         return this;
     }
 
@@ -54,28 +98,68 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                                                              Filter
     //                                                                              ======
     public String filterFunction(String functionExp) {
-        return processCoalesce(functionExp);
+        String filtered = functionExp;
+        final LinkedHashMap<String, ProcessCallback> callbackMap = _callbackMap;
+        if (callbackMap != null) {
+            final Set<Entry<String, ProcessCallback>> entrySet = callbackMap.entrySet();
+            for (Entry<String, ProcessCallback> entry : entrySet) {
+                filtered = entry.getValue().callback(filtered);
+            }
+        }
+        return processVarious(filtered);
+    }
+
+    protected static interface ProcessCallback {
+        String callback(String functionExp);
+    }
+
+    protected void addProcessCallback(String functionKey, ProcessCallback callback) {
+        if (_callbackMap == null) {
+            _callbackMap = new LinkedHashMap<String, ProcessCallback>();
+        }
+        if (_callbackMap.containsKey(functionKey)) {
+            String msg = "The function has been already set up: ";
+            msg = msg + "function=" + functionKey + "() option=" + toString();
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        _callbackMap.put(functionKey, callback);
     }
 
     // ===================================================================================
     //                                                                             Process
     //                                                                             =======
     protected String processCoalesce(String functionExp) {
-        if (_coalesce == null) {
+        return processSimpleFunction(functionExp, _coalesce, "coalesce");
+    }
+
+    protected String processRound(String functionExp) {
+        return processSimpleFunction(functionExp, _round, "round");
+    }
+
+    protected String processTrunc(String functionExp) {
+        return processSimpleFunction(functionExp, _trunc, "trunc");
+    }
+
+    protected String processVarious(String functionExp) { // for extension
+        return functionExp;
+    }
+
+    protected String processSimpleFunction(String functionExp, Object specifiedValue, String functionName) {
+        if (specifiedValue == null) {
             return functionExp;
         }
-        final String coalesce;
+        final String roundValue;
         if (_parameterKey != null) {
-            coalesce = buildBindParameter("coalesce");
+            roundValue = buildBindParameter(functionName);
         } else {
-            final String plain = _coalesce.toString();
-            if (_coalesce instanceof Number) {
-                coalesce = plain;
+            final String plain = specifiedValue.toString();
+            if (specifiedValue instanceof Number) {
+                roundValue = plain;
             } else {
-                coalesce = "'" + plain + "'";
+                roundValue = "'" + plain + "'";
             }
         }
-        return "coalesce(" + functionExp + ", " + coalesce + ")";
+        return functionName + "(" + functionExp + ", " + roundValue + ")";
     }
 
     protected String buildBindParameter(String optionKey) {
@@ -112,9 +196,26 @@ public class DerivedReferrerOption implements ParameterOption {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final String title = DfTypeUtil.toClassTitle(this);
+        return title + ":{coalesce=" + _coalesce + ", round=" + _round + ", trunc=" + _trunc + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public Object getCoalesce() {
         return _coalesce;
+    }
+
+    public Integer getRound() {
+        return _round;
+    }
+
+    public Integer getTrunc() {
+        return _trunc;
     }
 }

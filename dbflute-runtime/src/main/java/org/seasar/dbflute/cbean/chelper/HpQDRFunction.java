@@ -43,7 +43,14 @@ public class HpQDRFunction<CB extends ConditionBean> {
     }
 
     /**
-     * An overload method for count(). So refer to the method's java-doc.
+     * An overload method for count(). So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.query().scalarPurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -70,7 +77,14 @@ public class HpQDRFunction<CB extends ConditionBean> {
     }
 
     /**
-     * An overload method for countDistinct(). So refer to the method's java-doc.
+     * An overload method for countDistinct(). So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.query().scalarPurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -97,7 +111,14 @@ public class HpQDRFunction<CB extends ConditionBean> {
     }
 
     /**
-     * An overload method for max(). So refer to the method's java-doc.
+     * An overload method for max(). So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -124,7 +145,14 @@ public class HpQDRFunction<CB extends ConditionBean> {
     }
 
     /**
-     * An overload method for min(). So refer to the method's java-doc.
+     * An overload method for min(). So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.query().scalarPurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -151,7 +179,14 @@ public class HpQDRFunction<CB extends ConditionBean> {
     }
 
     /**
-     * An overload method for sum(). So refer to the method's java-doc.
+     * An overload method for sum(). So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.query().scalarPurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -178,7 +213,14 @@ public class HpQDRFunction<CB extends ConditionBean> {
     }
 
     /**
-     * An overload method for avg(). So refer to the method's java-doc.
+     * An overload method for avg(). So refer to the method's java-doc about basic info.
+     * <pre>
+     * cb.query().scalarPurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         ...
+     *     }
+     * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
+     * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
      * @return The parameter for comparing with scalar. (NotNull)
