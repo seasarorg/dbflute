@@ -9,5 +9,5 @@ import org.seasar.dbflute.cbean.SubQuery;
  */
 public interface HpQDRSetupper<CB extends ConditionBean> {
 
-    void setup(String function, SubQuery<CB> subQuery, Object coalesce, String operand, Object value);
+    void setup(String function, Object coalesce, SubQuery<CB> subQuery, String operand, Object value);
 }

@@ -55,6 +55,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         count(subQuery, aliasName, null);
     }
 
+    /**
+     * An overload method for count(). So refer to the method's java-doc.
+     * @param subQuery The sub query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     */
     public void count(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
         _querySetupper.setup("count", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
@@ -77,6 +83,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         countDistinct(subQuery, aliasName, null);
     }
 
+    /**
+     * An overload method for countDistinct(). So refer to the method's java-doc.
+     * @param subQuery The sub query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     */
     public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
         _querySetupper.setup("count(distinct", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
@@ -99,6 +111,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         max(subQuery, aliasName, null);
     }
 
+    /**
+     * An overload method for max(). So refer to the method's java-doc.
+     * @param subQuery The sub query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     */
     public void max(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
         _querySetupper.setup("max", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
@@ -121,6 +139,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         min(subQuery, aliasName, null);
     }
 
+    /**
+     * An overload method for min(). So refer to the method's java-doc.
+     * @param subQuery The sub query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     */
     public void min(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
         _querySetupper.setup("min", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
@@ -143,6 +167,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         sum(subQuery, aliasName, null);
     }
 
+    /**
+     * An overload method for sum(). So refer to the method's java-doc.
+     * @param subQuery The sub query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     */
     public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
         _querySetupper.setup("sum", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
@@ -165,6 +195,12 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         avg(subQuery, aliasName, null);
     }
 
+    /**
+     * An overload method for avg(). So refer to the method's java-doc.
+     * @param subQuery The sub query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param coalesce The alternate value when the function result is null. (Nullable: not use coalesce function)
+     */
     public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName, Object coalesce) {
         assertAliasName(aliasName);
         _querySetupper.setup("avg", coalesce, subQuery, _localCQ, filterAliasName(aliasName));
