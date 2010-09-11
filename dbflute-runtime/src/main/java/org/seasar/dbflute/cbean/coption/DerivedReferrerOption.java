@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -25,6 +26,7 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryLevelReflector;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
@@ -42,15 +44,21 @@ public class DerivedReferrerOption implements ParameterOption {
     protected Object _coalesce;
     protected Integer _round;
     protected Integer _trunc;
-    protected LinkedHashMap<String, ProcessCallback> _callbackMap;
+    protected LinkedHashMap<String, ProcessCallback> _callbackMap; // order should be guaranteed
     protected String _parameterKey;
     protected String _parameterMapPath;
+
+    // -----------------------------------------------------
+    //                                    called by internal
+    //                                    ------------------
+    protected ColumnInfo _targetColumnInfo;
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
     /**
-     * Set the value for coalesce function.
+     * Set the value for coalesce function. <br />
+     * If you set string value and the column is date type, convert it to a date object.
      * @param coalesce An alternate value when group function returns null. (Nullable: if null, no coalesce)
      * @return this. (NotNull)
      */
@@ -129,6 +137,9 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                                                             Process
     //                                                                             =======
     protected String processCoalesce(String functionExp) {
+        if (_coalesce instanceof String && isDateTypeColumn()) {
+            _coalesce = DfTypeUtil.toDate(_coalesce);
+        }
         return processSimpleFunction(functionExp, _coalesce, "coalesce");
     }
 
@@ -148,22 +159,15 @@ public class DerivedReferrerOption implements ParameterOption {
         if (specifiedValue == null) {
             return functionExp;
         }
-        final String roundValue;
-        if (_parameterKey != null) {
-            roundValue = buildBindParameter(functionName);
-        } else {
-            final String plain = specifiedValue.toString();
-            if (specifiedValue instanceof Number) {
-                roundValue = plain;
-            } else {
-                roundValue = "'" + plain + "'";
-            }
-        }
-        return functionName + "(" + functionExp + ", " + roundValue + ")";
+        return functionName + "(" + functionExp + ", " + buildBindParameter(functionName) + ")";
     }
 
     protected String buildBindParameter(String optionKey) {
         return "/*pmb." + _parameterMapPath + "." + _parameterKey + "." + optionKey + "*/null";
+    }
+
+    protected boolean isDateTypeColumn() {
+        return _targetColumnInfo != null && Date.class.isAssignableFrom(_targetColumnInfo.getPropertyType());
     }
 
     // ===================================================================================
@@ -217,5 +221,12 @@ public class DerivedReferrerOption implements ParameterOption {
 
     public Integer getTrunc() {
         return _trunc;
+    }
+
+    // -----------------------------------------------------
+    //                                    called by internal
+    //                                    ------------------
+    public void setTargetColumnInfo(ColumnInfo targetColumnInfo) {
+        _targetColumnInfo = targetColumnInfo;
     }
 }

@@ -41,8 +41,16 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     protected String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent) {
-        final String parameter = "/*pmb." + _parameterPath + "*/null";
-        return "(" + beginMark + subQueryClause + ln() + endIndent + ") " + _operand + " " + parameter + " " + endMark;
+        final StringBuilder sb = new StringBuilder();
+        sb.append("(").append(beginMark).append(subQueryClause);
+        sb.append(ln()).append(endIndent).append(") ");
+        sb.append(_operand);
+        if (_value != null) {
+            final String parameter = "/*pmb." + _parameterPath + "*/null";
+            sb.append(" ").append(parameter);
+        }
+        sb.append(" ").append(endMark);
+        return sb.toString();
     }
 
     @Override

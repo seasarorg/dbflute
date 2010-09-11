@@ -118,4 +118,35 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
         _setupper.setup(_function, _subQuery, "<=", value, _option);
     }
 
+    /**
+     * Set up the operand 'isNull' and the value of parameter. <br />
+     * The type of the parameter should be same as the type of target column. 
+     * <pre>
+     * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchasePrice();
+     *         subCB.query().setPaymentCompleteFlg_Equal_True();
+     *     }
+     * }).isNull(); // no parameter
+     * </pre> 
+     */
+    public void isNull() {
+        _setupper.setup(_function, _subQuery, "is null", null, _option);
+    }
+
+    /**
+     * Set up the operand 'isNull' and the value of parameter. <br />
+     * The type of the parameter should be same as the type of target column. 
+     * <pre>
+     * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchasePrice();
+     *         subCB.query().setPaymentCompleteFlg_Equal_True();
+     *     }
+     * }).isNull(); // no parameter
+     * </pre> 
+     */
+    public void isNotNull() {
+        _setupper.setup(_function, _subQuery, "is not null", null, _option);
+    }
 }

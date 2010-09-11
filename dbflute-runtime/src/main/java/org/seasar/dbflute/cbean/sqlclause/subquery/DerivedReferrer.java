@@ -38,6 +38,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     public String buildDerivedReferrer(String function, String columnDbName, String relatedColumnDbName,
             DerivedReferrerOption option) {
         reflectLocalSubQueryLevel();
+        setupOptionAttribute(option);
         final ColumnRealName columnRealName = _localRealNameProvider.provide(columnDbName);
         final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
         final String subQueryClause = getSubQueryClause(function, columnRealName, relatedColumnSqlName, option);
@@ -46,6 +47,10 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         final String endIndent = "       ";
         return doBuildDerivedReferrer(function, columnRealName, relatedColumnSqlName, subQueryClause, beginMark,
                 endMark, endIndent);
+    }
+
+    protected void setupOptionAttribute(DerivedReferrerOption option) {
+        option.setTargetColumnInfo(_subQueryClause.getSpecifiedColumnInfoAsOne());
     }
 
     protected abstract String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
