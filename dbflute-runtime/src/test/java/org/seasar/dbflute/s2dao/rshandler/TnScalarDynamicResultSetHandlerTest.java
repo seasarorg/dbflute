@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.seasar.dbflute.mock.MockResultSet;
 import org.seasar.dbflute.mock.MockValueType;
-import org.seasar.dbflute.s2dao.rshandler.TnScalarDynamicResultSetHandler;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**

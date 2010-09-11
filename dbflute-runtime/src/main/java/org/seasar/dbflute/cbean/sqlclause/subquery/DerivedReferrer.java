@@ -2,6 +2,9 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseH2;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseSqlServer;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
@@ -51,6 +54,9 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
 
     protected void setupOptionAttribute(DerivedReferrerOption option) {
         option.setTargetColumnInfo(_subQueryClause.getSpecifiedColumnInfoAsOne());
+        option.setDatabaseMySQL(_subQueryClause instanceof SqlClauseMySql);
+        option.setDatabaseSQLServer(_subQueryClause instanceof SqlClauseSqlServer);
+        option.setDatabaseH2(_subQueryClause instanceof SqlClauseH2);
     }
 
     protected abstract String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,

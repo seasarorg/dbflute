@@ -31,6 +31,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The option for DerivedReferrer.
@@ -42,8 +43,8 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                                                           Attribute
     //                                                                           =========
     protected Object _coalesce;
-    protected Integer _round;
-    protected Integer _trunc;
+    protected Object _round;
+    protected Object _trunc;
     protected LinkedHashMap<String, ProcessCallback> _callbackMap; // order should be guaranteed
     protected String _parameterKey;
     protected String _parameterMapPath;
@@ -52,6 +53,9 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                    called by internal
     //                                    ------------------
     protected ColumnInfo _targetColumnInfo;
+    protected boolean _databaseMySQL;
+    protected boolean _databaseSQLServer;
+    protected boolean _databaseH2;
 
     // ===================================================================================
     //                                                                              Option
@@ -140,30 +144,58 @@ public class DerivedReferrerOption implements ParameterOption {
         if (_coalesce instanceof String && isDateTypeColumn()) {
             _coalesce = DfTypeUtil.toDate(_coalesce);
         }
-        return processSimpleFunction(functionExp, _coalesce, "coalesce");
+        final String functionName = "coalesce";
+        final String propertyName = functionName;
+        return processSimpleFunction(functionExp, _coalesce, functionName, propertyName, null);
     }
 
     protected String processRound(String functionExp) {
-        return processSimpleFunction(functionExp, _round, "round");
+        final String functionName = "round";
+        final String propertyName = functionName;
+        return processSimpleFunction(functionExp, _round, functionName, propertyName, null);
     }
 
     protected String processTrunc(String functionExp) {
-        return processSimpleFunction(functionExp, _trunc, "trunc");
+        final String functionName;
+        final String thirdArg;
+        if (isTruncTrancate()) {
+            functionName = "truncate";
+            thirdArg = null;
+        } else if (isDatabaseSQLServer()) {
+            functionName = "round";
+            thirdArg = "1";
+        } else {
+            functionName = "trunc";
+            thirdArg = null;
+        }
+        return processSimpleFunction(functionExp, _trunc, functionName, "trunc", thirdArg);
+    }
+
+    protected boolean isTruncTrancate() {
+        return isDatabaseMySQL() || isDatabaseH2();
     }
 
     protected String processVarious(String functionExp) { // for extension
         return functionExp;
     }
 
-    protected String processSimpleFunction(String functionExp, Object specifiedValue, String functionName) {
+    protected String processSimpleFunction(String functionExp, Object specifiedValue, String functionName,
+            String propertyName, String thirdArg) {
         if (specifiedValue == null) {
             return functionExp;
         }
-        return functionName + "(" + functionExp + ", " + buildBindParameter(functionName) + ")";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(functionName).append("(").append(functionExp).append(", ");
+        sb.append(buildBindParameter(propertyName));
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(thirdArg)) {
+            sb.append(", ").append(thirdArg);
+        }
+        sb.append(")");
+        return sb.toString();
     }
 
-    protected String buildBindParameter(String optionKey) {
-        return "/*pmb." + _parameterMapPath + "." + _parameterKey + "." + optionKey + "*/null";
+    protected String buildBindParameter(String propertyName) {
+        return "/*pmb." + _parameterMapPath + "." + _parameterKey + "." + propertyName + "*/null";
     }
 
     protected boolean isDateTypeColumn() {
@@ -215,11 +247,11 @@ public class DerivedReferrerOption implements ParameterOption {
         return _coalesce;
     }
 
-    public Integer getRound() {
+    public Object getRound() {
         return _round;
     }
 
-    public Integer getTrunc() {
+    public Object getTrunc() {
         return _trunc;
     }
 
@@ -228,5 +260,29 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                    ------------------
     public void setTargetColumnInfo(ColumnInfo targetColumnInfo) {
         _targetColumnInfo = targetColumnInfo;
+    }
+
+    protected boolean isDatabaseMySQL() {
+        return _databaseMySQL;
+    }
+
+    public void setDatabaseMySQL(boolean databaseMySQL) {
+        _databaseMySQL = databaseMySQL;
+    }
+
+    protected boolean isDatabaseSQLServer() {
+        return _databaseSQLServer;
+    }
+
+    public void setDatabaseSQLServer(boolean databaseSQLServer) {
+        _databaseSQLServer = databaseSQLServer;
+    }
+
+    protected boolean isDatabaseH2() {
+        return _databaseH2;
+    }
+
+    public void setDatabaseH2(boolean databaseH2) {
+        _databaseH2 = databaseH2;
     }
 }
