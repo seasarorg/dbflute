@@ -78,10 +78,10 @@ public class DerivedReferrerOption implements ParameterOption {
 
     /**
      * Set the value for round function.
-     * @param round Decimal digits for round. (Nullable: if null, no round)
+     * @param round Decimal digits or date format for round. (Nullable: if null, no round)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption round(Integer round) {
+    public DerivedReferrerOption round(Object round) {
         _round = round;
         addProcessCallback("round", new ProcessCallback() {
             public String callback(String functionExp) {
@@ -93,10 +93,10 @@ public class DerivedReferrerOption implements ParameterOption {
 
     /**
      * Set the value for trunc function.
-     * @param trunc Decimal digits for trunc. (Nullable: if null, no trunc)
+     * @param trunc Decimal digits or date format for trunc. (Nullable: if null, no trunc)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption trunc(Integer trunc) {
+    public DerivedReferrerOption trunc(Object trunc) {
         _trunc = trunc;
         addProcessCallback("trunc", new ProcessCallback() {
             public String callback(String functionExp) {
