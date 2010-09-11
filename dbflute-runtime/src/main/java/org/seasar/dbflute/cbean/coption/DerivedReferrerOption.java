@@ -54,6 +54,7 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                    ------------------
     protected ColumnInfo _targetColumnInfo;
     protected boolean _databaseMySQL;
+    protected boolean _databasePostgreSQL;
     protected boolean _databaseSQLServer;
     protected boolean _databaseH2;
 
@@ -146,29 +147,37 @@ public class DerivedReferrerOption implements ParameterOption {
         }
         final String functionName = "coalesce";
         final String propertyName = functionName;
-        return processSimpleFunction(functionExp, _coalesce, functionName, propertyName, null);
+        return processSimpleFunction(functionExp, _coalesce, functionName, propertyName, null, false);
     }
 
     protected String processRound(String functionExp) {
         final String functionName = "round";
         final String propertyName = functionName;
-        return processSimpleFunction(functionExp, _round, functionName, propertyName, null);
+        return processSimpleFunction(functionExp, _round, functionName, propertyName, null, false);
     }
 
     protected String processTrunc(String functionExp) {
         final String functionName;
         final String thirdArg;
+        final boolean leftArg;
         if (isTruncTrancate()) {
             functionName = "truncate";
             thirdArg = null;
+            leftArg = false;
         } else if (isDatabaseSQLServer()) {
             functionName = "round";
             thirdArg = "1";
+            leftArg = false;
+        } else if (isDatabasePostgreSQL() && isDateTypeColumn()) {
+            functionName = "date_trunc";
+            thirdArg = null;
+            leftArg = true;
         } else {
             functionName = "trunc";
             thirdArg = null;
+            leftArg = false;
         }
-        return processSimpleFunction(functionExp, _trunc, functionName, "trunc", thirdArg);
+        return processSimpleFunction(functionExp, _trunc, functionName, "trunc", thirdArg, leftArg);
     }
 
     protected boolean isTruncTrancate() {
@@ -180,13 +189,18 @@ public class DerivedReferrerOption implements ParameterOption {
     }
 
     protected String processSimpleFunction(String functionExp, Object specifiedValue, String functionName,
-            String propertyName, String thirdArg) {
+            String propertyName, String thirdArg, boolean leftArg) {
         if (specifiedValue == null) {
             return functionExp;
         }
+        final String bindParameter = buildBindParameter(propertyName);
         final StringBuilder sb = new StringBuilder();
-        sb.append(functionName).append("(").append(functionExp).append(", ");
-        sb.append(buildBindParameter(propertyName));
+        sb.append(functionName).append("(");
+        if (leftArg) { // for example, PostgreSQL's date_trunc()
+            sb.append(bindParameter).append(", ").append(functionExp);
+        } else { // normal
+            sb.append(functionExp).append(", ").append(bindParameter);
+        }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(thirdArg)) {
             sb.append(", ").append(thirdArg);
         }
@@ -268,6 +282,14 @@ public class DerivedReferrerOption implements ParameterOption {
 
     public void setDatabaseMySQL(boolean databaseMySQL) {
         _databaseMySQL = databaseMySQL;
+    }
+
+    protected boolean isDatabasePostgreSQL() {
+        return _databasePostgreSQL;
+    }
+
+    public void setDatabasePostgreSQL(boolean databasePostgreSQL) {
+        _databasePostgreSQL = databasePostgreSQL;
     }
 
     protected boolean isDatabaseSQLServer() {

@@ -4,6 +4,7 @@ import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseH2;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
+import org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseSqlServer;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -55,6 +56,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     protected void setupOptionAttribute(DerivedReferrerOption option) {
         option.setTargetColumnInfo(_subQueryClause.getSpecifiedColumnInfoAsOne());
         option.setDatabaseMySQL(_subQueryClause instanceof SqlClauseMySql);
+        option.setDatabasePostgreSQL(_subQueryClause instanceof SqlClausePostgreSql);
         option.setDatabaseSQLServer(_subQueryClause instanceof SqlClauseSqlServer);
         option.setDatabaseH2(_subQueryClause instanceof SqlClauseH2);
     }
