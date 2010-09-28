@@ -160,6 +160,9 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         final Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
+            if (columnInfo.isOptimisticLock()) {
+                continue; // optimistic lock columns are processed after here
+            }
             final String columnDbName = columnInfo.getColumnDbName();
             if (option != null && option.hasStatement(columnDbName)) {
                 final String statement = option.buildStatement(columnDbName);
