@@ -56,11 +56,15 @@ public class UpdateEntityCommand extends AbstractUpdateEntityCommand {
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling());
-        cmd.setVersionNoAutoIncrementOnMemory(isOptimisticLockHandling());
+        cmd.setVersionNoAutoIncrementOnMemory(isVersionNoAutoIncrementOnMemory());
         return cmd;
     }
 
     protected boolean isOptimisticLockHandling() {
         return true;
+    }
+
+    protected boolean isVersionNoAutoIncrementOnMemory() {
+        return isOptimisticLockHandling();
     }
 }
