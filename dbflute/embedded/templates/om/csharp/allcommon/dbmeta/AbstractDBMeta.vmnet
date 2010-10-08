@@ -134,8 +134,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         protected ${glForeignInfo} cfi(String propName
                                 , ${glDBMeta} localDbm, ${glDBMeta} foreignDbm
                                 , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
-                                , int relNo, bool oneToOne) { // createForeignInfo()
-            return new ${glForeignInfo}(propName, localDbm, foreignDbm, localForeignColumnInfoMap, relNo, oneToOne);
+                                , int relNo, bool oneToOne, bool bizOneToOne) { // createForeignInfo()
+            return new ${glForeignInfo}(propName, localDbm, foreignDbm, localForeignColumnInfoMap, relNo, oneToOne, bizOneToOne);
         }
 
         // -------------------------------------------------

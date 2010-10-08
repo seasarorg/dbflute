@@ -244,6 +244,10 @@ public class ForeignKey {
         return false;
     }
 
+    public boolean isBizOneToOne() {
+        return isOneToOne() && hasFixedCondition();
+    }
+
     public boolean isSimpleKeyFK() {
         return _localColumns.size() == 1;
     }

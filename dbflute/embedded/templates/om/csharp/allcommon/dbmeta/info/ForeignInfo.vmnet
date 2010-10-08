@@ -20,13 +20,14 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected Map<${glColumnInfo}, ${glColumnInfo}> foreignLocalColumnInfoMap;
         protected int relationNo;
         protected bool oneToOne;
+        protected bool bizOneToOne;
 
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         public ${glForeignInfo}(String foreignPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} foreignDBMeta
                          , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
-                         , int relationNo, bool oneToOne) {
+                         , int relationNo, bool oneToOne, bool bizOneToOne) {
             AssertObjectNotNull("foreignPropertyName", foreignPropertyName);
             AssertObjectNotNull("localDBMeta", localDBMeta);
             AssertObjectNotNull("foreignDBMeta", foreignDBMeta);
@@ -43,6 +44,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             }
             this.relationNo = relationNo;
             this.oneToOne = oneToOne;
+            this.bizOneToOne = bizOneToOne;
         }
         
         // ===============================================================================
@@ -147,6 +149,10 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public bool IsOneToOne {
             get { return oneToOne; }
+        }
+
+        public bool IsBizOneToOne {
+            get { return bizOneToOne; }
         }
     }
 }

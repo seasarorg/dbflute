@@ -101,14 +101,14 @@ namespace ${myDBMetaPackageName} {
         // -------------------------------------------------
         //                                   Foreign Element
         //                                   ---------------
-#foreach ($foreignKeys in $table.foreignKeys)
+#foreach ($fk in $table.foreignKeys)
 #set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
-        public ${glForeignInfo} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap} { get {
+        public ${glForeignInfo} Foreign${fk.foreignJavaBeansRulePropertyNameInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
-#foreach ($column in $foreignKeys.localColumnList)
-            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
+#foreach ($column in $fk.localColumnList)
+            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${fk.foreignTableDBMetaClassName}.GetInstance().Column${fk.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
-            return cfi("${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}", this, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($foreignKeys)}, ${foreignKeys.isOneToOne()});
+            return cfi("${fk.foreignJavaBeansRulePropertyNameInitCap}", this, ${fk.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()});
         }}
 #end
 
@@ -120,7 +120,7 @@ namespace ${myDBMetaPackageName} {
 #foreach ($column in $referrer.foreignColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
-            return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
+            return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()});
         }}
 #end
 #end
