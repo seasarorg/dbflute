@@ -58,6 +58,8 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
+import org.seasar.dbflute.exception.DBMetaNotFoundException;
+import org.seasar.dbflute.exception.IllegalFixedConditionRelationVariableException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -405,12 +407,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             final int separatorIndex = relationExp.indexOf(".");
             final String tableName = relationExp.substring(0, separatorIndex);
             final String relationName = relationExp.substring(separatorIndex + ".".length());
-            final DBMeta targetMeta = findDBMeta(tableName);
+            final DBMeta targetMeta;
+            try {
+                targetMeta = findDBMeta(tableName);
+            } catch (DBMetaNotFoundException e) {
+                String notice = "The table for relation on fixed condition does not exist.";
+                throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, e);
+                return null; // unreachable
+            }
             final StringBuilder foreignPathSb = new StringBuilder();
-            final DBMeta localDBMeta = findDBMeta(getTableDbName());
-            boolean found = xsearchRelationTable(targetMeta, relationName, localDBMeta, foreignPathSb, 0);
             ConditionQuery relationLocalCQ = null;
-            if (found) {
+            if (xsearchRelationTable(targetMeta, relationName, this, foreignPathSb)) {
                 if (foreignPathSb.length() > 0) {
                     relationLocalCQ = invokeForeignCQ(foreignPathSb.toString());
                 } else {
@@ -422,9 +429,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     if (referrerQuery == null) { // base query
                         break;
                     }
-                    final DBMeta referrerDBMeta = findDBMeta(referrerQuery.getTableDbName());
-                    found = xsearchRelationTable(targetMeta, relationName, referrerDBMeta, foreignPathSb, 0);
-                    if (found) {
+                    if (xsearchRelationTable(targetMeta, relationName, referrerQuery, foreignPathSb)) {
                         if (foreignPathSb.length() > 0) {
                             relationLocalCQ = referrerQuery.invokeForeignCQ(foreignPathSb.toString());
                         } else {
@@ -435,15 +440,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     referrerQuery = referrerQuery.xgetReferrerQuery();
                 }
                 if (relationLocalCQ == null) {
-                    // TODO Not Found Table
+                    String notice = "The table for relation on fixed condition was not found in the scope.";
+                    throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition);
+                    return null; // unreachable
                 }
             }
-            final DBMeta relationMeta = findDBMeta(relationLocalCQ.getTableDbName());
-            if (!relationMeta.hasForeign(relationName)) {
-                // TODO Exception Not Found Relation
-            }
-            ConditionQuery relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
-
+            final ConditionQuery relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
             final String relationVariable = relationBeginMark + relationExp + relationEndMark;
             final String relationAlias = relationForeignCQ.xgetRealAliasName();
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
@@ -457,22 +459,64 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return fixedCondition;
     }
 
-    protected boolean xsearchRelationTable(DBMeta targetMeta, String relationName, DBMeta currentMeta,
-            StringBuilder foreignPathSb, int scopeLevel) {
-        if (targetMeta.getTableDbName().equals(currentMeta.getTableDbName())) {
+    protected boolean xsearchRelationTable(DBMeta targetMeta, String relationName, ConditionQuery currentCQ,
+            StringBuilder foreignPathSb) {
+        if (xsearchRelationTableFromRegistered(targetMeta, relationName, currentCQ, foreignPathSb)) {
             return true;
         }
-        if (scopeLevel > 2) { // until 2 level
+        final DBMeta currentDBMeta = findDBMeta(currentCQ.getTableDbName());
+        if (xsearchRelationTableFromLevel(targetMeta, relationName, currentCQ, currentDBMeta, foreignPathSb, 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean xsearchRelationTableFromRegistered(DBMeta targetMeta, String relationName,
+            ConditionQuery currentCQ, StringBuilder foreignPathSb) {
+        if (targetMeta.getTableDbName().equals(currentCQ.getTableDbName())) {
+            return true;
+        }
+        final DBMeta currentDBMeta = findDBMeta(currentCQ.getTableDbName());
+        final List<ForeignInfo> foreignInfoList = currentDBMeta.getForeignInfoList();
+        for (ForeignInfo foreignInfo : foreignInfoList) {
+            if (foreignInfo.isBizOneToOne()) {
+                continue; // biz-one-to-one relations are out of target here
+            }
+            final String foreignPropertyName = foreignInfo.getForeignPropertyName();
+            if (currentCQ.invokeHasForeignCQ(foreignPropertyName)) {
+                final ConditionQuery foreignCQ = currentCQ.invokeForeignCQ(foreignPropertyName);
+                if (xsearchRelationTableFromRegistered(targetMeta, relationName, foreignCQ, foreignPathSb)) {
+                    if (foreignPathSb.length() > 0) {
+                        foreignPathSb.insert(0, ".");
+                    }
+                    foreignPathSb.insert(0, foreignInfo.getForeignPropertyName());
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected boolean xsearchRelationTableFromLevel(DBMeta targetMeta, String relationName, ConditionQuery currentCQ,
+            DBMeta currentDBMeta, StringBuilder foreignPathSb, int scopeLevel) {
+        if (targetMeta.getTableDbName().equals(currentDBMeta.getTableDbName())) {
+            return true;
+        }
+        if (scopeLevel > 2) { // until this level
             return false;
         }
-        final List<ForeignInfo> foreignInfoList = currentMeta.getForeignInfoList();
+        final List<ForeignInfo> foreignInfoList = currentDBMeta.getForeignInfoList();
         final int nextLevel = scopeLevel + 1;
         for (ForeignInfo foreignInfo : foreignInfoList) {
             if (foreignInfo.isBizOneToOne()) {
                 continue; // biz-one-to-one relations are out of target here
             }
+            final String foreignPropertyName = foreignInfo.getForeignPropertyName();
+            if (currentCQ != null && currentCQ.invokeHasForeignCQ(foreignPropertyName)) { // basically first level only
+                continue; // already searched
+            }
             final DBMeta foreignDBMeta = foreignInfo.getForeignDBMeta();
-            if (xsearchRelationTable(targetMeta, relationName, foreignDBMeta, foreignPathSb, nextLevel)) {
+            if (xsearchRelationTableFromLevel(targetMeta, relationName, null, foreignDBMeta, foreignPathSb, nextLevel)) {
                 if (foreignPathSb.length() > 0) {
                     foreignPathSb.insert(0, ".");
                 }
@@ -481,6 +525,27 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         }
         return false;
+    }
+
+    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName,
+            String relationName, String fixedCondition) {
+        throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, null);
+    }
+
+    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName,
+            String relationName, String fixedCondition, Exception e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Relation Name");
+        br.addElement(relationName);
+        br.addItem("Fixed Condition");
+        br.addElement(fixedCondition);
+        br.addItem("BizOneToOne Local");
+        br.addElement(getTableDbName());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalFixedConditionRelationVariableException(msg, e);
     }
 
     // ===================================================================================
@@ -1372,7 +1437,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
-    public boolean hasForeignCQ(String foreignPropertyName) {
+    public boolean invokeHasForeignCQ(String foreignPropertyName) {
         final String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
         final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
         if (method == null) {

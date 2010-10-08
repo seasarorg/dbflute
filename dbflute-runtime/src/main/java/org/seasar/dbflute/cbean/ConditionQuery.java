@@ -114,14 +114,6 @@ public interface ConditionQuery {
      */
     String xgetRelationPath();
 
-    /**
-     * Has foreign condition-query?
-     * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
-     * @return The conditionQuery of the foreign relation as interface. (NotNull)
-     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
-     */
-    boolean hasForeignCQ(String foreignPropertyName);
-
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
@@ -176,4 +168,12 @@ public interface ConditionQuery {
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
     ConditionQuery invokeForeignCQ(String foreignPropertyName);
+
+    /**
+     * Invoke determining foreign condition-query existence?
+     * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
+     * @return The conditionQuery of the foreign relation as interface. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
+     */
+    boolean invokeHasForeignCQ(String foreignPropertyName);
 }
