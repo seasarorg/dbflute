@@ -207,7 +207,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         registerOuterJoin(cq, joinOnMap, null);
     }
 
-    protected virtual void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
+    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap, String fixedCondition) {
         // resolve variables on fixed condition
         if (fixedCondition != null) {
             fixedCondition = resolveFixedCondition(cq, joinOnMap, fixedCondition);
@@ -229,7 +229,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return fixedCondition;
     }
 
-    protected virtual String resolveFixedConditionOverRelation(ConditionQuery cq
+    protected virtual String resolveFixedConditionOverRelation(${glConditionQuery} cq
             , Map<String, String> joinOnMap, String fixedCondition) {
         String relationBeginMark = "$$over(";
         String relationEndMark = ")$$";
