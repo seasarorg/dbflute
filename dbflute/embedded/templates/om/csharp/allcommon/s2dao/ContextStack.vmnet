@@ -27,7 +27,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         public static void SaveAllContextOnThread() {
             if (!IsExistContextStackOnThread()) {
-                Thread.SetData(_slot, new List<${glContextStack}>());
+                Thread.SetData(_slot, new Stack<${glContextStack}>());
             }
             ${glContextStack} contextStack = new ${glContextStack}();
             if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
