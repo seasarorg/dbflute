@@ -186,7 +186,119 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected String getLocationBase(String columnPropertyName) {
         return getLocationBase() + columnPropertyName;
     }
-	
+
+    // ===================================================================================
+    //                                                                  Nested SetupSelect
+    //                                                                  ==================
+    public void doNss(NssCall callback) { // Very Internal
+        String foreignPropertyName = callback.Invoke().getForeignPropertyName();
+        String foreignTableAliasName = callback.Invoke().getRealAliasName();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, getRelationPath());
+        getSqlClause().registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
+    }
+    
+    public delegate ${glConditionQuery} NssCall(); // Very Internal
+
+    // ===================================================================================
+    //                                                                           OuterJoin
+    //                                                                           =========
+    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap) {
+        registerOuterJoin(cq, joinOnMap, null);
+    }
+
+    protected virtual void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
+        // resolve variables on fixed condition
+        if (fixedCondition != null) {
+            fixedCondition = resolveFixedCondition(cq, joinOnMap, fixedCondition);
+        }
+        String localDbName = getTableDbName();
+        String foreignDbName = cq.getTableDbName();
+        String foreignAliasName = cq.getAliasName();
+        getSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnMap, fixedCondition);
+    }
+
+    protected virtual String resolveFixedCondition(String fixedCondition, String localAliasName, String foreignAliasName) {
+        String localAliasName = getAliasName();
+        String foreignAliasName = cq.getAliasName();
+        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatible
+        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
+        fixedCondition = resolveFixedConditionSpecifiedRelation(cq, joinOnMap, fixedCondition);
+        return fixedCondition;
+    }
+
+    protected String resolveFixedConditionSpecifiedRelation(ConditionQuery cq, Map<String, String> joinOnMap,
+            String fixedCondition) {
+        String relationBeginMark = "$$relation(";
+        String relationEndMark = ")$$";
+        String remainder = fixedCondition;
+        while (true) {
+            int relationBeginIndex = remainder.IndexOf(relationBeginMark);
+            if (relationBeginIndex < 0) {
+                break;
+            }
+            remainder = remainder.substring(relationBeginIndex + relationBeginMark.Length);
+            int relationEndIndex = remainder.IndexOf(relationEndMark);
+            if (relationEndIndex < 0) {
+                break;
+            }
+            String relationExp = remainder.Substring(0, relationEndIndex);
+            int separatorIndex = relationExp.IndexOf(".");
+            String tableName = relationExp.Substring(0, separatorIndex);
+            String relationName = relationExp.Substring(separatorIndex + ".".length());
+            ${glDBMeta} targetMeta;
+            try {
+                targetMeta = findDBMeta(tableName);
+            } catch (DBMetaNotFoundException e) {
+                String notice = "The table for relation on fixed condition does not exist.";
+                throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, e);
+                return null; // unreachable
+            }
+            StringBuilder foreignPathSb = new StringBuilder();
+            ${glConditionQuery} relationLocalCQ = null;
+            if (xsearchRelationTable(targetMeta, relationName, this, foreignPathSb)) {
+                if (foreignPathSb.length() > 0) {
+                    relationLocalCQ = invokeForeignCQ(foreignPathSb.toString());
+                } else {
+                    relationLocalCQ = this;
+                }
+            } else {
+                ${glConditionQuery} referrerQuery = getReferrerQuery();
+                while (true) {
+                    if (referrerQuery == null) { // base query
+                        break;
+                    }
+                    if (xsearchRelationTable(targetMeta, relationName, referrerQuery, foreignPathSb)) {
+                        if (foreignPathSb.length() > 0) {
+                            relationLocalCQ = referrerQuery.invokeForeignCQ(foreignPathSb.toString());
+                        } else {
+                            relationLocalCQ = referrerQuery;
+                        }
+                        break;
+                    }
+                    referrerQuery = referrerQuery.xgetReferrerQuery();
+                }
+                if (relationLocalCQ == null) {
+                    String notice = "The table for relation on fixed condition was not found in the scope.";
+                    throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition);
+                    return null; // unreachable
+                }
+            }
+            ${glConditionQuery} relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+            String relationVariable = relationBeginMark + relationExp + relationEndMark;
+            String relationAlias = relationForeignCQ.getAliasName();
+            fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
+
+            // after case for loop
+            remainder = remainder.Substring(relationEndIndex + relationEndMark.length());
+
+            // for prevent from processing same one
+            remainder = replaceString(remainder, relationVariable, relationAlias);
+        }
+        return fixedCondition;
+    }
+
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
@@ -1521,17 +1633,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
 		return nextRelationPath;
 	}
-	
-    // ===================================================================================
-    //                                                                     Fixed Condition
-    //                                                                     ===============
-    protected String ppFxCd(String fixedCondition, String localAliasName, String foreignAliasName) { // prepareFixedCondition
-        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
-        return fixedCondition;
-    }
 
     // ===================================================================================
     //                                                                 Reflection Invoking
@@ -1700,23 +1801,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 		    newList.Add(element);
 		}
         return newList;
-    }
-
-    public void doNss(NssCall callback) { // Very Internal
-        String foreignPropertyName = callback.Invoke().getForeignPropertyName();
-        String foreignTableAliasName = callback.Invoke().getRealAliasName();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, getRelationPath());
-        getSqlClause().registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
-    }
-    
-    public delegate ${glConditionQuery} NssCall(); // Very Internal
-
-    protected void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap) {
-        getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
-    }
-
-    protected String fxcKey() { // getFixedConditionKey()
-        return getSqlClause().getFixedConditionKey();
     }
 
     // ===================================================================================

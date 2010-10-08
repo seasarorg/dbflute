@@ -36,6 +36,7 @@ public interface ${glConditionQuery} {
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
     void invokeOrderBy(String columnFlexibleName, bool isAsc);
     ${glConditionQuery} invokeForeignCQ(String foreignPropertyName);
+    bool invokeHasForeignCQ(String foreignPropertyName);
 }
 
 }

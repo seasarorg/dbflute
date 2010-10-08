@@ -474,9 +474,10 @@ namespace ${glPackageBaseCQ} {
             joinOnMap.put(getRealColumnName("${localColumn.name}"), cq.getRealColumnName("${foreignColumnName}"));
 #end
 #if ($fk.hasFixedCondition())
-            joinOnMap.put(fxcKey(), ppFxCd("${fk.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
-#end
+            registerOuterJoin(cq, joinOnMap, "${fk.fixedCondition}");
+#else
             registerOuterJoin(cq, joinOnMap);
+#end
         }
         protected String resolveNextRelationPath${fk.foreignPropertyNameInitCap}() {
             return resolveNextRelationPath("${table.name}", "${fk.foreignPropertyName}");
