@@ -231,7 +231,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected virtual String resolveFixedConditionSpecifiedRelation(ConditionQuery cq
             , Map<String, String> joinOnMap, String fixedCondition) {
-        String relationBeginMark = "$$relation(";
+        String relationBeginMark = "$$over(";
         String relationEndMark = ")$$";
         String remainder = fixedCondition;
         while (true) {
@@ -1784,11 +1784,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         int splitLength = splitList.Length;
         int index = 0;
         foreach (String elementName in splitList) {
-            foreignCQ = doInvokeForeignCQ(elementName);
             if (!doInvokeHasForeignCQ(foreignCQ, elementName)) {
                 return false;
             }
-            if ((index + 1) < splitLength) { // last loop
+            if ((index + 1) < splitLength) { // not last loop
                 foreignCQ = foreignCQ.invokeForeignCQ(elementName);
             }
             ++index;
@@ -1810,7 +1809,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         ${glConditionQuery} cq = this;
         int index = 0;
         foreach (String element in strings) {
-            if (length == (index+1)) {// at last loop!
+            if (length == (index+1)) { // at last loop!
                 propertyName = element;
                 break;
             }
