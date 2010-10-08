@@ -7,6 +7,7 @@ using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonDBMetaInfo};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonJavaLike};
@@ -217,7 +218,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         getSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnMap, fixedCondition);
     }
 
-    protected virtual String resolveFixedCondition(String fixedCondition, String localAliasName, String foreignAliasName) {
+    protected virtual String resolveFixedCondition(${glConditionQuery} cq, Map<String, String> joinOnMap, String fixedCondition) {
         String localAliasName = getAliasName();
         String foreignAliasName = cq.getAliasName();
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatible
@@ -238,7 +239,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             if (relationBeginIndex < 0) {
                 break;
             }
-            remainder = remainder.substring(relationBeginIndex + relationBeginMark.Length);
+            remainder = remainder.Substring(relationBeginIndex + relationBeginMark.Length);
             int relationEndIndex = remainder.IndexOf(relationEndMark);
             if (relationEndIndex < 0) {
                 break;
@@ -246,7 +247,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             String relationExp = remainder.Substring(0, relationEndIndex);
             int separatorIndex = relationExp.IndexOf(".");
             String tableName = relationExp.Substring(0, separatorIndex);
-            String relationName = relationExp.Substring(separatorIndex + ".".length());
+            String relationName = relationExp.Substring(separatorIndex + ".".Length);
             ${glDBMeta} targetMeta;
             try {
                 targetMeta = findDBMeta(tableName);
@@ -277,7 +278,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                         }
                         break;
                     }
-                    referrerQuery = referrerQuery.xgetReferrerQuery();
+                    referrerQuery = referrerQuery.getReferrerQuery();
                 }
                 if (relationLocalCQ == null) {
                     String notice = "The table for relation on fixed condition was not found in the scope.";
@@ -291,7 +292,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
 
             // after case for loop
-            remainder = remainder.Substring(relationEndIndex + relationEndMark.length());
+            remainder = remainder.Substring(relationEndIndex + relationEndMark.Length);
 
             // for prevent from processing same one
             remainder = replaceString(remainder, relationVariable, relationAlias);
@@ -313,7 +314,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected virtual bool xsearchRelationTableFromRegistered(${glDBMeta} targetMeta, String relationName
             , ${glConditionQuery} currentCQ, StringBuilder foreignPathSb) {
-        if (targetMeta.TableDbName.Equals(currentCQ.TableDbName)) {
+        if (targetMeta.TableDbName.Equals(currentCQ.getTableDbName())) {
             return true;
         }
         ${glDBMeta} currentDBMeta = findDBMeta(currentCQ.getTableDbName());
@@ -378,7 +379,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         msg = msg + " table=" + tableName + " relation=" + relationName;
         msg = msg + " fixedCondition=" + fixedCondition;
         msg = msg + " bizOneToOne local=" + getTableDbName();
-        throw new IllegalStateExpcetion(msg, e);
+        throw new IllegalStateException(msg, e);
     }
 
     // ===================================================================================
@@ -1761,7 +1762,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     public ${glConditionQuery} invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        String[] splitList = foreignPropertyName.Split(".");
+        String[] splitList = foreignPropertyName.Split('.');
         ${glConditionQuery} foreignCQ = this;
         foreach (String elementName in splitList) {
             foreignCQ = doInvokeForeignCQ(elementName);
@@ -1778,9 +1779,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     public bool invokeHasForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        String[] splitList = foreignPropertyName.Split(".");
+        String[] splitList = foreignPropertyName.Split('.');
         ${glConditionQuery} foreignCQ = this;
-        int splitLength = splitList.Count;
+        int splitLength = splitList.Length;
         int index = 0;
         foreach (String elementName in splitList) {
             foreignCQ = doInvokeForeignCQ(elementName);
@@ -1793,6 +1794,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             ++index;
         }
         return true;
+    }
+
+    protected bool doInvokeHasForeignCQ(${glConditionQuery} cq, String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
+        MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, foreignPropertyName);
+        return (bool)helpInvokingCQMethod(this, method, new Object[]{});
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {

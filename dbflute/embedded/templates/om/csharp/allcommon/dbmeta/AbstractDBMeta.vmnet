@@ -142,14 +142,10 @@ namespace ${glPackageBaseCommonDBMeta} {
             PropertyInfo[] props = GetType().GetProperties();
             List<${glForeignInfo}> foreignInfoList = new ArrayList<${glForeignInfo}>();
             String prefix = "Foreign";
-            try {
-                foreach (PropertyInfo prop in props) {
-                    if (prop.Name.StartsWith(prefix) && prop.PropertyType.Equals(typeof(${glForeignInfo}))) {
-                        foreignInfoList.add((${glForeignInfo})propertyInfo.GetValue(this, null));
-                    }
+            foreach (PropertyInfo prop in props) {
+                if (prop.Name.StartsWith(prefix) && prop.PropertyType.Equals(typeof(${glForeignInfo}))) {
+                    foreignInfoList.add((${glForeignInfo})prop.GetValue(this, null));
                 }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
             }
             return foreignInfoList;
         }}
@@ -189,15 +185,11 @@ namespace ${glPackageBaseCommonDBMeta} {
         public List<${glReferrerInfo}> ReferrerInfoList { get {
             PropertyInfo[] props = GetType().GetProperties();
             List<${glReferrerInfo}> foreignInfoList = new ArrayList<${glReferrerInfo}>();
-            String prefix = "Foreign";
-            try {
-                foreach (PropertyInfo prop in props) {
-                    if (prop.Name.StartsWith(prefix) && prop.PropertyType.Equals(typeof(${glReferrerInfo}))) {
-                        foreignInfoList.add((${glReferrerInfo})propertyInfo.GetValue(this, null));
-                    }
+            String prefix = "Referrer";
+            foreach (PropertyInfo prop in props) {
+                if (prop.Name.StartsWith(prefix) && prop.PropertyType.Equals(typeof(${glReferrerInfo}))) {
+                    foreignInfoList.add((${glReferrerInfo})prop.GetValue(this, null));
                 }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
             }
             return foreignInfoList;
         }}

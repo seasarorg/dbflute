@@ -566,7 +566,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     protected String getLeftOuterJoinClause() {
-        String fixedConditionKey = getFixedConditionKey();
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
             String aliasName = ite.next();
@@ -787,18 +786,8 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    public virtual void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap) {
-        assertAlreadyOuterJoin(aliasName);
-        assertJoinOnMapNotEmpty(joinOnMap, aliasName);
-        LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
-        joinInfo.setAliasName(aliasName);
-        joinInfo.setJoinTableName(joinTableDbName);
-        joinInfo.setJoinOnMap(joinOnMap);
-        _outerJoinMap.put(aliasName, joinInfo);
-    }
-
     public virtual void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition) {
+            Map<String, String> joinOnMap, String fixedCondition) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
         LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
@@ -840,6 +829,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
+        protected String _fixedCondition;
         protected bool _innerJoin;
         public bool hasInlineOrOnClause() {
             return !_inlineWhereClauseList.isEmpty() || !_additionalOnClauseList.isEmpty();
@@ -882,6 +872,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         public void setJoinOnMap(Map<String, String> value) {
             _joinOnMap = value;
+        }
+        public String getFixedCondition() {
+            return _fixedCondition;
+        }
+        public void setFixedCondition(String fixedCondition) {
+            _fixedCondition = fixedCondition;
         }
         public bool isInnerJoin() {
             return _innerJoin;
