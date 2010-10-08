@@ -835,7 +835,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             return !_inlineWhereClauseList.isEmpty() || !_additionalOnClauseList.isEmpty();
         }
         public bool hasFixedCondition() {
-            return _fixedCondition != null && _fixedCondition.Trim().Length() > 0;
+            return _fixedCondition != null && _fixedCondition.Trim().Length > 0;
         }
         public String getAliasName() {
             return _aliasName;
