@@ -109,10 +109,18 @@ public interface ConditionQuery {
     String xgetForeignPropertyName();
 
     /**
-     * Get the path of foreign relation.
-     * @return The path of foreign relation. (NotNull)
+     * Get the path of foreign relation. ex) _0_1
+     * @return The path of foreign relation. (Nullable)
      */
     String xgetRelationPath();
+
+    /**
+     * Has foreign condition-query?
+     * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
+     * @return The conditionQuery of the foreign relation as interface. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
+     */
+    boolean hasForeignCQ(String foreignPropertyName);
 
     // ===================================================================================
     //                                                                 Reflection Invoking
@@ -161,7 +169,7 @@ public interface ConditionQuery {
     void invokeOrderBy(String columnFlexibleName, boolean isAsc);
 
     /**
-     * Invoke getting foreign conditionQuery. <br />
+     * Invoke getting foreign condition-query. <br />
      * A method with parameters (using fixed condition) is unsupported.
      * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)

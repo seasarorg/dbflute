@@ -50,6 +50,7 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -58,6 +59,7 @@ import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
@@ -332,21 +334,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
+    /**
+     * Register outer-join.
+     * @param cq The condition-query for local table. (NotNull)
+     * @param joinOnMap The map of join-on clause. (NotNull)
+     */
     protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
         registerOuterJoin(cq, joinOnMap, null);
     }
 
+    /**
+     * Register outer-join.
+     * @param cq The condition-query for local table. (NotNull)
+     * @param joinOnMap The map of join-on clause. (NotNull)
+     * @param fixedCondition The plain fixed condition. (Nullable)
+     */
     protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
-        final String localDbName = getTableDbName();
-        final String foreignDbName = cq.getTableDbName();
-        final String localAliasName = xgetRealAliasName();
-        final String foreignAliasName = cq.xgetRealAliasName();
-        // resolve variables of fixed condition
+        // resolve variables on fixed condition
         if (fixedCondition != null) {
-            fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
-            fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
-            fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-            fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + xgetLocationBase());
+            fixedCondition = resolveFixedCondition(cq, joinOnMap, fixedCondition);
         }
         // translate join-on map using column real name
         final Map<ColumnRealName, ColumnRealName> joinOnRealMap = newLinkedHashMap();
@@ -356,7 +362,125 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             final String foreign = entry.getValue();
             joinOnRealMap.put(toColumnRealName(local), cq.toColumnRealName(foreign));
         }
+        final String localDbName = getTableDbName();
+        final String foreignDbName = cq.getTableDbName();
+        final String foreignAliasName = cq.xgetRealAliasName();
         xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnRealMap, fixedCondition);
+    }
+
+    /**
+     * Resolve variables on fixed condition.
+     * @param cq The condition-query for local table. (NotNull)
+     * @param joinOnMap The map of join-on clause. (NotNull, ReadOnly)
+     * @param fixedCondition The plain fixed condition. (NotNull: if null, this is not called)
+     * @return The resolved fixed condition. (NotNull)
+     */
+    protected String resolveFixedCondition(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
+        final String localAliasName = xgetRealAliasName();
+        final String foreignAliasName = cq.xgetRealAliasName();
+        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatible
+        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + xgetLocationBase());
+        fixedCondition = resolveFixedConditionSpecifiedRelation(cq, joinOnMap, fixedCondition);
+        return fixedCondition;
+    }
+
+    protected String resolveFixedConditionSpecifiedRelation(ConditionQuery cq, Map<String, String> joinOnMap,
+            String fixedCondition) {
+        final String relationBeginMark = "$$relation(";
+        final String relationEndMark = ")$$";
+        String remainder = fixedCondition;
+        while (true) {
+            final int relationBeginIndex = remainder.indexOf(relationBeginMark);
+            if (relationBeginIndex < 0) {
+                break;
+            }
+            remainder = remainder.substring(relationBeginIndex + relationBeginMark.length());
+            final int relationEndIndex = remainder.indexOf(relationEndMark);
+            if (relationEndIndex < 0) {
+                break;
+            }
+            final String relationExp = remainder.substring(0, relationEndIndex);
+            final int separatorIndex = relationExp.indexOf(".");
+            final String tableName = relationExp.substring(0, separatorIndex);
+            final String relationName = relationExp.substring(separatorIndex + ".".length());
+            final DBMeta targetMeta = findDBMeta(tableName);
+            final StringBuilder foreignPathSb = new StringBuilder();
+            final DBMeta localDBMeta = findDBMeta(getTableDbName());
+            boolean found = xsearchRelationTable(targetMeta, relationName, localDBMeta, foreignPathSb, 0);
+            ConditionQuery relationLocalCQ = null;
+            if (found) {
+                if (foreignPathSb.length() > 0) {
+                    relationLocalCQ = invokeForeignCQ(foreignPathSb.toString());
+                } else {
+                    relationLocalCQ = this;
+                }
+            } else {
+                ConditionQuery referrerQuery = xgetReferrerQuery();
+                while (true) {
+                    if (referrerQuery == null) { // base query
+                        break;
+                    }
+                    final DBMeta referrerDBMeta = findDBMeta(referrerQuery.getTableDbName());
+                    found = xsearchRelationTable(targetMeta, relationName, referrerDBMeta, foreignPathSb, 0);
+                    if (found) {
+                        if (foreignPathSb.length() > 0) {
+                            relationLocalCQ = referrerQuery.invokeForeignCQ(foreignPathSb.toString());
+                        } else {
+                            relationLocalCQ = referrerQuery;
+                        }
+                        break;
+                    }
+                    referrerQuery = referrerQuery.xgetReferrerQuery();
+                }
+                if (relationLocalCQ == null) {
+                    // TODO Not Found Table
+                }
+            }
+            final DBMeta relationMeta = findDBMeta(relationLocalCQ.getTableDbName());
+            if (!relationMeta.hasForeign(relationName)) {
+                // TODO Exception Not Found Relation
+            }
+            ConditionQuery relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+
+            final String relationVariable = relationBeginMark + relationExp + relationEndMark;
+            final String relationAlias = relationForeignCQ.xgetRealAliasName();
+            fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
+
+            // after case for loop
+            remainder = remainder.substring(relationEndIndex + relationEndMark.length());
+
+            // for prevent from processing same one
+            remainder = replaceString(remainder, relationVariable, relationAlias);
+        }
+        return fixedCondition;
+    }
+
+    protected boolean xsearchRelationTable(DBMeta targetMeta, String relationName, DBMeta currentMeta,
+            StringBuilder foreignPathSb, int scopeLevel) {
+        if (targetMeta.getTableDbName().equals(currentMeta.getTableDbName())) {
+            return true;
+        }
+        if (scopeLevel > 2) { // until 2 level
+            return false;
+        }
+        final List<ForeignInfo> foreignInfoList = currentMeta.getForeignInfoList();
+        final int nextLevel = scopeLevel + 1;
+        for (ForeignInfo foreignInfo : foreignInfoList) {
+            if (foreignInfo.isBizOneToOne()) {
+                continue; // biz-one-to-one relations are out of target here
+            }
+            final DBMeta foreignDBMeta = foreignInfo.getForeignDBMeta();
+            if (xsearchRelationTable(targetMeta, relationName, foreignDBMeta, foreignPathSb, nextLevel)) {
+                if (foreignPathSb.length() > 0) {
+                    foreignPathSb.insert(0, ".");
+                }
+                foreignPathSb.insert(0, foreignInfo.getForeignPropertyName());
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================
@@ -1224,9 +1348,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String methodName = "query" + initCap(foreignPropertyName);
         final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
         if (method == null) {
-            String msg = "Not found the method for getting a foreign condition query:";
-            msg = msg + " foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " methodName=" + methodName;
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Not found the method for getting a foreign condition query.");
+            br.addItem("foreignPropertyName");
+            br.addElement(foreignPropertyName);
+            br.addItem("methodName");
+            br.addElement(methodName);
+            br.addItem("ConditionQuery");
+            br.addElement(DfTypeUtil.toClassTitle(this));
+            final String msg = br.buildExceptionMessage();
             throw new ConditionInvokingFailureException(msg);
         }
         try {
@@ -1234,7 +1364,35 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         } catch (ReflectionFailureException e) {
             String msg = "Failed to invoke the method for setting a condition(query):";
             msg = msg + " foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " methodName=" + methodName;
+            msg = msg + " methodName=" + methodName + " table=" + getTableDbName();
+            throw new ConditionInvokingFailureException(msg, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasForeignCQ(String foreignPropertyName) {
+        final String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
+        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
+        if (method == null) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Not found the method for determining a foreign condition query.");
+            br.addItem("foreignPropertyName");
+            br.addElement(foreignPropertyName);
+            br.addItem("methodName");
+            br.addElement(methodName);
+            br.addItem("ConditionQuery");
+            br.addElement(DfTypeUtil.toClassTitle(this));
+            final String msg = br.buildExceptionMessage();
+            throw new ConditionInvokingFailureException(msg);
+        }
+        try {
+            return (Boolean) helpInvokingCQMethod(this, method, new Object[] {});
+        } catch (ReflectionFailureException e) {
+            String msg = "Failed to invoke the method for determining a condition(query):";
+            msg = msg + " foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " methodName=" + methodName + " table=" + getTableDbName();
             throw new ConditionInvokingFailureException(msg, e);
         }
     }
@@ -1246,7 +1404,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         ConditionQuery cq = this;
         int index = 0;
         for (String element : strings) {
-            if (length == (index + 1)) {// at last loop!
+            if (length == (index + 1)) { // at last loop!
                 propertyName = element;
                 break;
             }
