@@ -59,7 +59,7 @@ import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.DBMetaNotFoundException;
-import org.seasar.dbflute.exception.IllegalFixedConditionRelationVariableException;
+import org.seasar.dbflute.exception.IllegalFixedConditionOverRelationException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -377,13 +377,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
         fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + xgetLocationBase());
-        fixedCondition = resolveFixedConditionSpecifiedRelation(cq, joinOnMap, fixedCondition);
+        fixedCondition = resolveFixedConditionOverRelation(cq, joinOnMap, fixedCondition);
         return fixedCondition;
     }
 
-    protected String resolveFixedConditionSpecifiedRelation(ConditionQuery cq, Map<String, String> joinOnMap,
+    protected String resolveFixedConditionOverRelation(ConditionQuery cq, Map<String, String> joinOnMap,
             String fixedCondition) {
-        final String relationBeginMark = "$$relation(";
+        final String relationBeginMark = "$$over(";
         final String relationEndMark = ")$$";
         String remainder = fixedCondition;
         while (true) {
@@ -405,7 +405,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 targetMeta = findDBMeta(tableName);
             } catch (DBMetaNotFoundException e) {
                 String notice = "The table for relation on fixed condition does not exist.";
-                throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, e);
+                throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, e);
                 return null; // unreachable
             }
             final StringBuilder foreignPathSb = new StringBuilder();
@@ -522,10 +522,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName,
             String relationName, String fixedCondition) {
-        throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, null);
+        throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, null);
     }
 
-    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName,
+    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName,
             String relationName, String fixedCondition, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
@@ -538,7 +538,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         br.addItem("BizOneToOne Local");
         br.addElement(getTableDbName());
         final String msg = br.buildExceptionMessage();
-        throw new IllegalFixedConditionRelationVariableException(msg, e);
+        throw new IllegalFixedConditionOverRelationException(msg, e);
     }
 
     // ===================================================================================
