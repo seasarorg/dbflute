@@ -325,7 +325,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             }
             String foreignPropertyName = foreignInfo.ForeignPropertyName;
             if (currentCQ.invokeHasForeignCQ(foreignPropertyName)) {
-                ConditionQuery foreignCQ = currentCQ.invokeForeignCQ(foreignPropertyName);
+                ${glConditionQuery} foreignCQ = currentCQ.invokeForeignCQ(foreignPropertyName);
                 if (xsearchRelationTableFromRegistered(targetMeta, relationName, foreignCQ, foreignPathSb)) {
                     if (foreignPathSb.length() > 0) {
                         foreignPathSb.insert(0, ".");
