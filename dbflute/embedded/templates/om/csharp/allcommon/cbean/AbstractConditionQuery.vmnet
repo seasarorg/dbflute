@@ -225,11 +225,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
         fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
-        fixedCondition = resolveFixedConditionSpecifiedRelation(cq, joinOnMap, fixedCondition);
+        fixedCondition = resolveFixedConditionOverRelation(cq, joinOnMap, fixedCondition);
         return fixedCondition;
     }
 
-    protected virtual String resolveFixedConditionSpecifiedRelation(ConditionQuery cq
+    protected virtual String resolveFixedConditionOverRelation(ConditionQuery cq
             , Map<String, String> joinOnMap, String fixedCondition) {
         String relationBeginMark = "$$over(";
         String relationEndMark = ")$$";
@@ -253,7 +253,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 targetMeta = findDBMeta(tableName);
             } catch (DBMetaNotFoundException e) {
                 String notice = "The table for relation on fixed condition does not exist.";
-                throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, e);
+                throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, e);
                 return null; // unreachable
             }
             StringBuilder foreignPathSb = new StringBuilder();
@@ -282,7 +282,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 }
                 if (relationLocalCQ == null) {
                     String notice = "The table for relation on fixed condition was not found in the scope.";
-                    throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition);
+                    throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition);
                     return null; // unreachable
                 }
             }
@@ -368,12 +368,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return false;
     }
 
-    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName
+    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName
             , String relationName, String fixedCondition) {
-        throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, null);
+        throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, null);
     }
 
-    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName
+    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName
             , String relationName, String fixedCondition, Exception e) {
         String msg = notice;
         msg = msg + " table=" + tableName + " relation=" + relationName;
