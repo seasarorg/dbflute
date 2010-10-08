@@ -128,7 +128,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         final String foreignPropertyName = callback.qf().xgetForeignPropertyName();
         assertSetupSelectPurpose(foreignPropertyName);
         assertSetupSelectBeforeUnion(foreignPropertyName);
-        final String foreignTableAliasName = callback.qf().xgetRealAliasName();
+        final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = localCQ().xgetRelationPath();
         getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
                 localRelationPath);

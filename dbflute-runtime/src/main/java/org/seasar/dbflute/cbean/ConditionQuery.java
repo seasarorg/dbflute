@@ -41,12 +41,6 @@ public interface ConditionQuery {
     // not to be same as column names 
 
     /**
-     * Get real alias name (that has nest level mark).
-     * @return Real alias name. (NotNull)
-     */
-    String xgetRealAliasName();
-
-    /**
      * Convert to the column real name. (with real alias name)
      * @param columnDbName The DB name of column. (NotNull)
      * @return the column real name. (NotNull)
@@ -163,7 +157,7 @@ public interface ConditionQuery {
     /**
      * Invoke getting foreign condition-query. <br />
      * A method with parameters (using fixed condition) is unsupported.
-     * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
+     * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
@@ -171,7 +165,7 @@ public interface ConditionQuery {
 
     /**
      * Invoke determining foreign condition-query existence?
-     * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
+     * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */

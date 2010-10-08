@@ -316,8 +316,8 @@ public class DfReflectionUtil {
         assertObjectNotNull("method", method);
         try {
             return method.invoke(target, args);
-        } catch (InvocationTargetException ex) {
-            Throwable t = ex.getCause();
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             }
@@ -328,6 +328,11 @@ public class DfReflectionUtil {
             msg = msg + " method=" + method + " target=" + target;
             msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
             throw new ReflectionFailureException(msg, t);
+        } catch (IllegalArgumentException e) {
+            String msg = "Illegal argument for the method:";
+            msg = msg + " method=" + method + " target=" + target;
+            msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
+            throw new ReflectionFailureException(msg, e);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the method:";
             msg = msg + " method=" + method + " target=" + target;

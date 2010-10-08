@@ -237,15 +237,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
-    public String xgetRealAliasName() {
-        return xgetAliasName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public ColumnRealName toColumnRealName(String columnDbName) {
-        return new ColumnRealName(xgetRealAliasName(), toColumnSqlName(columnDbName));
+        return new ColumnRealName(xgetAliasName(), toColumnSqlName(columnDbName));
     }
 
     /**
@@ -323,7 +316,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                  ==================
     public void doNss(NssCall callback) { // very internal
         String foreignPropertyName = callback.qf().xgetForeignPropertyName();
-        String foreignTableAliasName = callback.qf().xgetRealAliasName();
+        String foreignTableAliasName = callback.qf().xgetAliasName();
         xgetSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
                 xgetRelationPath());
         xgetSqlClause().registerSelectedForeignInfo(callback.qf().xgetRelationPath(), foreignPropertyName);
@@ -366,7 +359,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         final String localDbName = getTableDbName();
         final String foreignDbName = cq.getTableDbName();
-        final String foreignAliasName = cq.xgetRealAliasName();
+        final String foreignAliasName = cq.xgetAliasName();
         xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnRealMap, fixedCondition);
     }
 
@@ -378,8 +371,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The resolved fixed condition. (NotNull)
      */
     protected String resolveFixedCondition(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
-        final String localAliasName = xgetRealAliasName();
-        final String foreignAliasName = cq.xgetRealAliasName();
+        final String localAliasName = xgetAliasName();
+        final String foreignAliasName = cq.xgetAliasName();
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatible
         fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
@@ -447,7 +440,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             final ConditionQuery relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
             final String relationVariable = relationBeginMark + relationExp + relationEndMark;
-            final String relationAlias = relationForeignCQ.xgetRealAliasName();
+            final String relationAlias = relationForeignCQ.xgetAliasName();
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
 
             // after case for loop
@@ -866,7 +859,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (isBaseQuery()) {
             xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue);
         } else {
-            final String aliasName = xgetRealAliasName();
+            final String aliasName = xgetAliasName();
             xgetSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, _onClause);
         }
     }
@@ -887,7 +880,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (isBaseQuery()) {
             xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, option);
         } else {
-            final String aliasName = xgetRealAliasName();
+            final String aliasName = xgetAliasName();
             xgetSqlClause()
                     .registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, option, _onClause);
         }
@@ -1115,7 +1108,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (isBaseQuery()) {
             xgetSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {
-            xgetSqlClause().registerOuterJoinInlineWhereClause(xgetRealAliasName(), whereClause, _onClause);
+            xgetSqlClause().registerOuterJoinInlineWhereClause(xgetAliasName(), whereClause, _onClause);
         }
     }
 
@@ -1173,7 +1166,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
-        xgetSqlClause().changeToInnerJoin(xgetRealAliasName());
+        xgetSqlClause().changeToInnerJoin(xgetAliasName());
     }
 
     // -----------------------------------------------------
@@ -1410,8 +1403,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     public ConditionQuery invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        final List<String> splitList = Srl.splitList(foreignPropertyName, ".");
+        ConditionQuery foreignCQ = this;
+        for (String elementName : splitList) {
+            foreignCQ = doInvokeForeignCQ(foreignCQ, elementName);
+        }
+        return foreignCQ;
+    }
+
+    protected ConditionQuery doInvokeForeignCQ(ConditionQuery cq, String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "query" + initCap(foreignPropertyName);
-        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] {});
         if (method == null) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found the method for getting a foreign condition query.");
@@ -1420,12 +1423,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             br.addItem("methodName");
             br.addElement(methodName);
             br.addItem("ConditionQuery");
-            br.addElement(DfTypeUtil.toClassTitle(this));
+            br.addElement(DfTypeUtil.toClassTitle(cq));
             final String msg = br.buildExceptionMessage();
             throw new ConditionInvokingFailureException(msg);
         }
         try {
-            return (ConditionQuery) helpInvokingCQMethod(this, method, new Object[] {});
+            return (ConditionQuery) helpInvokingCQMethod(cq, method, new Object[] {});
         } catch (ReflectionFailureException e) {
             String msg = "Failed to invoke the method for setting a condition(query):";
             msg = msg + " foreignPropertyName=" + foreignPropertyName;
@@ -1438,8 +1441,27 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * {@inheritDoc}
      */
     public boolean invokeHasForeignCQ(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        final List<String> splitList = Srl.splitList(foreignPropertyName, ".");
+        ConditionQuery foreignCQ = this;
+        final int splitLength = splitList.size();
+        int index = 0;
+        for (String elementName : splitList) {
+            if (!doInvokeHasForeignCQ(foreignCQ, elementName)) {
+                return false;
+            }
+            if ((index + 1) < splitLength) { // last loop
+                foreignCQ = foreignCQ.invokeForeignCQ(elementName);
+            }
+            ++index;
+        }
+        return true;
+    }
+
+    protected boolean doInvokeHasForeignCQ(ConditionQuery cq, String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
-        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] {});
         if (method == null) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found the method for determining a foreign condition query.");
@@ -1448,12 +1470,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             br.addItem("methodName");
             br.addElement(methodName);
             br.addItem("ConditionQuery");
-            br.addElement(DfTypeUtil.toClassTitle(this));
+            br.addElement(DfTypeUtil.toClassTitle(cq));
             final String msg = br.buildExceptionMessage();
             throw new ConditionInvokingFailureException(msg);
         }
         try {
-            return (Boolean) helpInvokingCQMethod(this, method, new Object[] {});
+            return (Boolean) helpInvokingCQMethod(cq, method, new Object[] {});
         } catch (ReflectionFailureException e) {
             String msg = "Failed to invoke the method for determining a condition(query):";
             msg = msg + " foreignPropertyName=" + foreignPropertyName;
@@ -1672,7 +1694,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return;
         }
         final String clause = ((SqlClauseMySql) xgetSqlClause()).buildMatchCondition(textColumnList, conditionValue,
-                modifier, getTableDbName(), xgetRealAliasName());
+                modifier, getTableDbName(), xgetAliasName());
         registerWhereClause(clause);
     }
 
