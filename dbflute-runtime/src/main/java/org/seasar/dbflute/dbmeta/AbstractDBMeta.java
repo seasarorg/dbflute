@@ -16,7 +16,6 @@
 package org.seasar.dbflute.dbmeta;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -40,6 +39,7 @@ import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.IllegalClassificationCodeException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
@@ -294,21 +294,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     public ForeignInfo findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
-        Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[] {});
-        } catch (NoSuchMethodException e) {
-            String msg = "Not found foreign by foreignPropertyName: foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new IllegalStateException(msg, e);
-        }
-        try {
-            return (ForeignInfo) method.invoke(this, new Object[] {});
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
-        }
+        final Method method = DfReflectionUtil.getPublicMethod(getClass(), methodName, null);
+        return (ForeignInfo) DfReflectionUtil.invoke(method, this, null);
     }
 
     protected ForeignInfo cfi(String propName, DBMeta localDbm, DBMeta foreignDbm,
@@ -327,19 +314,14 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_foreignInfoList != null) {
                 return _foreignInfoList;
             }
-            Method[] methods = this.getClass().getMethods();
+            final Method[] methods = this.getClass().getMethods();
             _foreignInfoList = newArrayList();
-            String prefix = "foreign";
-            Class<ForeignInfo> returnType = ForeignInfo.class;
-            Object[] args = new Object[] {};
-            try {
-                for (Method method : methods) {
-                    if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        _foreignInfoList.add((ForeignInfo) method.invoke(this, args));
-                    }
+            final String prefix = "foreign";
+            final Class<ForeignInfo> returnType = ForeignInfo.class;
+            for (Method method : methods) {
+                if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                    _foreignInfoList.add((ForeignInfo) DfReflectionUtil.invoke(method, this, null));
                 }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
             }
             return _foreignInfoList;
         }
@@ -395,21 +377,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     public ReferrerInfo findReferrerInfo(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
-        Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[] {});
-        } catch (NoSuchMethodException e) {
-            String msg = "Not found referrer by referrerPropertyName: referrerPropertyName=" + referrerPropertyName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new IllegalStateException(msg, e);
-        }
-        try {
-            return (ReferrerInfo) method.invoke(this, new Object[] {});
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
-        }
+        final Method method = DfReflectionUtil.getPublicMethod(getClass(), methodName, null);
+        return (ReferrerInfo) DfReflectionUtil.invoke(method, this, null);
     }
 
     protected ReferrerInfo cri(String propName, DBMeta localDbm, DBMeta referrerDbm,
@@ -428,19 +397,14 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_referrerInfoList != null) {
                 return _referrerInfoList;
             }
-            Method[] methods = this.getClass().getMethods();
+            final Method[] methods = this.getClass().getMethods();
             _referrerInfoList = newArrayList();
-            String prefix = "referrer";
-            Class<ReferrerInfo> returnType = ReferrerInfo.class;
-            Object[] args = new Object[] {};
-            try {
-                for (Method method : methods) {
-                    if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        _referrerInfoList.add((ReferrerInfo) method.invoke(this, args));
-                    }
+            final String prefix = "referrer";
+            final Class<ReferrerInfo> returnType = ReferrerInfo.class;
+            for (Method method : methods) {
+                if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                    _referrerInfoList.add((ReferrerInfo) DfReflectionUtil.invoke(method, this, null));
                 }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
             }
             return _referrerInfoList;
         }
@@ -888,22 +852,20 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected void throwIllegalClassificationCodeException(ColumnInfo columnInfo, Object code) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to get the classification by the code!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the code value of the classication column on your database." + ln();
-        msg = msg + "The code may NOT be one of classification code defined on DBFlute." + ln();
-        msg = msg + ln();
-        msg = msg + "[Code]" + ln() + code + ln();
-        msg = msg + ln();
-        msg = msg + "[Classication]" + ln() + columnInfo.getClassificationMeta() + ln();
-        msg = msg + ln();
-        msg = msg + "[Table]" + ln() + getTableDbName() + ln();
-        msg = msg + ln();
-        msg = msg + "[Column]" + ln() + columnInfo.getColumnDbName() + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to get the classification by the code.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the code value of the classication column on your database.");
+        br.addElement("The code may NOT be one of classification code defined on DBFlute.");
+        br.addItem("Code");
+        br.addElement(code);
+        br.addItem("Classication");
+        br.addElement(columnInfo.getClassificationMeta());
+        br.addItem("Table");
+        br.addElement(getTableDbName());
+        br.addItem("Column");
+        br.addElement(columnInfo.getColumnDbName());
+        final String msg = br.buildExceptionMessage();
         throw new IllegalClassificationCodeException(msg);
     }
 
