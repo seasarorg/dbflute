@@ -228,7 +228,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return fixedCondition;
     }
 
-    protected String resolveFixedConditionSpecifiedRelation(ConditionQuery cq, Map<String, String> joinOnMap,
+    protected virtual String resolveFixedConditionSpecifiedRelation(ConditionQuery cq, Map<String, String> joinOnMap,
             String fixedCondition) {
         String relationBeginMark = "$$relation(";
         String relationEndMark = ")$$";
@@ -297,6 +297,98 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             remainder = replaceString(remainder, relationVariable, relationAlias);
         }
         return fixedCondition;
+    }
+
+    protected bool xsearchRelationTable(${glDBMeta} targetMeta, String relationName, ${glConditionQuery} currentCQ,
+            StringBuilder foreignPathSb) {
+        if (xsearchRelationTableFromRegistered(targetMeta, relationName, currentCQ, foreignPathSb)) {
+            return true;
+        }
+        ${glDBMeta} currentDBMeta = findDBMeta(currentCQ.getTableDbName());
+        if (xsearchRelationTableFromLevel(targetMeta, relationName, currentCQ, currentDBMeta, foreignPathSb, 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    protected bool xsearchRelationTableFromRegistered(${glDBMeta} targetMeta, String relationName,
+            ${glConditionQuery} currentCQ, StringBuilder foreignPathSb) {
+        if (targetMeta.getTableDbName().equals(currentCQ.getTableDbName())) {
+            return true;
+        }
+        ${glDBMeta} currentDBMeta = findDBMeta(currentCQ.getTableDbName());
+        List<${glForeignInfo}> foreignInfoList = currentDBMeta.ForeignInfoList;
+        foreach (${glForeignInfo} foreignInfo in foreignInfoList) {
+            if (foreignInfo.isBizOneToOne()) {
+                continue; // biz-one-to-one relations are out of target here
+            }
+            String foreignPropertyName = foreignInfo.getForeignPropertyName();
+            if (currentCQ.invokeHasForeignCQ(foreignPropertyName)) {
+                ConditionQuery foreignCQ = currentCQ.invokeForeignCQ(foreignPropertyName);
+                if (xsearchRelationTableFromRegistered(targetMeta, relationName, foreignCQ, foreignPathSb)) {
+                    if (foreignPathSb.length() > 0) {
+                        foreignPathSb.insert(0, ".");
+                    }
+                    foreignPathSb.insert(0, foreignInfo.ForeignPropertyName);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected bool xsearchRelationTableFromLevel(${glDBMeta} targetMeta, String relationName, ${glConditionQuery} currentCQ,
+            ${glDBMeta} currentDBMeta, StringBuilder foreignPathSb, int scopeLevel) {
+        if (targetMeta.TableDbName.Equals(currentDBMeta.TableDbName)) {
+            return true;
+        }
+        if (scopeLevel > 2) { // until this level
+            return false;
+        }
+        List<${glForeignInfo}> foreignInfoList = currentDBMeta.getForeignInfoList();
+        int nextLevel = scopeLevel + 1;
+        foreach (${glForeignInfo} foreignInfo in foreignInfoList) {
+            if (foreignInfo.IsBizOneToOne) {
+                continue; // biz-one-to-one relations are out of target here
+            }
+            String foreignPropertyName = foreignInfo.getForeignPropertyName();
+            if (currentCQ != null && currentCQ.invokeHasForeignCQ(foreignPropertyName)) { // basically first level only
+                continue; // already searched
+            }
+            ${glDBMeta} foreignDBMeta = foreignInfo.ForeignDBMeta;
+            if (xsearchRelationTableFromLevel(targetMeta, relationName, null, foreignDBMeta, foreignPathSb, nextLevel)) {
+                if (foreignPathSb.length() > 0) {
+                    foreignPathSb.insert(0, ".");
+                }
+                foreignPathSb.insert(0, foreignInfo.ForeignPropertyName);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName,
+            String relationName, String fixedCondition) {
+        throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition, null);
+    }
+
+    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName,
+            String relationName, String fixedCondition, Exception e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Relation Name");
+        br.addElement(relationName);
+        br.addItem("Fixed Condition");
+        br.addElement(fixedCondition);
+        br.addItem("BizOneToOne Local");
+        br.addElement(getTableDbName());
+        String msg = notice;
+        msg = msg + " table=" + tableName + " relation=" + relationName;
+        msg = msg + " fixedCondition=" + fixedCondition;
+        msg = msg + " bizOneToOne local=" + getTableDbName();
+        throw new IllegalStateExpcetion(msg, e);
     }
 
     // ===================================================================================
@@ -1679,9 +1771,38 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     public ${glConditionQuery} invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        String[] splitList = foreignPropertyName.Split(".");
+        ${glConditionQuery} foreignCQ = this;
+        foreach (String elementName in splitList) {
+            foreignCQ = doInvokeForeignCQ(elementName);
+        }
+        return foreignCQ;
+    }
+
+    protected ${glConditionQuery} doInvokeForeignCQ(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         String methodName = "Query" + initCap(foreignPropertyName);
         MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, foreignPropertyName);
         return (${glConditionQuery})helpInvokingCQMethod(this, method, new Object[]{});
+    }
+
+    public bool invokeHasForeignCQ(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        String[] splitList = foreignPropertyName.Split(".");
+        ${glConditionQuery} foreignCQ = this;
+        int splitLength = splitList.Count;
+        int index = 0;
+        foreach (String elementName in splitList) {
+            foreignCQ = doInvokeForeignCQ(elementName);
+            if (!doInvokeHasForeignCQ(foreignCQ, elementName)) {
+                return false;
+            }
+            if ((index + 1) < splitLength) { // last loop
+                foreignCQ = foreignCQ.invokeForeignCQ(elementName);
+            }
+            ++index;
+        }
+        return true;
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {

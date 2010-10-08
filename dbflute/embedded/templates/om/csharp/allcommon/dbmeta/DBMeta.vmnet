@@ -48,6 +48,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         bool HasForeign(String foreignPropName);
         ${myClassName} FindForeignDBMeta(String foreignPropName);
         ${glForeignInfo} FindForeignInfo(String foreignPropName);
+        List<${glForeignInfo}> ForeignInfoList { get; }
 
         // -------------------------------------------------
         //                                  Referrer Element
@@ -55,6 +56,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         bool HasReferrer(String referrerPropertyName);
         ${myClassName} FindReferrerDBMeta(String referrerPropertyName);
         ${glReferrerInfo} FindReferrerInfo(String referrerPropertyName);
+        List<${glReferrerInfo}> ReferrerInfoList { get; }
 
         // ===============================================================================
         //                                                                   Identity Info
