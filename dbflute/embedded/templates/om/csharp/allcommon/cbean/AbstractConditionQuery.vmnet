@@ -247,60 +247,59 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             String relationExp = remainder.Substring(0, relationEndIndex);
             int separatorIndex = relationExp.IndexOf(".");
             String tableName;
-            String relationName;
+            String targetRelation;
             if (separatorIndex >= 0) {
-                tableName = relationExp.Substring(0, separatorIndex).Trim();
-                relationName = relationExp.Substring(separatorIndex + ".".Length).Trim();
+                pointTable = relationExp.Substring(0, separatorIndex).Trim();
+                targetRelation = relationExp.Substring(separatorIndex + ".".Length).Trim();
             } else {
-                tableName = relationExp.Trim();
-                relationName = null;
+                pointTable = relationExp.Trim();
+                targetRelation = null;
             }
-            ${glDBMeta} targetMeta;
+            ${glDBMeta} pointDBMeta;
             try {
-                targetMeta = findDBMeta(tableName);
+                pointDBMeta = findDBMeta(pointTable);
             } catch (DBMetaNotFoundException e) {
                 String notice = "The table for relation on fixed condition does not exist.";
-                throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, e);
+                throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition, e);
                 return null; // unreachable
             }
             StringBuilder foreignPathSb = new StringBuilder();
-            ${glConditionQuery} relationLocalCQ = null;
-            if (xsearchRelationTable(targetMeta, relationName, this, foreignPathSb)) {
-                if (foreignPathSb.length() > 0) {
-                    relationLocalCQ = invokeForeignCQ(foreignPathSb.toString());
-                } else {
-                    relationLocalCQ = this;
-                }
+            bool localPoint;
+            ${glConditionQuery} relationPointCQ;
+            if (pointDBMeta.TableDbName.equals(getTableDbName())) { // point is local
+                relationPointCQ = this;
+                localPoint = true;
             } else {
                 ${glConditionQuery} referrerQuery = getReferrerQuery();
                 while (true) {
                     if (referrerQuery == null) { // base query
                         break;
                     }
-                    if (xsearchRelationTable(targetMeta, relationName, referrerQuery, foreignPathSb)) {
-                        if (foreignPathSb.length() > 0) {
-                            relationLocalCQ = referrerQuery.invokeForeignCQ(foreignPathSb.toString());
-                        } else {
-                            relationLocalCQ = referrerQuery;
-                        }
+                    if (pointDBMeta.getTableDbName().equals(referrerQuery.getTableDbName())) {
                         break;
                     }
                     referrerQuery = referrerQuery.getReferrerQuery();
                 }
-                if (relationLocalCQ == null) {
+                relationPointCQ = referrerQuery;
+                if (relationPointCQ == null) {
                     String notice = "The table for relation on fixed condition was not found in the scope.";
-                    throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition);
+                    throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition);
                     return null; // unreachable
                 }
+                localPoint = false;
             }
-            ${glConditionQuery} relationForeignCQ;
-            if (relationName != null) {
-                relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+            ${glConditionQuery} columnTargetCQ;
+            if (targetRelation != null) {
+                columnTargetCQ = relationPointCQ.invokeForeignCQ(targetRelation);
             } else {
-                relationForeignCQ = relationLocalCQ;
+                if (localPoint) {
+                    String notice = "The relation on fixed condition is required if the table is on many-to-one.";
+                    throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
+                }
+                columnTargetCQ = relationPointCQ;
             }
             String relationVariable = relationBeginMark + relationExp + relationEndMark;
-            String relationAlias = relationForeignCQ.getAliasName();
+            String relationAlias = columnTargetCQ.getAliasName();
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
 
             // after case for loop
@@ -312,74 +311,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return fixedCondition;
     }
 
-    protected virtual bool xsearchRelationTable(${glDBMeta} targetMeta, String relationName
-            , ${glConditionQuery} currentCQ, StringBuilder foreignPathSb) {
-        if (xsearchRelationTableFromRegistered(targetMeta, relationName, currentCQ, foreignPathSb)) {
-            return true;
-        }
-        ${glDBMeta} currentDBMeta = findDBMeta(currentCQ.getTableDbName());
-        if (xsearchRelationTableFromLevel(targetMeta, relationName, currentCQ, currentDBMeta, foreignPathSb, 0)) {
-            return true;
-        }
-        return false;
-    }
-
-    protected virtual bool xsearchRelationTableFromRegistered(${glDBMeta} targetMeta, String relationName
-            , ${glConditionQuery} currentCQ, StringBuilder foreignPathSb) {
-        if (targetMeta.TableDbName.Equals(currentCQ.getTableDbName())) {
-            return true;
-        }
-        ${glDBMeta} currentDBMeta = findDBMeta(currentCQ.getTableDbName());
-        List<${glForeignInfo}> foreignInfoList = currentDBMeta.ForeignInfoList;
-        foreach (${glForeignInfo} foreignInfo in foreignInfoList) {
-            if (foreignInfo.IsBizOneToOne) {
-                continue; // biz-one-to-one relations are out of target here
-            }
-            String foreignPropertyName = foreignInfo.ForeignPropertyName;
-            if (currentCQ.invokeHasForeignCQ(foreignPropertyName)) {
-                ${glConditionQuery} foreignCQ = currentCQ.invokeForeignCQ(foreignPropertyName);
-                if (xsearchRelationTableFromRegistered(targetMeta, relationName, foreignCQ, foreignPathSb)) {
-                    if (foreignPathSb.length() > 0) {
-                        foreignPathSb.insert(0, ".");
-                    }
-                    foreignPathSb.insert(0, foreignInfo.ForeignPropertyName);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    protected virtual bool xsearchRelationTableFromLevel(${glDBMeta} targetMeta, String relationName
-            , ${glConditionQuery} currentCQ, ${glDBMeta} currentDBMeta, StringBuilder foreignPathSb, int scopeLevel) {
-        if (targetMeta.TableDbName.Equals(currentDBMeta.TableDbName)) {
-            return true;
-        }
-        if (scopeLevel > 2) { // until this level
-            return false;
-        }
-        List<${glForeignInfo}> foreignInfoList = currentDBMeta.ForeignInfoList;
-        int nextLevel = scopeLevel + 1;
-        foreach (${glForeignInfo} foreignInfo in foreignInfoList) {
-            if (foreignInfo.IsBizOneToOne) {
-                continue; // biz-one-to-one relations are out of target here
-            }
-            String foreignPropertyName = foreignInfo.ForeignPropertyName;
-            if (currentCQ != null && currentCQ.invokeHasForeignCQ(foreignPropertyName)) { // basically first level only
-                continue; // already searched
-            }
-            ${glDBMeta} foreignDBMeta = foreignInfo.ForeignDBMeta;
-            if (xsearchRelationTableFromLevel(targetMeta, relationName, null, foreignDBMeta, foreignPathSb, nextLevel)) {
-                if (foreignPathSb.length() > 0) {
-                    foreignPathSb.insert(0, ".");
-                }
-                foreignPathSb.insert(0, foreignInfo.ForeignPropertyName);
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName
             , String relationName, String fixedCondition) {
         throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, null);
@@ -388,9 +319,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName
             , String relationName, String fixedCondition, Exception e) {
         String msg = notice;
-        msg = msg + " table=" + tableName + " relation=" + relationName;
+        msg = msg + " pointTable=" + tableName + " targetRelation=" + relationName;
         msg = msg + " fixedCondition=" + fixedCondition;
-        msg = msg + " bizOneToOne local=" + getTableDbName();
+        msg = msg + " BizOneToOne's local=" + getTableDbName();
         throw new IllegalStateException(msg, e);
     }
 
