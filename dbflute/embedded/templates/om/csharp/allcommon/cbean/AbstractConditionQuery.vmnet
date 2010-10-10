@@ -246,8 +246,15 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             }
             String relationExp = remainder.Substring(0, relationEndIndex);
             int separatorIndex = relationExp.IndexOf(".");
-            String tableName = relationExp.Substring(0, separatorIndex);
-            String relationName = relationExp.Substring(separatorIndex + ".".Length);
+            String tableName;
+            String relationName;
+            if (separatorIndex >= 0) {
+                tableName = relationExp.Substring(0, separatorIndex).Trim();
+                relationName = relationExp.Substring(separatorIndex + ".".Length).Trim();
+            } else {
+                tableName = relationExp.Trim();
+                relationName = null;
+            }
             ${glDBMeta} targetMeta;
             try {
                 targetMeta = findDBMeta(tableName);
@@ -286,7 +293,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                     return null; // unreachable
                 }
             }
-            ${glConditionQuery} relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+            ${glConditionQuery} relationForeignCQ;
+            if (relationName != null) {
+                relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+            } else {
+                relationForeignCQ = relationLocalCQ;
+            }
             String relationVariable = relationBeginMark + relationExp + relationEndMark;
             String relationAlias = relationForeignCQ.getAliasName();
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
