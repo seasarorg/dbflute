@@ -1713,11 +1713,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return foreignCQ;
     }
 
-    protected ${glConditionQuery} doInvokeForeignCQ(String foreignPropertyName) {
+    protected ${glConditionQuery} doInvokeForeignCQ(${glConditionQuery} cq, String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         String methodName = "Query" + initCap(foreignPropertyName);
-        MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, foreignPropertyName);
-        return (${glConditionQuery})helpInvokingCQMethod(this, method, new Object[]{});
+        MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{}, foreignPropertyName);
+        return (${glConditionQuery})helpInvokingCQMethod(cq, method, new Object[]{});
     }
 
     public bool invokeHasForeignCQ(String foreignPropertyName) {
@@ -1741,8 +1741,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected bool doInvokeHasForeignCQ(${glConditionQuery} cq, String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         String methodName = "hasConditionQuery" + initCap(foreignPropertyName);
-        MethodInfo method = helpGettingCQMethod(this, methodName, new Type[]{}, foreignPropertyName);
-        return (bool)helpInvokingCQMethod(this, method, new Object[]{});
+        MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{}, foreignPropertyName);
+        return (bool)helpInvokingCQMethod(cq, method, new Object[]{});
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
