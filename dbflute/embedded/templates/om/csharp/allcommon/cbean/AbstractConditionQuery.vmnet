@@ -246,7 +246,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             }
             String relationExp = remainder.Substring(0, relationEndIndex);
             int separatorIndex = relationExp.IndexOf(".");
-            String tableName;
+            String pointTable;
             String targetRelation;
             if (separatorIndex >= 0) {
                 pointTable = relationExp.Substring(0, separatorIndex).Trim();
@@ -266,7 +266,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             StringBuilder foreignPathSb = new StringBuilder();
             bool localPoint;
             ${glConditionQuery} relationPointCQ;
-            if (pointDBMeta.TableDbName.equals(getTableDbName())) { // point is local
+            if (pointDBMeta.TableDbName.Equals(getTableDbName())) { // point is local
                 relationPointCQ = this;
                 localPoint = true;
             } else {
@@ -275,7 +275,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                     if (referrerQuery == null) { // base query
                         break;
                     }
-                    if (pointDBMeta.getTableDbName().equals(referrerQuery.getTableDbName())) {
+                    if (pointDBMeta.TableDbName.Equals(referrerQuery.getTableDbName())) {
                         break;
                     }
                     referrerQuery = referrerQuery.getReferrerQuery();
