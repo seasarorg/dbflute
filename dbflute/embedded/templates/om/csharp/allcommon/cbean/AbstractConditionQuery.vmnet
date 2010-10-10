@@ -263,9 +263,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition, e);
                 return null; // unreachable
             }
-            StringBuilder foreignPathSb = new StringBuilder();
-            bool localPoint;
             ${glConditionQuery} relationPointCQ;
+            bool localPoint;
             if (pointDBMeta.TableDbName.Equals(getTableDbName())) { // point is local
                 relationPointCQ = this;
                 localPoint = true;
@@ -1708,7 +1707,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String[] splitList = foreignPropertyName.Split('.');
         ${glConditionQuery} foreignCQ = this;
         foreach (String elementName in splitList) {
-            foreignCQ = doInvokeForeignCQ(elementName);
+            foreignCQ = doInvokeForeignCQ(foreignCQ, elementName);
         }
         return foreignCQ;
     }
