@@ -50,7 +50,6 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
-import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -398,61 +397,59 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             final String relationExp = remainder.substring(0, relationEndIndex);
             final int separatorIndex = relationExp.indexOf(".");
-            final String tableName;
-            final String relationName;
+            final String pointTable;
+            final String targetRelation;
             if (separatorIndex >= 0) {
-                tableName = relationExp.substring(0, separatorIndex).trim();
-                relationName = relationExp.substring(separatorIndex + ".".length()).trim();
+                pointTable = relationExp.substring(0, separatorIndex).trim();
+                targetRelation = relationExp.substring(separatorIndex + ".".length()).trim();
             } else {
-                tableName = relationExp.trim();
-                relationName = null;
+                pointTable = relationExp.trim();
+                targetRelation = null;
             }
-            final DBMeta targetMeta;
+            final DBMeta pointDBMeta;
             try {
-                targetMeta = findDBMeta(tableName);
+                pointDBMeta = findDBMeta(pointTable);
             } catch (DBMetaNotFoundException e) {
                 String notice = "The table for relation on fixed condition does not exist.";
-                throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, e);
+                throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition, e);
                 return null; // unreachable
             }
-            final StringBuilder foreignPathSb = new StringBuilder();
-            ConditionQuery relationLocalCQ = null;
-            if (xsearchRelationTable(targetMeta, relationName, this, foreignPathSb)) {
-                if (foreignPathSb.length() > 0) {
-                    relationLocalCQ = invokeForeignCQ(foreignPathSb.toString());
-                } else {
-                    relationLocalCQ = this;
-                }
-            } else {
+            final ConditionQuery relationPointCQ;
+            final boolean localPoint;
+            if (pointDBMeta.getTableDbName().equals(getTableDbName())) { // point is local
+                relationPointCQ = this;
+                localPoint = true;
+            } else { // point is referrer
                 ConditionQuery referrerQuery = xgetReferrerQuery();
                 while (true) {
-                    if (referrerQuery == null) { // base query
+                    if (referrerQuery == null) { // means not found
                         break;
                     }
-                    if (xsearchRelationTable(targetMeta, relationName, referrerQuery, foreignPathSb)) {
-                        if (foreignPathSb.length() > 0) {
-                            relationLocalCQ = referrerQuery.invokeForeignCQ(foreignPathSb.toString());
-                        } else {
-                            relationLocalCQ = referrerQuery;
-                        }
+                    if (pointDBMeta.getTableDbName().equals(referrerQuery.getTableDbName())) {
                         break;
                     }
                     referrerQuery = referrerQuery.xgetReferrerQuery();
                 }
-                if (relationLocalCQ == null) {
+                relationPointCQ = referrerQuery;
+                if (relationPointCQ == null) {
                     String notice = "The table for relation on fixed condition was not found in the scope.";
-                    throwIllegalFixedConditionRelationVariableException(notice, tableName, relationName, fixedCondition);
+                    throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition);
                     return null; // unreachable
                 }
+                localPoint = false;
             }
-            final ConditionQuery relationForeignCQ;
-            if (relationName != null) {
-                relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+            final ConditionQuery columnTargetCQ;
+            if (targetRelation != null) {
+                columnTargetCQ = relationPointCQ.invokeForeignCQ(targetRelation);
             } else {
-                relationForeignCQ = relationLocalCQ;
+                if (localPoint) {
+                    String notice = "The relation on fixed condition is required if the table is referrer.";
+                    throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
+                }
+                columnTargetCQ = relationPointCQ;
             }
             final String relationVariable = relationBeginMark + relationExp + relationEndMark;
-            final String relationAlias = relationForeignCQ.xgetAliasName();
+            final String relationAlias = columnTargetCQ.xgetAliasName();
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
 
             // after case for loop
@@ -464,90 +461,22 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return fixedCondition;
     }
 
-    protected boolean xsearchRelationTable(DBMeta targetMeta, String relationName, ConditionQuery currentCQ,
-            StringBuilder foreignPathSb) {
-        if (xsearchRelationTableFromRegistered(targetMeta, relationName, currentCQ, foreignPathSb)) {
-            return true;
-        }
-        final DBMeta currentDBMeta = findDBMeta(currentCQ.getTableDbName());
-        if (xsearchRelationTableFromLevel(targetMeta, relationName, currentCQ, currentDBMeta, foreignPathSb, 0)) {
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean xsearchRelationTableFromRegistered(DBMeta targetMeta, String relationName,
-            ConditionQuery currentCQ, StringBuilder foreignPathSb) {
-        if (targetMeta.getTableDbName().equals(currentCQ.getTableDbName())) {
-            return true;
-        }
-        final DBMeta currentDBMeta = findDBMeta(currentCQ.getTableDbName());
-        final List<ForeignInfo> foreignInfoList = currentDBMeta.getForeignInfoList();
-        for (ForeignInfo foreignInfo : foreignInfoList) {
-            if (foreignInfo.isBizOneToOne()) {
-                continue; // biz-one-to-one relations are out of target here
-            }
-            final String foreignPropertyName = foreignInfo.getForeignPropertyName();
-            if (currentCQ.invokeHasForeignCQ(foreignPropertyName)) {
-                final ConditionQuery foreignCQ = currentCQ.invokeForeignCQ(foreignPropertyName);
-                if (xsearchRelationTableFromRegistered(targetMeta, relationName, foreignCQ, foreignPathSb)) {
-                    if (foreignPathSb.length() > 0) {
-                        foreignPathSb.insert(0, ".");
-                    }
-                    foreignPathSb.insert(0, foreignInfo.getForeignPropertyName());
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    protected boolean xsearchRelationTableFromLevel(DBMeta targetMeta, String relationName, ConditionQuery currentCQ,
-            DBMeta currentDBMeta, StringBuilder foreignPathSb, int scopeLevel) {
-        if (targetMeta.getTableDbName().equals(currentDBMeta.getTableDbName())) {
-            return true;
-        }
-        if (scopeLevel > 2) { // until this level
-            return false;
-        }
-        final List<ForeignInfo> foreignInfoList = currentDBMeta.getForeignInfoList();
-        final int nextLevel = scopeLevel + 1;
-        for (ForeignInfo foreignInfo : foreignInfoList) {
-            if (foreignInfo.isBizOneToOne()) {
-                continue; // biz-one-to-one relations are out of target here
-            }
-            final String foreignPropertyName = foreignInfo.getForeignPropertyName();
-            if (currentCQ != null && currentCQ.invokeHasForeignCQ(foreignPropertyName)) { // basically first level only
-                continue; // already searched
-            }
-            final DBMeta foreignDBMeta = foreignInfo.getForeignDBMeta();
-            if (xsearchRelationTableFromLevel(targetMeta, relationName, null, foreignDBMeta, foreignPathSb, nextLevel)) {
-                if (foreignPathSb.length() > 0) {
-                    foreignPathSb.insert(0, ".");
-                }
-                foreignPathSb.insert(0, foreignInfo.getForeignPropertyName());
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected void throwIllegalFixedConditionRelationVariableException(String notice, String tableName,
+    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName,
             String relationName, String fixedCondition) {
         throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, null);
     }
 
-    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName,
-            String relationName, String fixedCondition, Exception e) {
+    protected void throwIllegalFixedConditionOverRelationException(String notice, String pointTable,
+            String targetRelation, String fixedCondition, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
-        br.addItem("Table Name");
-        br.addElement(tableName);
-        br.addItem("Relation Name");
-        br.addElement(relationName);
+        br.addItem("Point Table");
+        br.addElement(pointTable);
+        br.addItem("Target Relation");
+        br.addElement(targetRelation);
         br.addItem("Fixed Condition");
         br.addElement(fixedCondition);
-        br.addItem("BizOneToOne Local");
+        br.addItem("BizOneToOne's Local");
         br.addElement(getTableDbName());
         final String msg = br.buildExceptionMessage();
         throw new IllegalFixedConditionOverRelationException(msg, e);
