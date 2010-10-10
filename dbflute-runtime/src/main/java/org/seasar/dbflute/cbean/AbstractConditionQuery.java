@@ -398,8 +398,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             final String relationExp = remainder.substring(0, relationEndIndex);
             final int separatorIndex = relationExp.indexOf(".");
-            final String tableName = relationExp.substring(0, separatorIndex);
-            final String relationName = relationExp.substring(separatorIndex + ".".length());
+            final String tableName;
+            final String relationName;
+            if (separatorIndex >= 0) {
+                tableName = relationExp.substring(0, separatorIndex).trim();
+                relationName = relationExp.substring(separatorIndex + ".".length()).trim();
+            } else {
+                tableName = relationExp.trim();
+                relationName = null;
+            }
             final DBMeta targetMeta;
             try {
                 targetMeta = findDBMeta(tableName);
@@ -438,7 +445,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     return null; // unreachable
                 }
             }
-            final ConditionQuery relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+            final ConditionQuery relationForeignCQ;
+            if (relationName != null) {
+                relationForeignCQ = relationLocalCQ.invokeForeignCQ(relationName);
+            } else {
+                relationForeignCQ = relationLocalCQ;
+            }
             final String relationVariable = relationBeginMark + relationExp + relationEndMark;
             final String relationAlias = relationForeignCQ.xgetAliasName();
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
