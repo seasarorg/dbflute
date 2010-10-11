@@ -22,6 +22,7 @@ import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -165,14 +166,16 @@ public interface SqlClause {
     //                                                                           =========
     /**
      * Register outer-join.
-     * @param baseTableDbName The DB name of base table. {[baseTableName] left outer join} (NotNull)
-     * @param joinTableDbName The DB name of join table. {left outer join [joinTableName]} (NotNull)
-     * @param aliasName The alias name of join table. {left outer join joinTableName [aliasName]} (NotNull and Unique per invoking method)
+     * @param localTableDbName The DB name of local table. {[localTableDbName] left outer join} (NotNull)
+     * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName]} (NotNull)
+     * @param foreignAliasName The alias name of foreign table. {left outer join joinTableName [foreignAliasName]} (NotNull and Unique per invoking method)
      * @param joinOnMap The map of join condition on on-clause. (NotNull)
      * @param fixedCondition The fixed condition on on-clause. (Nullable: if null, means no fixed condition)
+     * @param fixedConditionResolver The resolver for variables on fixed-condition. (Nullable) 
      */
-    void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition);
+    void registerOuterJoin(String localTableDbName, String foreignTableDbName, String foreignAliasName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver);
 
     /**
      * Change the join type for the relation to inner join.

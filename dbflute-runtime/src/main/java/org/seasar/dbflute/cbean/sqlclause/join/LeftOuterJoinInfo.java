@@ -22,13 +22,14 @@ public class LeftOuterJoinInfo implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _aliasName;
-    protected String _baseTableDbName;
-    protected String _joinTableDbName;
+    protected String _foreignAliasName;
+    protected String _localTableDbName;
+    protected String _foreignTableDbName;
     protected final List<QueryClause> _inlineWhereClauseList = new ArrayList<QueryClause>();
     protected final List<QueryClause> _additionalOnClauseList = new ArrayList<QueryClause>();
     protected Map<ColumnRealName, ColumnRealName> _joinOnMap;
     protected String _fixedCondition;
+    protected transient FixedConditionResolver _fixedConditionResolver;
     protected boolean _innerJoin;
 
     // ===================================================================================
@@ -42,31 +43,37 @@ public class LeftOuterJoinInfo implements Serializable {
         return _fixedCondition != null && _fixedCondition.trim().length() > 0;
     }
 
+    public void resolveFixedCondition() { // required before using fixed-condition
+        if (hasFixedCondition() && _fixedConditionResolver != null) {
+            _fixedCondition = _fixedConditionResolver.resolveVariable(_fixedCondition);
+        }
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getAliasName() {
-        return _aliasName;
+    public String getForeignAliasName() {
+        return _foreignAliasName;
     }
 
-    public void setAliasName(String aliasName) {
-        _aliasName = aliasName;
+    public void setForeignAliasName(String foreignAliasName) {
+        _foreignAliasName = foreignAliasName;
     }
 
-    public String getBaseTableDbName() {
-        return _baseTableDbName;
+    public String getLocalTableDbName() {
+        return _localTableDbName;
     }
 
-    public void setBaseTableDbName(String baseTableDbName) {
-        _baseTableDbName = baseTableDbName;
+    public void setLocalTableDbName(String localTableDbName) {
+        _localTableDbName = localTableDbName;
     }
 
-    public String getJoinTableDbName() {
-        return _joinTableDbName;
+    public String getForeignTableDbName() {
+        return _foreignTableDbName;
     }
 
-    public void setJoinTableDbName(String joinTableDbName) {
-        _joinTableDbName = joinTableDbName;
+    public void setForeignTableDbName(String foreignTableDbName) {
+        _foreignTableDbName = foreignTableDbName;
     }
 
     public List<QueryClause> getInlineWhereClauseList() {
@@ -99,6 +106,14 @@ public class LeftOuterJoinInfo implements Serializable {
 
     public void setFixedCondition(String fixedCondition) {
         _fixedCondition = fixedCondition;
+    }
+
+    public FixedConditionResolver getFixedConditionResolver() {
+        return _fixedConditionResolver;
+    }
+
+    public void setFixedConditionResolver(FixedConditionResolver fixedConditionResolver) {
+        _fixedConditionResolver = fixedConditionResolver;
     }
 
     public boolean isInnerJoin() {

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.cbean.chelper.HpFixedConditionHandler;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -38,6 +39,7 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
+import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.cbean.sqlclause.subquery.ExistsReferrer;
@@ -57,8 +59,6 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
-import org.seasar.dbflute.exception.DBMetaNotFoundException;
-import org.seasar.dbflute.exception.IllegalFixedConditionOverRelationException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -250,6 +250,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Foreign Info
     //                                          ------------
+    /**
+     * {@inheritDoc}
+     */
     public String xgetForeignPropertyName() {
         return _foreignPropertyName;
     }
@@ -258,6 +261,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         this._foreignPropertyName = foreignPropertyName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String xgetRelationPath() {
         return _relationPath;
     }
@@ -277,19 +283,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                            Location
     //                                                                            ========
     /**
-     * Get the location of the property.
-     * @param propertyName The name of property. (NotNull)
-     * @return The location of the property as path. (NotNull)
+     * {@inheritDoc}
      */
-    protected String xgetLocation(String propertyName) {
-        return xgetLocationBase() + propertyName;
-    }
-
-    /**
-     * Get the base location of this condition-query.
-     * @return The base location of this condition-query. (NotNull)
-     */
-    protected String xgetLocationBase() {
+    public String xgetLocationBase() {
         final StringBuilder sb = new StringBuilder();
         ConditionQuery query = this;
         while (true) {
@@ -308,6 +304,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             query = query.xgetReferrerQuery();
         }
         return sb.toString();
+    }
+
+    /**
+     * Get the location of the property.
+     * @param propertyName The name of property. (NotNull)
+     * @return The location of the property as path. (NotNull)
+     */
+    protected String xgetLocation(String propertyName) {
+        return xgetLocationBase() + propertyName;
     }
 
     // ===================================================================================
@@ -330,156 +335,44 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                           =========
     /**
      * Register outer-join.
-     * @param cq The condition-query for local table. (NotNull)
+     * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnMap The map of join-on clause. (NotNull)
      */
-    protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
-        registerOuterJoin(cq, joinOnMap, null);
+    protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnMap) {
+        registerOuterJoin(foreignCQ, joinOnMap, null);
     }
 
     /**
      * Register outer-join.
-     * @param cq The condition-query for local table. (NotNull)
-     * @param joinOnMap The map of join-on clause. (NotNull)
+     * @param foreignCQ The condition-query for foreign table. (NotNull)
+     * @param joinOnResourceMap The map of join-on clause's resource. (NotNull)
      * @param fixedCondition The plain fixed condition. (Nullable)
      */
-    protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
-        // resolve variables on fixed condition
-        if (fixedCondition != null) {
-            fixedCondition = resolveFixedCondition(cq, joinOnMap, fixedCondition);
-        }
+    protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
+            String fixedCondition) {
         // translate join-on map using column real name
-        final Map<ColumnRealName, ColumnRealName> joinOnRealMap = newLinkedHashMap();
-        final Set<Entry<String, String>> entrySet = joinOnMap.entrySet();
+        final Map<ColumnRealName, ColumnRealName> joinOnMap = newLinkedHashMap();
+        final Set<Entry<String, String>> entrySet = joinOnResourceMap.entrySet();
         for (Entry<String, String> entry : entrySet) {
             final String local = entry.getKey();
             final String foreign = entry.getValue();
-            joinOnRealMap.put(toColumnRealName(local), cq.toColumnRealName(foreign));
+            joinOnMap.put(toColumnRealName(local), foreignCQ.toColumnRealName(foreign));
         }
-        final String localDbName = getTableDbName();
-        final String foreignDbName = cq.getTableDbName();
-        final String foreignAliasName = cq.xgetAliasName();
-        xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnRealMap, fixedCondition);
+        final String localTable = getTableDbName();
+        final String foreignTable = foreignCQ.getTableDbName();
+        final String foreignAlias = foreignCQ.xgetAliasName();
+        final FixedConditionResolver resolver = createFixedConditionResolver(foreignCQ, joinOnMap);
+        xgetSqlClause().registerOuterJoin(localTable, foreignTable, foreignAlias, joinOnMap, fixedCondition, resolver);
     }
 
-    /**
-     * Resolve variables on fixed condition.
-     * @param cq The condition-query for local table. (NotNull)
-     * @param joinOnMap The map of join-on clause. (NotNull, ReadOnly)
-     * @param fixedCondition The plain fixed condition. (NotNull: if null, this is not called)
-     * @return The resolved fixed condition. (NotNull)
-     */
-    protected String resolveFixedCondition(ConditionQuery cq, Map<String, String> joinOnMap, String fixedCondition) {
-        final String localAliasName = xgetAliasName();
-        final String foreignAliasName = cq.xgetAliasName();
-        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatible
-        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + xgetLocationBase());
-        fixedCondition = resolveFixedConditionOverRelation(cq, joinOnMap, fixedCondition);
-        return fixedCondition;
-    }
-
-    protected String resolveFixedConditionOverRelation(ConditionQuery cq, Map<String, String> joinOnMap,
-            String fixedCondition) {
-        final String relationBeginMark = "$$over(";
-        final String relationEndMark = ")$$";
-        String remainder = fixedCondition;
-        while (true) {
-            final int relationBeginIndex = remainder.indexOf(relationBeginMark);
-            if (relationBeginIndex < 0) {
-                break;
+    protected FixedConditionResolver createFixedConditionResolver(final ConditionQuery foreignCQ,
+            final Map<ColumnRealName, ColumnRealName> joinOnMap) {
+        final HpFixedConditionHandler fixedConditionHandler = new HpFixedConditionHandler(this, xgetDBMetaProvider());
+        return new FixedConditionResolver() {
+            public String resolveVariable(String fixedCondition) {
+                return fixedConditionHandler.resolveVariable(foreignCQ, joinOnMap, fixedCondition);
             }
-            remainder = remainder.substring(relationBeginIndex + relationBeginMark.length());
-            final int relationEndIndex = remainder.indexOf(relationEndMark);
-            if (relationEndIndex < 0) {
-                break;
-            }
-            final String relationExp = remainder.substring(0, relationEndIndex);
-            final int separatorIndex = relationExp.indexOf(".");
-            final String pointTable;
-            final String targetRelation;
-            if (separatorIndex >= 0) {
-                pointTable = relationExp.substring(0, separatorIndex).trim();
-                targetRelation = relationExp.substring(separatorIndex + ".".length()).trim();
-            } else {
-                pointTable = relationExp.trim();
-                targetRelation = null;
-            }
-            final DBMeta pointDBMeta;
-            try {
-                pointDBMeta = findDBMeta(pointTable);
-            } catch (DBMetaNotFoundException e) {
-                String notice = "The table for relation on fixed condition does not exist.";
-                throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition, e);
-                return null; // unreachable
-            }
-            final ConditionQuery relationPointCQ;
-            final boolean localPoint;
-            if (pointDBMeta.getTableDbName().equals(getTableDbName())) { // point is local
-                relationPointCQ = this;
-                localPoint = true;
-            } else { // point is referrer
-                ConditionQuery referrerQuery = xgetReferrerQuery();
-                while (true) {
-                    if (referrerQuery == null) { // means not found
-                        break;
-                    }
-                    if (pointDBMeta.getTableDbName().equals(referrerQuery.getTableDbName())) {
-                        break;
-                    }
-                    referrerQuery = referrerQuery.xgetReferrerQuery();
-                }
-                relationPointCQ = referrerQuery;
-                if (relationPointCQ == null) {
-                    String notice = "The table for relation on fixed condition was not found in the scope.";
-                    throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition);
-                    return null; // unreachable
-                }
-                localPoint = false;
-            }
-            final ConditionQuery columnTargetCQ;
-            if (targetRelation != null) {
-                columnTargetCQ = relationPointCQ.invokeForeignCQ(targetRelation);
-            } else {
-                if (localPoint) {
-                    String notice = "The relation on fixed condition is required if the table is referrer.";
-                    throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
-                }
-                columnTargetCQ = relationPointCQ;
-            }
-            final String relationVariable = relationBeginMark + relationExp + relationEndMark;
-            final String relationAlias = columnTargetCQ.xgetAliasName();
-            fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
-
-            // after case for loop
-            remainder = remainder.substring(relationEndIndex + relationEndMark.length());
-
-            // for prevent from processing same one
-            remainder = replaceString(remainder, relationVariable, relationAlias);
-        }
-        return fixedCondition;
-    }
-
-    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName,
-            String relationName, String fixedCondition) {
-        throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, null);
-    }
-
-    protected void throwIllegalFixedConditionOverRelationException(String notice, String pointTable,
-            String targetRelation, String fixedCondition, Exception e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice(notice);
-        br.addItem("Point Table");
-        br.addElement(pointTable);
-        br.addItem("Target Relation");
-        br.addElement(targetRelation);
-        br.addItem("Fixed Condition");
-        br.addElement(fixedCondition);
-        br.addItem("BizOneToOne's Local");
-        br.addElement(getTableDbName());
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalFixedConditionOverRelationException(msg, e);
+        };
     }
 
     // ===================================================================================

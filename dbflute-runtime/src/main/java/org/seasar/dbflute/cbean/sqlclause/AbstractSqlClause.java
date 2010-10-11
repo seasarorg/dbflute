@@ -33,6 +33,7 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
+import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
@@ -689,31 +690,23 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String getLeftOuterJoinClause() {
+        for (LeftOuterJoinInfo leftOuterJoinInfo : getOuterJoinMap().values()) {
+            leftOuterJoinInfo.resolveFixedCondition(); // lazy resolve for internal Query(Relation)
+        }
         final StringBuilder sb = new StringBuilder();
         final Set<Entry<String, LeftOuterJoinInfo>> outerJoinSet = getOuterJoinMap().entrySet();
         for (Entry<String, LeftOuterJoinInfo> outerJoinEntry : outerJoinSet) {
-            final String aliasName = outerJoinEntry.getKey();
+            final String foreignAliasName = outerJoinEntry.getKey();
             final LeftOuterJoinInfo joinInfo = outerJoinEntry.getValue();
-            buildLeftOuterJoinClause(sb, aliasName, joinInfo);
+            buildLeftOuterJoinClause(sb, foreignAliasName, joinInfo);
         }
         return sb.toString();
     }
 
-    protected Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
-        if (_outerJoinMap == null) {
-            _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>(4);
-        }
-        return _outerJoinMap;
-    }
-
-    protected boolean hasOuterJoin() {
-        return _outerJoinMap != null && !_outerJoinMap.isEmpty();
-    }
-
-    protected void buildLeftOuterJoinClause(StringBuilder sb, String aliasName, LeftOuterJoinInfo joinInfo) {
-        final String joinTableDbName = joinInfo.getJoinTableDbName();
+    protected void buildLeftOuterJoinClause(StringBuilder sb, String foreignAliasName, LeftOuterJoinInfo joinInfo) {
+        final String foreignTableDbName = joinInfo.getForeignTableDbName();
         final Map<ColumnRealName, ColumnRealName> joinOnMap = joinInfo.getJoinOnMap();
-        assertJoinOnMapNotEmpty(joinOnMap, aliasName);
+        assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
 
         sb.append(ln()).append("   ");
         final String joinExp;
@@ -725,18 +718,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(joinExp); // is main!
         {
             final int tablePos = 3 + joinExp.length(); // basically for in-line view indent
-            final DBMeta joinDBMeta = findDBMeta(joinTableDbName);
-            final TableSqlName joinTableSqlName = joinDBMeta.getTableSqlName();
+            final DBMeta foreignDBMeta = findDBMeta(foreignTableDbName);
+            final TableSqlName foreignTableSqlName = foreignDBMeta.getTableSqlName();
             final List<QueryClause> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
             final String tableExp;
             if (inlineWhereClauseList.isEmpty()) {
-                tableExp = joinTableSqlName.toString();
+                tableExp = foreignTableSqlName.toString();
             } else {
-                tableExp = getInlineViewClause(joinTableSqlName, inlineWhereClauseList, tablePos);
+                tableExp = getInlineViewClause(foreignTableSqlName, inlineWhereClauseList, tablePos);
             }
             sb.append(tableExp);
         }
-        sb.append(" ").append(aliasName);
+        sb.append(" ").append(foreignAliasName);
         if (joinInfo.hasInlineOrOnClause() || joinInfo.hasFixedCondition()) {
             sb.append(ln()).append("     "); // only when additional conditions exist
         }
@@ -922,20 +915,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition) {
-        assertAlreadyOuterJoin(aliasName);
-        assertJoinOnMapNotEmpty(joinOnMap, aliasName);
+    public void registerOuterJoin(String localTableDbName, String foreignTableDbName, String foreignAliasName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver) {
+        assertAlreadyOuterJoin(foreignAliasName);
+        assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
         final LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
-        joinInfo.setAliasName(aliasName);
-        joinInfo.setBaseTableDbName(baseTableDbName);
-        joinInfo.setJoinTableDbName(joinTableDbName);
+        joinInfo.setForeignAliasName(foreignAliasName);
+        joinInfo.setLocalTableDbName(localTableDbName);
+        joinInfo.setForeignTableDbName(foreignTableDbName);
         joinInfo.setJoinOnMap(joinOnMap);
         joinInfo.setFixedCondition(fixedCondition);
+        joinInfo.setFixedConditionResolver(fixedConditionResolver);
         if (_innerJoinEffective) { // basically false
             joinInfo.setInnerJoin(true);
         }
-        getOuterJoinMap().put(aliasName, joinInfo);
+        getOuterJoinMap().put(foreignAliasName, joinInfo);
     }
 
     /**
@@ -962,6 +957,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return this;
     }
 
+    protected Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
+        if (_outerJoinMap == null) {
+            _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>(4);
+        }
+        return _outerJoinMap;
+    }
+
+    protected boolean hasOuterJoin() {
+        return _outerJoinMap != null && !_outerJoinMap.isEmpty();
+    }
+
     protected void assertAlreadyOuterJoin(String aliasName) {
         if (getOuterJoinMap().containsKey(aliasName)) {
             String msg = "The alias name have already registered in outer join: " + aliasName;
@@ -969,9 +975,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected void assertJoinOnMapNotEmpty(Map<ColumnRealName, ColumnRealName> joinOnMap, String aliasName) {
+    protected void assertJoinOnMapNotEmpty(Map<ColumnRealName, ColumnRealName> joinOnMap, String foreignAliasName) {
         if (joinOnMap.isEmpty()) {
-            String msg = "The joinOnMap should not be empty: aliasName=" + aliasName;
+            String msg = "The joinOnMap should not be empty: foreignAliasName=" + foreignAliasName;
             throw new IllegalStateException(msg);
         }
     }

@@ -108,6 +108,12 @@ public interface ConditionQuery {
      */
     String xgetRelationPath();
 
+    /**
+     * Get the base location of this condition-query.
+     * @return The base location of this condition-query. (NotNull)
+     */
+    String xgetLocationBase();
+
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
@@ -165,6 +171,7 @@ public interface ConditionQuery {
 
     /**
      * Invoke determining foreign condition-query existence?
+     * A method with parameters (using fixed condition) is unsupported.
      * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
