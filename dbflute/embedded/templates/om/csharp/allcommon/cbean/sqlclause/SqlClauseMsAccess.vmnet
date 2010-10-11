@@ -17,9 +17,12 @@ public class ${myClassName} : ${glAbstractSqlClause} {
 	}
 
     public override void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<String, String> joinOnMap, String fixedCondition) {
-        base.registerOuterJoin(baseTableDbName, joinTableDbName, aliasName, joinOnMap, fixedCondition);
+            Map<String, String> joinOnMap, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+        base.registerOuterJoin(baseTableDbName, joinTableDbName, aliasName, joinOnMap, null, null);
         if (fixedCondition != null) {
+            if (fixedConditionResolver != null) {
+                fixedCondition = fixedConditionResolver.Invoke(fixedCondition);
+            }
             String clause = replaceString(fixedCondition, aliasName + ".", "");
             registerOuterJoinInlineWhereClause(aliasName, clause, false);
         }

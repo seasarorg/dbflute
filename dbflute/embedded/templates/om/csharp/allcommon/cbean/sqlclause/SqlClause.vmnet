@@ -253,4 +253,6 @@ public interface ${myClassName} {
             return _code;
         }
     }
+
+    public delegate String FixedConditionResolver(String fixedCondition);
 }
