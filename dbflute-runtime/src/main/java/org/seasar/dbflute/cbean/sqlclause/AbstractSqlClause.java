@@ -690,9 +690,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String getLeftOuterJoinClause() {
-        for (LeftOuterJoinInfo leftOuterJoinInfo : getOuterJoinMap().values()) {
-            leftOuterJoinInfo.resolveFixedCondition(); // lazy resolve for internal Query(Relation)
-        }
         final StringBuilder sb = new StringBuilder();
         final Set<Entry<String, LeftOuterJoinInfo>> outerJoinSet = getOuterJoinMap().entrySet();
         for (Entry<String, LeftOuterJoinInfo> outerJoinEntry : outerJoinSet) {
@@ -727,7 +724,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             } else {
                 tableExp = getInlineViewClause(foreignTableSqlName, inlineWhereClauseList, tablePos);
             }
-            sb.append(tableExp);
+            if (joinInfo.hasFixedCondition()) {
+                sb.append(joinInfo.resolveFixedInlineView(tableExp));
+            } else {
+                sb.append(tableExp);
+            }
         }
         sb.append(" ").append(foreignAliasName);
         if (joinInfo.hasInlineOrOnClause() || joinInfo.hasFixedCondition()) {
@@ -930,6 +931,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_innerJoinEffective) { // basically false
             joinInfo.setInnerJoin(true);
         }
+
+        // it should be resolved before registration because
+        // the process may have Query(Relation) as precondition
+        joinInfo.resolveFixedCondition();
+
         getOuterJoinMap().put(foreignAliasName, joinInfo);
     }
 

@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.seasar.dbflute.cbean.chelper.HpFixedConditionHandler;
+import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -365,14 +365,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         xgetSqlClause().registerOuterJoin(localTable, foreignTable, foreignAlias, joinOnMap, fixedCondition, resolver);
     }
 
-    protected FixedConditionResolver createFixedConditionResolver(final ConditionQuery foreignCQ,
+    protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,
             final Map<ColumnRealName, ColumnRealName> joinOnMap) {
-        final HpFixedConditionHandler fixedConditionHandler = new HpFixedConditionHandler(this, xgetDBMetaProvider());
-        return new FixedConditionResolver() {
-            public String resolveVariable(String fixedCondition) {
-                return fixedConditionHandler.resolveVariable(foreignCQ, joinOnMap, fixedCondition);
-            }
-        };
+        return new HpFixedConditionQueryResolver(this, foreignCQ, xgetDBMetaProvider());
     }
 
     // ===================================================================================

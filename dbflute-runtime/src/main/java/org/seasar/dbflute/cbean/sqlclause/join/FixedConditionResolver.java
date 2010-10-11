@@ -12,4 +12,11 @@ public interface FixedConditionResolver {
      * @return Resolved fixed-condition. (NotNull)
      */
     String resolveVariable(String fixedCondition);
+
+    /**
+     * Resolve fixed InlineView for fixed-condition.
+     * @param foreignTable The SQL name of foreign table that has fixed-condition. (NotNull) 
+     * @return Resolved foreign table expression. (NotNull)
+     */
+    String resolveFixedInlineView(String foreignTable);
 }

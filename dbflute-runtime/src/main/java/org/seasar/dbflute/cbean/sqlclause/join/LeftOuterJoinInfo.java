@@ -49,6 +49,13 @@ public class LeftOuterJoinInfo implements Serializable {
         }
     }
 
+    public String resolveFixedInlineView(String foreignTableSqlName) {
+        if (hasFixedCondition() && _fixedConditionResolver != null) {
+            return _fixedConditionResolver.resolveFixedInlineView(foreignTableSqlName);
+        }
+        return foreignTableSqlName.toString();
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
