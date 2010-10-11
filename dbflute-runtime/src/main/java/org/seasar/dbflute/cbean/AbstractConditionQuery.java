@@ -336,16 +336,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * Register outer-join.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
-     * @param joinOnMap The map of join-on clause. (NotNull)
+     * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
      */
-    protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnMap) {
-        registerOuterJoin(foreignCQ, joinOnMap, null);
+    protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap) {
+        registerOuterJoin(foreignCQ, joinOnResourceMap, null);
     }
 
     /**
      * Register outer-join.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
-     * @param joinOnResourceMap The map of join-on clause's resource. (NotNull)
+     * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
      * @param fixedCondition The plain fixed condition. (Nullable)
      */
     protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,

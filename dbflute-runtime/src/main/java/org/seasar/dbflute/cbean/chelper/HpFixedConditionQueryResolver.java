@@ -19,6 +19,7 @@ import org.seasar.dbflute.dbmeta.name.TableSqlName;
 import org.seasar.dbflute.exception.DBMetaNotFoundException;
 import org.seasar.dbflute.exception.IllegalFixedConditionOverRelationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.IndexOfInfo;
 
@@ -34,7 +35,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     protected final ConditionQuery _localCQ;
     protected final ConditionQuery _foreignCQ;
     protected final DBMetaProvider _dbmetaProvider;
-    protected InlineViewResource _inlineViewResource; // internal bridge
+    protected Map<String, InlineViewResource> _inlineViewResourceMap; // internal bridge container
 
     // ===================================================================================
     //                                                                         Constructor
@@ -79,50 +80,66 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             if (relationEndIndex < 0) {
                 break;
             }
+
             final String relationExp = remainder.substring(0, relationEndIndex);
-            final int separatorIndex = relationExp.indexOf(".");
             final String pointTable;
             final String targetRelation;
-            if (separatorIndex >= 0) {
-                pointTable = relationExp.substring(0, separatorIndex).trim();
-                targetRelation = relationExp.substring(separatorIndex + ".".length()).trim();
-            } else {
-                pointTable = relationExp.trim();
-                targetRelation = null;
+            {
+                final int separatorIndex = relationExp.indexOf(".");
+                if (separatorIndex >= 0) {
+                    pointTable = relationExp.substring(0, separatorIndex).trim();
+                    targetRelation = relationExp.substring(separatorIndex + ".".length()).trim();
+                } else {
+                    pointTable = relationExp.trim();
+                    targetRelation = null;
+                }
             }
+
             final ConditionQuery relationPointCQ;
-            final boolean foreign;
-            final boolean referrer;
+            final ConditionQuery columnTargetCQ;
             if (pointTable.equals(getLocalTableMark())) {
                 relationPointCQ = _localCQ;
-                foreign = false;
-                referrer = false;
-            } else if (pointTable.equals(getForeignTableMark())) {
-                relationPointCQ = _foreignCQ;
-                foreign = true;
-                referrer = false;
-                if (_inlineViewResource == null) {
-                    _inlineViewResource = new InlineViewResource();
-                }
-                String next = remainder.substring(relationEndIndex + relationEndMark.length()).trim();
-                if (!next.startsWith(".")) {
-                    String notice = "The OverRelation variable should continue to column after the variable.";
-                    throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition);
+                if (targetRelation != null) {
+                    columnTargetCQ = invokeColumnTargetCQ(relationPointCQ, targetRelation);
+                } else {
+                    String notice = "The relation on fixed condition is required if the table is not referrer.";
+                    throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
                     return null; // unreachable
                 }
-                next = next.substring(1);
-                final IndexOfInfo indexInfo = Srl.indexOfFirst(next, " ", ",", ")", "\n", "\t", "<", ">", "=", "!");
-                next = indexInfo != null ? next.substring(0, indexInfo.getIndex()) : next;
-                _inlineViewResource.addAdditionalColumn(next);
-                final List<ForeignInfo> nestedJoinList = new ArrayList<ForeignInfo>();
-                final List<String> splitList = Srl.splitList(targetRelation, ".");
-                DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
-                for (String element : splitList) {
-                    final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
-                    nestedJoinList.add(foreignInfo);
-                    currentDBMeta = foreignInfo.getForeignDBMeta();
+            } else if (pointTable.equals(getForeignTableMark())) {
+                relationPointCQ = _foreignCQ;
+                columnTargetCQ = relationPointCQ;
+                if (targetRelation == null) {
+                    String notice = "The relation on fixed condition is required if the table is not referrer.";
+                    throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
+                    return null; // unreachable
                 }
-                _inlineViewResource.addNestedQueryList(targetRelation, nestedJoinList);
+                // prepare fixed InlineView
+                if (_inlineViewResourceMap == null) {
+                    _inlineViewResourceMap = new LinkedHashMap<String, InlineViewResource>();
+                }
+                if (!_inlineViewResourceMap.containsKey(targetRelation)) {
+                    String next = remainder.substring(relationEndIndex + relationEndMark.length()).trim();
+                    if (!next.startsWith(".")) {
+                        String notice = "The OverRelation variable should continue to column after the variable.";
+                        throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
+                                fixedCondition);
+                        return null; // unreachable
+                    }
+                    next = next.substring(".".length());
+                    final IndexOfInfo indexInfo = Srl.indexOfFirst(next, " ", ",", ")", "\n", "\t");
+                    next = indexInfo != null ? next.substring(0, indexInfo.getIndex()) : next;
+                    final InlineViewResource resource = new InlineViewResource();
+                    resource.addAdditionalColumn(next);
+                    final List<String> splitList = Srl.splitList(targetRelation, ".");
+                    DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
+                    for (String element : splitList) {
+                        final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
+                        resource.addJoinInfo(foreignInfo);
+                        currentDBMeta = foreignInfo.getForeignDBMeta();
+                    }
+                    _inlineViewResourceMap.put(targetRelation, resource);
+                }
             } else {
                 final DBMeta pointDBMeta;
                 try {
@@ -149,19 +166,13 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition);
                     return null; // unreachable
                 }
-                foreign = false;
-                referrer = true;
-            }
-            final ConditionQuery columnTargetCQ;
-            if (targetRelation != null && !foreign) {
-                columnTargetCQ = relationPointCQ.invokeForeignCQ(targetRelation);
-            } else {
-                if (!referrer && !foreign) {
-                    String notice = "The relation on fixed condition is required if the table is referrer.";
-                    throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
+                if (targetRelation != null) {
+                    columnTargetCQ = invokeColumnTargetCQ(relationPointCQ, targetRelation);
+                } else {
+                    columnTargetCQ = relationPointCQ;
                 }
-                columnTargetCQ = relationPointCQ;
             }
+
             final String relationVariable = relationBeginMark + relationExp + relationEndMark;
             final String relationAlias = columnTargetCQ.xgetAliasName();
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
@@ -175,67 +186,78 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return fixedCondition;
     }
 
+    protected ConditionQuery invokeColumnTargetCQ(ConditionQuery relationPointCQ, String targetRelation) {
+        return relationPointCQ.invokeForeignCQ(targetRelation);
+    }
+
     // ===================================================================================
     //                                                            Resolve Fixed InlineView
     //                                                            ========================
     public String resolveFixedInlineView(String foreignTableSqlName) {
-        if (_inlineViewResource == null) {
+        if (_inlineViewResourceMap == null || _inlineViewResourceMap.isEmpty()) {
             return foreignTableSqlName; // not uses InlineView
         }
         // alias is required because foreignTableSqlName may be (normal) InlineView
         final String baseAlias = "dffixedbase";
-        final StringBuilder sb = new StringBuilder();
-        sb.append("(select ").append(baseAlias).append(".*");
-        final Set<String> additionalColumnSet = _inlineViewResource.getAdditionalColumnSet();
-        for (String columnName : additionalColumnSet) {
-            sb.append(", ").append(columnName);
-        }
-        sb.append(" from ").append(foreignTableSqlName).append(" ").append(baseAlias);
-
-        // may have same relation but 
+        final String baseIndent = "                    ";
+        final StringBuilder joinSb = new StringBuilder();
         final Map<ForeignInfo, String> relationMap = new HashMap<ForeignInfo, String>();
-        final Map<String, List<ForeignInfo>> nestedJoinListMap = _inlineViewResource.getNestedJoinListMap();
+        final List<String> additionalRealColumnList = new ArrayList<String>();
         int groupIndex = 0;
-        for (List<ForeignInfo> nestedJoinList : nestedJoinListMap.values()) {
+        for (InlineViewResource resource : _inlineViewResourceMap.values()) {
+            final List<ForeignInfo> joinInfoList = resource.getJoinInfoList();
             final String aliasBase = "dffixedjoin";
             String preForeignAlias = null;
+            String foreignAlias = null;
             int joinIndex = 0;
-            for (ForeignInfo foreignInfo : nestedJoinList) {
-                if (relationMap.containsKey(foreignInfo)) { // already joined
-                    preForeignAlias = relationMap.get(foreignInfo); // update previous alias
+            for (ForeignInfo joinInfo : joinInfoList) {
+                if (relationMap.containsKey(joinInfo)) { // already joined
+                    preForeignAlias = relationMap.get(joinInfo); // update previous alias
                     continue;
                 }
                 final TableSqlName foreignTable;
                 final String localAlias;
-                final String foreignAlias;
                 {
-                    final DBMeta foreignDBMeta = foreignInfo.getForeignDBMeta();
+                    final DBMeta foreignDBMeta = joinInfo.getForeignDBMeta();
                     foreignTable = foreignDBMeta.getTableSqlName();
-                    localAlias = (joinIndex == 0 ? baseAlias : preForeignAlias);
+                    localAlias = (preForeignAlias != null ? preForeignAlias : baseAlias);
                     foreignAlias = aliasBase + "_" + groupIndex + "_" + joinIndex;
                     preForeignAlias = foreignAlias;
                 }
-                sb.append(" left outer join ").append(foreignTable).append(" ").append(foreignAlias);
-                sb.append(" on ");
-                final Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap = foreignInfo
-                        .getLocalForeignColumnInfoMap();
+                joinSb.append(ln()).append(baseIndent);
+                joinSb.append("     left outer join ").append(foreignTable).append(" ").append(foreignAlias);
+                joinSb.append(" on ");
+                final Map<ColumnInfo, ColumnInfo> columnInfoMap = joinInfo.getLocalForeignColumnInfoMap();
                 int columnIndex = 0;
-                for (Entry<ColumnInfo, ColumnInfo> localForeignEntry : localForeignColumnInfoMap.entrySet()) {
+                for (Entry<ColumnInfo, ColumnInfo> localForeignEntry : columnInfoMap.entrySet()) {
                     final ColumnInfo localColumnInfo = localForeignEntry.getKey();
                     final ColumnInfo foreignColumninfo = localForeignEntry.getValue();
                     if (columnIndex > 0) {
-                        sb.append(" and ");
+                        joinSb.append(" and ");
                     }
-                    sb.append(localAlias).append(".").append(localColumnInfo.getColumnSqlName());
-                    sb.append(" = ").append(foreignAlias).append(".").append(foreignColumninfo.getColumnSqlName());
+                    joinSb.append(localAlias).append(".").append(localColumnInfo.getColumnSqlName());
+                    joinSb.append(" = ").append(foreignAlias).append(".").append(foreignColumninfo.getColumnSqlName());
                     ++columnIndex;
                 }
                 ++joinIndex;
             }
+            final Set<String> additionalColumnSet = resource.getAdditionalColumnSet();
+            for (String columnName : additionalColumnSet) {
+                additionalRealColumnList.add(foreignAlias + "." + columnName); // latest alias is target
+            }
             ++groupIndex;
         }
-        sb.append(")");
-        return sb.toString();
+        final StringBuilder sqlSb = new StringBuilder();
+        sqlSb.append("(select ").append(baseAlias).append(".*");
+        for (String columnName : additionalRealColumnList) {
+            sqlSb.append(", ").append(columnName);
+        }
+        sqlSb.append(ln()).append(baseIndent);
+        sqlSb.append("   from ").append(foreignTableSqlName).append(" ").append(baseAlias);
+        sqlSb.append(joinSb);
+        sqlSb.append(ln()).append(baseIndent);
+        sqlSb.append(")");
+        return sqlSb.toString();
     }
 
     // ===================================================================================
@@ -243,7 +265,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     //                                                                    ================
     protected static class InlineViewResource {
         protected Set<String> _additionalColumnSet;
-        protected Map<String, List<ForeignInfo>> _nestedJoinListMap;
+        protected List<ForeignInfo> _joinInfoList;
 
         public Set<String> getAdditionalColumnSet() {
             return _additionalColumnSet;
@@ -256,15 +278,15 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             _additionalColumnSet.add(additionalColumn);
         }
 
-        public Map<String, List<ForeignInfo>> getNestedJoinListMap() {
-            return _nestedJoinListMap;
+        public List<ForeignInfo> getJoinInfoList() {
+            return _joinInfoList;
         }
 
-        public void addNestedQueryList(String relationGroupKey, List<ForeignInfo> nestedJoinList) {
-            if (_nestedJoinListMap == null) {
-                _nestedJoinListMap = new LinkedHashMap<String, List<ForeignInfo>>();
+        public void addJoinInfo(ForeignInfo joinInfo) {
+            if (_joinInfoList == null) {
+                _joinInfoList = new ArrayList<ForeignInfo>();
             }
-            _nestedJoinListMap.put(relationGroupKey, nestedJoinList);
+            _joinInfoList.add(joinInfo);
         }
     }
 
@@ -328,5 +350,9 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
+    }
+
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }
