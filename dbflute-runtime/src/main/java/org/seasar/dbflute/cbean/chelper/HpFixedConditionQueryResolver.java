@@ -338,11 +338,11 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected String getLocalTableMark() {
-        return "!localTable!";
+        return "$localTable";
     }
 
     protected String getForeignTableMark() {
-        return "!foreignTable!";
+        return "$foreignTable";
     }
 
     // ===================================================================================
