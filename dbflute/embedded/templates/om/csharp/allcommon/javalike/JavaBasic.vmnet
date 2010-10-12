@@ -32,7 +32,7 @@ namespace ${glPackageBaseCommonJavaLike} {
             _res = new System.Text.StringBuilder(size);
         }
         public StringBuilder append(Object obj) {
-            _res.Append(obj);
+            _res.Append(obj != null ? obj.ToString() : "null");
             return this;
         }
         public StringBuilder insert(int offset, Object obj) {
