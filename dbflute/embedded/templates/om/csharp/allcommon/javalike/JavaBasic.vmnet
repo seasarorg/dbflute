@@ -49,6 +49,9 @@ namespace ${glPackageBaseCommonJavaLike} {
         public String toString() {
             return _res.ToString();
         }
+        public override String ToString() {
+            return toString();
+        }
         public static String operator +(StringBuilder a, StringBuilder b) {
             return a.toString() + b.toString();
         }
