@@ -345,12 +345,12 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                   Assist Helper
         //                                                                   =============
         protected void doSetupSelect(SsCall callback) {
-            String foreignPropertyName = callback.Invoke().getForeignPropertyName();
+            String foreignPropertyName = callback.Invoke().xgetForeignPropertyName();
             assertSetupSelectBeforeUnion(foreignPropertyName);
-            String foreignTableAliasName = callback.Invoke().getRealAliasName();
-            String localRelationPath = LocalCQ.getRelationPath();
+            String foreignTableAliasName = callback.Invoke().xgetAliasName();
+            String localRelationPath = LocalCQ.xgetRelationPath();
             SqlClause.registerSelectedSelectColumn(foreignTableAliasName, TableDbName, foreignPropertyName, localRelationPath);
-            SqlClause.registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
+            SqlClause.registerSelectedForeignInfo(callback.Invoke().xgetRelationPath(), foreignPropertyName);
         }
 
         protected delegate ${glConditionQuery} SsCall();

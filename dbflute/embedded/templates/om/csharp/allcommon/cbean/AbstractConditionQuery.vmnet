@@ -229,15 +229,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return new ${glHpFixedConditionQueryResolver}(this, foreignCQ, xgetDBMetaProvider());
     }
 
-    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName
-            , String relationName, String fixedCondition, Exception e) {
-        String msg = notice;
-        msg = msg + " pointTable=" + tableName + " targetRelation=" + relationName;
-        msg = msg + " fixedCondition=" + fixedCondition;
-        msg = msg + " BizOneToOne's local=" + getTableDbName();
-        throw new IllegalStateException(msg, e);
-    }
-
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========

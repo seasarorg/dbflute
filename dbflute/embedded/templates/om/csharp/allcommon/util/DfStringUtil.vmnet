@@ -216,56 +216,6 @@ public class Srl {
         return info;
     }
 
-    public class IndexOfInfo {
-        protected String _baseString;
-        protected int _index;
-        protected String _delimiter;
-
-        public String substringFront() {
-            return _baseString.Substring(0, getIndex());
-        }
-
-        public String substringFrontTrimmed() {
-            return substringFront().Trim();
-        }
-
-        public String substringRear() {
-            return _baseString.Substring(getRearIndex());
-        }
-
-        public String substringRearTrimmed() {
-            return substringRear().Trim();
-        }
-
-        public int getRearIndex() {
-            return _index + _delimiter.Length;
-        }
-
-        public String getBaseString() {
-            return _baseString;
-        }
-
-        public void setBaseString(String baseStr) {
-            this._baseString = baseStr;
-        }
-
-        public int getIndex() {
-            return _index;
-        }
-
-        public void setIndex(int index) {
-            this._index = index;
-        }
-
-        public String getDelimiter() {
-            return _delimiter;
-        }
-
-        public void setDelimiter(String delimiter) {
-            this._delimiter = delimiter;
-        }
-    }
-
     // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
@@ -430,4 +380,53 @@ public class Srl {
     }
 }
 
+    public class IndexOfInfo {
+        protected String _baseString;
+        protected int _index;
+        protected String _delimiter;
+
+        public String substringFront() {
+            return _baseString.Substring(0, getIndex());
+        }
+
+        public String substringFrontTrimmed() {
+            return substringFront().Trim();
+        }
+
+        public String substringRear() {
+            return _baseString.Substring(getRearIndex());
+        }
+
+        public String substringRearTrimmed() {
+            return substringRear().Trim();
+        }
+
+        public int getRearIndex() {
+            return _index + _delimiter.Length;
+        }
+
+        public String getBaseString() {
+            return _baseString;
+        }
+
+        public void setBaseString(String baseStr) {
+            this._baseString = baseStr;
+        }
+
+        public int getIndex() {
+            return _index;
+        }
+
+        public void setIndex(int index) {
+            this._index = index;
+        }
+
+        public String getDelimiter() {
+            return _delimiter;
+        }
+
+        public void setDelimiter(String delimiter) {
+            this._delimiter = delimiter;
+        }
+    }
 }

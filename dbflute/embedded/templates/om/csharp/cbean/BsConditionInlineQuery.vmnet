@@ -53,10 +53,10 @@ namespace ${glPackageCIQ} {
         }
     
         protected override String getInScopeSubQueryRealColumnName(String columnName) {
-            if (_onClauseInline) {
+            if (_onClause) {
                 throw new UnsupportedOperationException("InScopeSubQuery of on-clause is unsupported");
             }
-            return _onClauseInline ? xgetAliasName() + "." + columnName : columnName;
+            return _onClause ? xgetAliasName() + "." + columnName : columnName;
         }
     
         protected override void registerExistsSubQuery(${glConditionQuery} subQuery

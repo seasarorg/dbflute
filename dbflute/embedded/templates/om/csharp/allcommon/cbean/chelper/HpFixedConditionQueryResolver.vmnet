@@ -120,9 +120,9 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                     List<String> splitList = Srl.splitList(targetRelation, ".");
                     DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
                     foreach (String element in splitList) {
-                        ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
+                        ForeignInfo foreignInfo = currentDBMeta.FindForeignInfo(element);
                         resource.addJoinInfo(foreignInfo);
-                        currentDBMeta = foreignInfo.getForeignDBMeta();
+                        currentDBMeta = foreignInfo.ForeignDBMeta;
                     }
                     _inlineViewResourceMap.put(targetRelation, resource);
                 }
@@ -141,7 +141,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                     if (referrerQuery == null) { // means not found
                         break;
                     }
-                    if (Srl.equalsPlain(pointDBMeta.getTableDbName(), referrerQuery.getTableDbName())) {
+                    if (Srl.equalsPlain(pointDBMeta.TableDbName, referrerQuery.getTableDbName())) {
                         break;
                     }
                     referrerQuery = referrerQuery.xgetReferrerQuery();
@@ -201,11 +201,11 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                     preForeignAlias = relationMap.get(joinInfo); // update previous alias
                     continue;
                 }
-                TableSqlName foreignTable;
+                String foreignTable;
                 String localAlias;
                 {
-                    DBMeta foreignDBMeta = joinInfo.getForeignDBMeta();
-                    foreignTable = foreignDBMeta.getTableSqlName();
+                    DBMeta foreignDBMeta = joinInfo.ForeignDBMeta;
+                    foreignTable = foreignDBMeta.TableSqlName;
                     localAlias = (preForeignAlias != null ? preForeignAlias : baseAlias);
                     foreignAlias = aliasBase + "_" + groupIndex + "_" + joinIndex;
                     preForeignAlias = foreignAlias;
@@ -213,7 +213,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                 joinSb.append(ln()).append(baseIndent);
                 joinSb.append("     left outer join ").append(foreignTable).append(" ").append(foreignAlias);
                 joinSb.append(" on ");
-                Map<ColumnInfo, ColumnInfo> columnInfoMap = joinInfo.getLocalForeignColumnInfoMap();
+                Map<ColumnInfo, ColumnInfo> columnInfoMap = joinInfo.LocalForeignColumnInfoMap;
                 int columnIndex = 0;
                 foreach (Entry<ColumnInfo, ColumnInfo> localForeignEntry in columnInfoMap.entrySet()) {
                     ColumnInfo localColumnInfo = localForeignEntry.getKey();
@@ -221,8 +221,8 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                     if (columnIndex > 0) {
                         joinSb.append(" and ");
                     }
-                    joinSb.append(localAlias).append(".").append(localColumnInfo.getColumnSqlName());
-                    joinSb.append(" = ").append(foreignAlias).append(".").append(foreignColumninfo.getColumnSqlName());
+                    joinSb.append(localAlias).append(".").append(localColumnInfo.ColumnDbName);
+                    joinSb.append(" = ").append(foreignAlias).append(".").append(foreignColumninfo.ColumnDbName);
                     ++columnIndex;
                 }
                 ++joinIndex;
@@ -289,7 +289,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
         String msg = notice;
         msg = msg + " pointTable=" + tableName + " targetRelation=" + relationName;
         msg = msg + " fixedCondition=" + fixedCondition;
-        msg = msg + " BizOneToOne's local=" + getTableDbName();
+        msg = msg + " BizOneToOne's local=" + _localCQ.getTableDbName();
         throw new IllegalStateException(msg, e);
     }
 
