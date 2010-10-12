@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 
 using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonCHelper};
 using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonDBMeta};
@@ -203,24 +204,24 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnResourceMap) {
-        registerOuterJoin(cq, joinOnResourceMap, null);
+    protected virtual void registerOuterJoin(${glConditionQuery} foreignCQ, Map<String, String> joinOnResourceMap) {
+        registerOuterJoin(foreignCQ, joinOnResourceMap, null);
     }
 
-    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnResourceMap, String fixedCondition) {
+    protected virtual void registerOuterJoin(${glConditionQuery} foreignCQ, Map<String, String> joinOnResourceMap, String fixedCondition) {
         // translate join-on map using column real name
-        Map<String, String> joinOnMap = newLinkedHashMap();
+        Map<String, String> joinOnMap = new LinkedHashMap<String, String>();
         Set<Entry<String, String>> entrySet = joinOnResourceMap.entrySet();
         foreach (Entry<String, String> entry in entrySet) {
-            final String local = entry.getKey();
-            final String foreign = entry.getValue();
+            String local = entry.getKey();
+            String foreign = entry.getValue();
             joinOnMap.put(toColumnRealName(local), foreignCQ.toColumnRealName(foreign));
         }
         String localDbName = getTableDbName();
-        String foreignDbName = cq.getTableDbName();
-        String foreignAliasName = cq.xgetAliasName();
+        String foreignDbName = foreignCQ.getTableDbName();
+        String foreignAliasName = foreignCQ.xgetAliasName();
         FixedConditionResolver resolver = createFixedConditionResolver(foreignCQ, joinOnMap);
-        xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnMap, fixedCondition);
+        xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnMap, fixedCondition, resolver);
     }
 
     protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,

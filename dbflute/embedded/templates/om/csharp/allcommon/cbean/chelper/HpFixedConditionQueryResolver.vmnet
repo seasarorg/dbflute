@@ -4,6 +4,7 @@ using System;
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonDBMetaInfo};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
@@ -234,7 +235,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
         }
         StringBuilder sqlSb = new StringBuilder();
         sqlSb.append("(select ").append(baseAlias).append(".*");
-        for (String columnName : additionalRealColumnList) {
+        foreach (String columnName in additionalRealColumnList) {
             sqlSb.append(", ").append(columnName);
         }
         sqlSb.append(ln()).append(baseIndent);
@@ -248,7 +249,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
     // ===================================================================================
     //                                                                    InlineView Class
     //                                                                    ================
-    protected static class InlineViewResource {
+    protected class InlineViewResource {
         protected Set<String> _additionalColumnSet;
         protected List<ForeignInfo> _joinInfoList;
 

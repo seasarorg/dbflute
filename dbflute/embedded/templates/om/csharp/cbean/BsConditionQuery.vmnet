@@ -21,7 +21,7 @@ namespace ${glPackageBaseCQ} {
 
         public ${myConditionInlineQueryClassName} Inline() {
             if (_inlineQuery == null) {
-                _inlineQuery = new ${myConditionInlineQueryClassName}(getReferrerQuery(), xgetSqlClause(), xgetAliasName(), xgetNestLevel(), this);
+                _inlineQuery = new ${myConditionInlineQueryClassName}(xgetReferrerQuery(), xgetSqlClause(), xgetAliasName(), xgetNestLevel(), this);
             }
             _inlineQuery.xsetOnClause(false);
             return _inlineQuery;

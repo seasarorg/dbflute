@@ -28,8 +28,8 @@ namespace ${glPackageCIQ} {
         public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ)
             : base(childQuery, sqlClause, aliasName, nestLevel) {
             _myCQ = myCQ;
-            _foreignPropertyName = _myCQ.getForeignPropertyName();// Accept foreign property name.
-            _relationPath = _myCQ.getRelationPath();// Accept relation path.
+            _foreignPropertyName = _myCQ.xgetForeignPropertyName();// Accept foreign property name.
+            _relationPath = _myCQ.xgetRelationPath();// Accept relation path.
         }
 
         // ===================================================================================
@@ -56,7 +56,7 @@ namespace ${glPackageCIQ} {
             if (_onClauseInline) {
                 throw new UnsupportedOperationException("InScopeSubQuery of on-clause is unsupported");
             }
-            return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
+            return _onClauseInline ? xgetAliasName() + "." + columnName : columnName;
         }
     
         protected override void registerExistsSubQuery(${glConditionQuery} subQuery

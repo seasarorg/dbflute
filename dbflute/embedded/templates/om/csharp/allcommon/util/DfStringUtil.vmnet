@@ -92,7 +92,7 @@ public class Srl {
         return doSplitList(str, delimiter, true);
     }
 
-    protected static List<String> doSplitList(String str, String delimiter, boolean trim) {
+    protected static List<String> doSplitList(String str, String delimiter, bool trim) {
         assertStringNotNull(str);
         assertDelimiterNotNull(delimiter);
         List<String> list = new ArrayList<String>();
@@ -102,10 +102,10 @@ public class Srl {
             String element = str.Substring(i, (j - i));
             list.add(trim ? element.Trim() : element);
             i = j + delimiter.Length;
-            j = str.indexOf(delimiter, i);
+            j = str.IndexOf(delimiter, i);
         }
-        String element = str.Substring(i);
-        list.add(trim ? element.Trim() : element);
+        String last = str.Substring(i);
+        list.add(trim ? last.Trim() : last);
         return list;
     }
 
@@ -122,7 +122,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The information of index. (Nullable: if delimiter not found)
      */
-    public static IndexOfInfo indexOfFirst(String str, params String delimiters) {
+    public static IndexOfInfo indexOfFirst(String str, params String[] delimiters) {
         return doIndexOfFirst(false, str, delimiters);
     }
 
@@ -136,11 +136,11 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The information of index. (Nullable: if delimiter not found)
      */
-    public static IndexOfInfo indexOfFirstIgnoreCase(String str, String... delimiters) {
+    public static IndexOfInfo indexOfFirstIgnoreCase(String str, params String[] delimiters) {
         return doIndexOfFirst(true, str, delimiters);
     }
 
-    protected static IndexOfInfo doIndexOfFirst(bool ignoreCase, String str, params String delimiters) {
+    protected static IndexOfInfo doIndexOfFirst(bool ignoreCase, String str, params String[] delimiters) {
         return doIndexOf(ignoreCase, false, str, delimiters);
     }
 
@@ -172,7 +172,7 @@ public class Srl {
         return doIndexOfLast(true, str, delimiters);
     }
 
-    protected static IndexOfInfo doIndexOfLast(boolean ignoreCase, String str, params String[] delimiters) {
+    protected static IndexOfInfo doIndexOfLast(bool ignoreCase, String str, params String[] delimiters) {
         return doIndexOf(ignoreCase, true, str, delimiters);
     }
 
@@ -216,7 +216,7 @@ public class Srl {
         return info;
     }
 
-    public static class IndexOfInfo {
+    public class IndexOfInfo {
         protected String _baseString;
         protected int _index;
         protected String _delimiter;
