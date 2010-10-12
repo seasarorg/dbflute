@@ -119,18 +119,21 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     _inlineViewResourceMap = new LinkedHashMap<String, InlineViewResource>();
                 }
                 if (!_inlineViewResourceMap.containsKey(targetRelation)) {
-                    String rear = relationEndIndex.substringRearTrimmed();
-                    if (!Srl.startsWith(rear, ".")) {
-                        String notice = "The OverRelation variable should continue to column after the variable.";
-                        throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
-                                fixedCondition);
-                        return null; // unreachable
+                    final String columnName;
+                    {
+                        final IndexOfInfo rearIndex = Srl.indexOfFirst(relationEndIndex.substringRearTrimmed(), ".");
+                        if (rearIndex == null || rearIndex.getIndex() > 0) {
+                            String notice = "The OverRelation variable should continue to column after the variable.";
+                            throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
+                                    fixedCondition);
+                            return null; // unreachable
+                        }
+                        final String columnStart = rearIndex.substringRear();
+                        final IndexOfInfo indexInfo = Srl.indexOfFirst(columnStart, " ", ",", ")", "\n", "\t");
+                        columnName = indexInfo != null ? indexInfo.substringFront() : columnStart;
                     }
-                    rear = Srl.substring(rear, ".".length());
-                    final IndexOfInfo indexInfo = Srl.indexOfFirst(rear, " ", ",", ")", "\n", "\t");
-                    rear = indexInfo != null ? indexInfo.substringFront() : rear;
                     final InlineViewResource resource = new InlineViewResource();
-                    resource.addAdditionalColumn(rear);
+                    resource.addAdditionalColumn(columnName);
                     final List<String> splitList = Srl.splitList(targetRelation, ".");
                     DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
                     for (String element : splitList) {
