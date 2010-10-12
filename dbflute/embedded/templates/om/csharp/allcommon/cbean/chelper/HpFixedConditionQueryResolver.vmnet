@@ -225,9 +225,9 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                 joinSb.append(ln()).append(baseIndent);
                 joinSb.append("     left outer join ").append(foreignTable).append(" ").append(foreignAlias);
                 joinSb.append(" on ");
-                Map<ColumnInfo, ColumnInfo> columnInfoMap = joinInfo.LocalForeignColumnInfoMap;
+                Map<${glColumnInfo}, ${glColumnInfo}> columnInfoMap = joinInfo.LocalForeignColumnInfoMap;
                 int columnIndex = 0;
-                foreach (Entry<ColumnInfo, ColumnInfo> localForeignEntry in columnInfoMap.entrySet()) {
+                foreach (Entry<${glColumnInfo}, ${glColumnInfo}> localForeignEntry in columnInfoMap.entrySet()) {
                     ${glColumnInfo} localColumnInfo = localForeignEntry.getKey();
                     ${glColumnInfo} foreignColumninfo = localForeignEntry.getValue();
                     if (columnIndex > 0) {
