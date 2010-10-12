@@ -25,26 +25,26 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glForeignInfo}(String _foreignPropertyName, ${glDBMeta} _localDBMeta, ${glDBMeta} _foreignDBMeta
-                         , Map<${glColumnInfo}, ${glColumnInfo}> _localForeignColumnInfoMap
-                         , int _relationNo, bool _oneToOne, bool _bizOneToOne) {
-            AssertObjectNotNull("_foreignPropertyName", _foreignPropertyName);
-            AssertObjectNotNull("_localDBMeta", _localDBMeta);
-            AssertObjectNotNull("_foreignDBMeta", _foreignDBMeta);
-            AssertObjectNotNull("_localForeignColumnInfoMap", _localForeignColumnInfoMap);
-            _foreignPropertyName = _foreignPropertyName;
-            _localDBMeta = _localDBMeta;
-            _foreignDBMeta = _foreignDBMeta;
-            _localForeignColumnInfoMap = _localForeignColumnInfoMap;
-            Set<${glColumnInfo}> keySet = _localForeignColumnInfoMap.keySet();
+        public ${glForeignInfo}(String foreignPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} foreignDBMeta
+                         , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
+                         , int relationNo, bool oneToOne, bool bizOneToOne) {
+            AssertObjectNotNull("foreignPropertyName", foreignPropertyName);
+            AssertObjectNotNull("localDBMeta", localDBMeta);
+            AssertObjectNotNull("foreignDBMeta", foreignDBMeta);
+            AssertObjectNotNull("localForeignColumnInfoMap", localForeignColumnInfoMap);
+            _foreignPropertyName = foreignPropertyName;
+            _localDBMeta = localDBMeta;
+            _foreignDBMeta = foreignDBMeta;
+            _localForeignColumnInfoMap = localForeignColumnInfoMap;
+            Set<${glColumnInfo}> keySet = localForeignColumnInfoMap.keySet();
             _foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
-            foreach (${glColumnInfo} key in _localForeignColumnInfoMap.keySet()) {
-                ${glColumnInfo} value = _localForeignColumnInfoMap.get(key);
+            foreach (${glColumnInfo} key in localForeignColumnInfoMap.keySet()) {
+                ${glColumnInfo} value = localForeignColumnInfoMap.get(key);
                 _foreignLocalColumnInfoMap.put(value, key);
             }
-            _relationNo = _relationNo;
-            _oneToOne = _oneToOne;
-            _bizOneToOne = _bizOneToOne;
+            _relationNo = relationNo;
+            _oneToOne = oneToOne;
+            _bizOneToOne = bizOneToOne;
         }
         
         // ===============================================================================
@@ -119,7 +119,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public override int GetHashCode() {
             return _foreignPropertyName.GetHashCode() + _localDBMeta.GetHashCode() + _foreignDBMeta.GetHashCode();
         }
-    
+
         public override bool Equals(Object obj) {
             if (obj == null || !(obj is ${glForeignInfo})) {
                 return false;
