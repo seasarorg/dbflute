@@ -255,6 +255,36 @@ public class Srl {
     }
 
     // ===================================================================================
+    //                                                                               Count
+    //                                                                               =====
+    public static int count(String str, String element) {
+        return doCount(str, element, false);
+    }
+
+    public static int countIgnoreCase(String str, String element) {
+        return doCount(str, element, true);
+    }
+
+    protected static int doCount(String str, String element, bool ignoreCase) {
+        assertStringNotNull(str);
+        assertElementNotNull(element);
+        int count = 0;
+        if (ignoreCase) {
+            str = str.ToLower();
+            element = element.ToLower();
+        }
+        while (true) {
+            int index = str.IndexOf(element);
+            if (index < 0) {
+                break;
+            }
+            str = str.Substring(index + element.Length);
+            ++count;
+        }
+        return count;
+    }
+
+    // ===================================================================================
     //                                                                              Equals
     //                                                                              ======
     public static bool equalsIgnoreCase(String str1, String str2) {
@@ -345,8 +375,68 @@ public class Srl {
         assertObjectNotNull("str", str);
     }
 
+    protected static void assertStringListNotNull(List<String> strList) {
+        assertObjectNotNull("strList", strList);
+    }
+
+    protected static void assertElementNotNull(String element) {
+        assertObjectNotNull("element", element);
+    }
+
+    protected static void assertElementVaryingNotNull(String[] elements) {
+        assertObjectNotNull("elements", elements);
+    }
+
+    protected static void assertKeywordNotNull(String keyword) {
+        assertObjectNotNull("keyword", keyword);
+    }
+
+    protected static void assertKeywordVaryingNotNull(String[] keywords) {
+        assertObjectNotNull("keywords", keywords);
+    }
+
+    protected static void assertPrefixNotNull(String prefix) {
+        assertObjectNotNull("prefix", prefix);
+    }
+
+    protected static void assertSuffixNotNull(String suffix) {
+        assertObjectNotNull("suffix", suffix);
+    }
+
+    protected static void assertFromToMapNotNull(Map<String, String> fromToMap) {
+        assertObjectNotNull("fromToMap", fromToMap);
+    }
+
     protected static void assertDelimiterNotNull(String delimiter) {
         assertObjectNotNull("delimiter", delimiter);
+    }
+
+    protected static void assertFromStringNotNull(String fromStr) {
+        assertObjectNotNull("fromStr", fromStr);
+    }
+
+    protected static void assertToStringNotNull(String toStr) {
+        assertObjectNotNull("toStr", toStr);
+    }
+
+    protected static void assertBeginMarkNotNull(String beginMark) {
+        assertObjectNotNull("beginMark", beginMark);
+    }
+
+    protected static void assertEndMarkNotNull(String endMark) {
+        assertObjectNotNull("endMark", endMark);
+    }
+
+    protected static void assertDecamelNameNotNull(String decamelName) {
+        assertObjectNotNull("decamelName", decamelName);
+    }
+
+    protected static void assertCamelNameNotNull(String camelName) {
+        assertObjectNotNull("camelName", camelName);
+    }
+
+    protected static void assertSqlNotNull(String sql) {
+        assertObjectNotNull("sql", sql);
     }
 
     /**
