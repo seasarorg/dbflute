@@ -58,6 +58,11 @@ import static org.seasar.dbflute.util.Srl.indexOfFirstIgnoreCase;
 import static org.seasar.dbflute.util.Srl.indexOfLast;
 import static org.seasar.dbflute.util.Srl.indexOfLastIgnoreCase;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
+import static org.seasar.dbflute.util.Srl.is_NotNull_and_NotEmpty;
+import static org.seasar.dbflute.util.Srl.is_NotNull_and_NotTrimmedEmpty;
+import static org.seasar.dbflute.util.Srl.is_Null_or_Empty;
+import static org.seasar.dbflute.util.Srl.is_Null_or_TrimmedEmpty;
+import static org.seasar.dbflute.util.Srl.length;
 import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.removeBlockComment;
 import static org.seasar.dbflute.util.Srl.removeEmptyLine;
@@ -77,6 +82,8 @@ import static org.seasar.dbflute.util.Srl.substringLastFront;
 import static org.seasar.dbflute.util.Srl.substringLastFrontIgnoreCase;
 import static org.seasar.dbflute.util.Srl.substringLastRear;
 import static org.seasar.dbflute.util.Srl.substringLastRearIgnoreCase;
+import static org.seasar.dbflute.util.Srl.toLowerCase;
+import static org.seasar.dbflute.util.Srl.toUpperCase;
 import static org.seasar.dbflute.util.Srl.trim;
 import static org.seasar.dbflute.util.Srl.unquoteDouble;
 import static org.seasar.dbflute.util.Srl.unquoteSingle;
@@ -94,6 +101,61 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
  * @since 0.9.5 (2009/04/10 Friday)
  */
 public class DfStringUtilTest extends PlainTestCase {
+
+    // ===================================================================================
+    //                                                                        Null & Empty
+    //                                                                        ============
+    public void test_is_Null_or_Empty() {
+        assertTrue(is_Null_or_Empty(null));
+        assertTrue(is_Null_or_Empty(""));
+        assertFalse(is_Null_or_Empty(" "));
+        assertFalse(is_Null_or_Empty("foo"));
+    }
+
+    public void test_is_Null_or_TrimmedEmpty() {
+        assertTrue(is_Null_or_TrimmedEmpty(null));
+        assertTrue(is_Null_or_TrimmedEmpty(""));
+        assertTrue(is_Null_or_TrimmedEmpty(" "));
+        assertFalse(is_Null_or_TrimmedEmpty("foo"));
+    }
+
+    public void test_is_NotNull_and_NotEmpty() {
+        assertFalse(is_NotNull_and_NotEmpty(null));
+        assertFalse(is_NotNull_and_NotEmpty(""));
+        assertTrue(is_NotNull_and_NotEmpty(" "));
+        assertTrue(is_NotNull_and_NotEmpty("foo"));
+    }
+
+    public void test_is_NotNull_and_NotTrimmedEmpty() {
+        assertFalse(is_NotNull_and_NotTrimmedEmpty(null));
+        assertFalse(is_NotNull_and_NotTrimmedEmpty(""));
+        assertFalse(is_NotNull_and_NotTrimmedEmpty(" "));
+        assertTrue(is_NotNull_and_NotTrimmedEmpty("foo"));
+    }
+
+    // ===================================================================================
+    //                                                                              Length
+    //                                                                              ======
+    public void test_length() {
+        assertEquals(0, length(""));
+        assertEquals(1, length(" "));
+        assertEquals(3, length("foo"));
+    }
+
+    // ===================================================================================
+    //                                                                                Case
+    //                                                                                ====
+    public void test_toLowerCase() {
+        assertEquals("", toLowerCase(""));
+        assertEquals("f", toLowerCase("F"));
+        assertEquals("foo", toLowerCase("FOO"));
+    }
+
+    public void test_toUpperCase() {
+        assertEquals("", toUpperCase(""));
+        assertEquals("F", toUpperCase("f"));
+        assertEquals("FOO", toUpperCase("foo"));
+    }
 
     // ===================================================================================
     //                                                                                Trim
@@ -155,6 +217,7 @@ public class DfStringUtilTest extends PlainTestCase {
     public void test_indexOfFirst_basic() {
         assertEquals(3, indexOfFirst("foo.bar/baz.qux", ".", "/").getIndex());
         assertEquals(3, indexOfFirst("foo/bar.baz/qux", ".", "/").getIndex());
+        assertEquals(4, indexOfFirst("foo.bar/baz.qux", ".", "/").getRearIndex());
         assertNull(indexOfFirst("foo.bar/baz.qux", "O", "A"));
     }
 

@@ -71,26 +71,26 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         final String relationEndMark = getRelationEndMark();
         String remainder = fixedCondition;
         while (true) {
-            final int relationBeginIndex = remainder.indexOf(relationBeginMark);
-            if (relationBeginIndex < 0) {
+            final IndexOfInfo relationBeginIndex = Srl.indexOfFirst(remainder, relationBeginMark);
+            if (relationBeginIndex == null) {
                 break;
             }
-            remainder = remainder.substring(relationBeginIndex + relationBeginMark.length());
-            final int relationEndIndex = remainder.indexOf(relationEndMark);
-            if (relationEndIndex < 0) {
+            remainder = relationBeginIndex.substringRear();
+            final IndexOfInfo relationEndIndex = Srl.indexOfFirst(remainder, relationEndMark);
+            if (relationEndIndex == null) {
                 break;
             }
 
-            final String relationExp = remainder.substring(0, relationEndIndex);
+            final String relationExp = relationEndIndex.substringFront();
             final String pointTable;
             final String targetRelation;
             {
-                final int separatorIndex = relationExp.indexOf(".");
-                if (separatorIndex >= 0) {
-                    pointTable = relationExp.substring(0, separatorIndex).trim();
-                    targetRelation = relationExp.substring(separatorIndex + ".".length()).trim();
+                final IndexOfInfo separatorIndex = Srl.indexOfFirst(relationExp, ".");
+                if (separatorIndex != null) {
+                    pointTable = separatorIndex.substringFrontTrimmed();
+                    targetRelation = separatorIndex.substringRearTrimmed();
                 } else {
-                    pointTable = relationExp.trim();
+                    pointTable = Srl.trim(relationExp);
                     targetRelation = null;
                 }
             }
@@ -119,18 +119,18 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     _inlineViewResourceMap = new LinkedHashMap<String, InlineViewResource>();
                 }
                 if (!_inlineViewResourceMap.containsKey(targetRelation)) {
-                    String next = remainder.substring(relationEndIndex + relationEndMark.length()).trim();
-                    if (!next.startsWith(".")) {
+                    String rear = relationEndIndex.substringRearTrimmed();
+                    if (!Srl.startsWith(rear, ".")) {
                         String notice = "The OverRelation variable should continue to column after the variable.";
                         throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
                                 fixedCondition);
                         return null; // unreachable
                     }
-                    next = next.substring(".".length());
-                    final IndexOfInfo indexInfo = Srl.indexOfFirst(next, " ", ",", ")", "\n", "\t");
-                    next = indexInfo != null ? next.substring(0, indexInfo.getIndex()) : next;
+                    rear = Srl.substring(rear, ".".length());
+                    final IndexOfInfo indexInfo = Srl.indexOfFirst(rear, " ", ",", ")", "\n", "\t");
+                    rear = indexInfo != null ? indexInfo.substringFront() : rear;
                     final InlineViewResource resource = new InlineViewResource();
-                    resource.addAdditionalColumn(next);
+                    resource.addAdditionalColumn(rear);
                     final List<String> splitList = Srl.splitList(targetRelation, ".");
                     DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
                     for (String element : splitList) {
@@ -155,7 +155,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     if (referrerQuery == null) { // means not found
                         break;
                     }
-                    if (pointDBMeta.getTableDbName().equals(referrerQuery.getTableDbName())) {
+                    if (Srl.equalsPlain(pointDBMeta.getTableDbName(), referrerQuery.getTableDbName())) {
                         break;
                     }
                     referrerQuery = referrerQuery.xgetReferrerQuery();
@@ -178,7 +178,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
 
             // after case for loop
-            remainder = remainder.substring(relationEndIndex + relationEndMark.length());
+            remainder = relationEndIndex.substringRear();
 
             // for prevent from processing same one
             remainder = replaceString(remainder, relationVariable, relationAlias);

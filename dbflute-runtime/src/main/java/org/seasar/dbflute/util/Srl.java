@@ -30,62 +30,83 @@ public class Srl {
     // ===================================================================================
     //                                                                        Null & Empty
     //                                                                        ============
-    public static final boolean is_Null_or_Empty(final String str) {
+    public static boolean is_Null_or_Empty(final String str) {
         return str == null || str.length() == 0;
     }
 
-    public static final boolean is_Null_or_TrimmedEmpty(final String str) {
+    public static boolean is_Null_or_TrimmedEmpty(final String str) {
         return str == null || str.trim().length() == 0;
     }
 
-    public static final boolean is_NotNull_and_NotEmpty(final String str) {
+    public static boolean is_NotNull_and_NotEmpty(final String str) {
         return !is_Null_or_Empty(str);
     }
 
-    public static final boolean is_NotNull_and_NotTrimmedEmpty(final String str) {
+    public static boolean is_NotNull_and_NotTrimmedEmpty(final String str) {
         return !is_Null_or_TrimmedEmpty(str);
     }
 
-    public static final boolean isEmpty(final String str) {
+    public static boolean isEmpty(final String str) {
         return str != null && str.length() == 0;
     }
 
-    public static final boolean isTrimmedEmpty(final String str) {
+    public static boolean isTrimmedEmpty(final String str) {
         return str != null && str.trim().length() == 0;
+    }
+
+    // ===================================================================================
+    //                                                                              Length
+    //                                                                              ======
+    public static int length(final String str) {
+        assertStringNotNull(str);
+        return str.length();
+    }
+
+    // ===================================================================================
+    //                                                                                Case
+    //                                                                                ====
+    public static String toLowerCase(final String str) {
+        assertStringNotNull(str);
+        return str.toLowerCase();
+    }
+
+    public static String toUpperCase(final String str) {
+        assertStringNotNull(str);
+        return str.toUpperCase();
     }
 
     // ===================================================================================
     //                                                                                Trim
     //                                                                                ====
-    public static final String trim(final String str) {
+    public static String trim(final String str) {
         return doTrim(str, null);
     }
 
-    public static final String trim(final String str, final String trimStr) {
+    public static String trim(final String str, final String trimStr) {
         return doTrim(str, trimStr);
     }
 
-    public static final String ltrim(final String str) {
+    public static String ltrim(final String str) {
         return doLTrim(str, null);
     }
 
-    public static final String ltrim(final String str, final String trimStr) {
+    public static String ltrim(final String str, final String trimStr) {
         return doLTrim(str, trimStr);
     }
 
-    public static final String rtrim(final String str) {
+    public static String rtrim(final String str) {
         return doRTrim(str, null);
     }
 
-    public static final String rtrim(final String str, final String trimStr) {
+    public static String rtrim(final String str, final String trimStr) {
         return doRTrim(str, trimStr);
     }
 
-    protected static final String doTrim(final String str, final String trimStr) {
+    protected static String doTrim(final String str, final String trimStr) {
         return doRTrim(doLTrim(str, trimStr), trimStr);
     }
 
-    protected static final String doLTrim(final String str, final String trimStr) {
+    protected static String doLTrim(final String str, final String trimStr) {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
@@ -102,7 +123,7 @@ public class Srl {
         return str.substring(pos);
     }
 
-    protected static final String doRTrim(final String str, final String trimStr) {
+    protected static String doRTrim(final String str, final String trimStr) {
         assertStringNotNull(str);
 
         // for trim target same as String.trim()
@@ -116,6 +137,103 @@ public class Srl {
         for (pos = str.length() - 1; pos >= 0 && trimStr.indexOf(str.charAt(pos)) >= 0; pos--)
             ;
         return str.substring(0, pos + 1);
+    }
+
+    // ===================================================================================
+    //                                                                             Replace
+    //                                                                             =======
+    public static String replace(String str, String fromStr, String toStr) {
+        assertStringNotNull(str);
+        assertFromStringNotNull(fromStr);
+        assertToStringNotNull(toStr);
+        StringBuilder sb = null; // lazy load
+        int pos = 0;
+        int pos2 = 0;
+        do {
+            pos = str.indexOf(fromStr, pos2);
+            if (pos2 == 0 && pos < 0) { // first loop and not found
+                return str; // without creating StringBuilder 
+            }
+            if (sb == null) {
+                sb = new StringBuilder();
+            }
+            if (pos == 0) {
+                sb.append(toStr);
+                pos2 = fromStr.length();
+            } else if (pos > 0) {
+                sb.append(str.substring(pos2, pos));
+                sb.append(toStr);
+                pos2 = pos + fromStr.length();
+            } else { // (pos < 0) second or after loop only
+                sb.append(str.substring(pos2));
+                return sb.toString();
+            }
+        } while (true);
+    }
+
+    public static String replaceBy(String str, Map<String, String> fromToMap) {
+        assertStringNotNull(str);
+        assertFromToMapNotNull(fromToMap);
+        final Set<Entry<String, String>> entrySet = fromToMap.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            str = replace(str, entry.getKey(), entry.getValue());
+        }
+        return str;
+    }
+
+    public static String replaceScopeContent(String str, String fromStr, String toStr, String beginMark, String endMark) {
+        final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
+        if (scopeList.isEmpty()) {
+            return str;
+        }
+        return scopeList.get(0).replaceContentOnBaseString(fromStr, toStr);
+    }
+
+    public static String replaceScopeInterspace(String str, String fromStr, String toStr, String beginMark,
+            String endMark) {
+        final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
+        if (scopeList.isEmpty()) {
+            return str;
+        }
+        return scopeList.get(0).replaceInterspaceOnBaseString(fromStr, toStr);
+    }
+
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list. (NotNull)
+     */
+    public static List<String> splitList(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, false);
+    }
+
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list that their elements is trimmed. (NotNull)
+     */
+    public static List<String> splitListTrimmed(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, true);
+    }
+
+    protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
+        assertStringNotNull(str);
+        assertDelimiterNotNull(delimiter);
+        final List<String> list = new ArrayList<String>();
+        int i = 0;
+        int j = str.indexOf(delimiter);
+        for (int h = 0; j >= 0; h++) {
+            final String element = str.substring(i, j);
+            list.add(trim ? element.trim() : element);
+            i = j + delimiter.length();
+            j = str.indexOf(delimiter, i);
+        }
+        final String element = str.substring(i);
+        list.add(trim ? element.trim() : element);
+        return list;
     }
 
     // ===================================================================================
@@ -231,12 +349,32 @@ public class Srl {
         protected int _index;
         protected String _delimiter;
 
+        public String substringFront() {
+            return _baseString.substring(getIndex());
+        }
+
+        public String substringFrontTrimmed() {
+            return substringFront().trim();
+        }
+
+        public String substringRear() {
+            return _baseString.substring(getRearIndex());
+        }
+
+        public String substringRearTrimmed() {
+            return substringRear().trim();
+        }
+
+        public int getRearIndex() {
+            return _index + _delimiter.length();
+        }
+
         public String getBaseString() {
             return _baseString;
         }
 
         public void setBaseString(String baseStr) {
-            this._baseString = baseStr;
+            _baseString = baseStr;
         }
 
         public int getIndex() {
@@ -244,7 +382,7 @@ public class Srl {
         }
 
         public void setIndex(int index) {
-            this._index = index;
+            _index = index;
         }
 
         public String getDelimiter() {
@@ -252,13 +390,23 @@ public class Srl {
         }
 
         public void setDelimiter(String delimiter) {
-            this._delimiter = delimiter;
+            _delimiter = delimiter;
         }
     }
 
     // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
+    public static String substring(final String str, final int beginIndex) {
+        assertStringNotNull(str);
+        return str.substring(beginIndex);
+    }
+
+    public static String substring(final String str, final int beginIndex, final int endIndex) {
+        assertStringNotNull(str);
+        return str.substring(beginIndex, endIndex);
+    }
+
     /**
      * Extract front sub-string from first-found delimiter.
      * <pre>
@@ -269,7 +417,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringFirstFront(final String str, final String... delimiters) {
+    public static String substringFirstFront(final String str, final String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(false, false, false, str, delimiters);
     }
@@ -284,7 +432,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringFirstFrontIgnoreCase(final String str, final String... delimiters) {
+    public static String substringFirstFrontIgnoreCase(final String str, final String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(false, false, true, str, delimiters);
     }
@@ -299,7 +447,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringFirstRear(String str, String... delimiters) {
+    public static String substringFirstRear(String str, String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(false, true, false, str, delimiters);
     }
@@ -314,7 +462,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringFirstRearIgnoreCase(String str, String... delimiters) {
+    public static String substringFirstRearIgnoreCase(String str, String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(false, true, true, str, delimiters);
     }
@@ -329,7 +477,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringLastFront(String str, String... delimiters) {
+    public static String substringLastFront(String str, String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(true, false, false, str, delimiters);
     }
@@ -344,7 +492,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringLastFrontIgnoreCase(String str, String... delimiters) {
+    public static String substringLastFrontIgnoreCase(String str, String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(true, false, true, str, delimiters);
     }
@@ -359,7 +507,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringLastRear(String str, String... delimiters) {
+    public static String substringLastRear(String str, String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(true, true, false, str, delimiters);
     }
@@ -374,7 +522,7 @@ public class Srl {
      * @param delimiters The array of delimiters. (NotNull) 
      * @return The part of string. (NotNull: if delimiter not found, returns argument-plain string)
      */
-    public static final String substringLastRearIgnoreCase(String str, String... delimiters) {
+    public static String substringLastRearIgnoreCase(String str, String... delimiters) {
         assertStringNotNull(str);
         return doSubstringFirstRear(true, true, true, str, delimiters);
     }
@@ -404,104 +552,6 @@ public class Srl {
         } else {
             return str.substring(0, info.getIndex());
         }
-    }
-
-    // ===================================================================================
-    //                                                                               Split
-    //                                                                               =====
-    /**
-     * @param str The split target string. (NotNull)
-     * @param delimiter The delimiter for split. (NotNull)
-     * @return The split list. (NotNull)
-     */
-    public static final List<String> splitList(final String str, final String delimiter) {
-        return doSplitList(str, delimiter, false);
-    }
-
-    /**
-     * @param str The split target string. (NotNull)
-     * @param delimiter The delimiter for split. (NotNull)
-     * @return The split list that their elements is trimmed. (NotNull)
-     */
-    public static final List<String> splitListTrimmed(final String str, final String delimiter) {
-        return doSplitList(str, delimiter, true);
-    }
-
-    protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
-        assertStringNotNull(str);
-        assertDelimiterNotNull(delimiter);
-        final List<String> list = new ArrayList<String>();
-        int i = 0;
-        int j = str.indexOf(delimiter);
-        for (int h = 0; j >= 0; h++) {
-            final String element = str.substring(i, j);
-            list.add(trim ? element.trim() : element);
-            i = j + delimiter.length();
-            j = str.indexOf(delimiter, i);
-        }
-        final String element = str.substring(i);
-        list.add(trim ? element.trim() : element);
-        return list;
-    }
-
-    // ===================================================================================
-    //                                                                             Replace
-    //                                                                             =======
-    public static final String replace(String str, String fromStr, String toStr) {
-        assertStringNotNull(str);
-        assertFromStringNotNull(fromStr);
-        assertToStringNotNull(toStr);
-        StringBuilder sb = null; // lazy load
-        int pos = 0;
-        int pos2 = 0;
-        do {
-            pos = str.indexOf(fromStr, pos2);
-            if (pos2 == 0 && pos < 0) { // first loop and not found
-                return str; // without creating StringBuilder 
-            }
-            if (sb == null) {
-                sb = new StringBuilder();
-            }
-            if (pos == 0) {
-                sb.append(toStr);
-                pos2 = fromStr.length();
-            } else if (pos > 0) {
-                sb.append(str.substring(pos2, pos));
-                sb.append(toStr);
-                pos2 = pos + fromStr.length();
-            } else { // (pos < 0) second or after loop only
-                sb.append(str.substring(pos2));
-                return sb.toString();
-            }
-        } while (true);
-    }
-
-    public static final String replaceBy(String str, Map<String, String> fromToMap) {
-        assertStringNotNull(str);
-        assertFromToMapNotNull(fromToMap);
-        final Set<Entry<String, String>> entrySet = fromToMap.entrySet();
-        for (Entry<String, String> entry : entrySet) {
-            str = replace(str, entry.getKey(), entry.getValue());
-        }
-        return str;
-    }
-
-    public static final String replaceScopeContent(String str, String fromStr, String toStr, String beginMark,
-            String endMark) {
-        final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
-        if (scopeList.isEmpty()) {
-            return str;
-        }
-        return scopeList.get(0).replaceContentOnBaseString(fromStr, toStr);
-    }
-
-    public static final String replaceScopeInterspace(String str, String fromStr, String toStr, String beginMark,
-            String endMark) {
-        final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
-        if (scopeList.isEmpty()) {
-            return str;
-        }
-        return scopeList.get(0).replaceInterspaceOnBaseString(fromStr, toStr);
     }
 
     // ===================================================================================
@@ -993,7 +1043,7 @@ public class Srl {
     // ===================================================================================
     //                                                                              Equals
     //                                                                              ======
-    public static final boolean equalsIgnoreCase(String str1, String str2) {
+    public static boolean equalsIgnoreCase(String str1, String str2) {
         if (str1 != null) {
             if (str2 != null) {
                 return str1.equalsIgnoreCase(str2);
@@ -1005,7 +1055,7 @@ public class Srl {
         }
     }
 
-    public static final boolean equalsFlexible(String str1, String str2) {
+    public static boolean equalsFlexible(String str1, String str2) {
         if (str1 != null) {
             if (str2 != null) {
                 str1 = replace(str1, "_", "");
@@ -1019,13 +1069,13 @@ public class Srl {
         }
     }
 
-    public static final boolean equalsFlexibleTrimmed(String str1, String str2) {
+    public static boolean equalsFlexibleTrimmed(String str1, String str2) {
         str1 = str1 != null ? str1.trim() : null;
         str2 = str2 != null ? str2.trim() : null;
         return equalsFlexible(str1, str2);
     }
 
-    public static final boolean equalsPlain(String str1, String str2) {
+    public static boolean equalsPlain(String str1, String str2) {
         if (str1 != null) {
             if (str2 != null) {
                 return str1.equals(str2);
@@ -1040,7 +1090,7 @@ public class Srl {
     // ===================================================================================
     //                                                                             Connect
     //                                                                             =======
-    public static final String connectPrefix(String str, String prefix, String delimiter) {
+    public static String connectPrefix(String str, String prefix, String delimiter) {
         assertStringNotNull(str);
         if (is_NotNull_and_NotTrimmedEmpty(prefix)) {
             str = prefix + delimiter + str;
@@ -1048,7 +1098,7 @@ public class Srl {
         return str;
     }
 
-    public static final String connectSuffix(String str, String suffix, String delimiter) {
+    public static String connectSuffix(String str, String suffix, String delimiter) {
         assertStringNotNull(str);
         if (is_NotNull_and_NotTrimmedEmpty(suffix)) {
             str = str + delimiter + suffix;
@@ -1059,15 +1109,15 @@ public class Srl {
     // ===================================================================================
     //                                                                                Fill
     //                                                                                ====
-    public static final String rfill(String str, int size) {
+    public static String rfill(String str, int size) {
         return doFill(str, size, false);
     }
 
-    public static final String lfill(String str, int size) {
+    public static String lfill(String str, int size) {
         return doFill(str, size, true);
     }
 
-    protected static final String doFill(String str, int size, boolean left) {
+    protected static String doFill(String str, int size, boolean left) {
         assertStringNotNull(str);
         if (str.length() >= size) {
             return str;
