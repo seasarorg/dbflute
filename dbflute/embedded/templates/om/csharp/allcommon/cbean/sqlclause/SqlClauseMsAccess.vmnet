@@ -21,7 +21,7 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         base.registerOuterJoin(baseTableDbName, joinTableDbName, aliasName, joinOnMap, null, null);
         if (fixedCondition != null) {
             if (fixedConditionResolver != null) {
-                fixedCondition = fixedConditionResolver.Invoke(fixedCondition);
+                fixedCondition = fixedConditionResolver.resolveVariable(fixedCondition);
             }
             String clause = replaceString(fixedCondition, aliasName + ".", "");
             registerOuterJoinInlineWhereClause(aliasName, clause, false);

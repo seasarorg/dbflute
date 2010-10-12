@@ -36,7 +36,7 @@ public class Srl {
     // ===================================================================================
     //                                                                              Length
     //                                                                              ======
-    public static bool length(String str) {
+    public static int length(String str) {
         assertStringNotNull(str);
         return str.Length;
     }
@@ -46,19 +46,20 @@ public class Srl {
     //                                                                                ====
     public static String toLowerCase(String str) {
         assertStringNotNull(str);
-        return str.toLowerCase();
+        return str.ToLower();
     }
 
     public static String toUpperCase(String str) {
         assertStringNotNull(str);
-        return str.toUpperCase();
+        return str.ToUpper();
     }
 
     // ===================================================================================
     //                                                                                Trim
     //                                                                                ====
     public static String trim(String str) {
-        return str != null && str.Trim();
+        assertStringNotNull(str);
+        return str.Trim();
     }
 
     // ===================================================================================
@@ -196,7 +197,7 @@ public class Srl {
             if (last) {
                 index = filteredStr.LastIndexOf(filteredDelimiter);
             } else {
-                index = filteredStr.LndexOf(filteredDelimiter);
+                index = filteredStr.IndexOf(filteredDelimiter);
             }
             if (index < 0) {
                 continue;
@@ -273,7 +274,7 @@ public class Srl {
             if (str2 != null) {
                 str1 = replace(str1, "_", "");
                 str2 = replace(str2, "_", "");
-                return str1.ToLower().EqualsIgnoreCase(str2.ToLower());
+                return str1.ToLower().Equals(str2.ToLower());
             } else {
                 return false;
             }
@@ -283,8 +284,8 @@ public class Srl {
     }
 
     public static bool equalsFlexibleTrimmed(String str1, String str2) {
-        str1 = str1 != null ? str1.trim() : null;
-        str2 = str2 != null ? str2.trim() : null;
+        str1 = str1 != null ? str1.Trim() : null;
+        str2 = str2 != null ? str2.Trim() : null;
         return equalsFlexible(str1, str2);
     }
 
