@@ -279,9 +279,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         _onClause = onClause;
     }
 
-    // ===================================================================================
-    //                                                                            Location
-    //                                                                            ========
+    // -----------------------------------------------------
+    //                                              Location
+    //                                              --------
     /**
      * {@inheritDoc}
      */
