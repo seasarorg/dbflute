@@ -107,7 +107,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
 
             final ConditionQuery relationPointCQ;
             final ConditionQuery columnTargetCQ;
-            if (Srl.equalsPlain(pointTable, getLocalTableMark())) {
+            if (Srl.equalsPlain(pointTable, getLocalTableMark())) { // local table
                 relationPointCQ = _localCQ;
                 if (targetRelation != null) {
                     columnTargetCQ = invokeColumnTargetCQ(relationPointCQ, targetRelation);
@@ -116,7 +116,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
                     return null; // unreachable
                 }
-            } else if (Srl.equalsPlain(pointTable, getForeignTableMark())) {
+            } else if (Srl.equalsPlain(pointTable, getForeignTableMark())) { // foreign table
                 relationPointCQ = _foreignCQ;
                 columnTargetCQ = relationPointCQ;
                 if (targetRelation == null) {
@@ -128,34 +128,37 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                 if (_inlineViewResourceMap == null) {
                     _inlineViewResourceMap = new LinkedHashMap<String, InlineViewResource>();
                 }
-                if (!_inlineViewResourceMap.containsKey(targetRelation)) {
-                    final String columnName;
-                    {
-                        final IndexOfInfo rearIndex = Srl.indexOfFirst(relationEndIndex.substringRearTrimmed(), ".");
-                        if (rearIndex == null || rearIndex.getIndex() > 0) {
-                            String notice = "The OverRelation variable should continue to column after the variable.";
-                            throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
-                                    fixedCondition);
-                            return null; // unreachable
-                        }
-                        final String columnStart = rearIndex.substringRear();
-                        final IndexOfInfo indexInfo = Srl.indexOfFirst(columnStart, " ", ",", ")", "\n", "\t");
-                        columnName = indexInfo != null ? indexInfo.substringFront() : columnStart;
-                    }
-                    final InlineViewResource resource = new InlineViewResource();
-                    // the secondArg should be a column DB name, and then rear column is alias name
-                    final String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
-                    resource.addAdditionalColumn(resolvedColumn);
-                    final List<String> splitList = Srl.splitList(targetRelation, ".");
-                    DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
-                    for (String element : splitList) {
-                        final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
-                        resource.addJoinInfo(foreignInfo);
-                        currentDBMeta = foreignInfo.getForeignDBMeta();
-                    }
+                final InlineViewResource resource;
+                if (_inlineViewResourceMap.containsKey(targetRelation)) {
+                    resource = _inlineViewResourceMap.get(targetRelation);
+                } else {
+                    resource = new InlineViewResource();
                     _inlineViewResourceMap.put(targetRelation, resource);
                 }
-            } else {
+                final String columnName;
+                {
+                    final IndexOfInfo rearIndex = Srl.indexOfFirst(relationEndIndex.substringRearTrimmed(), ".");
+                    if (rearIndex == null || rearIndex.getIndex() > 0) {
+                        String notice = "The OverRelation variable should continue to column after the variable.";
+                        throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
+                                fixedCondition);
+                        return null; // unreachable
+                    }
+                    final String columnStart = rearIndex.substringRear();
+                    final IndexOfInfo indexInfo = Srl.indexOfFirst(columnStart, " ", ",", ")", "\n", "\t");
+                    columnName = indexInfo != null ? indexInfo.substringFront() : columnStart;
+                }
+                // the secondArg should be a column DB name, and then rear column is alias name
+                final String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
+                resource.addAdditionalColumn(resolvedColumn);
+                final List<String> splitList = Srl.splitList(targetRelation, ".");
+                DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
+                for (String element : splitList) {
+                    final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
+                    resource.addJoinInfo(foreignInfo);
+                    currentDBMeta = foreignInfo.getForeignDBMeta();
+                }
+            } else { // referrer table
                 final DBMeta pointDBMeta;
                 try {
                     pointDBMeta = _dbmetaProvider.provideDBMeta(pointTable);
@@ -254,6 +257,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     joinSb.append(" = ").append(foreignAlias).append(".").append(foreignColumninfo.getColumnSqlName());
                     ++columnIndex;
                 }
+                relationMap.put(joinInfo, foreignAlias);
                 ++joinIndex;
             }
             final Set<String> additionalColumnSet = resource.getAdditionalColumnSet();
