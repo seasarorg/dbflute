@@ -366,7 +366,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,
-            final Map<ColumnRealName, ColumnRealName> joinOnMap) {
+            Map<ColumnRealName, ColumnRealName> joinOnMap) {
         return new HpFixedConditionQueryResolver(this, foreignCQ, xgetDBMetaProvider());
     }
 

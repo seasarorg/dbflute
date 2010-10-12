@@ -97,7 +97,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
 
             final ConditionQuery relationPointCQ;
             final ConditionQuery columnTargetCQ;
-            if (pointTable.equals(getLocalTableMark())) {
+            if (Srl.equalsPlain(pointTable, getLocalTableMark())) {
                 relationPointCQ = _localCQ;
                 if (targetRelation != null) {
                     columnTargetCQ = invokeColumnTargetCQ(relationPointCQ, targetRelation);
@@ -106,7 +106,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
                     return null; // unreachable
                 }
-            } else if (pointTable.equals(getForeignTableMark())) {
+            } else if (Srl.equalsPlain(pointTable, getForeignTableMark())) {
                 relationPointCQ = _foreignCQ;
                 columnTargetCQ = relationPointCQ;
                 if (targetRelation == null) {
