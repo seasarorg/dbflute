@@ -471,7 +471,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($columnName in $fk.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $fk.getLocalForeignMapping().get($columnName))
-            joinOnMap.put(toColumnRealName("${localColumn.name}"), cq.toColumnRealName("${foreignColumnName}"));
+            joinOnMap.put("${localColumn.name}", "${foreignColumnName}");
 #end
 #if ($fk.hasFixedCondition())
             registerOuterJoin(cq, joinOnMap, "${fk.fixedCondition}");
@@ -514,7 +514,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($columnName in $referrer.foreignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))
-            joinOnMap.put(toColumnRealName("${foreignColumn.name}"), cq.toColumnRealName("${referrerColumnName}"));
+            joinOnMap.put("${foreignColumn.name}", "${referrerColumnName}");
 #end
 #if ($referrer.hasFixedCondition())
             joinOnMap.put(fxcKey(), ppFxCd("${referrer.fixedCondition}", xgetAliasName(), cq.xgetAliasName()));

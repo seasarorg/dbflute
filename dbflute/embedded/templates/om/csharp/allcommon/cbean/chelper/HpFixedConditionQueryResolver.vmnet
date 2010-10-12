@@ -71,17 +71,17 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
             String relationExp = relationEndIndex.substringFront();
             String pointTable;
             String targetRelation;
-            final String secondArg;
+            String secondArg;
             {
-                final IndexOfInfo separatorIndex = Srl.indexOfFirst(relationExp, ".");
+                IndexOfInfo separatorIndex = Srl.indexOfFirst(relationExp, ".");
                 if (separatorIndex != null) {
                     pointTable = separatorIndex.substringFrontTrimmed();
-                    final IndexOfInfo argIndex = Srl.indexOfFirst(separatorIndex.substringRearTrimmed(), ",");
+                    IndexOfInfo argIndex = Srl.indexOfFirst(separatorIndex.substringRearTrimmed(), ",");
                     targetRelation = argIndex != null ? argIndex.substringFrontTrimmed() : separatorIndex
                             .substringRearTrimmed();
                     secondArg = argIndex != null ? argIndex.substringRearTrimmed() : null;
                 } else {
-                    final IndexOfInfo argIndex = Srl.indexOfFirst(relationExp, ",");
+                    IndexOfInfo argIndex = Srl.indexOfFirst(relationExp, ",");
                     pointTable = argIndex != null ? argIndex.substringFrontTrimmed() : Srl.trim(relationExp);
                     targetRelation = null;
                     secondArg = argIndex != null ? argIndex.substringRearTrimmed() : null;
@@ -127,7 +127,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                     }
                     InlineViewResource resource = new InlineViewResource();
                     // the secondArg should be a column DB name, and then rear column is alias name
-                    final String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
+                    String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
                     resource.addAdditionalColumn(resolvedColumn);
                     List<String> splitList = Srl.splitList(targetRelation, ".");
                     DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
