@@ -258,7 +258,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #if ($fk.hasLocalColumnExceptPrimaryKey())
             if (_qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
-                    || _qyCall.qy().getReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
+                    || _qyCall.qy().xgetReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
 #foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
                 Column${col.javaName}(); // FK or one-to-one referrer

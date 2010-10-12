@@ -458,12 +458,12 @@ namespace ${glPackageBaseCommonCBean} {
                 _alreadySpecifiedRequiredColumn = true;
                 doSpecifyRequiredColumn();
             }
-            String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
+            String relationPath = _query.xgetRelationPath() != null ? _query.xgetRelationPath() : "";
             String tableAliasName;
             if (_query.isBaseQuery()) {
                 tableAliasName = _baseCB.SqlClause.getLocalTableAliasName();
             } else {
-                tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.getNestLevel());
+                tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel());
             }
             _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
         }
