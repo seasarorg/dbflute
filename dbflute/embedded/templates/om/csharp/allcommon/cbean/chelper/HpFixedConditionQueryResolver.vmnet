@@ -111,32 +111,35 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                 if (_inlineViewResourceMap == null) {
                     _inlineViewResourceMap = new LinkedHashMap<String, InlineViewResource>();
                 }
-                if (!_inlineViewResourceMap.containsKey(targetRelation)) {
-                    String columnName;
-                    {
-                        IndexOfInfo rearIndex = Srl.indexOfFirst(relationEndIndex.substringRearTrimmed(), ".");
-                        if (rearIndex == null || rearIndex.getIndex() > 0) {
-                            String notice = "The OverRelation variable should continue to column after the variable.";
-                            throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
-                                    fixedCondition);
-                            return null; // unreachable
-                        }
-                        String columnStart = rearIndex.substringRear();
-                        IndexOfInfo indexInfo = Srl.indexOfFirst(columnStart, " ", ",", ")", "\n", "\t");
-                        columnName = indexInfo != null ? indexInfo.substringFront() : columnStart;
-                    }
-                    InlineViewResource resource = new InlineViewResource();
-                    // the secondArg should be a column DB name, and then rear column is alias name
-                    String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
-                    resource.addAdditionalColumn(resolvedColumn);
-                    List<String> splitList = Srl.splitList(targetRelation, ".");
-                    ${glDBMeta} currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
-                    foreach (String element in splitList) {
-                        ${glForeignInfo} foreignInfo = currentDBMeta.FindForeignInfo(element);
-                        resource.addJoinInfo(foreignInfo);
-                        currentDBMeta = foreignInfo.ForeignDBMeta;
-                    }
+                InlineViewResource resource;
+                if (_inlineViewResourceMap.containsKey(targetRelation)) {
+                    resource = _inlineViewResourceMap.get(targetRelation);
+                } else {
+                    resource = new InlineViewResource();
                     _inlineViewResourceMap.put(targetRelation, resource);
+                }
+                String columnName;
+                {
+                    IndexOfInfo rearIndex = Srl.indexOfFirst(relationEndIndex.substringRearTrimmed(), ".");
+                    if (rearIndex == null || rearIndex.getIndex() > 0) {
+                        String notice = "The OverRelation variable should continue to column after the variable.";
+                        throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
+                                fixedCondition);
+                        return null; // unreachable
+                    }
+                    String columnStart = rearIndex.substringRear();
+                    IndexOfInfo indexInfo = Srl.indexOfFirst(columnStart, " ", ",", ")", "\n", "\t");
+                    columnName = indexInfo != null ? indexInfo.substringFront() : columnStart;
+                }
+                // the secondArg should be a column DB name, and then rear column is alias name
+                String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
+                resource.addAdditionalColumn(resolvedColumn);
+                List<String> splitList = Srl.splitList(targetRelation, ".");
+                ${glDBMeta} currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
+                foreach (String element in splitList) {
+                    ${glForeignInfo} foreignInfo = currentDBMeta.FindForeignInfo(element);
+                    resource.addJoinInfo(foreignInfo);
+                    currentDBMeta = foreignInfo.ForeignDBMeta;
                 }
             } else {
                 ${glDBMeta} pointDBMeta;
@@ -237,6 +240,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                     joinSb.append(" = ").append(foreignAlias).append(".").append(foreignColumninfo.ColumnDbName);
                     ++columnIndex;
                 }
+                relationMap.put(joinInfo, foreignAlias);
                 ++joinIndex;
             }
             Set<String> additionalColumnSet = resource.getAdditionalColumnSet();
