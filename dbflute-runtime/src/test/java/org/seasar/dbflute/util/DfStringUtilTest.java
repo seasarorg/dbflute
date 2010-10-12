@@ -94,6 +94,7 @@ import java.util.List;
 
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.Srl.DelimiterInfo;
+import org.seasar.dbflute.util.Srl.IndexOfInfo;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
@@ -217,7 +218,10 @@ public class DfStringUtilTest extends PlainTestCase {
     public void test_indexOfFirst_basic() {
         assertEquals(3, indexOfFirst("foo.bar/baz.qux", ".", "/").getIndex());
         assertEquals(3, indexOfFirst("foo/bar.baz/qux", ".", "/").getIndex());
-        assertEquals(4, indexOfFirst("foo.bar/baz.qux", ".", "/").getRearIndex());
+        IndexOfInfo info = indexOfFirst("foo.bar/baz.qux", ".", "/");
+        assertEquals(4, info.getRearIndex());
+        assertEquals("foo", info.substringFront());
+        assertEquals("bar/baz.qux", info.substringRear());
         assertNull(indexOfFirst("foo.bar/baz.qux", "O", "A"));
     }
 

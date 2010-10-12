@@ -350,7 +350,7 @@ public class Srl {
         protected String _delimiter;
 
         public String substringFront() {
-            return _baseString.substring(getIndex());
+            return _baseString.substring(0, getIndex());
         }
 
         public String substringFrontTrimmed() {
