@@ -161,6 +161,9 @@ $database.checkProperties()
 #set ($glUnionQuery = "${glProjectPrefix}UnionQuery")
 #set ($glOrQuery = "${glProjectPrefix}OrQuery")
 
+## [Allcommon-ConditionBean-Helper]
+#set ($glHpFixedConditionQueryResolver = "${glProjectPrefix}HpFixedConditionQueryResolver")
+
 ## [Allcommon-ConditionBean-Option]
 #set ($glConditionOption = "${glProjectPrefix}ConditionOption")
 #set ($glSimpleStringOption = "${glProjectPrefix}SimpleStringOption")
@@ -408,6 +411,8 @@ $database.checkProperties()
 
 ## [Allcommon-Util]
 #set ($glDfCollectionUtil = "${glProjectPrefix}DfCollectionUtil")
+#set ($glDfStringUtil = "${glProjectPrefix}DfStringUtil")
+#set ($glDfSystemUtil = "${glProjectPrefix}DfSystemUtil")
 #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
 #set ($glSimpleResourceUtil = "${glProjectPrefix}SimpleResourceUtil")
 #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
@@ -447,6 +452,7 @@ $database.checkProperties()
 #set ($glPackageBaseCommonCBeanPagenaviRange = "${database.baseCommonPackage}.CBean.PageNavi.Range")
 #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.CBean.SClause")
 #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.CBean.CValue")
+#set ($glPackageBaseCommonCHelper = "${database.baseCommonPackage}.CBean.CHelper")
 #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.CBean.COption")
 #set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.CBean.COption.Parts")
 #set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.CBean.COption.Parts.Local")
@@ -773,6 +779,16 @@ $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_is
 $database.info("    parseConditionKey_isNotNull")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKey}IsNotNull.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ckey/ConditionKey_isNotNull.${glTemplateFileExtension}",$path ,"", "")
+
+## -----------------------------------------------------
+##             allcommon condition-bean condition-option
+##             -----------------------------------------
+#set ($path = $database.getPackageAsPath(${glPackageBaseCommonCHelper}))
+$database.makeDirectory($path)
+
+$database.info("    parseConditionHelper")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCHelper})}${glHpFixedConditionQueryResolver}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/HpFixedConditionQueryResolver.${glTemplateFileExtension}",$path ,"", "")
 
 ## -----------------------------------------------------
 ##             allcommon condition-bean condition-option
@@ -1473,6 +1489,12 @@ $database.makeDirectory($path)
 
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glDfCollectionUtil}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/util/DfCollectionUtil.${glTemplateFileExtension}",$path,"", "")
+
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glDfStringUtil}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/util/DfStringUtil.${glTemplateFileExtension}",$path,"", "")
+
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glDfSystemUtil}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/util/DfSystemUtil.${glTemplateFileExtension}",$path,"", "")
 
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleAssertUtil}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleAssertUtil.${glTemplateFileExtension}",$path,"", "")

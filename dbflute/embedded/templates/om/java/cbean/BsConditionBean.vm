@@ -56,7 +56,7 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                     ===============
     @Override
     protected DBMetaProvider getDBMetaProvider() {
-        return new ${glDBMetaInstanceHandler}(); // as default
+        return ${glDBMetaInstanceHandler}.getProvider(); // as default
     }
 
     // ===================================================================================

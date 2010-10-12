@@ -565,7 +565,7 @@ namespace ${glPackageBaseCQ} {
         public abstract String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery);
 #end
 
-        public override String ToString() { return getSqlClause().getClause(); }
+        public override String ToString() { return xgetSqlClause().getClause(); }
 #if ($database.isDatabaseMSAccess())
 
         protected override bool xsuppressEscape() { return true; } // bacause MS-Access does not support escape

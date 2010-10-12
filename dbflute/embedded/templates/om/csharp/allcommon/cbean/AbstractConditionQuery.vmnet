@@ -58,7 +58,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-	protected bool _onClauseInline;
+	protected bool _onClause;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -73,6 +73,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                     DBMeta Provider
     //                                                                     ===============
+    protected DBMetaProvider xgetDBMetaProvider() {
+        return ${glDBMetaInstanceHandler}.getProvider();
+    }
+
     protected ${glDBMeta} findDBMeta(String tableFlexibleName) {
         return ${glDBMetaInstanceHandler}.FindDBMeta(tableFlexibleName);
     }
@@ -86,44 +90,40 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
-    public ${glConditionQuery} getReferrerQuery() {
+    public ${glConditionQuery} xgetReferrerQuery() {
         return _referrerQuery;
     }
 
-    public ${glSqlClause} getSqlClause() {
+    public ${glSqlClause} xgetSqlClause() {
         return _sqlClause;
     }
 
-    public String getAliasName() {
+    public String xgetAliasName() {
         return _aliasName;
     }
 
-    public int getNestLevel() {
+    public int xgetNestLevel() {
         return _nestLevel;
     }
 
-    public int getNextNestLevel() {
+    public int xgetNextNestLevel() {
         return _nestLevel+1;
     }
 
     public bool isBaseQuery() {
-        return (getReferrerQuery() == null);
+        return (xgetReferrerQuery() == null);
     }
 
-	public int getSubQueryLevel() {
+	public int xgetSubQueryLevel() {
 	    return _subQueryLevel;
 	}
 
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
-    public String getRealAliasName() {
-	    return getAliasName();
-    }
-
-    public String getRealColumnName(String columnName) {
+    public String toColumnRealName(String columnName) {
         assertColumnName(columnName);
-        return buildRealColumnName(getRealAliasName(), columnName);
+        return buildRealColumnName(xgetAliasName(), columnName);
     }
 
 	protected String buildRealColumnName(String aliasName, String columnName) {
@@ -133,7 +133,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          Foreign Info
     //                                          ------------
-    public String getForeignPropertyName() {
+    public String xgetForeignPropertyName() {
         return _foreignPropertyName;
     }
 
@@ -141,7 +141,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         this._foreignPropertyName = foreignPropertyName;
     }
 
-    public String getRelationPath() {
+    public String xgetRelationPath() {
         return _relationPath;
     }
 
@@ -152,18 +152,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-	public void xsetOnClauseInline(bool onClauseInline) {
-	    _onClauseInline = onClauseInline;
+	public void xsetOnClause(bool onClause) {
+	    _onClause = onClause;
 	}
 
-    // ===================================================================================
-    //                                                                            Location
-    //                                                                            ========
-    protected String getLocation(String columnPropertyName, ${glConditionKey} key) {
-        return getLocationBase(columnPropertyName) + "." + key.getConditionKey();
-    }
-
-    protected String getLocationBase() {
+    // -----------------------------------------------------
+    //                                              Location
+    //                                              --------
+    public String xgetLocationBase() {
         StringBuilder sb = new StringBuilder();
         ${glConditionQuery} query = this;
         while (true) {
@@ -171,7 +167,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 sb.insert(0, CQ_PROPERTY + ".");
                 break;
             } else {
-                String foreignPropertyName = query.getForeignPropertyName();
+                String foreignPropertyName = query.xgetForeignPropertyName();
                 if (foreignPropertyName == null) {
                     String msg = "The foreignPropertyName of the query should not be null:";
                     msg = msg + " query=" + query;
@@ -179,23 +175,27 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 }
                 sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
             }
-            query = query.getReferrerQuery();
+            query = query.xgetReferrerQuery();
         }
         return sb.toString();
     }
 
-    protected String getLocationBase(String columnPropertyName) {
-        return getLocationBase() + columnPropertyName;
+    protected String getLocation(String columnPropertyName, ${glConditionKey} key) {
+        return xgetLocationBase(columnPropertyName) + "." + key.getConditionKey();
+    }
+
+    protected String xgetLocationBase(String columnPropertyName) {
+        return xgetLocationBase() + columnPropertyName;
     }
 
     // ===================================================================================
     //                                                                  Nested SetupSelect
     //                                                                  ==================
     public void doNss(NssCall callback) { // Very Internal
-        String foreignPropertyName = callback.Invoke().getForeignPropertyName();
-        String foreignTableAliasName = callback.Invoke().getRealAliasName();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, getRelationPath());
-        getSqlClause().registerSelectedForeignInfo(callback.Invoke().getRelationPath(), foreignPropertyName);
+        String foreignPropertyName = callback.Invoke().xgetForeignPropertyName();
+        String foreignTableAliasName = callback.Invoke().xgetAliasName();
+        xgetSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, xgetRelationPath());
+        xgetSqlClause().registerSelectedForeignInfo(callback.Invoke().xgetRelationPath(), foreignPropertyName);
     }
     
     public delegate ${glConditionQuery} NssCall(); // Very Internal
@@ -203,116 +203,29 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap) {
-        registerOuterJoin(cq, joinOnMap, null);
+    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnResourceMap) {
+        registerOuterJoin(cq, joinOnResourceMap, null);
     }
 
-    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnMap, String fixedCondition) {
-        // resolve variables on fixed condition
-        if (fixedCondition != null) {
-            fixedCondition = resolveFixedCondition(cq, joinOnMap, fixedCondition);
+    protected virtual void registerOuterJoin(${glConditionQuery} cq, Map<String, String> joinOnResourceMap, String fixedCondition) {
+        // translate join-on map using column real name
+        Map<String, String> joinOnMap = newLinkedHashMap();
+        Set<Entry<String, String>> entrySet = joinOnResourceMap.entrySet();
+        foreach (Entry<String, String> entry in entrySet) {
+            final String local = entry.getKey();
+            final String foreign = entry.getValue();
+            joinOnMap.put(toColumnRealName(local), foreignCQ.toColumnRealName(foreign));
         }
         String localDbName = getTableDbName();
         String foreignDbName = cq.getTableDbName();
-        String foreignAliasName = cq.getAliasName();
-        getSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnMap, fixedCondition);
+        String foreignAliasName = cq.xgetAliasName();
+        FixedConditionResolver resolver = createFixedConditionResolver(foreignCQ, joinOnMap);
+        xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnMap, fixedCondition);
     }
 
-    protected virtual String resolveFixedCondition(${glConditionQuery} cq, Map<String, String> joinOnMap, String fixedCondition) {
-        String localAliasName = getAliasName();
-        String foreignAliasName = cq.getAliasName();
-        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatible
-        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
-        fixedCondition = resolveFixedConditionOverRelation(cq, joinOnMap, fixedCondition);
-        return fixedCondition;
-    }
-
-    protected virtual String resolveFixedConditionOverRelation(${glConditionQuery} cq
-            , Map<String, String> joinOnMap, String fixedCondition) {
-        String relationBeginMark = "$$over(";
-        String relationEndMark = ")$$";
-        String remainder = fixedCondition;
-        while (true) {
-            int relationBeginIndex = remainder.IndexOf(relationBeginMark);
-            if (relationBeginIndex < 0) {
-                break;
-            }
-            remainder = remainder.Substring(relationBeginIndex + relationBeginMark.Length);
-            int relationEndIndex = remainder.IndexOf(relationEndMark);
-            if (relationEndIndex < 0) {
-                break;
-            }
-            String relationExp = remainder.Substring(0, relationEndIndex);
-            int separatorIndex = relationExp.IndexOf(".");
-            String pointTable;
-            String targetRelation;
-            if (separatorIndex >= 0) {
-                pointTable = relationExp.Substring(0, separatorIndex).Trim();
-                targetRelation = relationExp.Substring(separatorIndex + ".".Length).Trim();
-            } else {
-                pointTable = relationExp.Trim();
-                targetRelation = null;
-            }
-            ${glDBMeta} pointDBMeta;
-            try {
-                pointDBMeta = findDBMeta(pointTable);
-            } catch (DBMetaNotFoundException e) {
-                String notice = "The table for relation on fixed condition does not exist.";
-                throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition, e);
-                return null; // unreachable
-            }
-            ${glConditionQuery} relationPointCQ;
-            bool localPoint;
-            if (pointDBMeta.TableDbName.Equals(getTableDbName())) { // point is local
-                relationPointCQ = this;
-                localPoint = true;
-            } else {
-                ${glConditionQuery} referrerQuery = getReferrerQuery();
-                while (true) {
-                    if (referrerQuery == null) { // base query
-                        break;
-                    }
-                    if (pointDBMeta.TableDbName.Equals(referrerQuery.getTableDbName())) {
-                        break;
-                    }
-                    referrerQuery = referrerQuery.getReferrerQuery();
-                }
-                relationPointCQ = referrerQuery;
-                if (relationPointCQ == null) {
-                    String notice = "The table for relation on fixed condition was not found in the scope.";
-                    throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition);
-                    return null; // unreachable
-                }
-                localPoint = false;
-            }
-            ${glConditionQuery} columnTargetCQ;
-            if (targetRelation != null) {
-                columnTargetCQ = relationPointCQ.invokeForeignCQ(targetRelation);
-            } else {
-                if (localPoint) {
-                    String notice = "The relation on fixed condition is required if the table is on many-to-one.";
-                    throwIllegalFixedConditionOverRelationException(notice, pointTable, null, fixedCondition);
-                }
-                columnTargetCQ = relationPointCQ;
-            }
-            String relationVariable = relationBeginMark + relationExp + relationEndMark;
-            String relationAlias = columnTargetCQ.getAliasName();
-            fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
-
-            // after case for loop
-            remainder = remainder.Substring(relationEndIndex + relationEndMark.Length);
-
-            // for prevent from processing same one
-            remainder = replaceString(remainder, relationVariable, relationAlias);
-        }
-        return fixedCondition;
-    }
-
-    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName
-            , String relationName, String fixedCondition) {
-        throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, null);
+    protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,
+            Map<String, String> joinOnMap) {
+        return new ${glHpFixedConditionQueryResolver}(this, foreignCQ, xgetDBMetaProvider());
     }
 
     protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName
@@ -409,15 +322,15 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected virtual bool isValidQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
-        String realColumnName = getRealColumnName(colName);
+        String realColumnName = toColumnRealName(colName);
         if (key.isValidRegistration(cvalue, value, realColumnName)) {
             return true;
         } else {
-            if (getSqlClause().isCheckInvalidQuery()) {
+            if (xgetSqlClause().isCheckInvalidQuery()) {
                 throwInvalidQueryRegisteredException(key, cvalue, realColumnName);
                 return false; // unreachable
             } else {
-                getSqlClause().registerInvalidQueryColumn(realColumnName, key);
+                xgetSqlClause().registerInvalidQueryColumn(realColumnName, key);
                 return false;
             }
         }
@@ -462,17 +375,17 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
-        int inScopeLimit = getSqlClause().getInScopeLimit();
+        int inScopeLimit = xgetSqlClause().getInScopeLimit();
         if (inScopeLimit > 0 && value.Count > inScopeLimit) {
             // if the key is for inScope, it should be split as 'or'
             // (if the key is for notInScope, it should be split as 'and')
-            bool alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+            bool alreadyOrScopeQuery = xgetSqlClause().isOrScopeQueryEffective();
             if (isConditionKeyInScope(key)) {
                 // if or-scope query has already been effective, create new or-scope
-                getSqlClause().makeOrScopeQueryEffective();
+                xgetSqlClause().makeOrScopeQueryEffective();
             } else {
                 if (alreadyOrScopeQuery) {
-                    getSqlClause().beginOrScopeQueryAndPart();
+                    xgetSqlClause().beginOrScopeQueryAndPart();
                 }
             }
 
@@ -490,10 +403,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 }
             } finally {
                 if (isConditionKeyInScope(key)) {
-                    getSqlClause().closeOrScopeQuery();
+                    xgetSqlClause().closeOrScopeQuery();
                 } else {
                     if (alreadyOrScopeQuery) {
-                        getSqlClause().endOrScopeQueryAndPart();
+                        xgetSqlClause().endOrScopeQueryAndPart();
                     }
                 }
             }
@@ -630,9 +543,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String capPropName = initCap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If CSharp, it is necessary to use capPropName!
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
+            xgetSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
         } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
+            xgetSqlClause().registerOuterJoinInlineWhereClause(xgetAliasName(), colName, key, cvalue, _onClause);
         }
     }
 
@@ -646,9 +559,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String capPropName = initCap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
+            xgetSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
         } else {
-			getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option, _onClauseInline);
+			xgetSqlClause().registerOuterJoinInlineWhereClause(xgetAliasName(), colName, key, cvalue, option, _onClause);
         }
     }
 
@@ -673,10 +586,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = realColumnName + " " + inScopeOption
                      + "in (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
@@ -684,12 +597,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected virtual String getInScopeSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
+        return toColumnRealName(columnName);
     }
 
     protected virtual String getInScopeSubQuerySql(${glConditionQuery} subQuery
                                  , String relatedColumnName, String propertyName) {
-        String tableAliasName = getSqlClause().getLocalTableAliasName();
+        String tableAliasName = xgetSqlClause().getLocalTableAliasName();
         String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
         String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                  , selectClause, tableAliasName);
@@ -717,10 +630,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = existsOption + "exists (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
         registerWhereClause(clause);
@@ -731,12 +644,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     protected virtual String getExistsSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
+        return toColumnRealName(columnName);
     }
 
     protected virtual String getExistsSubQuerySql(${glConditionQuery} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
-		int subQueryLevel = subQuery.getSubQueryLevel();
+		int subQueryLevel = subQuery.xgetSubQueryLevel();
 		String tableAliasName = "dfsublocal_" + subQueryLevel;
         String selectClause = "select " + tableAliasName + "." + relatedColumnName;
         String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
@@ -757,35 +670,35 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName
                                                                    , relatedColumnName, propertyName, aliasName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + aliasName + endMark;
-        getSqlClause().specifyDeriveSubQuery(aliasName, clause);
+        xgetSqlClause().specifyDeriveSubQuery(aliasName, clause);
     }
 
     protected String getSpecifyDerivedReferrerRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
+        return toColumnRealName(columnName);
     }
 
     protected String getSpecifyDerivedReferrerSubQuerySql(String function, ${glConditionQuery} subQuery
                                                         , String realColumnName, String relatedColumnName
                                                         , String propertyName, String aliasName) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
         }
         assertSpecifyDerivedReferrerColumnType(function, subQuery, deriveColumnName);
-        subQuery.getSqlClause().clearSpecifiedSelectColumn();
+        subQuery.xgetSqlClause().clearSpecifiedSelectColumn();
         String connect = xbuildFunctionConnector(function);
-        if (subQuery.getSqlClause().hasUnionQuery()) {
+        if (subQuery.xgetSqlClause().hasUnionQuery()) {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
             if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
@@ -912,12 +825,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName
                                                                  , relatedColumnName, propertyName, value);
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
-        String parameter = "/*pmb." + getLocationBase(parameterPropertyName) + "*/null";
+        String parameter = "/*pmb." + xgetLocationBase(parameterPropertyName) + "*/null";
         String clause = "(" + beginMark
                       + subQueryClause + ln() + endIndent
                       + ") " + operand + " " + parameter + " " + endMark;
@@ -925,25 +838,25 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected String getQueryDerivedReferrerRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
+        return toColumnRealName(columnName);
     }
 
     protected String getQueryDerivedReferrerSubQuerySql(String function, ${glConditionQuery} subQuery
                                                       , String realColumnName, String relatedColumnName
                                                       , String propertyName, Object value) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
         }
         assertQueryDerivedReferrerColumnType(function, subQuery, deriveColumnName, value);
-        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        subQuery.xgetSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         String connect = xbuildFunctionConnector(function);
-        if (subQuery.getSqlClause().hasUnionQuery()) {
+        if (subQuery.xgetSqlClause().hasUnionQuery()) {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
             if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
@@ -1236,7 +1149,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         // Get the specified column before it disappears at sub-query making.
         String deriveRealColumnName;
         {
-            String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+            String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
             if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
                 throwScalarSubQueryInvalidColumnSpecificationException(function);
             }
@@ -1245,10 +1158,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = deriveRealColumnName + " " + operand + " ("
                       + beginMark + subQueryClause + ln() + endIndent
@@ -1257,19 +1170,19 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected String getScalarSubQueryRealColumnName(String columnName) {
-        return getRealColumnName(columnName);
+        return toColumnRealName(columnName);
     }
 
     protected String getScalarSubQuerySql(String function, ${glConditionQuery} subQuery
                                         , String propertyName) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwScalarSubQueryInvalidColumnSpecificationException(function);
         }
         assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
-        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        subQuery.xgetSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The scalar-sub-query is unsupported when no primary key or two-or-more primary keys:";
@@ -1277,10 +1190,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             throw new UnsupportedOperationException(msg);
         }
         String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
-        if (subQuery.getSqlClause().hasUnionQuery()) {
+        if (subQuery.xgetSqlClause().hasUnionQuery()) {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             String selectClause = "select " + tableAliasName + "." + primaryKeyName
                                      + ", " + tableAliasName + "." + deriveColumnName;
             String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName
@@ -1400,7 +1313,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                      , String propertyName
                                                      , String selectClause
                                                      , String tableAliasName) {
-        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
+        String fromWhereClause = subQuery.xgetSqlClause().getClauseFromWhereWithUnionTemplate();
         
         // Replace the alias names for local table with alias name of sub-query unique.
         // However when it's inScope this replacement is unnecessary so comment out here. 
@@ -1411,12 +1324,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
 
         // Resolve the location path for the condition-query of sub-query. 
-        fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + getLocationBase(propertyName) + ".");
+        fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + xgetLocationBase(propertyName) + ".");
 
 		// Replace template marks. These are very important!
-		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
-		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "");
-		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), "");
+		fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionSelectClauseMark(), selectClause);
+		fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereClauseMark(), "");
+		fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereFirstConditionMark(), "");
 		return fromWhereClause;
     }
 
@@ -1426,28 +1339,28 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                            , String selectClause
                                                            , String tableAliasName
                                                            , String realColumnName) {
-        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
+        String fromWhereClause = subQuery.xgetSqlClause().getClauseFromWhereWithWhereUnionTemplate();
 
         // Replace the alias names for local table with alias name of sub-query unique. 
         fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
         
         // Resolve the location path for the condition-query of sub-query. 
-        fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + getLocationBase(propertyName) + ".");
+        fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + xgetLocationBase(propertyName) + ".");
         
         String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
         String firstConditionAfter = ln() + "   and ";
         
         // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return fromWhereClause;
     }
 
     protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQuery} subQuery) { // Very Internal
-        int subQueryLevel = subQuery.getSubQueryLevel();
+        int subQueryLevel = subQuery.xgetSubQueryLevel();
         if (_subQueryLevel <= subQueryLevel) {
             _subQueryLevel = subQueryLevel + 1;
         }
@@ -1484,7 +1397,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String capPropName = initCap(propertyName);
         // If CSharp, it is necessary to use capPropName!
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key));
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
+        xgetSqlClause().registerWhereClause(toColumnRealName(colName), key, cvalue);
     }
 
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
@@ -1494,18 +1407,18 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String capPropName = initCap(propertyName);
         // If CSharp, it is necessary to use capPropName!
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
+        xgetSqlClause().registerWhereClause(toColumnRealName(colName), key, cvalue, option);
     }
 	
     protected virtual void registerWhereClause(String whereClause) {
-        getSqlClause().registerWhereClause(whereClause);
+        xgetSqlClause().registerWhereClause(whereClause);
     }
 
     protected virtual void registerInlineWhereClause(String whereClause) {
         if (isBaseQuery()) {
-            getSqlClause().registerBaseTableInlineWhereClause(whereClause);
+            xgetSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClauseInline);
+            xgetSqlClause().registerOuterJoinInlineWhereClause(xgetAliasName(), whereClause, _onClause);
         }
     }
 
@@ -1516,15 +1429,15 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
 		
 		// At the future, building SQL will be moved to sqlClause.
-        getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
+        xgetSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
 
     protected String getUnionQuerySql(${glConditionQuery} unionQuery, String unionQueryPropertyName) {
-	    String fromClause = unionQuery.getSqlClause().getFromClause();
-		String whereClause = unionQuery.getSqlClause().getWhereClause();
+	    String fromClause = unionQuery.xgetSqlClause().getFromClause();
+		String whereClause = unionQuery.xgetSqlClause().getWhereClause();
 		String unionQueryClause;
 		if (whereClause.Trim().Length <= 0) {
-		    unionQueryClause = fromClause + " " + getSqlClause().getUnionWhereClauseMark();
+		    unionQueryClause = fromClause + " " + xgetSqlClause().getUnionWhereClauseMark();
 		} else {
 		    int whereIndex = whereClause.IndexOf("where ");
 		    if (whereIndex < 0) {
@@ -1532,7 +1445,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 			    throw new IllegalStateException(msg);
 			}
 			int clauseIndex = whereIndex + "where ".Length;
-			String mark = getSqlClause().getUnionWhereFirstConditionMark();
+			String mark = xgetSqlClause().getUnionWhereFirstConditionMark();
 			String markedClause = whereClause.Substring(0, clauseIndex) + mark + whereClause.Substring(clauseIndex);
 			unionQueryClause = fromClause + " " + markedClause;
 		}
@@ -1558,32 +1471,32 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
-        getSqlClause().changeToInnerJoin(getRealAliasName());
+        xgetSqlClause().changeToInnerJoin(xgetAliasName());
     }
 
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
 	public void WithNullsFirst() {// is User Public!
-	    getSqlClause().addNullsFirstToPreviousOrderBy();
+	    xgetSqlClause().addNullsFirstToPreviousOrderBy();
 	}
 	
 	public void WithNullsLast() {// is User Public!
-	    getSqlClause().addNullsLastToPreviousOrderBy();
+	    xgetSqlClause().addNullsLastToPreviousOrderBy();
 	}
 
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
-        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+        if (!xgetSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        getSqlClause().registerOrderBy(aliasName, null, true);
+        xgetSqlClause().registerOrderBy(aliasName, null, true);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Desc(String aliasName) {
-        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+        if (!xgetSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        getSqlClause().registerOrderBy(aliasName, null, false);
+        xgetSqlClause().registerOrderBy(aliasName, null, false);
     }
 
     protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
@@ -1628,7 +1541,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     public void registerOrderBy(String columnName, bool ascOrDesc) {
-        getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
+        xgetSqlClause().registerOrderBy(toColumnRealName(columnName), null, ascOrDesc);
     }
 
     protected void regOBA(String columnName) {
@@ -1643,15 +1556,15 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                                                       Name Resolver
     //                                                                       =============
     protected String resolveJoinAliasName(String relationPath, int nestLevel) {
-        return getSqlClause().resolveJoinAliasName(relationPath, nestLevel);
+        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
     }
 
     protected String resolveNestLevelExpression(String name) {
-        return getSqlClause().resolveNestLevelExpression(name, getNestLevel());
+        return xgetSqlClause().resolveNestLevelExpression(name, xgetNestLevel());
     }
 
 	protected String resolveNextRelationPath(String tableName, String relationPropertyName) {
-	    int relationNo = getSqlClause().resolveRelationNo(tableName, relationPropertyName);
+	    int relationNo = xgetSqlClause().resolveRelationNo(tableName, relationPropertyName);
         String nextRelationPath = "_" + relationNo;
         if (_relationPath != null) {
             nextRelationPath = _relationPath + nextRelationPath;
@@ -1936,7 +1849,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     public override String ToString() {
         return GetType().Name + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel
 		     + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
-			 + ", relationPath=" + _relationPath + ", onClauseInline=" + _onClauseInline + "}";
+			 + ", relationPath=" + _relationPath + ", onClause=" + _onClause + "}";
     }
 }
 

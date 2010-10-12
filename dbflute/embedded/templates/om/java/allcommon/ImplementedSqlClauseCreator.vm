@@ -31,7 +31,7 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 	 * @return SQL clause. (NotNull)
 	 */
     public SqlClause createSqlClause(String tableDbName) {
-        DBMetaProvider dbmetaProvider = new ${glDBMetaInstanceHandler}();
+        DBMetaProvider dbmetaProvider = ${glDBMetaInstanceHandler}.getProvider();
         SqlClause sqlClause = doCreateSqlClause(tableDbName, dbmetaProvider);
         setupSqlClauseOption(sqlClause);
         return sqlClause;

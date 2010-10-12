@@ -40,12 +40,12 @@ public interface ${myClassName} {
                                            , String localTableName
                                            , String foreignPropertyName
                                            , String localRelationPath);
-    
+
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
     void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<String, String> joinOnMap, String fixedCondition);
+            Map<String, String> joinOnMap, String fixedCondition, FixedConditionResolver fixedConditionResolver);
     void changeToInnerJoin(String aliasName);
     ${glSqlClause} makeInnerJoinEffective();
     ${glSqlClause} backToOuterJoin();
@@ -254,5 +254,8 @@ public interface ${myClassName} {
         }
     }
 
-    public delegate String FixedConditionResolver(String fixedCondition);
+    public interface FixedConditionResolver {
+        String resolveVariable(String fixedCondition);
+        String resolveFixedInlineView(String foreignTable);
+    }
 }

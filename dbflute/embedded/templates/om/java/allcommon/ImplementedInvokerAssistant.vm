@@ -103,7 +103,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected DBMetaProvider createDBMetaProvider() {
-        return new ${glDBMetaInstanceHandler}();
+        return ${glDBMetaInstanceHandler}.getProvider();
     }
 
     // -----------------------------------------------------

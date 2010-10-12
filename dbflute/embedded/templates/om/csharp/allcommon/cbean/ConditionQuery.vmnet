@@ -17,17 +17,17 @@ public interface ${glConditionQuery} {
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
-    ${glConditionQuery} getReferrerQuery();
-    ${glSqlClause} getSqlClause();
-    String getAliasName();
-    String getRealAliasName();
-    String getRealColumnName(String columnName);
-    int getNestLevel();
-    int getNextNestLevel();
+    ${glConditionQuery} xgetReferrerQuery();
+    ${glSqlClause} xgetSqlClause();
+    String xgetAliasName();
+    String toColumnRealName(String columnName);
+    int xgetNestLevel();
+    int xgetNextNestLevel();
     bool isBaseQuery();
-	int getSubQueryLevel();
-	String getForeignPropertyName();
-    String getRelationPath();
+	int xgetSubQueryLevel();
+	String xgetForeignPropertyName();
+    String xgetRelationPath();
+    String xgetLocationBase();
 	
     // ===================================================================================
     //                                                                 Reflection Invoking

@@ -568,11 +568,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected String getLeftOuterJoinClause() {
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
-            String aliasName = ite.next();
-            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-            String joinTableDbName = joinInfo.getJoinTableDbName();
+            String foreignAliasName = ite.next();
+            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(foreignAliasName);
+            String foreignTableDbName = joinInfo.getForeignTableDbName();
             Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
-            assertJoinOnMapNotEmpty(joinOnMap, aliasName);
+            assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
 
             sb.append(ln()).append("   ");
             if (joinInfo.isInnerJoin()) {
@@ -580,14 +580,20 @@ public abstract class ${myClassName} : ${glSqlClause} {
             } else {
                 sb.append(" left outer join "); // is main!
             }
-            String tableSqlName = findDBMeta(joinTableDbName).TableSqlName;
+            String foreignTableSqlName = findDBMeta(foreignTableDbName).TableSqlName;
             List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+            String tableExp;
             if (inlineWhereClauseList.isEmpty()) {
-                sb.append(tableSqlName);
+                tableExp = foreignTableSqlName;
             } else {
-                sb.append(getInlineViewClause(tableSqlName, inlineWhereClauseList));
+                tableExp = getInlineViewClause(foreignTableSqlName, inlineWhereClauseList);
             }
-            sb.append(" ").append(aliasName);
+            if (joinInfo.hasFixedCondition()) {
+                sb.append(joinInfo.resolveFixedInlineView(tableExp));
+            } else {
+                sb.append(tableExp);
+            }
+            sb.append(" ").append(foreignAliasName);
             if (joinInfo.hasInlineOrOnClause() || joinInfo.hasFixedCondition()) {
                 sb.append(ln()).append("     "); // only when additional conditions exist
             }
@@ -623,9 +629,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return false; // as default
     }
 
-    protected String getInlineViewClause(String joinTableDbName, List<String> inlineWhereClauseList) {
+    protected String getInlineViewClause(String foreignTableDbName, List<String> inlineWhereClauseList) {
         StringBuilder sb = new StringBuilder();
-        sb.append("(select * from ").append(joinTableDbName).append(" where ");
+        sb.append("(select * from ").append(foreignTableDbName).append(" where ");
         int count = 0;
         for (Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
             String clauseElement = ite.next();
@@ -786,19 +792,25 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    public virtual void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<String, String> joinOnMap, String fixedCondition) {
+    public virtual void registerOuterJoin(String baseTableDbName, String foreignTableDbName, String aliasName,
+            Map<String, String> joinOnMap, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
         LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
         joinInfo.setAliasName(aliasName);
-        joinInfo.setBaseTableDbName(baseTableDbName);
-        joinInfo.setJoinTableDbName(joinTableDbName);
+        joinInfo.setLocalTableDbName(baseTableDbName);
+        joinInfo.setForeignTableDbName(foreignTableDbName);
         joinInfo.setJoinOnMap(joinOnMap);
         joinInfo.setFixedCondition(fixedCondition);
+        joinInfo.setFixedConditionResolver(fixedConditionResolver);
         if (_innerJoinEffective) { // basically false
             joinInfo.setInnerJoin(true);
         }
+
+        // it should be resolved before registration because
+        // the process may have Query(Relation) as precondition
+        joinInfo.resolveFixedCondition();
+
         _outerJoinMap.put(aliasName, joinInfo);
     }
 
@@ -824,12 +836,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     protected class LeftOuterJoinInfo {
         protected String _aliasName;
-        protected String _baseTableDbName;
-        protected String _joinTableDbName;
+        protected String _localTableDbName;
+        protected String _foreignTableDbName;
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
         protected String _fixedCondition;
+        protected FixedConditionResolver _fixedConditionResolver;
         protected bool _innerJoin;
         public bool hasInlineOrOnClause() {
             return !_inlineWhereClauseList.isEmpty() || !_additionalOnClauseList.isEmpty();
@@ -837,23 +850,34 @@ public abstract class ${myClassName} : ${glSqlClause} {
         public bool hasFixedCondition() {
             return _fixedCondition != null && _fixedCondition.Trim().Length > 0;
         }
+        public void resolveFixedCondition() { // required before using fixed-condition
+            if (hasFixedCondition() && _fixedConditionResolver != null) {
+                _fixedCondition = _fixedConditionResolver.resolveVariable(_fixedCondition);
+            }
+        }
+        public String resolveFixedInlineView(String foreignTableSqlName) {
+            if (hasFixedCondition() && _fixedConditionResolver != null) {
+                return _fixedConditionResolver.resolveFixedInlineView(foreignTableSqlName);
+            }
+            return foreignTableSqlName.toString();
+        }
         public String getAliasName() {
             return _aliasName;
         }
         public void setAliasName(String value) {
             _aliasName = value;
         }
-        public String getBaseTableDbName() {
-            return _baseTableDbName;
+        public String getLocalTableDbName() {
+            return _localTableDbName;
         }
-        public void setBaseTableDbName(String baseTableDbName) {
-            _baseTableDbName = baseTableDbName;
+        public void setLocalTableDbName(String localTableDbName) {
+            _localTableDbName = localTableDbName;
         }
-        public String getJoinTableDbName() {
-            return _joinTableDbName;
+        public String getForeignTableDbName() {
+            return _foreignTableDbName;
         }
-        public void setJoinTableDbName(String joinTableDbName) {
-            _joinTableDbName = joinTableDbName;
+        public void setForeignTableDbName(String foreignTableDbName) {
+            _foreignTableDbName = foreignTableDbName;
         }
         public List<String> getInlineWhereClauseList() {
             return _inlineWhereClauseList;
@@ -878,6 +902,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         public void setFixedCondition(String fixedCondition) {
             _fixedCondition = fixedCondition;
+        }
+        public FixedConditionResolver getFixedConditionResolver() {
+            return _fixedConditionResolver;
+        }
+        public void setFixedConditionResolver(FixedConditionResolver fixedConditionResolver) {
+            _fixedConditionResolver = fixedConditionResolver;
         }
         public bool isInnerJoin() {
             return _innerJoin;

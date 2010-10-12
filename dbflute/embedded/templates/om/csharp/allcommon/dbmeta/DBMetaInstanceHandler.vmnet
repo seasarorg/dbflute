@@ -9,7 +9,12 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonDBMeta} {
 
-    public class ${myClassName} {
+    public interface DBMetaProvider {
+        ${glDBMeta} provideDBMeta(String tableFlexibleName);
+        ${glDBMeta} provideDBMetaChecked(String tableFlexibleName);
+    }
+
+    public class ${myClassName} : DBMetaProvider {
 
         // ===============================================================================
         //                                                                    Resource Map
@@ -98,6 +103,23 @@ namespace ${glPackageBaseCommonDBMeta} {
         protected static bool IsInitialized { get {
             return _tableDbNameInstanceMap.size() == _tableDbNameClassNameMap.size();
         }}
+
+        // ===============================================================================
+        //                                                              Provider Singleton
+        //                                                              ==================
+        protected static readonly DBMetaProvider _provider = new ${glDBMetaInstanceHandler}();
+
+        public static DBMetaProvider getProvider() {
+            return _provider;
+        }
+
+        public ${glDBMeta} provideDBMeta(String tableFlexibleName) {
+            return ByTableFlexibleName(tableFlexibleName);
+        }
+
+        public ${glDBMeta} provideDBMetaChecked(String tableFlexibleName) {
+            return FindDBMeta(tableFlexibleName);
+        }
 
         // ===============================================================================
         //                                                                     Find DBMeta

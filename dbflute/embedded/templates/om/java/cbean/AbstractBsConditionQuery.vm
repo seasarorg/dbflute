@@ -21,11 +21,6 @@ import ${glPackageCQ}.*;
 public abstract class ${myClassName} extends AbstractConditionQuery {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final DBMetaProvider _dbmetaProvider = new ${glDBMetaInstanceHandler}();
-
-    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${myClassName}(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
@@ -37,7 +32,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     //                                                                     ===============
     @Override
     protected DBMetaProvider xgetDBMetaProvider() {
-        return _dbmetaProvider;
+        return ${glDBMetaInstanceHandler}.getProvider();
     }
 
     // ===================================================================================

@@ -21,16 +21,16 @@ namespace ${glPackageBaseCQ} {
 
         public ${myConditionInlineQueryClassName} Inline() {
             if (_inlineQuery == null) {
-                _inlineQuery = new ${myConditionInlineQueryClassName}(getReferrerQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
+                _inlineQuery = new ${myConditionInlineQueryClassName}(getReferrerQuery(), xgetSqlClause(), xgetAliasName(), xgetNestLevel(), this);
             }
-            _inlineQuery.xsetOnClauseInline(false);
+            _inlineQuery.xsetOnClause(false);
             return _inlineQuery;
         }
         
         public ${myConditionInlineQueryClassName} On() {
             if (isBaseQuery()) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
             ${myConditionInlineQueryClassName} inlineQuery = Inline();
-            inlineQuery.xsetOnClauseInline(true);
+            inlineQuery.xsetOnClause(true);
             return inlineQuery;
         }
 
@@ -461,8 +461,8 @@ namespace ${glPackageBaseCQ} {
 #end
         protected ${foreignCQClassName} xcreateQuery${fk.ForeignPropertyNameInitCap}() {
             String nrp = resolveNextRelationPath${fk.foreignPropertyNameInitCap}();
-            String jan = resolveJoinAliasName(nrp, getNextNestLevel());
-            ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+            String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
+            ${foreignCQClassName} cq = new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
             cq.xsetForeignPropertyName("${fk.foreignPropertyName}"); cq.xsetRelationPath(nrp); return cq;
         }
         public void xsetupOuterJoin_${fk.ForeignPropertyNameInitCap}() {
@@ -471,7 +471,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($columnName in $fk.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $fk.getLocalForeignMapping().get($columnName))
-            joinOnMap.put(getRealColumnName("${localColumn.name}"), cq.getRealColumnName("${foreignColumnName}"));
+            joinOnMap.put(toColumnRealName("${localColumn.name}"), cq.toColumnRealName("${foreignColumnName}"));
 #end
 #if ($fk.hasFixedCondition())
             registerOuterJoin(cq, joinOnMap, "${fk.fixedCondition}");
@@ -504,8 +504,8 @@ namespace ${glPackageBaseCQ} {
         public ${relatedCQClassName} Query${referrer.referrerPropertyNameInitCapAsOne}() { return this.ConditionQuery${referrer.referrerPropertyNameInitCapAsOne}; }
         protected ${relatedCQClassName} createQuery${referrer.referrerPropertyNameInitCapAsOne}() {
             String nrp = resolveNextRelationPath${referrer.ReferrerPropertyNameInitCapAsOne}();
-            String jan = resolveJoinAliasName(nrp, getNextNestLevel());
-            ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), jan, getNextNestLevel());
+            String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
+            ${relatedCQClassName} cq = new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
             cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}"); cq.xsetRelationPath(nrp); return cq;
         }
         public void xsetupOuterJoin_${referrer.referrerPropertyNameInitCapAsOne}() {
@@ -514,10 +514,10 @@ namespace ${glPackageBaseCQ} {
 #foreach ($columnName in $referrer.foreignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))
-            joinOnMap.put(getRealColumnName("${foreignColumn.name}"), cq.getRealColumnName("${referrerColumnName}"));
+            joinOnMap.put(toColumnRealName("${foreignColumn.name}"), cq.toColumnRealName("${referrerColumnName}"));
 #end
 #if ($referrer.hasFixedCondition())
-            joinOnMap.put(fxcKey(), ppFxCd("${referrer.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
+            joinOnMap.put(fxcKey(), ppFxCd("${referrer.fixedCondition}", xgetAliasName(), cq.xgetAliasName()));
 #end
             registerOuterJoin(cq, joinOnMap);
         }
