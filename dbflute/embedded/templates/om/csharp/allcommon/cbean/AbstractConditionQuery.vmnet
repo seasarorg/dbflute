@@ -224,7 +224,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         xgetSqlClause().registerOuterJoin(localDbName, foreignDbName, foreignAliasName, joinOnMap, fixedCondition, resolver);
     }
 
-    protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,
+    protected FixedConditionResolver createFixedConditionResolver(${glConditionQuery} foreignCQ,
             Map<String, String> joinOnMap) {
         return new ${glHpFixedConditionQueryResolver}(this, foreignCQ, xgetDBMetaProvider());
     }

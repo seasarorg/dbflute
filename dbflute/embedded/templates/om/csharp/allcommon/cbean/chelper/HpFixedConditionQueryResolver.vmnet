@@ -130,16 +130,16 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                     String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
                     resource.addAdditionalColumn(resolvedColumn);
                     List<String> splitList = Srl.splitList(targetRelation, ".");
-                    DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
+                    ${glDBMeta} currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
                     foreach (String element in splitList) {
-                        ForeignInfo foreignInfo = currentDBMeta.FindForeignInfo(element);
+                        ${glForeignInfo} foreignInfo = currentDBMeta.FindForeignInfo(element);
                         resource.addJoinInfo(foreignInfo);
                         currentDBMeta = foreignInfo.ForeignDBMeta;
                     }
                     _inlineViewResourceMap.put(targetRelation, resource);
                 }
             } else {
-                DBMeta pointDBMeta;
+                ${glDBMeta} pointDBMeta;
                 try {
                     pointDBMeta = _dbmetaProvider.provideDBMeta(pointTable);
                 } catch (DBMetaNotFoundException e) {
@@ -199,16 +199,16 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
         String baseAlias = "dffixedbase";
         String baseIndent = "                    ";
         StringBuilder joinSb = new StringBuilder();
-        Map<ForeignInfo, String> relationMap = new HashMap<ForeignInfo, String>();
+        Map<${glForeignInfo}, String> relationMap = new HashMap<${glForeignInfo}, String>();
         List<String> additionalRealColumnList = new ArrayList<String>();
         int groupIndex = 0;
         foreach (InlineViewResource resource in _inlineViewResourceMap.values()) {
-            List<ForeignInfo> joinInfoList = resource.getJoinInfoList();
+            List<${glForeignInfo}> joinInfoList = resource.getJoinInfoList();
             String aliasBase = "dffixedjoin";
             String preForeignAlias = null;
             String foreignAlias = null;
             int joinIndex = 0;
-            foreach (ForeignInfo joinInfo in joinInfoList) {
+            foreach (${glForeignInfo} joinInfo in joinInfoList) {
                 if (relationMap.containsKey(joinInfo)) { // already joined
                     preForeignAlias = relationMap.get(joinInfo); // update previous alias
                     continue;
@@ -216,7 +216,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                 String foreignTable;
                 String localAlias;
                 {
-                    DBMeta foreignDBMeta = joinInfo.ForeignDBMeta;
+                    ${glDBMeta} foreignDBMeta = joinInfo.ForeignDBMeta;
                     foreignTable = foreignDBMeta.TableSqlName;
                     localAlias = (preForeignAlias != null ? preForeignAlias : baseAlias);
                     foreignAlias = aliasBase + "_" + groupIndex + "_" + joinIndex;
@@ -228,8 +228,8 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
                 Map<ColumnInfo, ColumnInfo> columnInfoMap = joinInfo.LocalForeignColumnInfoMap;
                 int columnIndex = 0;
                 foreach (Entry<ColumnInfo, ColumnInfo> localForeignEntry in columnInfoMap.entrySet()) {
-                    ColumnInfo localColumnInfo = localForeignEntry.getKey();
-                    ColumnInfo foreignColumninfo = localForeignEntry.getValue();
+                    ${glColumnInfo} localColumnInfo = localForeignEntry.getKey();
+                    ${glColumnInfo} foreignColumninfo = localForeignEntry.getValue();
                     if (columnIndex > 0) {
                         joinSb.append(" and ");
                     }
@@ -263,7 +263,7 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
     //                                                                    ================
     protected class InlineViewResource {
         protected Set<String> _additionalColumnSet;
-        protected List<ForeignInfo> _joinInfoList;
+        protected List<${glForeignInfo}> _joinInfoList;
 
         public Set<String> getAdditionalColumnSet() {
             return _additionalColumnSet;
@@ -276,13 +276,13 @@ public class ${glHpFixedConditionQueryResolver} : FixedConditionResolver {
             _additionalColumnSet.add(additionalColumn);
         }
 
-        public List<ForeignInfo> getJoinInfoList() {
+        public List<${glForeignInfo}> getJoinInfoList() {
             return _joinInfoList;
         }
 
-        public void addJoinInfo(ForeignInfo joinInfo) {
+        public void addJoinInfo(${glForeignInfo} joinInfo) {
             if (_joinInfoList == null) {
-                _joinInfoList = new ArrayList<ForeignInfo>();
+                _joinInfoList = new ArrayList<${glForeignInfo}>();
             }
             _joinInfoList.add(joinInfo);
         }
