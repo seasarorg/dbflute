@@ -139,11 +139,22 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 continue;
             }
 
+            if (isDatabaseFirebird()) {
+                // only patch for the DBMS (because this class needs stability)
+                final String metaTableName = columnResultSet.getString(3);
+                if (!tableName.equalsIgnoreCase(metaTableName)) {
+                    // Firebird treats an argument for a table name
+                    // as PrefixSearch so ignores without warning
+                    continue;
+                }
+            }
+
             // Filter duplicate objects
             if (columnNameSet.contains(columnName)) {
-                duplicateTableNameSet.add(columnResultSet.getString(3));
+                final String metaTableName = columnResultSet.getString(3);
+                duplicateTableNameSet.add(metaTableName);
                 duplicateColumnNameSet.add(columnName);
-                continue;
+                continue; // ignored with warning
             }
             columnNameSet.add(columnName);
 

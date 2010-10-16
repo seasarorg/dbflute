@@ -98,6 +98,10 @@ public abstract class DfAbstractMetaDataExtractor {
         return getBasicProperties().isDatabaseMSAccess();
     }
 
+    protected boolean isDatabaseFirebird() {
+        return getBasicProperties().isDatabaseFirebird();
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

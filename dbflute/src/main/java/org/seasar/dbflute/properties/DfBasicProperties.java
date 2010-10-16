@@ -132,6 +132,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseType().equalsIgnoreCase("msaccess");
     }
 
+    public boolean isDatabaseFirebird() {
+        return getDatabaseType().equalsIgnoreCase("firebird");
+    }
+
     public boolean isDatabase_Supported() {
         if (isDatabaseAsMainSupported() || isDatabaseAsSubSupported()) {
             return true;
