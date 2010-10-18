@@ -140,6 +140,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected void executeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        final boolean procedureBeforeTable = isDropProcedureBeforeTable();
+        if (procedureBeforeTable) {
+            executeProcedureProcess(conn, tableMetaInfoList);
+        }
+        executeTableProcess(conn, tableMetaInfoList);
+        if (!procedureBeforeTable) { // basically here
+            executeProcedureProcess(conn, tableMetaInfoList);
+        }
+        executeVariousProcess(conn, tableMetaInfoList);
+    }
+
+    protected void executeTableProcess(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         if (!_suppressTruncateTable) {
             truncateTableIfPossible(conn, tableMetaInfoList);
         } else {
@@ -160,16 +172,26 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         } else {
             _log.info("*Suppress dropping sequences");
         }
+    }
+
+    protected void executeProcedureProcess(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         if (!_suppressDropProcedure) {
             dropProcedure(conn, tableMetaInfoList);
         } else {
             _log.info("*Suppress dropping procedures");
         }
+    }
+
+    protected void executeVariousProcess(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         if (!_suppressDropDBLink) {
             dropDBLink(conn, tableMetaInfoList);
         } else {
             _log.info("*Suppress dropping DB links");
         }
+    }
+
+    protected boolean isDropProcedureBeforeTable() {
+        return false;
     }
 
     // ===================================================================================

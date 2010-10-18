@@ -11,12 +11,13 @@ import javax.sql.DataSource;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerDB2;
+import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerFirebird;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerH2;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerJdbc;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerMySQL;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerPostgreSQL;
-import org.seasar.dbflute.logic.replaceschema.schemainitializer.XDfSchemaInitializerSQLServer;
+import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerSQLServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -70,6 +71,8 @@ public class DfSchemaInitializerFactory {
             initializer = createSchemaInitializerSqlServer();
         } else if (_basicProperties.isDatabaseH2()) {
             initializer = createSchemaInitializerH2();
+        } else if (_basicProperties.isDatabaseFirebird()) {
+            initializer = createSchemaInitializerFirebird();
         } else {
             initializer = createSchemaInitializerJdbc();
         }
@@ -107,13 +110,19 @@ public class DfSchemaInitializerFactory {
     }
 
     protected DfSchemaInitializer createSchemaInitializerSqlServer() {
-        final XDfSchemaInitializerSQLServer initializer = new XDfSchemaInitializerSQLServer();
+        final DfSchemaInitializerSQLServer initializer = new DfSchemaInitializerSQLServer();
         setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }
 
     protected DfSchemaInitializer createSchemaInitializerH2() {
         final DfSchemaInitializerH2 initializer = new DfSchemaInitializerH2();
+        setupSchemaInitializerJdbcProperties(initializer);
+        return initializer;
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerFirebird() {
+        final DfSchemaInitializerFirebird initializer = new DfSchemaInitializerFirebird();
         setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }

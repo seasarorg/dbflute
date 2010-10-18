@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -65,22 +66,28 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
-        ResultSet parts = null;
+        ResultSet rs = null;
         try {
             final boolean uniqueKeyOnly = false;
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
-            parts = dbMeta.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
-            while (parts.next()) {
+            rs = dbMeta.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
+            while (rs.next()) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - -
                 // same policy as table process about JDBC handling
                 // (see DfTableHandler.java)
                 // - - - - - - - - - -/
 
-                final String indexName = parts.getString(6);
+                final String metaTableName = rs.getString(3);
+                if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
+                    // same policy as column process (see DfColumnHandler.java)
+                    continue;
+                }
+
+                final String indexName = rs.getString(6);
                 final boolean isNonUnique;
                 {
-                    final Boolean nonUnique = parts.getBoolean(4);
+                    final Boolean nonUnique = rs.getBoolean(4);
                     isNonUnique = (nonUnique != null && nonUnique);
                 }
                 if (!isNonUnique) {
@@ -94,10 +101,10 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
 
                 final String indexType;
                 {
-                    indexType = parts.getString(7);
+                    indexType = rs.getString(7);
                 }
 
-                final String columnName = parts.getString(9);
+                final String columnName = rs.getString(9);
                 if (columnName == null || columnName.trim().length() == 0) {
                     continue;
                 }
@@ -106,7 +113,7 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 }
                 final Integer ordinalPosition;
                 {
-                    final String ordinalPositionString = parts.getString(8);
+                    final String ordinalPositionString = rs.getString(8);
                     if (ordinalPositionString == null) {
                         String msg = "The unique columnName should have ordinal-position but null: ";
                         msg = msg + " columnName=" + columnName + " indexType=" + indexType;
@@ -133,8 +140,8 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 }
             }
         } finally {
-            if (parts != null) {
-                parts.close();
+            if (rs != null) {
+                rs.close();
             }
         }
         return indexMap;

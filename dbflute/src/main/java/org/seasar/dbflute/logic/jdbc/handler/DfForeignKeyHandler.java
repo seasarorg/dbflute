@@ -101,6 +101,12 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 // (see DfTableHandler.java)
                 // - - - - - - - - - -/
 
+                final String localTableName = rs.getString(7);
+                if (!Srl.equalsFlexibleTrimmed(tableName, localTableName)) {
+                    // same policy as column process (see DfColumnHandler.java)
+                    continue;
+                }
+
                 final String foreignCatalogName = rs.getString(1);
                 final String foreignSchemaName = rs.getString(2);
                 final String foreignTableName = rs.getString(3);
@@ -164,7 +170,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 }
                 // first or override
                 metaInfo.setForeignKeyName(fkName);
-                metaInfo.setLocalTableName(tableName);
+                metaInfo.setLocalTableName(localTableName);
                 metaInfo.setForeignTableName(foreignTableName);
                 metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
             }

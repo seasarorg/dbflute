@@ -32,6 +32,7 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -69,6 +70,18 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      */
     public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
+        DfPrimaryKeyMetaInfo info = doGetPrimaryKey(metaData, unifiedSchema, tableName);
+        if (!info.hasPrimaryKey()) {
+            info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toLowerCase());
+        }
+        if (!info.hasPrimaryKey()) {
+            info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toUpperCase());
+        }
+        return info;
+    }
+
+    protected DfPrimaryKeyMetaInfo doGetPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName) throws SQLException {
         final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
         if (isPrimaryKeyExtractingUnsupported()) {
             if (isDatabaseMsAccess()) {
@@ -76,49 +89,25 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             }
             return info;
         }
-        ResultSet parts = null;
-        ResultSet lowerSpare = null;
-        ResultSet upperSpare = null;
+        ResultSet rs = null;
         try {
-            parts = getPrimaryKeyResultSetFromDBMeta(metaData, unifiedSchema, tableName);
-            if (parts != null) {
-                while (parts.next()) {
-                    final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
-                    final String pkName = getPrimaryKeyNameFromDBMeta(parts);
-                    info.addPrimaryKey(columnName, pkName);
-                }
+            rs = getPrimaryKeyResultSetFromDBMeta(metaData, unifiedSchema, tableName);
+            if (rs == null) {
+                return info;
             }
-            if (!info.hasPrimaryKey()) { // for lower case
-                lowerSpare = getPrimaryKeyResultSetFromDBMeta(metaData, unifiedSchema, tableName.toLowerCase());
-                if (lowerSpare != null) {
-                    while (lowerSpare.next()) {
-                        final String columnName = getPrimaryKeyColumnNameFromDBMeta(lowerSpare);
-                        final String pkName = getPrimaryKeyNameFromDBMeta(lowerSpare);
-                        info.addPrimaryKey(columnName, pkName);
-                    }
+            while (rs.next()) {
+                final String metaTableName = rs.getString(3);
+                if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
+                    // same policy as column process (see DfColumnHandler.java)
+                    continue;
                 }
+                final String columnName = rs.getString(4);
+                final String pkName = rs.getString(6);
+                info.addPrimaryKey(columnName, pkName);
             }
-            if (!info.hasPrimaryKey()) { // for upper case
-                upperSpare = getPrimaryKeyResultSetFromDBMeta(metaData, unifiedSchema, tableName.toUpperCase());
-                if (upperSpare != null) {
-                    while (upperSpare.next()) {
-                        final String columnName = getPrimaryKeyColumnNameFromDBMeta(upperSpare);
-                        final String pkName = getPrimaryKeyNameFromDBMeta(upperSpare);
-                        info.addPrimaryKey(columnName, pkName);
-                    }
-                }
-            }
-            // check except columns
-            assertPrimaryKeyNotExcepted(info, unifiedSchema, tableName);
         } finally {
-            if (parts != null) {
-                parts.close();
-            }
-            if (lowerSpare != null) {
-                lowerSpare.close();
-            }
-            if (upperSpare != null) {
-                upperSpare.close();
+            if (rs != null) {
+                rs.close();
             }
         }
         return info;
@@ -134,14 +123,6 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             // patch: MySQL throws SQLException when the table was not found
             return null;
         }
-    }
-
-    protected String getPrimaryKeyColumnNameFromDBMeta(ResultSet resultSet) throws SQLException {
-        return resultSet.getString(4); // COLUMN_NAME
-    }
-
-    protected String getPrimaryKeyNameFromDBMeta(ResultSet resultSet) throws SQLException {
-        return resultSet.getString(6); // PK_NAME
     }
 
     protected void assertPrimaryKeyNotExcepted(DfPrimaryKeyMetaInfo info, UnifiedSchema unifiedSchema, String tableName) {
@@ -227,21 +208,27 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         final StringSet pkSet = StringSet.createAsFlexible();
         pkSet.addAll(pkList);
         final Map<String, Map<Integer, String>> uniqueKeyMap = newLinkedHashMap();
-        ResultSet parts = null;
+        ResultSet rs = null;
         try {
             final boolean uniqueKeyOnly = true;
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
-            parts = metaData.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
-            while (parts.next()) {
+            rs = metaData.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
+            while (rs.next()) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - -
                 // same policy as table process about JDBC handling
                 // (see DfTableHandler.java)
                 // - - - - - - - - - -/
 
+                final String metaTableName = rs.getString(3);
+                if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
+                    // same policy as column process (see DfColumnHandler.java)
+                    continue;
+                }
+
                 final boolean isNonUnique;
                 {
-                    final Boolean nonUnique = parts.getBoolean(4);
+                    final Boolean nonUnique = rs.getBoolean(4);
                     isNonUnique = (nonUnique != null && nonUnique);
                 }
                 if (isNonUnique) {
@@ -250,10 +237,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
 
                 final String indexType;
                 {
-                    indexType = parts.getString(7);
+                    indexType = rs.getString(7);
                 }
 
-                final String columnName = parts.getString(9);
+                final String columnName = rs.getString(9);
                 if (columnName == null || columnName.trim().length() == 0) {
                     continue;
                 }
@@ -267,10 +254,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                     assertUQColumnNotExcepted(unifiedSchema, tableName, columnName);
                 }
 
-                final String indexName = parts.getString(6);
+                final String indexName = rs.getString(6);
                 final Integer ordinalPosition;
                 {
-                    final String ordinalPositionString = parts.getString(8);
+                    final String ordinalPositionString = rs.getString(8);
                     if (ordinalPositionString == null) {
                         String msg = "The unique columnName should have ordinal-position but null: ";
                         msg = msg + " columnName=" + columnName + " indexType=" + indexType;
@@ -297,8 +284,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 }
             }
         } finally {
-            if (parts != null) {
-                parts.close();
+            if (rs != null) {
+                rs.close();
             }
         }
         return uniqueKeyMap;

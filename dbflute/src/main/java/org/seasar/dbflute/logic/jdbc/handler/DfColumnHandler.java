@@ -32,6 +32,7 @@ import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -139,19 +140,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 continue;
             }
 
-            if (isDatabaseFirebird()) {
-                // only patch for the DBMS (because this class needs stability)
-                final String metaTableName = columnResultSet.getString(3);
-                if (!tableName.equalsIgnoreCase(metaTableName)) {
-                    // Firebird treats an argument for a table name
-                    // as PrefixSearch so ignores without warning
-                    continue;
-                }
+            final String metaTableName = columnResultSet.getString(3);
+            if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
+                // for a DBMS that treats the argument "tableName"
+                // as PrefixSearch (for example, Firebird)
+                continue;
             }
 
             // Filter duplicate objects
             if (columnNameSet.contains(columnName)) {
-                final String metaTableName = columnResultSet.getString(3);
                 duplicateTableNameSet.add(metaTableName);
                 duplicateColumnNameSet.add(columnName);
                 continue; // ignored with warning
