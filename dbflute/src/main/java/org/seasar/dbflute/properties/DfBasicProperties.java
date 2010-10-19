@@ -13,6 +13,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * Basic properties.
@@ -595,6 +596,21 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             msg = msg + " language=" + getBasicProperties().getTargetLanguage();
             throw new IllegalStateException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                    Reservation Word
+    //                                                                    ================
+    public boolean isPgReservColumn(String columnName) {
+        // only "class" in Java is target
+        return isTargetLanguageJava() && Srl.equalsIgnoreCase(columnName, "class");
+    }
+
+    public String resolvePgReservColumn(String columnName) {
+        if (isPgReservColumn(columnName)) {
+            return columnName + (isColumnNameCamelCase() ? "Value" : "_VALUE");
+        }
+        return columnName;
     }
 
     // ===================================================================================

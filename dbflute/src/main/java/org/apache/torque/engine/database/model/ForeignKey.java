@@ -131,7 +131,13 @@ public class ForeignKey {
      * @param attrib the xml attributes
      */
     public void addReference(Attributes attrib) {
-        addReference(attrib.getValue("local"), attrib.getValue("foreign"));
+        final String localColumn = attrib.getValue("local");
+        final String foreignColumn = attrib.getValue("foreign");
+        addReference(resolvePgReservColumn(localColumn), resolvePgReservColumn(foreignColumn));
+    }
+
+    protected String resolvePgReservColumn(String columnName) {
+        return getBasicProperties().resolvePgReservColumn(columnName);
     }
 
     /**

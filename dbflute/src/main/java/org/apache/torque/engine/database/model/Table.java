@@ -120,7 +120,7 @@ public class Table {
     //                                                Column
     //                                                ------
     private List<Column> _columnList;
-    private StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexibleOrdered();
+    private StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
 
     // -----------------------------------------------------
     //                                           Foreign Key
@@ -555,7 +555,10 @@ public class Table {
         }
         _columnList.add(col);
         _columnMap.put(col.getName(), col);
-
+        final String hiddenName = col.getHiddenName();
+        if (hiddenName != null) {
+            _columnMap.put(hiddenName, col); // to find by hidden name
+        }
         col.setPosition(_columnList.size());
     }
 

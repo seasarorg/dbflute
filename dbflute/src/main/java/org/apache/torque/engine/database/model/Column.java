@@ -102,6 +102,7 @@ public class Column {
     //                                     Column Definition
     //                                     -----------------
     private String _name;
+    private String _hiddenName;
     private String _dbType;
     private String _columnSize;
     private boolean _isNotNull;
@@ -216,6 +217,17 @@ public class Column {
 
         //this._inputValidator = attrib.getValue("inputValidator");
         _description = attrib.getValue("description");
+
+        handleProgramReservationWord();
+    }
+
+    protected void handleProgramReservationWord() {
+        final DfBasicProperties basicProp = getBasicProperties();
+        if (basicProp.isPgReservColumn(_name)) {
+            _hiddenName = _name;
+            _name = basicProp.resolvePgReservColumn(_name);
+            _plainComment = _plainComment + " (hidden name = " + _hiddenName + ")";
+        }
     }
 
     public String getFullyQualifiedName() {
@@ -276,12 +288,17 @@ public class Column {
         _name = newName;
     }
 
+    public String getHiddenName() {
+        return _hiddenName;
+    }
+
     // -----------------------------------------------------
     //                                           Custom Name
     //                                           -----------
     public String getColumnSqlName() {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.quoteColumnNameIfNeeds(getName());
+        final String sqlName = _hiddenName != null ? _hiddenName : getName();
+        return prop.quoteColumnNameIfNeeds(sqlName);
     }
 
     // -----------------------------------------------------
