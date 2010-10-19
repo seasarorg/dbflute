@@ -76,6 +76,8 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
+import org.seasar.dbflute.exception.DfColumnNotFoundException;
+import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
@@ -260,13 +262,15 @@ public class Database {
             currTable.doFinalInitialization();
 
             // setup reverse fk relations
-            ForeignKey[] fks = currTable.getForeignKeys();
+            final ForeignKey[] fks = currTable.getForeignKeys();
             for (int j = 0; j < fks.length; j++) {
-                ForeignKey currFK = fks[j];
-                Table foreignTable = getTable(currFK.getForeignTableName());
+                final ForeignKey currFK = fks[j];
+                final String foreignTableName = currFK.getForeignTableName();
+                final Table foreignTable = getTable(foreignTableName);
                 if (foreignTable == null) {
-                    throw new EngineException("Attempt to set foreign" + " key to nonexistent table, "
-                            + currFK.getForeignTableName());
+                    String msg = "Not found the table:";
+                    msg = msg + " fk=" + currFK.getName() + " foreignTableName=" + foreignTableName;
+                    throw new DfTableNotFoundException(msg);
                 } else {
                     final List<ForeignKey> refererList = foreignTable.getRefererList();
                     if ((refererList == null || !refererList.contains(currFK))) {
@@ -274,15 +278,17 @@ public class Database {
                     }
 
                     // local column references
-                    Iterator<String> localColumnNames = currFK.getLocalColumns().iterator();
+                    final Iterator<String> localColumnNames = currFK.getLocalColumns().iterator();
                     while (localColumnNames.hasNext()) {
-                        Column local = currTable.getColumn((String) localColumnNames.next());
+                        final String localColumnName = localColumnNames.next();
+                        final Column local = currTable.getColumn(localColumnName);
                         // give notice of a schema inconsistency.
                         // note we do not prevent the npe as there is nothing
                         // that we can do, if it is to occur.
                         if (local == null) {
-                            throw new EngineException("Attempt to define foreign"
-                                    + " key with nonexistent column in table, " + currTable.getName());
+                            String msg = "Not found the column in the table:";
+                            msg = msg + " table=" + currTable + " column=" + localColumnName;
+                            throw new DfColumnNotFoundException(msg);
                         } else {
                             //check for foreign pk's
                             if (local.isPrimaryKey()) {
