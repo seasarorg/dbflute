@@ -287,7 +287,8 @@ public class Database {
                         // that we can do, if it is to occur.
                         if (local == null) {
                             String msg = "Not found the column in the table:";
-                            msg = msg + " table=" + currTable + " column=" + localColumnName;
+                            msg = msg + " fk=" + currFK.getName() + " foreignTableName=" + foreignTableName;
+                            msg = msg + " table=" + currTable + " localColumn=" + localColumnName;
                             throw new DfColumnNotFoundException(msg);
                         } else {
                             //check for foreign pk's
@@ -305,8 +306,10 @@ public class Database {
                         // if the foreign column does not exist, we may have an
                         // external reference or a misspelling
                         if (foreign == null) {
-                            throw new EngineException("Attempt to set foreign" + " key to nonexistent column: table="
-                                    + currTable.getName() + ", foreign column=" + foreignColumnName);
+                            String msg = "Not found the column in the table:";
+                            msg = msg + " fk=" + currFK.getName() + " foreignTableName=" + foreignTableName;
+                            msg = msg + " table=" + currTable + " foreignColumn=" + foreignColumnName;
+                            throw new DfColumnNotFoundException(msg);
                         } else {
                             foreign.addReferrer(currFK);
                         }

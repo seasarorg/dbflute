@@ -110,7 +110,8 @@ public abstract class DfAbstractMetaDataExtractor {
     }
 
     protected boolean needsToCheckMetaTable() {
-        // because Firebird treats the argument "tableName" as PrefixSearch
+        // Firebird treats the argument "tableName" as PrefixSearch
+        // (otherwise, Oracle does not need to check because of synonym handling)
         return isDatabaseFirebird();
     }
 
