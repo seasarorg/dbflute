@@ -1058,8 +1058,8 @@ public class Srl {
 
     public static boolean equalsFlexible(String str1, String... strs) {
         if (strs != null) {
+            str1 = str1 != null ? replace(str1, "_", "") : null;
             for (String element : strs) {
-                str1 = str1 != null ? replace(str1, "_", "") : null;
                 element = element != null ? replace(element, "_", "") : null;
                 if ((str1 != null && str1.equalsIgnoreCase(element)) || (str1 == null && element == null)) {
                     return true; // found
