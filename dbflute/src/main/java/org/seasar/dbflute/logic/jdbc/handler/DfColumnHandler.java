@@ -32,7 +32,6 @@ import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -141,9 +140,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             }
 
             final String metaTableName = columnResultSet.getString(3);
-            if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
-                // for a DBMS that treats the argument "tableName"
-                // as PrefixSearch (for example, Firebird)
+            if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
                 continue;
             }
 

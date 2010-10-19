@@ -102,8 +102,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 // - - - - - - - - - -/
 
                 final String localTableName = rs.getString(7);
-                if (!Srl.equalsFlexibleTrimmed(tableName, localTableName)) {
-                    // same policy as column process (see DfColumnHandler.java)
+                if (checkMetaTableDiffIfNeeds(tableName, localTableName)) {
                     continue;
                 }
 

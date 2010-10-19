@@ -32,7 +32,6 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -97,8 +96,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             }
             while (rs.next()) {
                 final String metaTableName = rs.getString(3);
-                if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
-                    // same policy as column process (see DfColumnHandler.java)
+                if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
                     continue;
                 }
                 final String columnName = rs.getString(4);
@@ -221,8 +219,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 // - - - - - - - - - -/
 
                 final String metaTableName = rs.getString(3);
-                if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
-                    // same policy as column process (see DfColumnHandler.java)
+                if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
                     continue;
                 }
 

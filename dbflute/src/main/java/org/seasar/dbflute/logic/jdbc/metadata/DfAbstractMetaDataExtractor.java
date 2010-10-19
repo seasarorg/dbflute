@@ -102,6 +102,18 @@ public abstract class DfAbstractMetaDataExtractor {
         return getBasicProperties().isDatabaseFirebird();
     }
 
+    protected boolean checkMetaTableDiffIfNeeds(String tableName, String metaTableName) {
+        if (!needsToCheckMetaTable()) {
+            return false;
+        }
+        return !Srl.equalsFlexibleTrimmed(tableName, metaTableName);
+    }
+
+    protected boolean needsToCheckMetaTable() {
+        // because Firebird treats the argument "tableName" as PrefixSearch
+        return isDatabaseFirebird();
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

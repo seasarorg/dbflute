@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -79,8 +78,7 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 // - - - - - - - - - -/
 
                 final String metaTableName = rs.getString(3);
-                if (!Srl.equalsFlexibleTrimmed(tableName, metaTableName)) {
-                    // same policy as column process (see DfColumnHandler.java)
+                if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
                     continue;
                 }
 
