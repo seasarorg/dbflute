@@ -1043,47 +1043,58 @@ public class Srl {
     // ===================================================================================
     //                                                                              Equals
     //                                                                              ======
-    public static boolean equalsIgnoreCase(String str1, String str2) {
-        if (str1 != null) {
-            if (str2 != null) {
-                return str1.equalsIgnoreCase(str2);
-            } else {
-                return false;
+    public static boolean equalsIgnoreCase(String str1, String... strs) {
+        if (strs != null) {
+            for (String element : strs) {
+                if ((str1 != null && str1.equalsIgnoreCase(element)) || (str1 == null && element == null)) {
+                    return true; // found
+                }
             }
+            return false;
         } else {
-            return str2 == null; // if both are null, it means equal
+            return str1 == null; // if both are null, it means equal
         }
     }
 
-    public static boolean equalsFlexible(String str1, String str2) {
-        if (str1 != null) {
-            if (str2 != null) {
-                str1 = replace(str1, "_", "");
-                str2 = replace(str2, "_", "");
-                return str1.equalsIgnoreCase(str2);
-            } else {
-                return false;
+    public static boolean equalsFlexible(String str1, String... strs) {
+        if (strs != null) {
+            for (String element : strs) {
+                str1 = str1 != null ? replace(str1, "_", "") : null;
+                element = element != null ? replace(element, "_", "") : null;
+                if ((str1 != null && str1.equalsIgnoreCase(element)) || (str1 == null && element == null)) {
+                    return true; // found
+                }
             }
+            return false;
         } else {
-            return str2 == null; // if both are null, it means equal
+            return str1 == null; // if both are null, it means equal
         }
     }
 
-    public static boolean equalsFlexibleTrimmed(String str1, String str2) {
+    public static boolean equalsFlexibleTrimmed(String str1, String... strs) {
         str1 = str1 != null ? str1.trim() : null;
-        str2 = str2 != null ? str2.trim() : null;
-        return equalsFlexible(str1, str2);
+        if (strs != null) {
+            String[] trimmedStrs = new String[strs.length];
+            for (int i = 0; i < strs.length; i++) {
+                final String element = strs[i];
+                trimmedStrs[i] = element != null ? element.trim() : null;
+            }
+            return equalsFlexible(str1, trimmedStrs);
+        } else {
+            return equalsFlexible(str1, (String[]) null);
+        }
     }
 
-    public static boolean equalsPlain(String str1, String str2) {
-        if (str1 != null) {
-            if (str2 != null) {
-                return str1.equals(str2);
-            } else {
-                return false;
+    public static boolean equalsPlain(String str1, String... strs) {
+        if (strs != null) {
+            for (String element : strs) {
+                if ((str1 != null && str1.equals(element)) || (str1 == null && element == null)) {
+                    return true; // found
+                }
             }
+            return false;
         } else {
-            return str2 == null; // if both are null, it means equal
+            return str1 == null; // if both are null, it means equal
         }
     }
 

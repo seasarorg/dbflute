@@ -888,43 +888,54 @@ public class DfStringUtilTest extends PlainTestCase {
     //                                                                              Equals
     //                                                                              ======
     public void test_equalsIgnoreCase_basic() {
-        assertTrue(equalsIgnoreCase(null, null));
+        assertTrue(equalsIgnoreCase(null, (String[]) null));
         assertFalse(equalsIgnoreCase(null, ""));
-        assertFalse(equalsIgnoreCase("", null));
+        assertFalse(equalsIgnoreCase("", (String[]) null));
         assertTrue(equalsIgnoreCase("foobar", "foobar"));
         assertTrue(equalsIgnoreCase("foobar", "fooBar"));
         assertFalse(equalsIgnoreCase("foobar", "foo_bar"));
         assertFalse(equalsIgnoreCase("foobar", "foobar "));
+        assertTrue(equalsIgnoreCase("foobar", "fooqux", "fooBar"));
+        assertTrue(equalsIgnoreCase(null, "foo", null));
+        assertTrue(equalsIgnoreCase(null, "foo", null, "bar"));
+        assertTrue(equalsIgnoreCase("bar", "foo", null, "bAr"));
     }
 
     public void test_equalsFlexible_basic() {
-        assertTrue(equalsFlexible(null, null));
+        assertTrue(equalsFlexible(null, (String[]) null));
         assertFalse(equalsFlexible(null, ""));
-        assertFalse(equalsFlexible("", null));
+        assertFalse(equalsFlexible("", (String[]) null));
         assertTrue(equalsFlexible("foobar", "foobar"));
         assertTrue(equalsFlexible("foobar", "fooBar"));
         assertTrue(equalsFlexible("foobar", "foo_bar"));
         assertFalse(equalsFlexible("foobar", "foobar "));
+        assertTrue(equalsFlexible("foobar", "barbar", "foobar"));
     }
 
     public void test_equalsFlexibleTrimmed_basic() {
-        assertTrue(equalsFlexibleTrimmed(null, null));
+        assertTrue(equalsFlexibleTrimmed(null, (String[]) null));
         assertFalse(equalsFlexibleTrimmed(null, ""));
-        assertFalse(equalsFlexibleTrimmed("", null));
+        assertFalse(equalsFlexibleTrimmed("", (String[]) null));
         assertTrue(equalsFlexibleTrimmed("foobar", "foobar"));
         assertTrue(equalsFlexibleTrimmed("foobar", "fooBar"));
         assertTrue(equalsFlexibleTrimmed("foobar", "foo_bar"));
         assertTrue(equalsFlexibleTrimmed("foobar", "foobar "));
+        assertTrue(equalsFlexibleTrimmed("foobar", "barbar ", "foobar "));
+        assertFalse(equalsFlexibleTrimmed("foobar", "barbar ", "quxqux "));
     }
 
     public void test_equalsPlain_basic() {
-        assertTrue(equalsPlain(null, null));
+        assertTrue(equalsPlain(null, (String[]) null));
         assertFalse(equalsPlain(null, ""));
-        assertFalse(equalsPlain("", null));
+        assertFalse(equalsPlain("", (String[]) null));
         assertTrue(equalsPlain("foobar", "foobar"));
         assertFalse(equalsPlain("foobar", "fooBar"));
         assertFalse(equalsPlain("foobar", "foo_bar"));
         assertFalse(equalsPlain("foobar", "foobar "));
+        assertTrue(equalsPlain("foobar", "barbar", "foobar"));
+        assertTrue(equalsPlain(null, "foo", null));
+        assertTrue(equalsPlain(null, "foo", null, "bar"));
+        assertTrue(equalsPlain("bar", "foo", null, "bar"));
     }
 
     // ===================================================================================
