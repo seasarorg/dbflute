@@ -602,8 +602,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                    Reservation Word
     //                                                                    ================
     public boolean isPgReservColumn(String columnName) {
-        // only "class" in Java is target
-        return isTargetLanguageJava() && Srl.equalsIgnoreCase(columnName, "class");
+        // only "class" is target because the word is frequently used
+        return Srl.equalsIgnoreCase(columnName, "class");
     }
 
     public String resolvePgReservColumn(String columnName) {
