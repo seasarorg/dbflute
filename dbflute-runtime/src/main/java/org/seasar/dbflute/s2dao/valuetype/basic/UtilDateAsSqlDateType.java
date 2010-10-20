@@ -75,22 +75,10 @@ public class UtilDateAsSqlDateType extends TnAbstractValueType {
     //                                                                       Assist Helper
     //                                                                       =============
     protected java.util.Date toUtilDate(Object value) {
-        try {
-            return DfTypeUtil.toDate(value);
-        } catch (RuntimeException e) {
-            String msg = "Failed to convert the object to java.util.Date:";
-            msg = msg + " type=" + (value != null ? value.getClass() : null) + " value=" + value;
-            throw new IllegalStateException(msg);
-        }
+        return DfTypeUtil.toDate(value);
     }
 
     protected java.sql.Date toSqlDate(Object value) {
-        try {
-            return DfTypeUtil.toSqlDate(value);
-        } catch (RuntimeException e) {
-            String msg = "Failed to convert the object to java.sql.Date:";
-            msg = msg + " type=" + (value != null ? value.getClass() : null) + " value=" + value;
-            throw new IllegalStateException(msg);
-        }
+        return DfTypeUtil.toSqlDate(value);
     }
 }

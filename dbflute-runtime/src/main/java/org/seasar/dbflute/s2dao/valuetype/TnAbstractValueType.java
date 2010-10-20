@@ -27,12 +27,21 @@ import org.seasar.dbflute.jdbc.ValueType;
  */
 public abstract class TnAbstractValueType implements ValueType {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private int _sqlType;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public TnAbstractValueType(int sqlType) {
         this._sqlType = sqlType;
     }
 
+    // ===================================================================================
+    //                                                                        Null Setting
+    //                                                                        ============
     protected void setNull(PreparedStatement ps, int index) throws SQLException {
         ps.setNull(index, _sqlType);
     }
@@ -41,6 +50,9 @@ public abstract class TnAbstractValueType implements ValueType {
         cs.setNull(parameterName, _sqlType);
     }
 
+    // ===================================================================================
+    //                                                                       Out Parameter
+    //                                                                       =============
     public void registerOutParameter(CallableStatement cs, int index) throws SQLException {
         cs.registerOutParameter(index, _sqlType);
     }
@@ -49,6 +61,9 @@ public abstract class TnAbstractValueType implements ValueType {
         cs.registerOutParameter(parameterName, _sqlType);
     }
 
+    // ===================================================================================
+    //                                                                            SQL Type
+    //                                                                            ========
     public int getSqlType() {
         return _sqlType;
     }
