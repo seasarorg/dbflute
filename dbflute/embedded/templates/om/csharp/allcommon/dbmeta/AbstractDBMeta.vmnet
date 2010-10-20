@@ -52,7 +52,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // createColumnInfo()
-        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, bool notNull
+        protected ${glColumnInfo} cci(String columnDbName, String columnSynonym, String columnAlias, bool notNull
                 , String propertyName, Type propertyType, bool primary, String columnDbType
                 , int? columnSize, int? columnDecimalDigits, bool commonColumn
                 , OptimisticLockType optimisticLockType, String columnComment
@@ -74,9 +74,9 @@ namespace ${glPackageBaseCommonDBMeta} {
                     referrerPropList.add(referrerProp.Trim());
                 }
             }
-            return new ${glColumnInfo}(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary
-                    , columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment
-                    , foreignPropList, referrerPropList);
+            return new ${glColumnInfo}(this, columnDbName, columnSynonym, columnAlias, notNull, propertyName
+                    , propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn
+                    , optimisticLockType, columnComment, foreignPropList, referrerPropList);
         }
 
         public List<${glColumnInfo}> ColumnInfoList { get { return _columnInfoList; } }

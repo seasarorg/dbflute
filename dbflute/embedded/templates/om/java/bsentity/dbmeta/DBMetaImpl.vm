@@ -56,7 +56,7 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
-    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
+    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
 #end
 
 #foreach ($col in $table.columns)
@@ -108,14 +108,14 @@ public class ${myClassName} extends AbstractDBMeta {
 #foreach ($fk in $table.foreignKeys)
     public ForeignInfo foreign${fk.foreignJavaBeansRulePropertyNameInitCap}() {
 #if ($fk.isSimpleKeyFK())
-#set ($column = $fk.localColumnAsOne)
-#set ($yourColumn = ${fk.getForeignColumnByLocalColumn(${column})})
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
+#set ($col = $fk.localColumnAsOne)
+#set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
+        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #else
         Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap();
-#foreach ($column in $fk.localColumnList)
-#set ($yourColumn = ${fk.getForeignColumnByLocalColumn(${column})})
-        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
+#foreach ($col in $fk.localColumnList)
+#set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
+        map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
         return cfi("${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()});
@@ -126,14 +126,14 @@ public class ${myClassName} extends AbstractDBMeta {
 #if (${referrer.isOneToOne()})
     public ForeignInfo foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
 #if ($referrer.isSimpleKeyFK())
-#set ($column = $referrer.foreignColumnAsOne)
-#set ($yourColumn = ${referrer.getLocalColumnByForeignColumn(${column})})
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
+#set ($col = $referrer.foreignColumnAsOne)
+#set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
+        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #else
         Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap();
-#foreach ($column in $referrer.foreignColumnList)
-#set ($yourColumn = ${referrer.getLocalColumnByForeignColumn(${column})})
-        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
+#foreach ($col in $referrer.foreignColumnList)
+#set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
+        map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
         return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()});
@@ -148,12 +148,12 @@ public class ${myClassName} extends AbstractDBMeta {
 #if (!${referrer.isOneToOne()})
     public ReferrerInfo referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
 #if ($referrer.isSimpleKeyFK())
-#set ($column = $referrer.foreignColumnAsOne)
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+#set ($col = $referrer.foreignColumnAsOne)
+        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
 #else
         Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap();
-#foreach ($column in $referrer.foreignColumnList)
-        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+#foreach ($col in $referrer.foreignColumnList)
+        map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
 #end
 #end
         return cri("${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${referrer.isOneToOne()});

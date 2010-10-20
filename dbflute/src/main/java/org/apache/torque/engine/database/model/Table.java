@@ -555,9 +555,9 @@ public class Table {
         }
         _columnList.add(col);
         _columnMap.put(col.getName(), col);
-        final String hiddenName = col.getHiddenName();
-        if (hiddenName != null) {
-            _columnMap.put(hiddenName, col); // to find by hidden name
+        final String synonym = col.getSynonym();
+        if (synonym != null) {
+            _columnMap.put(synonym, col); // to find by synonym name
         }
         col.setPosition(_columnList.size());
     }

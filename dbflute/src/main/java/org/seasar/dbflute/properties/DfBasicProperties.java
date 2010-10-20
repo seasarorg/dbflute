@@ -608,7 +608,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     public String resolvePgReservColumn(String columnName) {
         if (isPgReservColumn(columnName)) {
-            return columnName + (isColumnNameCamelCase() ? "Value" : "_VALUE");
+            return columnName + (isColumnNameCamelCase() ? "Synonym" : "_SYNONYM");
         }
         return columnName;
     }

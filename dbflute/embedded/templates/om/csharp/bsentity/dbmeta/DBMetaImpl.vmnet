@@ -59,7 +59,7 @@ namespace ${myDBMetaPackageName} {
 
         protected void InitializeColumnInfo() {
 #foreach ($col in $table.columns)
-            _column${col.javaName} = cci("${col.columnSqlName}", ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression});
+            _column${col.javaName} = cci("${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression});
 #end
         }
 
@@ -105,8 +105,8 @@ namespace ${myDBMetaPackageName} {
 #set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
         public ${glForeignInfo} Foreign${fk.foreignJavaBeansRulePropertyNameInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
-#foreach ($column in $fk.localColumnList)
-            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${fk.foreignTableDBMetaClassName}.GetInstance().Column${fk.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
+#foreach ($col in $fk.localColumnList)
+            map.put(Column${col.javaBeansRulePropertyNameInitCap}, ${fk.foreignTableDBMetaClassName}.GetInstance().Column${fk.getForeignColumnByLocalColumn(${col}).javaBeansRulePropertyNameInitCap});
 #end
             return cfi("${fk.foreignJavaBeansRulePropertyNameInitCap}", this, ${fk.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()});
         }}
@@ -117,8 +117,8 @@ namespace ${myDBMetaPackageName} {
 #if (${referrer.isOneToOne()})
         public ${glForeignInfo} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
-#foreach ($column in $referrer.foreignColumnList)
-            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
+#foreach ($col in $referrer.foreignColumnList)
+            map.put(Column${col.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap});
 #end
             return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()});
         }}
@@ -134,8 +134,8 @@ namespace ${myDBMetaPackageName} {
 #set ($referrerTable = $referrer.table)
         public ${glReferrerInfo} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
-#foreach ($column in $referrer.foreignColumnList)
-            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
+#foreach ($col in $referrer.foreignColumnList)
+            map.put(Column${col.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap});
 #end
             return cri("${referrer.referrerJavaBeansRulePropertyNameInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
         }}

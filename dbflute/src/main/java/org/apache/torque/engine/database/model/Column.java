@@ -102,7 +102,7 @@ public class Column {
     //                                     Column Definition
     //                                     -----------------
     private String _name;
-    private String _hiddenName;
+    private String _synonym;
     private String _dbType;
     private String _columnSize;
     private boolean _isNotNull;
@@ -224,9 +224,8 @@ public class Column {
     protected void handleProgramReservationWord() {
         final DfBasicProperties basicProp = getBasicProperties();
         if (basicProp.isPgReservColumn(_name)) {
-            _hiddenName = _name;
-            _name = basicProp.resolvePgReservColumn(_name);
-            _plainComment = _plainComment + " (hidden name = " + _hiddenName + ")";
+            _synonym = basicProp.resolvePgReservColumn(_name);
+            _plainComment = _plainComment + " (using DBFlute synonym)";
         }
     }
 
@@ -288,25 +287,30 @@ public class Column {
         _name = newName;
     }
 
-    public String getHiddenName() {
-        return _hiddenName;
-    }
-
     // -----------------------------------------------------
-    //                                           Custom Name
-    //                                           -----------
+    //                                              SQL Name
+    //                                              --------
     public String getColumnSqlName() {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        final String sqlName = _hiddenName != null ? _hiddenName : getName();
-        return prop.quoteColumnNameIfNeeds(sqlName);
+        return prop.quoteColumnNameIfNeeds(getName());
     }
 
     // -----------------------------------------------------
-    //                                            Alias Name
-    //                                            ----------
+    //                                               Synonym
+    //                                               -------
+    public String getSynonym() {
+        return _synonym;
+    }
+
+    public String getSynonymSettingExpression() {
+        return _synonym != null ? "\"" + _synonym + "\"" : "null";
+    }
+
+    // -----------------------------------------------------
+    //                                                 Alias
+    //                                                 -----
     public boolean hasAlias() {
-        final String alias = getAlias();
-        return alias != null && alias.trim().length() > 0;
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getAlias());
     }
 
     public String getAlias() {
@@ -330,11 +334,7 @@ public class Column {
     }
 
     public String getAliasSettingExpression() {
-        final String alias = getAlias();
-        if (alias == null || alias.trim().length() == 0) {
-            return "null";
-        }
-        return "\"" + alias + "\"";
+        return hasAlias() ? "\"" + getAlias() + "\"" : "null";
     }
 
     // -----------------------------------------------------
@@ -1257,11 +1257,12 @@ public class Column {
         if (_javaName != null) {
             return _javaName;
         }
+        final String resourceName = (_synonym != null ? _synonym : getName());
         if (needsJavaNameConvert()) {
-            _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
+            _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(resourceName);
         } else {
             // initial-capitalize only
-            _javaName = initCap(getName());
+            _javaName = initCap(resourceName);
         }
         _javaName = filterJavaNameBuriStyleIfNeeds(_javaName); // for Buri
         _javaName = filterJavaNameNonCompilableConnector(_javaName); // for example, "SPACE EXISTS"
