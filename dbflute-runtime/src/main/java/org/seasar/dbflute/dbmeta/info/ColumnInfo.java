@@ -49,6 +49,7 @@ public class ColumnInfo {
     protected final DBMeta _dbmeta;
     protected final String _columnDbName;
     protected final ColumnSqlName _columnSqlName;
+    protected final String _columnSynonym;
     protected final String _columnAlias;
     protected final boolean _notNull;
     protected final String _propertyName;
@@ -68,11 +69,11 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnSqlName, String columnAlias, boolean notNull,
-            String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType,
-            Integer columnSize, Integer decimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, List<String> foreignPropList, List<String> referrerPropList,
-            ClassificationMeta classificationMeta) {
+    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnSqlName, String columnSynonym,
+            String columnAlias, boolean notNull, String propertyName, Class<?> propertyType, boolean primary,
+            boolean autoIncrement, String columnDbType, Integer columnSize, Integer decimalDigits,
+            boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment,
+            List<String> foreignPropList, List<String> referrerPropList, ClassificationMeta classificationMeta) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("columnSqlName", columnSqlName);
@@ -81,6 +82,7 @@ public class ColumnInfo {
         this._dbmeta = dbmeta;
         this._columnDbName = columnDbName;
         this._columnSqlName = new ColumnSqlName(columnSqlName);
+        this._columnSynonym = columnSynonym;
         this._columnAlias = columnAlias;
         this._notNull = notNull;
         this._propertyName = propertyName;
@@ -238,7 +240,8 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the DB name of the column.
+     * Get the DB name of the column. <br />
+     * This is for identity of column. (NOT for SQL)
      * @return The DB name of the column. (NotNull)
      */
     public String getColumnDbName() {
@@ -246,11 +249,21 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the SQL name of the column.
-     * @return The SQL name of the column. (NotNull)
+     * Get the SQL name of the column. <br />
+     * This is for SQL, which is resolved about schema prefix and quoted and so on...  
+     * @return The SQL-name object of the column. (NotNull)
      */
     public ColumnSqlName getColumnSqlName() {
         return this._columnSqlName;
+    }
+
+    /**
+     * Get the synonym of the column. <br />
+     * This is for the synonym of DBFlute. (for example, PgReservColumn handling)
+     * @return The synonym of the column. (NotNull)
+     */
+    public String getColumnSynonym() {
+        return this._columnSynonym;
     }
 
     /**

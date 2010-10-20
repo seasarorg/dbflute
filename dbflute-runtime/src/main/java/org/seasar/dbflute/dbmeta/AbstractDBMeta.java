@@ -187,10 +187,11 @@ public abstract class AbstractDBMeta implements DBMeta {
         return columnInfo;
     }
 
-    protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnAlias, boolean notNull,
-            String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType,
-            Integer columnSize, Integer decimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, String foreignListExp, String referrerListExp, ClassificationMeta classificationMeta) { // createColumnInfo()
+    protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnSynonymName, String columnAlias,
+            boolean notNull, String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement,
+            String columnDbType, Integer columnSize, Integer decimalDigits, boolean commonColumn,
+            OptimisticLockType optimisticLockType, String columnComment, String foreignListExp, String referrerListExp,
+            ClassificationMeta classificationMeta) { // createColumnInfo()
         final String delimiter = ",";
         List<String> foreignPropList = null;
         if (foreignListExp != null && foreignListExp.trim().length() > 0) {
@@ -200,9 +201,9 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (referrerListExp != null && referrerListExp.trim().length() > 0) {
             referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
-        return new ColumnInfo(this, columnDbName, columnSqlName, columnAlias, notNull, propertyName, propertyType,
-                primary, autoIncrement, columnDbType, columnSize, decimalDigits, commonColumn, optimisticLockType,
-                columnComment, foreignPropList, referrerPropList, classificationMeta);
+        return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonymName, columnAlias, notNull, propertyName,
+                propertyType, primary, autoIncrement, columnDbType, columnSize, decimalDigits, commonColumn,
+                optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta);
     }
 
     /**
@@ -239,6 +240,10 @@ public abstract class AbstractDBMeta implements DBMeta {
             _columnInfoFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
             for (ColumnInfo columnInfo : columnInfoList) {
                 _columnInfoFlexibleMap.put(columnInfo.getColumnDbName(), columnInfo);
+                final String columnSynonym = columnInfo.getColumnSynonym();
+                if (columnSynonym != null) {
+                    _columnInfoFlexibleMap.put(columnSynonym, columnInfo); // to find by synonym name
+                }
             }
             return _columnInfoFlexibleMap;
         }
