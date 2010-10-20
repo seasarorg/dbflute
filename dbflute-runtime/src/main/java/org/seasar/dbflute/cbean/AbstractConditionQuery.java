@@ -1147,10 +1147,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return;
         }
         final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
-        final String propertyName = container.getPropertyName();
+        final String flexibleName = container.getFlexibleName();
         final ConditionQuery cq = container.getConditionQuery();
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(flexibleName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
         final Class<?> type = value.getClass();
         final Class<?>[] parameterTypes;
@@ -1201,11 +1201,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
-        final String propertyName = container.getPropertyName();
+        final String flexibleName = container.getFlexibleName();
         final ConditionQuery cq = container.getConditionQuery();
         final String ascDesc = isAsc ? "Asc" : "Desc";
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(flexibleName));
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
         final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] {});
         if (method == null) {
@@ -1331,16 +1331,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     private static class PropertyNameCQContainer {
-        protected String _propertyName;
+        protected String _flexibleName;
         protected ConditionQuery _cq;
 
-        public PropertyNameCQContainer(String propertyName, ConditionQuery cq) {
-            this._propertyName = propertyName;
+        public PropertyNameCQContainer(String flexibleName, ConditionQuery cq) {
+            this._flexibleName = flexibleName;
             this._cq = cq;
         }
 
-        public String getPropertyName() {
-            return _propertyName;
+        public String getFlexibleName() {
+            return _flexibleName;
         }
 
         public ConditionQuery getConditionQuery() {
