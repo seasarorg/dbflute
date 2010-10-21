@@ -66,6 +66,9 @@ public abstract class DfAbsractDataWriter {
     /** Does it output the insert SQLs as logging? */
     protected boolean _loggingInsertSql;
 
+    /** Does it suppress batch updates? */
+    protected boolean _suppressBatchUpdate;
+
     /** The handler of columns for getting column meta information(as helper). */
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
 
@@ -770,5 +773,13 @@ public abstract class DfAbsractDataWriter {
 
     public void setLoggingInsertSql(boolean loggingInsertSql) {
         this._loggingInsertSql = loggingInsertSql;
+    }
+
+    public boolean isSuppressBatchUpdate() {
+        return _suppressBatchUpdate;
+    }
+
+    public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
+        this._suppressBatchUpdate = suppressBatchUpdate;
     }
 }

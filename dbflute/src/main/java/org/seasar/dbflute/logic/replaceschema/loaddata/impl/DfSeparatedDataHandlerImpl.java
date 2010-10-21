@@ -20,10 +20,8 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -56,7 +54,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     protected boolean _loggingInsertSql;
     protected DataSource _dataSource;
     protected UnifiedSchema _unifiedSchema;
-    protected final List<String> _continuedErrorFileList = new ArrayList<String>();
+    protected boolean _suppressBatchUpdate;
 
     // ===================================================================================
     //                                                                                Main
@@ -100,19 +98,16 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                 final Map<String, String> defaultValueMap = getDefaultValueMap(info, elementName);
                 for (String fileName : sortedFileNameSet) {
                     final String fileNamePath = info.getBasePath() + "/" + elementName + "/" + fileName;
-                    final DfSeparatedDataWriterImpl writerImpl = new DfSeparatedDataWriterImpl(_dataSource);
-                    writerImpl.setUnifiedSchema(_unifiedSchema);
-                    writerImpl.setLoggingInsertSql(isLoggingInsertSql());
-                    writerImpl.setFilename(fileNamePath);
-                    writerImpl.setEncoding(elementName);
-                    writerImpl.setDelimiter(info.getDelimter());
-                    writerImpl.setErrorContinue(true);
-                    writerImpl.setConvertValueMap(convertValueMap);
-                    writerImpl.setDefaultValueMap(defaultValueMap);
-                    writerImpl.writeData(notFoundColumnMap);
-                    if (writerImpl.hasContinuedError()) {
-                        _continuedErrorFileList.add(fileNamePath);
-                    }
+                    final DfSeparatedDataWriterImpl writer = new DfSeparatedDataWriterImpl(_dataSource);
+                    writer.setUnifiedSchema(_unifiedSchema);
+                    writer.setLoggingInsertSql(isLoggingInsertSql());
+                    writer.setFilename(fileNamePath);
+                    writer.setEncoding(elementName);
+                    writer.setDelimiter(info.getDelimter());
+                    writer.setConvertValueMap(convertValueMap);
+                    writer.setDefaultValueMap(defaultValueMap);
+                    writer.setSuppressBatchUpdate(isSuppressBatchUpdate());
+                    writer.writeData(notFoundColumnMap);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -192,7 +187,11 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         this._unifiedSchema = unifiedSchema;
     }
 
-    public List<String> getContinuedErrorFileList() {
-        return _continuedErrorFileList;
+    public boolean isSuppressBatchUpdate() {
+        return _suppressBatchUpdate;
+    }
+
+    public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
+        this._suppressBatchUpdate = suppressBatchUpdate;
     }
 }

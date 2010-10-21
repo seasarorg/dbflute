@@ -15,8 +15,11 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,13 +34,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataWriter;
-import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -57,10 +58,8 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     protected String _filename;
     protected String _encoding;
     protected String _delimiter;
-    protected boolean _errorContinue;
     protected Map<String, Map<String, String>> _convertValueMap;
     protected Map<String, String> _defaultValueMap;
-    protected boolean _continuedError;
 
     /** The cache map of meta info. The key is table name. */
     protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
@@ -104,10 +103,11 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         Map<String, String> targetConvertColumnNameKeyToLowerMap = null;
         List<String> columnNameList = null;
 
+        PreparedStatement ps = null;
         try {
-            fis = new java.io.FileInputStream(_filename);
-            ir = new java.io.InputStreamReader(fis, _encoding);
-            br = new java.io.BufferedReader(ir);
+            fis = new FileInputStream(_filename);
+            ir = new InputStreamReader(fis, _encoding);
+            br = new BufferedReader(ir);
 
             FirstLineInfo firstLineInfo = null;
             int count = -1;
@@ -165,75 +165,56 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                     sqlBuilder.setAdditionalDefaultColumnNameToLowerMap(additionalDefaultColumnNameToLowerKeyMap);
                     sqlBuilder.setConvertValueMap(_convertValueMap);
                     sqlBuilder.setDefaultValueMap(_defaultValueMap);
-                    final DfWriteSqlBuildingResult sqlBuildingResult = sqlBuilder.buildSql();
-                    PreparedStatement ps = null;
-                    try {
-                        final String sql = sqlBuildingResult.getSql();
-                        final Map<String, Object> columnValueMap = sqlBuildingResult.getColumnValueMap();
-                        if (_loggingInsertSql) {
-                            _log.info(buildSql4Log(tableName, columnNameList, columnValueMap.values()));
-                        }
-                        ps = _dataSource.getConnection().prepareStatement(sql);
-                        int bindCount = 1;
-                        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
-                        for (Entry<String, Object> entry : entrySet) {
-                            final String columnName = entry.getKey();
-                            final Object obj = entry.getValue();
+                    if (ps == null) {
+                        ps = _dataSource.getConnection().prepareStatement(sqlBuilder.buildSql());
+                    }
+                    final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
+                    if (_loggingInsertSql) {
+                        _log.info(buildSql4Log(tableName, columnNameList, columnValueMap.values()));
+                    }
+                    int bindCount = 1;
+                    final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+                    for (Entry<String, Object> entry : entrySet) {
+                        final String columnName = entry.getKey();
+                        final Object obj = entry.getValue();
 
-                            // - - - - - - - - - - - - - - - - - - -
-                            // Process Null (against Null Headache)
-                            // - - - - - - - - - - - - - - - - - - -
-                            if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - -
-                            // Process NotNull and NotString
-                            // - - - - - - - - - - - - - - -
-                            // If the value is not null and the value has the own type except string,
-                            // It registers the value to statement by the type.
-                            if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
-                                bindCount++;
-                                continue;
-                            }
-
-                            // - - - - - - - - - - - - - - - - - - -
-                            // Process NotNull and StringExpression
-                            // - - - - - - - - - - - - - - - - - - -
-                            final String value = (String) obj;
-                            processNotNullString(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+                        // - - - - - - - - - - - - - - - - - - -
+                        // Process Null (against Null Headache)
+                        // - - - - - - - - - - - - - - - - - - -
+                        if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
                             bindCount++;
-                        }
-                        ps.execute();
-                    } catch (SQLException e) {
-                        if (_errorContinue) {
-                            final String titleName = DfTypeUtil.toClassTitle(e);
-                            final StringBuilder sb = new StringBuilder();
-                            sb.append("The statement threw ").append(titleName).append("! The detail is as follows:");
-                            sb.append(ln()).append("  Message    = ");
-                            sb.append(e.getMessage());
-                            sb.append(ln()).append("  Parameters = ");
-                            sb.append(sqlBuildingResult.getColumnValueMap());
-                            _log.warn(sb);
-                            _continuedError = true;
                             continue;
-                        } else {
-                            throw e;
                         }
-                    } finally {
-                        if (ps != null) {
-                            try {
-                                ps.close();
-                            } catch (SQLException ignored) {
-                                _log.info("statement.close() threw the exception!", ignored);
-                            }
+
+                        // - - - - - - - - - - - - - - -
+                        // Process NotNull and NotString
+                        // - - - - - - - - - - - - - - -
+                        // If the value is not null and the value has the own type except string,
+                        // It registers the value to statement by the type.
+                        if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                            bindCount++;
+                            continue;
                         }
+
+                        // - - - - - - - - - - - - - - - - - - -
+                        // Process NotNull and StringExpression
+                        // - - - - - - - - - - - - - - - - - - -
+                        final String value = (String) obj;
+                        processNotNullString(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+                        bindCount++;
+                    }
+                    if (_suppressBatchUpdate) {
+                        ps.execute();
+                    } else {
+                        ps.addBatch();
                     }
                 } finally {
                     valueList.clear();
                     preContinueString = "";
                 }
+            }
+            if (ps != null && !_suppressBatchUpdate) {
+                ps.executeBatch();
             }
         } catch (FileNotFoundException e) {
             throw e;
@@ -243,16 +224,14 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildExceptionMessage(_filename, lineString, tableName, nextEx);
+                String msg = buildExceptionMessage(_filename, tableName, lineString, nextEx);
                 throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildExceptionMessage(_filename, lineString, tableName, e);
+            String msg = buildExceptionMessage(_filename, tableName, lineString, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
-            String msg = "RuntimeException: filename=" + _filename + " encoding=" + _encoding;
-            msg = msg + " columnNameList=" + columnNameList + " lineString=" + lineString + " defaultValueMap="
-                    + _defaultValueMap;
-            throw new RuntimeException(msg, e);
+            String msg = buildExceptionMessage(_filename, tableName, lineString, e);
+            throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             try {
                 if (fis != null) {
@@ -266,6 +245,13 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
             } catch (java.io.IOException ignored) {
                 _log.warn("File-close threw the exception: ", ignored);
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ignored) {
+                    _log.info("statement.close() threw the exception!", ignored);
+                }
             }
         }
     }
@@ -395,34 +381,10 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                          Value List
     //                                                                          ==========
     protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
-        final List<String> valueList = new ArrayList<String>();
-
         // Don't use split!
         //final String[] values = lineString.split(delimiter);
-        final String[] values = tokenToArgs(lineString, delimiter);
-
-        for (String value : values) {
-            valueList.add(value);
-        }
+        final List<String> valueList = Srl.splitList(lineString, delimiter);
         return arrangeValueList(valueList, delimiter);
-    }
-
-    protected static String[] tokenToArgs(String value, String delimiter) {
-        List<String> list = tokenToList(value, delimiter);
-        return (String[]) list.toArray(new String[list.size()]);
-    }
-
-    protected static List<String> tokenToList(String value, String delimiter) {
-        List<String> list = new ArrayList<String>();
-        int i = 0;
-        int j = value.indexOf(delimiter);
-        for (int h = 0; j >= 0; h++) {
-            list.add(value.substring(i, j));
-            i = j + delimiter.length();
-            j = value.indexOf(delimiter, i);
-        }
-        list.add(value.substring(i));
-        return list;
     }
 
     protected ValueLineInfo arrangeValueList(List<String> valueList, String delimiter) {
@@ -431,7 +393,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         String preString = "";
         for (int i = 0; i < valueList.size(); i++) {
             final String value = valueList.get(i);
-            if (value == null) {
+            if (value == null) { // basically no way (valueList does not contain null)
                 continue;
             }
             if (i == valueList.size() - 1) { // The last loop
@@ -606,43 +568,8 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    /**
-     * Get the value of line separator.
-     * @return The value of line separator. (NotNull)
-     */
-    protected String ln() {
-        return "\n";
-    }
-
-    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public UnifiedSchema getUnifiedSchema() {
-        return _unifiedSchema;
-    }
-
-    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
-        this._unifiedSchema = unifiedSchema;
-    }
-
-    public boolean isLoggingInsertSql() {
-        return _loggingInsertSql;
-    }
-
-    public void setLoggingInsertSql(boolean loggingInsertSql) {
-        this._loggingInsertSql = loggingInsertSql;
-    }
-
-    public boolean isErrorContinue() {
-        return _errorContinue;
-    }
-
-    public void setErrorContinue(boolean errorContinue) {
-        this._errorContinue = errorContinue;
-    }
-
     public String getDelimiter() {
         return _delimiter;
     }
@@ -681,9 +608,5 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
 
     public void setDefaultValueMap(Map<String, String> defaultValueMap) {
         this._defaultValueMap = defaultValueMap;
-    }
-
-    public boolean hasContinuedError() {
-        return _continuedError;
     }
 }

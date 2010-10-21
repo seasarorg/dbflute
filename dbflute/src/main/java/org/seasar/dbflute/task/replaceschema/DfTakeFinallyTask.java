@@ -375,20 +375,6 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             }
         }
 
-        // Load Data
-        final LoadDataFinalInfo loadDataFinalInfo = buildLoadDataFinalInfo();
-        if (loadDataFinalInfo != null) {
-            if (firstDone) {
-                sb.append(ln()).append(ln());
-            } else {
-                firstDone = true;
-            }
-            sb.append(loadDataFinalInfo.getMessage());
-            if (loadDataFinalInfo.isFailure()) {
-                failure = true;
-            }
-        }
-
         // Take Finally
         if (result != null) {
             if (firstDone) {
@@ -510,77 +496,78 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
-    protected LoadDataFinalInfo buildLoadDataFinalInfo() {
-        final File file = new File(DfLoadDataTask.LOG_PATH);
-        if (!file.exists()) {
-            return null;
-        }
-        BufferedReader br = null;
-        try {
-            final FileInputStream fis = new FileInputStream(file);
-            br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-
-            final StringBuilder sb = new StringBuilder();
-            int index = 0;
-            while (true) {
-                final String line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                if (index == 0) { // title
-                    sb.append(" ");
-                } else { // warning file
-                    sb.append(ln()).append("  ");
-                }
-                sb.append(line);
-                ++index;
-            }
-            final LoadDataFinalInfo loadDataFinalInfo = new LoadDataFinalInfo();
-            loadDataFinalInfo.setMessage(sb.toString());
-            loadDataFinalInfo.setFailure(true); // loadDataFinalInfo has only error info
-            return loadDataFinalInfo;
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if (file.exists()) {
-                boolean deleted = file.delete();
-                if (!deleted) {
-                    // ignored
-                }
-            }
-        }
-    }
-
-    protected static class LoadDataFinalInfo {
-        protected String _message;
-        protected boolean _failure;
-
-        public String getMessage() {
-            return _message;
-        }
-
-        public void setMessage(String message) {
-            this._message = message;
-        }
-
-        public boolean isFailure() {
-            return _failure;
-        }
-
-        public void setFailure(boolean failure) {
-            this._failure = failure;
-        }
-    }
+    // *not used because loading data is not continued if it causes an error
+    //protected LoadDataFinalInfo buildLoadDataFinalInfo() {
+    //    final File file = new File(DfLoadDataTask.LOG_PATH);
+    //    if (!file.exists()) {
+    //        return null;
+    //    }
+    //    BufferedReader br = null;
+    //    try {
+    //        final FileInputStream fis = new FileInputStream(file);
+    //        br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+    //
+    //        final StringBuilder sb = new StringBuilder();
+    //        int index = 0;
+    //        while (true) {
+    //            final String line = br.readLine();
+    //            if (line == null) {
+    //                break;
+    //            }
+    //            if (index == 0) { // title
+    //                sb.append(" ");
+    //            } else { // warning file
+    //                sb.append(ln()).append("  ");
+    //            }
+    //            sb.append(line);
+    //            ++index;
+    //        }
+    //        final LoadDataFinalInfo loadDataFinalInfo = new LoadDataFinalInfo();
+    //        loadDataFinalInfo.setMessage(sb.toString());
+    //        loadDataFinalInfo.setFailure(true); // loadDataFinalInfo has only error info
+    //        return loadDataFinalInfo;
+    //    } catch (UnsupportedEncodingException e) {
+    //        throw new IllegalStateException(e);
+    //    } catch (FileNotFoundException e) {
+    //        throw new IllegalStateException(e);
+    //    } catch (IOException e) {
+    //        throw new IllegalStateException(e);
+    //    } finally {
+    //        if (br != null) {
+    //            try {
+    //                br.close();
+    //            } catch (IOException ignored) {
+    //            }
+    //        }
+    //        if (file.exists()) {
+    //            boolean deleted = file.delete();
+    //            if (!deleted) {
+    //                // ignored
+    //            }
+    //        }
+    //    }
+    //}
+    //
+    //protected static class LoadDataFinalInfo {
+    //    protected String _message;
+    //    protected boolean _failure;
+    //
+    //    public String getMessage() {
+    //        return _message;
+    //    }
+    //
+    //    public void setMessage(String message) {
+    //        this._message = message;
+    //    }
+    //
+    //    public boolean isFailure() {
+    //        return _failure;
+    //    }
+    //
+    //    public void setFailure(boolean failure) {
+    //        this._failure = failure;
+    //    }
+    //}
 
     // ===================================================================================
     //                                                                            Accessor

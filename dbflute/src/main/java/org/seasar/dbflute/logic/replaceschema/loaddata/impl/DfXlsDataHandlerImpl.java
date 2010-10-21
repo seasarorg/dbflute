@@ -71,9 +71,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     /** The pattern of skip sheet. (Nullable) */
     protected Pattern _skipSheetPattern;
 
-    /** Does it suppress batch updates? */
-    protected boolean _suppressBatchUpdate;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -486,14 +483,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public boolean isSuppressBatchUpdate() {
-        return _suppressBatchUpdate;
-    }
-
-    public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
-        this._suppressBatchUpdate = suppressBatchUpdate;
-    }
-
     public void setSkipSheet(String skipSheet) {
         if (skipSheet == null || skipSheet.trim().length() == 0) {
             return;

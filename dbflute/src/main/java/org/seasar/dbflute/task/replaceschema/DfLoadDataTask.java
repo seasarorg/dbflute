@@ -1,14 +1,5 @@
 package org.seasar.dbflute.task.replaceschema;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -40,7 +31,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                                                           =========
     protected boolean _validTaskEndInformation = true;
     protected DfXlsDataHandlerImpl _xlsDataHandlerImpl;
-    protected final List<String> _continuedErrorFileList = new ArrayList<String>();
+    protected DfSeparatedDataHandlerImpl _separatedDataHandlerImpl;
 
     // ===================================================================================
     //                                                                             Execute
@@ -62,7 +53,6 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         writeDbFromSeparatedFileAsLoadingTypeData("csv", ",");
         writeDbFromXlsAsLoadingTypeData();
         writeDbFromXlsAsLoadingTypeDataAdditional();
-        dumpContinuedErrorResult();
     }
 
     @Override
@@ -103,10 +93,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void writeDbFromSeparatedFile(String directoryPath, String typeName, String delimter) {
-        final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
-        handler.setLoggingInsertSql(isLoggingInsertSql());
-        handler.setDataSource(getDataSource());
-        handler.setUnifiedSchema(_mainSchema);
+        final DfSeparatedDataHandlerImpl handler = getSeparatedDataHandlerImpl();
         final DfSeparatedDataSeveralHandlingInfo handlingInfo = new DfSeparatedDataSeveralHandlingInfo();
         handlingInfo.setBasePath(directoryPath);
         handlingInfo.setTypeName(typeName);
@@ -114,7 +101,19 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         handlingInfo.setErrorContinue(true);
         final DfSeparatedDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
         showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
-        _continuedErrorFileList.addAll(handler.getContinuedErrorFileList());
+    }
+
+    protected DfSeparatedDataHandlerImpl getSeparatedDataHandlerImpl() {
+        if (_separatedDataHandlerImpl != null) {
+            return _separatedDataHandlerImpl;
+        }
+        final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
+        handler.setLoggingInsertSql(isLoggingInsertSql());
+        handler.setDataSource(getDataSource());
+        handler.setUnifiedSchema(_mainSchema);
+        handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        _separatedDataHandlerImpl = handler;
+        return _separatedDataHandlerImpl;
     }
 
     protected void showNotFoundColumn(String typeName, Map<String, Set<String>> notFoundColumnMap) {
@@ -177,20 +176,21 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected DfXlsDataHandlerImpl getXlsDataHandlerImpl() {
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        if (_xlsDataHandlerImpl == null) {
-            final DfXlsDataHandlerImpl xlsDataHandler;
-            if (basicProperties.isDatabaseSQLServer()) {
-                xlsDataHandler = new DfXlsDataHandlerSQLServer(getDataSource());
-            } else {
-                xlsDataHandler = new DfXlsDataHandlerImpl(getDataSource());
-            }
-            xlsDataHandler.setUnifiedSchema(_mainSchema); // for getting database meta data
-            xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
-            xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-            xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
-            _xlsDataHandlerImpl = xlsDataHandler;
+        if (_xlsDataHandlerImpl != null) {
+            return _xlsDataHandlerImpl;
         }
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        final DfXlsDataHandlerImpl xlsDataHandler;
+        if (basicProperties.isDatabaseSQLServer()) {
+            xlsDataHandler = new DfXlsDataHandlerSQLServer(getDataSource());
+        } else {
+            xlsDataHandler = new DfXlsDataHandlerImpl(getDataSource());
+        }
+        xlsDataHandler.setUnifiedSchema(_mainSchema); // for getting database meta data
+        xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
+        xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
+        _xlsDataHandlerImpl = xlsDataHandler;
         return _xlsDataHandlerImpl;
     }
 
@@ -208,45 +208,46 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     // ===================================================================================
     //                                                                         Dump Result
     //                                                                         ===========
-    protected void dumpContinuedErrorResult() {
-        final File file = new File(LOG_PATH);
-        if (file.exists()) {
-            boolean deleted = file.delete();
-            if (!deleted) {
-                return; // skip to dump!
-            }
-        }
-        if (_continuedErrorFileList.isEmpty()) {
-            return;
-        }
-        BufferedWriter bw = null;
-        try {
-            final StringBuilder contentsSb = new StringBuilder();
-            contentsSb.append("{Load Data}: warning files=" + _continuedErrorFileList.size());
-            List<String> continuedErrorFileList = _continuedErrorFileList;
-            for (String continuedErrorFile : continuedErrorFileList) {
-                // remove path because only file names are enough to see the files 
-                final String fileName = Srl.substringLastRear(continuedErrorFile, "/");
-                contentsSb.append(ln()).append("x " + fileName);
-            }
-            final FileOutputStream fos = new FileOutputStream(file);
-            bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-            bw.write(contentsSb.toString());
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
+    // *not used because loading data is not continued if it causes an error
+    //protected void dumpContinuedErrorResult() {
+    //    final File file = new File(LOG_PATH);
+    //    if (file.exists()) {
+    //        boolean deleted = file.delete();
+    //        if (!deleted) {
+    //            return; // skip to dump!
+    //        }
+    //    }
+    //    if (_continuedErrorFileList.isEmpty()) {
+    //        return;
+    //    }
+    //    BufferedWriter bw = null;
+    //    try {
+    //        final StringBuilder contentsSb = new StringBuilder();
+    //        contentsSb.append("{Load Data}: warning files=" + _continuedErrorFileList.size());
+    //        List<String> continuedErrorFileList = _continuedErrorFileList;
+    //        for (String continuedErrorFile : continuedErrorFileList) {
+    //            // remove path because only file names are enough to see the files 
+    //            final String fileName = Srl.substringLastRear(continuedErrorFile, "/");
+    //            contentsSb.append(ln()).append("x " + fileName);
+    //        }
+    //        final FileOutputStream fos = new FileOutputStream(file);
+    //        bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+    //        bw.write(contentsSb.toString());
+    //    } catch (UnsupportedEncodingException e) {
+    //        throw new IllegalStateException(e);
+    //    } catch (FileNotFoundException e) {
+    //        throw new IllegalStateException(e);
+    //    } catch (IOException e) {
+    //        throw new IllegalStateException(e);
+    //    } finally {
+    //        if (bw != null) {
+    //            try {
+    //                bw.close();
+    //            } catch (IOException ignored) {
+    //            }
+    //        }
+    //    }
+    //}
 
     // ===================================================================================
     //                                                                            Accessor

@@ -6,8 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -26,29 +28,37 @@ public class DfWriteSqlBuilder {
     protected Map<String, String> _additionalDefaultColumnNameToLowerMap;
     protected Map<String, Map<String, String>> _convertValueMap;
     protected Map<String, String> _defaultValueMap;
+    protected Map<String, String> _basicColumnValueMap;
 
     // ===================================================================================
     //                                                                           Build SQL
     //                                                                           =========
-    public DfWriteSqlBuildingResult buildSql() {
-        final DfWriteSqlBuildingResult sqlBuildingResult = new DfWriteSqlBuildingResult();
-        final Map<String, Object> columnValueMap = setupColumnValueMap();
+    public String buildSql() {
+        final Map<String, String> columnValueMap = createBasicColumnValueMap();
         final StringBuilder sb = new StringBuilder();
-        final Set<String> columnNameSet = columnValueMap.keySet();
-        for (String columnName : columnNameSet) {
+        final StringBuilder sbValues = new StringBuilder();
+        for (String columnName : columnValueMap.keySet()) {
             sb.append(", ").append(columnName);
+            sbValues.append(", ?");
         }
         sb.delete(0, ", ".length()).insert(0, "insert into " + _tableName + " (").append(")");
-        sb.append(setupValuesStringAndParameter(columnNameSet, columnValueMap, sqlBuildingResult));
-        sqlBuildingResult.setSql(sb.toString());
-        return sqlBuildingResult;
+        sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
+        sb.append(sbValues);
+        return sb.toString();
+    }
+
+    public Map<String, Object> setupParameter() {
+        return resolveColumnValueMap(createBasicColumnValueMap());
     }
 
     // ===================================================================================
-    //                                                                    Set up SQL Parts
-    //                                                                    ================
-    protected Map<String, Object> setupColumnValueMap() {
-        final Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
+    //                                                                           SQL Parts
+    //                                                                           =========
+    protected Map<String, String> createBasicColumnValueMap() {
+        if (_basicColumnValueMap != null) {
+            return _basicColumnValueMap;
+        }
+        _basicColumnValueMap = new LinkedHashMap<String, String>();
         int columnCount = -1;
         for (String columnName : _columnNameList) {
             columnCount++;
@@ -77,42 +87,43 @@ public class DfWriteSqlBuilder {
             }
             if (!_columnMap.isEmpty() && _columnMap.containsKey(columnName)) {
                 String realDbName = _columnMap.get(columnName).getColumnName();
-                columnValueMap.put(realDbName, value);
+                _basicColumnValueMap.put(realDbName, value);
             } else {
-                columnValueMap.put(columnName, value);
+                _basicColumnValueMap.put(columnName, value);
             }
         }
-        return columnValueMap;
+        return _basicColumnValueMap;
     }
 
-    protected String setupValuesStringAndParameter(final Set<String> columnNameSet, Map<String, Object> columnValueMap,
-            DfWriteSqlBuildingResult sqlBuildingResult) {
-        final StringBuilder sbValues = new StringBuilder();
-        for (String columnName : columnNameSet) {
-            if (hasDefaultValue(columnName)) {
+    protected Map<String, Object> resolveColumnValueMap(Map<String, String> basicColumnValueMap) {
+        final Map<String, Object> resolvedColumnValueMap = new LinkedHashMap<String, Object>();
+        final Set<Entry<String, String>> entrySet = basicColumnValueMap.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            final String columnName = entry.getKey();
+            final String plainValue = entry.getValue();
+            Object resolvedValue = null;
+            if (Srl.is_Null_or_Empty(plainValue) && hasDefaultValue(columnName)) {
                 final String defaultValue = findDefaultValue(columnName);
-                sbValues.append(", ").append("?");
                 if (defaultValue.equalsIgnoreCase("sysdate")) {
                     final Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-                    sqlBuildingResult.addColumnValue(columnName, currentTimestamp);
+                    resolvedValue = currentTimestamp;
                 } else {
-                    sqlBuildingResult.addColumnValue(columnName, defaultValue);
+                    resolvedValue = defaultValue;
                 }
-            } else {
-                Object value = columnValueMap.get(columnName);
-                if (hasConvertValue(columnName)) {
-                    final Map<String, String> convertValueMapping = findConvertValueMapping(columnName);
-                    value = (value != null && (value instanceof String)) ? ((String) value).trim() : value;
-                    if (convertValueMapping.containsKey(value)) {
-                        value = convertValueMapping.get(value);
-                    }
-                }
-                sbValues.append(", ?");
-                sqlBuildingResult.addColumnValue(columnName, value);
             }
+            if (Srl.is_NotNull_and_NotEmpty(plainValue) && hasConvertValue(columnName)) {
+                final Map<String, String> convertValueMapping = findConvertValueMapping(columnName);
+                final String mappingKey = plainValue.trim();
+                if (convertValueMapping.containsKey(mappingKey)) {
+                    resolvedValue = convertValueMapping.get(mappingKey);
+                }
+            }
+            if (resolvedValue == null) {
+                resolvedValue = plainValue;
+            }
+            resolvedColumnValueMap.put(columnName, resolvedValue);
         }
-        sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
-        return sbValues.toString();
+        return resolvedColumnValueMap;
     }
 
     // ===================================================================================
