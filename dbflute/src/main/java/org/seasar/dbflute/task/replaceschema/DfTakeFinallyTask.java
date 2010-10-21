@@ -357,6 +357,76 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         if (!file.exists()) {
             return null;
         }
+        final StringBuilder sb = new StringBuilder();
+        boolean firstDone = false;
+        boolean failure = false;
+
+        // Create Schema
+        final CreateSchemaFinalInfo createSchemaFinalInfo = buildCreateSchemaFinalInfo();
+        if (createSchemaFinalInfo != null) {
+            if (firstDone) {
+                sb.append(ln()).append(ln());
+            } else {
+                firstDone = true;
+            }
+            sb.append(createSchemaFinalInfo.getMessage());
+            if (createSchemaFinalInfo.isFailure()) {
+                failure = true;
+            }
+        }
+
+        // Load Data
+        final LoadDataFinalInfo loadDataFinalInfo = buildLoadDataFinalInfo();
+        if (loadDataFinalInfo != null) {
+            if (firstDone) {
+                sb.append(ln()).append(ln());
+            } else {
+                firstDone = true;
+            }
+            sb.append(loadDataFinalInfo.getMessage());
+            if (loadDataFinalInfo.isFailure()) {
+                failure = true;
+            }
+        }
+
+        // Take Finally
+        if (result != null) {
+            if (firstDone) {
+                sb.append(ln()).append(ln());
+            } else {
+                firstDone = true;
+            }
+            sb.append(" ").append(result.getResultMessage());
+            final String detailMessage = result.getDetailMessage();
+            if (detailMessage != null && detailMessage.trim().length() > 0) {
+                final LineToken lineToken = new LineTokenImpl();
+                final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+                lineTokenizingOption.setDelimiter(ln());
+                final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
+                for (String tokenizedElement : tokenizedList) {
+                    sb.append(ln()).append("  ").append(tokenizedElement);
+                }
+            }
+            if (result.isExistsError()) {
+                failure = true;
+            }
+        } else {
+            failure = true; // means take-finally was not finished
+        }
+
+        if (failure) { // exists error anywhere
+            sb.append(ln()).append("    * * * * * *");
+            sb.append(ln()).append("    * Failure *");
+            sb.append(ln()).append("    * * * * * *");
+        }
+        return sb.toString();
+    }
+
+    protected CreateSchemaFinalInfo buildCreateSchemaFinalInfo() {
+        final File file = new File(DfCreateSchemaTask.LOG_PATH);
+        if (!file.exists()) {
+            return null;
+        }
         BufferedReader br = null;
         try {
             final FileInputStream fis = new FileInputStream(file);
@@ -384,38 +454,15 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             }
 
             final StringBuilder sb = new StringBuilder();
-            final String ln = ln();
-
-            // Create Schema
-            sb.append(ln).append(" ").append(line);
+            sb.append(ln()).append(" ").append(line);
             for (String detail : detailList) {
-                sb.append(ln).append("  ").append(detail);
+                sb.append(ln()).append("  ").append(detail);
             }
 
-            // Take Finally
-            if (result != null) {
-                sb.append(ln);
-                sb.append(ln).append(" ").append(result.getResultMessage());
-                final String detailMessage = result.getDetailMessage();
-                if (detailMessage != null && detailMessage.trim().length() > 0) {
-                    final LineToken lineToken = new LineTokenImpl();
-                    final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-                    lineTokenizingOption.setDelimiter(ln);
-                    final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
-                    for (String tokenizedElement : tokenizedList) {
-                        sb.append(ln).append("  ").append(tokenizedElement);
-                    }
-                }
-            }
-
-            // Exists Error
-            final boolean existsError = isLine2True(line2) || (result == null || result.isExistsError());
-            if (existsError) {
-                sb.append(ln).append("    * * * * * *");
-                sb.append(ln).append("    * Failure *");
-                sb.append(ln).append("    * * * * * *");
-            }
-            return sb.toString();
+            final CreateSchemaFinalInfo info = new CreateSchemaFinalInfo();
+            info.setMessage(sb.toString());
+            info.setFailure(isLine2True(line2));
+            return info;
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         } catch (FileNotFoundException e) {
@@ -440,6 +487,99 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
     protected boolean isLine2True(String line2) {
         return line2 != null && line2.trim().equalsIgnoreCase("true");
+    }
+
+    protected static class CreateSchemaFinalInfo {
+        protected String _message;
+        protected boolean _failure;
+
+        public String getMessage() {
+            return _message;
+        }
+
+        public void setMessage(String message) {
+            this._message = message;
+        }
+
+        public boolean isFailure() {
+            return _failure;
+        }
+
+        public void setFailure(boolean failure) {
+            this._failure = failure;
+        }
+    }
+
+    protected LoadDataFinalInfo buildLoadDataFinalInfo() {
+        final File file = new File(DfLoadDataTask.LOG_PATH);
+        if (!file.exists()) {
+            return null;
+        }
+        BufferedReader br = null;
+        try {
+            final FileInputStream fis = new FileInputStream(file);
+            br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+
+            final StringBuilder sb = new StringBuilder();
+            int index = 0;
+            while (true) {
+                final String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                if (index == 0) { // title
+                    sb.append(" ");
+                } else { // warning file
+                    sb.append(ln()).append("  ");
+                }
+                sb.append(line);
+                ++index;
+            }
+            final LoadDataFinalInfo loadDataFinalInfo = new LoadDataFinalInfo();
+            loadDataFinalInfo.setMessage(sb.toString());
+            loadDataFinalInfo.setFailure(true); // loadDataFinalInfo has only error info
+            return loadDataFinalInfo;
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (!deleted) {
+                    // ignored
+                }
+            }
+        }
+    }
+
+    protected static class LoadDataFinalInfo {
+        protected String _message;
+        protected boolean _failure;
+
+        public String getMessage() {
+            return _message;
+        }
+
+        public void setMessage(String message) {
+            this._message = message;
+        }
+
+        public boolean isFailure() {
+            return _failure;
+        }
+
+        public void setFailure(boolean failure) {
+            this._failure = failure;
+        }
     }
 
     // ===================================================================================

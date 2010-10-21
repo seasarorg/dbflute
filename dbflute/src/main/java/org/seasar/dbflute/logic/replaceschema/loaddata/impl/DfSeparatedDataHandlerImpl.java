@@ -20,8 +20,10 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -52,10 +54,9 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _loggingInsertSql;
-
     protected DataSource _dataSource;
-
     protected UnifiedSchema _unifiedSchema;
+    protected final List<String> _continuedErrorFileList = new ArrayList<String>();
 
     // ===================================================================================
     //                                                                                Main
@@ -109,6 +110,9 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                     writerImpl.setConvertValueMap(convertValueMap);
                     writerImpl.setDefaultValueMap(defaultValueMap);
                     writerImpl.writeData(notFoundColumnMap);
+                    if (writerImpl.hasContinuedError()) {
+                        _continuedErrorFileList.add(fileNamePath);
+                    }
                 }
             }
         } catch (FileNotFoundException e) {
@@ -186,5 +190,9 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
     public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
         this._unifiedSchema = unifiedSchema;
+    }
+
+    public List<String> getContinuedErrorFileList() {
+        return _continuedErrorFileList;
     }
 }

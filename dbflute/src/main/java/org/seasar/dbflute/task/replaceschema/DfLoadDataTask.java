@@ -1,5 +1,14 @@
 package org.seasar.dbflute.task.replaceschema;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -24,12 +33,14 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfLoadDataTask.class);
+    protected static final String LOG_PATH = "./log/load-data.log";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean validTaskEndInformation = true;
-    protected DfXlsDataHandlerImpl xlsDataHandlerImpl;
+    protected boolean _validTaskEndInformation = true;
+    protected DfXlsDataHandlerImpl _xlsDataHandlerImpl;
+    protected final List<String> _continuedErrorFileList = new ArrayList<String>();
 
     // ===================================================================================
     //                                                                             Execute
@@ -51,11 +62,12 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         writeDbFromSeparatedFileAsLoadingTypeData("csv", ",");
         writeDbFromXlsAsLoadingTypeData();
         writeDbFromXlsAsLoadingTypeDataAdditional();
+        dumpContinuedErrorResult();
     }
 
     @Override
     protected boolean isValidTaskEndInformation() {
-        return validTaskEndInformation;
+        return _validTaskEndInformation;
     }
 
     protected String getDataLoadingType() {
@@ -102,6 +114,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         handlingInfo.setErrorContinue(true);
         final DfSeparatedDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
         showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
+        _continuedErrorFileList.addAll(handler.getContinuedErrorFileList());
     }
 
     protected void showNotFoundColumn(String typeName, Map<String, Set<String>> notFoundColumnMap) {
@@ -165,7 +178,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     protected DfXlsDataHandlerImpl getXlsDataHandlerImpl() {
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        if (xlsDataHandlerImpl == null) {
+        if (_xlsDataHandlerImpl == null) {
             final DfXlsDataHandlerImpl xlsDataHandler;
             if (basicProperties.isDatabaseSQLServer()) {
                 xlsDataHandler = new DfXlsDataHandlerSQLServer(getDataSource());
@@ -176,9 +189,9 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
             xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
             xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
-            xlsDataHandlerImpl = xlsDataHandler;
+            _xlsDataHandlerImpl = xlsDataHandler;
         }
-        return xlsDataHandlerImpl;
+        return _xlsDataHandlerImpl;
     }
 
     // --------------------------------------------
@@ -193,10 +206,53 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     // ===================================================================================
+    //                                                                         Dump Result
+    //                                                                         ===========
+    protected void dumpContinuedErrorResult() {
+        final File file = new File(LOG_PATH);
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            if (!deleted) {
+                return; // skip to dump!
+            }
+        }
+        if (_continuedErrorFileList.isEmpty()) {
+            return;
+        }
+        BufferedWriter bw = null;
+        try {
+            final StringBuilder contentsSb = new StringBuilder();
+            contentsSb.append("{Load Data}: warning files=" + _continuedErrorFileList.size());
+            List<String> continuedErrorFileList = _continuedErrorFileList;
+            for (String continuedErrorFile : continuedErrorFileList) {
+                // remove path because only file names are enough to see the files 
+                final String fileName = Srl.substringLastRear(continuedErrorFile, "/");
+                contentsSb.append(ln()).append("x " + fileName);
+            }
+            final FileOutputStream fos = new FileOutputStream(file);
+            bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
+            bw.write(contentsSb.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setValidTaskEndInformation(String validTaskEndInformation) {
-        this.validTaskEndInformation = validTaskEndInformation != null
+        this._validTaskEndInformation = validTaskEndInformation != null
                 && validTaskEndInformation.trim().equalsIgnoreCase("true");
     }
 }

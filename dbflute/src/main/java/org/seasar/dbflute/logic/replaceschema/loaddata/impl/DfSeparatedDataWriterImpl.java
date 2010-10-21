@@ -60,6 +60,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     protected boolean _errorContinue;
     protected Map<String, Map<String, String>> _convertValueMap;
     protected Map<String, String> _defaultValueMap;
+    protected boolean _continuedError;
 
     /** The cache map of meta info. The key is table name. */
     protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
@@ -215,6 +216,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             sb.append(ln()).append("  Parameters = ");
                             sb.append(sqlBuildingResult.getColumnValueMap());
                             _log.warn(sb);
+                            _continuedError = true;
                             continue;
                         } else {
                             throw e;
@@ -679,5 +681,9 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
 
     public void setDefaultValueMap(Map<String, String> defaultValueMap) {
         this._defaultValueMap = defaultValueMap;
+    }
+
+    public boolean hasContinuedError() {
+        return _continuedError;
     }
 }
