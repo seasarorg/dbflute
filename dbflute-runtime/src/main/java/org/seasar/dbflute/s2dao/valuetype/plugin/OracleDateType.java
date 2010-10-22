@@ -33,17 +33,19 @@ public abstract class OracleDateType extends UtilDateAsTimestampType {
     @Override
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) { // basically for insert and update
-            super.bindValue(ps, index, value);
+            super.bindValue(ps, index, null);
+        } else {
+            ps.setObject(index, toOracleDate(toTimestamp(value)));
         }
-        ps.setObject(index, toOracleDate(toTimestamp(value)));
     }
 
     @Override
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
-            super.bindValue(cs, parameterName, value);
+            super.bindValue(cs, parameterName, null);
+        } else {
+            cs.setObject(parameterName, toOracleDate(toTimestamp(value)));
         }
-        cs.setObject(parameterName, toOracleDate(toTimestamp(value)));
     }
 
     // ===================================================================================
