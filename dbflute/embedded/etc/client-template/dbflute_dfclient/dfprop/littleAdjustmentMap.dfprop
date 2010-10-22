@@ -20,6 +20,7 @@
 # o extendedS2DaoSettingClass: (NotRequired - Default '')
 # o shortCharHandlingMode: (NotRequired - Default NONE)
 # o quoteTableNameList: (NotRequired - Default list:{})
+# o quoteColumnNameList: (NotRequired - Default list:{})
 # 
 # *The line that starts with '#' means comment-out.
 #
@@ -219,6 +220,14 @@ map:{
     #  Specified tables is quoted on auto-generated SQL.
     #
     #; quoteTableNameList = list:{}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o quoteColumnNameList: (NotRequired - Default list:{})
+    #  The list of column DB names that need to be quoted.
+    #  Specified columns is quoted on auto-generated SQL.
+    #
+    #; quoteColumnNameList = list:{}
     # - - - - - - - - - -/
 }
 # ----------------/

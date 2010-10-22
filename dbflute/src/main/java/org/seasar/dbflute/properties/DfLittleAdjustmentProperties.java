@@ -62,7 +62,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isAvailableDatabaseDependency() {
         return isProperty("isAvailableDatabaseDependency", false);
     }
-    
+
     // ===================================================================================
     //                                                                         Native JDBC
     //                                                                         ===========
@@ -191,18 +191,19 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                 -----
     protected Set<String> _quoteTableNameSet;
 
-    protected Set<String> getQuoteTableNameSet() { // It's closet!
+    protected Set<String> getQuoteTableNameSet() {
         if (_quoteTableNameSet != null) {
             return _quoteTableNameSet;
         }
         final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
         final Object obj = littleAdjustmentMap.get("quoteTableNameList");
-        if (obj == null) {
-            return new HashSet<String>();
+        if (obj != null) {
+            final List<String> list = castToList(obj, "littleAdjustmentMap.quoteTableNameList");
+            _quoteTableNameSet = StringSet.createAsFlexible();
+            _quoteTableNameSet.addAll(list);
+        } else {
+            _quoteTableNameSet = new HashSet<String>();
         }
-        final List<String> list = castToList(obj, "littleAdjustmentMap.quoteTableNameList");
-        _quoteTableNameSet = StringSet.createAsFlexible();
-        _quoteTableNameSet.addAll(list);
         return _quoteTableNameSet;
     }
 
@@ -224,12 +225,29 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                                Column
     //                                                ------
-    // *basically unsupported about column's quotation
-    public boolean isQuoteColumn(String tableName) { // non property
-        return false; // fixed
+    protected Set<String> _quoteColumnNameSet;
+
+    protected Set<String> getQuoteColumnNameSet() {
+        if (_quoteColumnNameSet != null) {
+            return _quoteColumnNameSet;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final Object obj = littleAdjustmentMap.get("quoteColumnNameList");
+        if (obj != null) {
+            final List<String> list = castToList(obj, "littleAdjustmentMap.quoteColumnNameList");
+            _quoteColumnNameSet = StringSet.createAsFlexible();
+            _quoteColumnNameSet.addAll(list);
+        } else {
+            _quoteColumnNameSet = new HashSet<String>();
+        }
+        return _quoteColumnNameSet;
     }
 
-    public String quoteColumnNameIfNeeds(String columnName) { // non property
+    public boolean isQuoteColumn(String columnName) {
+        return getQuoteColumnNameSet().contains(columnName);
+    }
+
+    public String quoteColumnNameIfNeeds(String columnName) {
         return quoteColumnNameIfNeeds(columnName, false);
     }
 
