@@ -87,6 +87,7 @@ public class ${glDBFluteConfig} {
      * Constructor.
      */
     private ${glDBFluteConfig}() {
+        // adjusts default settings
 	    if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
             //   o the DATE type of Oracle has seconds  
