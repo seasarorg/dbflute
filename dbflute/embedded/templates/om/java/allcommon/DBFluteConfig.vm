@@ -96,11 +96,19 @@ public class ${glDBFluteConfig} {
             String timestampFormat = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
             _logTimestampFormat = "timestamp $df:{" + timestampFormat + "}";
 
-            // It should treat java.util.Date as time-stamp,
-            // because the DATE type of Oracle has time parts.
             Class<?> keyType = java.util.Date.class;
             ValueType valueType = TnValueTypes.UTILDATE_AS_TIMESTAMP;
-            TnValueTypes.registerBasicValueType(keyType, valueType); // switch
+
+            // because Oracle does not have the no-time-parts date type (good-bye java.sql.Date)
+            TnValueTypes.registerBasicValueType(keyType, valueType);
+
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            // uses Oracle date that is the class of database native JDBC to get best performances
+            TnValueTypes.registerPluginValueType("oracleDateType", new ImplementedOracleDateType());
+#else
+            // same as UtilDate handling because using database native JDBC is not available
+            TnValueTypes.registerPluginValueType("oracleDateType", valueType);
+#end
 	    } else if (isCurrentDBDef(DBDef.SQLServer)) {
 	        // It should treat java.util.UUID as string,
 	        // because the UUID type of SQLServer cannot handle the type.
@@ -109,6 +117,16 @@ public class ${glDBFluteConfig} {
             TnValueTypes.registerBasicValueType(keyType, valueType); // switch
 	    }
     }
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+
+    public class static ImplementedOracleDateType extends org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType {
+
+        @Override
+        protected Object toOracleDate(java.sql.Timestamp timestamp) {
+            return new oracle.sql.DATE(timestamp);
+        }
+    }
+#end
 
     // ===================================================================================
     //                                                                           Singleton

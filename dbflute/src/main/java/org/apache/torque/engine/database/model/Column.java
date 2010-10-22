@@ -340,7 +340,6 @@ public class Column {
     // -----------------------------------------------------
     //                                               DB Type
     //                                               -------
-    // for documents basically
     public void setDbType(String dbType) {
         this._dbType = dbType;
     }
@@ -349,40 +348,32 @@ public class Column {
         return _dbType;
     }
 
+    public boolean hasDbType() {
+        return _dbType != null && _dbType.trim().length() > 0;
+    }
+
     public String getDbTypeExpression() {
-        return _dbType != null ? _dbType : "UnknownType";
+        return hasDbType() ? _dbType : "UnknownType";
     }
 
     public boolean isDbTypeCharOrVarchar() {
-        final String dbType = getDbType();
-        if (dbType == null) {
-            return false;
-        }
-        return dbType.startsWith("char") || dbType.startsWith("varchar");
+        return hasDbType() && (_dbType.startsWith("char") || _dbType.startsWith("varchar"));
     }
 
     public boolean isDbTypeNCharOrNVarchar() {
-        final String dbType = getDbType();
-        if (dbType == null) {
-            return false;
-        }
-        return dbType.startsWith("nchar") || dbType.startsWith("nvarchar");
+        return hasDbType() && (_dbType.startsWith("nchar") || _dbType.startsWith("nvarchar"));
     }
 
     public boolean isDbTypeStringClob() { // as pinpoint
-        final String dbTypeName = getDbType();
-        if (dbTypeName == null) {
-            return false;
-        }
-        return _columnHandler.isConceptTypeStringClob(dbTypeName);
+        return hasDbType() && _columnHandler.isConceptTypeStringClob(_dbType);
     }
 
     public boolean isDbTypeBytesOid() { // as pinpoint
-        final String dbTypeName = getDbType();
-        if (dbTypeName == null) {
-            return false;
-        }
-        return _columnHandler.isConceptTypeBytesOid(dbTypeName);
+        return hasDbType() && _columnHandler.isConceptTypeBytesOid(_dbType);
+    }
+
+    public boolean isDbTypeOracleDate() { // as pinpoint
+        return hasDbType() && _columnHandler.isOracleDate(_dbType);
     }
 
     // -----------------------------------------------------

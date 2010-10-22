@@ -1390,6 +1390,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().getConditionQueryNotEqualDefinitionName();
     }
 
+    public boolean isAvailableDatabaseNativeJDBC() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();
+    }
+
     public boolean isMakeDeprecated() {
         return getProperties().getLittleAdjustmentProperties().isMakeDeprecated();
     }

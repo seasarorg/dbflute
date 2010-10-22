@@ -623,6 +623,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "bytesOidType";
 
 #end
+#if ($col.isDbTypeOracleDate())
+    /** The value type annotation. {${col.columnDefinitionLineDisp}} */
+    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "oracleDateType";
+
+#end
     /**
      * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())

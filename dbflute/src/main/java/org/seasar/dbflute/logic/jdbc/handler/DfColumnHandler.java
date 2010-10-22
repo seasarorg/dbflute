@@ -309,6 +309,10 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return getJdbcTypeMapper().isOracleNumber(dbTypeName);
     }
 
+    public boolean isOracleDate(final String dbTypeName) {
+        return getJdbcTypeMapper().isOracleDate(dbTypeName);
+    }
+
     public boolean isOracleCursor(final String dbTypeName) {
         return getJdbcTypeMapper().isOracleCursor(dbTypeName);
     }

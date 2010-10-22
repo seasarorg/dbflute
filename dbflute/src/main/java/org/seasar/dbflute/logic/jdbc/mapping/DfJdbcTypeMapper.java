@@ -223,6 +223,10 @@ public class DfJdbcTypeMapper {
         return _resource.isDbmsOracle() && matchIgnoreCase(dbTypeName, "number");
     }
 
+    public boolean isOracleDate(final String dbTypeName) {
+        return _resource.isDbmsOracle() && matchIgnoreCase(dbTypeName, "date");
+    }
+
     public boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
         return _resource.isDbmsOracle() && java.sql.Types.TIMESTAMP == jdbcType && matchIgnoreCase(dbTypeName, "date");
     }

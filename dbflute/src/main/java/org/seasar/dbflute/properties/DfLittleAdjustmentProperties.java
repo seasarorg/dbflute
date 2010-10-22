@@ -71,6 +71,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                         Native JDBC
+    //                                                                         ===========
+    public boolean isAvailableDatabaseNativeJDBC() {
+        // the default is available to get best performances,
+        // for example, it needs to use its oracle.sql.DATE on Oracle
+        return isProperty("isAvailableDatabaseNativeJDBC", true);
+    }
+
+    // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
     public boolean isCheckSelectedClassification() {
