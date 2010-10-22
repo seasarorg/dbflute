@@ -88,30 +88,27 @@ public class ${glDBFluteConfig} {
      */
     private ${glDBFluteConfig}() {
 	    if (isCurrentDBDef(DBDef.Oracle)) {
-            // Date formatting has Two points:
-            //   o The DATE type of Oracle has seconds.  
-            //   o It uses a date literal of Oracle.
+            // date formatting has two points:
+            //   o the DATE type of Oracle has seconds  
+            //   o it uses a date literal of Oracle
             String dateFormat = "yyyy-MM-dd HH:mm:ss";
             _logDateFormat = "timestamp $df:{" + dateFormat + "}";
             String timestampFormat = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
             _logTimestampFormat = "timestamp $df:{" + timestampFormat + "}";
 
+            // adjust UtilDate handling, which is basically
+            // for Oracle date that has time-parts 
             Class<?> keyType = java.util.Date.class;
-            ValueType valueType = TnValueTypes.UTILDATE_AS_TIMESTAMP;
-
-            // because Oracle does not have the no-time-parts date type (good-bye java.sql.Date)
-            TnValueTypes.registerBasicValueType(keyType, valueType);
-
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             // uses Oracle date that is the class of database native JDBC to get best performances
-            TnValueTypes.registerPluginValueType("oracleDateType", new ImplementedOracleDateType());
+            TnValueTypes.registerBasicValueType(keyType, new ImplementedOracleDateType());
 #else
-            // same as UtilDate handling because using database native JDBC is not available
-            TnValueTypes.registerPluginValueType("oracleDateType", valueType);
+            // because using database native JDBC is not available
+            TnValueTypes.registerBasicValueType(keyType, TnValueTypes.UTILDATE_AS_TIMESTAMP);
 #end
 	    } else if (isCurrentDBDef(DBDef.SQLServer)) {
-	        // It should treat java.util.UUID as string,
-	        // because the UUID type of SQLServer cannot handle the type.
+	        // it should treat java.util.UUID as string,
+	        // because the UUID type of SQLServer cannot handle the type
             Class<?> keyType = java.util.UUID.class;
             ValueType valueType = TnValueTypes.UUID_AS_STRING;
             TnValueTypes.registerBasicValueType(keyType, valueType); // switch
