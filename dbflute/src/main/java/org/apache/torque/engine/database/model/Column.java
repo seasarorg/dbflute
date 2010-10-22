@@ -222,9 +222,9 @@ public class Column {
     }
 
     protected void handleProgramReservationWord() {
-        final DfBasicProperties basicProp = getBasicProperties();
-        if (basicProp.isPgReservColumn(_name)) {
-            _synonym = basicProp.resolvePgReservColumn(_name);
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        if (prop.isPgReservColumn(_name)) {
+            _synonym = prop.resolvePgReservColumn(_name);
             _plainComment = _plainComment + " (using DBFlute synonym)";
         }
     }

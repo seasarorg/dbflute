@@ -1,5 +1,6 @@
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -330,6 +331,58 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                               PG Reservation Column
+    //                                                               =====================
+    protected List<String> _pgReservColumnList;
+
+    public List<String> getPgReservColumnList() { // It's closet!
+        if (_pgReservColumnList != null) {
+            return _pgReservColumnList;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final Object obj = littleAdjustmentMap.get("pgReservColumnList");
+        if (obj != null) {
+            _pgReservColumnList = castToList(obj, "littleAdjustmentMap.pgReservColumnList");
+        } else {
+            _pgReservColumnList = new ArrayList<String>();
+        }
+        return _pgReservColumnList;
+    }
+
+    public boolean isPgReservColumn(String columnName) {
+        final List<String> pgReservColumnList = getPgReservColumnList();
+        if (pgReservColumnList.isEmpty()) {
+            if (isTargetLanguageJava()) {
+                return Srl.equalsIgnoreCase(columnName, getDefaultJavaPgReservColumn());
+            } else if (isTargetLanguageCSharp()) {
+                return Srl.equalsIgnoreCase(columnName, getDefaultCSharpPgReservColumn());
+            } else {
+                return false;
+            }
+        } else {
+            return Srl.equalsIgnoreCase(columnName, pgReservColumnList.toArray(new String[] {}));
+        }
+    }
+
+    protected String[] getDefaultJavaPgReservColumn() {
+        // likely words only (and only can be checked at examples)
+        return new String[] { "class", "case", "package", "default", "new", "native", "void", "public", "protected",
+                "private", "interface", "abstract", "final", "finally", "return", "double", "float", "short" };
+    }
+
+    protected String[] getDefaultCSharpPgReservColumn() {
+        // likely words only (and only can be checked at examples)
+        return new String[] { "class" };
+    }
+
+    public String resolvePgReservColumn(String columnName) {
+        if (isPgReservColumn(columnName)) {
+            return columnName + (getBasicProperties().isColumnNameCamelCase() ? "Synonym" : "_SYNONYM");
+        }
+        return columnName;
+    }
+
+    // ===================================================================================
     //                                                                          Value Type
     //                                                                          ==========
     // S2Dao.NET does not implement ValueType attribute,
@@ -418,6 +471,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             throw new UnsupportedOperationException(msg);
         }
         return false;
+    }
+
+    protected boolean isTargetLanguageJava() {
+        return getBasicProperties().isTargetLanguageJava();
     }
 
     protected boolean isTargetLanguageCSharp() {
