@@ -91,26 +91,26 @@ public class ${glDBFluteConfig} {
             // date formatting has two points:
             //   o the DATE type of Oracle has seconds  
             //   o it uses a date literal of Oracle
-            String dateFormat = "yyyy-MM-dd HH:mm:ss";
-            _logDateFormat = "timestamp $df:{" + dateFormat + "}";
-            String timestampFormat = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
-            _logTimestampFormat = "timestamp $df:{" + timestampFormat + "}";
+            _logDateFormat = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
+            _logTimestampFormat = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
 
             // adjusts UtilDate handling, which is basically for Oracle date that has time-parts.
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
-            // treats as uses Oracle date of database native JDBC to get best performances
-            TnValueTypes.registerBasicValueType(java.util.Date.class, new ImplementedOracleDateType());
-#else
-            // treats as time-stamp because using database native JDBC is not available
-            TnValueTypes.registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
-#end
+            TnValueTypes.registerBasicValueType(java.util.Date.class, getOracleUtilDateHandlingType());
 	    } else if (isCurrentDBDef(DBDef.SQLServer)) {
 	        // it should treat java.util.UUID as string,
 	        // because the UUID type of SQLServer cannot handle the type
-            Class<?> keyType = java.util.UUID.class;
-            ValueType valueType = TnValueTypes.UUID_AS_STRING;
-            TnValueTypes.registerBasicValueType(keyType, valueType); // switch
+            TnValueTypes.registerBasicValueType(java.util.UUID.class, TnValueTypes.UUID_AS_STRING);
 	    }
+    }
+
+    private ValueType getOracleUtilDateHandlingType() {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+        // treats as uses Oracle date of database native JDBC to get best performances
+        return new ImplementedOracleDateType();
+#else
+        // treats as time-stamp because using database native JDBC is not available
+        return TnValueTypes.UTILDATE_AS_TIMESTAMP;
+#end
     }
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
 
