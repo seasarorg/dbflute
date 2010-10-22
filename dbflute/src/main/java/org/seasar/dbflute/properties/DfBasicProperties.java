@@ -641,7 +641,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     protected String[] getDefaultJavaPgReservColumn() {
         // likely words only (and only can be checked at examples)
-        return new String[] { "class", "case", "package", "default", "new", "native" };
+        return new String[] { "class", "case", "package", "default", "new", "native", "void", "public", "protected",
+                "private", "interface", "abstract", "final", "finally", "return", "double", "float", "short" };
     }
 
     protected String[] getDefaultCSharpPgReservColumn() {
