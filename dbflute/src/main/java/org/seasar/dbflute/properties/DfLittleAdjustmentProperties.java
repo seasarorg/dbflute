@@ -62,21 +62,20 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isAvailableDatabaseDependency() {
         return isProperty("isAvailableDatabaseDependency", false);
     }
+    
+    // ===================================================================================
+    //                                                                         Native JDBC
+    //                                                                         ===========
+    public boolean isAvailableDatabaseNativeJDBC() {
+        // for example, using oracle.sql.DATE on Oracle gives us best performances
+        return isProperty("isAvailableDatabaseNativeJDBC", false);
+    }
 
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
     public boolean isAvailableNonPrimaryKeyWritable() {
         return isProperty("isAvailableNonPrimaryKeyWritable", false);
-    }
-
-    // ===================================================================================
-    //                                                                         Native JDBC
-    //                                                                         ===========
-    public boolean isAvailableDatabaseNativeJDBC() {
-        // the default is available to get best performances,
-        // for example, it needs to use its oracle.sql.DATE on Oracle
-        return isProperty("isAvailableDatabaseNativeJDBC", true);
     }
 
     // ===================================================================================

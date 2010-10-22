@@ -96,15 +96,13 @@ public class ${glDBFluteConfig} {
             String timestampFormat = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
             _logTimestampFormat = "timestamp $df:{" + timestampFormat + "}";
 
-            // adjust UtilDate handling, which is basically
-            // for Oracle date that has time-parts 
-            Class<?> keyType = java.util.Date.class;
+            // adjusts UtilDate handling, which is basically for Oracle date that has time-parts.
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
-            // uses Oracle date that is the class of database native JDBC to get best performances
-            TnValueTypes.registerBasicValueType(keyType, new ImplementedOracleDateType());
+            // treats as uses Oracle date of database native JDBC to get best performances
+            TnValueTypes.registerBasicValueType(java.util.Date.class, new ImplementedOracleDateType());
 #else
-            // because using database native JDBC is not available
-            TnValueTypes.registerBasicValueType(keyType, TnValueTypes.UTILDATE_AS_TIMESTAMP);
+            // treats as time-stamp because using database native JDBC is not available
+            TnValueTypes.registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
 #end
 	    } else if (isCurrentDBDef(DBDef.SQLServer)) {
 	        // it should treat java.util.UUID as string,
@@ -116,7 +114,7 @@ public class ${glDBFluteConfig} {
     }
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
 
-    public class static ImplementedOracleDateType extends org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType {
+    public static class ImplementedOracleDateType extends org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType {
 
         @Override
         protected Object toOracleDate(java.sql.Timestamp timestamp) {

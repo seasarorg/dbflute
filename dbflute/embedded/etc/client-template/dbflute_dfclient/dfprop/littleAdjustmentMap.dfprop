@@ -6,8 +6,8 @@
 # o isAvailableAddingSchemaToTableSqlName: (NotRequired - Default false)
 # o isAvailableAddingCatalogToTableSqlName: (NotRequired - Default false)
 # o isAvailableDatabaseDependency: (NotRequired - Default false)
+# o isAvailableDatabaseNativeJDBC: (NotRequired - Default false)
 # o isAvailableNonPrimaryKeyWritable: (NotRequired - Default false)
-# o isAvailableDatabaseNativeJDBC: (NotRequired - Default true)
 # o isCheckSelectedClassification: (NotRequired - Default false)
 # o isForceClassificationSetting: (NotRequired - Default false)
 # o isMakeEntityChaseRelation: (NotRequired - Default false)
@@ -60,18 +60,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isAvailableNonPrimaryKeyWritable: (NotRequired - Default false)
-    #   [true]
-    #     Generate writable methods at non-primary-key table.
-    #
-    #   [false]
-    #     Non.
-    #
-    #; isAvailableNonPrimaryKeyWritable = false
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isAvailableDatabaseNativeJDBC: (NotRequired - Default true)
+    # o isAvailableDatabaseNativeJDBC: (NotRequired - Default false)
     #   [true]
     #     Use classes of database native JDBC on generated classes
     #     to get best performances of DB access.
@@ -80,7 +69,18 @@ map:{
     #   [false]
     #     Non.
     #
-    #; isAvailableDatabaseNativeJDBC = true
+    #; isAvailableDatabaseNativeJDBC = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isAvailableNonPrimaryKeyWritable: (NotRequired - Default false)
+    #   [true]
+    #     Generate writable methods at non-primary-key table.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isAvailableNonPrimaryKeyWritable = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
