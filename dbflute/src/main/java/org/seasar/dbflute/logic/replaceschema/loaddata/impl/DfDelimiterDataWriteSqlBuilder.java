@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -8,13 +9,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfWriteSqlBuilder {
+public class DfDelimiterDataWriteSqlBuilder {
 
     //====================================================================================
     //                                                                           Attribute
@@ -24,11 +27,10 @@ public class DfWriteSqlBuilder {
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
-    protected Map<String, String> _targetConvertColumnNameKeyToLowerMap;
-    protected Map<String, String> _additionalDefaultColumnNameToLowerMap;
     protected Map<String, Map<String, String>> _convertValueMap;
     protected Map<String, String> _defaultValueMap;
     protected Map<String, String> _basicColumnValueMap;
+    protected Map<String, String> _allColumnConvertMap;
 
     // ===================================================================================
     //                                                                           Build SQL
@@ -81,9 +83,11 @@ public class DfWriteSqlBuilder {
                 } else {
                     value = null;
                 }
-            } catch (java.lang.RuntimeException e) {
-                throw new RuntimeException("valueList.get(columnCount) threw the exception: valueList=" + _valueList
-                        + " columnCount=" + columnCount, e);
+            } catch (RuntimeException e) {
+                String msg = "valueList.get(columnCount) threw the exception:";
+                msg = msg + " tableName=" + _tableName + " columnNameList=" + _columnNameList;
+                msg = msg + " valueList=" + _valueList + " columnCount=" + columnCount;
+                throw new DfTableDataRegistrationFailureException(msg, e);
             }
             if (!_columnMap.isEmpty() && _columnMap.containsKey(columnName)) {
                 String realDbName = _columnMap.get(columnName).getColumnName();
@@ -101,68 +105,103 @@ public class DfWriteSqlBuilder {
         for (Entry<String, String> entry : entrySet) {
             final String columnName = entry.getKey();
             final String plainValue = entry.getValue();
-            Object resolvedValue = null;
-            if (Srl.is_Null_or_Empty(plainValue) && hasDefaultValue(columnName)) {
-                final String defaultValue = findDefaultValue(columnName);
-                if (defaultValue.equalsIgnoreCase("sysdate")) {
-                    final Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-                    resolvedValue = currentTimestamp;
-                } else {
-                    resolvedValue = defaultValue;
-                }
-            }
-            if (Srl.is_NotNull_and_NotEmpty(plainValue) && hasConvertValue(columnName)) {
-                final Map<String, String> convertValueMapping = findConvertValueMapping(columnName);
-                final String mappingKey = plainValue.trim();
-                if (convertValueMapping.containsKey(mappingKey)) {
-                    resolvedValue = convertValueMapping.get(mappingKey);
-                }
-            }
-            if (resolvedValue == null) {
-                resolvedValue = plainValue;
+            Object resolvedValue;
+            if (Srl.is_NotNull_and_NotEmpty(plainValue)) {
+                resolvedValue = resolveConvertValue(columnName, plainValue);
+            } else {
+                resolvedValue = resolveDefaultValue(columnName, plainValue);
             }
             resolvedColumnValueMap.put(columnName, resolvedValue);
         }
         return resolvedColumnValueMap;
     }
 
+    protected String resolveConvertValue(String columnName, String plainValue) {
+        String resolvedValue = plainValue;
+        final Map<String, String> valueMapping = findConvertValueMapping(columnName);
+        if (valueMapping == null || valueMapping.isEmpty()) {
+            return resolvedValue;
+        }
+        for (Entry<String, String> entry : valueMapping.entrySet()) {
+            final String before = resolveControlCharacter(entry.getKey());
+            final String after = resolveControlCharacter(entry.getValue());
+            if (Srl.startsWithIgnoreCase(before, DfNameHintUtil.CONTAIN_MARK)) {
+                final String realBefore = Srl.substringFirstRear(before, DfNameHintUtil.CONTAIN_MARK);
+                resolvedValue = Srl.replace(resolvedValue, realBefore, after);
+            } else if (resolvedValue.equals(before)) { // case sensitive here
+                resolvedValue = after;
+            }
+        }
+        return resolvedValue;
+    }
+
+    protected String resolveControlCharacter(String after) {
+        if (after == null) {
+            return null;
+        }
+        final String tmp = "${df:temporaryVariable}";
+        after = Srl.replace(after, "\\\\", tmp);
+        after = Srl.replace(after, "\\r", "\r");
+        after = Srl.replace(after, "\\n", "\n");
+        after = Srl.replace(after, "\\t", "\t");
+        after = Srl.replace(after, tmp, "\\");
+        return after;
+    }
+
+    protected Object resolveDefaultValue(String columnName, Object plainValue) {
+        if (!hasDefaultValue(columnName)) {
+            return plainValue;
+        }
+        Object resolvedValue = plainValue;
+        final String defaultValue = findDefaultValue(columnName);
+        if (Srl.is_Null_or_Empty(defaultValue)) {
+            return null; // empty is treated as null
+        }
+        if (defaultValue.equalsIgnoreCase("sysdate")) {
+            resolvedValue = new Timestamp(System.currentTimeMillis());
+        } else {
+            resolvedValue = defaultValue;
+        }
+        return resolvedValue;
+    }
+
     // ===================================================================================
     //                                                                       Convert Value
     //                                                                       =============
-    private boolean hasConvertValue(String columnName) {
-        return findConvertValueMapping(columnName) != null;
-    }
-
     private Map<String, String> findConvertValueMapping(String columnName) {
-        if (!_convertValueMap.containsKey(columnName)) {
-            if (_targetConvertColumnNameKeyToLowerMap.containsKey(columnName.toLowerCase())) {
-                final String realColumnName = _targetConvertColumnNameKeyToLowerMap.get(columnName.toLowerCase());
-                if (_convertValueMap.containsKey(realColumnName)) {
-                    return _convertValueMap.get(realColumnName);
-                }
+        if (_allColumnConvertMap == null) { // initialize
+            _allColumnConvertMap = _convertValueMap.get("$$ALL$$");
+            if (_allColumnConvertMap == null) {
+                _allColumnConvertMap = new HashMap<String, String>();
             }
-            return null;
         }
-        return _convertValueMap.get(columnName);
+        // convertValueMap should be case insensitive (or flexible) map
+        // (must be already resolved here)
+        final Map<String, String> resultMap = _convertValueMap.get(columnName);
+        if (resultMap != null && !resultMap.isEmpty()) {
+            if (!_allColumnConvertMap.isEmpty()) {
+                final Map<String, String> mergedMap = new HashMap<String, String>();
+                mergedMap.putAll(_allColumnConvertMap);
+                mergedMap.putAll(resultMap); // override if same value
+                return mergedMap;
+            } else {
+                return resultMap;
+            }
+        } else {
+            return !_allColumnConvertMap.isEmpty() ? _allColumnConvertMap : null;
+        }
     }
 
     // ===================================================================================
     //                                                                       Default Value
     //                                                                       =============
     private boolean hasDefaultValue(String columnName) {
-        return findDefaultValue(columnName) != null;
+        return _defaultValueMap.containsKey(columnName);
     }
 
     private String findDefaultValue(String columnName) {
-        if (!_defaultValueMap.containsKey(columnName)) {
-            if (_additionalDefaultColumnNameToLowerMap.containsKey(columnName.toLowerCase())) {
-                final String realColumnName = _additionalDefaultColumnNameToLowerMap.get(columnName.toLowerCase());
-                if (_defaultValueMap.containsKey(realColumnName)) {
-                    return _defaultValueMap.get(realColumnName);
-                }
-            }
-            return null;
-        }
+        // defaultValueMap should be case insensitive (or flexible) map
+        // (must be already resolved here)
         return _defaultValueMap.get(columnName);
     }
 
@@ -207,22 +246,6 @@ public class DfWriteSqlBuilder {
 
     public void setValueList(List<String> valueList) {
         this._valueList = valueList;
-    }
-
-    public Map<String, String> getTargetConvertColumnNameKeyToLowerMap() {
-        return _targetConvertColumnNameKeyToLowerMap;
-    }
-
-    public void setTargetConvertColumnNameKeyToLowerMap(Map<String, String> targetConvertColumnNameKeyToLowerMap) {
-        this._targetConvertColumnNameKeyToLowerMap = targetConvertColumnNameKeyToLowerMap;
-    }
-
-    public Map<String, String> getAdditionalDefaultColumnNameToLowerMap() {
-        return _additionalDefaultColumnNameToLowerMap;
-    }
-
-    public void setAdditionalDefaultColumnNameToLowerMap(Map<String, String> additionalDefaultColumnNameToLowerMap) {
-        this._additionalDefaultColumnNameToLowerMap = additionalDefaultColumnNameToLowerMap;
     }
 
     public Map<String, Map<String, String>> getConvertValueMap() {

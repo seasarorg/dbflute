@@ -18,7 +18,7 @@ package org.seasar.dbflute.logic.replaceschema.loaddata;
 /**
  * @author jflute
  */
-public interface DfSeparatedDataHandler {
+public interface DfDelimiterDataHandler {
 
     public DfSeparatedDataResultInfo writeSeveralData(DfSeparatedDataSeveralHandlingInfo info);
 }

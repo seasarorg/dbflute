@@ -37,7 +37,7 @@ public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
+    private static final Log _log = LogFactory.getLog(DfXlsDataHandlerSQLServer.class);
 
     // ===================================================================================
     //                                                                           Attribute

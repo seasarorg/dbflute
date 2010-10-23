@@ -10,7 +10,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfSeparatedDataHandlerImpl;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerSQLServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -31,7 +31,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                                                           =========
     protected boolean _validTaskEndInformation = true;
     protected DfXlsDataHandlerImpl _xlsDataHandlerImpl;
-    protected DfSeparatedDataHandlerImpl _separatedDataHandlerImpl;
+    protected DfDelimiterDataHandlerImpl _delimiterDataHandlerImpl;
 
     // ===================================================================================
     //                                                                             Execute
@@ -44,13 +44,13 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         _log.info("* Load Data         *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        writeDbFromSeparatedFileAsCommonData("tsv", "\t");
-        writeDbFromSeparatedFileAsCommonData("csv", ",");
+        writeDbFromDelimiterFileAsCommonData("tsv", "\t");
+        writeDbFromDelimiterFileAsCommonData("csv", ",");
         writeDbFromXlsAsCommonData();
         writeDbFromXlsAsCommonDataAdditional();
 
-        writeDbFromSeparatedFileAsLoadingTypeData("tsv", "\t");
-        writeDbFromSeparatedFileAsLoadingTypeData("csv", ",");
+        writeDbFromDelimiterFileAsLoadingTypeData("tsv", "\t");
+        writeDbFromDelimiterFileAsLoadingTypeData("csv", ",");
         writeDbFromXlsAsLoadingTypeData();
         writeDbFromXlsAsLoadingTypeDataAdditional();
     }
@@ -77,23 +77,23 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     // --------------------------------------------
-    //                               Separated Data
+    //                               Delimiter Data
     //                               --------------
-    protected void writeDbFromSeparatedFileAsCommonData(String typeName, String delimter) {
+    protected void writeDbFromDelimiterFileAsCommonData(String typeName, String delimter) {
         final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
         final String path = doGetCommonDataDirectoryPath(dir, typeName);
-        writeDbFromSeparatedFile(path, typeName, delimter);
+        writeDbFromDelimiterFile(path, typeName, delimter);
     }
 
-    protected void writeDbFromSeparatedFileAsLoadingTypeData(String typeName, String delimter) {
+    protected void writeDbFromDelimiterFileAsLoadingTypeData(String typeName, String delimter) {
         final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
         final String envType = getDataLoadingType();
         final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, typeName);
-        writeDbFromSeparatedFile(path, typeName, delimter);
+        writeDbFromDelimiterFile(path, typeName, delimter);
     }
 
-    protected void writeDbFromSeparatedFile(String directoryPath, String typeName, String delimter) {
-        final DfSeparatedDataHandlerImpl handler = getSeparatedDataHandlerImpl();
+    protected void writeDbFromDelimiterFile(String directoryPath, String typeName, String delimter) {
+        final DfDelimiterDataHandlerImpl handler = getDelimiterDataHandlerImpl();
         final DfSeparatedDataSeveralHandlingInfo handlingInfo = new DfSeparatedDataSeveralHandlingInfo();
         handlingInfo.setBasePath(directoryPath);
         handlingInfo.setTypeName(typeName);
@@ -103,17 +103,17 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
     }
 
-    protected DfSeparatedDataHandlerImpl getSeparatedDataHandlerImpl() {
-        if (_separatedDataHandlerImpl != null) {
-            return _separatedDataHandlerImpl;
+    protected DfDelimiterDataHandlerImpl getDelimiterDataHandlerImpl() {
+        if (_delimiterDataHandlerImpl != null) {
+            return _delimiterDataHandlerImpl;
         }
-        final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
+        final DfDelimiterDataHandlerImpl handler = new DfDelimiterDataHandlerImpl();
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setDataSource(getDataSource());
         handler.setUnifiedSchema(_mainSchema);
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-        _separatedDataHandlerImpl = handler;
-        return _separatedDataHandlerImpl;
+        _delimiterDataHandlerImpl = handler;
+        return _delimiterDataHandlerImpl;
     }
 
     protected void showNotFoundColumn(String typeName, Map<String, Set<String>> notFoundColumnMap) {

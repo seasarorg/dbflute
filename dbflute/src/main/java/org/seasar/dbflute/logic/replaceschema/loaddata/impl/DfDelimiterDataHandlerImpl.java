@@ -16,7 +16,6 @@
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -32,7 +31,9 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataHandler;
+import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
+import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
@@ -40,13 +41,13 @@ import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 /**
  * @author jflute
  */
-public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
+public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
+    private static final Log _log = LogFactory.getLog(DfDelimiterDataHandlerImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -98,7 +99,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                 final Map<String, String> defaultValueMap = getDefaultValueMap(info, elementName);
                 for (String fileName : sortedFileNameSet) {
                     final String fileNamePath = info.getBasePath() + "/" + elementName + "/" + fileName;
-                    final DfSeparatedDataWriterImpl writer = new DfSeparatedDataWriterImpl(_dataSource);
+                    final DfDelimiterDataWriterImpl writer = new DfDelimiterDataWriterImpl(_dataSource);
                     writer.setUnifiedSchema(_unifiedSchema);
                     writer.setLoggingInsertSql(isLoggingInsertSql());
                     writer.setFilename(fileNamePath);
@@ -110,10 +111,9 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                     writer.writeData(notFoundColumnMap);
                 }
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            String msg = "Failed to register delimiter data.";
+            throw new DfTableDataRegistrationFailureException(msg, e);
         }
         return resultInfo;
     }
@@ -130,24 +130,30 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     private Map<String, Map<String, String>> getConvertValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/convertValueMap.dataprop";
-        Map<String, Map<String, String>> resultMap = reader.readMapAsStringMapValue(path);
-        if (resultMap != null && !resultMap.isEmpty()) {
+        final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        Map<String, Map<String, String>> readMap = reader.readMapAsStringMapValue(path);
+        if (readMap != null && !readMap.isEmpty()) {
+            resultMap.putAll(readMap);
             return resultMap;
         }
         path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
-        resultMap = reader.readMapAsStringMapValue(path);
+        readMap = reader.readMapAsStringMapValue(path);
+        resultMap.putAll(readMap);
         return resultMap;
     }
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.dataprop";
-        Map<String, String> resultMap = reader.readMapAsStringValue(path);
-        if (resultMap != null && !resultMap.isEmpty()) {
+        final Map<String, String> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        Map<String, String> readMap = reader.readMapAsStringValue(path);
+        if (readMap != null && !readMap.isEmpty()) {
+            resultMap.putAll(readMap);
             return resultMap;
         }
         path = info.getBasePath() + "/" + encoding + "/default-value.txt";
-        resultMap = reader.readMapAsStringValue(path);
+        readMap = reader.readMapAsStringValue(path);
+        resultMap.putAll(readMap);
         return resultMap;
     }
 

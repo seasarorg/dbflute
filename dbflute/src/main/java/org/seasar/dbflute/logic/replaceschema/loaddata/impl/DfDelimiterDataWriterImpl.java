@@ -24,7 +24,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataWriter;
 import org.seasar.dbflute.util.Srl;
@@ -44,13 +44,13 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements DfSeparatedDataWriter {
+public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements DfSeparatedDataWriter {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSeparatedDataWriterImpl.class);
+    private static final Log _log = LogFactory.getLog(DfDelimiterDataWriterImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -62,12 +62,12 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     protected Map<String, String> _defaultValueMap;
 
     /** The cache map of meta info. The key is table name. */
-    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
+    protected final Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSeparatedDataWriterImpl(DataSource dataSource) {
+    public DfDelimiterDataWriterImpl(DataSource dataSource) {
         super(dataSource);
     }
 
@@ -98,10 +98,9 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         }
         String lineString = null;
         String preContinueString = "";
+        final List<String> columnNameList = new ArrayList<String>();
+        final List<String> additionalColumnList = new ArrayList<String>();
         final List<String> valueList = new ArrayList<String>();
-        Map<String, String> additionalDefaultColumnNameToLowerKeyMap = null;
-        Map<String, String> targetConvertColumnNameKeyToLowerMap = null;
-        List<String> columnNameList = null;
 
         PreparedStatement ps = null;
         try {
@@ -122,11 +121,17 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                     // Initialize the information of columns by first line.
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    firstLineInfo = getColumnNameList(_delimiter, lineString);
-                    additionalDefaultColumnNameToLowerKeyMap = getAdditionalDefaultColumnNameToLowerKeyMap(firstLineInfo);
-                    targetConvertColumnNameKeyToLowerMap = getTargetConvertColumnNameKeyToLowerMap(firstLineInfo);
-                    columnNameList = firstLineInfo.getColumnNameList();
-                    columnNameList.addAll(additionalDefaultColumnNameToLowerKeyMap.values());
+                    firstLineInfo = getFirstLineInfo(_delimiter, lineString);
+                    columnNameList.addAll(firstLineInfo.getColumnNameList());
+                    final StringSet columnSet = StringSet.createAsFlexible();
+                    columnSet.addAll(columnNameList);
+                    for (String defaultColumn : _defaultValueMap.values()) {
+                        if (columnSet.contains(defaultColumn)) {
+                            continue;
+                        }
+                        additionalColumnList.add(defaultColumn);
+                    }
+                    columnNameList.addAll(additionalColumnList);
                     continue;
                 }
                 {
@@ -146,23 +151,21 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                     valueList.addAll(ls);
                 }
                 try {
-                    if (isDifferentColumnValueCount(columnNameList, additionalDefaultColumnNameToLowerKeyMap,
-                            valueList, lineString)) {
+                    if (isDifferentColumnValueCount(firstLineInfo, valueList, lineString)) {
                         String msg = "The count of values wasn't correct:";
-                        msg = msg + " valueSize=" + valueList.size() + " columnNameSize=" + columnNameList.size();
+                        msg = msg + " columnNameSize=" + firstLineInfo.getColumnNameList().size();
+                        msg = msg + " valueSize=" + valueList.size();
                         msg = msg + " lineString=" + lineString + " valueList=" + valueList;
                         _log.warn(msg);
                         continue;
                     }
 
-                    final DfWriteSqlBuilder sqlBuilder = new DfWriteSqlBuilder();
+                    final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
                     sqlBuilder.setTableName(tableName);
                     sqlBuilder.setColumnMap(columnMetaInfoMap);
                     sqlBuilder.setColumnNameList(columnNameList);
                     sqlBuilder.setValueList(valueList);
                     sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
-                    sqlBuilder.setTargetConvertColumnNameKeyToLowerMap(targetConvertColumnNameKeyToLowerMap);
-                    sqlBuilder.setAdditionalDefaultColumnNameToLowerMap(additionalDefaultColumnNameToLowerKeyMap);
                     sqlBuilder.setConvertValueMap(_convertValueMap);
                     sqlBuilder.setDefaultValueMap(_defaultValueMap);
                     if (ps == null) {
@@ -304,9 +307,9 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     }
 
     // ===================================================================================
-    //                                                                    Column Name List
-    //                                                                    ================
-    protected FirstLineInfo getColumnNameList(String delimiter, final String lineString) {
+    //                                                                     First Line Info
+    //                                                                     ===============
+    protected FirstLineInfo getFirstLineInfo(String delimiter, final String lineString) {
         List<String> columnNameList;
         columnNameList = new ArrayList<String>();
         final String[] values = lineString.split(delimiter);
@@ -339,42 +342,6 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         String bindParameterString = bindParameters.toString();
         bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
         return tableName + ":{" + bindParameterString + "}";
-    }
-
-    // ===================================================================================
-    //                                                                       Convert Value
-    //                                                                       =============
-    protected Map<String, String> getTargetConvertColumnNameKeyToLowerMap(FirstLineInfo firstLineInfo) {
-        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        final Set<String> keySet = _convertValueMap.keySet();
-        final List<String> ls = firstLineInfo.getColumnNameToLowerList();
-        for (String columnName : keySet) {
-            final String toLowerColumnName = columnName.toLowerCase();
-            if (!ls.contains(toLowerColumnName)) {
-                resultMap.put(toLowerColumnName, columnName);
-            }
-        }
-        return resultMap;
-    }
-
-    // ===================================================================================
-    //                                                                       Default Value
-    //                                                                       =============
-    /**
-     * @param firstLineInfo The information of first line. (NotNull)
-     * @return The map of additional default column names these are to-lower. {to-lower column name : column name} (NotNull)
-     */
-    protected Map<String, String> getAdditionalDefaultColumnNameToLowerKeyMap(FirstLineInfo firstLineInfo) {
-        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        final Set<String> keySet = _defaultValueMap.keySet();
-        final List<String> ls = firstLineInfo.getColumnNameToLowerList();
-        for (String columnName : keySet) {
-            final String toLowerColumnName = columnName.toLowerCase();
-            if (!ls.contains(toLowerColumnName)) {
-                resultMap.put(toLowerColumnName, columnName);
-            }
-        }
-        return resultMap;
     }
 
     // ===================================================================================
@@ -559,9 +526,8 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
-    protected boolean isDifferentColumnValueCount(List<String> columnNameList,
-            Map<String, String> appendDefaultColumnNameToLowerMap, List<String> valueList, String lineString) {
-        if (valueList.size() < columnNameList.size() - appendDefaultColumnNameToLowerMap.size()) {
+    protected boolean isDifferentColumnValueCount(FirstLineInfo firstLineInfo, List<String> valueList, String lineString) {
+        if (valueList.size() < firstLineInfo.getColumnNameList().size()) {
             return true;
         }
         return false;
