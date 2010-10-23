@@ -34,8 +34,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataResultInfo;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataSeveralHandlingInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHandlingInfo;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**
@@ -60,8 +60,8 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public DfSeparatedDataResultInfo writeSeveralData(DfSeparatedDataSeveralHandlingInfo info) {
-        final DfSeparatedDataResultInfo resultInfo = new DfSeparatedDataResultInfo();
+    public DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataSeveralHandlingInfo info) {
+        final DfDelimiterDataResultInfo resultInfo = new DfDelimiterDataResultInfo();
         final Map<String, Set<String>> notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
         resultInfo.setNotFoundColumnMap(notFoundColumnMap);
         final File baseDir = new File(info.getBasePath());
@@ -127,7 +127,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
         }
     }
 
-    private Map<String, Map<String, String>> getConvertValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
+    private Map<String, Map<String, String>> getConvertValueMap(DfDelimiterDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/convertValueMap.dataprop";
         final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
@@ -142,7 +142,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
         return resultMap;
     }
 
-    private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
+    private Map<String, String> getDefaultValueMap(DfDelimiterDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.dataprop";
         final Map<String, String> resultMap = StringKeyMap.createAsFlexibleOrdered();

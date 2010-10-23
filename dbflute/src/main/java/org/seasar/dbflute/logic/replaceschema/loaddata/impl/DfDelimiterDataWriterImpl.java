@@ -38,13 +38,13 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataWriter;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements DfSeparatedDataWriter {
+public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements DfDelimiterDataWriter {
 
     // ===================================================================================
     //                                                                          Definition
@@ -75,7 +75,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                               Write
     //                                                                               =====
     /**
-     * Write data from separated-file.
+     * Write data from delimiter-file.
      * @param notFoundColumnMap Not found column map. (NotNUl)
      * @throws java.io.IOException
      */
@@ -125,7 +125,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     columnNameList.addAll(firstLineInfo.getColumnNameList());
                     final StringSet columnSet = StringSet.createAsFlexible();
                     columnSet.addAll(columnNameList);
-                    for (String defaultColumn : _defaultValueMap.values()) {
+                    for (String defaultColumn : _defaultValueMap.keySet()) {
                         if (columnSet.contains(defaultColumn)) {
                             continue;
                         }

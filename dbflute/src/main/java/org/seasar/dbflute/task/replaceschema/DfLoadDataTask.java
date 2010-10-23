@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataResultInfo;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfSeparatedDataSeveralHandlingInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHandlingInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
@@ -94,12 +94,12 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     protected void writeDbFromDelimiterFile(String directoryPath, String typeName, String delimter) {
         final DfDelimiterDataHandlerImpl handler = getDelimiterDataHandlerImpl();
-        final DfSeparatedDataSeveralHandlingInfo handlingInfo = new DfSeparatedDataSeveralHandlingInfo();
+        final DfDelimiterDataSeveralHandlingInfo handlingInfo = new DfDelimiterDataSeveralHandlingInfo();
         handlingInfo.setBasePath(directoryPath);
         handlingInfo.setTypeName(typeName);
         handlingInfo.setDelimter(delimter);
         handlingInfo.setErrorContinue(true);
-        final DfSeparatedDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
+        final DfDelimiterDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
         showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
     }
 

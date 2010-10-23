@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * @author jflute
  */
-public class DfSeparatedDataResultInfo {
+public class DfDelimiterDataResultInfo {
 
     // ===================================================================================
     //                                                                           Attribute

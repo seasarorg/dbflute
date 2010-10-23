@@ -18,7 +18,7 @@ package org.seasar.dbflute.logic.replaceschema.loaddata;
 /**
  * @author jflute
  */
-public class DfSeparatedDataSeveralHandlingInfo {
+public class DfDelimiterDataSeveralHandlingInfo {
 
     // ===================================================================================
     //                                                                           Attribute

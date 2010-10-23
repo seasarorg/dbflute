@@ -23,13 +23,13 @@ import java.util.Set;
 /**
  * @author jflute
  */
-public interface DfSeparatedDataWriter {
+public interface DfDelimiterDataWriter {
 
     /**
-     * Write data from separated-file.
+     * Write data from delimiter-file.
      * @param notFoundColumnMap Not found column map. (NotNUl)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void writeData(Map<String, Set<String>> notFoundColumnMap) throws FileNotFoundException, IOException;
+    void writeData(Map<String, Set<String>> notFoundColumnMap) throws FileNotFoundException, IOException;
 }
