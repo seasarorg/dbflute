@@ -295,6 +295,11 @@ public class Column {
         return prop.quoteColumnNameIfNeeds(getName());
     }
 
+    public String getColumnSqlNameDirectUse() {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.quoteColumnNameIfNeeds(getName(), true);
+    }
+
     // -----------------------------------------------------
     //                                               Synonym
     //                                               -------

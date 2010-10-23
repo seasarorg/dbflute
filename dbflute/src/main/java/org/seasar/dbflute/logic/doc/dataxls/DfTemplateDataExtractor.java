@@ -103,7 +103,7 @@ public class DfTemplateDataExtractor {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(column.getColumnSqlName());
+            sb.append(column.getColumnSqlNameDirectUse());
         }
         return sb.insert(0, "select ").toString();
     }
