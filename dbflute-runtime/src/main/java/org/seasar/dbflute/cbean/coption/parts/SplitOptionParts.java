@@ -16,6 +16,9 @@
 package org.seasar.dbflute.cbean.coption.parts;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.seasar.dbflute.util.Srl;
 
@@ -34,44 +37,92 @@ public class SplitOptionParts implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _split;
-    protected String _splitContainedDelimiter;
+    protected String _delimiter;
+    protected List<String> _subDelimiterList;
     protected int _splitLimitCount;
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
-    public boolean isSplit() {
-        return _split != null;
+    //                                                                               Split
+    //                                                                               =====
+    public void splitByBlank() {
+        _delimiter = " ";
+        addSubDelimiter("\u3000");
+        addSubDelimiter("\t");
+        addSubDelimiter("\r");
+        addSubDelimiter("\n");
+    }
+
+    public void splitByBlank(int splitLimitCount) {
+        splitByBlank();
+        _splitLimitCount = splitLimitCount;
     }
 
     public void splitBySpace() {
-        _split = " ";
+        _delimiter = " ";
     }
 
     public void splitBySpace(int splitLimitCount) {
-        _split = " ";
+        splitBySpace();
         _splitLimitCount = splitLimitCount;
     }
 
     public void splitBySpaceContainsDoubleByte() {
-        _split = " ";
-        _splitContainedDelimiter = "\u3000";
+        splitBySpace();
+        addSubDelimiter("\u3000");
     }
 
     public void splitBySpaceContainsDoubleByte(int splitLimitCount) {
-        _split = " ";
-        _splitContainedDelimiter = "\u3000";
+        splitBySpaceContainsDoubleByte();
         _splitLimitCount = splitLimitCount;
     }
 
     public void splitByPipeLine() {
-        _split = "|";
+        _delimiter = "|";
     }
 
     public void splitByPipeLine(int splitLimitCount) {
-        _split = "|";
+        splitByPipeLine();
         _splitLimitCount = splitLimitCount;
+    }
+
+    public void splitByVarious(List<String> delimiterList) {
+        if (delimiterList == null || delimiterList.isEmpty()) {
+            String msg = "The delimiterList should not be null or empty:";
+            msg = msg + " delimiterList=" + delimiterList;
+            throw new IllegalArgumentException(msg);
+        }
+        final List<String> acceptList = new ArrayList<String>(delimiterList);
+        _delimiter = delimiterList.remove(0);
+        addSubDelimiter(acceptList);
+    }
+
+    public void splitByVarious(List<String> delimiterList, int splitLimitCount) {
+        splitByVarious(delimiterList);
+        _splitLimitCount = splitLimitCount;
+    }
+
+    // ===================================================================================
+    //                                                                       Sub Delimiter
+    //                                                                       =============
+    protected void addSubDelimiter(String delimiter) {
+        if (_subDelimiterList == null) {
+            _subDelimiterList = new ArrayList<String>();
+        }
+        _subDelimiterList.add(delimiter);
+    }
+
+    protected void addSubDelimiter(List<String> delimiterList) {
+        if (_subDelimiterList == null) {
+            _subDelimiterList = new ArrayList<String>();
+        }
+        _subDelimiterList.addAll(delimiterList);
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isSplit() {
+        return _delimiter != null;
     }
 
     // ===================================================================================
@@ -82,8 +133,8 @@ public class SplitOptionParts implements Serializable {
             String msg = "The argument[value] should not be null!";
             throw new IllegalArgumentException(msg);
         }
-        value = repalceContainedDelimiterToRealDelimiter(value);
-        final java.util.StringTokenizer st = new java.util.StringTokenizer(value, _split);
+        value = resolveSubSplit(value);
+        final StringTokenizer st = new StringTokenizer(value, _delimiter);
         final String[] tokenizedValues = new String[st.countTokens()];
         int count = 0;
         while (st.hasMoreTokens()) {
@@ -106,24 +157,21 @@ public class SplitOptionParts implements Serializable {
 
     }
 
-    protected String repalceContainedDelimiterToRealDelimiter(String value) {
-        if (value == null) {
+    protected String resolveSubSplit(String value) {
+        if (value == null || _delimiter == null || _subDelimiterList == null) {
             return value;
         }
-        if (_splitContainedDelimiter == null) {
-            return value;
+        for (String subSplit : _subDelimiterList) {
+            value = replace(value, subSplit, _delimiter);
         }
-        if (_split == null) {
-            return value;
-        }
-        return replace(value, _splitContainedDelimiter, _split);
+        return value;
     }
 
     protected String[] removeInvalidValue(String[] values) {
-        final java.util.List<String> ls = new java.util.ArrayList<String>();
+        final List<String> ls = new ArrayList<String>();
         for (int i = 0; i < values.length; i++) {
             final String value = values[i];
-            if (value == null || value.equals("")) {// Don't trim!!!
+            if (value == null || value.equals("")) { // don't trim
                 continue;
             }
             ls.add(value);
@@ -147,8 +195,8 @@ public class SplitOptionParts implements Serializable {
     //                                                                             =========
     public Object createDeepCopy() {
         final SplitOptionParts deepCopy = new SplitOptionParts();
-        deepCopy._split = _split;
-        deepCopy._splitContainedDelimiter = _splitContainedDelimiter;
+        deepCopy._delimiter = _delimiter;
+        deepCopy._subDelimiterList = _subDelimiterList;
         deepCopy._splitLimitCount = _splitLimitCount;
         return deepCopy;
     }

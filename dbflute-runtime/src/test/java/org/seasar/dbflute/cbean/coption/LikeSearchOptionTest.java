@@ -1,6 +1,10 @@
 package org.seasar.dbflute.cbean.coption;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -56,6 +60,81 @@ public class LikeSearchOptionTest extends PlainTestCase {
 
         // ## Assert ##
         assertEquals("escape '/'", rearOption.trim());
+    }
+
+    // ===================================================================================
+    //                                                                            Split By
+    //                                                                            ========
+    public void test_splitBy_blank() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+
+        // ## Act ##
+        option.splitByBlank();
+        List<String> actual = Arrays.asList(option.generateSplitValueArray("FOO B　AR\tQU\rX\nQUU\r\nX"));
+
+        // ## Assert ##
+        assertEquals(Arrays.asList("FOO", "B", "AR", "QU", "X", "QUU", "X"), actual);
+    }
+
+    public void test_splitBy_blank_limit() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+
+        // ## Act ##
+        option.splitByBlank(3);
+        List<String> actual = Arrays.asList(option.generateSplitValueArray("FOO B　AR\tQU\rX\nQUU\r\nX"));
+
+        // ## Assert ##
+        assertEquals(Arrays.asList("FOO", "B", "AR"), actual);
+    }
+
+    public void test_splitBy_space() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+
+        // ## Act ##
+        option.splitBySpace();
+        String[] actual = option.generateSplitValueArray("FOO B　AR\tQUX\nQUUX");
+
+        // ## Assert ##
+        assertEquals(Arrays.asList("FOO", "B　AR\tQUX\nQUUX"), Arrays.asList(actual));
+    }
+
+    public void test_splitBy_spaceContainsDoubleByte() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+
+        // ## Act ##
+        option.splitBySpaceContainsDoubleByte();
+        String[] actual = option.generateSplitValueArray("FOO B　AR\tQUX\nQUUX");
+
+        // ## Assert ##
+        assertEquals(Arrays.asList("FOO", "B", "AR\tQUX\nQUUX"), Arrays.asList(actual));
+    }
+
+    public void test_splitBy_various_onlyone() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+
+        // ## Act ##
+        option.splitByVarious(DfCollectionUtil.newArrayList("\t"));
+        String[] actual = option.generateSplitValueArray("FOO B　AR\tQUX\nQUUX");
+
+        // ## Assert ##
+        assertEquals(Arrays.asList("FOO B　AR", "QUX\nQUUX"), Arrays.asList(actual));
+    }
+
+    public void test_splitBy_various_several() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+
+        // ## Act ##
+        option.splitByVarious(DfCollectionUtil.newArrayList("\t", "X"));
+        String[] actual = option.generateSplitValueArray("FOO B　AR\tQUX\nQUUX");
+
+        // ## Assert ##
+        assertEquals(Arrays.asList("FOO B　AR", "QU", "\nQUU"), Arrays.asList(actual));
     }
 
     // ===================================================================================

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean.coption;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.parts.SplitOptionParts;
 import org.seasar.dbflute.util.Srl;
@@ -47,6 +48,16 @@ public class SimpleStringOption implements ConditionOption, Serializable {
     // ===================================================================================
     //                                                                               Split
     //                                                                               =====
+    protected SimpleStringOption doSplitByBlank() {
+        getSplitOptionParts().splitByBlank();
+        return this;
+    }
+
+    protected SimpleStringOption doSplitByBlank(int splitLimitCount) {
+        getSplitOptionParts().splitByBlank(splitLimitCount);
+        return this;
+    }
+
     protected SimpleStringOption doSplitBySpace() {
         getSplitOptionParts().splitBySpace();
         return this;
@@ -77,11 +88,25 @@ public class SimpleStringOption implements ConditionOption, Serializable {
         return this;
     }
 
+    protected SimpleStringOption doSplitByVarious(List<String> delimiterList) {
+        getSplitOptionParts().splitByVarious(delimiterList);
+        return this;
+    }
+
+    protected SimpleStringOption doSplitByVarious(List<String> delimiterList, int splitLimitCount) {
+        getSplitOptionParts().splitByVarious(delimiterList, splitLimitCount);
+        return this;
+    }
+
     protected SplitOptionParts getSplitOptionParts() {
         if (_splitOptionParts == null) {
-            _splitOptionParts = new SplitOptionParts();
+            _splitOptionParts = createSplitOptionParts();
         }
         return _splitOptionParts;
+    }
+
+    protected SplitOptionParts createSplitOptionParts() {
+        return new SplitOptionParts();
     }
 
     public boolean isSplit() {

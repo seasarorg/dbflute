@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.util.List;
+
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
@@ -131,30 +133,98 @@ public class LikeSearchOption extends SimpleStringOption {
     // ===================================================================================
     //                                                                               Split
     //                                                                               =====
+    /**
+     * Split a value as several condition by blank (space, full-width space, tab, CR, LF).
+     * @return this.
+     */
+    public LikeSearchOption splitByBlank() {
+        return (LikeSearchOption) doSplitByBlank();
+    }
+
+    /**
+     * Split a value as several condition with limit by blank.
+     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
+     * @return this.
+     */
+    public LikeSearchOption splitByBlank(int splitLimitCount) {
+        return (LikeSearchOption) doSplitByBlank(splitLimitCount);
+    }
+
+    /**
+     * Split a value as several condition by space.
+     * @return this.
+     */
     public LikeSearchOption splitBySpace() {
         return (LikeSearchOption) doSplitBySpace();
     }
 
+    /**
+     * Split a value as several condition with limit by space.
+     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
+     * @return this.
+     */
     public LikeSearchOption splitBySpace(int splitLimitCount) {
         return (LikeSearchOption) doSplitBySpace(splitLimitCount);
     }
 
+    /**
+     * Split a value as several condition by space that contains full-width space.
+     * @return this.
+     */
     public LikeSearchOption splitBySpaceContainsDoubleByte() {
         return (LikeSearchOption) doSplitBySpaceContainsDoubleByte();
     }
 
+    /**
+     * Split a value as several condition by space that contains full-width space.
+     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
+     * @return this.
+     */
     public LikeSearchOption splitBySpaceContainsDoubleByte(int splitLimitCount) {
         return (LikeSearchOption) doSplitBySpaceContainsDoubleByte(splitLimitCount);
     }
 
+    /**
+     * Split a value as several condition by pipeline.
+     * @return this.
+     */
     public LikeSearchOption splitByPipeLine() {
         return (LikeSearchOption) doSplitByPipeLine();
     }
 
+    /**
+     * Split a value as several condition by pipeline.
+     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
+     * @return this.
+     */
     public LikeSearchOption splitByPipeLine(int splitLimitCount) {
         return (LikeSearchOption) doSplitByPipeLine(splitLimitCount);
     }
 
+    /**
+     * Split a value as several condition by specified various delimiters.
+     * @param delimiterList The list of delimiter for split. (NotNull, NotEmpty)
+     * @return this.
+     */
+    public LikeSearchOption splitByVarious(List<String> delimiterList) {
+        return (LikeSearchOption) doSplitByVarious(delimiterList);
+    }
+
+    /**
+     * Split a value as several condition by specified various delimiters.
+     * @param delimiterList The list of delimiter for split. (NotNull, NotEmpty)
+     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
+     * @return this.
+     */
+    public LikeSearchOption splitByVarious(List<String> delimiterList, int splitLimitCount) {
+        return (LikeSearchOption) doSplitByVarious(delimiterList, splitLimitCount);
+    }
+
+    /**
+     * Split as OR condition. <br >
+     * You should call this with a splitByXxx method.
+     * @return this.
+     */
     public LikeSearchOption asOrSplit() {
         _asOrSplit = true;
         return this;
