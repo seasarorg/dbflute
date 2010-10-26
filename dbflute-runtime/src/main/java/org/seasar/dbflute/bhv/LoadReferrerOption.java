@@ -70,7 +70,7 @@ public class LoadReferrerOption<REFERRER_CONDITION_BEAN extends ConditionBean, R
     //                                                                         ===========
     /**
      * Specify that the key condition is added as last condition. <br />
-     * This method is valid only after you use reffererConditionBean and add your original condition to it.
+     * This method is valid only after you use referrerConditionBean and add your original condition to it.
      * @return this. (NotNull)
      */
     public LoadReferrerOption<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> toLastKeyCondition() {
@@ -80,7 +80,7 @@ public class LoadReferrerOption<REFERRER_CONDITION_BEAN extends ConditionBean, R
 
     /**
      * Specify that it stops adding order-by of the key. <br />
-     * This method is valid only after you use reffererConditionBean and add your original order-by to it.
+     * This method is valid only after you use referrerConditionBean and add your original order-by to it.
      * @return this. (NotNull)
      */
     public LoadReferrerOption<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> stopOrderByKey() {
