@@ -426,7 +426,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
 
             protected void resolveSuperClassSimplePagingBean(final DfPmbMetaData pmbMetaData) {
-                if (pmbMetaData.getSuperClassName().equalsIgnoreCase("SPB")) {
+                final String superClassName = pmbMetaData.getSuperClassName();
+                if (superClassName.equalsIgnoreCase("Paging") // main
+                        || superClassName.equalsIgnoreCase("SPB")) { // an old style for compatible before 0.9.7.5
                     final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
                     final String projectPrefix = getBasicProperties().getProjectPrefix();
                     final DfBasicProperties basicProperties = getProperties().getBasicProperties();
