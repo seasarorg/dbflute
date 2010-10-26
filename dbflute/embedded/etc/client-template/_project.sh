@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export ANT_OPTS=-Xmx256m
 
