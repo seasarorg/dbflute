@@ -1028,26 +1028,48 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * Order with the keyword 'nulls first'.
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #FD4747">withNullsFirst()</span>;
+     * <span style="color: #3F7E5E">// order by BIRTHDATE asc nulls first</span>
+     * </pre>
      */
-    public void withNullsFirst() { // is User Public!
+    public void withNullsFirst() { // is user public!
         xgetSqlClause().addNullsFirstToPreviousOrderBy();
     }
 
     /**
      * Order with the keyword 'nulls last'.
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #FD4747">withNullsLast()</span>;
+     * <span style="color: #3F7E5E">// order by BIRTHDATE asc nulls last</span>
+     * </pre>
      */
-    public void withNullsLast() { // is User Public!
+    public void withNullsLast() { // is user public!
         xgetSqlClause().addNullsLastToPreviousOrderBy();
     }
 
     /**
-     * Order with the list of manual value. <br />
-     * This with Union is unsupported!
-     * @param manualValueList The list of manual value. (NotNull)
+     * Order with the list of manual values. <br />
+     * This function with Union is unsupported!
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * List&lt;String&gt; statusCodeList = Arrays.asList("WDL", "FML", "PRV");
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #FD4747">withManualOrder(statusCodeList)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when dflocal.MEMBER_STATUS_CODE = 'WDL' then 0</span>
+     * <span style="color: #3F7E5E">//     when dflocal.MEMBER_STATUS_CODE = 'FML' then 1</span>
+     * <span style="color: #3F7E5E">//     when dflocal.MEMBER_STATUS_CODE = 'PRV' then 2</span>
+     * <span style="color: #3F7E5E">//     else 3</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     * </pre>
+     * @param manualValueList The list of manual values. (NotNull)
      */
-    public void withManualOrder(List<? extends Object> manualValueList) { // is User Public!
+    public void withManualOrder(List<? extends Object> manualValueList) { // is user public!
         assertObjectNotNull("withManualOrder(manualValueList)", manualValueList);
-        ManumalOrderInfo manumalOrderInfo = new ManumalOrderInfo();
+        final ManumalOrderInfo manumalOrderInfo = new ManumalOrderInfo();
         manumalOrderInfo.setManualValueList(manualValueList);
         xgetSqlClause().addManualOrderToPreviousOrderByElement(manumalOrderInfo);
     }
