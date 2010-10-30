@@ -25,7 +25,7 @@ namespace ${glPackageBaseCommonBhvLoad} {
 
         public ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> xinit(
                 ${glConditionBeanSetupper}<REFERRER_CB> conditionBeanSetupper) { // internal
-            this.ConditionBeanSetupper(conditionBeanSetupper);
+            this.ConditionBeanSetupper = conditionBeanSetupper;
             return this;
         }
 
