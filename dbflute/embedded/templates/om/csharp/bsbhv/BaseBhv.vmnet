@@ -210,7 +210,7 @@ namespace ${glPackageExtendedBhv} {
         }
         public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
-            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(conditionBeanSetupper));
         }
         public virtual void Load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
             AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertObjectNotNull("loadReferrerOption", loadReferrerOption);

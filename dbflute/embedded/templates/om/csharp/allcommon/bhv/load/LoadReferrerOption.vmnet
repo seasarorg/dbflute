@@ -8,20 +8,14 @@ using ${glPackageBaseCommonBhvSetup};
 
 namespace ${glPackageBaseCommonBhvLoad} {
 
-    public class ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> where REFERRER_CONDITION_BEAN : ${glConditionBean} where REFERRER_ENTITY : ${glEntity} {
+    public class ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> where REFERRER_CB : ${glConditionBean} where REFERRER_ENTITY : ${glEntity} {
 
         // ===================================================================================
         //                                                                           Attribute
         //                                                                           =========
-        protected ${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> _conditionBeanSetupper;
-
+        protected ${glConditionBeanSetupper}<REFERRER_CB> _conditionBeanSetupper;
         protected ${glEntityListSetupper}<REFERRER_ENTITY> _entityListSetupper;
-
-        protected REFERRER_CONDITION_BEAN _referrerConditionBean;
-
-        protected bool _toLastKeyCondition;
-
-        protected bool _stopOrderByKey;
+        protected REFERRER_CB _referrerConditionBean;
 
         // ===================================================================================
         //                                                                         Constructor
@@ -29,59 +23,22 @@ namespace ${glPackageBaseCommonBhvLoad} {
         public ${glLoadReferrerOption}() {
         }
 
-        public ${glLoadReferrerOption}(${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> conditionBeanSetupper) {
-            this._conditionBeanSetupper = conditionBeanSetupper;
-        }
-
-        public ${glLoadReferrerOption}(${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupper}<REFERRER_ENTITY> entityListSetupper) {
-            this._conditionBeanSetupper = conditionBeanSetupper;
-            this._entityListSetupper = entityListSetupper;
-        }
-
-        public ${glLoadReferrerOption}(${glLoadReferrerOption}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> option) {
-            this._conditionBeanSetupper = option._conditionBeanSetupper;
-            this._entityListSetupper = option._entityListSetupper;
-            this._referrerConditionBean = option._referrerConditionBean;
-            this._toLastKeyCondition = option._toLastKeyCondition;
-            this._stopOrderByKey = option._stopOrderByKey;
+        public ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> xinit(
+                ${glConditionBeanSetupper}<REFERRER_CB> conditionBeanSetupper) { // internal
+            this.ConditionBeanSetupper(conditionBeanSetupper);
+            return this;
         }
 
         // ===================================================================================
         //                                                                         Easy-to-Use
         //                                                                         ===========
-        /**
-         * Specify that the key condition is added as last condition. <br />
-         * This method is valid only after you use referrerConditionBean and add your original condition to it.
-         * @return this. (NotNull)
-         */
-        public ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> ToLastKeyCondition() {
-            _toLastKeyCondition = true;
-            return this;
-        }
-
-        /**
-         * Specify that it stops adding order-by of the key. <br />
-         * This method is valid only after you use referrerConditionBean and add your original order-by to it.
-         * @return this. (NotNull)
-         */
-        public ${glLoadReferrerOption}<REFERRER_CONDITION_BEAN, REFERRER_ENTITY> StopOrderByKey() {
-            _stopOrderByKey = true;
-            return this;
-        }
-
-        public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERRER_CONDITION_BEAN cb) {// Internal
-            if (!_toLastKeyCondition) {
-                cb.SqlClause.exchangeFirstWhereClauseForLastOne();
-            }
-        }
-
-        public void delegateConditionBeanSettingUp(REFERRER_CONDITION_BEAN cb) {// Internal
+        public void delegateConditionBeanSettingUp(REFERRER_CB cb) { // internal
             if (_conditionBeanSetupper != null) {
                 _conditionBeanSetupper.Invoke(cb);
             }
         }
 
-        public void delegateEntitySettingUp(IList<REFERRER_ENTITY> entityList) {// Internal
+        public void delegateEntitySettingUp(IList<REFERRER_ENTITY> entityList) { // internal
             if (_entityListSetupper != null) {
                 _entityListSetupper.Invoke(entityList);
             }
@@ -90,7 +47,7 @@ namespace ${glPackageBaseCommonBhvLoad} {
         // ===================================================================================
         //                                                                            Accessor
         //                                                                            ========
-        public ${glConditionBeanSetupper}<REFERRER_CONDITION_BEAN> ConditionBeanSetupper { get {
+        public ${glConditionBeanSetupper}<REFERRER_CB> ConditionBeanSetupper { get {
             return _conditionBeanSetupper;
         } set {
             this._conditionBeanSetupper = value;
@@ -102,18 +59,10 @@ namespace ${glPackageBaseCommonBhvLoad} {
             this._entityListSetupper = value;
         }}
 
-        public REFERRER_CONDITION_BEAN ReferrerConditionBean { get {
+        public REFERRER_CB ReferrerConditionBean { get {
             return _referrerConditionBean;
         } set {
             this._referrerConditionBean = value;
         }}
-
-        public bool isToLastKeyCondition() {
-            return _toLastKeyCondition;
-        }
-
-        public bool isStopOrderByKey() {
-            return _stopOrderByKey;
-        }
     }
 }

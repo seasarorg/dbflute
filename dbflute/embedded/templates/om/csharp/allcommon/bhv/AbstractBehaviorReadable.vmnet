@@ -231,8 +231,7 @@ namespace ${glPackageBaseCommonBhv} {
                 // for when application uses union query in condition-bean set-upper.
                 callback.qyFKIn(referrerUnionCB, pkList);
             });
-            loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
-            if (!loadReferrerOption.isStopOrderByKey() && pkList.Count > 1) {
+            if (pkList.Count > 1) {
                 callback.qyOdFKAsc(cb);
                 cb.SqlComponentOfOrderByClause.exchangeFirstOrderByElementForLastOne();
             }

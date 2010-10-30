@@ -1129,7 +1129,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * cb.query().<span style="color: #FD4747">scalar_Equal()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
-     *         subCB.specify().setXxx... // derived column for function
+     *         subCB.specify().setXxx... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setYyy...
      *     }
      * });
@@ -1146,7 +1146,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * cb.query().<span style="color: #FD4747">scalar_NotEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
-     *         subCB.specify().setXxx... // derived column for function
+     *         subCB.specify().setXxx... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setYyy...
      *     }
      * });
@@ -1163,7 +1163,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * cb.query().<span style="color: #FD4747">scalar_GreaterThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
-     *         subCB.specify().setFoo... // derived column for function
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
      *     }
      * });
@@ -1180,7 +1180,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * cb.query().<span style="color: #FD4747">scalar_LessThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
-     *         subCB.specify().setFoo... // derived column for function
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
      *     }
      * });
@@ -1197,7 +1197,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * cb.query().<span style="color: #FD4747">scalar_GreaterEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
-     *         subCB.specify().setFoo... // derived column for function
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
      *     }
      * });
@@ -1214,7 +1214,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * cb.query().<span style="color: #FD4747">scalar_LessEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
-     *         subCB.specify().setFoo... // derived column for function
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
      *     }
      * });
