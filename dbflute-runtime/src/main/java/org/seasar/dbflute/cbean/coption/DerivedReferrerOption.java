@@ -63,7 +63,8 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                                                              ======
     /**
      * Set the value for coalesce function. <br />
-     * If you set string value and the column is date type, convert it to a date object.
+     * If you set string value and the derived column is date type, it converts it to a date object internally.
+     * For example, "2010-10-30 12:34:56.789", "2010/10/30" and so on ... are acceptable.
      * @param coalesce An alternate value when group function returns null. (Nullable: if null, no coalesce)
      * @return this. (NotNull)
      */
