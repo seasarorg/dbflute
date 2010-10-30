@@ -575,8 +575,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
                 callback.qyFKIn(referrerUnionCB, pkList);
             }
         });
-        loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
-        if (!loadReferrerOption.isStopOrderByKey() && pkList.size() > 1) {
+        if (pkList.size() > 1) {
             callback.qyOdFKAsc(cb);
             cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
         }
