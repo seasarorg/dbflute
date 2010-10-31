@@ -565,7 +565,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
     public void loadBuriAllRoundStateHistory_${processName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
         xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
-        loadBuriAllRoundStateHistory_${processName}List(${myEntityListVariableName}, new org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+        loadBuriAllRoundStateHistory_${processName}List(${myEntityListVariableName}, new org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(conditionBeanSetupper));
     }
     public void loadBuriAllRoundStateHistory_${processName}List(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         xassLRArg(${myEntityVariableName}, loadReferrerOption);
