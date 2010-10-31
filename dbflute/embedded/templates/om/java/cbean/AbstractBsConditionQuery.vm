@@ -995,7 +995,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         reg${tmpJavaName}(CK_LE,#if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
-#if (${col.isAvailableDateFromTo()} && !${col.isJdbcTypeTime()})
+#if (${col.isAvailableDateFromTo()})
 
     /**
      * FromTo with various options. (versatile) <br />
@@ -1012,6 +1012,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end
     }
+#end
+#if (${col.isAvailableDateDateFromTo()})
 
     /**
      * DateFromTo. (Date means yyyy/MM/dd) <br />

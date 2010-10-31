@@ -174,7 +174,11 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isAvailableDateFromTo(String tableName, String columnName) {
-        return isAvailable("Date", "FromTo", tableName, columnName);
+        return isAvailable("Date", "FromTo", tableName, columnName); // means FromTo of Date type
+    }
+
+    public boolean isAvailableDateDateFromTo(String tableName, String columnName) {
+        return isAvailable("Date", "DateFromTo", tableName, columnName); // means DateFromTo of Date type
     }
 
     public boolean isAvailableDateInScope(String tableName, String columnName) {

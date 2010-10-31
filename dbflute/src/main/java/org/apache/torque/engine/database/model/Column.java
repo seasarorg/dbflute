@@ -1818,8 +1818,18 @@ public class Column {
         return getIncludeQueryProperties().isAvailableDateLessEqual(getTableName(), getName());
     }
 
-    public boolean isAvailableDateFromTo() {
+    public boolean isAvailableDateFromTo() { // means FromTo of Date type
+        if (isJdbcTypeTime()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableDateFromTo(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateDateFromTo() { // means DateFromTo of Date type
+        if (isJdbcTypeTime()) {
+            return false;
+        }
+        return getIncludeQueryProperties().isAvailableDateDateFromTo(getTableName(), getName());
     }
 
     public boolean isAvailableDateInScope() {
