@@ -219,6 +219,45 @@ public class FromToOptionTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                    protected Method
+    //                                                                    ================
+    public void test_clearAll_pattern() {
+        // ## Arrange ##
+        String fromRes = "2008-12-14 18:34:56.789";
+        String toRes = "2008-12-17 09:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsDate().clearAll();
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_EQUAL, option.getToDateConditionKey());
+        assertEquals(fromRes, DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals(toRes, DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_clearAll_manual() {
+        // ## Arrange ##
+        String fromRes = "2008-12-14 18:34:56.789";
+        String toRes = "2008-12-17 09:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.toDateWithNoon().fromPatternDayStart().clearAll();
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_EQUAL, option.getToDateConditionKey());
+        assertEquals(fromRes, DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals(toRes, DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     public void test_toString() {

@@ -23,7 +23,7 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The option of from-to.
+ * The option of from-to for Date type.
  * <pre>
  * ex) from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
  * 
@@ -168,6 +168,18 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                                                   Manual Adjustment
     //                                                                   =================
     // -----------------------------------------------------
+    //                                                   All
+    //                                                   ---
+    protected void clearAll() {
+        clearOperand();
+        clearFromPattern();
+        clearToPattern();
+        clearFromDateWith();
+        clearToDateWith();
+        _usePattern = false;
+    }
+
+    // -----------------------------------------------------
     //                                               Operand
     //                                               -------
     public FromToOption greaterThan() {
@@ -218,15 +230,20 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     public FromToOption fromDateWithNoon() {
+        clearFromDateWith();
         _fromDateWithNoon = true;
-        _fromDateWithHour = null;
         return this;
     }
 
     public FromToOption fromDateWithHour(int hourOfDay) {
+        clearFromDateWith();
         _fromDateWithHour = hourOfDay;
-        _fromDateWithNoon = false;
         return this;
+    }
+
+    protected void clearFromDateWith() {
+        _fromDateWithNoon = false;
+        _fromDateWithHour = null;
     }
 
     // -----------------------------------------------------
@@ -260,15 +277,20 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     public FromToOption toDateWithNoon() {
+        clearToDateWith();
         _toDateWithNoon = true;
-        _toDateWithHour = null;
         return this;
     }
 
     public FromToOption toDateWithHour(int hourOfDay) {
+        clearToDateWith();
         _toDateWithHour = hourOfDay;
-        _toDateWithNoon = false;
         return this;
+    }
+
+    protected void clearToDateWith() {
+        _toDateWithNoon = false;
+        _toDateWithHour = null;
     }
 
     // -----------------------------------------------------
