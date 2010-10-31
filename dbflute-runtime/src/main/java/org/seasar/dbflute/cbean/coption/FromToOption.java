@@ -79,12 +79,14 @@ public class FromToOption implements ConditionOption, Serializable {
     protected boolean _fromPatternDayStart;
     protected boolean _fromPatternMonthStart;
     protected boolean _fromPatternYearStart;
-    protected boolean _fromDateNoon;
+    protected boolean _fromDateWithNoon;
+    protected Integer _fromDateWithHour;
 
     protected boolean _toPatternNextDayStart;
     protected boolean _toPatternNextMonthStart;
     protected boolean _toPatternNextYearStart;
-    protected boolean _toDateNoon;
+    protected boolean _toDateWithNoon;
+    protected Integer _toDateWithHour;
 
     protected boolean _usePattern;
 
@@ -215,8 +217,15 @@ public class FromToOption implements ConditionOption, Serializable {
         _fromPatternYearStart = false;
     }
 
-    public FromToOption fromWithNoon() {
-        _fromDateNoon = true;
+    public FromToOption fromDateWithNoon() {
+        _fromDateWithNoon = true;
+        _fromDateWithHour = null;
+        return this;
+    }
+
+    public FromToOption fromDateWithHour(int hourOfDay) {
+        _fromDateWithHour = hourOfDay;
+        _fromDateWithNoon = false;
         return this;
     }
 
@@ -251,7 +260,14 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     public FromToOption toDateWithNoon() {
-        _toDateNoon = true;
+        _toDateWithNoon = true;
+        _toDateWithHour = null;
+        return this;
+    }
+
+    public FromToOption toDateWithHour(int hourOfDay) {
+        _toDateWithHour = hourOfDay;
+        _toDateWithNoon = false;
         return this;
     }
 
@@ -288,8 +304,11 @@ public class FromToOption implements ConditionOption, Serializable {
         } else if (_fromPatternYearStart) {
             moveToCalendarYearStart(cal);
         }
-        if (_fromDateNoon) {
+        if (_fromDateWithNoon) {
             moveToNoon(cal);
+        }
+        if (_fromDateWithHour != null) {
+            moveToHour(cal, _fromDateWithHour);
         }
 
         final Date cloneDate = (Date) fromDate.clone();
@@ -317,8 +336,11 @@ public class FromToOption implements ConditionOption, Serializable {
         } else if (_toPatternNextYearStart) {
             moveToCalendarNextYearStart(cal);
         }
-        if (_toDateNoon) {
+        if (_toDateWithNoon) {
             moveToNoon(cal);
+        }
+        if (_toDateWithHour != null) {
+            moveToHour(cal, _toDateWithHour);
         }
 
         final Date cloneDate = (Date) toDate.clone();
@@ -410,6 +432,13 @@ public class FromToOption implements ConditionOption, Serializable {
         cal.clear(Calendar.SECOND);
         cal.clear(Calendar.MINUTE);
         cal.set(Calendar.HOUR_OF_DAY, 12);
+    }
+
+    protected void moveToHour(Calendar cal, int hourOfDay) {
+        cal.clear(Calendar.MILLISECOND);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MINUTE);
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
     }
 
     protected void clearCalendarHourMinuteSecondMilli(Calendar cal) {

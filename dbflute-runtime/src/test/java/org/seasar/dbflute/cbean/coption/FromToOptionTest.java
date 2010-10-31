@@ -57,7 +57,7 @@ public class FromToOptionTest extends PlainTestCase {
 
         // ## Act ##
         option.compareAsDate();
-        option.fromWithNoon();
+        option.fromDateWithNoon();
         option.toDateWithNoon();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
@@ -146,14 +146,14 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
     }
 
-    public void test_fromDateNoon_basic() {
+    public void test_fromDateWithNoon_basic() {
         // ## Arrange ##
         String fromRes = "2008-12-14 18:34:56";
         String toRes = "2008-12-17 09:34:56";
         FromToOption option = createOption();
 
         // ## Act ##
-        option.fromWithNoon();
+        option.fromDateWithNoon();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 
@@ -164,7 +164,7 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals(toRes, DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
-    public void test_toDateNoon_basic() {
+    public void test_toDateWithNoon_basic() {
         // ## Arrange ##
         String fromRes = "2008-12-14 18:34:56";
         String toRes = "2008-12-17 09:34:56";
@@ -180,6 +180,42 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals(ConditionKey.CK_LESS_EQUAL, option.getToDateConditionKey());
         assertEquals(fromRes, DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
         assertEquals("2008-12-17 12:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_fromDateWithHour_basic() {
+        // ## Arrange ##
+        String fromRes = "2008-12-14 18:34:56.789";
+        String toRes = "2008-12-17 09:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.fromDateWithHour(16);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_EQUAL, option.getToDateConditionKey());
+        assertEquals("2008-12-14 16:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals(toRes, DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_toDateWithHour_basic() {
+        // ## Arrange ##
+        String fromRes = "2008-12-14 18:34:56.789";
+        String toRes = "2008-12-17 09:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.toDateWithHour(3);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_EQUAL, option.getToDateConditionKey());
+        assertEquals("2008-12-17 03:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals(fromRes, DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
     }
 
     // ===================================================================================
