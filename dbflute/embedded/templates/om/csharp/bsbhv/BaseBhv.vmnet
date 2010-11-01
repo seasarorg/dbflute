@@ -253,17 +253,15 @@ namespace ${glPackageExtendedBhv} {
             public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; }
         }
 #end
-#foreach ($referrer in $table.referrers)
-  #set ($referrerTable = $referrer.table)
-  #set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
-  #if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
         public IList<${referrerEntityClassName}> Pullout${referrer.referrerPropertyNameInitCapAsOne}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
             return HelpPulloutInternally<${myExtendedObjectClassName}, ${referrerEntityClassName}>(${myEntityListVariableName}, new MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback());
         }
         protected class MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}> {
             public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} entity) { return entity.${referrer.referrerPropertyNameInitCapAsOne}; }
         }
-  #end
 #end
         #endregion
 

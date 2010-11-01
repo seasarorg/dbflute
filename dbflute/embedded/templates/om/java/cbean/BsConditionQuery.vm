@@ -462,12 +462,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
         }
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
         if (baseQuery.hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}()) {
             unionQuery.query${referrer.referrerPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${referrer.referrerPropertyNameInitCapAsOne}(), unionQuery.query${referrer.referrerPropertyNameInitCapAsOne}());
         }
-#end
 #end
     }
 
@@ -540,9 +538,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
 #end
-#foreach ($referrer in $table.referrers)
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
     /**
      * Get the condition-query for relation table. <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
@@ -584,7 +581,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
 #end
-#end
 #if ($table.hasOnlyOnePrimaryKey())
     // ===================================================================================
     //                                                                     Scalar SubQuery
@@ -613,7 +609,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                    Two-or-More PK's Exists Referrer
     //                                                    ================================
-#foreach ($referrer in $table.referrers)
+#foreach ($referrer in $table.referrerList)
 #if (${referrer.isTwoOrMoreKeyFK()})
 #set ($tmpJavaName = "TwoOrMorePk")
 #set ($tmpUncapitalisedJavaName = "twoOrMorePk")

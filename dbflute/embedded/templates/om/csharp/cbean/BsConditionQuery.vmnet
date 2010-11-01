@@ -414,12 +414,10 @@ namespace ${glPackageBaseCQ} {
 #end
             }
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
             if (baseQuery.hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}()) {
                 unionQuery.Query${referrer.referrerPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.Query${referrer.referrerPropertyNameInitCapAsOne}(), unionQuery.Query${referrer.referrerPropertyNameInitCapAsOne}());
             }
-#end
 #end
 
         }
@@ -487,9 +485,8 @@ namespace ${glPackageBaseCQ} {
         }
 #end
 
-  #foreach ($referrer in $table.referrers)
-    #set ($relatedCQClassName = "${glProjectPrefix}${referrer.table.javaName}${glConditionQueryInitialName}")
-    #if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($relatedCQClassName = "${glProjectPrefix}${referrer.table.javaName}${glConditionQueryInitialName}")
 
         protected ${relatedCQClassName} _conditionQuery${referrer.referrerPropertyNameInitCapAsOne};
         public ${relatedCQClassName} ConditionQuery${referrer.referrerPropertyNameInitCapAsOne} {
@@ -527,7 +524,6 @@ namespace ${glPackageBaseCQ} {
         public bool hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
             return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null;
         }
-#end
 #end
 #if ($table.hasOnlyOnePrimaryKey())
 

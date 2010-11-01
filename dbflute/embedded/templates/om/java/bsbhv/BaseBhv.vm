@@ -631,10 +631,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         });
     }
 #end
-#foreach ($referrer in $table.referrers)
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
-#if (${referrer.isOneToOne()})
     /**
      * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
@@ -648,7 +647,6 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
             { if (!ls.isEmpty()) { e.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
         });
     }
-#end
 #end
 #if ($table.isWritable())
 

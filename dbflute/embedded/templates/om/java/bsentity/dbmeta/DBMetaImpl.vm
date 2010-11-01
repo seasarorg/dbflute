@@ -121,9 +121,8 @@ public class ${myClassName} extends AbstractDBMeta {
         return cfi("${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()});
     }
 #end
-#foreach ($referrer in $table.referrers)
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($genericsColumnInfoMap = "ColumnInfo, ColumnInfo")
-#if (${referrer.isOneToOne()})
     public ForeignInfo foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
 #if ($referrer.isSimpleKeyFK())
 #set ($col = $referrer.foreignColumnAsOne)
@@ -139,13 +138,11 @@ public class ${myClassName} extends AbstractDBMeta {
         return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()});
     }
 #end
-#end
 
     // -----------------------------------------------------
     //                                     Referrer Property
     //                                     -----------------
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsManyList)
     public ReferrerInfo referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
 #if ($referrer.isSimpleKeyFK())
 #set ($col = $referrer.foreignColumnAsOne)
@@ -158,7 +155,6 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
         return cri("${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${referrer.isOneToOne()});
     }
-#end
 #end
 #if ($database.isMakeFlatExpansion())
 
@@ -198,21 +194,17 @@ public class ${myClassName} extends AbstractDBMeta {
             return ${foreignKeys.foreignTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
         public ${referrer.referrerTableDBMetaClassName}.${referrer.table.relationTraceClassName}RelationTrace foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
             return ${referrer.referrerTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
 #end
-#end
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsManyList)
         public ${referrer.referrerTableDBMetaClassName}.${referrer.table.relationTraceClassName}RelationTrace referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}());
             return ${referrer.referrerTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
-#end
 #end
 
 #foreach ($col in $table.columns)

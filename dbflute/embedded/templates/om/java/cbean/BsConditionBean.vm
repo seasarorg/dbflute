@@ -348,8 +348,7 @@ public class ${myClassName} extends AbstractConditionBean {
         return _nss${tmpPropertyNameInitCap};
     }
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
@@ -376,7 +375,6 @@ public class ${myClassName} extends AbstractConditionBean {
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
         return _nss${tmpPropertyNameInitCap};
     }
-#end
 #end
 
     // [DBFlute-0.7.4]
@@ -426,12 +424,10 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
         protected ${tmpCBClassName}.HpSpecification _${tmpPropertyName};
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
         protected ${tmpCBClassName}.HpSpecification _${tmpPropertyName};
-#end
 #end
         public HpSpecification(ConditionBean baseCB, HpSpQyCall<${myConditionQueryClassName}> qyCall
                              , HpCBPurpose purpose, DBMetaProvider dbmetaProvider)
@@ -487,8 +483,7 @@ public class ${myClassName} extends AbstractConditionBean {
             return _${tmpPropertyName};
         }
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -508,7 +503,6 @@ public class ${myClassName} extends AbstractConditionBean {
             }
             return _${tmpPropertyName};
         }
-#end
 #end
 #foreach ($referrer in $table.singleKeyStringOrIntegerReferrers)
 #if (!${referrer.isOneToOne()})

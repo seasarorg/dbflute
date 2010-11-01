@@ -112,9 +112,8 @@ namespace ${myDBMetaPackageName} {
         }}
 #end
 
-#foreach ($referrer in $table.referrers)
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
-#if (${referrer.isOneToOne()})
         public ${glForeignInfo} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
             Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($col in $referrer.foreignColumnList)
@@ -123,13 +122,11 @@ namespace ${myDBMetaPackageName} {
             return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()});
         }}
 #end
-#end
 
         // -------------------------------------------------
         //                                  Referrer Element
         //                                  ----------------
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsManyList)
 #set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
 #set ($referrerTable = $referrer.table)
         public ${glReferrerInfo} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
@@ -139,7 +136,6 @@ namespace ${myDBMetaPackageName} {
 #end
             return cri("${referrer.referrerJavaBeansRulePropertyNameInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
         }}
-#end
 #end
 
         // ===============================================================================
@@ -196,18 +192,14 @@ namespace ${myDBMetaPackageName} {
 #foreach ($foreignKeys in $table.foreignKeys)
         public static readonly String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
 #end
-#foreach ($referrer in $table.referrers)
-#if ($referrer.isOneToOne())
+#foreach ($referrer in $table.referrerAsOneList)
         public static readonly String FOREIGN_PROPERTY_NAME_${referrer.referrerPropertyNameInitCapAsOne} = "$foreignKeys.foreignPropertyNameInitCap";
-#end
 #end
         // -------------------------------------------------
         //                                     Referrer Name
         //                                     -------------
-#foreach ($referrer in $table.referrers)
-#if (!$referrer.isOneToOne())
+#foreach ($referrer in $table.referrerAsManyList)
         public static readonly String REFERRER_PROPERTY_NAME_${referrer.referrerPropertyNameInitCap} = "$referrer.referrerPropertyNameInitCap";
-#end
 #end
 
         // -------------------------------------------------

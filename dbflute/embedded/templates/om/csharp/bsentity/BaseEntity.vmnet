@@ -316,7 +316,7 @@ namespace ${myExtendedEntityPackageName} {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
         public IList<${referrerEntityClassName}> ${referrer.referrerPropertyNameInitCap} {
-            get { innerDomain().${referrer.referrerPropertyNameInitCap}; }
+            get { return innerDomain().${referrer.referrerPropertyNameInitCap}; }
         }
 
 #end

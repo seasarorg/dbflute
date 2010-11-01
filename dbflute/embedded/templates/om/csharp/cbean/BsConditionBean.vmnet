@@ -144,8 +144,7 @@ namespace ${glPackageBaseCB} {
             return _nss${tmpPropertyNameInitCap};
         }
 #end
-#foreach ($referrer in $table.referrers)
-  #if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
     #set ($tmpPropertyName = "${referrer.referrerPropertyNameInitCapAsOne}")
     #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
     #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
@@ -161,7 +160,6 @@ namespace ${glPackageBaseCB} {
             { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}()); }
             return _nss${tmpPropertyNameInitCap};
         }
-  #end
 #end
 
         // [DBFlute-0.7.4]
@@ -235,13 +233,11 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
         protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
         protected ${tmpCBClassName}Specification _${tmpPropertyName};
-#end
 #end
         public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
                                                       , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery, bool forColumnQuery)
@@ -290,8 +286,7 @@ namespace ${glPackageBaseCB} {
 #end
 		}
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -307,7 +302,6 @@ namespace ${glPackageBaseCB} {
 		    public bool has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _qyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}
-#end
 #end
 #foreach ($referrer in $table.singleKeyStringOrIntegerReferrers)
 #if (!${referrer.isOneToOne()})
