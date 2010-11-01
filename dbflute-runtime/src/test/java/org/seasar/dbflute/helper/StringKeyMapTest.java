@@ -77,6 +77,25 @@ public class StringKeyMapTest extends PlainTestCase {
         assertEquals(3, map.size());
     }
 
+    public void test_containsKey() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map = StringKeyMap.createAsCaseInsensitive();
+        LinkedHashMap<String, Integer> resourceMap = new LinkedHashMap<String, Integer>();
+        resourceMap.put("aaa", 1);
+        resourceMap.put("bbb", null);
+        resourceMap.put("ccc", 3);
+
+        // ## Act ##
+        map.putAll(resourceMap);
+
+        // ## Assert ##
+        assertTrue(map.containsKey("aaa"));
+        assertTrue(map.containsKey("bbb"));
+        assertTrue(map.containsKey("ccc"));
+        assertFalse(map.containsKey("ddd"));
+        assertTrue(map.containsKey("cCc"));
+    }
+
     // ===================================================================================
     //                                                                    Case Insensitive
     //                                                                    ================

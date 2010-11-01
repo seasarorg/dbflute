@@ -177,7 +177,8 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     public boolean containsKey(Object key) {
-        return get(key) != null;
+        final String stringKey = convertStringKey(key);
+        return _searchMap.containsKey(stringKey);
     }
 
     // -----------------------------------------------------
