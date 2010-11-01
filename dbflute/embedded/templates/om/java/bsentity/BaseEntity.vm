@@ -23,6 +23,9 @@ import ${glPackagePluginBuri}.${glBuriDef};
 #if ($table.hasRelation())
 import ${myExtendedEntityPackageName}.*;
 #end
+#if ($table.isLoadableCustomizeEntity())
+import ${glPackageExtendedEntity}.*;
+#end
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
@@ -88,11 +91,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                              Internal
     //                                              --------
     /** The modified properties for this entity. */
-    protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
+    protected EntityModifiedProperties __modifiedProperties = newEntityModifiedProperties();
 #if ($table.hasAllCommonColumn())
 
     /** Is common column auto set up effective? */
-    protected boolean _canCommonColumnAutoSetup = true;
+    protected boolean __canCommonColumnAutoSetup = true;
 #end
 
     // ===================================================================================
@@ -307,11 +310,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
-#foreach ($referrer in $table.referrers)
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-#if (${referrer.isOneToOne()})
     /** ${referrer.referrerSimpleDispAsOne}. */
     protected ${referrerEntityClassName} ${referrerVariableName};
 
@@ -339,12 +341,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
-#end
     // ===================================================================================
     //                                                                   Referrer Property
     //                                                                   =================
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
@@ -369,7 +369,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
 #end
-#end
 #if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
 #foreach ($processName in $table.tableProcessForMethodNameList)
 #set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
@@ -387,6 +386,53 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #end
 #end
+#if ($table.isLoadableCustomizeEntity())
+#set ($domain = $table.loadableCustomizeDomain)
+    protected ${domain.extendedEntityClassName} __innerDomain;
+
+    protected ${domain.extendedEntityClassName} innerDomain() {
+        if (__innerDomain == null) {
+            __innerDomain = new ${domain.extendedEntityClassName}();
+        }
+        return __innerDomain;
+    }
+
+    /**
+     * Prepare the inner instance of domain entity (basically for LoadReferrer).
+     * <pre>
+     * List&lt;UnpaidSummaryMember&gt; memberList = memberBhv.outsideSql()...;
+     * List&lt;Member&gt; domainList = new ArrayList&lt;Member&gt;();
+     * for (UnpaidSummaryMember member : memberList) {
+     *     domainList.add(member.<span style="color: #FD4747">prepareDomain()</span>);
+     * }
+     * memberBhv.<span style="color: #FD4747">loadPurchaseList</span>(domainList, new ConditionBeanSetupper...);
+     * for (UnpaidSummaryMember member : memberList) {
+     *     Purchase purchase = member.<span style="color: #FD4747">getPurchaseList()</span>; <span style="color: #3F7E5E">// you can get it</span>
+     *     ...
+     * }
+     * </pre>
+     * @return The domain entity for this customize entity.
+     */
+    public ${domain.extendedEntityClassName} prepareDomain() {
+#foreach ($exp in $table.loadableCustomizePrimaryKeySettingExpressionList)
+        innerDomain().${exp};
+#end
+        return innerDomain();
+    }
+
+#foreach ($referrer in $domain.referrerAsManyList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     */
+    public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+        return innerDomain().get${referrer.referrerJavaBeansRulePropertyNameInitCap}();
+    }
+
+#end
+#end
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
@@ -394,7 +440,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * {@inheritDoc}
      */
     public Set<String> getModifiedPropertyNames() {
-        return _modifiedProperties.getPropertyNames();
+        return __modifiedProperties.getPropertyNames();
     }
 
     protected EntityModifiedProperties newEntityModifiedProperties() {
@@ -405,14 +451,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * {@inheritDoc}
      */
     public void clearModifiedPropertyNames() {
-        _modifiedProperties.clear();
+        __modifiedProperties.clear();
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean hasModification() {
-        return !_modifiedProperties.isEmpty();
+        return !__modifiedProperties.isEmpty();
     }
 #if (${table.hasAllCommonColumn()})
     
@@ -423,21 +469,21 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * {@inheritDoc}
      */
     public void enableCommonColumnAutoSetup() {
-        _canCommonColumnAutoSetup = true;
+        __canCommonColumnAutoSetup = true;
     }
 
     /**
      * {@inheritDoc}
      */
     public void disableCommonColumnAutoSetup() {
-        _canCommonColumnAutoSetup = false;
+        __canCommonColumnAutoSetup = false;
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean canCommonColumnAutoSetup() {
-        return _canCommonColumnAutoSetup;
+        return __canCommonColumnAutoSetup;
     }
 #end
 #if ($table.isBuriTarget())
@@ -646,7 +692,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     ${col.propertySettingModifier} void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
-        _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
+        __modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
         this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
     }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)

@@ -254,8 +254,7 @@ namespace ${myExtendedEntityPackageName} {
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
-#foreach ($referrer in $table.referrerList)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
@@ -276,15 +275,13 @@ namespace ${myExtendedEntityPackageName} {
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
-#end
         #endregion
 
         // ===============================================================================
         //                                                               Referrer Property
         //                                                               =================
         #region Referrer Property
-#foreach ($referrer in $table.referrerList)
-#if (!${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
@@ -294,6 +291,32 @@ namespace ${myExtendedEntityPackageName} {
         public IList<${referrerEntityClassName}> ${referrer.referrerPropertyNameInitCap} {
             get { if (${referrerVariableName} == null) { ${referrerVariableName} = new List<${referrerEntityClassName}>(); } return ${referrerVariableName}; }
             set { ${referrerVariableName} = value; }
+        }
+
+#end
+#if ($table.isLoadableCustomizeEntity())
+#set ($domain = $table.loadableCustomizeDomain)
+        protected ${domain.extendedEntityClassName} __innerDomain;
+
+        protected ${domain.extendedEntityClassName} innerDomain() {
+            if (__innerDomain == null) {
+                __innerDomain = new ${domain.extendedEntityClassName}();
+            }
+            return __innerDomain;
+        }
+
+        public ${domain.extendedEntityClassName} PrepareDomain() {
+#foreach ($exp in $table.loadableCustomizePrimaryKeySettingExpressionList)
+            innerDomain().${exp};
+#end
+            return innerDomain();
+        }
+
+#foreach ($referrer in $domain.referrerAsManyList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+        public IList<${referrerEntityClassName}> ${referrer.referrerPropertyNameInitCap} {
+            get { innerDomain().${referrer.referrerPropertyNameInitCap}; }
         }
 
 #end

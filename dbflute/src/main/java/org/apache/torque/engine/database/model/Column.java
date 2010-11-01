@@ -133,8 +133,8 @@ public class Column {
     // -----------------------------------------------------
     //                                 Sql2Entity Definition
     //                                 ---------------------
-    private String _sql2EntityRelatedTableName;
-    private String _sql2EntityRelatedColumnName;
+    private Table _sql2EntityRelatedTable;
+    private Column _sql2EntityRelatedColumn;
     private String _sql2EntityForcedJavaNative;
 
     // -----------------------------------------------------
@@ -636,11 +636,11 @@ public class Column {
             plugDelimiterIfNeeds(sb);
             sb.append("FK to " + getForeignTableName());
         }
-        if (_sql2EntityRelatedTableName != null) {
+        if (hasSql2EntityRelatedTable()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("refers to ").append(_sql2EntityRelatedTableName);
-            if (_sql2EntityRelatedColumnName != null) {
-                sb.append(".").append(_sql2EntityRelatedColumnName);
+            sb.append("refers to ").append(getSql2EntityRelatedTable().getName());
+            if (hasSql2EntityRelatedColumn()) {
+                sb.append(".").append(getSql2EntityRelatedColumn().getName());
             }
         }
         if (hasClassification()) {
@@ -1481,22 +1481,38 @@ public class Column {
     // ===================================================================================
     //                                                               Sql2Entity Definition
     //                                                               =====================
-    /**
-     * Set the related table name for Sql2Entity. <br />
-     * This is used at supplementary information.
-     * @param sql2EntityRelatedTableName The related table name for Sql2Entity. (Nullable)
-     */
-    public void setSql2EntityRelatedTableName(String sql2EntityRelatedTableName) {
-        _sql2EntityRelatedTableName = sql2EntityRelatedTableName;
+    public Table getSql2EntityRelatedTable() {
+        return _sql2EntityRelatedTable;
     }
 
     /**
-     * Set the related column name for Sql2Entity. <br />
-     * This is used at supplementary information.
-     * @param sql2EntityRelatedColumnName The related column name for Sql2Entity. (Nullable)
+     * Set the related table for Sql2Entity. <br />
+     * This is used at supplementary information and LoadReferrer for customize entity.
+     * @param sql2EntityRelatedTable The related table for Sql2Entity. (Nullable)
      */
-    public void setSql2EntityRelatedColumnName(String sql2EntityRelatedColumnName) {
-        _sql2EntityRelatedColumnName = sql2EntityRelatedColumnName;
+    public void setSql2EntityRelatedTable(Table sql2EntityRelatedTable) {
+        _sql2EntityRelatedTable = sql2EntityRelatedTable;
+    }
+
+    public boolean hasSql2EntityRelatedTable() {
+        return _sql2EntityRelatedTable != null;
+    }
+
+    public Column getSql2EntityRelatedColumn() {
+        return _sql2EntityRelatedColumn;
+    }
+
+    /**
+     * Set the related column for Sql2Entity. <br />
+     * This is used at supplementary information and LoadReferrer for customize entity.
+     * @param sql2EntityRelatedColumn The related column for Sql2Entity. (Nullable)
+     */
+    public void setSql2EntityRelatedColumn(Column sql2EntityRelatedColumn) {
+        _sql2EntityRelatedColumn = sql2EntityRelatedColumn;
+    }
+
+    public boolean hasSql2EntityRelatedColumn() {
+        return _sql2EntityRelatedColumn != null;
     }
 
     /**
@@ -2057,35 +2073,35 @@ public class Column {
     }
 
     protected boolean hasSql2EntityRelatedTableClassification() {
-        if (_sql2EntityRelatedTableName == null) {
+        if (!hasSql2EntityRelatedTable()) {
             return false;
         }
         final Database database = getTable().getDatabase();
-        return database.hasClassification(_sql2EntityRelatedTableName, getName());
+        return database.hasClassification(getSql2EntityRelatedTable().getName(), getName());
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationName() {
-        if (_sql2EntityRelatedTableName == null) {
+        if (!hasSql2EntityRelatedTable()) {
             return false;
         }
         final Database database = getTable().getDatabase();
-        return database.hasClassificationName(_sql2EntityRelatedTableName, getName());
+        return database.hasClassificationName(getSql2EntityRelatedTable().getName(), getName());
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationAlias() {
-        if (_sql2EntityRelatedTableName == null) {
+        if (!hasSql2EntityRelatedTable()) {
             return false;
         }
         final Database database = getTable().getDatabase();
-        return database.hasClassificationAlias(_sql2EntityRelatedTableName, getName());
+        return database.hasClassificationAlias(getSql2EntityRelatedTable().getName(), getName());
     }
 
     protected String getSql2EntityRelatedTableClassificationName() {
-        if (_sql2EntityRelatedTableName == null) {
+        if (!hasSql2EntityRelatedTable()) {
             return null;
         }
         final Database database = getTable().getDatabase();
-        return database.getClassificationName(_sql2EntityRelatedTableName, getName());
+        return database.getClassificationName(getSql2EntityRelatedTable().getName(), getName());
     }
 
     // ===================================================================================

@@ -153,6 +153,7 @@ public class Table {
     // -----------------------------------------------------
     //                                 Sql2Entity Definition
     //                                 ---------------------
+    private boolean _sql2entityCustomize;
     private boolean _sql2entityTypeSafeCursor;
 
     // -----------------------------------------------------
@@ -691,7 +692,8 @@ public class Table {
 
     public Column getPrimaryKeyAsOne() {
         if (getPrimaryKey().size() != 1) {
-            String msg = "This method is for only-one primary-key: getPrimaryKey().size()=" + getPrimaryKey().size();
+            String msg = "This method is for only-one primary-key:";
+            msg = msg + " getPrimaryKey().size()=" + getPrimaryKey().size();
             msg = msg + " table=" + getName();
             throw new IllegalStateException(msg);
         }
@@ -1322,7 +1324,7 @@ public class Table {
             return false;
         }
         if (_referrerList == null) {
-            _referrerList = new ArrayList<ForeignKey>(5);
+            _referrerList = DfCollectionUtil.newArrayList();
         }
         _referrerList.add(fk);
         return true;
@@ -1332,11 +1334,39 @@ public class Table {
         return _referrerList;
     }
 
-    public List<ForeignKey> getRefererList() {
+    public List<ForeignKey> getReferrerAsManyList() {
+        return getReferrerAsWhatList(false);
+    }
+
+    public List<ForeignKey> getReferrerAsOneList() {
+        return getReferrerAsWhatList(true);
+    }
+
+    protected List<ForeignKey> getReferrerAsWhatList(boolean oneToOne) {
+        final List<ForeignKey> referrerList = getReferrerList();
+        if (referrerList == null || referrerList.isEmpty()) {
+            return referrerList;
+        }
+        List<ForeignKey> referrerListAsWhat = DfCollectionUtil.newArrayList();
+        for (ForeignKey key : referrerList) {
+            if (oneToOne) {
+                if (key.isOneToOne()) {
+                    referrerListAsWhat.add(key);
+                }
+            } else {
+                if (!key.isOneToOne()) {
+                    referrerListAsWhat.add(key);
+                }
+            }
+        }
+        return referrerListAsWhat;
+    }
+
+    public List<ForeignKey> getRefererList() { // for compatible (spell miss)
         return getReferrerList();
     }
 
-    public List<ForeignKey> getReferrers() {
+    public List<ForeignKey> getReferrers() { // for compatible (old style)
         return getReferrerList();
     }
 
@@ -1345,29 +1375,13 @@ public class Table {
     }
 
     public boolean hasReferrerAsMany() {
-        final List<ForeignKey> referrers = getReferrerList();
-        if (referrers == null || referrers.isEmpty()) {
-            return false;
-        }
-        for (ForeignKey key : referrers) {
-            if (!key.isOneToOne()) {
-                return true;
-            }
-        }
-        return false;
+        final List<ForeignKey> manyList = getReferrerAsManyList();
+        return manyList != null && !manyList.isEmpty();
     }
 
     protected boolean hasReferrerAsOne() {
-        final List<ForeignKey> referrers = getReferrerList();
-        if (referrers == null || referrers.isEmpty()) {
-            return false;
-        }
-        for (ForeignKey key : referrers) {
-            if (key.isOneToOne()) {
-                return true;
-            }
-        }
-        return false;
+        final List<ForeignKey> oneList = getReferrerAsOneList();
+        return oneList != null && !oneList.isEmpty();
     }
 
     // -----------------------------------------------------
@@ -1890,12 +1904,59 @@ public class Table {
     // ===================================================================================
     //                                                               Sql2Entity Definition
     //                                                               =====================
+    public boolean isSql2EntityCustomize() {
+        return _sql2entityCustomize;
+    }
+
+    public void setSql2EntityCustomize(boolean sql2entityCustomize) {
+        _sql2entityCustomize = sql2entityCustomize;
+    }
+
     public boolean isSql2EntityTypeSafeCursor() {
         return _sql2entityTypeSafeCursor;
     }
 
     public void setSql2EntityTypeSafeCursor(boolean sql2entityTypeSafeCursor) {
         this._sql2entityTypeSafeCursor = sql2entityTypeSafeCursor;
+    }
+
+    public boolean isLoadableCustomizeEntity() {
+        final Table domain = getLoadableCustomizeDomain();
+        return domain != null && domain.hasReferrerAsMany();
+    }
+
+    public Table getLoadableCustomizeDomain() {
+        if (!isSql2EntityCustomize() || !hasPrimaryKey()) {
+            return null;
+        }
+        final List<Column> primaryKeyList = getPrimaryKey();
+        for (Column pk : primaryKeyList) {
+            // check whether related columns are also primary keys
+            final Column relatedColumn = pk.getSql2EntityRelatedColumn();
+            if (relatedColumn == null || !relatedColumn.isPrimaryKey()) {
+                return null;
+            }
+        }
+        return primaryKeyList.get(0).getSql2EntityRelatedTable();
+    }
+
+    public List<String> getLoadableCustomizePrimaryKeySettingExpressionList() {
+        final List<Column> primaryKeyList = getPrimaryKey();
+        final List<String> settingList = DfCollectionUtil.newArrayList();
+        for (Column pk : primaryKeyList) {
+            final Column relatedColumn = pk.getSql2EntityRelatedColumn();
+            if (getBasicProperties().isTargetLanguageJava()) {
+                final String fromPropName = pk.getJavaBeansRulePropertyNameInitCap();
+                final String toPropName = relatedColumn.getJavaBeansRulePropertyNameInitCap();
+                settingList.add("set" + toPropName + "(get" + fromPropName + "())");
+            } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                settingList.add(relatedColumn.getJavaName() + " = this." + pk.getJavaName());
+            } else {
+                String msg = "Unsupported language for this method: " + getBasicProperties().getTargetLanguage();
+                throw new UnsupportedOperationException(msg);
+            }
+        }
+        return settingList;
     }
 
     // ===================================================================================
