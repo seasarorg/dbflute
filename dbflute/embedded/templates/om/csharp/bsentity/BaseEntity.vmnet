@@ -77,10 +77,10 @@ namespace ${myExtendedEntityPackageName} {
         protected ${col.JavaNative} _${col.uncapitalisedJavaName};
 
 #end
-        protected EntityModifiedProperties _modifiedProperties = new EntityModifiedProperties();
+        protected EntityModifiedProperties __modifiedProperties = new EntityModifiedProperties();
 #if ($table.hasAllCommonColumn())
 
-        protected bool _canCommonColumnAutoSetup = true;
+        protected bool __canCommonColumnAutoSetup = true;
 #end
         #endregion
 
@@ -339,11 +339,11 @@ namespace ${myExtendedEntityPackageName} {
         //                                                             Modified Properties
         //                                                             ===================
         public virtual IDictionary<String, Object> ModifiedPropertyNames {
-            get { return _modifiedProperties.PropertyNames; }
+            get { return __modifiedProperties.PropertyNames; }
         }
 
         public virtual void ClearModifiedPropertyNames() {
-            _modifiedProperties.Clear();
+            __modifiedProperties.Clear();
         }
 #if (${table.hasAllCommonColumn()})
 
@@ -351,15 +351,15 @@ namespace ${myExtendedEntityPackageName} {
         //                                                          Common Column Handling
         //                                                          ======================
         public virtual void EnableCommonColumnAutoSetup() {
-            _canCommonColumnAutoSetup = true;
+            __canCommonColumnAutoSetup = true;
         }
 
         public virtual void DisableCommonColumnAutoSetup() {
-            _canCommonColumnAutoSetup = false;
+            __canCommonColumnAutoSetup = false;
         }
 
         public virtual bool CanCommonColumnAutoSetup() {// for Framework
-            return _canCommonColumnAutoSetup;
+            return __canCommonColumnAutoSetup;
         }
 #end
 
@@ -521,7 +521,7 @@ namespace ${myExtendedEntityPackageName} {
             get { return _${col.uncapitalisedJavaName}; }
 #end
             set {
-                _modifiedProperties.AddPropertyName("${col.javaBeansRulePropertyNameInitCap}");
+                __modifiedProperties.AddPropertyName("${col.javaBeansRulePropertyNameInitCap}");
                 _${col.uncapitalisedJavaName} = value;
             }
         }
