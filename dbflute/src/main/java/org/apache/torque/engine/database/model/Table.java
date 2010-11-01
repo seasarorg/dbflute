@@ -1931,9 +1931,9 @@ public class Table {
         }
         final List<Column> primaryKeyList = getPrimaryKey();
         for (Column pk : primaryKeyList) {
-            // check whether related columns are also primary keys
+            // check whether the related column is also primary key if it exists
             final Column relatedColumn = pk.getSql2EntityRelatedColumn();
-            if (relatedColumn == null || !relatedColumn.isPrimaryKey()) {
+            if (relatedColumn != null && !relatedColumn.isPrimaryKey()) {
                 return null;
             }
         }
@@ -1941,10 +1941,32 @@ public class Table {
     }
 
     public List<String> getLoadableCustomizePrimaryKeySettingExpressionList() {
+        final Table domain = getLoadableCustomizeDomain();
+        if (domain == null) {
+            return DfCollectionUtil.emptyList();
+        }
         final List<Column> primaryKeyList = getPrimaryKey();
         final List<String> settingList = DfCollectionUtil.newArrayList();
+        final boolean hasRelatedColumn; // true if all PKs have related columns
+        {
+            boolean notFoundExists = false;
+            for (Column pk : primaryKeyList) {
+                if (!pk.hasSql2EntityRelatedColumn()) {
+                    notFoundExists = true; // for example, PostgreSQL
+                    break;
+                }
+            }
+            hasRelatedColumn = !notFoundExists;
+        }
+        int index = 0;
         for (Column pk : primaryKeyList) {
-            final Column relatedColumn = pk.getSql2EntityRelatedColumn();
+            final Column relatedColumn;
+            if (hasRelatedColumn) {
+                relatedColumn = pk.getSql2EntityRelatedColumn();
+            } else {
+                // if there are not related columns, it uses a key order
+                relatedColumn = domain.getPrimaryKey().get(index);
+            }
             if (getBasicProperties().isTargetLanguageJava()) {
                 final String fromPropName = pk.getJavaBeansRulePropertyNameInitCap();
                 final String toPropName = relatedColumn.getJavaBeansRulePropertyNameInitCap();
@@ -1955,6 +1977,7 @@ public class Table {
                 String msg = "Unsupported language for this method: " + getBasicProperties().getTargetLanguage();
                 throw new UnsupportedOperationException(msg);
             }
+            ++index;
         }
         return settingList;
     }

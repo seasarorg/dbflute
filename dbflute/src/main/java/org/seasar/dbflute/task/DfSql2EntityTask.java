@@ -679,13 +679,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupDbType(metaMap, columnName, column);
                 setupColumnSizeContainsDigit(metaMap, columnName, column);
                 setupColumnComment(metaMap, columnName, column);
-                final String relatedTableName = setupSql2EntityRelatedTableName(entityName, metaMap, columnName,
-                        column, pkRelatedTableName);
-                final String relatedColumnName = setupSql2EntityRelatedColumnName(metaMap, columnName, column);
-                final String forcedJavaNative = setupSql2EntityForcedJavaNative(metaMap, columnName, column);
-
+                setupSql2EntityElement(entityName, metaMap, columnName, column, pkRelatedTableName);
                 tbl.addColumn(column);
-                showColumnInfo(columnName, column, relatedTableName, relatedColumnName, forcedJavaNative);
             }
             if (!pkMap.isEmpty()) { // if not-removed columns exist
                 throwPrimaryKeyNotFoundException(entityName, pkMap, columnNameSet);
@@ -812,7 +807,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         column.setPlainComment(plainComment);
     }
 
-    protected String setupSql2EntityRelatedTableName(String entityName, Map<String, DfColumnMetaInfo> metaMap,
+    protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMetaInfo> metaMap, String columnName,
+            Column column, String pkRelatedTableName) {
+        final Table relatedTable = setupSql2EntityRelatedTable(entityName, metaMap, columnName, column,
+                pkRelatedTableName);
+        final Column relatedColumn = setupSql2EntityRelatedColumn(relatedTable, metaMap, columnName, column);
+        final String forcedJavaNative = setupSql2EntityForcedJavaNative(metaMap, columnName, column);
+
+        showColumnInfo(columnName, column, relatedTable, relatedColumn, forcedJavaNative);
+    }
+
+    protected Table setupSql2EntityRelatedTable(String entityName, Map<String, DfColumnMetaInfo> metaMap,
             String columnName, Column column, String pkRelatedTableName) {
         final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
@@ -835,7 +840,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
         }
         column.setSql2EntityRelatedTable(relatedTable);
-        return sql2EntityRelatedTableName;
+        return relatedTable;
     }
 
     protected void throwTableRelatedPrimaryKeyNotFoundException(String entityName, String tableName, String columnName) {
@@ -867,21 +872,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected String setupSql2EntityRelatedColumnName(Map<String, DfColumnMetaInfo> metaMap, String columnName,
-            Column column) {
-        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
-        final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
-        final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
+    protected Column setupSql2EntityRelatedColumn(Table relatedTable, Map<String, DfColumnMetaInfo> metaMap,
+            String columnName, Column column) {
         if (relatedTable == null) {
             return null;
         }
+        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
         final Column relatedColumn = relatedTable.getColumn(sql2EntityRelatedColumnName);
         if (relatedColumn == null) {
             return null;
         }
         column.setSql2EntityRelatedColumn(relatedColumn);
-        return sql2EntityRelatedColumnName;
+        return column;
     }
 
     protected Table getRelatedTable(String sql2EntityRelatedTableName) {
@@ -923,7 +926,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected void showColumnInfo(String columnName, Column column, String relatedTableName, String relatedColumnName,
+    protected void showColumnInfo(String columnName, Column column, Table relatedTable, Column relatedColumn,
             String forcedJavaNatice) {
         final StringBuilder sb = new StringBuilder();
         sb.append(" ").append(column.isPrimaryKey() ? "*" : " ");
@@ -934,8 +937,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(columnSize)) {
             sb.append("(").append(columnSize).append(")");
         }
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(relatedColumnName)) {
-            sb.append(" related:").append(relatedTableName).append(".").append(relatedColumnName);
+        if (relatedColumn != null) {
+            sb.append(" related:").append(relatedTable.getName());
+            sb.append(".").append(relatedColumn.getName());
         }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(forcedJavaNatice)) {
             sb.append(" forced:").append(forcedJavaNatice);
