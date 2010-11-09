@@ -223,16 +223,19 @@ namespace ${glPackageExtendedBhv} {
             HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>
                     (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(referrerBhv));
         }
-        protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback : InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}> {
+#set ($referrerColumn = ${referrer.localColumnAsOne})
+#set ($localColumn = ${referrer.foreignColumnAsOne})
+#set ($keyJavaNative = "${referrerColumn.javaNative}")
+        protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback : InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}> {
             protected ${referrerBhvClassName} referrerBhv;
             public MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(${referrerBhvClassName} referrerBhv) { this.referrerBhv = referrerBhv; }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} getPKVal(${myExtendedObjectClassName} e) { return e.${table.getPrimaryKeyJavaNameAsOne()}; }
+            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} e) { return e.${localColumn.javaName}; }
             public void setRfLs(${myExtendedObjectClassName} e, IList<${referrerEntityClassName}> ls) { e.${referrer.referrerPropertyNameInitCap} = ls; }
             public ${referrerCBClassName} newMyCB() { return referrerBhv.NewMyConditionBean(); }
-            public void qyFKIn(${referrerCBClassName} cb, IList<${table.getPrimaryKeyJavaNativeAsOne()}> ls) { cb.Query().Set${referrer.getLocalColumnJavaNameAsOne()}_InScope(ls); }
-            public void qyOdFKAsc(${referrerCBClassName} cb) { cb.Query().AddOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
+            public void qyFKIn(${referrerCBClassName} cb, IList<${keyJavaNative}> ls) { cb.Query().Set${referrerColumn.javaName}_InScope(ls); }
+            public void qyOdFKAsc(${referrerCBClassName} cb) { cb.Query().AddOrderBy_${referrerColumn.javaName}_Asc(); }
             public IList<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.SelectList(cb); }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} getFKVal(${referrerEntityClassName} e) { return e.${referrer.getLocalColumnJavaNameAsOne()}; }
+            public ${keyJavaNative} getFKVal(${referrerEntityClassName} e) { return e.${referrerColumn.javaName}; }
             public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} be) { re.${referrer.foreignPropertyNameInitCap} = be; }
         }
 #end

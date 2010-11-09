@@ -263,7 +263,12 @@ public class ForeignKey {
     }
 
     public boolean canBeReferrer() {
-        return isForeignColumnPrimaryKey() && !hasFixedCondition();
+        if (hasFixedCondition()) {
+            return false;
+        }
+        return isForeignColumnPrimaryKey() || isForeignColumnUnique();
+
+        // *reference to unique key is unsupported basically)
     }
 
     /**
@@ -271,8 +276,28 @@ public class ForeignKey {
      * @return Determination.
      */
     public boolean isLocalColumnPrimaryKey() {
-        final List<Column> localColumnList = getLocalColumnList();
-        for (Column column : localColumnList) {
+        return isColumnPrimaryKey(getLocalColumnList());
+    }
+
+    /**
+     * Are all foreign columns primary-key? <br />
+     * Basically true. If biz-one-to-one and unique key, false.
+     * @return Determination.
+     */
+    public boolean isForeignColumnPrimaryKey() {
+        return isColumnPrimaryKey(getForeignColumnList());
+    }
+
+    /**
+     * Are all foreign columns unique-key? <br />
+     * @return Determination.
+     */
+    public boolean isForeignColumnUnique() {
+        return isColumnUnique(getForeignColumnList());
+    }
+
+    protected boolean isColumnPrimaryKey(List<Column> columnList) {
+        for (Column column : columnList) {
             if (!column.isPrimaryKey()) {
                 return false;
             }
@@ -280,15 +305,9 @@ public class ForeignKey {
         return true;
     }
 
-    /**
-     * Are all foreign columns primary-key? <br />
-     * Basically true. Only when a relation is for biz-one-to-one, false.
-     * @return Determination.
-     */
-    public boolean isForeignColumnPrimaryKey() {
-        final List<Column> foreignColumnList = getForeignColumnList();
-        for (Column column : foreignColumnList) {
-            if (!column.isPrimaryKey()) {
+    protected boolean isColumnUnique(List<Column> columnList) {
+        for (Column column : columnList) {
+            if (!column.isUnique()) {
                 return false;
             }
         }
@@ -326,14 +345,13 @@ public class ForeignKey {
     }
 
     public Column getLocalColumnAsOne() {
-        String localColumnNameAsOne = getLocalColumnNameAsOne();
-        return getTable().getColumn(localColumnNameAsOne);
+        return getTable().getColumn(getLocalColumnNameAsOne());
     }
 
     public String getLocalColumnNameAsOne() {
         if (getLocalColumns().size() != 1) {
-            String msg = "This method is for only-one foreign-key: getForeignColumns().size()="
-                    + getLocalColumns().size();
+            String msg = "This method is for only-one foreign-key:";
+            msg = msg + " getForeignColumns().size()=" + getLocalColumns().size();
             msg = msg + " baseTable=" + getTable().getName() + " foreignTable=" + getForeignTable().getName();
             throw new IllegalStateException(msg);
         }
@@ -341,14 +359,12 @@ public class ForeignKey {
     }
 
     public String getLocalColumnJavaNameAsOne() {
-        final String columnName = getLocalColumnNameAsOne();
-        final Table localTable = getTable();
-        return localTable.getColumn(columnName).getJavaName();
+        return getLocalColumnAsOne().getJavaName();
     }
 
     public List<String> getLocalColumnJavaNameList() {
-        List<String> resultList = new ArrayList<String>();
-        List<Column> localColumnList = getLocalColumnList();
+        final List<String> resultList = new ArrayList<String>();
+        final List<Column> localColumnList = getLocalColumnList();
         for (Column column : localColumnList) {
             resultList.add(column.getJavaName());
         }
