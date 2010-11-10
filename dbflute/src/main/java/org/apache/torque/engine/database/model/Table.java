@@ -680,11 +680,9 @@ public class Table {
      */
     public List<Column> getPrimaryKey() {
         final List<Column> pk = new ArrayList<Column>(_columnList.size());
-        final Iterator<Column> iter = _columnList.iterator();
-        while (iter.hasNext()) {
-            final Column col = (Column) iter.next();
-            if (col.isPrimaryKey()) {
-                pk.add(col);
+        for (Column column : _columnList) {
+            if (column.isPrimaryKey()) {
+                pk.add(column);
             }
         }
         return pk;
@@ -1296,10 +1294,12 @@ public class Table {
     }
 
     public boolean hasTwoOrMoreKeyReferrer() {
-        List<Column> primaryKeyList = getPrimaryKey();
-        for (Column primaryKey : primaryKeyList) {
-            List<ForeignKey> referrers = primaryKey.getReferrers();
-            for (ForeignKey referrer : referrers) {
+        return xhasTwoOrMoreKeyReferrer(getPrimaryKey()) || xhasTwoOrMoreKeyReferrer(getUniqueColumnList());
+    }
+
+    protected boolean xhasTwoOrMoreKeyReferrer(List<Column> columnList) {
+        for (Column col : columnList) {
+            for (ForeignKey referrer : col.getReferrers()) {
                 if (!referrer.isSimpleKeyFK()) {
                     return true;
                 }
@@ -1575,6 +1575,14 @@ public class Table {
         unique.loadFromXML(attrib);
         addUnique(unique);
         return unique;
+    }
+
+    public List<Column> getUniqueColumnList() {
+        final StringKeyMap<Column> keyMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+        for (Column column : _columnList) {
+            keyMap.put(column.getName(), column);
+        }
+        return new ArrayList<Column>(keyMap.values());
     }
 
     // ===================================================================================

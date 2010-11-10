@@ -62,8 +62,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -85,8 +83,6 @@ import org.xml.sax.Attributes;
  * @author Modified by jflute
  */
 public class ForeignKey {
-
-    private static final Log _log = LogFactory.getLog(ForeignKey.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -542,64 +538,56 @@ public class ForeignKey {
 
     /**
      * Get the value of foreign property name.
-     * @param isJavaBeansRule Is java-beans rule.
+     * @param isJavaBeansRule Is it java-beans rule?
      * @return Generated string.
      */
     protected String getForeignPropertyName(boolean isJavaBeansRule) {
-        try {
-            final List<Column> localColumnList = getLocalColumnObjectList();
-            final List<String> columnNameList = new ArrayList<String>();
-            String result = "";
-            if (hasFixedSuffix()) {
-                result = getFixedSuffix();
-            } else {
-                for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
-                    final Column col = (Column) ite.next();
-
-                    if (col.isMultipleFK()) {
-                        columnNameList.add(col.getName());
-                        result = result + col.getJavaName();
-                    }
+        final List<Column> localColumnList = getLocalColumnObjectList();
+        String name = "";
+        if (hasFixedSuffix()) {
+            name = getFixedSuffix();
+        } else {
+            final List<String> multipleFKColumnNameList = new ArrayList<String>();
+            for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
+                final Column col = (Column) ite.next();
+                if (col.isMultipleFK()) { // the bug exists (refer to the method's source code)
+                    multipleFKColumnNameList.add(col.getName());
+                    name = name + col.getJavaName();
                 }
-                if (result.trim().length() != 0) {
-                    final String aliasName = getMultipleFKPropertyColumnAliasName(getTable().getName(), columnNameList);
-                    if (aliasName != null && aliasName.trim().length() != 0) {
-                        final String firstUpper = aliasName.substring(0, 1).toUpperCase();
-                        if (aliasName.trim().length() == 1) {
-                            result = "By" + firstUpper;
-                        } else {
-                            result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
-                        }
+            }
+            if (name.trim().length() > 0) { // means multiple FK columns exist
+                final String aliasName = getMultipleFKPropertyColumnAliasName(getTable().getName(),
+                        multipleFKColumnNameList);
+                if (aliasName != null && aliasName.trim().length() > 0) { // my young code
+                    final String firstUpper = aliasName.substring(0, 1).toUpperCase();
+                    if (aliasName.trim().length() == 1) {
+                        name = "By" + firstUpper;
                     } else {
-                        result = "By" + result;
+                        name = "By" + firstUpper + aliasName.substring(1, aliasName.length());
                     }
+                } else {
+                    name = "By" + name;
                 }
             }
-            if (getForeignTable().getName().equals(getTable().getName())) {
-                result = result + "Self";
-            }
-            if (isJavaBeansRule) {
-                result = getForeignTable().getJavaBeansRulePropertyName() + result;
-            } else {
-                result = getForeignTable().getUncapitalisedJavaName() + result;
-            }
-            if (_foreignPropertyNamePrefix != null) {
-                result = _foreignPropertyNamePrefix + result;
-            }
-
-            return result;
-        } catch (RuntimeException e) {
-            String msg = "getForeignPropertyName() threw the exception";
-            msg = msg + ": localColumns=" + _localColumns;
-            msg = msg + ": foreignTableName=" + _foreignTableName;
-            _log.warn(msg, e);
-            throw e;
         }
+        if (getForeignTable().getName().equals(getTable().getName())) {
+            name = name + "Self";
+        }
+        if (isJavaBeansRule) {
+            name = getForeignTable().getJavaBeansRulePropertyName() + name;
+        } else {
+            name = getForeignTable().getUncapitalisedJavaName() + name;
+        }
+        if (_foreignPropertyNamePrefix != null) {
+            name = _foreignPropertyNamePrefix + name;
+        }
+        return name;
     }
 
-    protected String getMultipleFKPropertyColumnAliasName(String tableName, List<String> columnNameList) {
+    protected String getMultipleFKPropertyColumnAliasName(String tableName, List<String> multipleFKColumnNameList) {
         final DfMultipleFKPropertyProperties prop = DfBuildProperties.getInstance().getMultipleFKPropertyProperties();
-        final String columnAliasName = prop.getMultipleFKPropertyColumnAliasName(getTable().getName(), columnNameList);
+        final String columnAliasName = prop.getMultipleFKPropertyColumnAliasName(getTable().getName(),
+                multipleFKColumnNameList);
         return columnAliasName;
     }
 

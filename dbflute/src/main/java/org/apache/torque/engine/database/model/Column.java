@@ -764,19 +764,24 @@ public class Column {
      * same table as another foreign key column in this table.
      */
     public boolean isMultipleFK() {
-        ForeignKey fk = getForeignKey();
+        final ForeignKey fk = getForeignKey();
         if (fk == null) {
             return false;
         }
-        String myForeignTableName = fk.getForeignTableName();
-        ForeignKey[] fks = _table.getForeignKeys();
-        String myColumnName = _name;
+        final String myForeignTableName = fk.getForeignTableName();
+        final ForeignKey[] fks = _table.getForeignKeys();
+        final String myColumnName = _name;
         for (int i = 0; i < fks.length; i++) {
-            String foreignTableName = fks[i].getForeignTableName();
+            final String foreignTableName = fks[i].getForeignTableName();
             if (!myForeignTableName.equalsIgnoreCase(foreignTableName)) {
                 continue;
             }
-            List<String> columnsNameList = fks[i].getLocalColumns();
+            // same table reference was found
+            final List<String> columnsNameList = fks[i].getLocalColumns();
+
+            // the bug exists but it doesn't have heavy problem so not fixed for compatible
+            //  if FOO_ID, BAR_ID, QUX_ID : FK_ONE(FOO_ID, BAR_ID), FK_TWO(BAR_ID, QUX_ID)
+            //  then BAR_ID column returns false here (actually it also be multiple FK)
             if (!Srl.containsElementIgnoreCase(columnsNameList, myColumnName)) {
                 return true;
             }

@@ -1,5 +1,6 @@
 package org.seasar.dbflute.properties;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -42,12 +43,12 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
         return _multipleFKPropertyMap;
     }
 
-    public String getMultipleFKPropertyColumnAliasName(String tableName, java.util.List<String> columnNameList) {
+    public String getMultipleFKPropertyColumnAliasName(String tableName, java.util.List<String> multipleFKColumnNameList) {
         final Map<String, Map<String, String>> foreignKeyMap = asFlexible().get(tableName);
         if (foreignKeyMap == null) {
             return "";
         }
-        final String columnKey = createMultipleFKPropertyColumnKey(columnNameList);
+        final String columnKey = createMultipleFKPropertyColumnKey(multipleFKColumnNameList);
         final Map<String, Map<String, String>> foreignKeyFxMap = asFlexible(foreignKeyMap);
         final Map<String, String> foreignPropertyElement = foreignKeyFxMap.get(columnKey);
         if (foreignPropertyElement == null) {
@@ -57,9 +58,9 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
         return columnAliasName;
     }
 
-    protected String createMultipleFKPropertyColumnKey(java.util.List<String> columnNameList) {
+    protected String createMultipleFKPropertyColumnKey(List<String> multipleFKColumnNameList) {
         final StringBuilder sb = new StringBuilder();
-        for (String columnName : columnNameList) {
+        for (String columnName : multipleFKColumnNameList) {
             sb.append("/").append(columnName);
         }
         sb.delete(0, "/".length());

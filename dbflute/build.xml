@@ -9,9 +9,9 @@
 	<property name="version" value="0.9.7.6"/>
 	<property name="build.version" value="${version}-SNAPSHOT"/>
 	<property name="pre.version" value="0.9.7.5"/>
-	<property name="runtime.version" value="0.9.7.5"/>
-	<property name="runtime.build.version" value="${runtime.version}"/>
-	<property name="runtime.pre.version" value="0.9.7.4"/>
+	<property name="runtime.version" value="0.9.7.6"/>
+	<property name="runtime.build.version" value="${runtime.version}-01-SNAPSHOT"/>
+	<property name="runtime.pre.version" value="0.9.7.5"/>
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value=".."/>
