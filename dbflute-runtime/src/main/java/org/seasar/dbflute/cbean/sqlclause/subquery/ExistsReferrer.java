@@ -88,7 +88,7 @@ public class ExistsReferrer extends AbstractSubQuery {
         {
             // because sub-query may be only allowed to return a single column.
             final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlNames[0]);
-            selectClause = "select " + tableAliasName + "." + relatedColumnRealName;
+            selectClause = "select " + relatedColumnRealName;
         }
         final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
                 relatedColumnSqlNames, correlatedColumnNames);
