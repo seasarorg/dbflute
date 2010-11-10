@@ -580,6 +580,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
         }
         loadReferrerOption.delegateConditionBeanSettingUp(cb);
+        if (cb.getSqlClause().hasSpecifiedSelectColumn(cb.getSqlClause().getLocalTableAliasName())) {
+            callback.spFKCol(cb); // specify required columns for relation
+        }
         final List<REFERRER_ENTITY> referrerList = callback.selRfLs(cb);
         loadReferrerOption.delegateEntitySettingUp(referrerList);
 
@@ -638,17 +641,19 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param <REFERRER_ENTITY> The type of referrer entity.
      */
     protected static interface InternalLoadReferrerCallback<LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> {
-        // For Base
+        // for Base
         public PK getPKVal(LOCAL_ENTITY entity); // getPrimaryKeyValue()
 
         public void setRfLs(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList); // setReferrerList()
 
-        // For Referrer
+        // for Referrer
         public REFERRER_CB newMyCB(); // newMyConditionBean()
 
         public void qyFKIn(REFERRER_CB cb, List<PK> pkList); // queryForeignKeyInScope()
 
         public void qyOdFKAsc(REFERRER_CB cb); // queryAddOrderByForeignKeyAsc() 
+
+        public void spFKCol(REFERRER_CB cb); // specifyForeignKeyColumn()
 
         public List<REFERRER_ENTITY> selRfLs(REFERRER_CB cb); // selectReferrerList() 
 

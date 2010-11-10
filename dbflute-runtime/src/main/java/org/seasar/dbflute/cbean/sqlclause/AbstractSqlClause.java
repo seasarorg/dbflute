@@ -1788,6 +1788,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         elementMap.put(columnDbName, tableDbName); // this tableDbName is unused actually, this is for future
     }
 
+    public boolean hasSpecifiedSelectColumn(String tableAliasName) {
+        return _specifiedSelectColumnMap != null && _specifiedSelectColumnMap.containsKey(tableAliasName);
+    }
+
     public void backupSpecifiedSelectColumn() {
         _backupSpecifiedSelectColumnMap = _specifiedSelectColumnMap;
     }
