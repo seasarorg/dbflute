@@ -2048,6 +2048,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
         elementMap.put(columnName, null); // The null value is unused actually, this is for future.
     }
 
+    public bool hasSpecifiedSelectColumn(String tableAliasName) {
+        return _specifiedSelectColumnMap != null && _specifiedSelectColumnMap.containsKey(tableAliasName);
+    }
+
     public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery) {
         if (_specifiedDeriveSubQueryMap == null) {
             _specifiedDeriveSubQueryMap = new LinkedHashMap<String, String>();

@@ -234,6 +234,7 @@ namespace ${glPackageExtendedBhv} {
             public ${referrerCBClassName} newMyCB() { return referrerBhv.NewMyConditionBean(); }
             public void qyFKIn(${referrerCBClassName} cb, IList<${keyJavaNative}> ls) { cb.Query().Set${referrerColumn.javaName}_InScope(ls); }
             public void qyOdFKAsc(${referrerCBClassName} cb) { cb.Query().AddOrderBy_${referrerColumn.javaName}_Asc(); }
+            public void spFKCol(${referrerCBClassName} cb) { cb.Specify().Column${referrerColumn.javaName}(); }
             public IList<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.SelectList(cb); }
             public ${keyJavaNative} getFKVal(${referrerEntityClassName} e) { return e.${referrerColumn.javaName}; }
             public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} be) { re.${referrer.foreignPropertyNameInitCap} = be; }

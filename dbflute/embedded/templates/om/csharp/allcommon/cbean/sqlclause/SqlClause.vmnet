@@ -185,6 +185,7 @@ public interface ${myClassName} {
     //                                                                       Specification
     //                                                                       =============
     void specifySelectColumn(String tableAliasName, String columnName);
+    bool hasSpecifiedSelectColumn(String tableAliasName);
     void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
     bool hasSpecifiedDeriveSubQuery(String aliasName);
     String getSpecifiedColumnNameAsOne();
