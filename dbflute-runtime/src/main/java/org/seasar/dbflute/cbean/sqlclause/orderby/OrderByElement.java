@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -161,6 +162,12 @@ public class OrderByElement implements Serializable {
         sb.append(ln()).append("   case").append(ln());
         int index = 0;
         for (Object value : manualValueList) {
+            if (value == null) {
+                continue;
+            }
+            if (value instanceof Classification) {
+                value = ((Classification) value).code();
+            }
             final String q = (value instanceof Number) ? "" : "'";
             sb.append("     when ");
             if (value != null) {

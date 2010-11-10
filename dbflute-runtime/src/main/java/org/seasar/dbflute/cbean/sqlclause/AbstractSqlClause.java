@@ -1364,7 +1364,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo) {
         assertObjectNotNull("manumalOrderInfo", manumalOrderInfo);
         if (hasUnionQuery()) {
-            String msg = "Manual Order with Union is unavailable: " + manumalOrderInfo.getManualValueList();
+            String msg = "ManualOrder with UnionQuery is unsupported: " + manumalOrderInfo.getManualValueList();
             throw new IllegalConditionBeanOperationException(msg);
         }
         getOrderBy().addManualOrderByElement(manumalOrderInfo);
