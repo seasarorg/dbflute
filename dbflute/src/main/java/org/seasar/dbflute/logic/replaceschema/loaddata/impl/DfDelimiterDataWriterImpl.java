@@ -96,6 +96,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
             throw new IllegalStateException(msg);
         }
+
         String lineString = null;
         String preContinueString = "";
         final List<String> columnNameList = new ArrayList<String>();
@@ -109,15 +110,16 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             br = new BufferedReader(ir);
 
             FirstLineInfo firstLineInfo = null;
-            int count = -1;
+            int loopIndex = -1;
+            int addedBatchSize = 0;
             while (true) {
-                ++count;
+                ++loopIndex;
 
                 lineString = br.readLine();
                 if (lineString == null) {
                     break;
                 }
-                if (count == 0) {
+                if (loopIndex == 0) {
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                     // Initialize the information of columns by first line.
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -210,13 +212,21 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         ps.execute();
                     } else {
                         ps.addBatch();
+                        ++addedBatchSize;
+                        if (addedBatchSize == 100000) {
+                            // this is supported in only delimiter data writer
+                            // because delimiter data can treat large data
+                            ps.executeBatch(); // to avoid OutOfMemory
+                            ps.clearBatch(); // for next batch
+                            addedBatchSize = 0;
+                        }
                     }
                 } finally {
                     valueList.clear();
                     preContinueString = "";
                 }
             }
-            if (ps != null && !_suppressBatchUpdate) {
+            if (ps != null && addedBatchSize > 0) {
                 ps.executeBatch();
             }
         } catch (FileNotFoundException e) {
