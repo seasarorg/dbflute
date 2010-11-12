@@ -21,12 +21,14 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
+import org.seasar.dbflute.exception.PagingCountSelectNotCountException;
 import org.seasar.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.FetchBean;
@@ -154,6 +156,36 @@ public class BehaviorExceptionThrower {
     protected void setupDisplaySqlElement(ExceptionMessageBuilder br, ConditionBean cb) {
         br.addItem("Display SQL");
         br.addElement(cb.toDisplaySql());
+    }
+
+    public <ENTITY> void throwPagingCountSelectNotCountException(String tableDbName, String path, PagingBean pmb,
+            Class<ENTITY> entityType, EntityDuplicatedException e) { // for OutsideSql
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The count select for paging could not get a count.");
+        br.addItem("Advice");
+        br.addElement("A select clause of OutsideSql paging should be switchable like this:");
+        br.addElement("For example:");
+        br.addElement("  /*IF pmb.isPaging()*/");
+        br.addElement("  select member.MEMBER_ID");
+        br.addElement("       , member.MEMBER_NAME");
+        br.addElement("       , ...");
+        br.addElement("  -- ELSE select count(*)");
+        br.addElement("  /*END*/");
+        br.addElement("    from ...");
+        br.addElement("   where ...");
+        br.addElement("");
+        br.addElement("This specificaton is for both ManualPaging and AutoPaging.");
+        br.addElement("(AutoPaging is only allowed to omit a paging condition)");
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        br.addItem("OutsideSql");
+        br.addElement(path);
+        br.addItem("ParameterBean");
+        br.addElement(pmb);
+        br.addItem("Entity Type");
+        br.addElement(entityType);
+        final String msg = br.buildExceptionMessage();
+        throw new PagingCountSelectNotCountException(msg, e);
     }
 
     // ===================================================================================

@@ -24,6 +24,7 @@ import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.exception.EntityDuplicatedException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
@@ -156,7 +157,12 @@ public class OutsideSqlPagingExecutor {
 
             public int count() {
                 pmb.xsetPaging(false);
-                return countExecutor.selectEntityWithDeletedCheck(path, pmb, Integer.class);
+                try {
+                    return countExecutor.selectEntityWithDeletedCheck(path, pmb, Integer.class);
+                } catch (EntityDuplicatedException e) { // means switching the select clause failed
+                    throwPagingCountSelectNotCountException(path, pmb, entityType, e);
+                    return -1; // unreachable
+                }
             }
 
             public List<ENTITY> paging() {
@@ -170,6 +176,11 @@ public class OutsideSqlPagingExecutor {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
         return new OutsideSqlEntityExecutor<PagingBean>(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, countOption);
+    }
+
+    protected <ENTITY> void throwPagingCountSelectNotCountException(String path, PagingBean pmb,
+            Class<ENTITY> entityType, EntityDuplicatedException e) {
+        createBhvExThrower().throwPagingCountSelectNotCountException(_tableDbName, path, pmb, entityType, e);
     }
 
     protected <ENTITY> PagingInvoker<ENTITY> createPagingInvoker() {
