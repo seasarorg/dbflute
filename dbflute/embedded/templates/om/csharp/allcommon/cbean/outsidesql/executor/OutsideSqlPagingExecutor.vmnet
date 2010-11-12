@@ -62,6 +62,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             protected Type _entityType;
             protected ${glOutsideSqlEntityExecutor}<${glPagingBean}> _countExecutor;
             protected ${glOutsideSqlPagingExecutor} _pagingExecutor;
+
             public DefaultPagingHandler(String path, ${glPagingBean} pmb, Type entityType, ${glOutsideSqlEntityExecutor}<${glPagingBean}> countExecutor, ${glOutsideSqlPagingExecutor} pagingExecutor) {
                 this._path = path;
                 this._pmb = pmb;
@@ -69,16 +70,56 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
                 this._countExecutor = countExecutor;
                 this._pagingExecutor = pagingExecutor;
             }
+
             public ${glPagingBean} PagingBean {
                 get { return _pmb; }
             }
+
             public int Count() {
                 _pmb.XSetPaging(false);
-                return _countExecutor.SelectEntityWithDeletedCheck<int>(_path, _pmb);
+                try {
+                    return _countExecutor.SelectEntityWithDeletedCheck<int>(_path, _pmb);
+                } catch (${glEntityDuplicatedException} e) { // means switching the select clause failed
+                    throwPagingCountSelectNotCountException(path, pmb, entityType, e);
+                    return -1; // unreachable
+                }
             }
+
             public IList<ENTITY> Paging() {
                 _pmb.XSetPaging(true);
                 return _pagingExecutor.SelectList<ENTITY>(_path, _pmb);
+            }
+
+            protected void throwPagingCountSelectNotCountException(String path, ${glPagingBean} pmb,
+                    Type entityType, ${glEntityDuplicatedException} e) {
+                String msg = "Look! Read the message below." + ln();
+                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+                msg = msg + "The count select for paging could not get a count." + ln();
+                msg = msg + ln();
+                msg = msg + "[Advice]" + ln();
+                msg = msg + "A select clause of OutsideSql paging should be switchable like this:" + ln();
+                msg = msg + "For example:" + ln();
+                msg = msg + "  /*IF pmb.isPaging()*/" + ln();
+                msg = msg + "  select member.MEMBER_ID" + ln();
+                msg = msg + "       , member.MEMBER_NAME" + ln();
+                msg = msg + "       , ..." + ln();
+                msg = msg + "  -- ELSE select count(*)" + ln();
+                msg = msg + "  /*END*/" + ln();
+                msg = msg + "    from ..." + ln();
+                msg = msg + "   where ..." + ln();
+                msg = msg + ln();
+                msg = msg + "This specificaton is for both ManualPaging and AutoPaging." + ln();
+                msg = msg + "(AutoPaging is only allowed to omit a paging condition)" + ln();
+                msg = msg + ln();
+                msg = msg + "[Table]" + ln() + _tableDbName + ln();
+                msg = msg + ln();
+                msg = msg + "[OutsideSql]" + ln() + path + ln();
+                msg = msg + ln();
+                msg = msg + "[ParameterBean]" + ln() + pmb + ln();
+                msg = msg + ln();
+                msg = msg + "[Entity Type]" + ln() + entityType + ln();
+                msg = msg + "* * * * * * * * * */";
+                throw new SystemException(msg, e);
             }
         }
 
@@ -93,6 +134,13 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         public ${glOutsideSqlPagingExecutor} DynamicBinding() {
             _outsideSqlOption.DynamicBinding();
             return this;
+        }
+
+    	// ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected static String ln() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
 }
