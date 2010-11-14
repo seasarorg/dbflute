@@ -708,7 +708,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * Embed conditions in their variables on where clause (and 'on' clause). <br />
      * You should not use this normally. It's a final weapon! <br />
      * And that this method is not perfect so be attention! <br />
-     * If the same-name-columns exist in your conditions, both are embedded.
+     * If the same-name-columns exist in your conditions, both are embedded. <br />
+     * And an empty set means that all conditions are target.
      * @param embeddedColumnInfoSet The set of embedded target column information. (NotNull)
      * @param quote Should the conditions value be quoted?
      * @deprecated You should not use this easily. It's a dangerous function.

@@ -25,6 +25,9 @@ import java.util.Map;
  */
 public class OrScopeQueryInfo {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected List<QueryClause> _tmpOrWhereList;
     protected List<QueryClause> _tmpOrBaseTableInlineWhereList;
     protected Map<String, List<QueryClause>> _tmpOrAdditionalOnClauseListMap;
@@ -32,6 +35,9 @@ public class OrScopeQueryInfo {
     protected OrScopeQueryInfo _parentInfo; // null means base point
     protected List<OrScopeQueryInfo> _childInfoList;
 
+    // ===================================================================================
+    //                                                                            Tmp List
+    //                                                                            ========
     public List<QueryClause> getTmpOrAdditionalOnClauseList(String aliasName) {
         List<QueryClause> orClauseList = getTmpOrAdditionalOnClauseListMap().get(aliasName);
         if (orClauseList != null) {
@@ -96,6 +102,9 @@ public class OrScopeQueryInfo {
         this._tmpOrOuterJoinInlineClauseListMap = tmpOrOuterJoinInlineClauseListMap;
     }
 
+    // ===================================================================================
+    //                                                                   Child Parent Info
+    //                                                                   =================
     public boolean hasChildInfo() {
         return _childInfoList != null && !_childInfoList.isEmpty();
     }

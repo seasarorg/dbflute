@@ -20,19 +20,31 @@ package org.seasar.dbflute.cbean.sqlclause.query;
  */
 public class OrScopeQueryAndPartQueryClause implements QueryClause {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected QueryClause _clause;
     protected int _identity;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public OrScopeQueryAndPartQueryClause(QueryClause clause, int identity) {
         _clause = clause;
         _identity = identity;
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
         return _clause.toString();
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public int getIdentity() {
         return _identity;
     }

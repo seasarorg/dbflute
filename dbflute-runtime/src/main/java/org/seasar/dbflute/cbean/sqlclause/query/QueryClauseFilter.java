@@ -73,6 +73,8 @@ public interface QueryClauseFilter {
          */
         public String filterClauseElement(String clauseElement) {
             if (_filterTargetColumnInfoSet == null || _filterTargetColumnInfoSet.isEmpty()) {
+                // an empty set means that all conditions are target
+                // (null set is no way because of null check at the entry method)
                 return toEmbedded(clauseElement);
             }
             for (ColumnInfo columnInfo : _filterTargetColumnInfoSet) {

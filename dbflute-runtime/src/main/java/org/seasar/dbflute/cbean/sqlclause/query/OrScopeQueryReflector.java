@@ -28,11 +28,17 @@ import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
  */
 public class OrScopeQueryReflector {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final List<QueryClause> _whereList;
     protected final List<QueryClause> _baseTableInlineWhereList;
     protected final Map<String, LeftOuterJoinInfo> _outerJoinMap;
     protected final OrScopeQuerySetupper _setupper = new OrScopeQuerySetupper();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public OrScopeQueryReflector(List<QueryClause> whereList, List<QueryClause> baseTableInlineWhereList,
             Map<String, LeftOuterJoinInfo> outerJoinMap) {
         _whereList = whereList;
@@ -40,8 +46,12 @@ public class OrScopeQueryReflector {
         _outerJoinMap = outerJoinMap;
     }
 
+    // ===================================================================================
+    //                                                                             Reflect
+    //                                                                             =======
     public void reflectTmpOrClauseToRealObject(OrScopeQueryInfo localInfo) {
         {
+            // to Normal Query (where clause)
             final List<OrScopeQueryClauseGroup> groupList = setupTmpOrListList(localInfo,
                     new OrScopeQueryClauseListProvider() {
                         public List<QueryClause> provide(OrScopeQueryInfo tmpOrScopeQueryInfo) {
@@ -51,6 +61,7 @@ public class OrScopeQueryReflector {
             setupOrScopeQuery(groupList, _whereList, true);
         }
         {
+            // to InlineView for baseTable
             final List<OrScopeQueryClauseGroup> groupList = setupTmpOrListList(localInfo,
                     new OrScopeQueryClauseListProvider() {
                         public List<QueryClause> provide(OrScopeQueryInfo tmpOrScopeQueryInfo) {
@@ -60,6 +71,7 @@ public class OrScopeQueryReflector {
             setupOrScopeQuery(groupList, _baseTableInlineWhereList, false);
         }
         {
+            // to OnClause
             final Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
             for (Entry<String, LeftOuterJoinInfo> entry : entrySet) {
                 final String aliasName = entry.getKey();
@@ -74,6 +86,7 @@ public class OrScopeQueryReflector {
             }
         }
         {
+            // to InlineView for relation
             final Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
             for (Entry<String, LeftOuterJoinInfo> entry : entrySet) {
                 final String aliasName = entry.getKey();
