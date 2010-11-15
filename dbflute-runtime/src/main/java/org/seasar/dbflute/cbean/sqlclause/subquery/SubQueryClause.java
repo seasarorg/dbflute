@@ -111,10 +111,10 @@ public class SubQueryClause {
         // Replace template marks. These are very important!
         final String firstConditionAfter = ln() + "   and ";
         final SqlClause sc = _sqlClause;
-        clause = replaceString(clause, sc.getWhereClauseMark(), "where " + joinCondition);
+        clause = replaceString(clause, sc.getWhereClauseMark(), ln() + " where " + joinCondition);
         clause = replaceString(clause, sc.getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         clause = replaceString(clause, sc.getUnionSelectClauseMark(), _selectClause);
-        clause = replaceString(clause, sc.getUnionWhereClauseMark(), "where " + joinCondition);
+        clause = replaceString(clause, sc.getUnionWhereClauseMark(), ln() + " where " + joinCondition);
         clause = replaceString(clause, sc.getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return clause;
     }
