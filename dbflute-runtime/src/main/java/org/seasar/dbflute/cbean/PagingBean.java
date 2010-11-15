@@ -115,6 +115,17 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     PagingBean fetchPage(int fetchPageNumber);
 
     // ===================================================================================
+    //                                                                     Paging Resource
+    //                                                                     ===============
+    /**
+     * Create the invoker of paging.
+     * @param <ENTITY> The type of entity.
+     * @param tableDbName The DB name of table. (NotNull)
+     * @return The instance of PagingInvoker for the table. (NotNull)
+     */
+    <ENTITY> PagingInvoker<ENTITY> createPagingInvoker(String tableDbName);
+
+    // ===================================================================================
     //                                                                      Fetch Property
     //                                                                      ==============
     /**

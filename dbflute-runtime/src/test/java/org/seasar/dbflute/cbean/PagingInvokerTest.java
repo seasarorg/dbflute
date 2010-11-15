@@ -455,14 +455,14 @@ public class PagingInvokerTest extends PlainTestCase {
         // ## Act & Assert ##
         pagingBean.fetchPage(1);
         fillList(selectedList, 28);
-        assertEquals(28, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
+        assertEquals(28, tgt.deriveAllRecordCountByLastPage(selectedList, pagingBean));
         fillList(selectedList, 30);
-        assertEquals(30, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
+        assertEquals(30, tgt.deriveAllRecordCountByLastPage(selectedList, pagingBean));
         pagingBean.fetchPage(2);
         fillList(selectedList, 28);
-        assertEquals(58, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
+        assertEquals(58, tgt.deriveAllRecordCountByLastPage(selectedList, pagingBean));
         fillList(selectedList, 30);
-        assertEquals(60, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
+        assertEquals(60, tgt.deriveAllRecordCountByLastPage(selectedList, pagingBean));
     }
 
     // ===================================================================================

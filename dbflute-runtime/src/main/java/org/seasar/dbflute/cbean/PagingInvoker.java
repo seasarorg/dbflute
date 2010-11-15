@@ -20,6 +20,7 @@ import java.util.List;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.PagingStatusInvalidException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -63,15 +64,15 @@ public class PagingInvoker<ENTITY> {
         final int allRecordCount;
         final List<ENTITY> selectedList;
         try {
-            if (pagingBean.canPagingCountLater()) {
+            if (pagingBean.canPagingCountLater()) { // can expect good performance
                 selectedList = handler.paging();
                 if (isCurrentLastPage(selectedList, pagingBean)) {
-                    allRecordCount = deriveAllRecordCountFromLastPageValues(selectedList, pagingBean);
+                    allRecordCount = deriveAllRecordCountByLastPage(selectedList, pagingBean);
                 } else {
                     allRecordCount = handler.count();
                 }
                 checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
-            } else { // basically main here
+            } else { // basically main here because it has been used for a long time
                 allRecordCount = handler.count();
                 checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
                 if (allRecordCount == 0) {
@@ -83,7 +84,7 @@ public class PagingInvoker<ENTITY> {
             final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
             if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
                 pagingBean.fetchPage(rb.getAllPageCount());
-                final int reAllRecordCount = handler.count();
+                final int reAllRecordCount = handler.count(); // always count first in ReSelect 
                 final List<ENTITY> reSelectedList = handler.paging();
                 return builder.buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
             } else {
@@ -95,48 +96,39 @@ public class PagingInvoker<ENTITY> {
     }
 
     protected void throwPagingStatusInvalidException(PagingBean pagingBean) {
-        boolean cbean = pagingBean instanceof ConditionBean;
-        String name = cbean ? "condition-bean" : "parameter-bean";
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The status of paging was INVALID!" + ln();
-        msg = msg + "(Paging parameters was not found)" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Confirm your logic for paging of " + name + "." + ln();
-        msg = msg + "Paging execution needs paging parameters 'pageSize' and 'pageNumber'." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
+        final boolean cbean = pagingBean instanceof ConditionBean;
+        final String name = cbean ? "condition-bean" : "parameter-bean";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The status of paging was INVALID. (paging parameters was not found)");
+        br.addItem("Advice");
+        br.addElement("Confirm your logic for paging of " + name + ".");
+        br.addElement("Paging execution needs paging parameters 'pageSize' and 'pageNumber'.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
         if (cbean) {
-            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-            msg = msg + "    cb.query().set...;" + ln();
-            msg = msg + "    ... = memberBhv.selectPage(cb);" + ln();
+            br.addElement("    MemberCB cb = new MemberCB();");
+            br.addElement("    cb.query().set...;");
+            br.addElement("    ... = memberBhv.selectPage(cb);");
         } else {
-            msg = msg + "    SimpleMemberPmb pmb = new SimpleMemberPmb();" + ln();
-            msg = msg + "    pmb.set...;" + ln();
-            msg = msg + "    ... = memberBhv.outsideSql().manualPaging().selectPage(...);" + ln();
+            br.addElement("    SimpleMemberPmb pmb = new SimpleMemberPmb();");
+            br.addElement("    pmb.set...;");
+            br.addElement("    ... = memberBhv.outsideSql().manualPaging().selectPage(...);");
         }
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
+        br.addElement("  (o):");
         if (cbean) {
-            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-            msg = msg + "    cb.query().set...;" + ln();
-            msg = msg + "    cb.paging(20, 2); // *Point!" + ln();
-            msg = msg + "    ... = memberBhv.selectPage(cb);" + ln();
+            br.addElement("    MemberCB cb = new MemberCB();");
+            br.addElement("    cb.query().set...;");
+            br.addElement("    cb.paging(20, 2); // *Point!");
+            br.addElement("    ... = memberBhv.selectPage(cb);");
         } else {
-            msg = msg + "    SimpleMemberPmb cb = new SimpleMemberPmb();" + ln();
-            msg = msg + "    pmb.set...;" + ln();
-            msg = msg + "    pmb.paging(20, 2); // *Point!" + ln();
-            msg = msg + "    ... = memberBhv.outsideSql().manualPaging().selectPage(...);" + ln();
+            br.addElement("    SimpleMemberPmb pmb = new SimpleMemberPmb();");
+            br.addElement("    pmb.set...;");
+            br.addElement("    pmb.paging(20, 2); // *Point!");
+            br.addElement("    ... = memberBhv.outsideSql().manualPaging().selectPage(...);");
         }
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "[Paging Bean]" + ln();
-        msg = msg + pagingBean + ln();
-        msg = msg + "* * * * * * * * * */";
+        br.addItem("PagingBean");
+        br.addElement(pagingBean);
+        final String msg = br.buildExceptionMessage();
         throw new PagingStatusInvalidException(msg);
     }
 
@@ -155,8 +147,12 @@ public class PagingInvoker<ENTITY> {
      * @return Determination.
      */
     protected boolean isCurrentLastPage(List<ENTITY> selectedList, PagingBean pagingBean) {
+        if (selectedList.size() == 0 && pagingBean.getFetchPageNumber() > 1) {
+            return false; // because of unknown all record count (re-selected later)
+        }
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-        // It returns true if the size of list is NOT under fetch size(page size).
+        // It returns true if the size of list is under fetch size(page size).
+        // (contains the size is zero and first page is target)
         // 
         // {For example}
         // If the fetch size is 20 and the size of selected list is 19 or less,
@@ -170,12 +166,12 @@ public class PagingInvoker<ENTITY> {
     }
 
     /**
-     * Derive all record count from last page values.
+     * Derive all record count by last page.
      * @param selectedList The selected list. (NotNull)
      * @param pagingBean The bean of paging. (NotNull)
      * @return Derived all record count.
      */
-    protected int deriveAllRecordCountFromLastPageValues(List<ENTITY> selectedList, PagingBean pagingBean) {
+    protected int deriveAllRecordCountByLastPage(List<ENTITY> selectedList, PagingBean pagingBean) {
         int baseSize = (pagingBean.getFetchPageNumber() - 1) * pagingBean.getFetchSize();
         return baseSize + selectedList.size();
     }

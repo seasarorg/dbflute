@@ -139,7 +139,7 @@ public class OutsideSqlPagingExecutor {
     public <ENTITY> PagingResultBean<ENTITY> selectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
         try {
             final PagingHandler<ENTITY> handler = createPagingHandler(path, pmb, entityType);
-            final PagingInvoker<ENTITY> invoker = createPagingInvoker();
+            final PagingInvoker<ENTITY> invoker = createPagingInvoker(pmb);
             return invoker.invokePaging(handler);
         } catch (PagingOverSafetySizeException e) {
             createBhvExThrower().throwDangerousResultSizeException(pmb, e);
@@ -183,8 +183,8 @@ public class OutsideSqlPagingExecutor {
         createBhvExThrower().throwPagingCountSelectNotCountException(_tableDbName, path, pmb, entityType, e);
     }
 
-    protected <ENTITY> PagingInvoker<ENTITY> createPagingInvoker() {
-        return new PagingInvoker<ENTITY>(_tableDbName);
+    protected <ENTITY> PagingInvoker<ENTITY> createPagingInvoker(PagingBean pmb) {
+        return pmb.createPagingInvoker(_tableDbName);
     }
 
     protected void setupScrollableCursorIfNeeds() {

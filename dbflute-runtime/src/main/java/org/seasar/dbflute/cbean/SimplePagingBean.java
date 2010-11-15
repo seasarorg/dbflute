@@ -183,6 +183,16 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, S
     }
 
     // -----------------------------------------------------
+    //                                       Paging Resource
+    //                                       ---------------
+    /**
+     * {@inheritDoc}
+     */
+    public <ENTITY> PagingInvoker<ENTITY> createPagingInvoker(String tableDbName) {
+        return new PagingInvoker<ENTITY>(tableDbName);
+    }
+
+    // -----------------------------------------------------
     //                                        Fetch Property
     //                                        --------------
     /**

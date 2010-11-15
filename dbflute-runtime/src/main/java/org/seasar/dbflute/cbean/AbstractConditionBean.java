@@ -446,6 +446,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // -----------------------------------------------------
+    //                                       Paging Resource
+    //                                       ---------------
+    /**
+     * {@inheritDoc}
+     */
+    public <ENTITY> PagingInvoker<ENTITY> createPagingInvoker(String tableDbName) {
+        return new PagingInvoker<ENTITY>(tableDbName);
+    }
+
+    // -----------------------------------------------------
     //                                        Fetch Property
     //                                        --------------
     /**

@@ -6,6 +6,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.OrderByBean;
 import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -103,6 +104,10 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public PagingBean fetchScope(int fetchStartIndex, int fetchSize) {
+        return null;
+    }
+
+    public <ENTITY> PagingInvoker<ENTITY> createPagingInvoker(String tableDbName) {
         return null;
     }
 

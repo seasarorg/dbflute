@@ -250,7 +250,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             CB cb, Class<ENTITY> entityType, InternalSelectPageCallback<ENTITY, CB> callback) {
         try {
             final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType, callback);
-            final PagingInvoker<ENTITY> invoker = createPagingInvoker();
+            final PagingInvoker<ENTITY> invoker = createPagingInvoker(cb);
             return invoker.invokePaging(handler);
         } catch (PagingOverSafetySizeException e) {
             createBhvExThrower().throwDangerousResultSizeException(cb, e);
@@ -275,8 +275,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         };
     }
 
-    protected <ENTITY extends Entity> PagingInvoker<ENTITY> createPagingInvoker() {
-        return new PagingInvoker<ENTITY>(getTableDbName());
+    protected <ENTITY extends Entity, CB extends ConditionBean> PagingInvoker<ENTITY> createPagingInvoker(CB cb) {
+        return cb.createPagingInvoker(getTableDbName());
     }
 
     // ===================================================================================
