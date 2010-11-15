@@ -34,7 +34,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
             int allRecordCount;
             IList<ENTITY> selectedList;
-            if (_countLater) {
+            if (_countLater) { // not implemented about performance optimization
                 selectedList = handler.Paging();
                 allRecordCount = handler.Count();
             } else {
