@@ -2140,23 +2140,26 @@ public abstract class ${myClassName} : ${glSqlClause} {
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         StringBuilder sb = new StringBuilder();
-        String ln = this.ln();
-        sb.append("update ").append(tableSqlName).append(ln);
+        sb.append("update ").append(tableSqlName).append(ln());
         int index = 0;
         // It is guaranteed that the map has one or more elements.
         foreach (String columnName in columnParameterMap.keySet()) {
             String parameter = columnParameterMap.get(columnName); 
             if (index == 0) {
-                sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
+                sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln());
             } else {
-                sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln);
+                sb.append("     , ").append(columnName).append(" = ").append(parameter).append(ln());
             }
             ++index;
         }
         if (isUpdateSubQueryUseLocalTableSupported()) {
             String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            sb.append(" in (").append(ln()).append(subQuery);
+            if (!subQuery.EndsWith(ln())) {
+                sb.append(ln());
+            }
+            sb.append(")");
             return sb.toString();
         } else {
             String subQuery = filterSubQueryIndent(fromWhereClause);
@@ -2193,10 +2196,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (isUpdateSubQueryUseLocalTableSupported()) {
             String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             StringBuilder sb = new StringBuilder();
-            String ln = this.ln();
-            sb.append("delete from ").append(tableSqlName).append(ln);
+            sb.append("delete from ").append(tableSqlName).append(ln());
             sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
+            sb.append(" in (").append(ln()).append(subQuery);
+            if (!subQuery.EndsWith(ln())) {
+                sb.append(ln());
+            }
+            sb.append(")");
             return sb.toString();
         } else {
             String subQuery = filterSubQueryIndent(fromWhereClause);

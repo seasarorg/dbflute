@@ -28,7 +28,18 @@ namespace ${glPackageBaseCommon} {
         public static bool IsExistAccessContextOnThread() {
             return (Thread.GetData(_accessContextSlot) != null);
         }
-		
+
+		public static DateTime? GetAccessTimestampOnThread() {
+            if (IsExistAccessContextOnThread()) {
+                ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
+                DateTime? accessTimestamp = userContextOnThread.AccessTimestamp;
+                if (accessTimestamp != null) {
+                    return accessTimestamp;
+                }
+            }
+            return DateTime.Now; // as Default
+		}
+
 		public static String GetAccessUserOnThread() {
             if (IsExistAccessContextOnThread()) {
                 ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
@@ -79,17 +90,6 @@ namespace ${glPackageBaseCommon} {
             }
             throw new SystemException(msg);
 		}
-		
-		public static DateTime? GetAccessTimestampOnThread() {
-            if (IsExistAccessContextOnThread()) {
-                ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
-                DateTime? accessTimestamp = userContextOnThread.AccessTimestamp;
-                if (accessTimestamp != null) {
-                    return accessTimestamp;
-                }
-            }
-            return DateTime.Now; // as Default
-		}
 
 		public static Object GetAccessValueOnThread(String key) {
             if (IsExistAccessContextOnThread()) {
@@ -109,34 +109,31 @@ namespace ${glPackageBaseCommon} {
             throw new SystemException(msg);
 		}
 		
-        protected String _accessUser;
-    
-        protected String _accessProcess;
-    
-        protected String _accessModule;
-    
         protected DateTime? _accessTimestamp;
+        protected String _accessUser;
+        protected String _accessProcess;
+        protected String _accessModule;
 
         protected IDictionary<String, Object> _accessValueMap;
-		
+
+		public DateTime? AccessTimestamp {
+		    get { return _accessTimestamp; }
+			set { _accessTimestamp = value; }
+		}
+
 		public String AccessUser {
 		    get { return _accessUser; }
 			set { _accessUser = value; }
 		}
-		
+
 		public String AccessProcess {
 		    get { return _accessProcess; }
 			set { _accessProcess = value; }
 		}
-		
+
 		public String AccessModule {
 		    get { return _accessModule; }
 			set { _accessModule = value; }
-		}
-		
-		public DateTime? AccessTimestamp {
-		    get { return _accessTimestamp; }
-			set { _accessTimestamp = value; }
 		}
 
 		public IDictionary<String, Object> AccessValueMap {
