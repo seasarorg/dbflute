@@ -1982,7 +1982,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
             final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
             sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln()).append(subQuery).append(ln()).append(")");
+            sb.append(" in (").append(ln()).append(subQuery);
+            if (!subQuery.endsWith(ln())) {
+                sb.append(ln());
+            }
+            sb.append(")");
             return sb.toString();
         } else {
             if (hasOuterJoin()) {
@@ -2028,7 +2032,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final StringBuilder sb = new StringBuilder();
             sb.append("delete from ").append(tableSqlName).append(ln());
             sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln()).append(subQuery).append(ln()).append(")");
+            sb.append(" in (").append(ln()).append(subQuery);
+            if (!subQuery.endsWith(ln())) {
+                sb.append(ln());
+            }
+            sb.append(")");
             return sb.toString();
         } else { // unsupported or two-or-more primary keys
             if (hasOuterJoin()) {
