@@ -25,7 +25,7 @@ import org.seasar.dbflute.exception.AccessContextNotFoundException;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * The context of DB access.
+ * The context of DB access. (basically for CommonColumnAutoSetup)
  * @author jflute
  */
 public class AccessContext {
@@ -74,6 +74,44 @@ public class AccessContext {
     // ===================================================================================
     //                                                                  Access Information
     //                                                                  ==================
+    /**
+     * Get access date on thread. <br />
+     * If it couldn't get access date from access-context, it returns application current date!
+     * @return Access date. (NotNull)
+     */
+    public static Date getAccessDateOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final AccessContext userContextOnThread = getAccessContextOnThread();
+            final java.util.Date accessDate = userContextOnThread.getAccessDate();
+            if (accessDate != null) {
+                return accessDate;
+            }
+            if (userContextOnThread.getAccessDateProvider() != null) {
+                return userContextOnThread.getAccessDateProvider().getAccessDate();
+            }
+        }
+        return new Date();
+    }
+
+    /**
+     * Get access time-stamp on thread. <br />
+     * If it couldn't get access time-stamp from access-context, it returns application current time-stamp!
+     * @return Access time-stamp. (NotNull)
+     */
+    public static Timestamp getAccessTimestampOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final AccessContext userContextOnThread = getAccessContextOnThread();
+            final Timestamp accessTimestamp = userContextOnThread.getAccessTimestamp();
+            if (accessTimestamp != null) {
+                return accessTimestamp;
+            }
+            if (userContextOnThread.getAccessTimestampProvider() != null) {
+                return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
+            }
+        }
+        return new Timestamp(DfSystemUtil.currentTimeMillis());
+    }
+
     /**
      * Get access user on thread.
      * @return Access user. (NotNull)
@@ -138,44 +176,6 @@ public class AccessContext {
             throwAccessContextNotFoundException(methodName);
         }
         return null; // unreachable
-    }
-
-    /**
-     * Get access date on thread. <br />
-     * If it couldn't get access date from access-context, it returns application current date!
-     * @return Access date. (NotNull)
-     */
-    public static Date getAccessDateOnThread() {
-        if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final java.util.Date accessDate = userContextOnThread.getAccessDate();
-            if (accessDate != null) {
-                return accessDate;
-            }
-            if (userContextOnThread.getAccessDateProvider() != null) {
-                return userContextOnThread.getAccessDateProvider().getAccessDate();
-            }
-        }
-        return new Date();
-    }
-
-    /**
-     * Get access time-stamp on thread. <br />
-     * If it couldn't get access time-stamp from access-context, it returns application current time-stamp!
-     * @return Access time-stamp. (NotNull)
-     */
-    public static Timestamp getAccessTimestampOnThread() {
-        if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final Timestamp accessTimestamp = userContextOnThread.getAccessTimestamp();
-            if (accessTimestamp != null) {
-                return accessTimestamp;
-            }
-            if (userContextOnThread.getAccessTimestampProvider() != null) {
-                return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
-            }
-        }
-        return new Timestamp(DfSystemUtil.currentTimeMillis());
     }
 
     /**
@@ -252,93 +252,92 @@ public class AccessContext {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String accessUser;
-    protected String accessProcess;
-    protected String accessModule;
-    protected java.util.Date accessDate;
-    protected AccessDateProvider accessDateProvider;
-    protected java.sql.Timestamp accessTimestamp;
-    protected AccessTimestampProvider accessTimestampProvider;
-    protected Map<String, Object> accessValueMap;
+    protected Date _accessDate;
+    protected AccessDateProvider _accessDateProvider;
+    protected Timestamp _accessTimestamp;
+    protected AccessTimestampProvider _accessTimestampProvider;
+    protected String _accessUser;
+    protected String _accessProcess;
+    protected String _accessModule;
+    protected Map<String, Object> _accessValueMap;
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + accessUser + ", " + accessProcess + ", " + accessModule + ", " + accessDate + ", "
-                + accessDateProvider + ", " + accessTimestamp + ", " + accessTimestampProvider + ", " + accessValueMap
-                + "}";
+        return "{" + _accessDate + ", " + _accessTimestamp + ", " + _accessUser + ", " + _accessProcess + ", "
+                + _accessModule + ", " + _accessValueMap + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getAccessUser() {
-        return accessUser;
+    public Date getAccessDate() {
+        return _accessDate;
     }
 
-    public void setAccessUser(String accessUser) {
-        this.accessUser = accessUser;
-    }
-
-    public String getAccessProcess() {
-        return accessProcess;
-    }
-
-    public void setAccessProcess(String accessProcess) {
-        this.accessProcess = accessProcess;
-    }
-
-    public String getAccessModule() {
-        return accessModule;
-    }
-
-    public void setAccessModule(String accessModule) {
-        this.accessModule = accessModule;
-    }
-
-    public java.util.Date getAccessDate() {
-        return accessDate;
-    }
-
-    public void setAccessDate(java.util.Date accessDate) {
-        this.accessDate = accessDate;
+    public void setAccessDate(Date accessDate) {
+        this._accessDate = accessDate;
     }
 
     public AccessDateProvider getAccessDateProvider() {
-        return accessDateProvider;
+        return _accessDateProvider;
     }
 
     public void setAccessDateProvider(AccessDateProvider accessDateProvider) {
-        this.accessDateProvider = accessDateProvider;
+        this._accessDateProvider = accessDateProvider;
     }
 
-    public java.sql.Timestamp getAccessTimestamp() {
-        return accessTimestamp;
+    public Timestamp getAccessTimestamp() {
+        return _accessTimestamp;
     }
 
-    public void setAccessTimestamp(java.sql.Timestamp accessTimestamp) {
-        this.accessTimestamp = accessTimestamp;
+    public void setAccessTimestamp(Timestamp accessTimestamp) {
+        this._accessTimestamp = accessTimestamp;
     }
 
     public AccessTimestampProvider getAccessTimestampProvider() {
-        return accessTimestampProvider;
+        return _accessTimestampProvider;
     }
 
     public void setAccessTimestampProvider(AccessTimestampProvider accessTimestampProvider) {
-        this.accessTimestampProvider = accessTimestampProvider;
+        this._accessTimestampProvider = accessTimestampProvider;
+    }
+
+    public String getAccessUser() {
+        return _accessUser;
+    }
+
+    public void setAccessUser(String accessUser) {
+        this._accessUser = accessUser;
+    }
+
+    public String getAccessProcess() {
+        return _accessProcess;
+    }
+
+    public void setAccessProcess(String accessProcess) {
+        this._accessProcess = accessProcess;
+    }
+
+    public String getAccessModule() {
+        return _accessModule;
+    }
+
+    public void setAccessModule(String accessModule) {
+        this._accessModule = accessModule;
     }
 
     public Map<String, Object> getAccessValueMap() {
-        return accessValueMap;
+        return _accessValueMap;
     }
 
     public void registerAccessValue(String key, Object value) {
-        if (accessValueMap == null) {
-            accessValueMap = new HashMap<String, Object>();
+        if (_accessValueMap == null) {
+            _accessValueMap = new HashMap<String, Object>();
         }
-        accessValueMap.put(key, value);
+        _accessValueMap.put(key, value);
     }
 
     // ===================================================================================
@@ -353,7 +352,7 @@ public class AccessContext {
          * Get access date.
          * @return Access date. (NotNull)
          */
-        public java.util.Date getAccessDate();
+        public Date getAccessDate();
     }
 
     /**
@@ -365,6 +364,6 @@ public class AccessContext {
          * Get access timestamp.
          * @return Access timestamp. (NotNull)
          */
-        public java.sql.Timestamp getAccessTimestamp();
+        public Timestamp getAccessTimestamp();
     }
 }
