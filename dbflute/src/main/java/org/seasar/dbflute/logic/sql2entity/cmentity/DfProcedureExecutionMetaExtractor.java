@@ -20,6 +20,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
@@ -416,7 +417,11 @@ public class DfProcedureExecutionMetaExtractor {
             }
         }
         try {
-            valueType.registerOutParameter(conn, cs, paramIndex);
+            if (column.isOracleTreatedAsArray()) {
+                cs.registerOutParameter(paramIndex, Types.ARRAY, column.getArrayTypeName());
+            } else {
+                valueType.registerOutParameter(conn, cs, paramIndex);
+            }
         } catch (SQLException e) {
             String msg = buildOutParameterExceptionMessage(paramIndex, jdbcDefType, column, valueType);
             throw new DfJDBCException(msg, e);

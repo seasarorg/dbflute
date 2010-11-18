@@ -41,9 +41,9 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureAssistantOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureAssistantOracle.OracleArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.various.DfProcedureArrayExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.various.DfProcedureArrayExtractorOracle.OracleArrayInfo;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
@@ -367,7 +367,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     protected void resolveOracleArrayInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMetaInfo> metaInfoList) {
-        final DfProcedureAssistantOracle assistant = new DfProcedureAssistantOracle(dataSource);
+        final DfProcedureArrayExtractorOracle assistant = new DfProcedureArrayExtractorOracle(dataSource);
         final Map<String, OracleArrayInfo> arrayInfoMap = assistant.assistArrayInfoMap(unifiedSchema);
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
             final String packageName = metaInfo.getProcedureCatalog();

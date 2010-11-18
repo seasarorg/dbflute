@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.jdbc.metadata.procedure;
+package org.seasar.dbflute.logic.jdbc.metadata.various;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +33,13 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.7.6 (2010/11/18 Thursday)
  */
-public class DfProcedureAssistantOracle {
+public class DfProcedureArrayExtractorOracle {
 
-    private static final Log _log = LogFactory.getLog(DfProcedureAssistantOracle.class);
+    private static final Log _log = LogFactory.getLog(DfProcedureArrayExtractorOracle.class);
 
     protected final DataSource _dataSource;
 
-    public DfProcedureAssistantOracle(DataSource dataSource) {
+    public DfProcedureArrayExtractorOracle(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
@@ -76,27 +76,6 @@ public class DfProcedureAssistantOracle {
             }
         }
         return infoMap;
-    }
-
-    public static class OracleArrayInfo {
-        protected String typeName;
-        protected String elementType;
-
-        public String getTypeName() {
-            return typeName;
-        }
-
-        public void setTypeName(String typeName) {
-            this.typeName = typeName;
-        }
-
-        public String getElementType() {
-            return elementType;
-        }
-
-        public void setElementType(String elementType) {
-            this.elementType = elementType;
-        }
     }
 
     protected List<ProcedureColumnSupplementInfo> selectProcedureColumnSupplementInfo(UnifiedSchema unifiedSchema) {
@@ -143,6 +122,27 @@ public class DfProcedureAssistantOracle {
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
         sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
         return sb.toString();
+    }
+
+    public static class OracleArrayInfo {
+        protected String typeName;
+        protected String elementType;
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
+        }
+
+        public String getElementType() {
+            return elementType;
+        }
+
+        public void setElementType(String elementType) {
+            this.elementType = elementType;
+        }
     }
 
     public static class ProcedureColumnSupplementInfo {
