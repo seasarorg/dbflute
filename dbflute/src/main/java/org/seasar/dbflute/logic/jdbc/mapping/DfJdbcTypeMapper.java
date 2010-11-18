@@ -110,8 +110,8 @@ public class DfJdbcTypeMapper {
             return getVarcharJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "char")) {
             return getCharJdbcType();
-        } else if (containsIgnoreCase(dbTypeName, "number")) {
-            return getClobJdbcType();
+        } else if (containsIgnoreCase(dbTypeName, "numeric", "number", "decimal")) {
+            return getNumericJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "timestamp")) {
             return getTimestampJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "datetime")) {
@@ -271,6 +271,10 @@ public class DfJdbcTypeMapper {
 
     protected String getCharJdbcType() {
         return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.CHAR);
+    }
+
+    protected String getNumericJdbcType() {
+        return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.NUMERIC);
     }
 
     protected String getTimestampJdbcType() {
