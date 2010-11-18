@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -41,8 +42,8 @@ public class UUIDAsDirectType extends TnAbstractValueType {
         super(sqlType);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        final String string = resultSet.getString(index);
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        final String string = rs.getString(index);
         return string != null ? toUUID(string) : string;
     }
 
@@ -61,7 +62,7 @@ public class UUIDAsDirectType extends TnAbstractValueType {
         return string != null ? toUUID(string) : string;
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -69,7 +70,8 @@ public class UUIDAsDirectType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {

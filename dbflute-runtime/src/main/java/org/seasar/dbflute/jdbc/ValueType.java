@@ -16,31 +16,35 @@
 package org.seasar.dbflute.jdbc;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public interface ValueType {
 
-    Object getValue(ResultSet resultSet, int index) throws SQLException;
+    Object getValue(ResultSet rs, int index) throws SQLException;
 
-    Object getValue(ResultSet resultSet, String columnName) throws SQLException;
+    Object getValue(ResultSet rs, String columnName) throws SQLException;
 
     Object getValue(CallableStatement cs, int index) throws SQLException;
 
     Object getValue(CallableStatement cs, String parameterName) throws SQLException;
 
-    void bindValue(PreparedStatement ps, int index, Object value) throws SQLException;
+    // *binding may need a connection
+    //  (for example, Oracle ARRAY type needs its connection to bind)
 
-    void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException;
+    void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException;
 
-    void registerOutParameter(CallableStatement cs, int index) throws SQLException;
+    void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException;
 
-    void registerOutParameter(CallableStatement cs, String parameterName) throws SQLException;
+    void registerOutParameter(Connection conn, CallableStatement cs, int index) throws SQLException;
+
+    void registerOutParameter(Connection conn, CallableStatement cs, String parameterName) throws SQLException;
 
     int getSqlType();
 }

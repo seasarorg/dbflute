@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,12 +35,12 @@ public class LongType extends TnAbstractValueType {
         super(Types.BIGINT);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toLong(resultSet.getObject(index));
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        return DfTypeUtil.toLong(rs.getObject(index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toLong(resultSet.getObject(columnName));
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        return DfTypeUtil.toLong(rs.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
@@ -50,7 +51,7 @@ public class LongType extends TnAbstractValueType {
         return DfTypeUtil.toLong(cs.getObject(parameterName));
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -58,7 +59,8 @@ public class LongType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {

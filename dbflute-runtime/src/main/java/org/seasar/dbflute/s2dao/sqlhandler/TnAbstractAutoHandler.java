@@ -86,7 +86,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         final PreparedStatement ps = prepareStatement(conn);
         int ret = -1;
         try {
-            bindArgs(ps, _bindVariables, _bindVariableValueTypes);
+            bindArgs(conn, ps, _bindVariables, _bindVariableValueTypes);
             ret = executeUpdate(ps);
         } finally {
             close(ps);

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,7 +55,7 @@ public class StringType extends TnAbstractValueType {
         return cs.getString(parameterName);
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -62,7 +63,8 @@ public class StringType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {

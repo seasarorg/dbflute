@@ -72,7 +72,7 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(conn);
-            bindArgs(ps, args, argTypes);
+            bindArgs(conn, ps, args, argTypes);
             return execute(ps);
         } catch (SQLException e) {
             handleSQLException(e, ps);

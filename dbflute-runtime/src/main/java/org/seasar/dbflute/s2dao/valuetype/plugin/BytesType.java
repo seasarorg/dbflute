@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,7 +47,8 @@ public class BytesType extends TnAbstractValueType {
         this.trait = trait;
     }
 
-    public void bindValue(final PreparedStatement ps, final int index, final Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value)
+            throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else if (value instanceof byte[]) {
@@ -56,7 +58,7 @@ public class BytesType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(final CallableStatement cs, final String parameterName, final Object value)
+    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value)
             throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
@@ -67,19 +69,19 @@ public class BytesType extends TnAbstractValueType {
         }
     }
 
-    public Object getValue(final ResultSet resultSet, final int index) throws SQLException {
-        return trait.get(resultSet, index);
+    public Object getValue(ResultSet rs, final int index) throws SQLException {
+        return trait.get(rs, index);
     }
 
-    public Object getValue(final ResultSet resultSet, final String columnName) throws SQLException {
-        return trait.get(resultSet, columnName);
+    public Object getValue(ResultSet rs, final String columnName) throws SQLException {
+        return trait.get(rs, columnName);
     }
 
-    public Object getValue(final CallableStatement cs, final int index) throws SQLException {
+    public Object getValue(CallableStatement cs, final int index) throws SQLException {
         return trait.get(cs, index);
     }
 
-    public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
+    public Object getValue(CallableStatement cs, final String parameterName) throws SQLException {
         return trait.get(cs, parameterName);
     }
 

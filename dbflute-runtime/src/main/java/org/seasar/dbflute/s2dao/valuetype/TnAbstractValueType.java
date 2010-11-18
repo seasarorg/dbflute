@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -53,11 +54,11 @@ public abstract class TnAbstractValueType implements ValueType {
     // ===================================================================================
     //                                                                       Out Parameter
     //                                                                       =============
-    public void registerOutParameter(CallableStatement cs, int index) throws SQLException {
+    public void registerOutParameter(Connection conn, CallableStatement cs, int index) throws SQLException {
         cs.registerOutParameter(index, _sqlType);
     }
 
-    public void registerOutParameter(CallableStatement cs, String parameterName) throws SQLException {
+    public void registerOutParameter(Connection conn, CallableStatement cs, String parameterName) throws SQLException {
         cs.registerOutParameter(parameterName, _sqlType);
     }
 

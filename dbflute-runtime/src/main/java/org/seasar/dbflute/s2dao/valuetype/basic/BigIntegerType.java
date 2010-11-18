@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,23 +35,24 @@ public class BigIntegerType extends TnAbstractValueType {
         super(Types.BIGINT);
     }
 
-    public Object getValue(final ResultSet resultSet, final int index) throws SQLException {
-        return DfTypeUtil.toBigInteger(resultSet.getBigDecimal(index));
+    public Object getValue(ResultSet rs, final int index) throws SQLException {
+        return DfTypeUtil.toBigInteger(rs.getBigDecimal(index));
     }
 
-    public Object getValue(final ResultSet resultSet, final String columnName) throws SQLException {
-        return DfTypeUtil.toBigInteger(resultSet.getBigDecimal(columnName));
+    public Object getValue(ResultSet rs, final String columnName) throws SQLException {
+        return DfTypeUtil.toBigInteger(rs.getBigDecimal(columnName));
     }
 
-    public Object getValue(final CallableStatement cs, final int index) throws SQLException {
+    public Object getValue(CallableStatement cs, final int index) throws SQLException {
         return DfTypeUtil.toBigInteger(cs.getBigDecimal(index));
     }
 
-    public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
+    public Object getValue(CallableStatement cs, final String parameterName) throws SQLException {
         return DfTypeUtil.toBigInteger(cs.getBigDecimal(parameterName));
     }
 
-    public void bindValue(final PreparedStatement ps, final int index, final Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value)
+            throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -58,7 +60,7 @@ public class BigIntegerType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(final CallableStatement cs, final String parameterName, final Object value)
+    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value)
             throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);

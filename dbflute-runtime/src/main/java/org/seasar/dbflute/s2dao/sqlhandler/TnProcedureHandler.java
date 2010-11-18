@@ -69,14 +69,14 @@ public class TnProcedureHandler extends TnBasicHandler {
         try {
             conn = getConnection();
             cs = prepareCallableStatement(conn);
-            bindArgs(cs, pmb);
+            bindArgs(conn, cs, pmb);
 
             // Execute the procedure!
             // The return means whether the first result is a (not-parameter) result set.
             final boolean executed = cs.execute();
 
-            handleNotParamResult(cs, pmb, executed); // should be before out-parameter handling
-            handleOutParameter(cs, pmb, executed);
+            handleNotParamResult(conn, cs, pmb, executed); // should be before out-parameter handling
+            handleOutParameter(conn, cs, pmb, executed);
             return pmb;
         } catch (SQLException e) {
             handleSQLException(e, cs);
@@ -107,7 +107,7 @@ public class TnProcedureHandler extends TnBasicHandler {
         return getStatementFactory().createCallableStatement(connection, getSql());
     }
 
-    protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
+    protected void bindArgs(Connection conn, CallableStatement cs, Object dto) throws SQLException {
         if (dto == null) {
             return;
         }
@@ -117,14 +117,14 @@ public class TnProcedureHandler extends TnBasicHandler {
             final int bindIndex = (i + 1);
             // if INOUT parameter, both are true
             if (ppt.isOutType()) {
-                valueType.registerOutParameter(cs, bindIndex);
+                valueType.registerOutParameter(conn, cs, bindIndex);
             }
             if (ppt.isInType()) {
                 // bind as PreparedStatement
                 // because CallableStatement's setter might be unsupported
                 // (for example, PostgreSQL JDBC Driver for JDBC 3.0)
                 final Object value = ppt.getValue(dto);
-                valueType.bindValue(cs, bindIndex, value);
+                valueType.bindValue(conn, cs, bindIndex, value);
             }
             // either must be true
             ++i;
@@ -133,12 +133,14 @@ public class TnProcedureHandler extends TnBasicHandler {
 
     /**
      * Handle not-parameter result set, for example, MySQL, DB2 and (MS) SQLServer.
+     * @param conn The connection for the database. (NotNull)
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
      * @param executed The return value of execute() that means whether the first result is a result set. 
      * @throws SQLException
      */
-    protected void handleNotParamResult(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
+    protected void handleNotParamResult(Connection conn, CallableStatement cs, Object pmb, boolean executed)
+            throws SQLException {
         if (pmb == null) {
             return;
         }
@@ -172,12 +174,14 @@ public class TnProcedureHandler extends TnBasicHandler {
 
     /**
      * Handle result set for out-parameter.
+     * @param conn The connection for the database. (NotNull)
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
      * @param executed The return value of execute() that means whether the first result is a result set.
      * @throws SQLException
      */
-    protected void handleOutParameter(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
+    protected void handleOutParameter(Connection conn, CallableStatement cs, Object pmb, boolean executed)
+            throws SQLException {
         if (pmb == null) {
             return;
         }

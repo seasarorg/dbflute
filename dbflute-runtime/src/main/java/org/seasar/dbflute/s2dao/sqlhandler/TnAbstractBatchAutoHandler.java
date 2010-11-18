@@ -106,13 +106,13 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             }
             return new int[0];
         }
-        final Connection connection = getConnection();
+        final Connection conn = getConnection();
         try {
-            final PreparedStatement ps = prepareStatement(connection);
+            final PreparedStatement ps = prepareStatement(conn);
             try {
                 for (Iterator<?> iter = list.iterator(); iter.hasNext();) {
                     final Object bean = (Object) iter.next();
-                    prepareBatchElement(ps, bean);
+                    prepareBatchElement(conn, ps, bean);
                 }
                 final int[] result = executeBatch(ps, list);
                 handleBatchUpdateResultWithOptimisticLock(ps, list, result);
@@ -121,16 +121,16 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
                 close(ps);
             }
         } finally {
-            close(connection);
+            close(conn);
         }
         // Reflection to bean is unsupported at batch update.
         // postBatchUpdateBean(...);
     }
 
-    protected void prepareBatchElement(PreparedStatement ps, Object bean) {
+    protected void prepareBatchElement(Connection conn, PreparedStatement ps, Object bean) {
         setupBindVariables(bean);
         logSql(getBindVariables(), getArgTypes(getBindVariables()));
-        bindArgs(ps, getBindVariables(), getBindVariableValueTypes());
+        bindArgs(conn, ps, getBindVariables(), getBindVariableValueTypes());
         addBatch(ps);
     }
 

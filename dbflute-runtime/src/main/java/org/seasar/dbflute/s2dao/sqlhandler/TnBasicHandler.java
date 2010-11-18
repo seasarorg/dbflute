@@ -82,18 +82,19 @@ public class TnBasicHandler {
     //                                    Arguments Handling
     //                                    ------------------
     /**
-     * @param ps Prepared statement. (NotNull)
+     * @param conn The connection for the database. (NotNull)
+     * @param ps The prepared statement for the SQL. (NotNull)
      * @param args The arguments for binding. (Nullable)
      * @param valueTypes The types of binding value. (NotNull)
      */
-    protected void bindArgs(PreparedStatement ps, Object[] args, ValueType[] valueTypes) {
+    protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, ValueType[] valueTypes) {
         if (args == null) {
             return;
         }
         try {
             for (int i = 0; i < args.length; ++i) {
                 final ValueType valueType = valueTypes[i];
-                valueType.bindValue(ps, i + 1, args[i]);
+                valueType.bindValue(conn, ps, i + 1, args[i]);
             }
         } catch (SQLException e) {
             handleSQLException(e, ps);
@@ -101,28 +102,30 @@ public class TnBasicHandler {
     }
 
     /**
-     * @param ps Prepared statement. (NotNull)
+     * @param conn The connection for the database. (NotNull)
+     * @param ps The prepared statement for the SQL. (NotNull)
      * @param args The arguments for binding. (Nullable)
      * @param argTypes The types of arguments. (NotNull)
      */
-    protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
-        bindArgs(ps, args, argTypes, 0);
+    protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
+        bindArgs(conn, ps, args, argTypes, 0);
     }
 
     /**
-     * @param ps Prepared statement. (NotNull)
+     * @param conn The connection for the database. (NotNull)
+     * @param ps The prepared statement for the SQL. (NotNull)
      * @param args The arguments for binding. (Nullable)
      * @param argTypes The types of arguments. (NotNull)
      * @param beginIndex The index for beginning of binding.
      */
-    protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes, int beginIndex) {
+    protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, Class<?>[] argTypes, int beginIndex) {
         if (args == null) {
             return;
         }
         try {
             for (int i = beginIndex; i < args.length; ++i) {
                 final ValueType valueType = findValueType(argTypes[i], args[i]);
-                valueType.bindValue(ps, i + 1, args[i]);
+                valueType.bindValue(conn, ps, i + 1, args[i]);
             }
         } catch (SQLException e) {
             handleSQLException(e, ps);

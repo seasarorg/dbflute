@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,12 +45,12 @@ public class UtilDateAsSqlDateType extends TnAbstractValueType {
     // ===================================================================================
     //                                                                           Get Value
     //                                                                           =========
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return toUtilDate(_sqlDateType.getValue(resultSet, index));
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        return toUtilDate(_sqlDateType.getValue(rs, index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return toUtilDate(_sqlDateType.getValue(resultSet, columnName));
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        return toUtilDate(_sqlDateType.getValue(rs, columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
@@ -63,12 +64,13 @@ public class UtilDateAsSqlDateType extends TnAbstractValueType {
     // ===================================================================================
     //                                                                          Bind Value
     //                                                                          ==========
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-        _sqlDateType.bindValue(ps, index, toSqlDate(value));
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
+        _sqlDateType.bindValue(conn, ps, index, toSqlDate(value));
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-        _sqlDateType.bindValue(cs, parameterName, toSqlDate(value));
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
+        _sqlDateType.bindValue(conn, cs, parameterName, toSqlDate(value));
     }
 
     // ===================================================================================

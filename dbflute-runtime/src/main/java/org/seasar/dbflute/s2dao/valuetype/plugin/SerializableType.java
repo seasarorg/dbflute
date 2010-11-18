@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.valuetype.plugin;
 
 import java.io.Serializable;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,34 +35,35 @@ public class SerializableType extends BytesType {
     }
 
     @Override
-    public Object getValue(final ResultSet rs, final int index) throws SQLException {
+    public Object getValue(ResultSet rs, final int index) throws SQLException {
         return deserialize(super.getValue(rs, index));
     }
 
     @Override
-    public Object getValue(final ResultSet rs, final String columnName) throws SQLException {
+    public Object getValue(ResultSet rs, final String columnName) throws SQLException {
         return deserialize(super.getValue(rs, columnName));
     }
 
     @Override
-    public Object getValue(final CallableStatement cs, final int index) throws SQLException {
+    public Object getValue(CallableStatement cs, final int index) throws SQLException {
         return deserialize(super.getValue(cs, index));
     }
 
     @Override
-    public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
+    public Object getValue(CallableStatement cs, final String parameterName) throws SQLException {
         return deserialize(super.getValue(cs, parameterName));
     }
 
     @Override
-    public void bindValue(final PreparedStatement ps, final int index, final Object value) throws SQLException {
-        super.bindValue(ps, index, serialize(value));
+    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value)
+            throws SQLException {
+        super.bindValue(conn, ps, index, serialize(value));
     }
 
     @Override
-    public void bindValue(final CallableStatement cs, final String parameterName, final Object value)
+    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value)
             throws SQLException {
-        super.bindValue(cs, parameterName, serialize(value));
+        super.bindValue(conn, cs, parameterName, serialize(value));
     }
 
     protected byte[] serialize(final Object obj) throws SQLException {

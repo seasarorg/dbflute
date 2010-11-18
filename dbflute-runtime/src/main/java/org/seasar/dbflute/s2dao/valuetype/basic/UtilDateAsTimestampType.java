@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,12 +45,12 @@ public class UtilDateAsTimestampType extends TnAbstractValueType {
     // ===================================================================================
     //                                                                           Get Value
     //                                                                           =========
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return toUtilDate(_timestampType.getValue(resultSet, index));
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        return toUtilDate(_timestampType.getValue(rs, index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return toUtilDate(_timestampType.getValue(resultSet, columnName));
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        return toUtilDate(_timestampType.getValue(rs, columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
@@ -63,12 +64,13 @@ public class UtilDateAsTimestampType extends TnAbstractValueType {
     // ===================================================================================
     //                                                                          Bind Value
     //                                                                          ==========
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-        _timestampType.bindValue(ps, index, toTimestamp(value));
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
+        _timestampType.bindValue(conn, ps, index, toTimestamp(value));
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-        _timestampType.bindValue(cs, parameterName, toTimestamp(value));
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
+        _timestampType.bindValue(conn, cs, parameterName, toTimestamp(value));
     }
 
     // ===================================================================================

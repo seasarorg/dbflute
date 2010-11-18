@@ -18,6 +18,7 @@ package org.seasar.dbflute.s2dao.valuetype.basic;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,12 +37,12 @@ public class BinaryStreamType extends TnAbstractValueType {
         super(Types.BINARY);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getBinaryStream(index);
+    public Object getValue(ResultSet rs, int index) throws SQLException {
+        return rs.getBinaryStream(index);
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getBinaryStream(columnName);
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
+        return rs.getBinaryStream(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
@@ -59,7 +60,7 @@ public class BinaryStreamType extends TnAbstractValueType {
         return new ByteArrayInputStream(bytes);
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else if (value instanceof InputStream) {
@@ -70,7 +71,8 @@ public class BinaryStreamType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else if (value instanceof InputStream) {

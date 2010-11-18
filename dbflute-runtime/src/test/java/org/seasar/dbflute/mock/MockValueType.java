@@ -1,6 +1,7 @@
 package org.seasar.dbflute.mock;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,12 +13,6 @@ import org.seasar.dbflute.jdbc.ValueType;
  * @since 0.9.6.4 (2010/01/22 Friday)
  */
 public class MockValueType implements ValueType {
-
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-    }
-
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-    }
 
     public int getSqlType() {
         return 0;
@@ -39,13 +34,16 @@ public class MockValueType implements ValueType {
         return null;
     }
 
-    public void registerOutParameter(CallableStatement cs, int index) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
     }
 
-    public void registerOutParameter(CallableStatement cs, String parameterName) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
     }
 
-    public String toText(Object value) {
-        return null;
+    public void registerOutParameter(Connection conn, CallableStatement cs, int index) throws SQLException {
+    }
+
+    public void registerOutParameter(Connection conn, CallableStatement cs, String parameterName) throws SQLException {
     }
 }

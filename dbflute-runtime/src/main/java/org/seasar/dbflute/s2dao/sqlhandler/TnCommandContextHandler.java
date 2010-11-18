@@ -61,18 +61,18 @@ public class TnCommandContextHandler extends TnBasicHandler {
         }
     }
 
-    protected int execute(Connection connection, CommandContext context) {
+    protected int execute(Connection conn, CommandContext context) {
         logSql(context.getBindVariables(), getArgTypes(context.getBindVariables()));
-        final PreparedStatement ps = prepareStatement(connection);
+        final PreparedStatement ps = prepareStatement(conn);
         int ret = -1;
         try {
             final Object[] bindVariables = context.getBindVariables();
             final Class<?>[] bindVariableTypes = context.getBindVariableTypes();
             if (hasPropertyTypeList()) {
-                final int index = bindFirstScope(ps, bindVariables, bindVariableTypes);
-                bindSecondScope(ps, bindVariables, bindVariableTypes, index);
+                final int index = bindFirstScope(conn, ps, bindVariables, bindVariableTypes);
+                bindSecondScope(conn, ps, bindVariables, bindVariableTypes, index);
             } else {
-                bindArgs(ps, bindVariables, bindVariableTypes);
+                bindArgs(conn, ps, bindVariables, bindVariableTypes);
             }
             ret = executeUpdate(ps);
         } finally {
@@ -85,7 +85,8 @@ public class TnCommandContextHandler extends TnBasicHandler {
         return _boundPropTypeList != null && !_boundPropTypeList.isEmpty();
     }
 
-    protected int bindFirstScope(PreparedStatement ps, Object[] bindVariables, Class<?>[] bindVariableTypes) {
+    protected int bindFirstScope(Connection conn, PreparedStatement ps, Object[] bindVariables,
+            Class<?>[] bindVariableTypes) {
         final List<Object> firstVariableList = new ArrayList<Object>();
         final List<ValueType> firstValueTypeList = new ArrayList<ValueType>();
         int index = 0;
@@ -94,12 +95,13 @@ public class TnCommandContextHandler extends TnBasicHandler {
             firstValueTypeList.add(propertyType.getValueType());
             ++index;
         }
-        bindArgs(ps, firstVariableList.toArray(), firstValueTypeList.toArray(new ValueType[0]));
+        bindArgs(conn, ps, firstVariableList.toArray(), firstValueTypeList.toArray(new ValueType[0]));
         return index;
     }
 
-    protected void bindSecondScope(PreparedStatement ps, Object[] bindVariables, Class<?>[] bindVariableTypes, int index) {
-        bindArgs(ps, bindVariables, bindVariableTypes, index);
+    protected void bindSecondScope(Connection conn, PreparedStatement ps, Object[] bindVariables,
+            Class<?>[] bindVariableTypes, int index) {
+        bindArgs(conn, ps, bindVariables, bindVariableTypes, index);
     }
 
     // ===================================================================================

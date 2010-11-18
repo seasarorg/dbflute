@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.plugin;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -31,18 +32,19 @@ public abstract class OracleDateType extends UtilDateAsTimestampType {
     //                                                                          Bind Value
     //                                                                          ==========
     @Override
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) { // basically for insert and update
-            super.bindValue(ps, index, null);
+            super.bindValue(conn, ps, index, null);
         } else {
             ps.setObject(index, toOracleDate(toTimestamp(value)));
         }
     }
 
     @Override
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
         if (value == null) {
-            super.bindValue(cs, parameterName, null);
+            super.bindValue(conn, cs, parameterName, null);
         } else {
             cs.setObject(parameterName, toOracleDate(toTimestamp(value)));
         }

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,12 +37,12 @@ public class ClassificationType extends TnAbstractValueType {
         super(Types.VARCHAR);
     }
 
-    public Object getValue(ResultSet resultSet, int index) throws SQLException {
+    public Object getValue(ResultSet rs, int index) throws SQLException {
         String msg = "Getting as classification is unsupported: index=" + index;
         throw new UnsupportedOperationException(msg);
     }
 
-    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
+    public Object getValue(ResultSet rs, String columnName) throws SQLException {
         String msg = "Getting as classification is unsupported: columnName=" + columnName;
         throw new UnsupportedOperationException(msg);
     }
@@ -56,7 +57,7 @@ public class ClassificationType extends TnAbstractValueType {
         throw new UnsupportedOperationException(msg);
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -78,7 +79,8 @@ public class ClassificationType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
+            throws SQLException {
         String msg = "Binding as classification for Procedure is unsupported: value=" + value;
         throw new UnsupportedOperationException(msg);
     }
