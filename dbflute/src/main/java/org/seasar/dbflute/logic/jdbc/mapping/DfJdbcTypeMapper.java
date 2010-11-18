@@ -68,6 +68,27 @@ public class DfJdbcTypeMapper {
      * @return The JDBC type of the column. (NotNull)
      */
     public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
+        String jdbcType = doGetColumnJdbcType(jdbcDefType, dbTypeName);
+        if (jdbcType == null) {
+            // * * * * * *
+            // Priority 5
+            // * * * * * *
+            return getVarcharJdbcType();
+        }
+        return jdbcType;
+    }
+
+    /**
+     * Does it have a mapping about the type?
+     * @param jdbcDefType The definition type of JDBC.
+     * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
+     * @return The JDBC type of the column. (NotNull)
+     */
+    public boolean hasMappingJdbcType(int jdbcDefType, String dbTypeName) {
+        return doGetColumnJdbcType(jdbcDefType, dbTypeName) != null;
+    }
+
+    public String doGetColumnJdbcType(int jdbcDefType, String dbTypeName) {
         // * * * * * *
         // Priority 1
         // * * * * * *
@@ -123,10 +144,7 @@ public class DfJdbcTypeMapper {
         } else if (containsIgnoreCase(dbTypeName, "clob")) {
             return getClobJdbcType();
         } else {
-            // * * * * * *
-            // Priority 5
-            // * * * * * *
-            return getVarcharJdbcType();
+            return null;
         }
     }
 
@@ -241,7 +259,7 @@ public class DfJdbcTypeMapper {
     public boolean isOracleCursor(final String dbTypeName) {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "cursor");
     }
-    
+
     public boolean isOracleTable(final String dbTypeName) {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "table");
     }

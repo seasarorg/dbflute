@@ -210,13 +210,23 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     }
 
     /**
-     * Get the JDBC type of the column. <br /> 
+     * Get the JDBC type of the column. 
      * @param jdbcDefType The JDBC definition value.
      * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
      * @return The JDBC type of the column. (NotNull)
      */
     public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
         return getJdbcTypeMapper().getColumnJdbcType(jdbcDefType, dbTypeName);
+    }
+
+    /**
+     * Does it have a mapping about the type?
+     * @param jdbcDefType The definition type of JDBC.
+     * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
+     * @return The JDBC type of the column. (NotNull)
+     */
+    public boolean hasMappingJdbcType(int jdbcDefType, String dbTypeName) {
+        return getJdbcTypeMapper().hasMappingJdbcType(jdbcDefType, dbTypeName);
     }
 
     protected DfJdbcTypeMapper getJdbcTypeMapper() {
