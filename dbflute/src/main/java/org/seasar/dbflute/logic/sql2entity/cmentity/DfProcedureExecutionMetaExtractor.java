@@ -451,7 +451,11 @@ public class DfProcedureExecutionMetaExtractor {
             }
         }
         try {
-            valueType.bindValue(conn, cs, paramIndex, value);
+            if (column.isOracleTreatedAsArray()) {
+                cs.setNull(paramIndex, Types.ARRAY, column.getArrayTypeName());
+            } else {
+                valueType.bindValue(conn, cs, paramIndex, value);
+            }
         } catch (SQLException e) {
             String msg = buildBindingExceptionMessage(paramIndex, jdbcDefType, value, column, valueType);
             throw new DfJDBCException(msg, e);

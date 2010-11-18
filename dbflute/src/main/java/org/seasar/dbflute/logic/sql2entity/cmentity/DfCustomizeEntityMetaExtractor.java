@@ -16,7 +16,7 @@ public class DfCustomizeEntityMetaExtractor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureExecutionMetaExtractor.class);
+    private static final Log _log = LogFactory.getLog(DfCustomizeEntityMetaExtractor.class);
 
     public static interface DfForcedJavaNativeProvider {
         String provide(String columnName);
