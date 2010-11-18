@@ -68,7 +68,8 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     protected void doDropSequence(Connection conn) {
-        dropDataDictionaryObject(conn, "sequences", "sequence", "ALL_SEQUENCES", "SEQUENCE_OWNER", "SEQUENCE_NAME");
+        dropDataDictionaryObject(conn, "sequences", "sequence", "ALL_SEQUENCES", "SEQUENCE_OWNER", "SEQUENCE_NAME",
+                true);
     }
 
     // ===================================================================================
@@ -84,7 +85,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
      * @param conn The connection to main schema. (NotNull)
      */
     protected void doDropDBLink(Connection conn) {
-        dropDataDictionaryObject(conn, "DB links", "database link", "ALL_DB_LINKS", "OWNER", "DB_LINK");
+        dropDataDictionaryObject(conn, "DB links", "database link", "ALL_DB_LINKS", "OWNER", "DB_LINK", false);
     }
 
     // ===================================================================================
@@ -96,14 +97,14 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     protected void doDropTypeObject(Connection conn) {
-        dropDataDictionaryObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME");
+        dropDataDictionaryObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", false);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected void dropDataDictionaryObject(Connection conn, String titleName, String sqlName, String tableName,
-            String ownerColumnName, String targetColumnName) {
+            String ownerColumnName, String targetColumnName, boolean schemaPrefix) {
         if (!_unifiedSchema.hasSchema()) {
             return;
         }
@@ -134,7 +135,8 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         try {
             st = conn.createStatement();
             for (String objectName : objectNameList) {
-                final String dropSql = "drop " + sqlName + " " + schema + "." + objectName;
+                final String prefix = schemaPrefix ? schema + "." : "";
+                final String dropSql = "drop " + sqlName + " " + prefix + objectName;
                 _log.info(dropSql);
                 st.execute(dropSql);
             }

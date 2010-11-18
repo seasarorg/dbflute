@@ -196,6 +196,9 @@ public class DfPmbBasicHandler {
         return metaData.getPropertyNameColumnNameMap();
     }
 
+    // -----------------------------------------------------
+    //                                Handling Determination
+    //                                ----------------------
     public boolean needsStringClobHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
@@ -243,6 +246,9 @@ public class DfPmbBasicHandler {
         return elementTypeName != null && _columnHandler.isOracleTreatedAsArray(dbTypeName);
     }
 
+    // -----------------------------------------------------
+    //                                           Column Info
+    //                                           -----------
     public String getPropertyColumnArrayTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getPropertyNameColumnInfo(className, propertyName);
