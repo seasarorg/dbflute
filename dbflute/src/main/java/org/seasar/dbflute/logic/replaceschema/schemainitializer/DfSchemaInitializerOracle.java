@@ -68,70 +68,20 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     protected void dropSequence(Connection conn) {
-        if (!_unifiedSchema.hasSchema()) {
-            return;
-        }
-        final String schema = _unifiedSchema.getPureSchema();
-        final List<String> sequenceNameList = new ArrayList<String>();
-        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + schema + "'";
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            st = conn.createStatement();
-            _log.info("...Executing helper SQL:" + ln() + metaDataSql);
-            rs = st.executeQuery(metaDataSql);
-            while (rs.next()) {
-                final String sequenceName = rs.getString("SEQUENCE_NAME");
-                sequenceNameList.add(sequenceName);
-            }
-        } catch (SQLException continued) {
-            String msg = "*Failed to the SQL:" + ln();
-            msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
-            msg = msg + metaDataSql;
-            _log.info(metaDataSql);
-            return;
-        } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("rs.close() threw the exception!", ignored);
-                }
-            }
-        }
-        try {
-            st = conn.createStatement();
-            for (String sequenceName : sequenceNameList) {
-                final String dropSequenceSql = "drop sequence " + schema + "." + sequenceName;
-                _log.info(dropSequenceSql);
-                st.execute(dropSequenceSql);
-            }
-        } catch (SQLException e) {
-            String msg = "Failed to drop sequences: " + sequenceNameList;
-            throw new IllegalStateException(msg, e);
-        } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("rs.close() threw the exception!", ignored);
-                }
-            }
-        }
+        dropDataDictionaryObject(conn, "sequences", "sequence", "ALL_SEQUENCES", "SEQUENCE_OWNER", "SEQUENCE_NAME");
+    }
+
+    // ===================================================================================
+    //                                                                      Drop Procedure
+    //                                                                      ==============
+    @Override
+    protected void dropProcedure(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        super.dropProcedure(conn, tableMetaInfoList);
+        dropTypeObject(conn);
+    }
+
+    protected void dropTypeObject(Connection conn) {
+        dropDataDictionaryObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME");
     }
 
     // ===================================================================================
@@ -147,69 +97,53 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
      * @param conn The connection to main schema. (NotNull)
      */
     protected void dropDBLink(Connection conn) {
+        dropDataDictionaryObject(conn, "DB links", "database link", "ALL_DB_LINKS", "OWNER", "DB_LINK");
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected void dropDataDictionaryObject(Connection conn, String titleName, String sqlName, String tableName,
+            String ownerColumnName, String targetColumnName) {
         if (!_unifiedSchema.hasSchema()) {
             return;
         }
-        final List<String> dbLinkNameList = new ArrayList<String>();
         final String schema = _unifiedSchema.getPureSchema();
-        final String metaDataSql = "select * from ALL_DB_LINKS where OWNER = '" + schema + "'";
+        final List<String> objectNameList = new ArrayList<String>();
+        final String metaSql = "select * from " + tableName + " where " + ownerColumnName + " = '" + schema + "'";
         Statement st = null;
         ResultSet rs = null;
         try {
             st = conn.createStatement();
-            _log.info("...Executing helper SQL:" + ln() + metaDataSql);
-            rs = st.executeQuery(metaDataSql);
+            _log.info("...Executing helper SQL:" + ln() + metaSql);
+            rs = st.executeQuery(metaSql);
             while (rs.next()) {
-                final String dbLinkName = rs.getString("DB_LINK");
-                dbLinkNameList.add(dbLinkName);
+                final String objectName = rs.getString(targetColumnName);
+                objectNameList.add(objectName);
             }
         } catch (SQLException continued) {
+            // if the data dictionary table is not found,
+            // it continues because it might be a version difference 
             String msg = "*Failed to the SQL:" + ln();
             msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
-            msg = msg + metaDataSql;
-            _log.info(metaDataSql);
+            msg = msg + metaSql;
+            _log.info(metaSql);
             return;
         } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("rs.close() threw the exception!", ignored);
-                }
-            }
+            closeResource(rs, st);
         }
         try {
             st = conn.createStatement();
-            for (String dbLinkName : dbLinkNameList) {
-                final String dropDbLinkSql = "drop database link " + dbLinkName;
-                _log.info(dropDbLinkSql);
-                st.execute(dropDbLinkSql);
+            for (String objectName : objectNameList) {
+                final String dropSql = "drop " + sqlName + " " + schema + "." + objectName;
+                _log.info(dropSql);
+                st.execute(dropSql);
             }
         } catch (SQLException e) {
-            String msg = "Failed to drop DB links: " + dbLinkNameList;
+            String msg = "Failed to drop " + titleName + ": " + objectNameList;
             throw new IllegalStateException(msg, e);
         } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("rs.close() threw the exception!", ignored);
-                }
-            }
+            closeStatement(st);
         }
     }
 }

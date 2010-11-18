@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.replaceschema.schemainitializer;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -212,25 +213,19 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         public String buildTruncateTableSql(DfTableMetaInfo metaInfo);
     }
 
-    protected void callbackTruncateTableByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
+    protected void callbackTruncateTableByJdbc(Connection conn, List<DfTableMetaInfo> tableMetaInfoList,
             DfTruncateTableByJdbcCallback callback) {
         for (DfTableMetaInfo metaInfo : tableMetaInfoList) {
             final String truncateTableSql = callback.buildTruncateTableSql(metaInfo);
-            Statement statement = null;
+            Statement st = null;
             try {
-                statement = connection.createStatement();
-                statement.execute(truncateTableSql);
+                st = conn.createStatement();
+                st.execute(truncateTableSql);
                 _log.info(truncateTableSql);
             } catch (Exception e) {
                 continue;
             } finally {
-                if (statement != null) {
-                    try {
-                        statement.close();
-                    } catch (SQLException ignored) {
-                        _log.info("statement.close() threw the exception!", ignored);
-                    }
-                }
+                closeStatement(st);
             }
         }
     }
@@ -257,9 +252,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected void callbackDropForeignKeyByJdbc(Connection conn, List<DfTableMetaInfo> tableMetaInfoList,
             DfDropForeignKeyByJdbcCallback callback) {
-        Statement statement = null;
+        Statement st = null;
         try {
-            statement = conn.createStatement();
+            st = conn.createStatement();
             for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
                 if (isSkipDropForeignKey(tableMetaInfo)) {
                     continue;
@@ -300,20 +295,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
                     final String dropForeignKeySql = callback.buildDropForeignKeySql(foreignKeyMetaInfo);
                     _log.info(dropForeignKeySql);
-                    statement.execute(dropForeignKeySql);
+                    st.execute(dropForeignKeySql);
                 }
             }
         } catch (SQLException e) {
             String msg = "Failed to drop foreign keys!";
             throw new SQLFailureException(msg, e);
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
-                }
-            }
+            closeStatement(st);
         }
     }
 
@@ -400,13 +389,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             String msg = "Failed to drop the table: " + currentSql;
             throw new SQLFailureException(msg, e);
         } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("Statement#close() threw the exception!", ignored);
-                }
-            }
+            closeStatement(st);
         }
     }
 
@@ -506,13 +489,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             String msg = "Failed to drop the procedure: " + currentSql;
             throw new SQLFailureException(msg, e);
         } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("Statement#close() threw the exception!", ignored);
-                }
-            }
+            closeStatement(st);
         }
     }
 
@@ -549,6 +526,31 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+    }
+
+    protected void closeResource(ResultSet rs, Statement st) {
+        closeResultSet(rs);
+        closeStatement(st);
+    }
+
+    protected void closeResultSet(ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException ignored) {
+                _log.info("rs.close() threw the exception!", ignored);
+            }
+        }
+    }
+
+    protected void closeStatement(Statement st) {
+        if (st != null) {
+            try {
+                st.close();
+            } catch (SQLException ignored) {
+                _log.info("statement.close() threw the exception!", ignored);
+            }
+        }
     }
 
     // ===================================================================================
