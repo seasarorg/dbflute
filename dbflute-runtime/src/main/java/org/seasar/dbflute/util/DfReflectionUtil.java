@@ -173,28 +173,31 @@ public class DfReflectionUtil {
     //                                                                               =====
     public static Field getAccessibleField(Class<?> clazz, String fieldName) {
         assertObjectNotNull("clazz", clazz);
-        return findField(clazz, fieldName, false);
+        return findField(clazz, fieldName, VisibilityType.ACCESSIBLE);
     }
 
     public static Field getPublicField(Class<?> clazz, String fieldName) {
         assertObjectNotNull("clazz", clazz);
-        return findField(clazz, fieldName, true);
+        return findField(clazz, fieldName, VisibilityType.PUBLIC);
     }
 
-    protected static Field findField(Class<?> clazz, String fieldName, boolean publicOnly) {
+    public static Field getWholeField(Class<?> clazz, String fieldName) {
+        assertObjectNotNull("clazz", clazz);
+        return findField(clazz, fieldName, VisibilityType.WHOLE);
+    }
+
+    protected static Field findField(Class<?> clazz, String fieldName, VisibilityType visibilityType) {
         assertObjectNotNull("clazz", clazz);
         for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
             final Field[] fields = target.getDeclaredFields();
             for (int i = 0; i < fields.length; ++i) {
                 final Field current = fields[i];
-                final int modifiers = current.getModifiers();
-                if (publicOnly && !Modifier.isPublic(modifiers)) {
+                final int modifier = current.getModifiers();
+                if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
                     continue;
                 }
-                if (target != clazz) { // if super class
-                    if (!Modifier.isPublic(modifiers) && !Modifier.isProtected(modifiers)) {
-                        continue;
-                    }
+                if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
+                    continue;
                 }
                 if (fieldName.equals(current.getName())) {
                     return current;
@@ -270,28 +273,33 @@ public class DfReflectionUtil {
     public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        return findMethod(clazz, methodName, argTypes, false);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.ACCESSIBLE);
     }
 
     public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        return findMethod(clazz, methodName, argTypes, true);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.PUBLIC);
     }
 
-    protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes, boolean publicOnly) {
+    public static Method getWholeMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.WHOLE);
+    }
+
+    protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes,
+            VisibilityType visibilityType) {
         for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
             final Method[] methods = target.getDeclaredMethods();
             for (int i = 0; i < methods.length; ++i) {
                 final Method current = methods[i];
-                final int modifiers = current.getModifiers();
-                if (publicOnly && !Modifier.isPublic(modifiers)) {
+                final int modifier = current.getModifiers();
+                if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
                     continue;
                 }
-                if (target != clazz) { // if super class
-                    if (!Modifier.isPublic(modifiers) && !Modifier.isProtected(modifiers)) {
-                        continue;
-                    }
+                if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
+                    continue;
                 }
                 if (methodName.equals(current.getName())) {
                     final Class<?>[] types = current.getParameterTypes();
@@ -388,8 +396,16 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                            Modifier
     //                                                                            ========
+    public static enum VisibilityType {
+        ACCESSIBLE, PUBLIC, WHOLE
+    }
+
     public static boolean isPublic(int modifier) {
         return Modifier.isPublic(modifier);
+    }
+
+    protected static boolean isDefaultOrPrivate(int modifier) {
+        return !Modifier.isPublic(modifier) && !Modifier.isProtected(modifier);
     }
 
     public static boolean isStatic(int modifier) {
