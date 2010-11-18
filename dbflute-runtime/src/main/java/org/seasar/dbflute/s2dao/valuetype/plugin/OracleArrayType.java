@@ -23,25 +23,26 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
 
-import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
+import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * The type of Oracle's array for a property of collection type.
  * @author jflute
  */
-public abstract class OracleArrayType extends TnAbstractValueType {
+public abstract class OracleArrayType implements ValueType {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final int _sqlType;
     protected final String _arrayTypeName;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public OracleArrayType(String arrayTypeName) {
-        super(Types.ARRAY);
+        _sqlType = Types.ARRAY;
         _arrayTypeName = arrayTypeName;
     }
 
@@ -100,14 +101,23 @@ public abstract class OracleArrayType extends TnAbstractValueType {
     }
 
     // ===================================================================================
+    //                                                                        Null Setting
+    //                                                                        ============
+    protected void setNull(PreparedStatement ps, int index) throws SQLException {
+        ps.setNull(index, getSqlType(), _arrayTypeName);
+    }
+
+    protected void setNull(CallableStatement cs, String parameterName) throws SQLException {
+        cs.setNull(parameterName, getSqlType(), _arrayTypeName);
+    }
+
+    // ===================================================================================
     //                                                                       Out Parameter
     //                                                                       =============
-    @Override
     public void registerOutParameter(Connection conn, CallableStatement cs, int index) throws SQLException {
         cs.registerOutParameter(index, getSqlType(), _arrayTypeName);
     }
 
-    @Override
     public void registerOutParameter(Connection conn, CallableStatement cs, String parameterName) throws SQLException {
         cs.registerOutParameter(parameterName, getSqlType(), _arrayTypeName);
     }
@@ -133,4 +143,11 @@ public abstract class OracleArrayType extends TnAbstractValueType {
      * @throws java.sql.SQLException
      */
     protected abstract Object toStandardArray(Object oracleArray) throws SQLException;
+
+    // ===================================================================================
+    //                                                                            SQL Type
+    //                                                                            ========
+    public int getSqlType() {
+        return _sqlType;
+    }
 }

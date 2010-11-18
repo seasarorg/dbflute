@@ -31,7 +31,7 @@ public abstract class TnAbstractValueType implements ValueType {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private int _sqlType;
+    protected int _sqlType;
 
     // ===================================================================================
     //                                                                         Constructor
