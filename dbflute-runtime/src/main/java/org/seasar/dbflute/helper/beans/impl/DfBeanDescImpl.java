@@ -436,7 +436,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
         final Map<String, List<Method>> methodListMap = new LinkedHashMap<String, List<Method>>();
         final Method[] methods = _beanClass.getMethods();
         for (int i = 0; i < methods.length; i++) {
-            Method method = methods[i];
+            final Method method = methods[i];
             if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
                 continue;
             }
@@ -479,41 +479,41 @@ public class DfBeanDescImpl implements DfBeanDesc {
 
     private void setupFieldsByInterface(Class<?> interfaceClass) {
         addFields(interfaceClass);
-        Class<?>[] interfaces = interfaceClass.getInterfaces();
+        final Class<?>[] interfaces = interfaceClass.getInterfaces();
         for (int i = 0; i < interfaces.length; ++i) {
             setupFieldsByInterface(interfaces[i]);
         }
     }
 
     private void addFields(Class<?> clazz) {
-        Field[] fields = clazz.getDeclaredFields();
+        final Field[] fields = clazz.getDeclaredFields();
         for (int i = 0; i < fields.length; ++i) {
-            Field field = fields[i];
-            String fname = field.getName();
-            if (!_fieldMap.containsKey(fname)) {
-                field.setAccessible(true);
-                _fieldMap.put(fname, field);
-                if (DfReflectionUtil.isInstanceVariableField(field)) {
-                    if (hasPropertyDesc(fname)) {
-                        DfPropertyDesc pd = getPropertyDesc(field.getName());
-                        pd.setField(field);
-                    } else if (DfReflectionUtil.isPublicField(field)) {
-                        DfPropertyDesc pd = new DfPropertyDescImpl(field.getName(), field.getType(), null, null, field,
-                                this);
-                        _propertyDescMap.put(fname, pd);
-                    }
+            final Field field = fields[i];
+            final String fname = field.getName();
+            if (_fieldMap.containsKey(fname)) { // target class's fields have priority  
+                continue;
+            }
+            field.setAccessible(true);
+            _fieldMap.put(fname, field);
+            if (DfReflectionUtil.isInstanceVariableField(field)) {
+                if (hasPropertyDesc(fname)) {
+                    final DfPropertyDesc pd = getPropertyDesc(fname);
+                    pd.setField(field);
+                } else if (DfReflectionUtil.isPublicField(field)) {
+                    final DfPropertyDesc pd = new DfPropertyDescImpl(fname, field.getType(), null, null, field, this);
+                    _propertyDescMap.put(fname, pd);
                 }
             }
         }
     }
 
     private void setupFieldsByClass(Class<?> targetClass) {
-        addFields(targetClass);
-        Class<?>[] interfaces = targetClass.getInterfaces();
+        addFields(targetClass); // should be set up at first
+        final Class<?>[] interfaces = targetClass.getInterfaces();
         for (int i = 0; i < interfaces.length; ++i) {
             setupFieldsByInterface(interfaces[i]);
         }
-        Class<?> superClass = targetClass.getSuperclass();
+        final Class<?> superClass = targetClass.getSuperclass();
         if (superClass != Object.class && superClass != null) {
             setupFieldsByClass(superClass);
         }

@@ -51,7 +51,7 @@ public class TnProcedureMetaDataFactory {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public TnProcedureMetaData createProcedureMetaData(final String procedureName, final Class<?> pmbType) {
+    public TnProcedureMetaData createProcedureMetaData(String procedureName, Class<?> pmbType) {
         final TnProcedureMetaData procedureMetaData = new TnProcedureMetaData(procedureName);
         if (pmbType == null) {
             return procedureMetaData;
@@ -194,9 +194,14 @@ public class TnProcedureMetaDataFactory {
         final Class<?> pmbType = parameterDesc.getBeanDesc().getBeanClass();
         final String paramName = parameterDesc.getPropertyName();
         final Class<?> paramType = parameterDesc.getPropertyType();
-        final String keyName = _annotationReader.getValueType(parameterDesc);
-        final DBDef dbdef = ResourceContext.currentDBDef();
-        return _valueTypeProvider.provide(pmbType, paramName, paramType, keyName, dbdef);
+        final Object valueTypeDef = _annotationReader.getValueType(parameterDesc);
+        if (valueTypeDef instanceof ValueType) {
+            return (ValueType) valueTypeDef;
+        } else {
+            final String keyName = (valueTypeDef != null ? valueTypeDef.toString() : null);
+            final DBDef dbdef = ResourceContext.currentDBDef();
+            return _valueTypeProvider.provide(pmbType, paramName, paramType, keyName, dbdef);
+        }
     }
 
     // ===================================================================================
@@ -250,13 +255,13 @@ public class TnProcedureMetaDataFactory {
             }
         }
 
-        public String getValueType(DfPropertyDesc propertyDesc) {
+        public Object getValueType(DfPropertyDesc propertyDesc) {
             final String propertyName = propertyDesc.getPropertyName();
             final String annotationName = propertyName + VALUE_TYPE_SUFFIX;
             final DfBeanDesc pmbDesc = propertyDesc.getBeanDesc();
             if (pmbDesc.hasField(annotationName)) {
-                final Field f = pmbDesc.getField(annotationName);
-                return (String) getValue(f, null);
+                final Field field = pmbDesc.getField(annotationName);
+                return getValue(field, null);
             } else {
                 return null;
             }

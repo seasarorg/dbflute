@@ -18,6 +18,8 @@ package org.seasar.dbflute.s2dao.valuetype;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
@@ -28,6 +30,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
+import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.basic.BigDecimalType;
 import org.seasar.dbflute.s2dao.valuetype.basic.BigIntegerType;
@@ -173,6 +177,17 @@ public class TnValueTypes {
         registerPluginValueType("bytesOidType", BYTES_OID);
         registerPluginValueType("fixedLengthStringType", FIXED_LENGTH_STRING);
         registerPluginValueType("objectBindingBigDecimalType", OBJECT_BINDING_BIGDECIMAL);
+    }
+
+    protected static volatile PhysicalConnectionDigger _physicalConnectionDigger = new DefaultPhysicalConnectionDigger();
+
+    public static class DefaultPhysicalConnectionDigger implements PhysicalConnectionDigger {
+        public Connection getConnection(Connection conn) throws SQLException {
+            if (conn instanceof NotClosingConnectionWrapper) {
+                conn = ((NotClosingConnectionWrapper) conn).getActualConnection();
+            }
+            return conn;
+        }
     }
 
     // ===================================================================================
@@ -461,6 +476,21 @@ public class TnValueTypes {
         _pluginValueTypeMap.clear();
         _dynamicObjectValueTypeMap.clear();
         initialize();
+    }
+
+    // ===================================================================================
+    //                                                                 Physical Connection
+    //                                                                 ===================
+    public static synchronized void registerPhysicalConnectionDigger(PhysicalConnectionDigger digger) {
+        assertObjectNotNull("digger", digger);
+        _physicalConnectionDigger = digger;
+    }
+
+    /**
+     * @return The instance of PhysicalConnectionDigger. (NotNull)
+     */
+    public static PhysicalConnectionDigger getPhysicalConnectionDigger() {
+        return _physicalConnectionDigger;
     }
 
     // ===================================================================================

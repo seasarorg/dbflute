@@ -200,7 +200,7 @@ public class DfReflectionUtil {
                     continue;
                 }
                 if (fieldName.equals(current.getName())) {
-                    return current;
+                    return current; // target class's fields have priority
                 }
             }
         }
@@ -270,18 +270,47 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
+    /**
+     * Get the accessible method that means as follows:
+     * <pre>
+     * o target class's methods = all
+     * o superclass's methods   = public or protected
+     * </pre>
+     * @param clazz The type of class that defines the method. (NotNull)
+     * @param methodName The name of method. (NotNull)
+     * @param argTypes The type of argument. (NotNull)
+     * @return The instance of method. (Nullable: if null, not found)
+     */
     public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
         return findMethod(clazz, methodName, argTypes, VisibilityType.ACCESSIBLE);
     }
 
+    /**
+     * Get the public method.
+     * @param clazz The type of class that defines the method. (NotNull)
+     * @param methodName The name of method. (NotNull)
+     * @param argTypes The type of argument. (NotNull)
+     * @return The instance of method. (Nullable: if null, not found)
+     */
     public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
         return findMethod(clazz, methodName, argTypes, VisibilityType.PUBLIC);
     }
 
+    /**
+     * Get the method in whole methods that means as follows:
+     * <pre>
+     * o target class's methods = all
+     * o superclass's methods   = all (also contains private)
+     * </pre>
+     * @param clazz The type of class that defines the method. (NotNull)
+     * @param methodName The name of method. (NotNull)
+     * @param argTypes The type of argument. (NotNull)
+     * @return The instance of method. (Nullable: if null, not found)
+     */
     public static Method getWholeMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);

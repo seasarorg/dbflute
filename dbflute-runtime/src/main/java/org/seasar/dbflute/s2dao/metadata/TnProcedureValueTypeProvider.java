@@ -32,7 +32,7 @@ public class TnProcedureValueTypeProvider {
     //                                                                             Provide
     //                                                                             =======
     /**
-     * Provide value type for procedure.
+     * Provide value type for procedure from registered types.
      * @param pmbType The type of ProcdurePmb for the parameter. (NotNull)
      * @param paramName The name of parameter. (NotNull)
      * @param paramType The type of parameter. (NotNull)
