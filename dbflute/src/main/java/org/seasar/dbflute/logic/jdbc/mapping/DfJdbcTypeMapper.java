@@ -241,7 +241,7 @@ public class DfJdbcTypeMapper {
     public boolean isOracleCursor(final String dbTypeName) {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "cursor");
     }
-
+    
     public boolean isOracleTable(final String dbTypeName) {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "table");
     }

@@ -180,8 +180,12 @@ public class DfProcedurePmbSetupper {
         } else if (column.isOracleTreatedAsArray()) {
             // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY" (it's not useful for type mapping)
             final String elementTypeName = column.getElementTypeName();
+            System.out.println(column.getColumnName());
+            System.out.println("***: " + elementTypeName);
             final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, elementTypeName);
+            System.out.println("***: " + torqueType);
             final String elementPropertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
+            System.out.println("***: " + elementPropertyType);
             propertyType = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo().getGenericListClassName(
                     elementPropertyType);
         } else {
