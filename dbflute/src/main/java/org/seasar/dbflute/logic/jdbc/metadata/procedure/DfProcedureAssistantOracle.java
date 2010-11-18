@@ -52,7 +52,17 @@ public class DfProcedureAssistantOracle {
             final String dataType = info.getDataType();
             if (argumentName != null && Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY")) {
                 final OracleArrayInfo oracleArrayInfo = new OracleArrayInfo();
-                oracleArrayInfo.setTypeName(info.getTypeName());
+                final String typeName = info.getTypeName();
+                final String typeSubName = info.getTypeSubName();
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(typeSubName)) {
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(typeName)) {
+                        oracleArrayInfo.setTypeName(typeName + "." + typeSubName);
+                    } else {
+                        oracleArrayInfo.setTypeName(typeSubName);
+                    }
+                } else {
+                    oracleArrayInfo.setTypeName(typeName);
+                }
                 if (infoList.size() > (i + 1)) {
                     ProcedureColumnSupplementInfo nextInfo = infoList.get(i + 1);
                     oracleArrayInfo.setElementType(nextInfo.getDataType());
@@ -100,6 +110,7 @@ public class DfProcedureAssistantOracle {
         columnList.add("ARGUMENT_NAME");
         columnList.add("DATA_TYPE");
         columnList.add("TYPE_NAME");
+        columnList.add("TYPE_SUBNAME");
         final List<Map<String, String>> resultList;
         try {
             _log.info(sql);
@@ -119,6 +130,7 @@ public class DfProcedureAssistantOracle {
             info.setArgumentName(map.get("ARGUMENT_NAME"));
             info.setDataType(map.get("DATA_TYPE"));
             info.setTypeName(map.get("TYPE_NAME"));
+            info.setTypeSubName(map.get("TYPE_SUBNAME"));
             infoList.add(info);
         }
         return infoList;
@@ -141,6 +153,7 @@ public class DfProcedureAssistantOracle {
         protected String _argumentName;
         protected String _dataType;
         protected String _typeName;
+        protected String _typeSubName;
 
         public String getPackageName() {
             return _packageName;
@@ -196,6 +209,14 @@ public class DfProcedureAssistantOracle {
 
         public void setTypeName(String typeName) {
             this._typeName = typeName;
+        }
+
+        public String getTypeSubName() {
+            return _typeSubName;
+        }
+
+        public void setTypeSubName(String typeSubName) {
+            this._typeSubName = typeSubName;
         }
     }
 }
