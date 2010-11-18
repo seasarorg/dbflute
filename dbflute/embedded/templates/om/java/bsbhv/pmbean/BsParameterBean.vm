@@ -10,6 +10,7 @@ import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #end
 import org.seasar.dbflute.jdbc.*;
+import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;

@@ -102,6 +102,7 @@ public class DfProcedureAssistantOracle {
         columnList.add("TYPE_NAME");
         final List<Map<String, String>> resultList;
         try {
+            _log.info(sql);
             resultList = facade.selectStringList(sql, columnList);
         } catch (Exception continued) {
             // because of assist info

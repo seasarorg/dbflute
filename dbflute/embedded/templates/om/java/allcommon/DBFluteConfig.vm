@@ -573,7 +573,11 @@ public class ${glDBFluteConfig} {
 
         @Override
         protected Object toStandardArray(Object oracleArray) throws SQLException {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             return ((oracle.sql.ARRAY)oracleArray).getArray();
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
         }
 
         protected Connection getOracleConnection(Connection conn) throws SQLException {
