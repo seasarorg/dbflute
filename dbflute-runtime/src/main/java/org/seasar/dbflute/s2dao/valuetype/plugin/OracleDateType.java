@@ -51,7 +51,7 @@ public abstract class OracleDateType extends UtilDateAsTimestampType {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
+    //                                                                       Oracle's Type
     //                                                                       =============
     /**
      * Convert the time-stamp to Oracle's date.
