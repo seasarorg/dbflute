@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
@@ -38,6 +39,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
@@ -279,7 +281,8 @@ public abstract class DfAbstractTask extends Task {
     protected void initializeVariousEnvironment() {
         if (getBasicProperties().isDatabaseOracle()) {
             // basically for data loading of ReplaceSchema
-            TnValueTypes.registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
+            final DBDef currentDBDef = ResourceContext.currentDBDef();
+            TnValueTypes.registerBasicValueType(currentDBDef, java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
         }
     }
 

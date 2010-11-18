@@ -43,6 +43,7 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.texen.ant.TexenTask;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
@@ -58,6 +59,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
@@ -303,7 +305,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected void initializeVariousEnvironment() {
         if (getBasicProperties().isDatabaseOracle()) {
             // basically for data loading of ReplaceSchema
-            TnValueTypes.registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
+            final DBDef currentDBDef = ResourceContext.currentDBDef();
+            TnValueTypes.registerBasicValueType(currentDBDef, java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
         }
     }
 

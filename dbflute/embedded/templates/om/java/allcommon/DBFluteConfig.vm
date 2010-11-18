@@ -449,18 +449,6 @@ public class ${glDBFluteConfig} {
         TnValueTypes.removePluginValueType(currentDBDef(), keyName);
     }
 
-    /**
-     * Register the digger of physical connection.
-     * @param physicalConnectionDigger The digger of physical connection. (NotNull)
-     */
-    public void registerPhysicalConnectionDigger(PhysicalConnectionDigger physicalConnectionDigger) {
-        assertNotLocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Registering physical connection digger: " + physicalConnectionDigger);
-        }
-        TnValueTypes.registerPhysicalConnectionDigger(physicalConnectionDigger);
-    }
-
     // ===================================================================================
     //                                                                  Configuration Lock
     //                                                                  ==================
