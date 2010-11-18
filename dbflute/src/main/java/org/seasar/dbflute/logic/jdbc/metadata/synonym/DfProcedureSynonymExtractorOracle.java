@@ -64,7 +64,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = StringKeyMap.createAsFlexibleOrdered();
         final String sql = buildSynonymSelect();
         Connection conn = null;
-        Statement statement = null;
+        Statement st = null;
         ResultSet rs = null;
         try {
             conn = _dataSource.getConnection();
@@ -73,15 +73,15 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
             final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>();
             final DfProcedureHandler procedureHandler = new DfProcedureHandler();
             for (UnifiedSchema unifiedSchema : _targetSchemaList) {
-                procedureList.addAll(procedureHandler.getPlainProcedureList(metaData, unifiedSchema));
+                procedureList.addAll(procedureHandler.getPlainProcedureList(_dataSource, metaData, unifiedSchema));
             }
             for (DfProcedureMetaInfo metaInfo : procedureList) {
                 final String procedureKeyName = metaInfo.getProcedureFullQualifiedName();
                 procedureMap.put(procedureKeyName, metaInfo);
             }
-            statement = conn.createStatement();
+            st = conn.createStatement();
             _log.info(sql);
-            rs = statement.executeQuery(sql);
+            rs = st.executeQuery(sql);
             while (rs.next()) {
                 final UnifiedSchema synonymOwner = createAsDynamicSchema(null, rs.getString("OWNER"));
                 final String synonymName = rs.getString("SYNONYM_NAME");
@@ -137,9 +137,9 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
             String msg = "Failed to get procedure synonyms: sql=" + sql;
             throw new SQLFailureException(msg, e);
         } finally {
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {
                 }
             }

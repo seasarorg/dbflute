@@ -515,6 +515,9 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                   Implemented Class
     //                                                                   =================
+    // -----------------------------------------------------
+    //                                                Spring
+    //                                                ------
     protected static class SpringDBCPDataSourceHandler implements DataSourceHandler {
 
         public Connection getConnection(DataSource ds) throws SQLException {
@@ -548,6 +551,9 @@ public class ${glDBFluteConfig} {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                Oracle
+    //                                                ------
     public static class ImplementedOracleArrayType extends OracleArrayType {
 
         public ImplementedOracleArrayType(String arrayTypeName) {
@@ -558,7 +564,7 @@ public class ${glDBFluteConfig} {
         protected Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             Connection physConn = getOracleConnection(conn);
-            oracle.sql.ArrayDescriptor desc = oracle.sql.ArrayDescriptor.createDescriptor(arrayTypeName, physConn)
+            oracle.sql.ArrayDescriptor desc = oracle.sql.ArrayDescriptor.createDescriptor(arrayTypeName, physConn);
             return new oracle.sql.ARRAY(desc, physConn, arrayValue);
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
@@ -586,6 +592,9 @@ public class ${glDBFluteConfig} {
         }
     }
 
+    // -----------------------------------------------------
+    //                                   Physical Connection
+    //                                   -------------------
     public static class ImplementedPhysicalConnectionDigger implements PhysicalConnectionDigger {
 
         public Connection getConnection(Connection conn) throws SQLException {

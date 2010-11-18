@@ -23,6 +23,10 @@ public class DfProcedureColumnMetaInfo {
     protected Map<String, DfColumnMetaInfo> _columnMetaInfoMap = DfCollectionUtil.emptyMap(); // if result set
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
 
+    // for Array
+    protected String _arrayTypeName;
+    protected String _elementTypeName;
+
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
@@ -97,6 +101,9 @@ public class DfProcedureColumnMetaInfo {
         return comment;
     }
 
+    // ===================================================================================
+    //                                                                  Type Determination
+    //                                                                  ==================
     public boolean isConceptTypeStringClob() {
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isConceptTypeStringClob(dbTypeName);
@@ -147,14 +154,9 @@ public class DfProcedureColumnMetaInfo {
         return _columnHandler.isOracleCursor(dbTypeName);
     }
 
-    public boolean isOracleTable() {
+    public boolean isOracleTreatedAsArray() {
         final String dbTypeName = getDbTypeName();
-        return _columnHandler.isOracleTable(dbTypeName);
-    }
-
-    public boolean isOracleVArray() {
-        final String dbTypeName = getDbTypeName();
-        return _columnHandler.isOracleVArray(dbTypeName);
+        return _columnHandler.isOracleTreatedAsArray(dbTypeName);
     }
 
     public boolean isSQLServerUniqueIdentifier() {
@@ -250,5 +252,21 @@ public class DfProcedureColumnMetaInfo {
 
     public void setColumnMetaInfoMap(Map<String, DfColumnMetaInfo> columnMetaInfoMap) {
         this._columnMetaInfoMap = columnMetaInfoMap;
+    }
+
+    public String getArrayTypeName() {
+        return _arrayTypeName;
+    }
+
+    public void setArrayTypeName(String arrayTypeName) {
+        this._arrayTypeName = arrayTypeName;
+    }
+
+    public String getElementTypeName() {
+        return _elementTypeName;
+    }
+
+    public void setElementTypeName(String elementTypeName) {
+        this._elementTypeName = elementTypeName;
     }
 }

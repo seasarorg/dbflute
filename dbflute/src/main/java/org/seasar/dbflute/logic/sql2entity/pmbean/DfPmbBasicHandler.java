@@ -232,6 +232,29 @@ public class DfPmbBasicHandler {
         return _columnHandler.isConceptTypeObjectBindingBigDecimal(metaInfo.getDbTypeName());
     }
 
+    public boolean needsOracleArrayHandling(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        if (metaInfo == null) {
+            return false;
+        }
+        final String dbTypeName = metaInfo.getDbTypeName();
+        final String elementTypeName = getPropertyColumnElementTypeName(className, propertyName);
+        return elementTypeName != null && _columnHandler.isOracleTreatedAsArray(dbTypeName);
+    }
+
+    public String getPropertyColumnArrayTypeName(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getPropertyNameColumnInfo(className, propertyName);
+        return columnInfo != null ? columnInfo.getArrayTypeName() : null;
+    }
+
+    public String getPropertyColumnElementTypeName(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getPropertyNameColumnInfo(className, propertyName);
+        return columnInfo != null ? columnInfo.getElementTypeName() : null;
+    }
+
     protected DfProcedureColumnMetaInfo getPropertyNameColumnInfo(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);

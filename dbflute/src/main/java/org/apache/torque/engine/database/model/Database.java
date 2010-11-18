@@ -432,6 +432,14 @@ public class Database {
         return getPmbBasicHandler().needsObjectBindingBigDecimalHandling(className, propertyName);
     }
 
+    public boolean needsOracleArrayHandling(String className, String propertyName) {
+        return getPmbBasicHandler().needsOracleArrayHandling(className, propertyName);
+    }
+
+    public String getPropertyColumnArrayTypeName(String className, String propertyName) {
+        return getPmbBasicHandler().getPropertyColumnArrayTypeName(className, propertyName);
+    }
+
     // -----------------------------------------------------
     //                                                Option
     //                                                ------

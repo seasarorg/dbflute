@@ -424,7 +424,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             if (_dropGenerateProcedureOnly) {
                 procedureList = handler.getAvailableProcedureList(_dataSource);
             } else {
-                procedureList = handler.getPlainProcedureList(metaData, _unifiedSchema);
+                procedureList = handler.getPlainProcedureList(_dataSource, metaData, _unifiedSchema);
             }
         } catch (SQLException e) {
             String msg = "Failed to get procedure meta data: " + _unifiedSchema;

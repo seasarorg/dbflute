@@ -41,6 +41,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureAssistantOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureAssistantOracle.OracleArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
@@ -96,10 +98,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
 
         // main schema
-        final List<DfProcedureMetaInfo> procedureList = getPlainProcedureList(metaData, mainSchema);
+        final List<DfProcedureMetaInfo> procedureList = getPlainProcedureList(dataSource, metaData, mainSchema);
 
         // additional schema
-        setupAdditionalSchemaProcedure(metaData, procedureList);
+        setupAdditionalSchemaProcedure(dataSource, metaData, procedureList);
 
         // procedure synonym
         setupProcedureSynonym(procedureList);
@@ -137,8 +139,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     // -----------------------------------------------------
     //                                     Additional Schema
     //                                     -----------------
-    protected void setupAdditionalSchemaProcedure(DatabaseMetaData metaData, List<DfProcedureMetaInfo> procedureList)
-            throws SQLException {
+    protected void setupAdditionalSchemaProcedure(DataSource dataSource, DatabaseMetaData metaData,
+            List<DfProcedureMetaInfo> procedureList) throws SQLException {
         if (_suppressAdditionalSchema) {
             return;
         }
@@ -149,7 +151,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (schemaInfo.isSuppressProcedure()) {
                 continue;
             }
-            final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(metaData, additionalSchema);
+            final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(dataSource, metaData,
+                    additionalSchema);
             procedureList.addAll(additionalProcedureList);
         }
     }
@@ -319,12 +322,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     /**
      * Get the list of plain procedures. <br />
      * It selects procedures of main schema only.
+     * @param dataSource Data source. (NotNull)
      * @param metaData The meta data of database. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
      * @return The list of procedure meta information. (NotNull)
      */
-    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
-            throws SQLException {
+    public List<DfProcedureMetaInfo> getPlainProcedureList(DataSource dataSource, DatabaseMetaData metaData,
+            UnifiedSchema unifiedSchema) throws SQLException {
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
         String procedureName = null;
         ResultSet columnResultSet = null;
@@ -350,7 +354,39 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 }
             }
         }
+        resolveAssitInfo(dataSource, unifiedSchema, metaInfoList);
         return metaInfoList;
+    }
+
+    protected void resolveAssitInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
+            List<DfProcedureMetaInfo> metaInfoList) {
+        if (isDatabaseOracle()) {
+            resolveOracleArrayInfo(dataSource, unifiedSchema, metaInfoList);
+        }
+    }
+
+    protected void resolveOracleArrayInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
+            List<DfProcedureMetaInfo> metaInfoList) {
+        final DfProcedureAssistantOracle assistant = new DfProcedureAssistantOracle(dataSource);
+        final Map<String, OracleArrayInfo> arrayInfoMap = assistant.assistArrayInfoMap(unifiedSchema);
+        for (DfProcedureMetaInfo metaInfo : metaInfoList) {
+            final String packageName = metaInfo.getProcedureCatalog();
+            final String procedureName = metaInfo.getProcedureName();
+            final List<DfProcedureColumnMetaInfo> columnList = metaInfo.getProcedureColumnList();
+            for (DfProcedureColumnMetaInfo columnInfo : columnList) {
+                final StringBuilder keySb = new StringBuilder();
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) {
+                    keySb.append(packageName).append(".");
+                }
+                keySb.append(procedureName).append(".").append(columnInfo.getColumnName());
+                final OracleArrayInfo arrayInfo = arrayInfoMap.get(keySb.toString());
+                if (arrayInfo == null) {
+                    continue;
+                }
+                columnInfo.setArrayTypeName(arrayInfo.getTypeName());
+                columnInfo.setElementTypeName(arrayInfo.getElementType());
+            }
+        }
     }
 
     protected ResultSet doGetProcedures(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
