@@ -32,7 +32,7 @@ import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class TnProcedureHandler extends TnBasicHandler {

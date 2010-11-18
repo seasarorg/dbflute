@@ -28,7 +28,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * Basically unused on DBFlute because
  * character type is out of mapping target. <br />
- * {Refers to Seasar and Extends its class}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class CharacterType extends TnAbstractValueType {

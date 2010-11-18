@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class TnRelationRowCache {

@@ -24,7 +24,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteAutoHandler;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class TnDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand {

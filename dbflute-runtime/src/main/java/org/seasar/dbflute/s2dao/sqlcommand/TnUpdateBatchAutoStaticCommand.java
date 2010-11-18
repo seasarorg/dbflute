@@ -25,7 +25,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateBatchAutoHandler;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {

@@ -26,7 +26,7 @@ import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public interface DfBeanDesc {

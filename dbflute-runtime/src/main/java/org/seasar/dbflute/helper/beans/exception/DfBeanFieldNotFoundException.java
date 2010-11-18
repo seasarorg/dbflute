@@ -16,7 +16,7 @@
 package org.seasar.dbflute.helper.beans.exception;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class DfBeanFieldNotFoundException extends RuntimeException {
