@@ -98,6 +98,8 @@ public abstract class OracleArrayType extends TnAbstractValueType {
      * @param arrayTypeName The name of array type for Oracle. (NotNull)
      * @param arrayValue The value of array. (NotNull) 
      * @return The instance of oracle.sql.ARRAY for the array argument. (NotNull)
+     * @throws java.sql.SQLException
      */
-    protected abstract Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue);
+    protected abstract Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue)
+            throws SQLException;
 }
