@@ -105,33 +105,19 @@ public class ${glDBFluteConfig} {
      * Constructor.
      */
     private ${glDBFluteConfig}() { // adjusts default settings
-        _physicalConnectionDigger = createDefaultPhysicalConnectionDigger();
+        _physicalConnectionDigger = new ImplementedPhysicalConnectionDigger();
+
         if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
             //   o the DATE type of Oracle has seconds  
             //   o it uses a date literal of Oracle
             _logDateFormat = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
             _logTimestampFormat = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
-            // adjusts UtilDate handling, which is basically for Oracle date that has time-parts.
-            TnValueTypes.registerBasicValueType(java.util.Date.class, createOracleUtilDateHandlingType());
-        } else if (isCurrentDBDef(DBDef.SQLServer)) {
-            // it should treat java.util.UUID as string,
-            // because the UUID type of SQLServer cannot handle the type
-            TnValueTypes.registerBasicValueType(java.util.UUID.class, TnValueTypes.UUID_AS_STRING);
         }
-    }
-
-    private PhysicalConnectionDigger createDefaultPhysicalConnectionDigger() {
-        return new ImplementedPhysicalConnectionDigger();
-    }
-
-    private ValueType createOracleUtilDateHandlingType() {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+
         // treats as uses Oracle date of database native JDBC to get best performances
-        return new ImplementedOracleDateType();
-#else
-        // treats as time-stamp because using database native JDBC is not available
-        return TnValueTypes.UTILDATE_AS_TIMESTAMP;
+        TnValueTypes.registerPluginValueType("oracleDateType", new ImplementedOracleDateType());
 #end
     }
 

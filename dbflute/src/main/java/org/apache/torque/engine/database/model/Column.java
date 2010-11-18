@@ -381,6 +381,10 @@ public class Column {
         return hasDbType() && _columnHandler.isOracleDate(_dbType);
     }
 
+    public boolean isSQLServerUniqueIdentifier() { // as pinpoint
+        return hasDbType() && _columnHandler.isSQLServerUniqueIdentifier(_dbType);
+    }
+
     // -----------------------------------------------------
     //                                           Column Size
     //                                           -----------
@@ -1481,6 +1485,25 @@ public class Column {
     //                                           -----------
     public String getFlexNative() {
         return TypeMap.findFlexNativeByJavaNative(getJavaNative());
+    }
+
+    // -----------------------------------------------------
+    //                                    ValueType Handling
+    //                                    ------------------
+    public boolean needsOracleDateHandling() {
+        return isDbTypeOracleDate() && isJavaNativeUtilDate();
+    }
+
+    public boolean needsUuidAsStringHandling() {
+        return isSQLServerUniqueIdentifier() && isJavaNativeUUIDObject();
+    }
+
+    public boolean needsStringClobHandling() {
+        return isDbTypeStringClob();
+    }
+
+    public boolean needsBytesOidHandling() {
+        return isDbTypeBytesOid();
     }
 
     // ===================================================================================
