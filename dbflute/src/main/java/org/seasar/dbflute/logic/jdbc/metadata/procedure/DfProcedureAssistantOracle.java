@@ -128,8 +128,8 @@ public class DfProcedureAssistantOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from ALL_ARGUMENTS");
-        sb.append(" order by PACKAGE_NAME, OVERLOAD, SEQUENCE");
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" order by PACKAGE_NAME, OVERLOAD, SEQUENCE");
         return sb.toString();
     }
 
