@@ -68,7 +68,7 @@ public class DfJdbcTypeMapper {
      * @return The JDBC type of the column. (NotNull)
      */
     public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
-        String jdbcType = doGetColumnJdbcType(jdbcDefType, dbTypeName);
+        final String jdbcType = doGetColumnJdbcType(jdbcDefType, dbTypeName);
         if (jdbcType == null) {
             // * * * * * *
             // Priority 5
@@ -119,7 +119,6 @@ public class DfJdbcTypeMapper {
             }
         }
         // here means that it cannot determine by jdbcDefValue
-        // (jdbcDefValue is OTHER type)
 
         // * * * * * *
         // Priority 4
@@ -133,9 +132,7 @@ public class DfJdbcTypeMapper {
             return getCharJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "numeric", "number", "decimal")) {
             return getNumericJdbcType();
-        } else if (containsIgnoreCase(dbTypeName, "timestamp")) {
-            return getTimestampJdbcType();
-        } else if (containsIgnoreCase(dbTypeName, "datetime")) {
+        } else if (containsIgnoreCase(dbTypeName, "timestamp", "datetime")) {
             return getTimestampJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "date")) {
             return getDateJdbcType();

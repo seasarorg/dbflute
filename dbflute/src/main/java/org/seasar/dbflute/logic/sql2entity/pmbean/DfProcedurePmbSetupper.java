@@ -181,22 +181,11 @@ public class DfProcedurePmbSetupper {
             // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY" (it's not useful for type mapping)
             final String elementTypeName = column.getElementTypeName();
             final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-            if (_columnHandler.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
-                final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, elementTypeName);
-                final String elementPropertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize,
-                        decimalDigits);
-                propertyType = grammarInfo.getGenericListClassName(elementPropertyType);
-            } else {
-                propertyType = grammarInfo.getGenericListClassName("Object");
-            }
+            final String elementPropertyType = findPlainPropertyType(jdbcDefType, elementTypeName, columnSize,
+                    decimalDigits);
+            propertyType = grammarInfo.getGenericListClassName(elementPropertyType);
         } else {
-            if (_columnHandler.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
-                final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
-                propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
-            } else {
-                // procedure has many-many types so it uses Object type (not String) 
-                propertyType = "Object";
-            }
+            propertyType = findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits);
         }
         return propertyType;
     }
@@ -204,6 +193,18 @@ public class DfProcedurePmbSetupper {
     protected String getProcedureDefaultResultSetPropertyType() {
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
         return grammarInfo.getGenericMapListClassName("String", "Object");
+    }
+
+    protected String findPlainPropertyType(int jdbcDefType, String dbTypeName, Integer columnSize, Integer decimalDigits) {
+        final String propertyType;
+        if (_columnHandler.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
+            final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
+            propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
+        } else {
+            // procedure has many-many types so it uses Object type (not String) 
+            propertyType = "Object";
+        }
+        return propertyType;
     }
 
     // -----------------------------------------------------

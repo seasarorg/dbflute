@@ -374,17 +374,21 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final String procedureName = metaInfo.getProcedureName();
             final List<DfProcedureColumnMetaInfo> columnList = metaInfo.getProcedureColumnList();
             for (DfProcedureColumnMetaInfo columnInfo : columnList) {
+                final String columnName = columnInfo.getColumnName();
                 final StringBuilder keySb = new StringBuilder();
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) {
                     keySb.append(packageName).append(".");
                 }
-                keySb.append(procedureName).append(".").append(columnInfo.getColumnName());
+                keySb.append(procedureName).append(".").append(columnName);
                 final OracleArrayInfo arrayInfo = arrayInfoMap.get(keySb.toString());
                 if (arrayInfo == null) {
                     continue;
                 }
-                columnInfo.setArrayTypeName(arrayInfo.getTypeName());
-                columnInfo.setElementTypeName(arrayInfo.getElementType());
+                final String typeName = arrayInfo.getTypeName();
+                final String elementType = arrayInfo.getElementType();
+                _log.info("...Resolving array type: " + keySb + " -> " + typeName + " (" + elementType + ")");
+                columnInfo.setArrayTypeName(typeName);
+                columnInfo.setElementTypeName(elementType);
             }
         }
     }
