@@ -177,6 +177,8 @@ public class TnValueTypes {
         registerPluginValueType("bytesOidType", BYTES_OID);
         registerPluginValueType("fixedLengthStringType", FIXED_LENGTH_STRING);
         registerPluginValueType("objectBindingBigDecimalType", OBJECT_BINDING_BIGDECIMAL);
+        registerPluginValueType("oracleDateType", UTILDATE_AS_TIMESTAMP);
+        registerPluginValueType("uuidAsStringType", UUID_AS_STRING);
     }
 
     protected static volatile PhysicalConnectionDigger _physicalConnectionDigger = new DefaultPhysicalConnectionDigger();
