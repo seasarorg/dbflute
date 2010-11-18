@@ -1490,14 +1490,6 @@ public class Column {
     // -----------------------------------------------------
     //                                    ValueType Handling
     //                                    ------------------
-    public boolean needsOracleDateHandling() {
-        return isDbTypeOracleDate() && isJavaNativeUtilDate();
-    }
-
-    public boolean needsUuidAsStringHandling() {
-        return isSQLServerUniqueIdentifier() && isJavaNativeUUIDObject();
-    }
-
     public boolean needsStringClobHandling() {
         return isDbTypeStringClob();
     }
