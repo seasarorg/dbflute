@@ -16,10 +16,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.mock.MockValueType;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.basic.BigDecimalType;
 import org.seasar.dbflute.s2dao.valuetype.basic.BinaryType;
 import org.seasar.dbflute.s2dao.valuetype.basic.IntegerType;
@@ -35,9 +37,42 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class TnValueTypesTest extends PlainTestCase {
 
+    private final DBDef _currentDBDef = DBDef.MySQL;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        ResourceContext context = new ResourceContext();
+        context.setCurrentDBDef(_currentDBDef);
+        ResourceContext.setResourceContextOnThread(context);
+    }
+
     @Override
     protected void tearDown() throws Exception {
-        TnValueTypes.restoreDefault();
+        TnValueTypes.restoreDefault(_currentDBDef);
+        super.tearDown();
+    }
+
+    // ===================================================================================
+    //                                                                         DBMS Switch
+    //                                                                         ===========
+    public void test_DBMS_switch_basic() throws Exception {
+        assertEquals(TnValueTypes.UTILDATE_AS_SQLDATE, TnValueTypes.getValueType(java.util.Date.class));
+        TnValueTypes.registerBasicValueType(DBDef.Derby, java.util.Date.class, TnValueTypes.BYTE);
+        assertEquals(TnValueTypes.UTILDATE_AS_SQLDATE, TnValueTypes.getValueType(java.util.Date.class));
+        assertEquals(TnValueTypes.BYTE, TnValueTypes.findValueTypes(DBDef.Derby).getValueType(java.util.Date.class));
+    }
+
+    public void test_DBMS_switch_Oracle_date() throws Exception {
+        assertEquals(TnValueTypes.UTILDATE_AS_SQLDATE, TnValueTypes.getValueType(java.util.Date.class));
+        assertEquals(TnValueTypes.UTILDATE_AS_TIMESTAMP, TnValueTypes.findValueTypes(DBDef.Oracle).getValueType(
+                java.util.Date.class));
+    }
+
+    public void test_DBMS_switch_SQLServer_uuid() throws Exception {
+        assertEquals(TnValueTypes.UUID_AS_DIRECT, TnValueTypes.getValueType(java.util.UUID.class));
+        assertEquals(TnValueTypes.UUID_AS_STRING, TnValueTypes.findValueTypes(DBDef.SQLServer).getValueType(
+                java.util.UUID.class));
     }
 
     // ===================================================================================
@@ -101,8 +136,8 @@ public class TnValueTypesTest extends PlainTestCase {
         MockValueType mockValueType = new MockValueType();
 
         // ## Act ##
-        TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
-        TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
+        TnValueTypes.registerBasicValueType(_currentDBDef, TestPlainStatus.class, mockValueType);
+        TnValueTypes.registerBasicValueType(_currentDBDef, Enum.class, mockValueType);
         ValueType valueType = TnValueTypes.getValueType(keyType);
 
         // ## Assert ##
@@ -116,7 +151,7 @@ public class TnValueTypesTest extends PlainTestCase {
         MockValueType mockValueType = new MockValueType();
 
         // ## Act ##
-        TnValueTypes.registerBasicValueType(keyType, mockValueType);
+        TnValueTypes.registerBasicValueType(_currentDBDef, keyType, mockValueType);
         ValueType valueType = TnValueTypes.getValueType(keyType);
 
         // ## Assert ##
@@ -130,7 +165,7 @@ public class TnValueTypesTest extends PlainTestCase {
         MockValueType mockValueType = new MockValueType();
 
         // ## Act ##
-        TnValueTypes.registerBasicValueType(keyType, mockValueType);
+        TnValueTypes.registerBasicValueType(_currentDBDef, keyType, mockValueType);
         ValueType valueType = TnValueTypes.getValueType(keyType);
 
         // ## Assert ##
@@ -143,8 +178,8 @@ public class TnValueTypesTest extends PlainTestCase {
         MockValueType mockValueType = new MockValueType();
 
         // ## Act ##
-        TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
-        TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
+        TnValueTypes.registerBasicValueType(_currentDBDef, TestPlainStatus.class, mockValueType);
+        TnValueTypes.registerBasicValueType(_currentDBDef, Enum.class, mockValueType);
         ValueType valueType = TnValueTypes.getValueType(TestClassificationStatus.FML);
 
         // ## Assert ##
@@ -158,7 +193,7 @@ public class TnValueTypesTest extends PlainTestCase {
         MockValueType mockValueType = new MockValueType();
 
         // ## Act ##
-        TnValueTypes.registerBasicValueType(keyType, mockValueType);
+        TnValueTypes.registerBasicValueType(_currentDBDef, keyType, mockValueType);
         ValueType valueType = TnValueTypes.getValueType(TestPlainStatus.FML);
 
         // ## Assert ##
@@ -191,12 +226,13 @@ public class TnValueTypesTest extends PlainTestCase {
         MockValueType mockValueType = new MockValueType();
 
         // ## Act ##
-        TnValueTypes.registerBasicValueType(FilenameFilter.class, mockValueType);
-        ValueType interfaceValueType = TnValueTypes.getBasicInterfaceValueType(FilenameFilter.class);
+        TnValueTypes.registerBasicValueType(_currentDBDef, FilenameFilter.class, mockValueType);
+        ValueType interfaceValueType = TnValueTypes.findValueTypes(_currentDBDef).getBasicInterfaceValueType(
+                FilenameFilter.class);
 
         // ## Assert ##
         assertEquals(mockValueType, interfaceValueType);
-        assertNull(TnValueTypes.getBasicInterfaceValueType(FileFilter.class));
+        assertNull(TnValueTypes.findValueTypes(_currentDBDef).getBasicInterfaceValueType(FileFilter.class));
     }
 
     public void test_registerBasicValueType_interface_threadSafe() throws Exception {
@@ -207,13 +243,14 @@ public class TnValueTypesTest extends PlainTestCase {
                     public ValueType execute() {
                         MockValueType mockValueType = new MockValueType();
                         if (Thread.currentThread().getId() % 2 == 0) {
-                            TnValueTypes.registerBasicValueType(FilenameFilter.class, mockValueType);
-                            ValueType interfaceValueType = TnValueTypes
+                            TnValueTypes.registerBasicValueType(_currentDBDef, FilenameFilter.class, mockValueType);
+                            ValueType interfaceValueType = TnValueTypes.findValueTypes(_currentDBDef)
                                     .getBasicInterfaceValueType(FilenameFilter.class);
                             return interfaceValueType;
                         } else {
-                            TnValueTypes.registerBasicValueType(FileFilter.class, mockValueType);
-                            ValueType interfaceValueType = TnValueTypes.getBasicInterfaceValueType(FileFilter.class);
+                            TnValueTypes.registerBasicValueType(_currentDBDef, FileFilter.class, mockValueType);
+                            ValueType interfaceValueType = TnValueTypes.findValueTypes(_currentDBDef)
+                                    .getBasicInterfaceValueType(FileFilter.class);
                             return interfaceValueType;
                         }
                     }
@@ -234,7 +271,7 @@ public class TnValueTypesTest extends PlainTestCase {
     //                                                                          byJdbcType
     //                                                                          ==========
     public void test_getValueType_byJdbcType_dynamicObject_basic() throws Exception {
-        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.isEmpty());
+        assertTrue(TnValueTypes.findValueTypes(_currentDBDef)._dynamicObjectValueTypeMap.isEmpty());
         {
             // ## Arrange & Act ##
             ValueType valueType = TnValueTypes.getValueType(Types.OTHER);
@@ -244,7 +281,7 @@ public class TnValueTypesTest extends PlainTestCase {
             assertEquals(Types.OTHER, valueType.getSqlType());
             assertTrue(TnValueTypes.isDynamicObject(valueType));
         }
-        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.containsKey(Types.OTHER));
+        assertTrue(TnValueTypes.findValueTypes(_currentDBDef)._dynamicObjectValueTypeMap.containsKey(Types.OTHER));
         {
             // ## Arrange & Act ##
             ValueType valueType = TnValueTypes.getValueType(12345678);
@@ -254,7 +291,7 @@ public class TnValueTypesTest extends PlainTestCase {
             assertEquals(12345678, valueType.getSqlType());
             assertTrue(TnValueTypes.isDynamicObject(valueType));
         }
-        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.containsKey(12345678));
+        assertTrue(TnValueTypes.findValueTypes(_currentDBDef)._dynamicObjectValueTypeMap.containsKey(12345678));
         {
             // ## Arrange & Act ##
             ValueType valueType = TnValueTypes.getValueType(12345678);
@@ -264,7 +301,7 @@ public class TnValueTypesTest extends PlainTestCase {
             assertEquals(12345678, valueType.getSqlType());
             assertTrue(TnValueTypes.isDynamicObject(valueType));
         }
-        assertTrue(TnValueTypes._dynamicObjectValueTypeMap.containsKey(12345678));
+        assertTrue(TnValueTypes.findValueTypes(_currentDBDef)._dynamicObjectValueTypeMap.containsKey(12345678));
     }
 
     public void test_getValueType_byJdbcType_dynamicObject_threadSafe_basic() throws Exception {

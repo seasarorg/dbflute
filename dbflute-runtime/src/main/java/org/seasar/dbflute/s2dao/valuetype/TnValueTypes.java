@@ -15,24 +15,13 @@
  */
 package org.seasar.dbflute.s2dao.valuetype;
 
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Calendar;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.seasar.dbflute.jdbc.Classification;
-import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
-import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.basic.BigDecimalType;
 import org.seasar.dbflute.s2dao.valuetype.basic.BigIntegerType;
 import org.seasar.dbflute.s2dao.valuetype.basic.BinaryStreamType;
@@ -118,84 +107,59 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected static final Map<Class<?>, ValueType> _basicObjectValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
-    protected static final Map<Class<?>, ValueType> _basicInterfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
-    protected static final Map<String, ValueType> _pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
-    protected static final Map<Integer, ValueType> _dynamicObjectValueTypeMap = new ConcurrentHashMap<Integer, ValueType>();
+    protected static final Map<DBDef, TnPlainValueTypes> _valueTypesMap = new ConcurrentHashMap<DBDef, TnPlainValueTypes>();
 
     static {
         initialize();
     }
 
     protected static void initialize() {
-        // basic (object)
-        registerBasicValueType(String.class, STRING);
-        registerBasicValueType(char.class, CHARACTER);
-        registerBasicValueType(Character.class, CHARACTER);
-        registerBasicValueType(byte.class, BYTE);
-        registerBasicValueType(Byte.class, BYTE);
-        registerBasicValueType(short.class, SHORT);
-        registerBasicValueType(Short.class, SHORT);
-        registerBasicValueType(int.class, INTEGER);
-        registerBasicValueType(Integer.class, INTEGER);
-        registerBasicValueType(long.class, LONG);
-        registerBasicValueType(Long.class, LONG);
-        registerBasicValueType(float.class, FLOAT);
-        registerBasicValueType(Float.class, FLOAT);
-        registerBasicValueType(double.class, DOUBLE);
-        registerBasicValueType(Double.class, DOUBLE);
-        registerBasicValueType(BigInteger.class, BIGINTEGER);
-        registerBasicValueType(BigDecimal.class, BIGDECIMAL);
-        registerBasicValueType(java.sql.Date.class, SQLDATE);
-        registerBasicValueType(java.sql.Time.class, TIME);
-
-        // The (java.util.)date type is treated as As-SqlDate by default.
-        // If Oracle, this switches to As-Timestamp when initialization
-        // because the date type of Oracle has time parts.
-        registerBasicValueType(java.util.Date.class, UTILDATE_AS_SQLDATE);
-
-        registerBasicValueType(Timestamp.class, TIMESTAMP);
-        registerBasicValueType(Calendar.class, TIMESTAMP);
-        registerBasicValueType(BYTE_ARRAY_CLASS, BINARY);
-        registerBasicValueType(InputStream.class, BINARY_STREAM);
-        registerBasicValueType(boolean.class, BOOLEAN);
-        registerBasicValueType(Boolean.class, BOOLEAN);
-
-        // The (java.util.)UUID type is treated as As-Direct by default.
-        // If SQLServer, this switches to As-String when initialization
-        // because the UUID type of SQLServer cannot handle the type.
-        registerBasicValueType(UUID.class, UUID_AS_DIRECT);
-
-        // basic (interface)
-        registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class
-
-        // Because object type is to be handle as special type.
-        //registerBasicValueType(Object.class, OBJECT);
-
-        // plug-in (default)
-        registerPluginValueType("stringClobType", STRING_CLOB);
-        registerPluginValueType("bytesOidType", BYTES_OID);
-        registerPluginValueType("fixedLengthStringType", FIXED_LENGTH_STRING);
-        registerPluginValueType("objectBindingBigDecimalType", OBJECT_BINDING_BIGDECIMAL);
-        registerPluginValueType("oracleDateType", UTILDATE_AS_TIMESTAMP);
-        registerPluginValueType("uuidAsStringType", UUID_AS_STRING);
+        _valueTypesMap.put(DBDef.MySQL, createValueTypes());
+        _valueTypesMap.put(DBDef.PostgreSQL, createValueTypes());
+        {
+            final TnPlainValueTypes valueTypes = createValueTypes();
+            valueTypes.registerBasicValueType(java.util.Date.class, UTILDATE_AS_TIMESTAMP);
+            _valueTypesMap.put(DBDef.Oracle, valueTypes);
+        }
+        _valueTypesMap.put(DBDef.DB2, createValueTypes());
+        {
+            final TnPlainValueTypes valueTypes = createValueTypes();
+            valueTypes.registerBasicValueType(UUID.class, UUID_AS_STRING);
+            _valueTypesMap.put(DBDef.SQLServer, valueTypes);
+        }
+        _valueTypesMap.put(DBDef.H2, createValueTypes());
+        _valueTypesMap.put(DBDef.Derby, createValueTypes());
+        _valueTypesMap.put(DBDef.SQLite, createValueTypes());
+        _valueTypesMap.put(DBDef.FireBird, createValueTypes());
+        _valueTypesMap.put(DBDef.MSAccess, createValueTypes());
+        _valueTypesMap.put(DBDef.Unknown, createValueTypes());
     }
 
-    protected static volatile PhysicalConnectionDigger _physicalConnectionDigger = new DefaultPhysicalConnectionDigger();
+    protected static TnPlainValueTypes createValueTypes() {
+        return new TnPlainValueTypes();
+    }
 
-    public static class DefaultPhysicalConnectionDigger implements PhysicalConnectionDigger {
-        public Connection getConnection(Connection conn) throws SQLException {
-            if (conn instanceof NotClosingConnectionWrapper) {
-                conn = ((NotClosingConnectionWrapper) conn).getActualConnection();
+    protected static TnPlainValueTypes getValueTypes() {
+        final DBDef currentDBDef = ResourceContext.currentDBDef();
+        return findValueTypes(currentDBDef);
+    }
+
+    protected static TnPlainValueTypes findValueTypes(DBDef dbdef) {
+        assertObjectNotNull("dbdef", dbdef);
+        TnPlainValueTypes valueTypes = _valueTypesMap.get(dbdef);
+        if (valueTypes == null) {
+            synchronized (_valueTypesMap) {
+                valueTypes = new TnPlainValueTypes();
+                _valueTypesMap.put(dbdef, valueTypes);
             }
-            return conn;
         }
+        return valueTypes;
     }
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected TnValueTypes() {
+    private TnValueTypes() {
     }
 
     // ===================================================================================
@@ -212,11 +176,7 @@ public class TnValueTypes {
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public static ValueType findByTypeOrValue(Class<?> type, Object value) {
-        final ValueType byType = getValueType(type);
-        if (!isDefaultObject(byType)) {
-            return byType;
-        }
-        return getValueType(value);
+        return getValueTypes().findByTypeOrValue(type, value);
     }
 
     /**
@@ -227,16 +187,13 @@ public class TnValueTypes {
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public static ValueType findByValueOrJdbcDefType(Object value, int jdbcDefType) {
-        final ValueType byValue = getValueType(value);
-        if (!isDefaultObject(byValue)) {
-            return byValue;
-        }
-        return getValueType(jdbcDefType);
+        return getValueTypes().findByValueOrJdbcDefType(value, jdbcDefType);
     }
 
     // ===================================================================================
     //                                                                                 Get
     //                                                                                 ===
+    // basically for Framework
     // -----------------------------------------------------
     //                                               byValue
     //                                               -------
@@ -246,10 +203,7 @@ public class TnValueTypes {
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public static ValueType getValueType(Object value) {
-        if (value == null) {
-            return DEFAULT_OBJECT;
-        }
-        return getValueType(value.getClass());
+        return getValueTypes().getValueType(value);
     }
 
     // -----------------------------------------------------
@@ -265,44 +219,7 @@ public class TnValueTypes {
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public static ValueType getValueType(Class<?> type) {
-        if (type == null) {
-            return DEFAULT_OBJECT;
-        }
-        final boolean interfaceFirst = Enum.class.isAssignableFrom(type);
-        ValueType valueType = null;
-        if (interfaceFirst) {
-            valueType = getBasicInterfaceValueType(type);
-            if (valueType == null) {
-                valueType = getBasicObjectValueType(type);
-            }
-        } else {
-            valueType = getBasicObjectValueType(type);
-            if (valueType == null) {
-                valueType = getBasicInterfaceValueType(type);
-            }
-        }
-        return valueType != null ? valueType : DEFAULT_OBJECT;
-    }
-
-    protected static ValueType getBasicObjectValueType(Class<?> type) {
-        for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
-            final ValueType valueType = _basicObjectValueTypeMap.get(c);
-            if (valueType != null) {
-                return valueType;
-            }
-        }
-        return null;
-    }
-
-    protected static ValueType getBasicInterfaceValueType(Class<?> type) {
-        final Set<Entry<Class<?>, ValueType>> entrySet = _basicInterfaceValueTypeMap.entrySet();
-        for (Entry<Class<?>, ValueType> entry : entrySet) {
-            final Class<?> inf = entry.getKey();
-            if (inf.isAssignableFrom(type)) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        return getValueTypes().getValueType(type);
     }
 
     // -----------------------------------------------------
@@ -313,66 +230,7 @@ public class TnValueTypes {
      * @return The value type. (NotNull)
      */
     public static ValueType getValueType(int jdbcDefType) { // for no entity and so on
-        final Class<?> type = getType(jdbcDefType);
-        if (type.equals(Object.class)) {
-            // uses dynamic object
-            ValueType valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
-            if (valueType != null) {
-                return valueType;
-            } else {
-                synchronized (_dynamicObjectValueTypeMap) {
-                    valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
-                    if (valueType != null) {
-                        return valueType;
-                    }
-                    final ObjectType objectType = new ObjectType(jdbcDefType);
-                    _dynamicObjectValueTypeMap.put(jdbcDefType, objectType);
-                    return objectType;
-                }
-            }
-        } else {
-            return getValueType(type);
-        }
-    }
-
-    protected static Class<?> getType(int jdbcDefType) {
-        switch (jdbcDefType) {
-        case Types.TINYINT:
-            return Byte.class;
-        case Types.SMALLINT:
-            return Short.class;
-        case Types.INTEGER:
-            return Integer.class;
-        case Types.BIGINT:
-            return Long.class;
-        case Types.REAL:
-        case Types.FLOAT:
-            return Float.class;
-        case Types.DOUBLE:
-            return Double.class;
-        case Types.DECIMAL:
-        case Types.NUMERIC:
-            return BigDecimal.class;
-        case Types.DATE:
-            return java.sql.Date.class;
-        case Types.TIME:
-            return java.sql.Time.class;
-        case Types.TIMESTAMP:
-            return Timestamp.class;
-        case Types.BINARY:
-        case Types.BLOB:
-        case Types.VARBINARY:
-        case Types.LONGVARBINARY:
-            return BYTE_ARRAY_CLASS;
-        case Types.CHAR:
-        case Types.LONGVARCHAR:
-        case Types.VARCHAR:
-            return String.class;
-        case Types.BOOLEAN:
-            return Boolean.class;
-        default:
-            return Object.class;
-        }
+        return getValueTypes().getValueType(jdbcDefType);
     }
 
     // -----------------------------------------------------
@@ -383,67 +241,44 @@ public class TnValueTypes {
      * @return The value type. (Nullable)
      */
     public static ValueType getPluginValueType(String valueTypeName) {
-        assertObjectNotNull("valueTypeName", valueTypeName);
-        return _pluginValueTypeMap.get(valueTypeName);
+        return getValueTypes().getPluginValueType(valueTypeName);
     }
 
     // -----------------------------------------------------
     //                                               Default
     //                                               -------
     public static boolean isDefaultObject(ValueType valueType) {
-        if (valueType == null) {
-            return false;
-        }
-        if (!ObjectType.class.equals(valueType.getClass())) {
-            return false;
-        }
-        return ((ObjectType) valueType).isDefaultObject();
+        return getValueTypes().isDefaultObject(valueType);
     }
 
     public static boolean isDynamicObject(ValueType valueType) {
-        if (valueType == null) {
-            return false;
-        }
-        if (!ObjectType.class.equals(valueType.getClass())) {
-            return false;
-        }
-        return !((ObjectType) valueType).isDefaultObject(); // means dynamic
+        return getValueTypes().isDynamicObject(valueType);
     }
 
     // ===================================================================================
     //                                                                            Register
     //                                                                            ========
-    // *basically should be executed in application's initialization
+    // basically for Application initializer (and Framework)
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
     /**
-     * Register the basic value type.
+     * Register the basic value type (managed per DBMS).
+     * @param dbdef The definition of database. (NotNull)
      * @param keyType The key as type. (NotNull)
      * @param valueType The value type. (NotNull)
      */
-    public static synchronized void registerBasicValueType(Class<?> keyType, ValueType valueType) {
-        assertObjectNotNull("keyType", keyType);
-        assertObjectNotNull("valueType", valueType);
-        if (keyType.isInterface()) {
-            _basicInterfaceValueTypeMap.put(keyType, valueType);
-        } else {
-            _basicObjectValueTypeMap.put(keyType, valueType);
-        }
+    public static synchronized void registerBasicValueType(DBDef dbdef, Class<?> keyType, ValueType valueType) {
+        findValueTypes(dbdef).registerBasicValueType(keyType, valueType);
     }
 
     /**
-     * Remove the basic value type.
+     * Remove the basic value type (managed per DBMS).
+     * @param dbdef The definition of database. (NotNull)
      * @param keyType The key as type. (NotNull)
      */
-    public static synchronized void removeBasicValueType(Class<?> keyType) {
-        assertObjectNotNull("keyType", keyType);
-        if (_basicObjectValueTypeMap.containsKey(keyType)) {
-            _basicObjectValueTypeMap.remove(keyType);
-        }
-        if (_basicInterfaceValueTypeMap.containsKey(keyType)) {
-            _basicInterfaceValueTypeMap.remove(keyType);
-        }
+    public static synchronized void removeBasicValueType(DBDef dbdef, Class<?> keyType) {
+        findValueTypes(dbdef).removeBasicValueType(keyType);
     }
 
     // -----------------------------------------------------
@@ -451,48 +286,28 @@ public class TnValueTypes {
     //                                               -------
     /**
      * Register the plug-in value type.
+     * @param dbdef The definition of database. (NotNull)
      * @param keyName The key as name. (NotNull)
      * @param valueType The value type. (NotNull)
      */
-    public static synchronized void registerPluginValueType(String keyName, ValueType valueType) {
-        assertObjectNotNull("keyName", keyName);
-        assertObjectNotNull("valueType", valueType);
-        _pluginValueTypeMap.put(keyName, valueType);
+    public static synchronized void registerPluginValueType(DBDef dbdef, String keyName, ValueType valueType) {
+        findValueTypes(dbdef).registerPluginValueType(keyName, valueType);
     }
 
     /**
      * Remove the plug-in value type.
+     * @param dbdef The definition of database. (NotNull)
      * @param keyName The key as name. (NotNull)
      */
-    public static synchronized void removePluginValueType(String keyName) {
-        assertObjectNotNull("keyName", keyName);
-        _pluginValueTypeMap.remove(keyName);
+    public static synchronized void removePluginValueType(DBDef dbdef, String keyName) {
+        findValueTypes(dbdef).removePluginValueType(keyName);
     }
 
     // ===================================================================================
     //                                                                             Restore
     //                                                                             =======
-    protected static synchronized void restoreDefault() { // as unit test utility
-        _basicObjectValueTypeMap.clear();
-        _basicInterfaceValueTypeMap.clear();
-        _pluginValueTypeMap.clear();
-        _dynamicObjectValueTypeMap.clear();
-        initialize();
-    }
-
-    // ===================================================================================
-    //                                                                 Physical Connection
-    //                                                                 ===================
-    public static synchronized void registerPhysicalConnectionDigger(PhysicalConnectionDigger digger) {
-        assertObjectNotNull("digger", digger);
-        _physicalConnectionDigger = digger;
-    }
-
-    /**
-     * @return The instance of PhysicalConnectionDigger. (NotNull)
-     */
-    public static PhysicalConnectionDigger getPhysicalConnectionDigger() {
-        return _physicalConnectionDigger;
+    protected static synchronized void restoreDefault(DBDef dbdef) { // as unit test utility
+        findValueTypes(dbdef).restoreDefault();
     }
 
     // ===================================================================================
