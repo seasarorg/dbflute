@@ -147,6 +147,16 @@ public class DfProcedureColumnMetaInfo {
         return _columnHandler.isOracleCursor(dbTypeName);
     }
 
+    public boolean isOracleTable() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isOracleTable(dbTypeName);
+    }
+
+    public boolean isOracleVArray() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isOracleVArray(dbTypeName);
+    }
+
     public boolean isSQLServerUniqueIdentifier() {
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isSQLServerUniqueIdentifier(dbTypeName);

@@ -177,6 +177,8 @@ public class DfProcedurePmbSetupper {
         if (column.isOracleNumber()) {
             // Because the length setting of procedure parameter is unsupported on Oracle.
             propertyType = TypeMap.getDefaultDecimalJavaNativeType();
+        } else if (column.isOracleTable() || column.isOracleVArray()) {
+            propertyType = "java.util.List<String>"; // TODO jflute : getting element type from data dictionary
         } else {
             final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
             propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);

@@ -1,5 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DBDef;
@@ -10,10 +16,21 @@ import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.exception.IllegalDBFluteConfigAccessException;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
+import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
+import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.s2dao.valuetype.plugin.OracleArrayType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType;
 import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
+import org.seasar.dbflute.util.DfReflectionUtil;
+#if ($database.isTargetContainerSeasar())
+import org.seasar.extension.dbcp.ConnectionWrapper;
+#end
+#if ($database.isTargetContainerSpring())
+import org.springframework.jdbc.datasource.DataSourceUtils;
+#end
 
 /**
  * @author ${database.classAuthor}
@@ -57,6 +74,7 @@ public class ${glDBFluteConfig} {
     protected String _logDateFormat;
     protected String _logTimestampFormat;
     protected DataSourceHandler _dataSourceHandler;
+    protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected SqlClauseCreator _sqlClauseCreator;
     protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
@@ -86,17 +104,16 @@ public class ${glDBFluteConfig} {
     /**
      * Constructor.
      */
-    private ${glDBFluteConfig}() {
-        // adjusts default settings
+    private ${glDBFluteConfig}() { // adjusts default settings
+        _physicalConnectionDigger = createDefaultPhysicalConnectionDigger();
         if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
             //   o the DATE type of Oracle has seconds  
             //   o it uses a date literal of Oracle
             _logDateFormat = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
             _logTimestampFormat = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
-
             // adjusts UtilDate handling, which is basically for Oracle date that has time-parts.
-            TnValueTypes.registerBasicValueType(java.util.Date.class, getOracleUtilDateHandlingType());
+            TnValueTypes.registerBasicValueType(java.util.Date.class, createOracleUtilDateHandlingType());
         } else if (isCurrentDBDef(DBDef.SQLServer)) {
             // it should treat java.util.UUID as string,
             // because the UUID type of SQLServer cannot handle the type
@@ -104,7 +121,11 @@ public class ${glDBFluteConfig} {
         }
     }
 
-    private ValueType getOracleUtilDateHandlingType() {
+    private PhysicalConnectionDigger createDefaultPhysicalConnectionDigger() {
+        return new ImplementedPhysicalConnectionDigger();
+    }
+
+    private ValueType createOracleUtilDateHandlingType() {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
         // treats as uses Oracle date of database native JDBC to get best performances
         return new ImplementedOracleDateType();
@@ -113,16 +134,6 @@ public class ${glDBFluteConfig} {
         return TnValueTypes.UTILDATE_AS_TIMESTAMP;
 #end
     }
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
-
-    public static class ImplementedOracleDateType extends org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType {
-
-        @Override
-        protected Object toOracleDate(java.sql.Timestamp timestamp) {
-            return new oracle.sql.DATE(timestamp);
-        }
-    }
-#end
 
     // ===================================================================================
     //                                                                           Singleton
@@ -223,6 +234,28 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting dataSourceHandler: " + dataSourceHandler);
         }
         _dataSourceHandler = dataSourceHandler;
+    }
+
+    // [DBFlute-0.9.7.6]
+    // ===================================================================================
+    //                                                           PhysicalConnection Digger
+    //                                                           =========================
+    /**
+     * @return The digger of physical connection. (Nullable)
+     */
+    public PhysicalConnectionDigger getPhysicalConnectionDigger() {
+        return _physicalConnectionDigger;
+    }
+
+    /**
+     * @param physicalConnectionDigger The digger of physical connection. (Nullable)
+     */
+    public void setPhysicalConnectionDigger(PhysicalConnectionDigger physicalConnectionDigger) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting physicalConnectionDigger: " + physicalConnectionDigger);
+        }
+        _physicalConnectionDigger = physicalConnectionDigger;
     }
 
     // [DBFlute-0.9.6.4]
@@ -430,6 +463,19 @@ public class ${glDBFluteConfig} {
         TnValueTypes.removePluginValueType(keyName);
     }
 
+    /**
+     * Register the digger of physical connection. <br />
+     * This setting is shared by other DBFlute projects in the same class loader.
+     * @param physicalConnectionDigger The digger of physical connection. (NotNull)
+     */
+    public void registerPhysicalConnectionDigger(PhysicalConnectionDigger physicalConnectionDigger) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Registering physical connection digger: " + physicalConnectionDigger);
+        }
+        TnValueTypes.registerPhysicalConnectionDigger(physicalConnectionDigger);
+    }
+
     // ===================================================================================
     //                                                                  Configuration Lock
     //                                                                  ==================
@@ -465,4 +511,114 @@ public class ${glDBFluteConfig} {
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
         return ${glDBCurrent}.getInstance().isCurrentDBDef(currentDBDef);
     }
+
+    // ===================================================================================
+    //                                                                   Implemented Class
+    //                                                                   =================
+    protected static class SpringDBCPDataSourceHandler implements DataSourceHandler {
+
+        public Connection getConnection(DataSource ds) throws SQLException {
+            final Connection conn = getConnectionFromUtils(ds);
+            if (isConnectionTransactional(conn, ds)) {
+                return new NotClosingConnectionWrapper(conn);
+            } else {
+                return conn;
+            }
+        }
+
+        public Connection getConnectionFromUtils(DataSource ds) {
+#if ($database.isTargetContainerSpring())
+            return DataSourceUtils.getConnection(ds);
+#else
+            throw new UnsupportedOperationException("This method is only for Spring Framework.");
+#end
+        }
+
+        public boolean isConnectionTransactional(Connection conn, DataSource ds) {
+#if ($database.isTargetContainerSpring())
+            return DataSourceUtils.isConnectionTransactional(conn, ds);
+#else
+            throw new UnsupportedOperationException("This method is only for Spring Framework.");
+#end
+        }
+
+        @Override
+        public String toString() {
+            return "SpringDBCPDataSourceHandler(for Spring and Commons-DBCP)";
+        }
+    }
+
+    public static class ImplementedOracleArrayType extends OracleArrayType {
+
+        public ImplementedOracleArrayType(String arrayTypeName) {
+            super(arrayTypeName);
+        }
+
+        @Override
+        protected Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            Connection physConn = getOracleConnection(conn);
+            oracle.sql.ArrayDescriptor desc = oracle.sql.ArrayDescriptor.createDescriptor(arrayTypeName, physConn)
+            return new oracle.sql.ARRAY(desc, physConn, arrayValue);
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+
+        protected Connection getOracleConnection(Connection conn) throws SQLException {
+            return getPhysicalConnectionDigger().getConnection(conn);
+        }
+
+        protected PhysicalConnectionDigger getPhysicalConnectionDigger() {
+            return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
+        }
+    }
+
+    public static class ImplementedOracleDateType extends OracleDateType {
+
+        @Override
+        protected Object toOracleDate(Timestamp timestamp) {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            return new oracle.sql.DATE(timestamp);
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+    }
+
+    public static class ImplementedPhysicalConnectionDigger implements PhysicalConnectionDigger {
+
+        public Connection getConnection(Connection conn) throws SQLException {
+            if (conn instanceof NotClosingConnectionWrapper) {
+                conn = ((NotClosingConnectionWrapper) conn).getActualConnection();
+            }
+            conn = resolveS2DBCP(conn);
+            conn = resolveCommonsDBCP(conn);
+            return conn;
+        }
+
+        protected Connection resolveS2DBCP(Connection conn) {
+#if ($database.isTargetContainerSeasar())
+            if (conn instanceof ConnectionWrapper) {
+                conn = ((ConnectionWrapper)conn).getPhysicalConnection();
+            }
+#end
+            return conn;
+        }
+
+        protected Connection resolveCommonsDBCP(Connection conn) {
+            if ("org.apache.commons.dbcp.PoolingDataSource$PoolGuardConnectionWrapper".equals(conn.getClass().getName())) {
+                conn = getFieldConnection(conn, "delegate");
+            }
+            if ("org.apache.commons.dbcp.PoolableConnection".equals(conn.getClass().getName())) {
+                conn = getFieldConnection(conn, "_conn");
+            }
+            return conn;
+        }
+
+        protected Connection getFieldConnection(Connection conn, String fieldName) {
+            Field field = DfReflectionUtil.getWholeField(conn.getClass(), fieldName);
+            return (Connection) DfReflectionUtil.getValueForcedly(field, conn);
+        }
+    } 
 }

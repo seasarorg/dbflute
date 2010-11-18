@@ -317,6 +317,14 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return getJdbcTypeMapper().isOracleCursor(dbTypeName);
     }
 
+    public boolean isOracleTable(final String dbTypeName) {
+        return getJdbcTypeMapper().isOracleTable(dbTypeName);
+    }
+
+    public boolean isOracleVArray(final String dbTypeName) {
+        return getJdbcTypeMapper().isOracleVArray(dbTypeName);
+    }
+
     public boolean isSQLServerUniqueIdentifier(final String dbTypeName) {
         return getJdbcTypeMapper().isSQLServerUniqueIdentifier(dbTypeName);
     }
