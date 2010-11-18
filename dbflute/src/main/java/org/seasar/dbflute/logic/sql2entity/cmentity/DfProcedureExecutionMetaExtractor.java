@@ -108,7 +108,7 @@ public class DfProcedureExecutionMetaExtractor {
             conn.setAutoCommit(false);
             cs = conn.prepareCall(sql);
             final List<DfProcedureColumnMetaInfo> boundColumnList = DfCollectionUtil.newArrayList();
-            setupBindParameter(cs, columnList, testValueList, boundColumnList);
+            setupBindParameter(conn, cs, columnList, testValueList, boundColumnList);
             ResultSet rs = null;
 
             boolean executed;
@@ -122,7 +122,7 @@ public class DfProcedureExecutionMetaExtractor {
                     } catch (SQLException ignored) {
                     }
                     cs = conn.prepareCall(retrySql);
-                    setupBindParameter(cs, columnList, testValueList, boundColumnList);
+                    setupBindParameter(conn, cs, columnList, testValueList, boundColumnList);
                     executed = cs.execute();
                     _log.info("  (o) retry: " + retrySql);
                 } catch (SQLException ignored) {
@@ -368,8 +368,9 @@ public class DfProcedureExecutionMetaExtractor {
         return sb.toString();
     }
 
-    protected void setupBindParameter(CallableStatement cs, List<DfProcedureColumnMetaInfo> columnList,
-            List<Object> testValueList, List<DfProcedureColumnMetaInfo> boundColumnList) throws SQLException {
+    protected void setupBindParameter(Connection conn, CallableStatement cs,
+            List<DfProcedureColumnMetaInfo> columnList, List<Object> testValueList,
+            List<DfProcedureColumnMetaInfo> boundColumnList) throws SQLException {
         boundColumnList.clear();
         int index = 0;
         int testValueIndex = 0;
@@ -378,18 +379,18 @@ public class DfProcedureExecutionMetaExtractor {
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
             final int jdbcDefType = column.getJdbcDefType();
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                registerOutParameter(cs, paramIndex, jdbcDefType, column);
+                registerOutParameter(conn, cs, paramIndex, jdbcDefType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                bindObject(cs, paramIndex, jdbcDefType, testValueList.get(testValueIndex), column);
+                bindObject(conn, cs, paramIndex, jdbcDefType, testValueList.get(testValueIndex), column);
                 ++testValueIndex;
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
-                registerOutParameter(cs, paramIndex, jdbcDefType, column);
+                registerOutParameter(conn, cs, paramIndex, jdbcDefType, column);
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                registerOutParameter(cs, paramIndex, jdbcDefType, column);
-                bindObject(cs, paramIndex, jdbcDefType, testValueList.get(testValueIndex), column);
+                registerOutParameter(conn, cs, paramIndex, jdbcDefType, column);
+                bindObject(conn, cs, paramIndex, jdbcDefType, testValueList.get(testValueIndex), column);
                 ++testValueIndex;
                 boundColumnList.add(column);
             }
@@ -397,7 +398,7 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected void registerOutParameter(CallableStatement cs, int paramIndex, int jdbcDefType,
+    protected void registerOutParameter(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType,
             DfProcedureColumnMetaInfo column) throws SQLException {
         final ValueType valueType;
         {
@@ -415,7 +416,7 @@ public class DfProcedureExecutionMetaExtractor {
             }
         }
         try {
-            valueType.registerOutParameter(cs, paramIndex);
+            valueType.registerOutParameter(conn, cs, paramIndex);
         } catch (SQLException e) {
             String msg = buildOutParameterExceptionMessage(paramIndex, jdbcDefType, column, valueType);
             throw new DfJDBCException(msg, e);
@@ -433,7 +434,7 @@ public class DfProcedureExecutionMetaExtractor {
         return msg;
     }
 
-    protected void bindObject(CallableStatement cs, int paramIndex, int jdbcDefType, Object value,
+    protected void bindObject(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType, Object value,
             DfProcedureColumnMetaInfo column) throws SQLException {
         final ValueType valueType;
         {
@@ -445,7 +446,7 @@ public class DfProcedureExecutionMetaExtractor {
             }
         }
         try {
-            valueType.bindValue(cs, paramIndex, value);
+            valueType.bindValue(conn, cs, paramIndex, value);
         } catch (SQLException e) {
             String msg = buildBindingExceptionMessage(paramIndex, jdbcDefType, value, column, valueType);
             throw new DfJDBCException(msg, e);

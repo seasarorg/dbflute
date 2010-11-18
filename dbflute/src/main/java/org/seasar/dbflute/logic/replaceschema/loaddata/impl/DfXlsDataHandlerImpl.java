@@ -150,7 +150,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
                     ps = conn.prepareStatement(preparedSql);
                 }
-                doWriteDataRow(file, dataTable, dataRow, columnMetaInfoMap, columnNameList, ps);
+                doWriteDataRow(file, dataTable, dataRow, columnMetaInfoMap, columnNameList, conn, ps);
             }
             if (!_suppressBatchUpdate) {
                 ps.executeBatch();
@@ -219,8 +219,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap, List<String> columnNameList, PreparedStatement ps)
-            throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap, List<String> columnNameList, Connection conn,
+            PreparedStatement ps) throws SQLException {
         final String tableName = dataTable.getTableName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
@@ -253,7 +253,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // - - - - - - - - - - - - - - -
             // If the value is not null and the value has the own type except string,
             // It registers the value to statement by the type.
-            if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+            if (processNotNullNotString(tableName, columnName, obj, conn, ps, bindCount, columnMetaInfoMap)) {
                 bindCount++;
                 continue;
             }
@@ -262,7 +262,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // Process NotNull and StringExpression
             // - - - - - - - - - - - - - - - - - - -
             final String value = (String) obj;
-            processNotNullString(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+            processNotNullString(tableName, columnName, value, conn, ps, bindCount, columnMetaInfoMap);
             bindCount++;
         }
         if (_suppressBatchUpdate) {

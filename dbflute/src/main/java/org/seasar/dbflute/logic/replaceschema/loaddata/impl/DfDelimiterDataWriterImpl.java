@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -83,9 +84,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
         _log.info("writeData(" + _filename + ", " + _encoding + ")");
         _log.info("= = = = = = =/");
-        java.io.FileInputStream fis = null;
-        java.io.InputStreamReader ir = null;
-        java.io.BufferedReader br = null;
+        FileInputStream fis = null;
+        InputStreamReader ir = null;
+        BufferedReader br = null;
 
         String tableName = _filename.substring(_filename.lastIndexOf("/") + 1, _filename.lastIndexOf("."));
         if (tableName.indexOf("-") >= 0) {
@@ -103,6 +104,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         final List<String> additionalColumnList = new ArrayList<String>();
         final List<String> valueList = new ArrayList<String>();
 
+        Connection conn = null;
         PreparedStatement ps = null;
         try {
             fis = new FileInputStream(_filename);
@@ -170,8 +172,11 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
                     sqlBuilder.setConvertValueMap(_convertValueMap);
                     sqlBuilder.setDefaultValueMap(_defaultValueMap);
+                    if (conn == null) {
+                        conn = _dataSource.getConnection();
+                    }
                     if (ps == null) {
-                        ps = _dataSource.getConnection().prepareStatement(sqlBuilder.buildSql());
+                        ps = conn.prepareStatement(sqlBuilder.buildSql());
                     }
                     final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                     if (_loggingInsertSql) {
@@ -196,7 +201,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // - - - - - - - - - - - - - - -
                         // If the value is not null and the value has the own type except string,
                         // It registers the value to statement by the type.
-                        if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                        if (processNotNullNotString(tableName, columnName, obj, conn, ps, bindCount, columnMetaInfoMap)) {
                             bindCount++;
                             continue;
                         }
@@ -205,7 +210,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // Process NotNull and StringExpression
                         // - - - - - - - - - - - - - - - - - - -
                         final String value = (String) obj;
-                        processNotNullString(tableName, columnName, value, ps, bindCount, columnMetaInfoMap);
+                        processNotNullString(tableName, columnName, value, conn, ps, bindCount, columnMetaInfoMap);
                         bindCount++;
                     }
                     if (_suppressBatchUpdate) {
@@ -263,7 +268,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 try {
                     ps.close();
                 } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
+                    _log.info("Statement.close() threw the exception!", ignored);
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                    _log.info("Connection.close() threw the exception!", ignored);
                 }
             }
         }

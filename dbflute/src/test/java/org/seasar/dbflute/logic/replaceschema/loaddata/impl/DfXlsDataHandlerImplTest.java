@@ -15,7 +15,6 @@ import java.util.regex.PatternSyntaxException;
 import org.junit.Test;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 public class DfXlsDataHandlerImplTest extends PlainTestCase {
@@ -58,7 +57,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
         columnMetaInfoMap.put("foo", info);
 
         // ## Act ##
-        boolean actual = impl.processBoolean("tbl", "foo", "0", null, 0, columnMetaInfoMap);
+        boolean actual = impl.processBoolean("tbl", "foo", "0", null, null, 0, columnMetaInfoMap);
 
         // ## Assert ##
         log("actual=" + actual);
