@@ -571,6 +571,11 @@ public class ${glDBFluteConfig} {
 #end
         }
 
+        @Override
+        protected Object toStandardArray(Object oracleArray) throws SQLException {
+            return ((oracle.sql.ARRAY)oracleArray).getArray();
+        }
+
         protected Connection getOracleConnection(Connection conn) throws SQLException {
             return getPhysicalConnectionDigger().getConnection(conn);
         }
