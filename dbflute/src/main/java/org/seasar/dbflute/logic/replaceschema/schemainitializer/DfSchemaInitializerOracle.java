@@ -64,24 +64,11 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                       =============
     @Override
     protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        dropSequence(conn);
+        doDropSequence(conn);
     }
 
-    protected void dropSequence(Connection conn) {
+    protected void doDropSequence(Connection conn) {
         dropDataDictionaryObject(conn, "sequences", "sequence", "ALL_SEQUENCES", "SEQUENCE_OWNER", "SEQUENCE_NAME");
-    }
-
-    // ===================================================================================
-    //                                                                      Drop Procedure
-    //                                                                      ==============
-    @Override
-    protected void dropProcedure(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        super.dropProcedure(conn, tableMetaInfoList);
-        dropTypeObject(conn);
-    }
-
-    protected void dropTypeObject(Connection conn) {
-        dropDataDictionaryObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME");
     }
 
     // ===================================================================================
@@ -89,15 +76,27 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                        ============
     @Override
     protected void dropDBLink(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        dropDBLink(conn);
+        doDropDBLink(conn);
     }
 
     /**
      * Drop DB links that are private DB links. <br />
      * @param conn The connection to main schema. (NotNull)
      */
-    protected void dropDBLink(Connection conn) {
+    protected void doDropDBLink(Connection conn) {
         dropDataDictionaryObject(conn, "DB links", "database link", "ALL_DB_LINKS", "OWNER", "DB_LINK");
+    }
+
+    // ===================================================================================
+    //                                                                    Drop Type Object
+    //                                                                    ================
+    @Override
+    protected void dropTypeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        doDropTypeObject(conn);
+    }
+
+    protected void doDropTypeObject(Connection conn) {
+        dropDataDictionaryObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME");
     }
 
     // ===================================================================================

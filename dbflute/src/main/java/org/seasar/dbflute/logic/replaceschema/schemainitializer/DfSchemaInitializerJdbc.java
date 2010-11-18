@@ -189,6 +189,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         } else {
             _log.info("*Suppress dropping DB links");
         }
+        if (!_suppressTruncateTable || !_suppressDropProcedure) { // belongs to the two
+            dropTypeObject(conn, tableMetaInfoList);
+        } else {
+            _log.info("*Suppress dropping type objectss");
+        }
     }
 
     protected boolean isDropProcedureBeforeTable() {
@@ -507,6 +512,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                        Drop DB Link
     //                                                                        ============
     protected void dropDBLink(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        // override if it needs
+    }
+
+    // ===================================================================================
+    //                                                                    Drop Type Object
+    //                                                                    ================
+    protected void dropTypeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         // override if it needs
     }
 
