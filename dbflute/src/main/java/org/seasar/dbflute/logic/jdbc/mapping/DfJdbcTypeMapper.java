@@ -98,6 +98,7 @@ public class DfJdbcTypeMapper {
             }
         }
         // here means that it cannot determine by jdbcDefValue
+        // (jdbcDefValue is OTHER type)
 
         // * * * * * *
         // Priority 4
@@ -109,6 +110,8 @@ public class DfJdbcTypeMapper {
             return getVarcharJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "char")) {
             return getCharJdbcType();
+        } else if (containsIgnoreCase(dbTypeName, "number")) {
+            return getClobJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "timestamp")) {
             return getTimestampJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "datetime")) {
