@@ -24,8 +24,10 @@ import java.sql.Types;
 import java.util.Collection;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
+ * The type of Oracle's array for a property of collection type.
  * @author jflute
  */
 public abstract class OracleArrayType extends TnAbstractValueType {
@@ -47,19 +49,27 @@ public abstract class OracleArrayType extends TnAbstractValueType {
     //                                                                           Get Value
     //                                                                           =========
     public Object getValue(ResultSet rs, int index) throws SQLException {
-        return rs.getArray(index);
+        return toCollectionFromArray(rs.getArray(index));
     }
 
     public Object getValue(ResultSet rs, String columnName) throws SQLException {
-        return rs.getArray(columnName);
+        return toCollectionFromArray(rs.getArray(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getArray(index);
+        return toCollectionFromArray(cs.getArray(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getArray(parameterName);
+        return toCollectionFromArray(cs.getArray(parameterName));
+    }
+
+    protected Object toCollectionFromArray(Object value) throws SQLException {
+        if (value == null) {
+            return null;
+        }
+        Object[] array = (Object[]) toStandardArray(value);
+        return DfCollectionUtil.newArrayList(array);
     }
 
     // ===================================================================================
@@ -69,7 +79,7 @@ public abstract class OracleArrayType extends TnAbstractValueType {
         if (value == null) { // basically for insert and update
             setNull(ps, index);
         } else {
-            ps.setObject(index, toOracleArray(conn, _arrayTypeName, toArray(value)));
+            ps.setObject(index, toOracleArray(conn, _arrayTypeName, toArrayFromCollection(value)));
         }
     }
 
@@ -78,11 +88,11 @@ public abstract class OracleArrayType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setObject(parameterName, toOracleArray(conn, _arrayTypeName, toArray(value)));
+            cs.setObject(parameterName, toOracleArray(conn, _arrayTypeName, toArrayFromCollection(value)));
         }
     }
 
-    protected Object toArray(Object value) {
+    protected Object toArrayFromCollection(Object value) {
         if (value instanceof Collection<?>) {
             return ((Collection<?>) value).toArray();
         }
@@ -90,10 +100,23 @@ public abstract class OracleArrayType extends TnAbstractValueType {
     }
 
     // ===================================================================================
+    //                                                                       Out Parameter
+    //                                                                       =============
+    @Override
+    public void registerOutParameter(Connection conn, CallableStatement cs, int index) throws SQLException {
+        cs.registerOutParameter(index, getSqlType(), _arrayTypeName);
+    }
+
+    @Override
+    public void registerOutParameter(Connection conn, CallableStatement cs, String parameterName) throws SQLException {
+        cs.registerOutParameter(parameterName, getSqlType(), _arrayTypeName);
+    }
+
+    // ===================================================================================
     //                                                                       Oracle's Type
     //                                                                       =============
     /**
-     * Convert the array value to Oracle's array.
+     * Convert an array value to the Oracle's array.
      * @param conn The connection for the database. (NotNull)
      * @param arrayTypeName The name of array type for Oracle. (NotNull)
      * @param arrayValue The value of array. (NotNull) 
@@ -102,4 +125,12 @@ public abstract class OracleArrayType extends TnAbstractValueType {
      */
     protected abstract Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue)
             throws SQLException;
+
+    /**
+     * Convert the Oracle's array to a standard array.
+     * @param oracleArray The value of Oracle's array (oracle.sql.ARRAY). (NotNull) 
+     * @return The instance of standard array for the Oracle's array argument. (NotNull)
+     * @throws java.sql.SQLException
+     */
+    protected abstract Object toStandardArray(Object oracleArray) throws SQLException;
 }

@@ -35,9 +35,20 @@ public interface ValueType {
 
     Object getValue(CallableStatement cs, String parameterName) throws SQLException;
 
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     // *binding may need a connection
     //  (for example, Oracle ARRAY type needs its connection to bind)
+    // = = = = = = = = = =/
 
+    /**
+     * Bind the value. <br />
+     * Also used to procedures instead of bindValue(CallableStatement).
+     * @param conn The connection for the database. (NotNull)
+     * @param ps The prepared statement. (NotNull)
+     * @param index The parameter index.
+     * @param value The parameter value. (Nullable)
+     * @throws SQLException
+     */
     void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException;
 
     void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException;
@@ -46,5 +57,9 @@ public interface ValueType {
 
     void registerOutParameter(Connection conn, CallableStatement cs, String parameterName) throws SQLException;
 
+    /**
+     * The SQL type of JDBC.
+     * @return The integer definition of java.sql.Types.
+     */
     int getSqlType();
 }
