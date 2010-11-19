@@ -40,7 +40,7 @@ public abstract class OracleArrayType implements ValueType {
     protected final int _sqlType;
     protected final String _arrayTypeName;
     protected final Class<?> _elementType;
-    protected final Entity _elementEntityPrototype; // when element is STRUCT type
+    protected final Entity _entityPrototype; // when element is STRUCT type
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,9 +50,9 @@ public abstract class OracleArrayType implements ValueType {
         _arrayTypeName = arrayTypeName;
         _elementType = elementType;
         if (Entity.class.isAssignableFrom(elementType)) {
-            _elementEntityPrototype = (Entity) DfReflectionUtil.newInstance(elementType);
+            _entityPrototype = (Entity) DfReflectionUtil.newInstance(elementType);
         } else {
-            _elementEntityPrototype = null;
+            _entityPrototype = null;
         }
     }
 
