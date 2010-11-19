@@ -57,10 +57,14 @@ public abstract class AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
+    protected String getBasePointAliasName() {
+        return _sqlClause.getBasePointAliasName();
+    }
+
     protected String buildLocalTableAliasName() {
-        // this name must not contain "dflocal"
+        // this name must not contain the base point alias name
         // because the word is replaced later in mistake
-        return "dfsub" + _subQueryLevel + "local";
+        return "sub" + _subQueryLevel + "loc";
     }
 
     protected String buildPlainFromWhereClause(String selectClause, String tableAliasName) {

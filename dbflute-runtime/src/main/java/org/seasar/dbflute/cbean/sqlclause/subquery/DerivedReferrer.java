@@ -80,7 +80,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         {
             final String specifiedColumnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
             final ColumnRealName specifiedColumnRealName = _subQueryClause.getSpecifiedColumnRealNameAsOne();
-            if (!specifiedColumnRealName.getTableAliasName().equals(_subQueryClause.getBasePointAliasName())) {
+            if (!specifiedColumnRealName.getTableAliasName().equals(getBasePointAliasName())) {
                 // The column is on sub-query local table.
                 derivedColumnRealName = specifiedColumnRealName;
             } else {

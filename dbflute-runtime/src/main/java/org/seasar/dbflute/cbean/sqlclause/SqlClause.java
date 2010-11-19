@@ -90,6 +90,7 @@ public interface SqlClause {
      * You should handle UnionSelectClauseMark and UnionWhereClauseMark and UnionWhereFirstConditionMark
      * and WhereClauseMark and WhereFirstConditionMark in clause.
      * </p>
+     * @param localAlias The alias name for local table. (NotNull)
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
     String getClauseFromWhereWithWhereUnionTemplate();

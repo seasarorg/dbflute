@@ -1697,8 +1697,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String getBasePointAliasName() {
         // _forSubQuery is not needed here
         // because SubQuery brothers adjust alias names by themselves
-        // (for example, it replaces "dflocal" to "dfsublocal_x")
-        return "dflocal"; // fixed (being used for a long time)
+        // for example, it replaces this to sub-query alias name
+        // so this name should not be too simple
+        return "dfloc";
     }
 
     /**
@@ -1707,7 +1708,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
         // nestLevel is unused because relationPath has same role
         // (that was used long long ago)
-        return "df" + (_forSubQuery ? "sub" + subQueryLevel : "") + "relation" + relationPath;
+        return (_forSubQuery ? "sub" + subQueryLevel : "") + "dfrel" + relationPath;
     }
 
     /**

@@ -57,7 +57,7 @@ public class InScopeRelation extends AbstractSubQuery {
     }
 
     protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName) {
-        final String tableAliasName = _sqlClause.getBasePointAliasName();
+        final String tableAliasName = getBasePointAliasName();
         final String selectClause;
         {
             final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
