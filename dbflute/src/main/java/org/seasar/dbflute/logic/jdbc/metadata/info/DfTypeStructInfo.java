@@ -15,18 +15,19 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import org.seasar.dbflute.helper.StringKeyMap;
+
 /**
  * @author jflute
  * @since 0.9.7.6 (2010/11/18 Thursday)
  */
-public class DfTypeArrayInfo {
+public class DfTypeStructInfo {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String _typeName;
-    protected String _elementType;
-    protected DfColumnMetaInfo _structColumnInfoMap;
+    protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered();
 
     // ===================================================================================
     //                                                                            Accessor
@@ -39,19 +40,11 @@ public class DfTypeArrayInfo {
         this._typeName = typeName;
     }
 
-    public String getElementType() {
-        return _elementType;
+    public StringKeyMap<DfColumnMetaInfo> getAttributeInfoMap() {
+        return _attributeInfoMap;
     }
 
-    public void setElementType(String elementType) {
-        this._elementType = elementType;
-    }
-
-    public DfColumnMetaInfo getStructColumnInfoMap() {
-        return _structColumnInfoMap;
-    }
-
-    public void setStructColumnInfoMap(DfColumnMetaInfo structColumnInfoMap) {
-        this._structColumnInfoMap = structColumnInfoMap;
+    public void putAttributeInfo(DfColumnMetaInfo attributeInfo) {
+        _attributeInfoMap.put(attributeInfo.getColumnName(), attributeInfo);
     }
 }

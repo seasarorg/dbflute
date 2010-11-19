@@ -26,7 +26,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -42,12 +45,63 @@ public class DfStructExtractorOracle {
         _dataSource = dataSource;
     }
 
-    public Map<String, List<OracleStructAttributeInfo>> assistStructInfoMap(UnifiedSchema unifiedSchema) {
+    /**
+     * 
+     * @param unifiedSchema The unified schema. (NotNull)
+     * @return The map of struct info. {key=struct type name} (NotNull)
+     */
+    public Map<String, DfTypeStructInfo> assistStructInfoMap(UnifiedSchema unifiedSchema) {
+        final List<Map<String, String>> resultList = selectStructAttribute(unifiedSchema);
+        final Map<String, DfTypeStructInfo> structInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        for (Map<String, String> map : resultList) {
+            final String typeName = map.get("TYPE_NAME");
+            DfTypeStructInfo info = structInfoMap.get(typeName);
+            if (info == null) {
+                info = new DfTypeStructInfo();
+                structInfoMap.put(typeName, info);
+            }
+            info.setTypeName(typeName);
+            final DfColumnMetaInfo attributeInfo = new DfColumnMetaInfo();
+            final String attrName = map.get("ATTR_NAME");
+            if (Srl.is_Null_or_TrimmedEmpty(attrName)) {
+                continue;
+            }
+            attributeInfo.setColumnName(attrName);
+
+            // in review
+            //final String typeOwner = map.get("ATTR_TYPE_OWNER");
+
+            final String dbTypeName = map.get("ATTR_TYPE_NAME");
+            attributeInfo.setDbTypeName(dbTypeName);
+            final String length = map.get("LENGTH");
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(length)) {
+                attributeInfo.setColumnSize(Integer.valueOf(length));
+            } else {
+                final String precision = map.get("PRECISION");
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(precision)) {
+                    attributeInfo.setColumnSize(Integer.valueOf(precision));
+                }
+            }
+            final String scale = map.get("SCALE");
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(scale)) {
+                attributeInfo.setDecimalDigits(Integer.valueOf(scale));
+            }
+            info.putAttributeInfo(attributeInfo);
+        }
+        return structInfoMap;
+    }
+
+    protected List<Map<String, String>> selectStructAttribute(UnifiedSchema unifiedSchema) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("TYPE_NAME");
         columnList.add("ATTR_NAME");
+        columnList.add("ATTR_TYPE_OWNER");
         columnList.add("ATTR_TYPE_NAME");
+        columnList.add("LENGTH");
+        columnList.add("PRECISION");
+        columnList.add("SCALE");
+        columnList.add("ATTR_NO");
         final String sql = buildStructAttributeSql(unifiedSchema);
         final List<Map<String, String>> resultList;
         try {
@@ -56,23 +110,9 @@ public class DfStructExtractorOracle {
         } catch (Exception continued) {
             // because of assist info
             _log.info("Failed to select supplement info: " + continued.getMessage());
-            return DfCollectionUtil.newHashMap();
+            return DfCollectionUtil.emptyList();
         }
-        final Map<String, List<OracleStructAttributeInfo>> structInfoMap = StringKeyMap.createAsFlexibleOrdered();
-        for (Map<String, String> map : resultList) {
-            final String typeName = map.get("TYPE_NAME");
-            List<OracleStructAttributeInfo> infoList = structInfoMap.get(typeName);
-            if (infoList == null) {
-                infoList = DfCollectionUtil.newArrayList();
-                structInfoMap.put(typeName, infoList);
-            }
-            final OracleStructAttributeInfo info = new OracleStructAttributeInfo();
-            info.setTypeName(typeName);
-            info.setAttrName(map.get("ATTR_NAME"));
-            info.setAttrTypeName(map.get("ATTR_TYPE_NAME"));
-            infoList.add(info);
-        }
-        return structInfoMap;
+        return resultList;
     }
 
     protected String buildStructAttributeSql(UnifiedSchema unifiedSchema) {
@@ -86,35 +126,5 @@ public class DfStructExtractorOracle {
         sb.append(")");
         sb.append(" order by TYPE_NAME, ATTR_NO");
         return sb.toString();
-    }
-
-    public static class OracleStructAttributeInfo {
-        protected String _typeName;
-        protected String _attrName;
-        protected String _attrTypeName;
-
-        public String getTypeName() {
-            return _typeName;
-        }
-
-        public void setTypeName(String typeName) {
-            this._typeName = typeName;
-        }
-
-        public String getAttrName() {
-            return _attrName;
-        }
-
-        public void setAttrName(String attrName) {
-            this._attrName = attrName;
-        }
-
-        public String getAttrTypeName() {
-            return _attrTypeName;
-        }
-
-        public void setAttrTypeName(String attrTypeName) {
-            this._attrTypeName = attrTypeName;
-        }
     }
 }

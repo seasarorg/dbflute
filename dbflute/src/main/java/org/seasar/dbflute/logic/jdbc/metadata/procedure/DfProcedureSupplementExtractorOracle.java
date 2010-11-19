@@ -34,7 +34,7 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.7.6 (2010/11/18 Thursday)
  */
-public class DfProcedureSupplementExtractorOracle {
+public class DfProcedureSupplementExtractorOracle implements DfProcedureSupplementExtractor {
 
     private static final Log _log = LogFactory.getLog(DfProcedureSupplementExtractorOracle.class);
 
