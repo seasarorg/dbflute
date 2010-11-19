@@ -73,6 +73,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
             final Map<String, DfProcedureMetaInfo> procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
             final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>();
             final DfProcedureHandler procedureHandler = new DfProcedureHandler();
+            procedureHandler.suppressLogging();
             for (UnifiedSchema unifiedSchema : _targetSchemaList) {
                 // get new procedure list because different instances is needed at this process
                 procedureList.addAll(procedureHandler.getPlainProcedureList(_dataSource, metaData, unifiedSchema));

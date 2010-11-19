@@ -68,6 +68,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                           =========
     protected boolean _suppressAdditionalSchema;
     protected boolean _suppressFilterByProperty;
+    protected boolean _suppressLogging;
     protected DataSource _procedureSynonymDataSource;
 
     // ===================================================================================
@@ -179,13 +180,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         if (handlingType.equals(ProcedureSynonymHandlingType.INCLUDE)) {
             // only add procedure synonyms to the procedure list
         } else if (handlingType.equals(ProcedureSynonymHandlingType.SWITCH)) {
-            _log.info("...Clearing normal procedures: count=" + procedureList.size());
+            log("...Clearing normal procedures: count=" + procedureList.size());
             procedureList.clear(); // because of switch
         } else {
             String msg = "Unexpected handling type of procedure sysnonym: " + handlingType;
             throw new IllegalStateException(msg);
         }
-        _log.info("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
+        log("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
         final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
         final List<DfProcedureMetaInfo> procedureSynonymList = new ArrayList<DfProcedureMetaInfo>();
         for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
@@ -198,7 +199,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final String beforeName = metaInfo.getProcedureMetaInfo().buildProcedureLoggingName();
             final DfProcedureMetaInfo mergedProcedure = metaInfo.createMergedProcedure();
             final String afterName = mergedProcedure.buildProcedureLoggingName();
-            _log.info("  " + beforeName + " to " + afterName);
+            log("  " + beforeName + " to " + afterName);
 
             procedureSynonymList.add(mergedProcedure);
         }
@@ -235,19 +236,19 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
         final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
-        _log.info("...Filtering procedures by the property: before=" + procedureList.size());
+        log("...Filtering procedures by the property: before=" + procedureList.size());
         int passedCount = 0;
         for (DfProcedureMetaInfo metaInfo : procedureList) {
             final String procedureLoggingName = metaInfo.buildProcedureLoggingName();
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
-                _log.info("  passed: non-target catalog - " + procedureLoggingName);
+                log("  passed: non-target catalog - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
             final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
-                _log.info("  passed: non-target schema - " + procedureLoggingName);
+                log("  passed: non-target schema - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
@@ -257,14 +258,14 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (!outsideSqlProperties.isTargetProcedureName(procedureFullQualifiedName)
                     && !outsideSqlProperties.isTargetProcedureName(procedureSchemaQualifiedName)
                     && !outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                _log.info("  passed: non-target name - " + procedureLoggingName);
+                log("  passed: non-target name - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
             resultList.add(metaInfo);
         }
         if (passedCount == 0) {
-            _log.info("  -> All procedures are target: count=" + procedureList.size());
+            log("  -> All procedures are target: count=" + procedureList.size());
         }
         return resultList;
     }
@@ -315,7 +316,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         } else {
             msg = msg + " elect=" + secondName + secondType + " skipped=" + firstName + firstType;
         }
-        _log.info(msg);
+        log(msg);
     }
 
     // ===================================================================================
@@ -373,6 +374,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final Map<String, Integer> overloadInfoMap = extractor.extractOverloadInfoMap(unifiedSchema);
         final Map<String, DfTypeArrayInfo> arrayInfoMap = extractor.extractArrayInfoMap(unifiedSchema);
         final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
+        final List<DfTypeArrayInfo> resolvedArrayInfoList = new ArrayList<DfTypeArrayInfo>();
+        final List<DfTypeStructInfo> resolvedStructInfoList = new ArrayList<DfTypeStructInfo>();
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
             final String catalog = metaInfo.getProcedureCatalog();
             final String procedureName = metaInfo.getProcedureName();
@@ -390,18 +393,31 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 // Array
                 final DfTypeArrayInfo arrayInfo = arrayInfoMap.get(key);
                 if (arrayInfo != null) {
-                    final String typeName = arrayInfo.getTypeName();
-                    final String elementType = arrayInfo.getElementType();
-                    _log.info("...Resolving array type: " + key + " -> " + typeName + " (" + elementType + ")");
+                    resolvedArrayInfoList.add(arrayInfo);
                     columnInfo.setTypeArrayInfo(arrayInfo);
                 }
 
                 // Struct
                 final String dbTypeName = columnInfo.getDbTypeName();
-                final DfTypeStructInfo structInfo = structInfoMap.get(dbTypeName);
+                // filter because STRUCT type might have its schema prefix
+                final DfTypeStructInfo structInfo = structInfoMap.get(Srl.substringFirstRear(dbTypeName, "."));
                 if (structInfo != null) {
+                    resolvedStructInfoList.add(structInfo);
                     columnInfo.setTypeStructInfo(structInfo);
                 }
+            }
+        }
+        if (!resolvedArrayInfoList.isEmpty()) {
+            log("Resolved array type: " + resolvedArrayInfoList.size());
+            for (DfTypeArrayInfo arrayInfo : resolvedArrayInfoList) {
+                log(" - " + arrayInfo.getTypeName() + "<" + arrayInfo.getElementType() + ">"
+                        + (arrayInfo.hasStructInfo() ? " (struct)" : ""));
+            }
+        }
+        if (!resolvedStructInfoList.isEmpty()) {
+            log("Resolved struct type: " + resolvedStructInfoList.size());
+            for (DfTypeStructInfo structInfo : resolvedStructInfoList) {
+                log(" - " + structInfo.getTypeName() + "(" + structInfo.getAttributeInfoMap().size() + ")");
             }
         }
     }
@@ -534,7 +550,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                     // for example, SQLServer throws an exception
                     // if the procedure is a function that returns table type
                     final String procdureName = procedureMetaInfo.getProcedureFullQualifiedName();
-                    _log.info("*Failed to get data type: " + procdureName + "." + columnName);
+                    log("*Failed to get data type: " + procdureName + "." + columnName);
                     tmpJdbcType = Types.OTHER;
                 }
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(dataType)) {
@@ -652,7 +668,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             // It is a precondition that PostgreSQL does not allow functions to have a result set return
             // when it also has result set parameters (as an out parameter).
             String name = procedureMetaInfo.buildProcedureLoggingName() + "." + resultSetReturnName;
-            _log.info("...Removing the result set return which is unnecessary: " + name);
+            log("...Removing the result set return which is unnecessary: " + name);
             columnMetaInfoList.remove(resultSetReturnIndex);
         }
     }
@@ -679,6 +695,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
     }
 
+    protected void log(String msg) {
+        if (_suppressLogging) {
+            return;
+        }
+        _log.info(msg);
+    }
+
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
@@ -688,6 +711,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     public void suppressFilterByProperty() {
         _suppressFilterByProperty = true;
+    }
+
+    public void suppressLogging() {
+        _suppressLogging = true;
     }
 
     public void includeProcedureSynonym(DataSource dataSource) {

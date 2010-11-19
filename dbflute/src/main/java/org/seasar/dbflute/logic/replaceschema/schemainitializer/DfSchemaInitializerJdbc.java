@@ -411,6 +411,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected void dropProcedure(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         final DfProcedureHandler handler = new DfProcedureHandler();
         handler.suppressAdditionalSchema();
+        handler.suppressLogging();
         DatabaseMetaData metaData;
         try {
             metaData = conn.getMetaData();
