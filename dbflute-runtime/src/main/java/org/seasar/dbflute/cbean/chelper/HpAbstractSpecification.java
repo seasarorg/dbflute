@@ -17,7 +17,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                           Attribute
     //                                                                           =========
     protected final ConditionBean _baseCB;
-    protected final HpSpQyCall<CQ> _qyCall; // not final because it may be switched
+    protected final HpSpQyCall<CQ> _qyCall;
     protected HpSpQyCall<CQ> _syncQyCall;
     protected final HpCBPurpose _purpose;
     protected final DBMetaProvider _dbmetaProvider;
