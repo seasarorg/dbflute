@@ -80,7 +80,7 @@ namespace ${glPackageBaseCB} {
         }
 
         protected virtual ${myConditionQueryClassName} CreateLocalCQ() {
-            return xcreateCQ(null, this.SqlClause, this.SqlClause.getLocalTableAliasName(), 0);
+            return xcreateCQ(null, this.SqlClause, this.SqlClause.getBasePointAliasName(), 0);
         }
 
         protected virtual ${myConditionQueryClassName} xcreateCQ(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
@@ -208,12 +208,13 @@ namespace ${glPackageBaseCB} {
         //                                                                    Purpose Type
         //                                                                    ============
         public void xsetupForColumnQuery(${myConditionBeanClassName} baseCB) {
+            xinheritSubQueryInfo(baseCB.LocalCQ);
             //xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
             _forColumnQuery = true; // old style
 
             // inherits a parent query to synchronize real name
             // (and also for suppressing query check) 
-            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall(baseCB));
+            Specify().xsetSyncQyCall(new ${myConditionBeanClassName}ColQySpQyCall(baseCB));
         }
     }
 
@@ -253,8 +254,8 @@ namespace ${glPackageBaseCB} {
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #if ($fk.hasLocalColumnExceptPrimaryKey())
-            if (_qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()
-                    || _qyCall.qy().xgetReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
+            if (qyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}()
+                    || qyCall().qy().xgetReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
 #foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
                 Column${col.javaName}(); // FK or one-to-one referrer
@@ -272,7 +273,11 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery); }
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery);
+                if (xhasSyncQyCall()) // inherits it
+                { _${tmpPropertyName}.xsetSyncQyCall(new ${tmpPropertyNameInitCap}SpQyCall(xsyncQyCall())); }
+            }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
@@ -293,7 +298,11 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery); }
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery);
+                if (xhasSyncQyCall()) // inherits it
+                { _${tmpPropertyName}.xsetSyncQyCall(new ${tmpPropertyNameInitCap}SpQyCall(xsyncQyCall())); }
+            }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
@@ -310,7 +319,9 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         public RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> Derived${tmpPropertyNameInitCap}() {
-            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), delegate(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) { cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); });
+            if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), delegate(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName)
+                { cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); });
         }
 #end
 #end

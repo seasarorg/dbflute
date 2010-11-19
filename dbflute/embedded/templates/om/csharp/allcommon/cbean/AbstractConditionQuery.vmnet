@@ -119,6 +119,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 	    return _subQueryLevel;
 	}
 
+    public void xsetSubQueryLevel(int subQueryLevel) {
+        _subQueryLevel = subQueryLevel;
+    }
+
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
@@ -576,7 +580,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
@@ -594,7 +597,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected virtual String getInScopeSubQuerySql(${glConditionQuery} subQuery
                                  , String relatedColumnName, String propertyName) {
-        String tableAliasName = xgetSqlClause().getLocalTableAliasName();
+        String tableAliasName = xgetSqlClause().getBasePointAliasName();
         String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
         String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                  , selectClause, tableAliasName);
@@ -620,7 +623,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
         existsOption = existsOption != null ? existsOption + " " : "";
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
@@ -659,7 +661,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("DerivedReferrerSubQuery(function)", function);
         assertObjectNotNull("DerivedReferrerSubQuery(" + columnName + ")", subQuery);
         String realColumnName = getSpecifyDerivedReferrerRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName
                                                                    , relatedColumnName, propertyName, aliasName);
         int subQueryLevel = subQuery.xgetSubQueryLevel();
@@ -814,7 +815,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
         assertObjectNotNull("QueryDerivedReferrer(" + columnName + ")", subQuery);
         String realColumnName = getQueryDerivedReferrerRealColumnName(columnName);
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName
                                                                  , relatedColumnName, propertyName, value);
         int subQueryLevel = subQuery.xgetSubQueryLevel();
@@ -1148,7 +1148,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             deriveRealColumnName = getScalarSubQueryRealColumnName(deriveColumnName);
         }
 
-        xincrementLocalSubQueryLevelIfNeeds(subQuery);
         String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
         int subQueryLevel = subQuery.xgetSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
@@ -1312,7 +1311,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         // (Override base alias name at sub-query on SQL)
         // So if the argument 'tableAliasName' is not null, replace it. 
         if (tableAliasName != null) {
-            fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+            fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getBasePointAliasName(), tableAliasName);
         }
 
         // Resolve the location path for the condition-query of sub-query. 
@@ -1334,7 +1333,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String fromWhereClause = subQuery.xgetSqlClause().getClauseFromWhereWithWhereUnionTemplate();
 
         // Replace the alias names for local table with alias name of sub-query unique. 
-        fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);
+        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getBasePointAliasName(), tableAliasName);
         
         // Resolve the location path for the condition-query of sub-query. 
         fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + xgetLocationBase(propertyName) + ".");
@@ -1349,13 +1348,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
         fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return fromWhereClause;
-    }
-
-    protected void xincrementLocalSubQueryLevelIfNeeds(${glConditionQuery} subQuery) { // Very Internal
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
-        if (_subQueryLevel <= subQueryLevel) {
-            _subQueryLevel = subQueryLevel + 1;
-        }
     }
 
     protected String xbuildFunctionConnector(String function) {
@@ -1548,11 +1540,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                                                       Name Resolver
     //                                                                       =============
     protected String resolveJoinAliasName(String relationPath, int nestLevel) {
-        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
-    }
-
-    protected String resolveNestLevelExpression(String name) {
-        return xgetSqlClause().resolveNestLevelExpression(name, xgetNestLevel());
+        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel, _subQueryLevel);
     }
 
 	protected String resolveNextRelationPath(String tableName, String relationPropertyName) {

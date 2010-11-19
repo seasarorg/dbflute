@@ -24,7 +24,8 @@ public interface ${glConditionQuery} {
     int xgetNestLevel();
     int xgetNextNestLevel();
     bool isBaseQuery();
-	int xgetSubQueryLevel();
+    int xgetSubQueryLevel();
+    void xsetSubQueryLevel(int subQueryLevel);
 	String xgetForeignPropertyName();
     String xgetRelationPath();
     String xgetLocationBase();

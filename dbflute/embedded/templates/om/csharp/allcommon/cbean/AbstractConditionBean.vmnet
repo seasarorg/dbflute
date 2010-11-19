@@ -26,11 +26,11 @@ namespace ${glPackageBaseCommonCBean} {
     
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
         protected bool _forUnion;
-        protected bool _forExistsSubQuery;
-        protected bool _forInScopeSubQuery;
+        protected bool _forExistsReferrer;
+        protected bool _forInScopeRelation;
         protected bool _forDerivedReferrer;
         protected bool _forScalarSelect;
-        protected bool _forScalarSubQuery;
+        protected bool _forScalarCondition;
         protected bool _forColumnQuery;
 
         // ===============================================================================
@@ -318,24 +318,22 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                    Purpose Type
         //                                                                    ============
         public void xsetupForUnion(${ConditionBean} baseCB) {
-            if (baseCB.SqlClause.isForSubQuery()) {
-                this.SqlClause.setupForSubQuery(); // inherits it
-            }
+            xinheritSubQueryInfo(baseCB.LocalCQ);
             _forUnion = true;
         }
 
-        public void xsetupForExistsSubQuery() {
-            this.SqlClause.setupForSubQuery();
-            _forExistsSubQuery = true;
+        public void xsetupForExistsReferrer(${glConditionQuery} baseCQ) {
+            xprepareSubQueryInfo(baseCQ);
+            _forExistsReferrer = true;
         }
 
-        public void xsetupForInScopeSubQuery() {
-            this.SqlClause.setupForSubQuery();
-            _forInScopeSubQuery = true;
+        public void xsetupForInScopeRelation(${glConditionQuery} baseCQ) {
+            xprepareSubQueryInfo(baseCQ);
+            _forInScopeRelation = true;
         }
 
-        public void xsetupForDerivedReferrer() {
-            this.SqlClause.setupForSubQuery();
+        public void xsetupForDerivedReferrer(${glConditionQuery} baseCQ) {
+            xprepareSubQueryInfo(baseCQ);
             _forDerivedReferrer = true;
         }
 
@@ -343,9 +341,22 @@ namespace ${glPackageBaseCommonCBean} {
             _forScalarSelect = true;
         }
 
-        public void xsetupForScalarSubQuery() {
+        public void xsetupForScalarCondition(${glConditionQuery} baseCQ) {
+            xprepareSubQueryInfo(baseCQ);
+            _forScalarCondition = true;
+        }
+
+        protected void xinheritSubQueryInfo(${glConditionQuery} baseCQ) {
+            if (baseCQ.xgetSqlClause().isForSubQuery()) { // inherits it
+                this.LocalCQ.xsetSubQueryLevel(baseCQ.xgetSubQueryLevel());
+                this.SqlClause.setupForSubQuery();
+            }
+        }
+
+        protected void xprepareSubQueryInfo(${glConditionQuery} baseCQ) {
+            int nextSubQueryLevel = baseCQ.xgetSubQueryLevel() + 1;
+            this.LocalCQ.xsetSubQueryLevel(nextSubQueryLevel);
             this.SqlClause.setupForSubQuery();
-            _forScalarSubQuery = true;
         }
 
         // ===============================================================================
@@ -441,9 +452,10 @@ namespace ${glPackageBaseCommonCBean} {
     public abstract class AbstractSpecification<CQ> where CQ : ${glConditionQuery} {
         protected ${glConditionBean} _baseCB;
         protected SpQyCall<CQ> _qyCall;
+        protected HpSpQyCall<CQ> _syncQyCall;
         protected bool _forDerivedReferrer;
         protected bool _forScalarSelect;
-        protected bool _forScalarSubQuery;
+        protected bool _forScalarCondition;
         protected bool _forColumnQuery;
         protected CQ _query;
         protected bool _alreadySpecifiedRequiredColumn;
@@ -454,13 +466,15 @@ namespace ${glPackageBaseCommonCBean} {
             _qyCall = qyCall;
             _forDerivedReferrer = forDerivedReferrer;
             _forScalarSelect = forScalarSelect;
-            _forScalarSubQuery = forScalarSubQuery;
+            _forScalarCondition = forScalarSubQuery;
             _forColumnQuery = forColumnQuery;
         }
 
         protected void doColumn(String columnName) {
             assertColumn(columnName);
-            if (_query == null) { _query = _qyCall.qy(); }
+            if (_query == null) {
+                _query = qyCall().qy();
+            }
             if (isRequiredColumnSpecificationEnabled()) {
                 _alreadySpecifiedRequiredColumn = true;
                 doSpecifyRequiredColumn();
@@ -468,18 +482,15 @@ namespace ${glPackageBaseCommonCBean} {
             String relationPath = _query.xgetRelationPath() != null ? _query.xgetRelationPath() : "";
             String tableAliasName;
             if (_query.isBaseQuery()) {
-                tableAliasName = _baseCB.SqlClause.getLocalTableAliasName();
+                tableAliasName = _baseCB.SqlClause.getBasePointAliasName();
             } else {
-                tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel());
+                tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel(), _query.xgetSubQueryLevel());
             }
             _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
         }
 
-        protected void assertColumn(String columnName) {
-            if (isNormalUse()) {
-                if (_query == null && !_qyCall.has())
-                { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
-            }
+        protected HpSpQyCall<CQ> qyCall() { // basically for SpecifyColumn (NOT DerivedReferrer)
+            return _syncQyCall != null ? _syncQyCall : _qyCall;
         }
 
         protected bool isRequiredColumnSpecificationEnabled() {
@@ -489,19 +500,42 @@ namespace ${glPackageBaseCommonCBean} {
             return isNormalUse();
         }
 
-        protected void assertForeign(String foreignPropertyName) {
-            if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
-            if (_forScalarSelect) { throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName); }
-            if (_forScalarSubQuery) { throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName); }
+        protected abstract void doSpecifyRequiredColumn();
+        protected abstract String getTableDbName();
+
+        public bool IsAlreadySpecifiedRequiredColumn { get {
+            return _alreadySpecifiedRequiredColumn;
+        }}
+
+        public HpSpQyCall<CQ> xsyncQyCall() {
+            return _syncQyCall;
+        }
+
+        public void xsetSyncQyCall(SpQyCall<CQ> qyCall) {
+            _qyCall = qyCall;
+        }
+
+        public bool xhasSyncQyCall() {
+            return _syncQyCall != null;
+        }
+
+        protected void assertColumn(String columnName) {
+            if (isNormalUse()) {
+                if (_query == null && !_qyCall.has())
+                { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+            }
         }
 
         protected bool isNormalUse() {
-            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_forColumnQuery;
+            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarCondition && !_forColumnQuery;
         }
 
-        protected abstract void doSpecifyRequiredColumn();
-        protected abstract String getTableDbName();
-        
+        protected void assertForeign(String foreignPropertyName) {
+            if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forScalarSelect) { throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forScalarCondition) { throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName); }
+        }
+
         protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -603,18 +637,6 @@ namespace ${glPackageBaseCommonCBean} {
 
         protected String ln() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
-        }
-
-        public bool IsAlreadySpecifiedRequiredColumn { get {
-            return _alreadySpecifiedRequiredColumn;
-        }}
-
-        public void xswitchQyCall(SpQyCall<CQ> qyCall) {
-            if (qyCall == null) {
-                String msg = "The argument 'qyCall' should not be null.";
-                throw new SystemException(msg);
-            }
-            _qyCall = qyCall;
         }
     }
 

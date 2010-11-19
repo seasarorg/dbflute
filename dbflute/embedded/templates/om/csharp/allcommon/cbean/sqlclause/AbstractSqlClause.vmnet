@@ -34,6 +34,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
     /** The DB meta of table. */
     protected ${glDBMeta} _dbmeta;
 
+    /** Is this SQL for sub-query? (for example, used by alias name adjustment) */
+    protected bool _forSubQuery;
+
     // -----------------------------------------------------
     //                                       Clause Resource
     //                                       ---------------
@@ -306,7 +309,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public String getSelectClause() {
         // [DBFlute-0.8.6]
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
-            return buildSelectClauseCountOrScalar(getLocalTableAliasName());
+            return buildSelectClauseCountOrScalar(getBasePointAliasName());
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
@@ -318,7 +321,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         // [DBFlute-0.7.4]
         Map<String, String> localSpecifiedMap = null;
         if (_specifiedSelectColumnMap != null) {
-            localSpecifiedMap = _specifiedSelectColumnMap.get(getLocalTableAliasName());
+            localSpecifiedMap = _specifiedSelectColumnMap.get(getBasePointAliasName());
         }
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
@@ -356,7 +359,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 sb.append(" ");
                 needsDelimiter = true;
             }
-            String realColumnName = getLocalTableAliasName() + "." + columnName;
+            String realColumnName = getBasePointAliasName() + "." + columnName;
             String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
@@ -568,9 +571,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         String tableSqlName = getDBMeta().TableSqlName;
         if (_baseTableInlineWhereList.isEmpty()) {
-            sb.append(tableSqlName).append(" ").append(getLocalTableAliasName());
+            sb.append(tableSqlName).append(" ").append(getBasePointAliasName());
         } else {
-            sb.append(getInlineViewClause(tableSqlName, _baseTableInlineWhereList)).append(" ").append(getLocalTableAliasName());
+            sb.append(getInlineViewClause(tableSqlName, _baseTableInlineWhereList)).append(" ").append(getBasePointAliasName());
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -1818,42 +1821,25 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public abstract ${glSqlClause} lockForUpdate();
     
     // ===================================================================================
-    //                                                                            Resolver
-    //                                                                            ========
-    public String resolveJoinAliasName(String relationPath, int cqNestNo) {
-        return resolveNestLevelExpression("dfrelation" + relationPath, cqNestNo);
+    //                                                                    Table Alias Info
+    //                                                                    ================
+    public String getBasePointAliasName() {
+        // _forSubQuery is not needed here
+        // because SubQuery brothers adjust alias names by themselves
+        // (for example, it replaces "dflocal" to "dfsublocal_x")
+        return "dflocal"; // fixed (being used for a long time)
     }
 
-    public String resolveNestLevelExpression(String name, int cqNestNo) {
-        // if (cqNestNo > 1) {
-        //     return name + "_n" + cqNestNo;
-        // } else {
-        //     return name;
-        // }
-        return name;
+    public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
+        // nestLevel is unused because relationPath has same role
+        // (that was used long long ago)
+        return "df" + (_forSubQuery ? "sub" + subQueryLevel : "") + "relation" + relationPath;
     }
 
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
          ${glDBMeta} dbmeta = findDBMeta(localTableName);
          ${glForeignInfo} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
         return foreignInfo.RelationNo;
-    }
-
-    // ===================================================================================
-    //                                                                    Table Alias Info
-    //                                                                    ================
-    public String getLocalTableAliasName() {
-        // _forSubQuery is not needed here
-        // because SubQuery brothers adjust alias names by themselves
-        // (for example, it replaces "dflocal" to "dfsublocal_x")
-        return "dflocal";
-    }
-    
-    public String getForeignTableAliasPrefix() {
-        // it doesn't use CB purpose type
-        // because, for example, union query is not sub-query
-        // but it can be used in sub-query
-        return _forSubQuery ? "dfsubrelation" : "dfrelation";
     }
 
     // ===================================================================================
@@ -2139,7 +2125,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (columnParameterMap.isEmpty()) {
             return null;
         }
-        String aliasName = getLocalTableAliasName();
+        String aliasName = getBasePointAliasName();
         ${glDBMeta} dbmeta = getDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryUpdate() should have only one primary key:";
@@ -2193,7 +2179,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     public String getClauseQueryDelete() {
-        String aliasName = getLocalTableAliasName();
+        String aliasName = getBasePointAliasName();
         ${glDBMeta} dbmeta = getDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryDelete() should have only one primary key:";

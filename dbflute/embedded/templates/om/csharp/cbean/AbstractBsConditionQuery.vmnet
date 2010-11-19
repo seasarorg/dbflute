@@ -104,7 +104,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void Exists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
@@ -126,7 +126,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void NotExists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
@@ -140,7 +140,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
         public void InScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
         }
@@ -161,7 +161,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
@@ -175,7 +175,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
         public void NotInScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
         }
@@ -196,7 +196,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
@@ -212,7 +212,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerSpecifyDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
         }
@@ -238,7 +238,7 @@ namespace ${glPackageBaseCQ} {
         }
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
             registerQueryDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
@@ -312,7 +312,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void Exists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
@@ -334,7 +334,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void NotExists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotExistsSubQuery(cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
         }
@@ -348,7 +348,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${fk.foreignPropertyNameInitCap}")
         public void InScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
         }
@@ -369,7 +369,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void InScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
@@ -383,7 +383,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${fk.foreignPropertyNameInitCap}")
         public void NotInScope${fk.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${fk.firstForeignColumnName}", subQueryPropertyName);
         }
@@ -404,7 +404,7 @@ namespace ${glPackageBaseCQ} {
 #end
         public void NotInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerNotInScopeSubQuery(cb.Query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
         }
@@ -420,7 +420,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerSpecifyDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
         }
@@ -446,7 +446,7 @@ namespace ${glPackageBaseCQ} {
         }
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
             registerQueryDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
@@ -549,7 +549,7 @@ namespace ${glPackageBaseCQ} {
 
         protected void xscalarSubQuery(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery, String operand) {
             assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarSubQuery(); subQuery.Invoke(cb);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarCondition(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keepScalarSubQuery(cb.Query()); // for saving query-value.
             registerScalarSubQuery(function, cb.Query(), subQueryPropertyName, operand);
         }
@@ -560,7 +560,7 @@ namespace ${glPackageBaseCQ} {
         //                                                                  ==============
         public void MyselfInScope(${glSubQuery}<${myConditionBeanClassName}> subQuery) {
             assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); subQuery.Invoke(cb);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForInScopeRelation(this); subQuery.Invoke(cb);
             String subQueryPropertyName = keepMyselfInScopeSubQuery(cb.Query()); // for saving query-value.
             registerInScopeSubQuery(cb.Query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName);
         }

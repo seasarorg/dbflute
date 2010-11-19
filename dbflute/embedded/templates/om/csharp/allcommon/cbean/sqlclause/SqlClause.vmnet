@@ -146,17 +146,11 @@ public interface ${myClassName} {
     ${myClassName} lockForUpdate();
 
     // ===================================================================================
-    //                                                                            Resolver
-    //                                                                            ========
-    String resolveJoinAliasName(String relationPath, int cqNestNo);
-    String resolveNestLevelExpression(String name, int cqNestNo);
-    int resolveRelationNo(String baseTableName, String foreignPropertyName);
-
-    // ===================================================================================
     //                                                                    Table Alias Info
     //                                                                    ================
-    String getLocalTableAliasName();
-    String getForeignTableAliasPrefix();
+    String getBasePointAliasName();
+    String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel);
+    int resolveRelationNo(String localTableName, String foreignPropertyName);
 
     // ===================================================================================
     //                                                                       Template Mark
