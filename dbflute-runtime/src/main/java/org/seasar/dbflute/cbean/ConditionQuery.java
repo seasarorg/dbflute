@@ -56,31 +56,33 @@ public interface ConditionQuery {
 
     /**
      * Get the referrer query.
-     * @return The referrer query. (Nullable: If null, this is base query)
+     * @return The condition-query of referrer table. (Nullable: If null, this is base query)
      */
     ConditionQuery xgetReferrerQuery();
 
     /**
      * Get the SqlClause.
-     * @return The SqlClause. (NotNull)
+     * @return The instance of SqlClause. (NotNull)
      */
     SqlClause xgetSqlClause();
 
     /**
-     * Get alias name.
-     * @return Alias name. (NotNull)
+     * Get the alias name for this query.
+     * @return The alias name for this query. (NotNull)
      */
     String xgetAliasName();
 
+    // nest level is old style
+    // so basically unused now 
     /**
-     * Get nest level.
-     * @return Nest level.
+     * Get the nest level of relation.
+     * @return The nest level of relation.
      */
     int xgetNestLevel();
 
     /**
-     * Get next nest level.
-     * @return Next nest level.
+     * Get the nest level for next relation.
+     * @return The nest level for next relation.
      */
     int xgetNextNestLevel();
 

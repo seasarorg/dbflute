@@ -884,10 +884,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return _purpose;
     }
 
-    // very internal
+    // very internal (super very important)
     public void xsetupForUnion(ConditionBean baseCB) {
-        if (baseCB.getSqlClause().isForSubQuery()) {
-            getSqlClause().setupForSubQuery(); // inherits it
+        if (baseCB.getSqlClause().isForSubQuery()) { // inherits it
+            localCQ().xsetSubQueryLevel(baseCB.localCQ().xgetSubQueryLevel());
+            getSqlClause().setupForSubQuery();
         }
         xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);
     }
@@ -927,8 +928,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //}
 
     protected void xprepareSubQueryInfo(ConditionQuery baseCQ) {
-        final int subQueryLevel = baseCQ.xgetSubQueryLevel();
-        localCQ().xsetSubQueryLevel(subQueryLevel + 1);
+        localCQ().xsetSubQueryLevel(baseCQ.xgetSubQueryLevel() + 1);
         getSqlClause().setupForSubQuery();
     }
 

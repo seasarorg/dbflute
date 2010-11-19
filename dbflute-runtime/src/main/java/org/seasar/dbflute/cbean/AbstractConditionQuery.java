@@ -109,7 +109,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /** My alias name. */
     protected final String _aliasName;
 
-    /** The level of nest. */
+    /** The nest level of relation. */
     protected final int _nestLevel;
 
     /** The level of subQuery. */
