@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.jdbc.metadata.sequence;
+package org.seasar.dbflute.logic.replaceschema.takefinally.sequence;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

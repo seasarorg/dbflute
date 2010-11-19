@@ -5,11 +5,11 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerDB2;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerH2;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerPostgreSQL;
+import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
+import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerDB2;
+import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerH2;
+import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerOracle;
+import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerPostgreSQL;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 

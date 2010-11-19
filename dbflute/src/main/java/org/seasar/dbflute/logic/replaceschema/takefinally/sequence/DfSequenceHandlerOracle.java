@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.jdbc.metadata.sequence;
+package org.seasar.dbflute.logic.replaceschema.takefinally.sequence;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,17 +30,17 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
  */
-public class DfSequenceHandlerDB2 extends DfSequenceHandlerJdbc {
+public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSequenceHandlerDB2.class);
+    private static final Log _log = LogFactory.getLog(DfSequenceHandlerOracle.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerDB2(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
+    public DfSequenceHandlerOracle(DataSource dataSource, List<UnifiedSchema> unifiedSchemaList) {
         super(dataSource, unifiedSchemaList);
     }
 
@@ -51,7 +51,7 @@ public class DfSequenceHandlerDB2 extends DfSequenceHandlerJdbc {
     protected Integer selectNextVal(Statement st, String sequenceName) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = st.executeQuery("values nextval for " + sequenceName);
+            rs = st.executeQuery("select " + sequenceName + ".nextval from dual");
             rs.next();
             return rs.getInt(1);
         } finally {
