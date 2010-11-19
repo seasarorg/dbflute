@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -43,15 +44,21 @@ public class DfProcedureArrayExtractorOracle {
         _dataSource = dataSource;
     }
 
-    public Map<String, OracleArrayInfo> assistArrayInfoMap(UnifiedSchema unifiedSchema) {
-        final List<ProcedureColumnSupplementInfo> infoList = selectProcedureColumnSupplementInfo(unifiedSchema);
-        final StringKeyMap<OracleArrayInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
+    /**
+     * Extract the map of array info. <br />
+     * Same name and different type parameters of overload are unsupported. 
+     * @param unifiedSchema The unified schema. (NotNull)
+     * @return The map of array info. {key:(packageName.)procedureName.columnName} (NotNull)
+     */
+    public Map<String, DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema) {
+        final List<ProcedureArgumentInfo> infoList = selectProcedureColumnSupplementInfo(unifiedSchema);
+        final StringKeyMap<DfTypeArrayInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
-            final ProcedureColumnSupplementInfo info = infoList.get(i);
+            final ProcedureArgumentInfo info = infoList.get(i);
             final String argumentName = info.getArgumentName();
             final String dataType = info.getDataType();
             if (argumentName != null && Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY")) {
-                final OracleArrayInfo oracleArrayInfo = new OracleArrayInfo();
+                final DfTypeArrayInfo oracleArrayInfo = new DfTypeArrayInfo();
                 final String typeName = info.getTypeName();
                 final String typeSubName = info.getTypeSubName();
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(typeSubName)) {
@@ -64,7 +71,7 @@ public class DfProcedureArrayExtractorOracle {
                     oracleArrayInfo.setTypeName(typeName);
                 }
                 if (infoList.size() > (i + 1)) {
-                    ProcedureColumnSupplementInfo nextInfo = infoList.get(i + 1);
+                    ProcedureArgumentInfo nextInfo = infoList.get(i + 1);
                     oracleArrayInfo.setElementType(nextInfo.getDataType());
                 }
                 final StringBuilder keySb = new StringBuilder();
@@ -78,7 +85,7 @@ public class DfProcedureArrayExtractorOracle {
         return infoMap;
     }
 
-    protected List<ProcedureColumnSupplementInfo> selectProcedureColumnSupplementInfo(UnifiedSchema unifiedSchema) {
+    protected List<ProcedureArgumentInfo> selectProcedureColumnSupplementInfo(UnifiedSchema unifiedSchema) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildProcedureArgumentSql(unifiedSchema);
         final List<String> columnList = new ArrayList<String>();
@@ -97,11 +104,11 @@ public class DfProcedureArrayExtractorOracle {
         } catch (Exception continued) {
             // because of assist info
             _log.info("Failed to select supplement info: " + continued.getMessage());
-            return new ArrayList<ProcedureColumnSupplementInfo>();
+            return new ArrayList<ProcedureArgumentInfo>();
         }
-        final List<ProcedureColumnSupplementInfo> infoList = DfCollectionUtil.newArrayList();
+        final List<ProcedureArgumentInfo> infoList = DfCollectionUtil.newArrayList();
         for (Map<String, String> map : resultList) {
-            ProcedureColumnSupplementInfo info = new ProcedureColumnSupplementInfo();
+            ProcedureArgumentInfo info = new ProcedureArgumentInfo();
             info.setPackageName(map.get("PACKAGE_NAME"));
             info.setObjectName(map.get("OBJECT_NAME"));
             info.setOverload(map.get("OVERLOAD"));
@@ -124,28 +131,7 @@ public class DfProcedureArrayExtractorOracle {
         return sb.toString();
     }
 
-    public static class OracleArrayInfo {
-        protected String typeName;
-        protected String elementType;
-
-        public String getTypeName() {
-            return typeName;
-        }
-
-        public void setTypeName(String typeName) {
-            this.typeName = typeName;
-        }
-
-        public String getElementType() {
-            return elementType;
-        }
-
-        public void setElementType(String elementType) {
-            this.elementType = elementType;
-        }
-    }
-
-    public static class ProcedureColumnSupplementInfo {
+    protected static class ProcedureArgumentInfo {
         protected String _packageName;
         protected String _objectName;
         protected String _overload;

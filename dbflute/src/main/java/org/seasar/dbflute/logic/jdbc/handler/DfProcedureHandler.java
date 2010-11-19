@@ -39,11 +39,11 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.various.DfProcedureArrayExtractorOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.various.DfProcedureArrayExtractorOracle.OracleArrayInfo;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
@@ -321,7 +321,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                                                     ===============
     /**
      * Get the list of plain procedures. <br />
-     * It selects procedures of main schema only.
+     * It selects procedures of specified schema only.
      * @param dataSource Data source. (NotNull)
      * @param metaData The meta data of database. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
@@ -368,7 +368,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     protected void resolveOracleArrayInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMetaInfo> metaInfoList) {
         final DfProcedureArrayExtractorOracle assistant = new DfProcedureArrayExtractorOracle(dataSource);
-        final Map<String, OracleArrayInfo> arrayInfoMap = assistant.assistArrayInfoMap(unifiedSchema);
+        final Map<String, DfTypeArrayInfo> arrayInfoMap = assistant.extractArrayInfoMap(unifiedSchema);
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
             final String packageName = metaInfo.getProcedureCatalog();
             final String procedureName = metaInfo.getProcedureName();
@@ -380,7 +380,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                     keySb.append(packageName).append(".");
                 }
                 keySb.append(procedureName).append(".").append(columnName);
-                final OracleArrayInfo arrayInfo = arrayInfoMap.get(keySb.toString());
+                final DfTypeArrayInfo arrayInfo = arrayInfoMap.get(keySb.toString());
                 if (arrayInfo == null) {
                     continue;
                 }
