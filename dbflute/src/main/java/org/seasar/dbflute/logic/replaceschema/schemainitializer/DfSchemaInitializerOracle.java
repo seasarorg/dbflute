@@ -24,7 +24,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The schema initializer for Oracle.
@@ -68,8 +70,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     protected void doDropSequence(Connection conn) {
-        dropDataDictionaryObject(conn, "sequences", "sequence", "ALL_SEQUENCES", "SEQUENCE_OWNER", "SEQUENCE_NAME",
-                true);
+        dropDicObject(conn, "sequences", "sequence", "ALL_SEQUENCES", "SEQUENCE_OWNER", "SEQUENCE_NAME", null, true);
     }
 
     // ===================================================================================
@@ -85,7 +86,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
      * @param conn The connection to main schema. (NotNull)
      */
     protected void doDropDBLink(Connection conn) {
-        dropDataDictionaryObject(conn, "DB links", "database link", "ALL_DB_LINKS", "OWNER", "DB_LINK", false);
+        dropDicObject(conn, "DB links", "database link", "ALL_DB_LINKS", "OWNER", "DB_LINK", null, false);
     }
 
     // ===================================================================================
@@ -93,24 +94,48 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                    ================
     @Override
     protected void dropTypeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        doDropTypeObject(conn);
+        final int retryLimit = 10;
+        int retryCount = 0;
+        while (true) {
+            try {
+                doDropTypeObject(conn, "TYPECODE asc");
+                break;
+            } catch (SQLFailureException e) {
+                try {
+                    ++retryCount;
+                    doDropTypeObject(conn, "TYPECODE desc");
+                    break;
+                } catch (SQLFailureException ignored) {
+                    if (retryLimit >= retryCount) {
+                        throw e;
+                    }
+                    continue;
+                }
+            }
+        }
     }
 
-    protected void doDropTypeObject(Connection conn) {
-        dropDataDictionaryObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", false);
+    protected void doDropTypeObject(Connection conn, String orderBy) {
+        dropDicObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", orderBy, false);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected void dropDataDictionaryObject(Connection conn, String titleName, String sqlName, String tableName,
-            String ownerColumnName, String targetColumnName, boolean schemaPrefix) {
+    protected void dropDicObject(Connection conn, String titleName, String sqlName, String tableName,
+            String ownerColumnName, String targetColumnName, String orderBy, boolean schemaPrefix) {
         if (!_unifiedSchema.hasSchema()) {
             return;
         }
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> objectNameList = new ArrayList<String>();
-        final String metaSql = "select * from " + tableName + " where " + ownerColumnName + " = '" + schema + "'";
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select * from ").append(tableName);
+        sb.append(" where ").append(ownerColumnName).append(" = '").append(schema).append("'");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(orderBy)) {
+            sb.append(" order by ").append(orderBy);
+        }
+        final String metaSql = sb.toString();
         Statement st = null;
         ResultSet rs = null;
         try {
@@ -142,7 +167,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             }
         } catch (SQLException e) {
             String msg = "Failed to drop " + titleName + ": " + objectNameList;
-            throw new IllegalStateException(msg, e);
+            throw new SQLFailureException(msg, e);
         } finally {
             closeStatement(st);
         }
