@@ -32,7 +32,6 @@ public class DfProcedureColumnMetaInfo {
     // ===================================================================================
     //                                                                Status Determination
     //                                                                ====================
-
     public boolean hasColumnComment() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_columnComment);
     }

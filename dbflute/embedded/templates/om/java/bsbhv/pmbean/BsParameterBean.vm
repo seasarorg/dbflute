@@ -64,21 +64,21 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "notParamResult, ${procedureNotParamResultIndex}";
 #set ($procedureNotParamResultIndex = $procedureNotParamResultIndex + 1)
 #end
-#if ($database.needsStringClobHandling($pmbClassName, $propertyName))
+#if ($database.needsPmbMetaDataProcedureParameterStringClobHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "stringClobType";
 #end
-#if ($database.needsBytesOidHandling($pmbClassName, $propertyName))
+#if ($database.needsPmbMetaDataProcedureParameterBytesOidHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "bytesOidType";
 #end
-#if ($database.needsFixedLengthStringHandling($pmbClassName, $propertyName))
+#if ($database.needsPmbMetaDataProcedureParameterFixedLengthStringHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "fixedLengthStringType";
 #end
-#if ($database.needsObjectBindingBigDecimalHandling($pmbClassName, $propertyName))
+#if ($database.needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "objectBindingBigDecimalType";
 #end
-#if ($database.needsOracleArrayHandling($pmbClassName, $propertyName))
+#if ($database.needsPmbMetaDataProcedureParameterOracleArrayHandling($pmbClassName, $propertyName))
     public static final ValueType ${annotationPropName}_VALUE_TYPE
-            = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleArrayType("${database.getPropertyColumnArrayTypeName($pmbClassName, $propertyName)}");
+            = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleArrayType("${database.getPmbMetaDataProcedureParameterArrayTypeName($pmbClassName, $propertyName)}");
 #end
 #end
 #end
@@ -90,7 +90,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /** ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} */
-    protected ${propertyType} ${variableName};
+    protected ${propertyType} ${variableName}; ${database.getPmbMetaDataProcedureParameterOverloadNoComment($pmbClassName, $propertyName)}
 
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
     /** The value of likeSearchOption for ${propertyName}. */

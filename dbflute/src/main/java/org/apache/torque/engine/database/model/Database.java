@@ -416,28 +416,37 @@ public class Database {
         return getPmbBasicHandler().isPropertyOptionProcedureParameterResult(className, propertyName);
     }
 
-    public boolean needsStringClobHandling(String className, String propertyName) {
+    public boolean needsPmbMetaDataProcedureParameterStringClobHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsStringClobHandling(className, propertyName);
     }
 
-    public boolean needsBytesOidHandling(String className, String propertyName) {
+    public boolean needsPmbMetaDataProcedureParameterBytesOidHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsBytesOidHandling(className, propertyName);
     }
 
-    public boolean needsFixedLengthStringHandling(String className, String propertyName) {
+    public boolean needsPmbMetaDataProcedureParameterFixedLengthStringHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsFixedLengthStringHandling(className, propertyName);
     }
 
-    public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
+    public boolean needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling(String className,
+            String propertyName) {
         return getPmbBasicHandler().needsObjectBindingBigDecimalHandling(className, propertyName);
     }
 
-    public boolean needsOracleArrayHandling(String className, String propertyName) {
+    public boolean needsPmbMetaDataProcedureParameterOracleArrayHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsOracleArrayHandling(className, propertyName);
     }
 
-    public String getPropertyColumnArrayTypeName(String className, String propertyName) {
-        return getPmbBasicHandler().getPropertyColumnArrayTypeName(className, propertyName);
+    public String getPmbMetaDataProcedureParameterArrayTypeName(String className, String propertyName) {
+        return getPmbBasicHandler().getProcedureParameterArrayTypeName(className, propertyName);
+    }
+
+    public String getPmbMetaDataProcedureParameterOverloadNo(String className, String propertyName) {
+        return getPmbBasicHandler().getProcedureParameterOverloadNo(className, propertyName);
+    }
+
+    public String getPmbMetaDataProcedureParameterOverloadNoComment(String className, String propertyName) {
+        return getPmbBasicHandler().getProcedureParameterOverloadNoComment(className, propertyName);
     }
 
     // -----------------------------------------------------

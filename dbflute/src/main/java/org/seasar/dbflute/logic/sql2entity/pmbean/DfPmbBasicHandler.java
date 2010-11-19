@@ -201,7 +201,7 @@ public class DfPmbBasicHandler {
     //                                ----------------------
     public boolean needsStringClobHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -210,7 +210,7 @@ public class DfPmbBasicHandler {
 
     public boolean needsBytesOidHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -219,7 +219,7 @@ public class DfPmbBasicHandler {
 
     public boolean needsFixedLengthStringHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -228,7 +228,7 @@ public class DfPmbBasicHandler {
 
     public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -237,37 +237,55 @@ public class DfPmbBasicHandler {
 
     public boolean needsOracleArrayHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
         if (metaInfo == null) {
             return false;
         }
         final String dbTypeName = metaInfo.getDbTypeName();
-        final String elementType = getPropertyColumnElementTypeName(className, propertyName);
+        final String elementType = getProcedureParameterElementTypeName(className, propertyName);
         return elementType != null && _columnHandler.isOracleTreatedAsArray(dbTypeName);
     }
 
     // -----------------------------------------------------
     //                                           Column Info
     //                                           -----------
-    public String getPropertyColumnArrayTypeName(String className, String propertyName) {
+    public String getProcedureParameterArrayTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getPropertyNameColumnInfo(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
             return columnInfo.getTypeArrayInfo().getTypeName();
         }
-        return null;
+        return "";
     }
 
-    public String getPropertyColumnElementTypeName(String className, String propertyName) {
+    public String getProcedureParameterElementTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getPropertyNameColumnInfo(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
             return columnInfo.getTypeArrayInfo().getElementType();
         }
-        return null;
+        return "";
     }
 
-    protected DfProcedureColumnMetaInfo getPropertyNameColumnInfo(String className, String propertyName) {
+    public String getProcedureParameterOverloadNo(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
+        if (columnInfo != null) {
+            final Integer overloadNo = columnInfo.getOverloadNo();
+            return overloadNo != null ? overloadNo.toString() : "";
+        }
+        return "";
+    }
+
+    public String getProcedureParameterOverloadNoComment(String className, String propertyName) {
+        final String overloadNo = getProcedureParameterOverloadNo(className, propertyName);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(overloadNo)) {
+            return "// overloadNo = " + overloadNo;
+        }
+        return overloadNo;
+    }
+
+    protected DfProcedureColumnMetaInfo getProcedureColumnInfo(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);
         if (columnInfoMap != null) {
@@ -468,7 +486,7 @@ public class DfPmbBasicHandler {
     //                                               -------
     public String getPropertyRefColumnInfo(String className, String propertyName, AppData appData) {
         if (isForProcedure(className)) {
-            final DfProcedureColumnMetaInfo metaInfo = getPropertyNameColumnInfo(className, propertyName);
+            final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
             return metaInfo != null ? ": {" + metaInfo.getColumnDefinitionLineDisp() + "}" : "";
         }
         final StringBuilder sb = new StringBuilder();
