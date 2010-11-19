@@ -287,14 +287,14 @@ public class DfProcedurePmbSetupper {
     //                                                                        Convert Name
     //                                                                        ============
     protected String convertProcedureNameToPmbName(String procedureName) {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
         procedureName = Srl.replace(procedureName, ".", "_");
-        procedureName = resolveVendorProcedureNameHeadable(procedureName);
-        return Srl.camelize(procedureName) + "Pmb";
+        procedureName = resolveVendorProcedureNameHeadache(procedureName);
+        return projectPrefix + Srl.camelize(procedureName) + "Pmb";
     }
 
-    protected String resolveVendorProcedureNameHeadable(String procedureName) {
-        if (getBasicProperties().isDatabaseSQLServer()) {
-            // SQLServer returns 'sp_foo;1'
+    protected String resolveVendorProcedureNameHeadache(String procedureName) {
+        if (getBasicProperties().isDatabaseSQLServer()) { // SQLServer returns 'sp_foo;1'
             procedureName = Srl.substringLastFront(procedureName, ";");
         }
         return procedureName;
@@ -302,13 +302,13 @@ public class DfProcedurePmbSetupper {
 
     protected String convertProcedurePmbNameToEntityName(String pmbName, String propertyName) {
         final String baseName = Srl.substringLastFront(pmbName, "Pmb");
-        final String entityName = baseName + Srl.initCap(propertyName);
-        return entityName;
+        return baseName + Srl.initCap(propertyName);
     }
 
     protected String convertStructNameToEntityName(DfTypeStructInfo structInfo) {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String typeName = structInfo.getTypeName();
-        return "Struct" + Srl.camelize(typeName);
+        return projectPrefix + "Struct" + Srl.camelize(typeName);
     }
 
     protected String convertProcedureListPropertyType(String entityName) {

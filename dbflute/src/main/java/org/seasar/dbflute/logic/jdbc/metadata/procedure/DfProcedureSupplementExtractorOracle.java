@@ -30,6 +30,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -73,8 +74,19 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
      * @return The map of array info. {key = (packageName.)procedureName.columnName, value = overloadNo} (NotNull)
      */
     public StringKeyMap<Integer> extractOverloadInfoMap(UnifiedSchema unifiedSchema) {
-        //final List<ProcedureArgumentInfo> infoList = selectProcedureArgumentInfo(unifiedSchema);
-        return StringKeyMap.createAsFlexibleOrdered();
+        final List<ProcedureArgumentInfo> infoList = findProcedureArgumentInfoList(unifiedSchema);
+        final StringKeyMap<Integer> infoMap = StringKeyMap.createAsFlexibleOrdered();
+        for (int i = 0; i < infoList.size(); i++) {
+            final ProcedureArgumentInfo info = infoList.get(i);
+            final String argumentName = info.getArgumentName();
+            final String overload = info.getOverload();
+            if (Srl.is_Null_or_TrimmedEmpty(argumentName) || Srl.is_Null_or_TrimmedEmpty(overload)) {
+                continue;
+            }
+            final String key = generateParameterInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
+            infoMap.put(key, DfTypeUtil.toInteger(overload));
+        }
+        return infoMap;
     }
 
     // ===================================================================================
@@ -93,7 +105,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             final ProcedureArgumentInfo info = infoList.get(i);
             final String argumentName = info.getArgumentName();
             final String dataType = info.getDataType();
-            if (argumentName == null && !Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY")) {
+            if (Srl.is_Null_or_TrimmedEmpty(argumentName) || !Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY")) {
                 continue;
             }
             final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
@@ -113,19 +125,10 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 arrayInfo.setElementType(nextInfo.getDataType());
             }
             processStructElement(unifiedSchema, arrayInfo);
-            final String key = generateArrayInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
+            final String key = generateParameterInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
             infoMap.put(key, arrayInfo);
         }
         return infoMap;
-    }
-
-    protected String generateArrayInfoMapKey(String packageName, String procedureName, String parameterName) {
-        final StringBuilder keySb = new StringBuilder();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) {
-            keySb.append(packageName).append(".");
-        }
-        keySb.append(procedureName).append(".").append(parameterName);
-        return keySb.toString();
     }
 
     protected void processStructElement(UnifiedSchema unifiedSchema, DfTypeArrayInfo arrayInfo) {
@@ -153,6 +156,18 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             _structInfoMapMap.put(unifiedSchema, structInfoMap);
         }
         return structInfoMap;
+    }
+
+    // ===================================================================================
+    //                                                                       Key Generator
+    //                                                                       =============
+    public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName) {
+        final StringBuilder keySb = new StringBuilder();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalog)) {
+            keySb.append(catalog).append(".");
+        }
+        keySb.append(procedureName).append(".").append(parameterName);
+        return keySb.toString();
     }
 
     // ===================================================================================

@@ -374,20 +374,12 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final Map<String, DfTypeArrayInfo> arrayInfoMap = extractor.extractArrayInfoMap(unifiedSchema);
         final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
-            final String packageName = metaInfo.getProcedureCatalog();
+            final String catalog = metaInfo.getProcedureCatalog();
             final String procedureName = metaInfo.getProcedureName();
             final List<DfProcedureColumnMetaInfo> columnList = metaInfo.getProcedureColumnList();
             for (DfProcedureColumnMetaInfo columnInfo : columnList) {
                 final String columnName = columnInfo.getColumnName();
-                final String key;
-                {
-                    final StringBuilder keySb = new StringBuilder();
-                    if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) {
-                        keySb.append(packageName).append(".");
-                    }
-                    keySb.append(procedureName).append(".").append(columnName);
-                    key = keySb.toString();
-                }
+                final String key = extractor.generateParameterInfoMapKey(catalog, procedureName, columnName);
 
                 // Overload
                 final Integer overloadNo = overloadInfoMap.get(key);

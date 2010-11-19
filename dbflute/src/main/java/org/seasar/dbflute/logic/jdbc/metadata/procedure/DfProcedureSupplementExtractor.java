@@ -18,7 +18,9 @@ package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 
 /**
  * @author jflute
@@ -30,7 +32,7 @@ public interface DfProcedureSupplementExtractor {
      * Extract the map of overload info. <br />
      * Same name and different type parameters of overload are unsupported. 
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of array info. {key=(packageName.)procedureName.columnName, value=overloadNo} (NotNull)
+     * @return The map of array info. (NotNull)
      */
     public Map<String, Integer> extractOverloadInfoMap(UnifiedSchema unifiedSchema);
 
@@ -38,7 +40,11 @@ public interface DfProcedureSupplementExtractor {
      * Extract the map of array info. <br />
      * Same name and different type parameters of overload are unsupported. 
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of array info. {key=(packageName.)procedureName.columnName} (NotNull)
+     * @return The map of array info. (NotNull)
      */
     public Map<String, DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema);
+
+    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema);
+
+    public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName);
 }
