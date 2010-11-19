@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.factory;
+package org.seasar.dbflute.logic.jdbc.urlanalyzer.factory;
 
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerDerby;

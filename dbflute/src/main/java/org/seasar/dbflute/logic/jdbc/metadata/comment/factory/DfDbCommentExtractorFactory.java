@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.factory;
+package org.seasar.dbflute.logic.jdbc.metadata.comment.factory;
 
 import javax.sql.DataSource;
 

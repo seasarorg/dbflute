@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.factory;
+package org.seasar.dbflute.logic.replaceschema.takefinally.sequence.factory;
 
 import java.util.List;
 
