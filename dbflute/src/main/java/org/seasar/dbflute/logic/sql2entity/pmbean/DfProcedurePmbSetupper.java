@@ -203,10 +203,12 @@ public class DfProcedurePmbSetupper {
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
             if (arrayInfo.hasStructInfo()) {
                 final DfTypeStructInfo structInfo = arrayInfo.getStructInfo();
-                doProcessStructProperty(column, structInfo, processInfo);
+                final String entityName = doProcessStructProperty(column, structInfo, processInfo);
+                arrayInfo.setElementJavaNative(entityName);
             } else {
                 final String elementType = arrayInfo.getElementType();
                 final String propertyType = findPlainPropertyType(jdbcDefType, elementType, columnSize, decimalDigits);
+                arrayInfo.setElementJavaNative(propertyType);
                 processInfo.setPropertyType(getGenericListClassName(propertyType));
             }
             return processInfo;
@@ -228,14 +230,16 @@ public class DfProcedurePmbSetupper {
         return column.isPostgreSQLCursor() || column.isOracleCursor();
     }
 
-    protected void doProcessStructProperty(DfProcedureColumnMetaInfo column, DfTypeStructInfo structInfo,
+    protected String doProcessStructProperty(DfProcedureColumnMetaInfo column, DfTypeStructInfo structInfo,
             ProcedurePropertyInfo processInfo) {
         final String entityName = convertStructNameToEntityName(structInfo);
         if (!_entityInfoMap.containsKey(entityName)) { // because STRUCTs are independent objects
             _entityInfoMap.put(entityName, structInfo.getAttributeInfoMap());
         }
+        structInfo.setEntityType(entityName);
         processInfo.setPropertyType(getGenericListClassName(entityName));
         processInfo.setRefCustomizeEntity(true);
+        return entityName;
     }
 
     protected String getProcedureDefaultResultSetPropertyType() {

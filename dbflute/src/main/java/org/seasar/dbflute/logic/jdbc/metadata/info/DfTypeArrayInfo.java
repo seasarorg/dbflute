@@ -27,6 +27,7 @@ public class DfTypeArrayInfo {
     protected String _typeName;
     protected String _elementType;
     protected DfTypeStructInfo _structInfo; // if element type is STRUCT
+    protected String _elementJavaNative; // is set after analyzing
 
     // ===================================================================================
     //                                                                       Determination
@@ -68,5 +69,13 @@ public class DfTypeArrayInfo {
 
     public void setStructInfo(DfTypeStructInfo structInfo) {
         this._structInfo = structInfo;
+    }
+
+    public String getElementJavaNative() {
+        return _elementJavaNative;
+    }
+
+    public void setElementJavaNative(String elementJavaNative) {
+        this._elementJavaNative = elementJavaNative;
     }
 }

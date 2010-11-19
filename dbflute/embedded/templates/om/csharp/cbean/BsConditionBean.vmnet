@@ -96,13 +96,13 @@ namespace ${glPackageBaseCB} {
         //                                                                     ===========
 	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-            cb.xsetupForUnion(); xsyncUQ(cb); unionQuery.Invoke(cb);
+            cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.Invoke(cb);
 		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionQuery(cq);
         }
 
 	    public virtual void UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-            cb.xsetupForUnion(); xsyncUQ(cb); unionQuery.Invoke(cb);
+            cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.Invoke(cb);
 		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionAllQuery(cq);
 	    }
 
@@ -207,23 +207,23 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                    Purpose Type
         //                                                                    ============
-        public void xsetupForColumnQuery(${myConditionBeanClassName} cb) {
+        public void xsetupForColumnQuery(${myConditionBeanClassName} baseCB) {
             //xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
             _forColumnQuery = true; // old style
 
             // inherits a parent query to synchronize real name
             // (and also for suppressing query check) 
-            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall(cb));
+            Specify().xswitchQyCall(new ${myConditionBeanClassName}ColQySpQyCall(baseCB));
         }
     }
 
     public class ${myConditionBeanClassName}ColQySpQyCall : SpQyCall<${myConditionQueryClassName}> {
-        protected ${myConditionBeanClassName} _conditionBean;
-        public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} conditionBean) {
-            _conditionBean = conditionBean;
+        protected ${myConditionBeanClassName} _baseCB;
+        public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} baseCB) {
+            _baseCB = baseCB;
         }
         public bool has() { return true; } 
-        public ${myConditionQueryClassName} qy() { return _conditionBean.Query(); } 
+        public ${myConditionQueryClassName} qy() { return _baseCB.Query(); } 
     }
 
     public class ${myConditionBeanClassName}Specification : AbstractSpecification<${myConditionQueryClassName}> {

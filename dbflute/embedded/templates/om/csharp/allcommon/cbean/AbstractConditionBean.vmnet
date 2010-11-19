@@ -317,28 +317,35 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                    Purpose Type
         //                                                                    ============
-        public void xsetupForDerivedReferrer() {
-            _forDerivedReferrer = true;
-        }
-    
-        public void xsetupForScalarSelect() {
-            _forScalarSelect = true;
-        }
-    
-        public void xsetupForScalarSubQuery() {
-            _forScalarSubQuery = true;
-        }
-    
-        public void xsetupForUnion() {
+        public void xsetupForUnion(${ConditionBean} baseCB) {
+            if (baseCB.SqlClause.isForSubQuery()) {
+                this.SqlClause.setupForSubQuery(); // inherits it
+            }
             _forUnion = true;
         }
-    
+
         public void xsetupForExistsSubQuery() {
+            this.SqlClause.setupForSubQuery();
             _forExistsSubQuery = true;
         }
-    
+
         public void xsetupForInScopeSubQuery() {
+            this.SqlClause.setupForSubQuery();
             _forInScopeSubQuery = true;
+        }
+
+        public void xsetupForDerivedReferrer() {
+            this.SqlClause.setupForSubQuery();
+            _forDerivedReferrer = true;
+        }
+
+        public void xsetupForScalarSelect() { // not sub-query
+            _forScalarSelect = true;
+        }
+
+        public void xsetupForScalarSubQuery() {
+            this.SqlClause.setupForSubQuery();
+            _forScalarSubQuery = true;
         }
 
         // ===============================================================================

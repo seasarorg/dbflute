@@ -282,6 +282,15 @@ public class DfPmbBasicHandler {
         return "";
     }
 
+    public String getProcedureParameterElementJavaNative(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
+        if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
+            return columnInfo.getTypeArrayInfo().getElementJavaNative();
+        }
+        return "Object"; // as default
+    }
+
     protected DfProcedureColumnMetaInfo getProcedureColumnInfo(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);

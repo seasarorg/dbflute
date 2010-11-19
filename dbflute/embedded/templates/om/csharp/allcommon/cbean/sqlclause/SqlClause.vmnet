@@ -12,16 +12,22 @@ namespace ${glPackageBaseCommonSqlClause} {
 // JavaLike
 public interface ${myClassName} {
 
-    // =====================================================================================
-    //                                                                                Clause
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Manage
+    //                                                                              ======
+    void setupForSubQuery();
+    bool isForSubQuery();
+
+    // ===================================================================================
+    //                                                                              Clause
+    //                                                                              ======
     String getClause();
     String getClauseFromWhereWithUnionTemplate();
     String getClauseFromWhereWithWhereUnionTemplate();
 
-    // =====================================================================================
-    //                                                                          Clause Parts
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Clause Parts
+    //                                                                        ============
     String getSelectClause();
     Map<String, int?> getSelectIndexMap();
     Map<String, String> getSelectIndexReverseMap();

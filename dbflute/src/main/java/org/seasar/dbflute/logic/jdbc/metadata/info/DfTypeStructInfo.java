@@ -28,6 +28,7 @@ public class DfTypeStructInfo {
     //                                                                           =========
     protected String _typeName;
     protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered();
+    protected String _entityType; // is set after analyzing
 
     // ===================================================================================
     //                                                                       Determination
@@ -61,5 +62,13 @@ public class DfTypeStructInfo {
 
     public void putAttributeInfo(DfColumnMetaInfo attributeInfo) {
         _attributeInfoMap.put(attributeInfo.getColumnName(), attributeInfo);
+    }
+
+    public String getEntityType() {
+        return _entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this._entityType = entityType;
     }
 }

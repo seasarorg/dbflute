@@ -533,8 +533,8 @@ public class ${glDBFluteConfig} {
     //                                                ------
     public static class ImplementedOracleArrayType extends OracleArrayType {
 
-        public ImplementedOracleArrayType(String arrayTypeName) {
-            super(arrayTypeName);
+        public ImplementedOracleArrayType(String arrayTypeName, Class<?> elementType) {
+            super(arrayTypeName, elementType);
         }
 
         @Override

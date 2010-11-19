@@ -191,7 +191,7 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     protected ${myConditionQueryClassName} createLocalCQ() {
-        return xcreateCQ(null, getSqlClause(), getSqlClause().getLocalTableAliasName(), 0);
+        return xcreateCQ(null, getSqlClause(), getSqlClause().getBasePointAliasName(), 0);
     }
 
     protected ${myConditionQueryClassName} xcreateCQ(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
@@ -220,7 +220,7 @@ public class ${myClassName} extends AbstractConditionBean {
      */
     public void union(UnionQuery<${myConditionBeanClassName}> unionQuery) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForUnion(); xsyncUQ(cb); unionQuery.query(cb);
+        cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.query(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionQuery(cq);
     }
 
@@ -239,7 +239,7 @@ public class ${myClassName} extends AbstractConditionBean {
      */
     public void unionAll(UnionQuery<${myConditionBeanClassName}> unionQuery) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForUnion(); xsyncUQ(cb); unionQuery.query(cb);
+        cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.query(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
 #if ($database.isAvailableDatabaseDependency())
@@ -472,13 +472,23 @@ public class ${myClassName} extends AbstractConditionBean {
             assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
                 _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
-                    public boolean has() { return qyCall().has() && qyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    public boolean has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 #if ($fk.hasDynamicFixedCondition())
-                    public ${tmpCQClassName} qy() { return qyCall().qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
+                    public ${tmpCQClassName} qy() { return _qyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
 #else
-                    public ${tmpCQClassName} qy() { return qyCall().qy().query${tmpPropertyNameInitCap}(); } }
+                    public ${tmpCQClassName} qy() { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
 #end
                     , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall<${tmpCQClassName}>() {
+                        public boolean has() { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+                        public ${tmpCQClassName} qy() { return xsyncQyCall().qy().getConditionQuery${tmpPropertyNameInitCap}(); }
+#else
+                        public ${tmpCQClassName} qy() { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
+#end
+                    });
+                }
             }
             return _${tmpPropertyName};
         }
@@ -497,9 +507,15 @@ public class ${myClassName} extends AbstractConditionBean {
             assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
                 _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
-                    public boolean has() { return qyCall().has() && qyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
-                    public ${tmpCQClassName} qy() { return qyCall().qy().query${tmpPropertyNameInitCap}(); } }
+                    public boolean has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    public ${tmpCQClassName} qy() { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
                     , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall<${tmpCQClassName}>() {
+                        public boolean has() { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                        public ${tmpCQClassName} qy() { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
+                    });
+                }
             }
             return _${tmpPropertyName};
         }
@@ -524,7 +540,7 @@ public class ${myClassName} extends AbstractConditionBean {
          * @return The object to set up a function for referrer table. (NotNull)
          */
         public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
-            assertDerived("${tmpPropertyName}");
+            assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
             return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
                 public void setup(String function, SubQuery<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName, DerivedReferrerOption option) {
                     cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName, option); } }, _dbmetaProvider);
@@ -635,14 +651,15 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
-    public void xsetupForColumnQuery(final ${myConditionBeanClassName} cb) {
+    public void xsetupForColumnQuery(final ${myConditionBeanClassName} baseCB) {
+        xinheritSubQueryInfo(baseCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
 
         // inherits a parent query to synchronize real name
         // (and also for suppressing query check) 
-        specify().xswitchQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
+        specify().xsetSyncQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
             public boolean has() { return true; }
-            public ${myConditionQueryClassName} qy() { return cb.query(); }
+            public ${myConditionQueryClassName} qy() { return baseCB.query(); }
         });
     }
 
@@ -651,7 +668,7 @@ public class ${myClassName} extends AbstractConditionBean {
 
         // for suppressing query check
         final ${myConditionBeanClassName} nonCheckCB = new ${myConditionBeanClassName}();
-        specify().xswitchQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
+        specify().xsetSyncQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
             public boolean has() { return true; }
             public ${myConditionQueryClassName} qy() { return nonCheckCB.query(); }
         });

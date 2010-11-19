@@ -517,7 +517,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String nrp = resolveNextRelationPath("${table.name}", "${fk.foreignPropertyName}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${foreignCQClassName} cq = new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
-        cq.xsetForeignPropertyName("${fk.foreignPropertyName}"); cq.xsetRelationPath(nrp); return cq;
+        cq.xsetForeignPropertyName("${fk.foreignPropertyName}");
+        cq.xsetSubQueryLevel(xgetSubQueryLevel()); cq.xsetRelationPath(nrp); return cq;
     }
     protected void xsetupOuterJoin${fk.foreignPropertyNameInitCap}() {
         ${foreignCQClassName} cq = getConditionQuery${fk.foreignPropertyNameInitCap}();
@@ -560,7 +561,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String nrp = resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${relatedCQClassName} cq = new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
-        cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}"); cq.xsetRelationPath(nrp); return cq;
+        cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
+        cq.xsetSubQueryLevel(xgetSubQueryLevel()); cq.xsetRelationPath(nrp); return cq;
     }
     protected void xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}() {
         ${relatedCQClassName} cq = getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
@@ -631,7 +633,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      */
     public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(); subQuery.query(cb);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
         registerExistsReferrer(cb.query(), "${referrer.foreignColumnNames}", "${referrer.localColumnNames}", subQueryPropertyName);
     }
@@ -655,7 +657,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #foreach ($processName in $table.tableProcessForMethodNameList)
     public void existsBuriAllRoundStateHistory_${processName}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer();
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         cb.query().setInternalDataType_Equal("${glPackageExtendedEntity}.${myExtendedObjectClassName}"); subQuery.query(cb);
         String subQueryPropertyName = keepBuriAllRoundStateHistory_${processName}(cb.query()); // for saving query-value.
         registerExistsReferrer(cb.query(), "${table.primaryKeyNameAsOne}", "INTERNAL_PK_VALUE", subQueryPropertyName);

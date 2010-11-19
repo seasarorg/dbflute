@@ -52,6 +52,10 @@ public class DfProcedureColumnMetaInfo {
         return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getElementType());
     }
 
+    public boolean hasTypeArrayElementJavaNativeType() {
+        return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getElementJavaNative());
+    }
+
     public boolean hasTypeStructInfo() {
         return _typeStructInfo != null;
     }

@@ -143,6 +143,17 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     // ===================================================================================
+    //                                                                              Manage
+    //                                                                              ======
+    public void setupForSubQuery() {
+        _forSubQuery = true;
+    }
+
+    public bool isForSubQuery() {
+        return _forSubQuery;
+    }
+
+    // ===================================================================================
     //                                                                         Main Clause
     //                                                                         ===========
     // -----------------------------------------------------
@@ -295,7 +306,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public String getSelectClause() {
         // [DBFlute-0.8.6]
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
-            return buildSelectClauseCountOrScalar("dflocal");
+            return buildSelectClauseCountOrScalar(getLocalTableAliasName());
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
@@ -557,9 +568,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         String tableSqlName = getDBMeta().TableSqlName;
         if (_baseTableInlineWhereList.isEmpty()) {
-            sb.append(tableSqlName).append(" dflocal");
+            sb.append(tableSqlName).append(" ").append(getLocalTableAliasName());
         } else {
-            sb.append(getInlineViewClause(tableSqlName, _baseTableInlineWhereList)).append(" dflocal");
+            sb.append(getInlineViewClause(tableSqlName, _baseTableInlineWhereList)).append(" ").append(getLocalTableAliasName());
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -1832,11 +1843,17 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                    Table Alias Info
     //                                                                    ================
     public String getLocalTableAliasName() {
+        // _forSubQuery is not needed here
+        // because SubQuery brothers adjust alias names by themselves
+        // (for example, it replaces "dflocal" to "dfsublocal_x")
         return "dflocal";
     }
     
     public String getForeignTableAliasPrefix() {
-        return "dfrelation";
+        // it doesn't use CB purpose type
+        // because, for example, union query is not sub-query
+        // but it can be used in sub-query
+        return _forSubQuery ? "dfsubrelation" : "dfrelation";
     }
 
     // ===================================================================================

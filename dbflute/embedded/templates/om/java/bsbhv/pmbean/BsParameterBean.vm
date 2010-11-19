@@ -82,7 +82,8 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #end
 #if ($database.needsPmbMetaDataProcedureParameterOracleArrayHandling($pmbClassName, $propertyName))
     public static final ValueType ${annotationPropName}_VALUE_TYPE
-            = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleArrayType("${database.getPmbMetaDataProcedureParameterArrayTypeName($pmbClassName, $propertyName)}");
+            = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleArrayType
+                  ("${database.getPmbMetaDataProcedureParameterArrayTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterElementJavaNative($pmbClassName, $propertyName)}.class);
 #end
 #end
 #end

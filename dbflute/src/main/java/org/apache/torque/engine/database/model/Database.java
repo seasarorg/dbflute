@@ -445,6 +445,10 @@ public class Database {
         return getPmbBasicHandler().getProcedureParameterArrayTypeName(className, propertyName);
     }
 
+    public String getPmbMetaDataProcedureParameterElementJavaNative(String className, String propertyName) {
+        return getPmbBasicHandler().getProcedureParameterElementJavaNative(className, propertyName);
+    }
+
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
