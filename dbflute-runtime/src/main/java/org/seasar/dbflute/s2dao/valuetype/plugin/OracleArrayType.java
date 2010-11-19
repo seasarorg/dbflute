@@ -23,8 +23,10 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
  * The type of Oracle's array for a property of collection type.
@@ -37,13 +39,21 @@ public abstract class OracleArrayType implements ValueType {
     //                                                                           =========
     protected final int _sqlType;
     protected final String _arrayTypeName;
+    protected final Class<?> _elementType;
+    protected final Entity _elementEntityPrototype; // when element is STRUCT type
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OracleArrayType(String arrayTypeName) {
+    public OracleArrayType(String arrayTypeName, Class<?> elementType) {
         _sqlType = Types.ARRAY;
         _arrayTypeName = arrayTypeName;
+        _elementType = elementType;
+        if (Entity.class.isAssignableFrom(elementType)) {
+            _elementEntityPrototype = (Entity) DfReflectionUtil.newInstance(elementType);
+        } else {
+            _elementEntityPrototype = null;
+        }
     }
 
     // ===================================================================================

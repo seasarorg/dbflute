@@ -18,7 +18,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                           =========
     protected final ConditionBean _baseCB;
     protected final HpSpQyCall<CQ> _qyCall; // not final because it may be switched
-    protected HpSpQyCall<CQ> _switchedToQyCall;
+    protected HpSpQyCall<CQ> _syncQyCall;
     protected final HpCBPurpose _purpose;
     protected final DBMetaProvider _dbmetaProvider;
     protected CQ _query;
@@ -68,6 +68,30 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         sqlClause.specifySelectColumn(tableAliasName, columnName, _query.getTableDbName());
     }
 
+    /**
+     * Get the query call with sync. <br />
+     * This method is basically for SpecifyColumn.
+     * Don't set this (or call-back that uses this) to other objects.
+     * @return The instance of query call. (NotNull)
+     */
+    protected HpSpQyCall<CQ> qyCall() { // basically for SpecifyColumn (NOT DerivedReferrer)
+        return _syncQyCall != null ? _syncQyCall : _qyCall;
+    }
+
+    protected boolean isRequiredColumnSpecificationEnabled() {
+        if (_alreadySpecifiedRequiredColumn) {
+            return false;
+        }
+        return isNormalUse(); // only normal purpose needs
+    }
+
+    protected abstract void doSpecifyRequiredColumn();
+
+    protected abstract String getTableDbName();
+
+    // ===================================================================================
+    //                                                                      Purpose Assert
+    //                                                                      ==============
     protected void assertColumn(String columnName) {
         if (_purpose.isNoSpecifyColumnTwoOrMore()) {
             if (_specifyColumnCount > 1) {
@@ -85,17 +109,6 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
                 throwSpecifyColumnNotSetupSelectColumnException(columnName);
             }
         }
-    }
-
-    protected HpSpQyCall<CQ> qyCall() { // basically for SpecifyColumn (NOT DerivedReferrer)
-        return _switchedToQyCall != null ? _switchedToQyCall : _qyCall;
-    }
-
-    protected boolean isRequiredColumnSpecificationEnabled() {
-        if (_alreadySpecifiedRequiredColumn) {
-            return false;
-        }
-        return isNormalUse(); // only normal purpose needs
     }
 
     protected void assertRelation(String relationName) {
@@ -124,13 +137,32 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         return HpCBPurpose.NORMAL_USE.equals(_purpose);
     }
 
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isAlreadySpecifiedRequiredColumn() {
+        return _alreadySpecifiedRequiredColumn;
+    }
+
     protected boolean hasDerivedReferrer() {
         return !_baseCB.getSqlClause().getSpecifiedDerivingAliasList().isEmpty();
     }
 
-    protected abstract void doSpecifyRequiredColumn();
+    // ===================================================================================
+    //                                                              Synchronization QyCall
+    //                                                              ======================
+    // synchronize Query(Relation)
+    public HpSpQyCall<CQ> xsyncQyCall() {
+        return _syncQyCall;
+    }
 
-    protected abstract String getTableDbName();
+    public void xsetSyncQyCall(HpSpQyCall<CQ> qyCall) {
+        _syncQyCall = qyCall;
+    }
+
+    public boolean xhasSyncQyCall() {
+        return _syncQyCall != null;
+    }
 
     // ===================================================================================
     //                                                                  Exception Throwing
@@ -171,20 +203,5 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                      ==============
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean isAlreadySpecifiedRequiredColumn() {
-        return _alreadySpecifiedRequiredColumn;
-    }
-
-    public void xswitchQyCall(HpSpQyCall<CQ> qyCall) {
-        if (qyCall == null) {
-            String msg = "The argument 'qyCall' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        _switchedToQyCall = qyCall;
     }
 }

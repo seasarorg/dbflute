@@ -886,10 +886,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // very internal (super very important)
     public void xsetupForUnion(ConditionBean baseCB) {
-        if (baseCB.getSqlClause().isForSubQuery()) { // inherits it
-            localCQ().xsetSubQueryLevel(baseCB.localCQ().xgetSubQueryLevel());
-            getSqlClause().setupForSubQuery();
-        }
+        xinheritSubQueryInfo(baseCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);
     }
 
@@ -908,7 +905,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.DERIVED_REFERRER);
     }
 
-    public void xsetupForScalarSelect() { // not sub-query
+    public void xsetupForScalarSelect() { // not sub-query (used independently)
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_SELECT);
     }
 
@@ -917,18 +914,26 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION);
     }
 
-    // *defined at base condition-bean
+    // *defined at base condition-bean per table
     //public void xsetupForColumnQuery() {
     //    xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
     //}
 
-    // *defined at base condition-bean
+    // *defined at base condition-bean per table
     //public void xsetupForVaryingUpdate() {
     //    xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
     //}
 
+    protected void xinheritSubQueryInfo(ConditionQuery baseCQ) {
+        if (baseCQ.xgetSqlClause().isForSubQuery()) { // inherits it
+            localCQ().xsetSubQueryLevel(baseCQ.xgetSubQueryLevel());
+            getSqlClause().setupForSubQuery();
+        }
+    }
+
     protected void xprepareSubQueryInfo(ConditionQuery baseCQ) {
-        localCQ().xsetSubQueryLevel(baseCQ.xgetSubQueryLevel() + 1);
+        final int nextSubQueryLevel = baseCQ.xgetSubQueryLevel() + 1;
+        localCQ().xsetSubQueryLevel(nextSubQueryLevel);
         getSqlClause().setupForSubQuery();
     }
 

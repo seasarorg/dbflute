@@ -740,7 +740,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + "The specified the column for column query was INVALID!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
+        msg = msg + "You should call specify().column[TargetColumn]() only once." + ln();
         msg = msg + "For example:" + ln();
         msg = msg + "  (x):" + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
