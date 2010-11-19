@@ -70,7 +70,8 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     protected void doDropSequence(Connection conn) {
-        dropDicObject(conn, "sequences", "sequence", "ALL_SEQUENCES", "SEQUENCE_OWNER", "SEQUENCE_NAME", null, true);
+        final String tableName = "ALL_SEQUENCES";
+        dropDicObject(conn, "sequences", "sequence", tableName, "SEQUENCE_OWNER", "SEQUENCE_NAME", null, true, false);
     }
 
     // ===================================================================================
@@ -86,7 +87,8 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
      * @param conn The connection to main schema. (NotNull)
      */
     protected void doDropDBLink(Connection conn) {
-        dropDicObject(conn, "DB links", "database link", "ALL_DB_LINKS", "OWNER", "DB_LINK", null, false);
+        final String tableName = "ALL_DB_LINKS";
+        dropDicObject(conn, "DB links", "database link", tableName, "OWNER", "DB_LINK", null, false, false);
     }
 
     // ===================================================================================
@@ -94,38 +96,31 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                    ================
     @Override
     protected void dropTypeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        // TYPE objects have dependences themselves
         final int retryLimit = 10;
         int retryCount = 0;
         while (true) {
-            try {
-                doDropTypeObject(conn, "TYPECODE asc");
+            final String orderBy = "TYPECODE " + (retryCount % 2 == 0 ? "asc" : "desc");
+            boolean complete = doDropTypeObject(conn, orderBy, true);
+            if (complete || retryLimit <= retryCount) {
                 break;
-            } catch (SQLFailureException e) {
-                try {
-                    doDropTypeObject(conn, "TYPECODE desc");
-                    break;
-                } catch (SQLFailureException ignored) {
-                    if (retryLimit < retryCount) {
-                        throw e;
-                    }
-                    ++retryCount;
-                    continue;
-                }
             }
+            ++retryCount;
         }
     }
 
-    protected void doDropTypeObject(Connection conn, String orderBy) {
-        dropDicObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", orderBy, false);
+    protected boolean doDropTypeObject(Connection conn, String orderBy, boolean errorContinue) {
+        return dropDicObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", orderBy, false,
+                errorContinue);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected void dropDicObject(Connection conn, String titleName, String sqlName, String tableName,
-            String ownerColumnName, String targetColumnName, String orderBy, boolean schemaPrefix) {
+    protected boolean dropDicObject(Connection conn, String titleName, String sqlName, String tableName,
+            String ownerColumnName, String targetColumnName, String orderBy, boolean schemaPrefix, boolean errorContinue) {
         if (!_unifiedSchema.hasSchema()) {
-            return;
+            return true;
         }
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> objectNameList = new ArrayList<String>();
@@ -153,18 +148,28 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
             msg = msg + metaSql;
             _log.info(metaSql);
-            return;
+            return true;
         } finally {
             closeResource(rs, st);
         }
         try {
+            boolean complete = true;
             st = conn.createStatement();
             for (String objectName : objectNameList) {
                 final String prefix = schemaPrefix ? schema + "." : "";
                 final String dropSql = "drop " + sqlName + " " + prefix + objectName;
                 _log.info(dropSql);
-                st.execute(dropSql);
+                try {
+                    st.execute(dropSql);
+                } catch (SQLException e) {
+                    if (errorContinue) {
+                        complete = false;
+                        continue;
+                    }
+                    throw e;
+                }
             }
+            return complete;
         } catch (SQLException e) {
             String msg = "Failed to drop " + titleName + ": " + objectNameList;
             throw new SQLFailureException(msg, e);
