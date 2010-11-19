@@ -5,7 +5,6 @@ import java.util.Map;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 public class DfProcedureColumnMetaInfo {
@@ -18,31 +17,44 @@ public class DfProcedureColumnMetaInfo {
     protected String _dbTypeName;
     protected Integer _columnSize;
     protected Integer _decimalDigits;
-    protected Integer _overloadNo;
+    protected Integer _overloadNo; // for example, Oracle's package procedure
     protected String _columnComment;
     protected DfProcedureColumnType _procedureColumnType;
-    protected Map<String, DfColumnMetaInfo> _resultSetColumnInfoMap = DfCollectionUtil.emptyMap(); // as default
-    protected DfTypeArrayInfo _typeArrayInfo;
+
+    // if the informations can be extracted
+    // (if these attributes are null, it's not always true that these are other types)
+    protected Map<String, DfColumnMetaInfo> _resultSetColumnInfoMap; // when ResultSet type
+    protected DfTypeArrayInfo _typeArrayInfo; // when ARRAY type 
+    protected DfTypeStructInfo _typeStructInfo; // when STRUCT type
 
     protected final DfColumnHandler _columnHandler = new DfColumnHandler(); // for type determination
 
     // ===================================================================================
     //                                                                Status Determination
     //                                                                ====================
-    public boolean hasResultSetColumnInfo() {
-        return !_resultSetColumnInfoMap.isEmpty();
-    }
 
     public boolean hasColumnComment() {
-        return Srl.is_NotNull_and_NotTrimmedEmpty(getColumnComment());
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_columnComment);
+    }
+
+    public boolean hasResultSetColumnInfo() {
+        return _resultSetColumnInfoMap != null && !_resultSetColumnInfoMap.isEmpty();
+    }
+
+    public boolean hasTypeArrayInfo() {
+        return _typeArrayInfo != null;
     }
 
     public boolean hasTypeArrayTypeName() {
-        return _typeArrayInfo != null && _typeArrayInfo.getTypeName() != null;
+        return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getTypeName());
     }
 
     public boolean hasTypeArrayElementType() {
-        return _typeArrayInfo != null && _typeArrayInfo.getElementType() != null;
+        return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getElementType());
+    }
+
+    public boolean hasTypeStructInfo() {
+        return _typeStructInfo != null;
     }
 
     // ===================================================================================
@@ -164,6 +176,12 @@ public class DfProcedureColumnMetaInfo {
         return _columnHandler.isOracleCursor(dbTypeName);
     }
 
+    public boolean isOracleStruct() {
+        // STRUCT is unknown by dbTypeName
+        // so determines from Data Dictionary
+        return _typeStructInfo != null;
+    }
+
     public boolean isOracleTreatedAsArray() {
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isOracleTreatedAsArray(dbTypeName);
@@ -264,7 +282,7 @@ public class DfProcedureColumnMetaInfo {
         this._columnComment = columnComment;
     }
 
-    public Map<String, DfColumnMetaInfo> getResultSetColumnMetaInfoMap() {
+    public Map<String, DfColumnMetaInfo> getResultSetColumnInfoMap() {
         return _resultSetColumnInfoMap;
     }
 
@@ -278,5 +296,13 @@ public class DfProcedureColumnMetaInfo {
 
     public void setTypeArrayInfo(DfTypeArrayInfo typeArrayInfo) {
         this._typeArrayInfo = typeArrayInfo;
+    }
+
+    public DfTypeStructInfo getTypeStructInfo() {
+        return _typeStructInfo;
+    }
+
+    public void setTypeStructInfo(DfTypeStructInfo typeStructInfo) {
+        this._typeStructInfo = typeStructInfo;
     }
 }

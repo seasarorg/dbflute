@@ -2,33 +2,31 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.Map;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
-
 /**
  * @author jflute
  */
 public class DfProcedureNotParamResultMetaInfo {
 
-    protected String propertyName;
-    protected Map<String, DfColumnMetaInfo> columnMetaInfoMap = DfCollectionUtil.emptyMap();
+    protected String _propertyName;
+    protected Map<String, DfColumnMetaInfo> _resultSetColumnInfoMap;
 
-    public boolean hasColumnMetaInfo() {
-        return !columnMetaInfoMap.isEmpty();
+    public boolean hasResultSetColumnInfo() {
+        return _resultSetColumnInfoMap != null && !_resultSetColumnInfoMap.isEmpty();
     }
 
     public String getPropertyName() {
-        return propertyName;
+        return _propertyName;
     }
 
     public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
+        this._propertyName = propertyName;
     }
 
-    public Map<String, DfColumnMetaInfo> getColumnMetaInfoMap() {
-        return columnMetaInfoMap;
+    public Map<String, DfColumnMetaInfo> getResultSetColumnInfoMap() {
+        return _resultSetColumnInfoMap;
     }
 
-    public void setColumnMetaInfoMap(Map<String, DfColumnMetaInfo> columnMetaInfoMap) {
-        this.columnMetaInfoMap = columnMetaInfoMap;
+    public void setResultSetColumnInfoMap(Map<String, DfColumnMetaInfo> resultSetColumnInfoMap) {
+        this._resultSetColumnInfoMap = resultSetColumnInfoMap;
     }
 }

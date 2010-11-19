@@ -26,7 +26,14 @@ public class DfTypeArrayInfo {
     //                                                                           =========
     protected String _typeName;
     protected String _elementType;
-    protected DfColumnMetaInfo _structColumnInfoMap;
+    protected DfTypeStructInfo _structInfo; // if element type is STRUCT
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean hasStructInfo() { // means the element type is STRUCT
+        return _structInfo != null;
+    }
 
     // ===================================================================================
     //                                                                            Accessor
@@ -47,11 +54,11 @@ public class DfTypeArrayInfo {
         this._elementType = elementType;
     }
 
-    public DfColumnMetaInfo getStructColumnInfoMap() {
-        return _structColumnInfoMap;
+    public DfTypeStructInfo getStructInfo() {
+        return _structInfo;
     }
 
-    public void setStructColumnInfoMap(DfColumnMetaInfo structColumnInfoMap) {
-        this._structColumnInfoMap = structColumnInfoMap;
+    public void setStructInfo(DfTypeStructInfo structInfo) {
+        this._structInfo = structInfo;
     }
 }
