@@ -419,6 +419,8 @@ public class DfProcedureExecutionMetaExtractor {
         try {
             if (column.isOracleTreatedAsArray() && column.hasTypeArrayTypeName()) {
                 cs.registerOutParameter(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeName());
+            } else if (column.isOracleStruct() && column.hasTypeStructInfo()) {
+                cs.registerOutParameter(paramIndex, Types.STRUCT, column.getTypeStructInfo().getTypeName());
             } else {
                 valueType.registerOutParameter(conn, cs, paramIndex);
             }
@@ -453,6 +455,8 @@ public class DfProcedureExecutionMetaExtractor {
         try {
             if (column.isOracleTreatedAsArray() && column.hasTypeArrayTypeName()) {
                 cs.setNull(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeName());
+            } else if (column.isOracleStruct() && column.hasTypeStructInfo()) {
+                cs.setNull(paramIndex, Types.STRUCT, column.getTypeStructInfo().getTypeName());
             } else {
                 valueType.bindValue(conn, cs, paramIndex, value);
             }

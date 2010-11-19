@@ -121,8 +121,13 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 arrayInfo.setTypeName(typeName);
             }
             if (infoList.size() > (i + 1)) { // element type is in data type of next record
-                ProcedureArgumentInfo nextInfo = infoList.get(i + 1);
-                arrayInfo.setElementType(nextInfo.getDataType());
+                final ProcedureArgumentInfo nextInfo = infoList.get(i + 1);
+                final String nextDataType = nextInfo.getDataType();
+                if (Srl.equalsIgnoreCase("OBJECT", nextDataType)) { // element is struct type
+                    arrayInfo.setElementType(nextInfo.getTypeName());
+                } else {
+                    arrayInfo.setElementType(nextDataType);
+                }
             }
             processStructElement(unifiedSchema, arrayInfo);
             final String key = generateParameterInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
