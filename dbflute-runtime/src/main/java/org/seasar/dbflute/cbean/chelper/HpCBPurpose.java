@@ -9,13 +9,14 @@ public enum HpCBPurpose {
 
     NORMAL_USE(new HpSpec()) // basic (all functions can be used)
     , UNION_QUERY(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // Union
-    , EXISTS_REFERRER(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // ExistsReferrer 
-    , IN_SCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // InScopeRelation
-    , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyDerivedReferrer().noOrderBy()) // DerivedReferrer
+    , EXISTS_REFERRER(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // ExistsReferrer 
+    , IN_SCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // InScopeRelation
+    , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyDerivedReferrer().noOrderBy()
+            .subQuery()) // DerivedReferrer
     , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noOrderBy()) // ScalarSelect
     , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
-            .noSpecifyDerivedReferrer().noOrderBy()) // ScalarCondition
+            .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarCondition
 
     // A purpose that can specify but not allowed to query
     // needs to switch condition-bean used in specification
@@ -87,6 +88,10 @@ public enum HpCBPurpose {
         return _spec.isNoOrderBy();
     }
 
+    public boolean isSubQuery() {
+        return _spec.isSubQuery();
+    }
+
     @Override
     public String toString() {
         return Srl.camelize(name());
@@ -102,6 +107,7 @@ public enum HpCBPurpose {
         protected boolean _noSpecifyDerivedReferrerTwoOrMore;
         protected boolean _noQuery;
         protected boolean _noOrderBy;
+        protected boolean _subQuery;
 
         public HpSpec noSetupSelect() {
             _noSetupSelect = true;
@@ -148,6 +154,11 @@ public enum HpCBPurpose {
             return this;
         }
 
+        public HpSpec subQuery() {
+            _subQuery = true;
+            return this;
+        }
+
         public boolean isNoSetupSelect() {
             return _noSetupSelect;
         }
@@ -182,6 +193,10 @@ public enum HpCBPurpose {
 
         public boolean isNoOrderBy() {
             return _noOrderBy;
+        }
+
+        public boolean isSubQuery() {
+            return _subQuery;
         }
     }
 }

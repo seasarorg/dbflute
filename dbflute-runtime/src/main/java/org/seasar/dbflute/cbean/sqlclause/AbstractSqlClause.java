@@ -396,7 +396,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String getSelectClause() {
         // [DBFlute-0.8.6]
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
-            return buildSelectClauseCountOrScalar("dflocal");
+            return buildSelectClauseCountOrScalar(getLocalTableAliasName());
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
@@ -681,9 +681,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (hasBaseTableInlineWhereClause()) {
             final List<QueryClause> baseTableInlineWhereList = getBaseTableInlineWhereList();
             sb.append(getInlineViewClause(tableSqlName, baseTableInlineWhereList, tablePos));
-            sb.append(" dflocal");
+            sb.append(" ").append(getLocalTableAliasName());
         } else {
-            sb.append(tableSqlName).append(" dflocal");
+            sb.append(tableSqlName).append(" ").append(getLocalTableAliasName());
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -1672,7 +1672,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                            Resolver
     //                                                                            ========
     public String resolveJoinAliasName(String relationPath, int cqNestNo) {
-        return resolveNestLevelExpression("dfrelation" + relationPath, cqNestNo);
+        return resolveNestLevelExpression(getForeignTableAliasPrefix() + relationPath, cqNestNo);
     }
 
     public String resolveNestLevelExpression(String name, int cqNestNo) {
@@ -1695,11 +1695,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                    Table Alias Info
     //                                                                    ================
     public String getLocalTableAliasName() {
+        // _purpose.isSubQuery() is not needed here
+        // because SubQuery brothers adjust alias names by themselves
+        // (for example, it replaces "dflocal" to "dfsublocal_x")
         return "dflocal";
     }
 
     public String getForeignTableAliasPrefix() {
-        return "dfrelation";
+        return _purpose.isSubQuery() ? "dfsubrelation" : "dfrelation";
     }
 
     // ===================================================================================
