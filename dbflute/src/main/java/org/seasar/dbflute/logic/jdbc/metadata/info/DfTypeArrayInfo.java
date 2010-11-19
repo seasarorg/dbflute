@@ -24,25 +24,26 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String typeName;
-    protected String elementType;
+    protected String _typeName;
+    protected String _elementType;
+    protected DfColumnMetaInfo _structColumnInfoMap;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getTypeName() {
-        return typeName;
+        return _typeName;
     }
 
     public void setTypeName(String typeName) {
-        this.typeName = typeName;
+        this._typeName = typeName;
     }
 
     public String getElementType() {
-        return elementType;
+        return _elementType;
     }
 
     public void setElementType(String elementType) {
-        this.elementType = elementType;
+        this._elementType = elementType;
     }
 }

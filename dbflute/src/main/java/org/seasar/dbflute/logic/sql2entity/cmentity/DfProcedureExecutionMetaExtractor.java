@@ -165,7 +165,7 @@ public class DfProcedureExecutionMetaExtractor {
                 if (obj instanceof ResultSet) {
                     rs = (ResultSet) obj;
                     final Map<String, DfColumnMetaInfo> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
-                    column.setColumnMetaInfoMap(columnMetaInfoMap);
+                    column.setResultSetColumnInfoMap(columnMetaInfoMap);
                 }
                 ++index;
             }
@@ -417,8 +417,8 @@ public class DfProcedureExecutionMetaExtractor {
             }
         }
         try {
-            if (column.isOracleTreatedAsArray()) {
-                cs.registerOutParameter(paramIndex, Types.ARRAY, column.getArrayTypeName());
+            if (column.isOracleTreatedAsArray() && column.hasTypeArrayTypeName()) {
+                cs.registerOutParameter(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeName());
             } else {
                 valueType.registerOutParameter(conn, cs, paramIndex);
             }
@@ -451,8 +451,8 @@ public class DfProcedureExecutionMetaExtractor {
             }
         }
         try {
-            if (column.isOracleTreatedAsArray()) {
-                cs.setNull(paramIndex, Types.ARRAY, column.getArrayTypeName());
+            if (column.isOracleTreatedAsArray() && column.hasTypeArrayTypeName()) {
+                cs.setNull(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeName());
             } else {
                 valueType.bindValue(conn, cs, paramIndex, value);
             }

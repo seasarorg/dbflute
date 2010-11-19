@@ -39,19 +39,31 @@ public class DfProcedureArrayExtractorOracle {
     private static final Log _log = LogFactory.getLog(DfProcedureArrayExtractorOracle.class);
 
     protected final DataSource _dataSource;
+    protected List<ProcedureArgumentInfo> _procedureArgumentInfoList;
 
     public DfProcedureArrayExtractorOracle(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
     /**
+     * Extract the map of overload info. <br />
+     * Same name and different type parameters of overload are unsupported. 
+     * @param unifiedSchema The unified schema. (NotNull)
+     * @return The map of array info. {key=(packageName.)procedureName.columnName, value=overloadNo} (NotNull)
+     */
+    public Map<String, Integer> extractOverloadInfoMap(UnifiedSchema unifiedSchema) {
+        //final List<ProcedureArgumentInfo> infoList = selectProcedureArgumentInfo(unifiedSchema);
+        return DfCollectionUtil.emptyMap();
+    }
+
+    /**
      * Extract the map of array info. <br />
      * Same name and different type parameters of overload are unsupported. 
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of array info. {key:(packageName.)procedureName.columnName} (NotNull)
+     * @return The map of array info. {key=(packageName.)procedureName.columnName} (NotNull)
      */
     public Map<String, DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema) {
-        final List<ProcedureArgumentInfo> infoList = selectProcedureColumnSupplementInfo(unifiedSchema);
+        final List<ProcedureArgumentInfo> infoList = selectProcedureArgumentInfo(unifiedSchema);
         final StringKeyMap<DfTypeArrayInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
             final ProcedureArgumentInfo info = infoList.get(i);
@@ -85,7 +97,10 @@ public class DfProcedureArrayExtractorOracle {
         return infoMap;
     }
 
-    protected List<ProcedureArgumentInfo> selectProcedureColumnSupplementInfo(UnifiedSchema unifiedSchema) {
+    protected List<ProcedureArgumentInfo> selectProcedureArgumentInfo(UnifiedSchema unifiedSchema) {
+        if (_procedureArgumentInfoList != null) {
+            return _procedureArgumentInfoList;
+        }
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildProcedureArgumentSql(unifiedSchema);
         final List<String> columnList = new ArrayList<String>();
@@ -119,7 +134,8 @@ public class DfProcedureArrayExtractorOracle {
             info.setTypeSubName(map.get("TYPE_SUBNAME"));
             infoList.add(info);
         }
-        return infoList;
+        _procedureArgumentInfoList = infoList;
+        return _procedureArgumentInfoList;
     }
 
     protected String buildProcedureArgumentSql(UnifiedSchema unifiedSchema) {

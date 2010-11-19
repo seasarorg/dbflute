@@ -29,8 +29,8 @@ public class DfProcedureMetaInfo {
     protected boolean _procedureSynonym;
     protected boolean _packageProcedure;
 
-    protected List<DfProcedureColumnMetaInfo> _procedureColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
-    protected List<DfProcedureNotParamResultMetaInfo> _notParamResultList = new ArrayList<DfProcedureNotParamResultMetaInfo>();
+    protected final List<DfProcedureColumnMetaInfo> _procedureColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
+    protected final List<DfProcedureNotParamResultMetaInfo> _notParamResultList = new ArrayList<DfProcedureNotParamResultMetaInfo>();
 
     // ===================================================================================
     //                                                                          Expression
@@ -58,6 +58,9 @@ public class DfProcedureMetaInfo {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_procedurePackage);
     }
 
+    // -----------------------------------------------------
+    //                                            Build Name
+    //                                            ----------
     public String buildProcedureKeyName() {
         return _procedureName;
     }
@@ -88,6 +91,18 @@ public class DfProcedureMetaInfo {
 
     public String buildProcedurePureName() {
         return Srl.substringLastRear(_procedureName, ".");
+    }
+
+    // -----------------------------------------------------
+    //                                              Overload
+    //                                              --------
+    public boolean hasOverloadParameter() {
+        for (DfProcedureColumnMetaInfo metaInfo : _procedureColumnList) {
+            if (metaInfo.getOverloadNo() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

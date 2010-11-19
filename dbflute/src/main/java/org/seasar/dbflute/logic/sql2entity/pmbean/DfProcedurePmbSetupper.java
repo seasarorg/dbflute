@@ -103,9 +103,9 @@ public class DfProcedurePmbSetupper {
                 }
                 propertyNameColumnInfoMap.put(propertyName, column);
                 String propertyType = getProcedureColumnPropertyType(column);
-                if (column.hasColumnMetaInfo()) {
+                if (column.hasResultSetColumnInfo()) {
                     final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
-                    _entityInfoMap.put(entityName, column.getColumnMetaInfoMap());
+                    _entityInfoMap.put(entityName, column.getResultSetColumnMetaInfoMap());
                     existsCustomizeEntity = true;
                     propertyType = convertProcedureListPropertyType(entityName);
                 }
@@ -149,9 +149,9 @@ public class DfProcedurePmbSetupper {
         _log.info(" ");
     }
 
-    // -----------------------------------------------------
-    //                                   Procedure Meta Info
-    //                                   -------------------
+    // ===================================================================================
+    //                                                                      Procedure List
+    //                                                                      ==============
     protected List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
         _procedureHandler.includeProcedureSynonym(_dataSource);
         final List<DfProcedureMetaInfo> procedureList = _procedureHandler.getAvailableProcedureList(_dataSource);
@@ -162,65 +162,59 @@ public class DfProcedurePmbSetupper {
         return procedureList;
     }
 
-    // -----------------------------------------------------
-    //                                      Procedure Column
-    //                                      ----------------
+    // ===================================================================================
+    //                                                                    Procedure Column
+    //                                                                    ================
     protected String getProcedureColumnPropertyType(DfProcedureColumnMetaInfo column) {
         if (isResultSetProperty(column)) {
             return getProcedureDefaultResultSetPropertyType();
         }
         final int jdbcDefType = column.getJdbcDefType();
-        final String dbTypeName = column.getDbTypeName();
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
-        final String propertyType;
         if (column.isOracleNumber()) {
             // because the length setting of procedure parameter is unsupported on Oracle
-            propertyType = TypeMap.getDefaultDecimalJavaNativeType();
-        } else if (column.isOracleTreatedAsArray()) {
-            // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY" (it's not useful for type mapping)
-            final String elementTypeName = column.getElementTypeName();
-            final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-            final String elementPropertyType = findPlainPropertyType(jdbcDefType, elementTypeName, columnSize,
-                    decimalDigits);
-            propertyType = grammarInfo.getGenericListClassName(elementPropertyType);
-        } else {
-            propertyType = findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits);
+            return TypeMap.getDefaultDecimalJavaNativeType();
         }
-        return propertyType;
+        if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
+            // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY" (it's not useful for type mapping)
+            final String elementType = column.getTypeArrayInfo().getElementType();
+            final String propertyType = findPlainPropertyType(jdbcDefType, elementType, columnSize, decimalDigits);
+            return getGenericListClassName(propertyType);
+        }
+        final String dbTypeName = column.getDbTypeName();
+        return findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits);
+    }
+
+    protected boolean isResultSetProperty(DfProcedureColumnMetaInfo column) {
+        if (column.hasResultSetColumnInfo()) {
+            return true;
+        }
+        return column.isPostgreSQLCursor() || column.isOracleCursor();
     }
 
     protected String getProcedureDefaultResultSetPropertyType() {
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-        return grammarInfo.getGenericMapListClassName("String", "Object");
+        return grammarInfo.getGenericMapListClassName("String", "Object"); // Map<String, Object>
     }
 
     protected String findPlainPropertyType(int jdbcDefType, String dbTypeName, Integer columnSize, Integer decimalDigits) {
-        final String propertyType;
         if (_columnHandler.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
             final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
-            propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
+            return TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
         } else {
-            // procedure has many-many types so it uses Object type (not String) 
-            propertyType = "Object";
-        }
-        return propertyType;
-    }
-
-    // -----------------------------------------------------
-    //                                        Various Helper
-    //                                        --------------
-    protected boolean isResultSetProperty(DfProcedureColumnMetaInfo column) {
-        if (column.hasColumnMetaInfo()) {
-            return true;
-        }
-        if (column.isPostgreSQLCursor() || column.isOracleCursor()) {
-            return true;
-        } else {
-            return false;
+            return "Object"; // procedure has many-many types so it uses Object type (not String)
         }
     }
 
+    protected String getGenericListClassName(String element) {
+        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        return grammarInfo.getGenericListClassName(element); // List<ELEMENT>
+    }
+
+    // ===================================================================================
+    //                                                                        Convert Name
+    //                                                                        ============
     protected String convertProcedureNameToPmbName(String procedureName) {
         procedureName = Srl.replace(procedureName, ".", "_");
         procedureName = resolveVendorProcedureNameHeadable(procedureName);
@@ -259,6 +253,9 @@ public class DfProcedurePmbSetupper {
         return columnName;
     }
 
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfBasicProperties getBasicProperties() {
         return DfBuildProperties.getInstance().getBasicProperties();
     }

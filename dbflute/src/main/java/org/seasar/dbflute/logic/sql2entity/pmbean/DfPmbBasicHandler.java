@@ -242,8 +242,8 @@ public class DfPmbBasicHandler {
             return false;
         }
         final String dbTypeName = metaInfo.getDbTypeName();
-        final String elementTypeName = getPropertyColumnElementTypeName(className, propertyName);
-        return elementTypeName != null && _columnHandler.isOracleTreatedAsArray(dbTypeName);
+        final String elementType = getPropertyColumnElementTypeName(className, propertyName);
+        return elementType != null && _columnHandler.isOracleTreatedAsArray(dbTypeName);
     }
 
     // -----------------------------------------------------
@@ -252,22 +252,28 @@ public class DfPmbBasicHandler {
     public String getPropertyColumnArrayTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getPropertyNameColumnInfo(className, propertyName);
-        return columnInfo != null ? columnInfo.getArrayTypeName() : null;
+        if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
+            return columnInfo.getTypeArrayInfo().getTypeName();
+        }
+        return null;
     }
 
     public String getPropertyColumnElementTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getPropertyNameColumnInfo(className, propertyName);
-        return columnInfo != null ? columnInfo.getElementTypeName() : null;
+        if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
+            return columnInfo.getTypeArrayInfo().getElementType();
+        }
+        return null;
     }
 
     protected DfProcedureColumnMetaInfo getPropertyNameColumnInfo(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);
-        if (columnInfoMap == null) {
-            return null;
+        if (columnInfoMap != null) {
+            return columnInfoMap.get(propertyName);
         }
-        return columnInfoMap.get(propertyName);
+        return null;
     }
 
     protected Map<String, DfProcedureColumnMetaInfo> getPropertyNameColumnInfoMap(String className) {

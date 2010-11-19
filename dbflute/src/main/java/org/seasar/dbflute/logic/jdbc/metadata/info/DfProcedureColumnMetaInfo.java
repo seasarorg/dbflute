@@ -18,18 +18,36 @@ public class DfProcedureColumnMetaInfo {
     protected String _dbTypeName;
     protected Integer _columnSize;
     protected Integer _decimalDigits;
+    protected Integer _overloadNo;
     protected String _columnComment;
     protected DfProcedureColumnType _procedureColumnType;
-    protected Map<String, DfColumnMetaInfo> _columnMetaInfoMap = DfCollectionUtil.emptyMap(); // if result set
-    protected DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected Map<String, DfColumnMetaInfo> _resultSetColumnInfoMap = DfCollectionUtil.emptyMap(); // as default
+    protected DfTypeArrayInfo _typeArrayInfo;
 
-    // for Array
-    protected String _arrayTypeName;
-    protected String _elementTypeName;
+    protected final DfColumnHandler _columnHandler = new DfColumnHandler(); // for type determination
 
     // ===================================================================================
-    //                                                                            Behavior
-    //                                                                            ========
+    //                                                                Status Determination
+    //                                                                ====================
+    public boolean hasResultSetColumnInfo() {
+        return !_resultSetColumnInfoMap.isEmpty();
+    }
+
+    public boolean hasColumnComment() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getColumnComment());
+    }
+
+    public boolean hasTypeArrayTypeName() {
+        return _typeArrayInfo != null && _typeArrayInfo.getTypeName() != null;
+    }
+
+    public boolean hasTypeArrayElementType() {
+        return _typeArrayInfo != null && _typeArrayInfo.getElementType() != null;
+    }
+
+    // ===================================================================================
+    //                                                                             Display
+    //                                                                             =======
     public String getColumnDisplayName() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getColumnNameDisp());
@@ -84,14 +102,6 @@ public class DfProcedureColumnMetaInfo {
         }
         sb.append(" as ").append(_procedureColumnType.alias());
         return sb.toString();
-    }
-
-    public boolean hasColumnMetaInfo() {
-        return !_columnMetaInfoMap.isEmpty();
-    }
-
-    public boolean hasColumnComment() {
-        return Srl.is_NotNull_and_NotTrimmedEmpty(getColumnComment());
     }
 
     public String getColumnCommentForSchemaHtml() {
@@ -238,6 +248,14 @@ public class DfProcedureColumnMetaInfo {
         this._decimalDigits = decimalDigits;
     }
 
+    public Integer getOverloadNo() {
+        return _overloadNo;
+    }
+
+    public void setOverloadNo(Integer overloadNo) {
+        this._overloadNo = overloadNo;
+    }
+
     public String getColumnComment() {
         return _columnComment;
     }
@@ -246,27 +264,19 @@ public class DfProcedureColumnMetaInfo {
         this._columnComment = columnComment;
     }
 
-    public Map<String, DfColumnMetaInfo> getColumnMetaInfoMap() {
-        return _columnMetaInfoMap;
+    public Map<String, DfColumnMetaInfo> getResultSetColumnMetaInfoMap() {
+        return _resultSetColumnInfoMap;
     }
 
-    public void setColumnMetaInfoMap(Map<String, DfColumnMetaInfo> columnMetaInfoMap) {
-        this._columnMetaInfoMap = columnMetaInfoMap;
+    public void setResultSetColumnInfoMap(Map<String, DfColumnMetaInfo> resultSetColumnInfoMap) {
+        this._resultSetColumnInfoMap = resultSetColumnInfoMap;
     }
 
-    public String getArrayTypeName() {
-        return _arrayTypeName;
+    public DfTypeArrayInfo getTypeArrayInfo() {
+        return _typeArrayInfo;
     }
 
-    public void setArrayTypeName(String arrayTypeName) {
-        this._arrayTypeName = arrayTypeName;
-    }
-
-    public String getElementTypeName() {
-        return _elementTypeName;
-    }
-
-    public void setElementTypeName(String elementTypeName) {
-        this._elementTypeName = elementTypeName;
+    public void setTypeArrayInfo(DfTypeArrayInfo typeArrayInfo) {
+        this._typeArrayInfo = typeArrayInfo;
     }
 }
