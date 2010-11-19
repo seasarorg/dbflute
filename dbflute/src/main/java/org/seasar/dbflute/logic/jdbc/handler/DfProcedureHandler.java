@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -374,8 +375,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final Map<String, Integer> overloadInfoMap = extractor.extractOverloadInfoMap(unifiedSchema);
         final Map<String, DfTypeArrayInfo> arrayInfoMap = extractor.extractArrayInfoMap(unifiedSchema);
         final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
-        final List<DfTypeArrayInfo> resolvedArrayInfoList = new ArrayList<DfTypeArrayInfo>();
-        final List<DfTypeStructInfo> resolvedStructInfoList = new ArrayList<DfTypeStructInfo>();
+        final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
+        final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
             final String catalog = metaInfo.getProcedureCatalog();
             final String procedureName = metaInfo.getProcedureName();
@@ -393,7 +394,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 // Array
                 final DfTypeArrayInfo arrayInfo = arrayInfoMap.get(key);
                 if (arrayInfo != null) {
-                    resolvedArrayInfoList.add(arrayInfo);
+                    resolvedArrayDispSet.add(arrayInfo.toString());
                     columnInfo.setTypeArrayInfo(arrayInfo);
                 }
 
@@ -402,22 +403,21 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 // filter because STRUCT type might have its schema prefix
                 final DfTypeStructInfo structInfo = structInfoMap.get(Srl.substringFirstRear(dbTypeName, "."));
                 if (structInfo != null) {
-                    resolvedStructInfoList.add(structInfo);
+                    resolvedStructDispSet.add(structInfo.toString());
                     columnInfo.setTypeStructInfo(structInfo);
                 }
             }
         }
-        if (!resolvedArrayInfoList.isEmpty()) {
-            log("Resolved array type: " + resolvedArrayInfoList.size());
-            for (DfTypeArrayInfo arrayInfo : resolvedArrayInfoList) {
-                log(" - " + arrayInfo.getTypeName() + "<" + arrayInfo.getElementType() + ">"
-                        + (arrayInfo.hasStructInfo() ? " (struct)" : ""));
+        if (!resolvedArrayDispSet.isEmpty()) {
+            log("Resolved array type: " + resolvedArrayDispSet.size());
+            for (String arrayInfo : resolvedArrayDispSet) {
+                log(" - " + arrayInfo);
             }
         }
-        if (!resolvedStructInfoList.isEmpty()) {
-            log("Resolved struct type: " + resolvedStructInfoList.size());
-            for (DfTypeStructInfo structInfo : resolvedStructInfoList) {
-                log(" - " + structInfo.getTypeName() + "(" + structInfo.getAttributeInfoMap().size() + ")");
+        if (!resolvedStructDispSet.isEmpty()) {
+            log("Resolved struct type: " + resolvedStructDispSet.size());
+            for (String structInfo : resolvedStructDispSet) {
+                log(" - " + structInfo);
             }
         }
     }

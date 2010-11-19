@@ -30,6 +30,21 @@ public class DfTypeStructInfo {
     protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered();
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        for (DfColumnMetaInfo info : _attributeInfoMap.values()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(info.getColumnName());
+        }
+        return _typeName + "(" + sb.toString() + ")";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getTypeName() {

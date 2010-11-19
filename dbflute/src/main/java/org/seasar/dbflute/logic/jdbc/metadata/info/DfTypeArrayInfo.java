@@ -36,6 +36,14 @@ public class DfTypeArrayInfo {
     }
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    @Override
+    public String toString() {
+        return _typeName + "<" + _elementType + ">" + (_structInfo != null ? " (struct)" : "");
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getTypeName() {
