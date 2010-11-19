@@ -44,6 +44,10 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     // -----------------------------------------------------
     //                                   Procedure Parameter
     //                                   -------------------
+#if ($database.hasPmbMetaDataProcedureOverload($pmbClassName))
+    // this procedure has overload parameters so you need to extend this class
+    // and set up parameter annotations for one call of overload
+#end
 #set ($procedureParameterIndex = 0)
 #set ($procedureNotParamResultIndex = 1000)
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
@@ -90,7 +94,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /** ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} */
-    protected ${propertyType} ${variableName}; ${database.getPmbMetaDataProcedureParameterOverloadNoComment($pmbClassName, $propertyName)}
+    protected ${propertyType} ${variableName};
 
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
     /** The value of likeSearchOption for ${propertyName}. */

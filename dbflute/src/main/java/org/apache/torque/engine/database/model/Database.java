@@ -396,6 +396,10 @@ public class Database {
         return getPmbBasicHandler().isRefCustomizeEntity(className);
     }
 
+    public boolean hasPmbMetaDataProcedureOverload(String className) {
+        return getPmbBasicHandler().hasProcedureOverload(className);
+    }
+
     public boolean isPmbMetaDataPropertyOptionProcedureParameterIn(String className, String propertyName) {
         return getPmbBasicHandler().isPropertyOptionProcedureParameterIn(className, propertyName);
     }
@@ -439,14 +443,6 @@ public class Database {
 
     public String getPmbMetaDataProcedureParameterArrayTypeName(String className, String propertyName) {
         return getPmbBasicHandler().getProcedureParameterArrayTypeName(className, propertyName);
-    }
-
-    public String getPmbMetaDataProcedureParameterOverloadNo(String className, String propertyName) {
-        return getPmbBasicHandler().getProcedureParameterOverloadNo(className, propertyName);
-    }
-
-    public String getPmbMetaDataProcedureParameterOverloadNoComment(String className, String propertyName) {
-        return getPmbBasicHandler().getProcedureParameterOverloadNoComment(className, propertyName);
     }
 
     // -----------------------------------------------------

@@ -65,7 +65,9 @@ public class DfStructExtractorOracle {
         final List<Map<String, String>> resultList = selectStructAttribute(unifiedSchema);
         final StringKeyMap<DfTypeStructInfo> structInfoMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
-            final String typeName = map.get("TYPE_NAME");
+            // filter because TYPE_NAME might have its schema prefix
+            final String typeName = Srl.substringFirstRear(map.get("TYPE_NAME"), ".");
+
             DfTypeStructInfo info = structInfoMap.get(typeName);
             if (info == null) {
                 info = new DfTypeStructInfo();

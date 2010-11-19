@@ -160,6 +160,21 @@ public class DfPmbBasicHandler {
         return metaData.isRefCustomizeEntity();
     }
 
+    public boolean hasProcedureOverload(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);
+        if (columnInfoMap == null) {
+            return false;
+        }
+        final Collection<DfProcedureColumnMetaInfo> values = columnInfoMap.values();
+        for (DfProcedureColumnMetaInfo columnInfo : values) {
+            if (columnInfo.getOverloadNo() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isPropertyOptionProcedureParameterIn(String className, String propertyName) {
         String option = findPropertyOption(className, propertyName);
         return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnIn.toString());
@@ -265,24 +280,6 @@ public class DfPmbBasicHandler {
             return columnInfo.getTypeArrayInfo().getElementType();
         }
         return "";
-    }
-
-    public String getProcedureParameterOverloadNo(String className, String propertyName) {
-        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
-        if (columnInfo != null) {
-            final Integer overloadNo = columnInfo.getOverloadNo();
-            return overloadNo != null ? overloadNo.toString() : "";
-        }
-        return "";
-    }
-
-    public String getProcedureParameterOverloadNoComment(String className, String propertyName) {
-        final String overloadNo = getProcedureParameterOverloadNo(className, propertyName);
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(overloadNo)) {
-            return "// overloadNo = " + overloadNo;
-        }
-        return overloadNo;
     }
 
     protected DfProcedureColumnMetaInfo getProcedureColumnInfo(String className, String propertyName) {

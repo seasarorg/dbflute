@@ -105,7 +105,10 @@ public class DfProcedurePmbSetupper {
                 {
                     propertyName = convertColumnNameToPropertyName(columnName);
                 }
+
+                // procedure's overload is unsupported because of this (override property) 
                 propertyNameColumnInfoMap.put(propertyName, column);
+
                 final ProcedurePropertyInfo propertyInfo = processProcedureProperty(pmbName, column, propertyName);
                 final String propertyType = propertyInfo.getPropertyType();
                 if (propertyInfo.isRefCustomizeEntity()) {
