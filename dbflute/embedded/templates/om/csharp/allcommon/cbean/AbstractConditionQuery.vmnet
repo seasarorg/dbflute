@@ -644,7 +644,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected virtual String getExistsSubQuerySql(${glConditionQuery} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
 		int subQueryLevel = subQuery.xgetSubQueryLevel();
-		String tableAliasName = "dfsublocal_" + subQueryLevel;
+		String tableAliasName = "sub" + subQueryLevel + "loc";
         String selectClause = "select " + tableAliasName + "." + relatedColumnName;
         String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                        , selectClause, tableAliasName, realColumnName);
@@ -680,7 +680,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                         , String realColumnName, String relatedColumnName
                                                         , String propertyName, String aliasName) {
         int subQueryLevel = subQuery.xgetSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String tableAliasName = "sub" + subQueryLevel + "loc";
         String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
@@ -837,7 +837,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                       , String realColumnName, String relatedColumnName
                                                       , String propertyName, Object value) {
         int subQueryLevel = subQuery.xgetSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String tableAliasName = "sub" + subQueryLevel + "loc";
         String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
@@ -1167,7 +1167,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected String getScalarSubQuerySql(String function, ${glConditionQuery} subQuery
                                         , String propertyName) {
         int subQueryLevel = subQuery.xgetSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String tableAliasName = "sub" + subQueryLevel + "loc";
         String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwScalarSubQueryInvalidColumnSpecificationException(function);

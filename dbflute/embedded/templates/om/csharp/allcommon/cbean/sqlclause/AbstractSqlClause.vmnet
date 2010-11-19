@@ -1824,16 +1824,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                    Table Alias Info
     //                                                                    ================
     public String getBasePointAliasName() {
-        // _forSubQuery is not needed here
-        // because SubQuery brothers adjust alias names by themselves
-        // (for example, it replaces "dflocal" to "dfsublocal_x")
-        return "dflocal"; // fixed (being used for a long time)
+        return "dfloc";
     }
 
     public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
-        // nestLevel is unused because relationPath has same role
-        // (that was used long long ago)
-        return "df" + (_forSubQuery ? "sub" + subQueryLevel : "") + "relation" + relationPath;
+        return (_forSubQuery ? "sub" + subQueryLevel : "df") + "rel" + relationPath;
     }
 
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
