@@ -67,6 +67,10 @@ public abstract class AbstractSubQuery {
         return "sub" + _subQueryLevel + "loc";
     }
 
+    protected String buildSubQueryMainAliasName() {
+        return "sub" + _subQueryLevel + "main";
+    }
+
     protected String buildPlainFromWhereClause(String selectClause, String tableAliasName) {
         final SubQueryClause clause = createSubQueryClause(selectClause, tableAliasName);
         return clause.buildPlainSubQueryFromWhereClause();

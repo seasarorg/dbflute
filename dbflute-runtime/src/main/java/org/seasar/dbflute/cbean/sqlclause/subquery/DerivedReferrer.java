@@ -117,10 +117,11 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
             mainSql = selectClause + " " + fromWhereClause;
         }
-        final String joinCondition = "dfsubquerymain." + relatedColumnSqlName + " = " + columnRealName;
-        final ColumnRealName mainDerivedColumnRealName = new ColumnRealName("dfsubquerymain", derivedColumnSqlName);
+        final String mainAlias = buildSubQueryMainAliasName();
+        final String joinCondition = mainAlias + "." + relatedColumnSqlName + " = " + columnRealName;
+        final ColumnRealName mainDerivedColumnRealName = new ColumnRealName(mainAlias, derivedColumnSqlName);
         return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) + ln() + "  from ("
-                + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where " + joinCondition;
+                + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark + ln() + " where " + joinCondition;
     }
 
     protected String buildFunctionPart(String function, ColumnRealName columnRealName, DerivedReferrerOption option) {

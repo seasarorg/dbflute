@@ -1708,7 +1708,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
         // nestLevel is unused because relationPath has same role
         // (that was used long long ago)
-        return (_forSubQuery ? "sub" + subQueryLevel : "") + "dfrel" + relationPath;
+        return (_forSubQuery ? "sub" + subQueryLevel : "df") + "rel" + relationPath;
     }
 
     /**

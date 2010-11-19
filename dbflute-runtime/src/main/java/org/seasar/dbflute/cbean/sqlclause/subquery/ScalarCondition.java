@@ -91,9 +91,10 @@ public class ScalarCondition extends AbstractSubQuery {
             final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
             mainSql = selectClause + " " + fromWhereClause;
         }
-        final ColumnRealName mainDerivedColumnRealName = new ColumnRealName("dfsubquerymain", derivedColumnSqlName);
+        final String mainAlias = buildSubQueryMainAliasName();
+        final ColumnRealName mainDerivedColumnRealName = new ColumnRealName(mainAlias, derivedColumnSqlName);
         return "select " + function + "(" + mainDerivedColumnRealName + ")" + ln() + "  from (" + beginMark + mainSql
-                + ln() + "       ) dfsubquerymain" + endMark;
+                + ln() + "       ) " + mainAlias + endMark;
     }
 
     protected void throwScalarConditionInvalidColumnSpecificationException(String function) {

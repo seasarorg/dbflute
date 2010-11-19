@@ -1052,9 +1052,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #FD4747">withManualOrder(statusCodeList)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
-     * <span style="color: #3F7E5E">//     when dflocal.MEMBER_STATUS_CODE = 'WDL' then 0</span>
-     * <span style="color: #3F7E5E">//     when dflocal.MEMBER_STATUS_CODE = 'FML' then 1</span>
-     * <span style="color: #3F7E5E">//     when dflocal.MEMBER_STATUS_CODE = 'PRV' then 2</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'FML' then 1</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'PRV' then 2</span>
      * <span style="color: #3F7E5E">//     else 3</span>
      * <span style="color: #3F7E5E">//   end asc, ...</span>
      * </pre>
