@@ -41,7 +41,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.array.DfProcedureArrayExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.factory.DfProcedureSynonymExtractorFactory;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -367,7 +367,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     protected void doResolveAssistInfoOracle(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMetaInfo> metaInfoList) {
-        final DfProcedureArrayExtractorOracle assistant = new DfProcedureArrayExtractorOracle(dataSource);
+        final DfProcedureSupplementExtractorOracle assistant = new DfProcedureSupplementExtractorOracle(dataSource);
         final Map<String, DfTypeArrayInfo> arrayInfoMap = assistant.extractArrayInfoMap(unifiedSchema);
         final Map<String, Integer> overloadInfoMap = assistant.extractOverloadInfoMap(unifiedSchema);
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
@@ -402,7 +402,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     protected void resolveOracleOverloadInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMetaInfo> metaInfoList) {
-        final DfProcedureArrayExtractorOracle assistant = new DfProcedureArrayExtractorOracle(dataSource);
+        final DfProcedureSupplementExtractorOracle assistant = new DfProcedureSupplementExtractorOracle(dataSource);
         final Map<String, DfTypeArrayInfo> arrayInfoMap = assistant.extractArrayInfoMap(unifiedSchema);
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
             final String packageName = metaInfo.getProcedureCatalog();

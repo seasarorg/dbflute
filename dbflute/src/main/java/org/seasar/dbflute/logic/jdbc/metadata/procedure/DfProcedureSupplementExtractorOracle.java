@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.jdbc.metadata.procedure.array;
+package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +34,14 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.7.6 (2010/11/18 Thursday)
  */
-public class DfProcedureArrayExtractorOracle {
+public class DfProcedureSupplementExtractorOracle {
 
-    private static final Log _log = LogFactory.getLog(DfProcedureArrayExtractorOracle.class);
+    private static final Log _log = LogFactory.getLog(DfProcedureSupplementExtractorOracle.class);
 
     protected final DataSource _dataSource;
     protected List<ProcedureArgumentInfo> _procedureArgumentInfoList;
 
-    public DfProcedureArrayExtractorOracle(DataSource dataSource) {
+    public DfProcedureSupplementExtractorOracle(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
