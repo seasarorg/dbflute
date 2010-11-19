@@ -2,6 +2,7 @@ package org.seasar.dbflute.cbean.chelper;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -55,13 +56,16 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             doSpecifyRequiredColumn();
         }
         final String relationPath = _query.xgetRelationPath() != null ? _query.xgetRelationPath() : "";
+        final SqlClause sqlClause = _baseCB.getSqlClause();
         final String tableAliasName;
         if (_query.isBaseQuery()) {
-            tableAliasName = _baseCB.getSqlClause().getLocalTableAliasName();
+            tableAliasName = sqlClause.getBasePointAliasName();
         } else {
-            tableAliasName = _baseCB.getSqlClause().resolveJoinAliasName(relationPath, _query.xgetNestLevel());
+            final int nestLevel = _query.xgetNestLevel();
+            final int subQueryLevel = _query.xgetSubQueryLevel();
+            tableAliasName = sqlClause.resolveJoinAliasName(relationPath, nestLevel, subQueryLevel);
         }
-        _baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName, _query.getTableDbName());
+        sqlClause.specifySelectColumn(tableAliasName, columnName, _query.getTableDbName());
     }
 
     protected void assertColumn(String columnName) {

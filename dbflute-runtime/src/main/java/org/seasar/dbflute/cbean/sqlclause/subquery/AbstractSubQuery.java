@@ -25,7 +25,6 @@ public abstract class AbstractSubQuery {
     protected final ColumnSqlNameProvider _subQuerySqlNameProvider;
     protected final int _subQueryLevel;
     protected final SqlClause _subQueryClause;
-    protected final SubQueryLevelReflector _reflector;
     protected final String _subQueryIdentity;
     protected final DBMeta _subQueryDBMeta;
 
@@ -39,21 +38,18 @@ public abstract class AbstractSubQuery {
      * @param subQuerySqlNameProvider The provider of column real name for sub-query. (NotNull)
      * @param subQueryLevel The sub-query level for sub-query.
      * @param subQueryClause The SQL clause for sub-query. (NotNull)
-     * @param reflector The reflector of sub-query level for local table. (NotNull)
      * @param subQueryIdentity The identity string for sub-query. (NotNull)
      * @param subQueryDBMeta The DB meta for sub-query. (NotNull)
      */
     public AbstractSubQuery(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
-            DBMeta subQueryDBMeta) {
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta) {
         _sqlClause = sqlClause;
         _subQueryPath = subQueryPath;
         _localRealNameProvider = localRealNameProvider;
         _subQuerySqlNameProvider = subQuerySqlNameProvider;
         _subQueryLevel = subQueryLevel;
         _subQueryClause = subQueryClause;
-        _reflector = reflector;
         _subQueryIdentity = subQueryIdentity;
         _subQueryDBMeta = subQueryDBMeta;
     }
@@ -61,6 +57,12 @@ public abstract class AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
+    protected String buildLocalTableAliasName() {
+        // this name must not contain "dflocal"
+        // because the word is replaced later in mistake
+        return "dfsub" + _subQueryLevel + "local";
+    }
+
     protected String buildPlainFromWhereClause(String selectClause, String tableAliasName) {
         final SubQueryClause clause = createSubQueryClause(selectClause, tableAliasName);
         return clause.buildPlainSubQueryFromWhereClause();
@@ -80,13 +82,6 @@ public abstract class AbstractSubQuery {
 
     protected SubQueryClause createSubQueryClause(String selectClause, String tableAliasName) {
         return new SubQueryClause(_sqlClause, _subQueryPath, selectClause, _subQueryClause, tableAliasName);
-    }
-
-    // ===================================================================================
-    //                                                                       Reflect Level
-    //                                                                       =============
-    protected void reflectLocalSubQueryLevel() {
-        _reflector.reflect(_subQueryLevel);
     }
 
     // ===================================================================================

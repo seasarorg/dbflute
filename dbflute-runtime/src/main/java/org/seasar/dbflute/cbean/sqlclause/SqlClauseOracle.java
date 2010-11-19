@@ -131,10 +131,10 @@ public class SqlClauseOracle extends AbstractSqlClause {
         final DBMeta dbmeta = findDBMeta(_tableDbName);
         if (dbmeta.hasPrimaryKey()) {
             final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-            _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + primaryKeyName;
+            _lockSqlSuffix = " for update of " + getBasePointAliasName() + "." + primaryKeyName;
         } else {
             final ColumnSqlName randomColumnName = ((ColumnInfo) dbmeta.getColumnInfoList().get(0)).getColumnSqlName();
-            _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + randomColumnName;
+            _lockSqlSuffix = " for update of " + getBasePointAliasName() + "." + randomColumnName;
         }
         return this;
     }

@@ -51,7 +51,7 @@ public class SubQueryClause {
         // (Override base alias name at sub-query on SQL)
         // So if the argument 'tableAliasName' is not null, replace it. 
         if (_tableAliasName != null) {
-            fromWhereClause = replaceString(fromWhereClause, "dflocal", _tableAliasName);
+            fromWhereClause = replaceString(fromWhereClause, getBasePointAliasName(), _tableAliasName);
         }
 
         // Resolve the location path for the condition-query of sub-query. 
@@ -99,7 +99,7 @@ public class SubQueryClause {
         String clause = _subQueryClause.getClauseFromWhereWithWhereUnionTemplate();
 
         // Replace the alias names for local table with alias name of sub-query unique. 
-        clause = replaceString(clause, "dflocal", _tableAliasName);
+        clause = replaceString(clause, getBasePointAliasName(), _tableAliasName);
 
         // Resolve the location path for the condition-query of sub-query. 
         clause = replaceString(clause, ".conditionQuery.", "." + _subQueryPath + ".");
@@ -117,6 +117,13 @@ public class SubQueryClause {
         clause = replaceString(clause, sc.getUnionWhereClauseMark(), ln() + " where " + joinCondition);
         clause = replaceString(clause, sc.getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return clause;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String getBasePointAliasName() {
+        return _sqlClause.getBasePointAliasName();
     }
 
     // ===================================================================================

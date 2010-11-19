@@ -92,6 +92,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The cache map of DB meta for basically related tables. */
     protected Map<String, DBMeta> _cachedDBMetaMap;
 
+    /** Is this SQL for sub-query? (for example, used by alias name adjustment) */
+    protected boolean _forSubQuery;
+
     // -----------------------------------------------------
     //                                       Clause Resource
     //                                       ---------------
@@ -241,6 +244,23 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _dbmetaProvider = dbmetaProvider;
         _dbmeta = findDBMeta(_tableDbName);
         return this;
+    }
+
+    // ===================================================================================
+    //                                                                              Manage
+    //                                                                              ======
+    /**
+     * {@inheritDoc}
+     */
+    public void setupForSubQuery() {
+        _forSubQuery = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isForSubQuery() {
+        return _forSubQuery;
     }
 
     // ===================================================================================
@@ -396,7 +416,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String getSelectClause() {
         // [DBFlute-0.8.6]
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
-            return buildSelectClauseCountOrScalar(getLocalTableAliasName());
+            return buildSelectClauseCountOrScalar(getBasePointAliasName());
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
@@ -407,7 +427,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         Map<String, String> localSpecifiedMap = null;
         if (_specifiedSelectColumnMap != null) {
-            localSpecifiedMap = _specifiedSelectColumnMap.get(getLocalTableAliasName());
+            localSpecifiedMap = _specifiedSelectColumnMap.get(getBasePointAliasName());
         }
         final boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
@@ -448,7 +468,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 sb.append(" ");
                 needsDelimiter = true;
             }
-            final String realColumnName = getLocalTableAliasName() + "." + columnSqlName;
+            final String realColumnName = getBasePointAliasName() + "." + columnSqlName;
             final String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
@@ -681,9 +701,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (hasBaseTableInlineWhereClause()) {
             final List<QueryClause> baseTableInlineWhereList = getBaseTableInlineWhereList();
             sb.append(getInlineViewClause(tableSqlName, baseTableInlineWhereList, tablePos));
-            sb.append(" ").append(getLocalTableAliasName());
+            sb.append(" ").append(getBasePointAliasName());
         } else {
-            sb.append(tableSqlName).append(" ").append(getLocalTableAliasName());
+            sb.append(tableSqlName).append(" ").append(getBasePointAliasName());
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -1669,40 +1689,34 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
-    //                                                                            Resolver
-    //                                                                            ========
-    public String resolveJoinAliasName(String relationPath, int cqNestNo) {
-        return resolveNestLevelExpression(getForeignTableAliasPrefix() + relationPath, cqNestNo);
+    //                                                                    Table Alias Info
+    //                                                                    ================
+    /**
+     * {@inheritDoc}
+     */
+    public String getBasePointAliasName() {
+        // _forSubQuery is not needed here
+        // because SubQuery brothers adjust alias names by themselves
+        // (for example, it replaces "dflocal" to "dfsublocal_x")
+        return "dflocal"; // fixed (being used for a long time)
     }
 
-    public String resolveNestLevelExpression(String name, int cqNestNo) {
-        // *comment out old style 
-        //if (cqNestNo > 1) {
-        //    return name + "_n" + cqNestNo;
-        //} else {
-        //    return name;
-        //}
-        return name;
+    /**
+     * {@inheritDoc}
+     */
+    public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
+        // nestLevel is unused because relationPath has same role
+        // (that was used long long ago)
+        return "df" + (_forSubQuery ? "sub" + subQueryLevel : "") + "relation" + relationPath;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
         final DBMeta dbmeta = findDBMeta(localTableName);
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         return foreignInfo.getRelationNo();
-    }
-
-    // ===================================================================================
-    //                                                                    Table Alias Info
-    //                                                                    ================
-    public String getLocalTableAliasName() {
-        // _purpose.isSubQuery() is not needed here
-        // because SubQuery brothers adjust alias names by themselves
-        // (for example, it replaces "dflocal" to "dfsublocal_x")
-        return "dflocal";
-    }
-
-    public String getForeignTableAliasPrefix() {
-        return _purpose.isSubQuery() ? "dfsubrelation" : "dfrelation";
     }
 
     // ===================================================================================
@@ -1953,7 +1967,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (columnParameterMap.isEmpty()) {
             return null;
         }
-        final String aliasName = getLocalTableAliasName();
+        final String aliasName = getBasePointAliasName();
         final DBMeta dbmeta = getDBMeta();
         final TableSqlName tableSqlName = dbmeta.getTableSqlName();
         final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
@@ -2018,7 +2032,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public String getClauseQueryDelete() {
-        final String aliasName = getLocalTableAliasName();
+        final String aliasName = getBasePointAliasName();
         final DBMeta dbmeta = getDBMeta();
         final TableSqlName tableSqlName = dbmeta.getTableSqlName();
         final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();

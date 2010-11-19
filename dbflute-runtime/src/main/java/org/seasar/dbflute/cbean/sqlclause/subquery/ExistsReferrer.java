@@ -21,9 +21,9 @@ public class ExistsReferrer extends AbstractSubQuery {
     //                                                                         ===========
     public ExistsReferrer(SqlClause sqlClause, SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause,
-            SubQueryLevelReflector reflector, String subQueryIdentity, DBMeta subQueryDBMeta) {
+            String subQueryIdentity, DBMeta subQueryDBMeta) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                reflector, subQueryIdentity, subQueryDBMeta);
+                subQueryIdentity, subQueryDBMeta);
     }
 
     // ===================================================================================
@@ -31,7 +31,6 @@ public class ExistsReferrer extends AbstractSubQuery {
     //                                                                        ============
     public String buildExistsReferrer(String columnDbName, String relatedColumnDbName, String existsOption) {
         existsOption = existsOption != null ? existsOption + " " : "";
-        reflectLocalSubQueryLevel();
         final String subQueryClause;
         if (columnDbName.contains(",") && relatedColumnDbName.contains(",")) {
             // two-or-more primary keys
@@ -65,7 +64,7 @@ public class ExistsReferrer extends AbstractSubQuery {
      * @return The clause of sub-query. (NotNull)
      */
     protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName, ColumnRealName correlatedColumnRealName) {
-        final String tableAliasName = "dfsublocal_" + _subQueryLevel;
+        final String tableAliasName = buildLocalTableAliasName();
         final String selectClause;
         {
             final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
@@ -83,7 +82,7 @@ public class ExistsReferrer extends AbstractSubQuery {
      * @return The clause of sub-query. (NotNull)
      */
     protected String getSubQueryClause(ColumnSqlName[] relatedColumnSqlNames, ColumnRealName[] correlatedColumnNames) {
-        final String tableAliasName = "dfsublocal_" + _subQueryLevel;
+        final String tableAliasName = buildLocalTableAliasName();
         final String selectClause;
         {
             // because sub-query may be only allowed to return a single column.

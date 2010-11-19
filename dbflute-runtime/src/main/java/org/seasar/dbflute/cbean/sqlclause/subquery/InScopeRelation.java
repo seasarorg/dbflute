@@ -23,10 +23,10 @@ public class InScopeRelation extends AbstractSubQuery {
     //                                                                         ===========
     public InScopeRelation(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
-            DBMeta subQueryDBMeta, boolean suppressLocalAliasName) {
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
+            boolean suppressLocalAliasName) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                reflector, subQueryIdentity, subQueryDBMeta);
+                subQueryIdentity, subQueryDBMeta);
         _suppressLocalAliasName = suppressLocalAliasName;
     }
 
@@ -35,7 +35,6 @@ public class InScopeRelation extends AbstractSubQuery {
     //                                                                        ============
     public String buildInScopeRelation(String columnDbName, String relatedColumnDbName, String inScopeOption) {
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
-        reflectLocalSubQueryLevel();
         final String subQueryClause;
         {
             final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
@@ -58,7 +57,7 @@ public class InScopeRelation extends AbstractSubQuery {
     }
 
     protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName) {
-        final String tableAliasName = _sqlClause.getLocalTableAliasName();
+        final String tableAliasName = _sqlClause.getBasePointAliasName();
         final String selectClause;
         {
             final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);

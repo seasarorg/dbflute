@@ -26,10 +26,10 @@ public class ScalarCondition extends AbstractSubQuery {
     //                                                                         ===========
     public ScalarCondition(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
-            DBMeta subQueryDBMeta, String mainSubQueryIdentity, String operand) {
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
+            String mainSubQueryIdentity, String operand) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                reflector, subQueryIdentity, subQueryDBMeta);
+                subQueryIdentity, subQueryDBMeta);
         _mainSubQueryIdentity = mainSubQueryIdentity;
         _operand = operand;
     }
@@ -38,8 +38,6 @@ public class ScalarCondition extends AbstractSubQuery {
     //                                                                        Build Clause
     //                                                                        ============
     public String buildScalarCondition(String function) {
-        reflectLocalSubQueryLevel();
-
         // Get the specified column before it disappears at sub-query making.
         final ColumnRealName columnRealName;
         {
@@ -63,7 +61,7 @@ public class ScalarCondition extends AbstractSubQuery {
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final String tableAliasName = "dfsublocal_" + _subQueryLevel;
+        final String tableAliasName = buildLocalTableAliasName();
         final String derivedColumnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
         if (derivedColumnDbName == null) {
             throwScalarConditionInvalidColumnSpecificationException(function);

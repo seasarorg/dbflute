@@ -23,10 +23,10 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     //                                                                         ===========
     public SpecifyDerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
-            DBMeta subQueryDBMeta, String mainSubQueryIdentity, String aliasName) {
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
+            String mainSubQueryIdentity, String aliasName) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                reflector, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity);
+                subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity);
         _aliasName = aliasName;
     }
 

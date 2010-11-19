@@ -885,27 +885,34 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // very internal
-    public void xsetupForUnion() {
+    public void xsetupForUnion(ConditionBean baseCB) {
+        if (baseCB.getSqlClause().isForSubQuery()) {
+            getSqlClause().setupForSubQuery(); // inherits it
+        }
         xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);
     }
 
-    public void xsetupForExistsReferrer() {
+    public void xsetupForExistsReferrer(ConditionQuery baseCQ) {
+        xprepareSubQueryInfo(baseCQ);
         xchangePurposeSqlClause(HpCBPurpose.EXISTS_REFERRER);
     }
 
-    public void xsetupForInScopeRelation() {
+    public void xsetupForInScopeRelation(ConditionQuery baseCQ) {
+        xprepareSubQueryInfo(baseCQ);
         xchangePurposeSqlClause(HpCBPurpose.IN_SCOPE_RELATION);
     }
 
-    public void xsetupForDerivedReferrer() {
+    public void xsetupForDerivedReferrer(ConditionQuery baseCQ) {
+        xprepareSubQueryInfo(baseCQ);
         xchangePurposeSqlClause(HpCBPurpose.DERIVED_REFERRER);
     }
 
-    public void xsetupForScalarSelect() {
+    public void xsetupForScalarSelect() { // not sub-query
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_SELECT);
     }
 
-    public void xsetupForScalarCondition() {
+    public void xsetupForScalarCondition(ConditionQuery baseCQ) {
+        xprepareSubQueryInfo(baseCQ);
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION);
     }
 
@@ -918,6 +925,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //public void xsetupForVaryingUpdate() {
     //    xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
     //}
+
+    protected void xprepareSubQueryInfo(ConditionQuery baseCQ) {
+        final int subQueryLevel = baseCQ.xgetSubQueryLevel();
+        localCQ().xsetSubQueryLevel(subQueryLevel + 1);
+        getSqlClause().setupForSubQuery();
+    }
 
     protected void xchangePurposeSqlClause(HpCBPurpose purpose) {
         _purpose = purpose;

@@ -25,10 +25,10 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     //                                                                         ===========
     public QueryDerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
-            DBMeta subQueryDBMeta, String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
+            String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                reflector, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity);
+                subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity);
         _operand = operand;
         _value = value;
         _parameterPath = parameterPath;

@@ -580,7 +580,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
         }
         loadReferrerOption.delegateConditionBeanSettingUp(cb);
-        if (cb.getSqlClause().hasSpecifiedSelectColumn(cb.getSqlClause().getLocalTableAliasName())) {
+        if (cb.getSqlClause().hasSpecifiedSelectColumn(cb.getSqlClause().getBasePointAliasName())) {
             callback.spFKCol(cb); // specify required columns for relation
         }
         final List<REFERRER_ENTITY> referrerList = callback.selRfLs(cb);

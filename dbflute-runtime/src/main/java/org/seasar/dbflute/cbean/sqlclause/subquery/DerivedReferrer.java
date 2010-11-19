@@ -29,10 +29,10 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     //                                                                         ===========
     public DerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, SubQueryLevelReflector reflector, String subQueryIdentity,
-            DBMeta subQueryDBMeta, String mainSubQueryIdentity) {
+            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
+            String mainSubQueryIdentity) {
         super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                reflector, subQueryIdentity, subQueryDBMeta);
+                subQueryIdentity, subQueryDBMeta);
         _mainSubQueryIdentity = mainSubQueryIdentity;
     }
 
@@ -41,7 +41,6 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     //                                                                        ============
     public String buildDerivedReferrer(String function, String columnDbName, String relatedColumnDbName,
             DerivedReferrerOption option) {
-        reflectLocalSubQueryLevel();
         setupOptionAttribute(option);
         final ColumnRealName columnRealName = _localRealNameProvider.provide(columnDbName);
         final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
@@ -72,7 +71,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final String tableAliasName = "dfsublocal_" + _subQueryLevel;
+        final String tableAliasName = buildLocalTableAliasName();
         final ColumnSqlName derivedColumnSqlName = _subQueryClause.getSpecifiedColumnSqlNameAsOne();
         if (derivedColumnSqlName == null) {
             throwDerivedReferrerInvalidColumnSpecificationException(function);
@@ -81,7 +80,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         {
             final String specifiedColumnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
             final ColumnRealName specifiedColumnRealName = _subQueryClause.getSpecifiedColumnRealNameAsOne();
-            if (!specifiedColumnRealName.getTableAliasName().equals(_subQueryClause.getLocalTableAliasName())) {
+            if (!specifiedColumnRealName.getTableAliasName().equals(_subQueryClause.getBasePointAliasName())) {
                 // The column is on sub-query local table.
                 derivedColumnRealName = specifiedColumnRealName;
             } else {

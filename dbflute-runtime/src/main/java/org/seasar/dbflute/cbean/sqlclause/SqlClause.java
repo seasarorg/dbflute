@@ -37,9 +37,23 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
  */
 public interface SqlClause {
 
-    // =====================================================================================
-    //                                                                                Clause
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Manage
+    //                                                                              ======
+    /**
+     * Set up this SQL for sub-query.
+     */
+    void setupForSubQuery();
+
+    /**
+     * Is this SQL for sub-query?
+     * @return Determination.
+     */
+    boolean isForSubQuery();
+
+    // ===================================================================================
+    //                                                                              Clause
+    //                                                                              ======
     // -----------------------------------------------------
     //                                       Complete Clause
     //                                       ---------------
@@ -80,9 +94,9 @@ public interface SqlClause {
      */
     String getClauseFromWhereWithWhereUnionTemplate();
 
-    // =====================================================================================
-    //                                                                          Clause Parts
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Clause Parts
+    //                                                                        ============
     /**
      * Get the clause of 'select'. This is an internal method.
      * @return The clause of select. {[select ...] from table...} (NotNull)
@@ -445,38 +459,31 @@ public interface SqlClause {
     SqlClause lockForUpdate();
 
     // ===================================================================================
-    //                                                                            Resolver
-    //                                                                            ========
+    //                                                                    Table Alias Info
+    //                                                                    ================
     /**
-     * Resolve join alias name.
-     * @param relationPath Relation path. (NotNull)
-     * @param cqNestNo The nest no of condition query.
-     * @return Resolved join alias name. (NotNull)
+     * Get the alias name for base point table. <br />
+     * This returns the fixed name for base point table in spite of sub-query.
+     * @return The string name. (NotNull)
      */
-    String resolveJoinAliasName(String relationPath, int cqNestNo);
+    String getBasePointAliasName();
 
     /**
-     * Resolve nest level expression.
-     * @param name Name. (NotNull)
-     * @param cqNestNo The nest no of condition query.
-     * @return Resolved name about nest level. (NotNull)
+     * Resolve alias name for join table.
+     * @param relationPath Relation path. (NotNull)
+     * @param nestLevel The nest level of condition query.
+     * @param subQueryLevel The level of sub-query
+     * @return The resolved name. (NotNull)
      */
-    String resolveNestLevelExpression(String name, int cqNestNo);
+    String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel);
 
     /**
      * Resolve relation no.
-     * @param baseTableName The table name of base. (NotNull)
-     * @param foreignPropertyName The property name of foreign. (NotNull)
-     * @return Resolved relation no.
+     * @param localTableName The name of local table. (NotNull)
+     * @param foreignPropertyName The property name of foreign relation. (NotNull)
+     * @return The resolved relation No.
      */
-    int resolveRelationNo(String baseTableName, String foreignPropertyName);
-
-    // ===================================================================================
-    //                                                                    Table Alias Info
-    //                                                                    ================
-    String getLocalTableAliasName();
-
-    String getForeignTableAliasPrefix();
+    int resolveRelationNo(String localTableName, String foreignPropertyName);
 
     // ===================================================================================
     //                                                                       Template Mark
