@@ -214,6 +214,7 @@ public class DfProcedurePmbSetupper {
         if (column.isOracleStruct() && column.hasTypeStructInfo()) {
             final DfTypeStructInfo structInfo = column.getTypeStructInfo();
             doProcessStructProperty(column, structInfo, processInfo);
+            return processInfo;
         }
         final String dbTypeName = column.getDbTypeName();
         processInfo.setPropertyType(findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits));
@@ -248,6 +249,10 @@ public class DfProcedurePmbSetupper {
             return TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
         } else {
             return "Object"; // procedure has many-many types so it uses Object type (not String)
+
+            // it's not complete because nested properties are not target
+            // for example, attributes in STRUCT type
+            // but it's OK, that's the specification of DBFlute
         }
     }
 

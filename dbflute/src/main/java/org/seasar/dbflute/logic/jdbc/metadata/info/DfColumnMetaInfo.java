@@ -38,6 +38,7 @@ public class DfColumnMetaInfo {
     protected String _sql2entityRelatedTableName;
     protected String _sql2entityRelatedColumnName;
     protected String _sql2entityForcedJavaNative;
+    protected boolean _procedureParameter;
 
     // ===================================================================================
     //                                                                       Determination
@@ -161,5 +162,13 @@ public class DfColumnMetaInfo {
 
     public void setSql2EntityForcedJavaNative(String sql2entityForcedJavaNative) {
         this._sql2entityForcedJavaNative = sql2entityForcedJavaNative;
+    }
+
+    public boolean isProcedureParameter() {
+        return _procedureParameter;
+    }
+
+    public void setProcedureParameter(boolean procedureParameter) {
+        this._procedureParameter = procedureParameter;
     }
 }

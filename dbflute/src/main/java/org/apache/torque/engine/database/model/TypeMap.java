@@ -145,6 +145,7 @@ public class TypeMap {
     public static final String TIME = "TIME";
     public static final String TIMESTAMP = "TIMESTAMP";
     public static final String ARRAY = "ARRAY";
+    public static final String OTHER = "OTHER";
 
     // -----------------------------------------------------
     //                                              Original
@@ -179,6 +180,7 @@ public class TypeMap {
     public static final String TIMESTAMP_NATIVE_TYPE = "java.sql.Timestamp";
     public static final String ARRAY_NATIVE_TYPE = "String";
     public static final String UUID_NATIVE_TYPE = "java.util.UUID";
+    public static final String OTHER_NATIVE_TYPE = "Object";
 
     // ===================================================================================
     //                                                                            Type Map
@@ -257,6 +259,7 @@ public class TypeMap {
         _jdbcTypeToJavaNativeMap.put(TIMESTAMP, initializeJavaNative(TIMESTAMP, TIMESTAMP_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(ARRAY, initializeJavaNative(ARRAY, ARRAY_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(UUID, initializeJavaNative(UUID, UUID_NATIVE_TYPE));
+        _jdbcTypeToJavaNativeMap.put(OTHER, initializeJavaNative(OTHER, OTHER_NATIVE_TYPE));
 
         // Register new JDBC type from property.
         {
@@ -298,6 +301,7 @@ public class TypeMap {
         // [UUID Headache]: UUID has not been supported yet on JDBC.
         //_jdbcDefValueToJdbcTypeMap.put(new Integer(Types.UUID), UUID);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.ARRAY), ARRAY);
+        _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.OTHER), OTHER);
 
         // * * * * * * * * * * * * * * * * * * * * * * *
         // The map of JDBC Type to JDBC Definition-Value

@@ -31,6 +31,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DBDef;
@@ -780,7 +781,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        return _columnHandler.getColumnJdbcType(columnMetaInfo);
+        if (columnMetaInfo.isProcedureParameter() && !_columnHandler.hasMappingJdbcType(columnMetaInfo)) {
+            // unknown type of procedure parameter should be treated as Object
+            return TypeMap.OTHER;
+        } else {
+            return _columnHandler.getColumnJdbcType(columnMetaInfo);
+        }
     }
 
     protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> metaMap, String columnName,

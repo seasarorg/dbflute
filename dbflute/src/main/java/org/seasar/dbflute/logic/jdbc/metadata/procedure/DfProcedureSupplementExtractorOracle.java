@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
@@ -158,6 +159,11 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (structInfoMap == null) {
             final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
             structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
+            for (DfTypeStructInfo structInfo : structInfoMap.values()) {
+                for (DfColumnMetaInfo metaInfo : structInfo.getAttributeInfoMap().values()) {
+                    metaInfo.setProcedureParameter(true); // for default mapping type
+                }
+            }
             _structInfoMapMap.put(unifiedSchema, structInfoMap);
         }
         return structInfoMap;

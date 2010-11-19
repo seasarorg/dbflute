@@ -44,7 +44,19 @@ public interface DfProcedureSupplementExtractor {
      */
     public Map<String, DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema);
 
+    /**
+     * Extract the map of struct info for procedure. <br />
+     * (but it contains structs that are not defined as procedure parameters)
+     * @param unifiedSchema The unified schema. (NotNull)
+     * @return The map of array info. (NotNull)
+     */
     public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema);
 
+    /**
+     * @param catalog The catalog for procedure. (Nullable)
+     * @param procedureName The name of procedure. (NotNull)
+     * @param parameterName The name of parameter. (NotNull)
+     * @return The map key for parameter info. (NotNull)
+     */
     public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName);
 }
