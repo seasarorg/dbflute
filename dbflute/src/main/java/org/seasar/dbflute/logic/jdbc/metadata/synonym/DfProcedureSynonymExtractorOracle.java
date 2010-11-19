@@ -61,6 +61,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfProcedureSynonymMetaInfo> extractProcedureSynonymMap() {
+        _log.info("...Extracting procedure synonym");
         final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = StringKeyMap.createAsFlexibleOrdered();
         final String sql = buildSynonymSelect();
         Connection conn = null;

@@ -102,13 +102,13 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                 break;
             } catch (SQLFailureException e) {
                 try {
-                    ++retryCount;
                     doDropTypeObject(conn, "TYPECODE desc");
                     break;
                 } catch (SQLFailureException ignored) {
-                    if (retryLimit >= retryCount) {
+                    if (retryLimit < retryCount) {
                         throw e;
                     }
+                    ++retryCount;
                     continue;
                 }
             }
