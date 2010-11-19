@@ -240,28 +240,39 @@ public class TnProcedureMetaDataFactory {
     //                                                                   Annotation Reader
     //                                                                   =================
     protected static class TnFieldProcedureAnnotationReader {
+
         protected static final String PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
         protected static final String VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
 
+        /**
+         * Get the specification of parameter.
+         * @param propertyDesc The description of property. (NotNull)
+         * @return The specification of parameter. (Nullable)
+         */
         public String getParameterSpecification(DfPropertyDesc propertyDesc) {
             final String propertyName = propertyDesc.getPropertyName();
             final String annotationName = propertyName + PARAMETER_SUFFIX;
             final DfBeanDesc pmbDesc = propertyDesc.getBeanDesc();
             if (pmbDesc.hasField(annotationName)) {
-                final Field f = pmbDesc.getField(annotationName);
-                return (String) getValue(f, null);
+                final Field field = pmbDesc.getField(annotationName);
+                return (String) DfReflectionUtil.getValue(field, null);
             } else {
                 return null;
             }
         }
 
+        /**
+         * Get the name or instance of value type for parameter.
+         * @param propertyDesc The description of property. (NotNull)
+         * @return The string or instance of value type. (Nullable)
+         */
         public Object getValueType(DfPropertyDesc propertyDesc) {
             final String propertyName = propertyDesc.getPropertyName();
             final String annotationName = propertyName + VALUE_TYPE_SUFFIX;
             final DfBeanDesc pmbDesc = propertyDesc.getBeanDesc();
             if (pmbDesc.hasField(annotationName)) {
                 final Field field = pmbDesc.getField(annotationName);
-                return getValue(field, null);
+                return DfReflectionUtil.getValue(field, null);
             } else {
                 return null;
             }
