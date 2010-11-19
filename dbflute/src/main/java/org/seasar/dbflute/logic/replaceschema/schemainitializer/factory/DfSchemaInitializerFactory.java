@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.factory;
+package org.seasar.dbflute.logic.replaceschema.schemainitializer.factory;
 
 import java.io.PrintWriter;
 import java.sql.Connection;

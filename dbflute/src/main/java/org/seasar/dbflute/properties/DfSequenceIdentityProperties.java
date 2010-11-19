@@ -17,9 +17,9 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
