@@ -27,6 +27,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -36,70 +38,130 @@ import org.seasar.dbflute.util.Srl;
  */
 public class DfProcedureSupplementExtractorOracle implements DfProcedureSupplementExtractor {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfProcedureSupplementExtractorOracle.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final DataSource _dataSource;
-    protected List<ProcedureArgumentInfo> _procedureArgumentInfoList;
 
+    /** The info map of argument for cache. */
+    protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = DfCollectionUtil
+            .newHashMap();
+
+    /** The info map of STRUCT type for cache. */
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structInfoMapMap = DfCollectionUtil
+            .newHashMap();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfProcedureSupplementExtractorOracle(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
+    // ===================================================================================
+    //                                                                            Overload
+    //                                                                            ========
     /**
      * Extract the map of overload info. <br />
      * Same name and different type parameters of overload are unsupported. 
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of array info. {key=(packageName.)procedureName.columnName, value=overloadNo} (NotNull)
+     * @return The map of array info. {key = (packageName.)procedureName.columnName, value = overloadNo} (NotNull)
      */
-    public Map<String, Integer> extractOverloadInfoMap(UnifiedSchema unifiedSchema) {
+    public StringKeyMap<Integer> extractOverloadInfoMap(UnifiedSchema unifiedSchema) {
         //final List<ProcedureArgumentInfo> infoList = selectProcedureArgumentInfo(unifiedSchema);
-        return DfCollectionUtil.emptyMap();
+        return StringKeyMap.createAsFlexibleOrdered();
     }
 
+    // ===================================================================================
+    //                                                                               Array
+    //                                                                               =====
     /**
      * Extract the map of array info. <br />
      * Same name and different type parameters of overload are unsupported. 
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of array info. {key=(packageName.)procedureName.columnName} (NotNull)
+     * @return The map of array info. {key = (packageName.)procedureName.columnName} (NotNull)
      */
-    public Map<String, DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema) {
-        final List<ProcedureArgumentInfo> infoList = selectProcedureArgumentInfo(unifiedSchema);
+    public StringKeyMap<DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema) {
+        final List<ProcedureArgumentInfo> infoList = findProcedureArgumentInfoList(unifiedSchema);
         final StringKeyMap<DfTypeArrayInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
             final ProcedureArgumentInfo info = infoList.get(i);
             final String argumentName = info.getArgumentName();
             final String dataType = info.getDataType();
-            if (argumentName != null && Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY")) {
-                final DfTypeArrayInfo oracleArrayInfo = new DfTypeArrayInfo();
-                final String typeName = info.getTypeName();
-                final String typeSubName = info.getTypeSubName();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(typeSubName)) {
-                    if (Srl.is_NotNull_and_NotTrimmedEmpty(typeName)) {
-                        oracleArrayInfo.setTypeName(typeName + "." + typeSubName);
-                    } else {
-                        oracleArrayInfo.setTypeName(typeSubName);
-                    }
-                } else {
-                    oracleArrayInfo.setTypeName(typeName);
-                }
-                if (infoList.size() > (i + 1)) {
-                    ProcedureArgumentInfo nextInfo = infoList.get(i + 1);
-                    oracleArrayInfo.setElementType(nextInfo.getDataType());
-                }
-                final StringBuilder keySb = new StringBuilder();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(info.getPackageName())) {
-                    keySb.append(info.getPackageName()).append(".");
-                }
-                keySb.append(info.getObjectName()).append(".").append(info.getArgumentName());
-                infoMap.put(keySb.toString(), oracleArrayInfo);
+            if (argumentName == null && !Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY")) {
+                continue;
             }
+            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
+            final String typeName = info.getTypeName();
+            final String typeSubName = info.getTypeSubName();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(typeSubName)) {
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(typeName)) {
+                    arrayInfo.setTypeName(typeName + "." + typeSubName);
+                } else {
+                    arrayInfo.setTypeName(typeSubName);
+                }
+            } else {
+                arrayInfo.setTypeName(typeName);
+            }
+            if (infoList.size() > (i + 1)) { // element type is in data type of next record
+                ProcedureArgumentInfo nextInfo = infoList.get(i + 1);
+                arrayInfo.setElementType(nextInfo.getDataType());
+            }
+            processStructElement(unifiedSchema, arrayInfo);
+            final String key = generateArrayInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
+            infoMap.put(key, arrayInfo);
         }
         return infoMap;
     }
 
-    protected List<ProcedureArgumentInfo> selectProcedureArgumentInfo(UnifiedSchema unifiedSchema) {
-        if (_procedureArgumentInfoList != null) {
-            return _procedureArgumentInfoList;
+    protected String generateArrayInfoMapKey(String packageName, String procedureName, String parameterName) {
+        final StringBuilder keySb = new StringBuilder();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) {
+            keySb.append(packageName).append(".");
+        }
+        keySb.append(procedureName).append(".").append(parameterName);
+        return keySb.toString();
+    }
+
+    protected void processStructElement(UnifiedSchema unifiedSchema, DfTypeArrayInfo arrayInfo) {
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = findStructInfoMap(unifiedSchema);
+        final DfTypeStructInfo structInfo = structInfoMap.get(arrayInfo.getElementType());
+        if (structInfo == null) {
+            return;
+        }
+        arrayInfo.setStructInfo(structInfo);
+        // *STRUCT type of other schema is unsupported for now
+    }
+
+    // ===================================================================================
+    //                                                                              Struct
+    //                                                                              ======
+    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
+        return findStructInfoMap(unifiedSchema);
+    }
+
+    protected StringKeyMap<DfTypeStructInfo> findStructInfoMap(UnifiedSchema unifiedSchema) {
+        StringKeyMap<DfTypeStructInfo> structInfoMap = _structInfoMapMap.get(unifiedSchema);
+        if (structInfoMap == null) {
+            final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
+            structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
+            _structInfoMapMap.put(unifiedSchema, structInfoMap);
+        }
+        return structInfoMap;
+    }
+
+    // ===================================================================================
+    //                                                                       Argument Info
+    //                                                                       =============
+    protected List<ProcedureArgumentInfo> findProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
+        final List<ProcedureArgumentInfo> cachedList = _argumentInfoListMap.get(unifiedSchema);
+        if (cachedList != null) {
+            return cachedList;
         }
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildProcedureArgumentSql(unifiedSchema);
@@ -134,8 +196,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             info.setTypeSubName(map.get("TYPE_SUBNAME"));
             infoList.add(info);
         }
-        _procedureArgumentInfoList = infoList;
-        return _procedureArgumentInfoList;
+        _argumentInfoListMap.put(unifiedSchema, infoList);
+        return _argumentInfoListMap.get(unifiedSchema);
     }
 
     protected String buildProcedureArgumentSql(UnifiedSchema unifiedSchema) {

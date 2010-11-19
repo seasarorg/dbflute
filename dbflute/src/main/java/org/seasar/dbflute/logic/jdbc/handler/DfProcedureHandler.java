@@ -34,11 +34,13 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureListGettingFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorOracle;
@@ -367,9 +369,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     protected void doResolveAssistInfoOracle(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMetaInfo> metaInfoList) {
-        final DfProcedureSupplementExtractorOracle assistant = new DfProcedureSupplementExtractorOracle(dataSource);
-        final Map<String, DfTypeArrayInfo> arrayInfoMap = assistant.extractArrayInfoMap(unifiedSchema);
-        final Map<String, Integer> overloadInfoMap = assistant.extractOverloadInfoMap(unifiedSchema);
+        final DfProcedureSupplementExtractorOracle extractor = new DfProcedureSupplementExtractorOracle(dataSource);
+        final Map<String, Integer> overloadInfoMap = extractor.extractOverloadInfoMap(unifiedSchema);
+        final Map<String, DfTypeArrayInfo> arrayInfoMap = extractor.extractArrayInfoMap(unifiedSchema);
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {
             final String packageName = metaInfo.getProcedureCatalog();
             final String procedureName = metaInfo.getProcedureName();
@@ -385,6 +388,14 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                     keySb.append(procedureName).append(".").append(columnName);
                     key = keySb.toString();
                 }
+
+                // Overload
+                final Integer overloadNo = overloadInfoMap.get(key);
+                if (overloadNo != null) {
+                    columnInfo.setOverloadNo(overloadNo);
+                }
+
+                // Array
                 final DfTypeArrayInfo arrayInfo = arrayInfoMap.get(key);
                 if (arrayInfo != null) {
                     final String typeName = arrayInfo.getTypeName();
@@ -392,37 +403,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                     _log.info("...Resolving array type: " + key + " -> " + typeName + " (" + elementType + ")");
                     columnInfo.setTypeArrayInfo(arrayInfo);
                 }
-                final Integer overloadNo = overloadInfoMap.get(key);
-                if (overloadNo != null) {
-                    columnInfo.setOverloadNo(overloadNo);
-                }
-            }
-        }
-    }
 
-    protected void resolveOracleOverloadInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
-            List<DfProcedureMetaInfo> metaInfoList) {
-        final DfProcedureSupplementExtractorOracle assistant = new DfProcedureSupplementExtractorOracle(dataSource);
-        final Map<String, DfTypeArrayInfo> arrayInfoMap = assistant.extractArrayInfoMap(unifiedSchema);
-        for (DfProcedureMetaInfo metaInfo : metaInfoList) {
-            final String packageName = metaInfo.getProcedureCatalog();
-            final String procedureName = metaInfo.getProcedureName();
-            final List<DfProcedureColumnMetaInfo> columnList = metaInfo.getProcedureColumnList();
-            for (DfProcedureColumnMetaInfo columnInfo : columnList) {
-                final String columnName = columnInfo.getColumnName();
-                final StringBuilder keySb = new StringBuilder();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) {
-                    keySb.append(packageName).append(".");
+                // Struct
+                final String dbTypeName = columnInfo.getDbTypeName();
+                final DfTypeStructInfo structInfo = structInfoMap.get(dbTypeName);
+                if (structInfo != null) {
+                    columnInfo.setTypeStructInfo(structInfo);
                 }
-                keySb.append(procedureName).append(".").append(columnName);
-                final DfTypeArrayInfo arrayInfo = arrayInfoMap.get(keySb.toString());
-                if (arrayInfo == null) {
-                    continue;
-                }
-                final String typeName = arrayInfo.getTypeName();
-                final String elementType = arrayInfo.getElementType();
-                _log.info("...Resolving array type: " + keySb + " -> " + typeName + " (" + elementType + ")");
-                columnInfo.setTypeArrayInfo(arrayInfo);
             }
         }
     }

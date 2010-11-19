@@ -37,22 +37,33 @@ import org.seasar.dbflute.util.Srl;
  */
 public class DfStructExtractorOracle {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfStructExtractorOracle.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final DataSource _dataSource;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfStructExtractorOracle(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
+    // ===================================================================================
+    //                                                                             Extract
+    //                                                                             =======
     /**
-     * 
      * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of struct info. {key=struct type name} (NotNull)
      */
-    public Map<String, DfTypeStructInfo> assistStructInfoMap(UnifiedSchema unifiedSchema) {
+    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
         final List<Map<String, String>> resultList = selectStructAttribute(unifiedSchema);
-        final Map<String, DfTypeStructInfo> structInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
             final String typeName = map.get("TYPE_NAME");
             DfTypeStructInfo info = structInfoMap.get(typeName);
@@ -74,11 +85,11 @@ public class DfStructExtractorOracle {
             final String dbTypeName = map.get("ATTR_TYPE_NAME");
             attributeInfo.setDbTypeName(dbTypeName);
             final String length = map.get("LENGTH");
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(length)) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(length)) { // for example, varchar2
                 attributeInfo.setColumnSize(Integer.valueOf(length));
             } else {
                 final String precision = map.get("PRECISION");
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(precision)) {
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(precision)) { // for example, number
                     attributeInfo.setColumnSize(Integer.valueOf(precision));
                 }
             }
