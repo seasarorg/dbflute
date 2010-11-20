@@ -148,7 +148,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                      SubQuery Level
     //                                                                      ==============
-    public int setupForSubQuery() {
+    public int getSubQueryLevel() {
         return _subQueryLevel;
     }
 
@@ -1829,11 +1829,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                    ================
     public String getBasePointAliasName() {
         // the variable should be resolved when making a sub-query clause
-        return _forSubQuery ? "sub${subQueryLevel}loc" : "dfloc";
+        return isForSubQuery() ? "sub" + getSubQueryLevel() + "loc" : "dfloc";
     }
 
-    public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
-        return (_forSubQuery ? "sub" + subQueryLevel : "df") + "rel" + relationPath;
+    public String resolveJoinAliasName(String relationPath, int nestLevel) {
+        return (isForSubQuery() ? "sub" + getSubQueryLevel() : "df") + "rel" + relationPath;
 
         // nestLevel is unused because relationPath has same role
         // (that was used long long ago)

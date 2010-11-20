@@ -36,6 +36,10 @@ public class DfTypeArrayInfo {
         return _structInfo != null;
     }
 
+    public boolean hasElementJavaNative() {
+        return _elementJavaNative != null;
+    }
+
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============

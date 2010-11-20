@@ -156,17 +156,18 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
 
     protected StringKeyMap<DfTypeStructInfo> findStructInfoMap(UnifiedSchema unifiedSchema) {
         StringKeyMap<DfTypeStructInfo> structInfoMap = _structInfoMapMap.get(unifiedSchema);
-        if (structInfoMap == null) {
-            final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
-            structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
-            for (DfTypeStructInfo structInfo : structInfoMap.values()) {
-                for (DfColumnMetaInfo metaInfo : structInfo.getAttributeInfoMap().values()) {
-                    metaInfo.setProcedureParameter(true); // for default mapping type
-                }
-            }
-            _structInfoMapMap.put(unifiedSchema, structInfoMap);
+        if (structInfoMap != null) {
+            return structInfoMap;
         }
-        return structInfoMap;
+        final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
+        structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
+        for (DfTypeStructInfo structInfo : structInfoMap.values()) {
+            for (DfColumnMetaInfo metaInfo : structInfo.getAttributeInfoMap().values()) {
+                metaInfo.setProcedureParameter(true); // for default mapping type
+            }
+        }
+        _structInfoMapMap.put(unifiedSchema, structInfoMap);
+        return _structInfoMapMap.get(unifiedSchema);
     }
 
     // ===================================================================================

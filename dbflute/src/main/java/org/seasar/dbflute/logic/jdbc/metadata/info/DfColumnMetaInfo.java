@@ -43,14 +43,22 @@ public class DfColumnMetaInfo {
     protected boolean _procedureParameter;
 
     // basically only when procedure parameter
-    protected String arrayTypeName;
-    protected String structTypeName;
+    protected DfTypeArrayInfo _typeArrayInfo;
+    protected DfTypeStructInfo _typeStructInfo;
 
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean hasColumnComment() {
         return _columnComment != null && _columnComment.trim().length() > 0;
+    }
+
+    public boolean hasTypeArrayInfo() {
+        return _typeArrayInfo != null;
+    }
+
+    public boolean hasTypeStructInfo() {
+        return _typeStructInfo != null;
     }
 
     // ===================================================================================
@@ -178,19 +186,19 @@ public class DfColumnMetaInfo {
         this._procedureParameter = procedureParameter;
     }
 
-    public String getArrayTypeName() {
-        return arrayTypeName;
+    public DfTypeArrayInfo getTypeArrayInfo() {
+        return _typeArrayInfo;
     }
 
-    public void setArrayTypeName(String arrayTypeName) {
-        this.arrayTypeName = arrayTypeName;
+    public void setTypeArrayInfo(DfTypeArrayInfo typeArrayInfo) {
+        this._typeArrayInfo = typeArrayInfo;
     }
 
-    public String getStructTypeName() {
-        return structTypeName;
+    public DfTypeStructInfo getTypeStructInfo() {
+        return _typeStructInfo;
     }
 
-    public void setStructTypeName(String structTypeName) {
-        this.structTypeName = structTypeName;
+    public void setTypeStructInfo(DfTypeStructInfo typeStructInfo) {
+        this._typeStructInfo = typeStructInfo;
     }
 }

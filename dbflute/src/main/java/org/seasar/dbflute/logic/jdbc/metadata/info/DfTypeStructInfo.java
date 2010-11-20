@@ -31,6 +31,13 @@ public class DfTypeStructInfo {
     protected String _entityType; // is set after analyzing
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean hasEntityType() {
+        return _entityType != null;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override

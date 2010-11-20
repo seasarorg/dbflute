@@ -236,7 +236,7 @@ namespace ${glPackageBaseCommonBhv} {
                 cb.SqlComponentOfOrderByClause.exchangeFirstOrderByElementForLastOne();
             }
             loadReferrerOption.delegateConditionBeanSettingUp(cb);
-            if (cb.SqlClause.hasSpecifiedSelectColumn()) {
+            if (cb.SqlClause.hasSpecifiedSelectColumn(cb.SqlClause.getBasePointAliasName())) {
                 callback.spFKCol(cb); // specify required columns
             }
             IList<REFERRER_ENTITY> referrerList = callback.selRfLs(cb);

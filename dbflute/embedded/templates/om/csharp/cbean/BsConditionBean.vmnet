@@ -168,7 +168,7 @@ namespace ${glPackageBaseCB} {
         //                                                                         =======
         protected ${myConditionBeanClassName}Specification _specification;
         public ${myConditionBeanClassName}Specification Specify() {
-            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery); }
+            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect, _forScalarCondition, _forColumnQuery); }
             return _specification;
         }
         protected bool HasSpecifiedColumn { get {
@@ -274,7 +274,7 @@ namespace ${glPackageBaseCB} {
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
-                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery);
+                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarCondition, _forColumnQuery);
                 if (xhasSyncQyCall()) // inherits it
                 { _${tmpPropertyName}.xsetSyncQyCall(new ${tmpPropertyNameInitCap}SpQyCall(xsyncQyCall())); }
             }
@@ -299,7 +299,7 @@ namespace ${glPackageBaseCB} {
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
-                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery, _forColumnQuery);
+                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarCondition, _forColumnQuery);
                 if (xhasSyncQyCall()) // inherits it
                 { _${tmpPropertyName}.xsetSyncQyCall(new ${tmpPropertyNameInitCap}SpQyCall(xsyncQyCall())); }
             }

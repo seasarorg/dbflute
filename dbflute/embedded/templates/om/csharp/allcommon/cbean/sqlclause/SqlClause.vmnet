@@ -150,7 +150,7 @@ public interface ${myClassName} {
     //                                                                    Table Alias Info
     //                                                                    ================
     String getBasePointAliasName();
-    String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel);
+    String resolveJoinAliasName(String relationPath, int nestLevel);
     int resolveRelationNo(String localTableName, String foreignPropertyName);
 
     // ===================================================================================

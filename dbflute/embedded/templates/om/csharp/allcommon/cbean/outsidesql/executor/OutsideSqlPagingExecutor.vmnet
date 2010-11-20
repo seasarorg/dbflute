@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonJdbc};
 using ${glPackageBaseCommonUtil};
 
@@ -80,7 +81,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
                 try {
                     return _countExecutor.SelectEntityWithDeletedCheck<int>(_path, _pmb);
                 } catch (${glEntityDuplicatedException} e) { // means switching the select clause failed
-                    throwPagingCountSelectNotCountException(path, pmb, entityType, e);
+                    throwPagingCountSelectNotCountException(_path, _pmb, _entityType, e);
                     return -1; // unreachable
                 }
             }

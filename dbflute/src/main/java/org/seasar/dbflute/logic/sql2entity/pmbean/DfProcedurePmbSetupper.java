@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.sql2entity.pmbean;
 
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
@@ -210,8 +211,8 @@ public class DfProcedurePmbSetupper {
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
             if (arrayInfo.hasStructInfo()) {
                 final DfTypeStructInfo structInfo = arrayInfo.getStructInfo();
-                final String entityName = doProcessStructProperty(column, structInfo, propertyInfo, true);
-                arrayInfo.setElementJavaNative(entityName);
+                final String entityType = doProcessStructProperty(column, structInfo, propertyInfo, true);
+                arrayInfo.setElementJavaNative(entityType);
             } else {
                 final String elementType = arrayInfo.getElementType();
                 final String propertyType = findPlainPropertyType(jdbcDefType, elementType, columnSize, decimalDigits);
@@ -240,24 +241,66 @@ public class DfProcedurePmbSetupper {
     protected String doProcessStructProperty(DfProcedureColumnMetaInfo column, DfTypeStructInfo structInfo,
             ProcedurePropertyInfo propertyInfo, boolean inArray) {
         final String typeName = structInfo.getTypeName();
-        if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
-            final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap).enableJavaNameConvert());
-        }
 
-        // type name becomes entity name plainly but it will be converted as java name
-        // so it uses database's convert that is same conversion way as generating
-        // because this process needs entityType on program
-        final String entityName = _database.convertJavaNameByJdbcNameAsTable(typeName);
+        // handling for entity generation and nested array & struct 
+        if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
+            registerEntityInfoIfNeeds(structInfo);
+
+            final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
+            for (DfColumnMetaInfo attrInfo : attrMap.values()) { // nested array or struct handling
+                if (attrInfo.hasTypeArrayInfo()) {
+                    final DfTypeArrayInfo typeArrayInfo = attrInfo.getTypeArrayInfo();
+                    if (typeArrayInfo.hasElementJavaNative()) {
+                        attrInfo.setSql2EntityForcedJavaNative(typeArrayInfo.getElementJavaNative());
+                    } else {
+                        if (typeArrayInfo.hasStructInfo()) {
+                            final DfTypeStructInfo nestedStructInfo = typeArrayInfo.getStructInfo();
+                            registerEntityInfoIfNeeds(nestedStructInfo);
+                            attrInfo.setSql2EntityForcedJavaNative(buildStructEntityType(nestedStructInfo));
+                        } else {
+                            final String elementType = attrInfo.getTypeArrayInfo().getElementType();
+                            final String propertyType = findPlainPropertyType(Types.OTHER, elementType, null, null);
+                            typeArrayInfo.setElementJavaNative(propertyType);
+                            attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(propertyType));
+                        }
+                    }
+                } else if (attrInfo.hasTypeStructInfo()) {
+                    final DfTypeStructInfo nestedStructInfo = attrInfo.getTypeStructInfo();
+                    if (nestedStructInfo.hasEntityType()) {
+                        attrInfo.setSql2EntityForcedJavaNative(nestedStructInfo.getEntityType());
+                    } else {
+                        registerEntityInfoIfNeeds(nestedStructInfo);
+                        attrInfo.setSql2EntityForcedJavaNative(buildStructEntityType(nestedStructInfo));
+                    }
+                }
+            }
+        }
 
         // entityType is class name can used on program
         // so it adjusts project prefix here
+        final String entityType = buildStructEntityType(structInfo);
+        propertyInfo.setPropertyType(inArray ? getGenericListClassName(entityType) : entityType);
+        propertyInfo.setRefCustomizeEntity(true);
+        return entityType;
+    }
+
+    protected void registerEntityInfoIfNeeds(DfTypeStructInfo structInfo) {
+        final String typeName = structInfo.getTypeName();
+        if (!_entityInfoMap.containsKey(typeName)) {
+            final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
+            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap).enableJavaNameConvert());
+        }
+    }
+
+    protected String buildStructEntityType(DfTypeStructInfo structInfo) {
+        // type name becomes entity name plainly but it will be converted as java name
+        // so it uses database's convert that is same conversion way as generating
+        // because this process needs entityType on program
+        final String entityName = _database.convertJavaNameByJdbcNameAsTable(structInfo.getTypeName());
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String entityType = projectPrefix + entityName;
         structInfo.setEntityType(entityType);
-        propertyInfo.setPropertyType(inArray ? getGenericListClassName(entityType) : entityType);
-        propertyInfo.setRefCustomizeEntity(true);
-        return entityName;
+        return entityType;
     }
 
     protected String getProcedureDefaultResultSetPropertyType() {
