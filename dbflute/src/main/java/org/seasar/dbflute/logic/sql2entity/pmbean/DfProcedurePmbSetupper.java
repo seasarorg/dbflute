@@ -180,51 +180,51 @@ public class DfProcedurePmbSetupper {
     //                                                                       =============
     protected ProcedurePropertyInfo processProcedureProperty(String pmbName, DfProcedureColumnMetaInfo column,
             String propertyName) {
-        final ProcedurePropertyInfo processInfo = new ProcedurePropertyInfo();
-        processInfo.setColumnInfo(column);
+        final ProcedurePropertyInfo propertyInfo = new ProcedurePropertyInfo();
+        propertyInfo.setColumnInfo(column);
         if (isResultSetProperty(column)) {
             if (column.hasResultSetColumnInfo()) {
                 final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
                 _entityInfoMap.put(entityName,
                         new DfCustomizeEntityInfo(entityName, column.getResultSetColumnInfoMap()));
-                processInfo.setPropertyType(convertProcedureListPropertyType(entityName));
-                processInfo.setRefCustomizeEntity(true);
+                propertyInfo.setPropertyType(convertProcedureListPropertyType(entityName));
+                propertyInfo.setRefCustomizeEntity(true);
             } else {
-                processInfo.setPropertyType(getProcedureDefaultResultSetPropertyType());
+                propertyInfo.setPropertyType(getProcedureDefaultResultSetPropertyType());
             }
-            return processInfo;
+            return propertyInfo;
         }
         final int jdbcDefType = column.getJdbcDefType();
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
         if (column.isOracleNumber()) {
             // because the length setting of procedure parameter is unsupported on Oracle
-            processInfo.setPropertyType(TypeMap.getDefaultDecimalJavaNativeType());
-            return processInfo;
+            propertyInfo.setPropertyType(TypeMap.getDefaultDecimalJavaNativeType());
+            return propertyInfo;
         }
         if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
             // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY" (it's not useful for type mapping)
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
             if (arrayInfo.hasStructInfo()) {
                 final DfTypeStructInfo structInfo = arrayInfo.getStructInfo();
-                final String entityName = doProcessStructProperty(column, structInfo, processInfo);
+                final String entityName = doProcessStructProperty(column, structInfo, propertyInfo, true);
                 arrayInfo.setElementJavaNative(entityName);
             } else {
                 final String elementType = arrayInfo.getElementType();
                 final String propertyType = findPlainPropertyType(jdbcDefType, elementType, columnSize, decimalDigits);
                 arrayInfo.setElementJavaNative(propertyType);
-                processInfo.setPropertyType(getGenericListClassName(propertyType));
+                propertyInfo.setPropertyType(getGenericListClassName(propertyType));
             }
-            return processInfo;
+            return propertyInfo;
         }
         if (column.isOracleStruct() && column.hasTypeStructInfo()) {
             final DfTypeStructInfo structInfo = column.getTypeStructInfo();
-            doProcessStructProperty(column, structInfo, processInfo);
-            return processInfo;
+            doProcessStructProperty(column, structInfo, propertyInfo, false);
+            return propertyInfo;
         }
         final String dbTypeName = column.getDbTypeName();
-        processInfo.setPropertyType(findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits));
-        return processInfo;
+        propertyInfo.setPropertyType(findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits));
+        return propertyInfo;
     }
 
     protected boolean isResultSetProperty(DfProcedureColumnMetaInfo column) {
@@ -235,19 +235,18 @@ public class DfProcedurePmbSetupper {
     }
 
     protected String doProcessStructProperty(DfProcedureColumnMetaInfo column, DfTypeStructInfo structInfo,
-            ProcedurePropertyInfo processInfo) {
-        final String typeName = structInfo.getTypeName();
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
-        final String entityName = projectPrefix + "Struct" + Srl.camelize(typeName);
-        if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
+            ProcedurePropertyInfo propertyInfo, boolean inArray) {
+        final String entityName = Srl.camelize(structInfo.getTypeName());
+        if (!_entityInfoMap.containsKey(entityName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            final DfCustomizeEntityInfo entityInfo = new DfCustomizeEntityInfo(typeName, attrMap);
-            entityInfo.setForcedEntityName(entityName); // entity name is fixed
-            _entityInfoMap.put(typeName, entityInfo);
+            final DfCustomizeEntityInfo entityInfo = new DfCustomizeEntityInfo(entityName, attrMap);
+            _entityInfoMap.put(entityName, entityInfo);
         }
-        structInfo.setEntityType(entityName);
-        processInfo.setPropertyType(getGenericListClassName(entityName));
-        processInfo.setRefCustomizeEntity(true);
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String realEntityName = projectPrefix + entityName; // adjusts project prefix here
+        structInfo.setEntityType(realEntityName);
+        propertyInfo.setPropertyType(inArray ? getGenericListClassName(realEntityName) : realEntityName);
+        propertyInfo.setRefCustomizeEntity(true);
         return entityName;
     }
 
@@ -327,14 +326,10 @@ public class DfProcedurePmbSetupper {
         return baseName + Srl.initCap(propertyName);
     }
 
-    protected String convertStructNameToEntityName(DfTypeStructInfo structInfo) {
-        final String typeName = structInfo.getTypeName();
-        return "Struct" + Srl.camelize(typeName);
-    }
-
     protected String convertProcedureListPropertyType(String entityName) {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-        return grammarInfo.getGenericListClassName(entityName);
+        return grammarInfo.getGenericListClassName(projectPrefix + entityName); // adjusts project prefix here
     }
 
     protected String convertColumnNameToPropertyName(String columnName) {

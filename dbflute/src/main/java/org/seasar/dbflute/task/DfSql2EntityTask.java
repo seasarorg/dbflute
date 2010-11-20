@@ -84,6 +84,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // an entity name for a map key is a name not resolved about project prefix
+    // (the prefix is resolved in Table class)
     protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, Object> _cursorInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, DfPmbMetaData> _pmbMetaDataMap = DfCollectionUtil.newLinkedHashMap();
@@ -662,9 +664,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final Table tbl = new Table();
             tbl.setSql2EntityCustomize(true);
             tbl.setName(entityInfo.getTableDbName());
-            if (entityInfo.hasForcedEntityName()) { // for example, STRUCT
-                tbl.setSql2EntityForcedEntityName(entityInfo.getForcedEntityName());
-            }
             tbl.setupNeedsJavaNameConvertFalse();
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);

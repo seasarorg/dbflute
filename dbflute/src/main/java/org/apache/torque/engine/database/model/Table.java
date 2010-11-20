@@ -154,7 +154,6 @@ public class Table {
     //                                 Sql2Entity Definition
     //                                 ---------------------
     private boolean _sql2entityCustomize;
-    private String _sql2entityForcedEntityName;
     private boolean _sql2entityTypeSafeCursor;
 
     // -----------------------------------------------------
@@ -1776,9 +1775,6 @@ public class Table {
     }
 
     protected String buildExtendedEntityClassName(String projectPrefix) {
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(_sql2entityForcedEntityName)) {
-            return _sql2entityForcedEntityName;
-        }
         return projectPrefix + getSchemaClassPrefix() + getJavaName();
     }
 
@@ -1922,14 +1918,6 @@ public class Table {
 
     public void setSql2EntityCustomize(boolean sql2entityCustomize) {
         _sql2entityCustomize = sql2entityCustomize;
-    }
-
-    public String isSql2EntityForcedEntityName() {
-        return _sql2entityForcedEntityName;
-    }
-
-    public void setSql2EntityForcedEntityName(String sql2entityForcedEntityname) {
-        _sql2entityForcedEntityName = sql2entityForcedEntityname;
     }
 
     public boolean isSql2EntityTypeSafeCursor() {
