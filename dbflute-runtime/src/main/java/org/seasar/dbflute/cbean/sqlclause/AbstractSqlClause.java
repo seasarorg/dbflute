@@ -414,9 +414,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         Select Clause
     //                                         -------------
     public String getSelectClause() {
-        // [DBFlute-0.8.6]
+        final String basePointAliasName = getBasePointAliasName();
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
-            return buildSelectClauseCountOrScalar(getBasePointAliasName());
+            return buildSelectClauseCountOrScalar(basePointAliasName);
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
@@ -427,7 +427,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         Map<String, String> localSpecifiedMap = null;
         if (_specifiedSelectColumnMap != null) {
-            localSpecifiedMap = _specifiedSelectColumnMap.get(getBasePointAliasName());
+            localSpecifiedMap = _specifiedSelectColumnMap.get(basePointAliasName);
         }
         final boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
@@ -468,7 +468,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 sb.append(" ");
                 needsDelimiter = true;
             }
-            final String realColumnName = getBasePointAliasName() + "." + columnSqlName;
+            final String realColumnName = basePointAliasName + "." + columnSqlName;
             final String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
@@ -698,12 +698,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
         }
         final TableSqlName tableSqlName = getDBMeta().getTableSqlName();
+        final String basePointAliasName = getBasePointAliasName();
         if (hasBaseTableInlineWhereClause()) {
             final List<QueryClause> baseTableInlineWhereList = getBaseTableInlineWhereList();
             sb.append(getInlineViewClause(tableSqlName, baseTableInlineWhereList, tablePos));
-            sb.append(" ").append(getBasePointAliasName());
+            sb.append(" ").append(basePointAliasName);
         } else {
-            sb.append(tableSqlName).append(" ").append(getBasePointAliasName());
+            sb.append(tableSqlName).append(" ").append(basePointAliasName);
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -1695,20 +1696,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public String getBasePointAliasName() {
-        // _forSubQuery is not needed here
-        // because SubQuery brothers adjust alias names by themselves
-        // for example, it replaces this to sub-query alias name
-        // so this name should not be too simple
-        return "dfloc";
+        // the variable should be resolved when making a sub-query clause
+        return _forSubQuery ? "sub${subQueryLevel}loc" : "dfloc";
     }
 
     /**
      * {@inheritDoc}
      */
     public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
+        return (_forSubQuery ? "sub" + subQueryLevel : "df") + "rel" + relationPath;
+
         // nestLevel is unused because relationPath has same role
         // (that was used long long ago)
-        return (_forSubQuery ? "sub" + subQueryLevel : "df") + "rel" + relationPath;
     }
 
     /**

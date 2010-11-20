@@ -469,8 +469,8 @@ public class ConditionBeanExceptionThrower {
         msg = msg + "The specified the column for derived-referrer was INVALID!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
-        msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
+        msg = msg + "You should call specify().column[TargetColumn]() only once." + ln();
+        msg = msg + "(If your function is count(), the target column should be primary key.)" + ln();
         msg = msg + "For example:" + ln();
         msg = msg + "  (x): (empty)" + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();

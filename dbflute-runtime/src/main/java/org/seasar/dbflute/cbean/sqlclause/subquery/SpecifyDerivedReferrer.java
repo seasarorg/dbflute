@@ -16,16 +16,16 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The alias name for derived column. (Nullable: if null, means no alias expression) */
     protected final String _aliasName;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SpecifyDerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            String mainSubQueryIdentity, String aliasName) {
-        super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+    public SpecifyDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
+            String subQueryIdentity, DBMeta subQueryDBMeta, String mainSubQueryIdentity, String aliasName) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
                 subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity);
         _aliasName = aliasName;
     }

@@ -19,12 +19,11 @@ public abstract class AbstractSubQuery {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final SqlClause _sqlClause;
     protected final SubQueryPath _subQueryPath;
     protected final ColumnRealNameProvider _localRealNameProvider;
     protected final ColumnSqlNameProvider _subQuerySqlNameProvider;
     protected final int _subQueryLevel;
-    protected final SqlClause _subQueryClause;
+    protected final SqlClause _subQuerySqlClause;
     protected final String _subQueryIdentity;
     protected final DBMeta _subQueryDBMeta;
 
@@ -32,64 +31,96 @@ public abstract class AbstractSubQuery {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * @param sqlClause The SQL clause for local table. (NotNull)
      * @param subQueryPath The property path of sub-query. (NotNull)
      * @param localRealNameProvider The provider of column real name for local table. (NotNull)
      * @param subQuerySqlNameProvider The provider of column real name for sub-query. (NotNull)
      * @param subQueryLevel The sub-query level for sub-query.
-     * @param subQueryClause The SQL clause for sub-query. (NotNull)
+     * @param subQuerySqlClause The SQL clause for sub-query. (NotNull)
      * @param subQueryIdentity The identity string for sub-query. (NotNull)
      * @param subQueryDBMeta The DB meta for sub-query. (NotNull)
      */
-    public AbstractSubQuery(SqlClause sqlClause, SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta) {
-        _sqlClause = sqlClause;
+    public AbstractSubQuery(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
+            String subQueryIdentity, DBMeta subQueryDBMeta) {
         _subQueryPath = subQueryPath;
         _localRealNameProvider = localRealNameProvider;
         _subQuerySqlNameProvider = subQuerySqlNameProvider;
         _subQueryLevel = subQueryLevel;
-        _subQueryClause = subQueryClause;
+        _subQuerySqlClause = subQuerySqlClause;
         _subQueryIdentity = subQueryIdentity;
         _subQueryDBMeta = subQueryDBMeta;
     }
 
     // ===================================================================================
-    //                                                                        Build Clause
-    //                                                                        ============
-    protected String getBasePointAliasName() {
-        return _sqlClause.getBasePointAliasName();
-    }
-
-    protected String buildLocalTableAliasName() {
-        // this name must not contain the base point alias name
-        // because the word is replaced later in mistake
-        return "sub" + _subQueryLevel + "loc";
+    //                                                                          Alias Name
+    //                                                                          ==========
+    protected String getSubQueryLocalAliasName() {
+        return _subQuerySqlClause.getBasePointAliasName();
     }
 
     protected String buildSubQueryMainAliasName() {
         return "sub" + _subQueryLevel + "main";
     }
 
-    protected String buildPlainFromWhereClause(String selectClause, String tableAliasName) {
-        final SubQueryClause clause = createSubQueryClause(selectClause, tableAliasName);
+    protected String resolveSubQueryLevelVariable(String subQueryClause) {
+        return replace(subQueryClause, "${subQueryLevel}", String.valueOf(_subQueryLevel));
+    }
+
+    // ===================================================================================
+    //                                                                        Build Clause
+    //                                                                        ============
+    /**
+     * Build the clause of plain sub-query from from-where clause.
+     * @param selectClause The clause of select for sub-query. (NotNull)
+     * @param localAliasName The alias name of sub-query local table. (NotNull)
+     * @return The clause string of plain sub-query. (NotNull)
+     */
+    protected String buildPlainFromWhereClause(String selectClause, String localAliasName) {
+        final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
         return clause.buildPlainSubQueryFromWhereClause();
     }
 
-    protected String buildCorrelationFromWhereClause(String selectClause, String tableAliasName,
-            ColumnSqlName relatedColumnSqlName, ColumnRealName correlatedColumnRealName) {
-        final SubQueryClause clause = createSubQueryClause(selectClause, tableAliasName);
-        return clause.buildCorrelationSubQueryFromWhereClause(relatedColumnSqlName, correlatedColumnRealName);
+    /**
+     * Build the clause of correlation sub-query from from-where clause.
+     * @param selectClause The clause of select for sub-query. (NotNull)
+     * @param localAliasName The alias name of sub-query local table. (NotNull)
+     * @param correlatedColumnRealName The real name of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlName The real name of related column that is sub-query table's column. (NotNull)
+     * @return The clause string of correlation sub-query. (NotNull)
+     */
+    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
+            ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName) {
+        final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
+        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealName, relatedColumnSqlName);
     }
 
-    protected String buildCorrelationFromWhereClause(String selectClause, String tableAliasName,
-            ColumnSqlName[] relatedColumnSqlNames, ColumnRealName[] correlatedColumnRealNames) {
-        final SubQueryClause clause = createSubQueryClause(selectClause, tableAliasName);
-        return clause.buildCorrelationSubQueryFromWhereClause(relatedColumnSqlNames, correlatedColumnRealNames);
+    /**
+     * Build the clause of correlation sub-query from from-where clause.
+     * @param selectClause The clause of select for sub-query. (NotNull)
+     * @param localAliasName The alias name of sub-query local table. (NotNull)
+     * @param correlatedColumnRealNames The real names of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlNames The real names of related column that is sub-query table's column. (NotNull)
+     * @return The clause string of correlation sub-query. (NotNull)
+     */
+    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
+            ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames) {
+        final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
+        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealNames, relatedColumnSqlNames);
     }
 
-    protected SubQueryClause createSubQueryClause(String selectClause, String tableAliasName) {
-        return new SubQueryClause(_sqlClause, _subQueryPath, selectClause, _subQueryClause, tableAliasName);
+    protected SubQueryClause createSubQueryClause(String selectClause, String localAliasName) {
+        return new SubQueryClause(_subQueryPath, selectClause, _subQuerySqlClause, localAliasName);
+    }
+
+    // ===================================================================================
+    //                                                                     Indent Resolver
+    //                                                                     ===============
+    protected String resolveSubQueryBeginMark(String subQueryIdentity) {
+        return _subQuerySqlClause.resolveSubQueryBeginMark(subQueryIdentity);
+    }
+
+    protected String resolveSubQueryEndMark(String subQueryIdentity) {
+        return _subQuerySqlClause.resolveSubQueryEndMark(subQueryIdentity);
     }
 
     // ===================================================================================

@@ -724,7 +724,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                        ExistsReferrer
     //                                        --------------
-    // {Modified at DBFlute-0.7.5}
     protected void registerExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName) {
         registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, null);
@@ -738,7 +737,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String existsOption) {
         assertObjectNotNull("ExistsReferrer(" + columnDbName + ")", subQuery);
-        final SqlClause sqlClause = xgetSqlClause();
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSubQueryLevel();
@@ -750,7 +748,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
-        final ExistsReferrer existsReferrer = new ExistsReferrer(sqlClause, subQueryPath, localRealNameProvider,
+        final ExistsReferrer existsReferrer = new ExistsReferrer(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta);
         final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, existsOption);
         registerWhereClause(clause);
@@ -775,7 +773,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String inScopeOption) {
         assertObjectNotNull("InScopeRelation(" + columnDbName + ")", subQuery);
-        final SqlClause sqlClause = xgetSqlClause();
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSubQueryLevel();
@@ -788,7 +785,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final boolean suppressLocalAliasName = isInScopeRelationSuppressLocalAliasName();
-        final InScopeRelation inScopeRelation = new InScopeRelation(sqlClause, subQueryPath, localRealNameProvider,
+        final InScopeRelation inScopeRelation = new InScopeRelation(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta,
                 suppressLocalAliasName);
         final String clause = inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName, inScopeOption);
@@ -811,7 +808,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (option == null) {
             option = new DerivedReferrerOption(); // as default
         }
-        final SqlClause sqlClause = xgetSqlClause();
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSubQueryLevel();
@@ -824,7 +820,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-        final SpecifyDerivedReferrer derivedReferrer = option.createSpecifyDerivedReferrer(sqlClause, subQueryPath,
+        final SpecifyDerivedReferrer derivedReferrer = option.createSpecifyDerivedReferrer(subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
                 subQueryDBMeta, mainSubQueryIdentity, aliasName);
         registerParameterOption(option);
@@ -844,7 +840,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (option == null) {
             option = new DerivedReferrerOption(); // as default
         }
-        final SqlClause sqlClause = xgetSqlClause();
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSubQueryLevel();
@@ -858,7 +853,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final String parameterPath = xgetLocation(parameterPropertyName);
-        final QueryDerivedReferrer derivedReferrer = option.createQueryDerivedReferrer(sqlClause, subQueryPath,
+        final QueryDerivedReferrer derivedReferrer = option.createQueryDerivedReferrer(subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
                 subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
         registerParameterOption(option);
@@ -873,7 +868,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerScalarCondition(String function, final ConditionQuery subQuery, String propertyName,
             String operand) {
         assertObjectNotNull("ScalarCondition(" + propertyName + ")", subQuery);
-        final SqlClause sqlClause = xgetSqlClause();
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSubQueryLevel();
@@ -886,7 +880,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-        final ScalarCondition scalarCondition = new ScalarCondition(sqlClause, subQueryPath, localRealNameProvider,
+        final ScalarCondition scalarCondition = new ScalarCondition(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta,
                 mainSubQueryIdentity, operand);
         final String clause = scalarCondition.buildScalarCondition(function);

@@ -15,69 +15,69 @@ public class SubQueryClause {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final SqlClause _sqlClause;
     protected final SubQueryPath _subQueryPath;
     protected final String _selectClause; // needed for union
-    protected final SqlClause _subQueryClause;
-    protected final String _tableAliasName;
+    protected final SqlClause _subQuerySqlClause;
+    protected final String _localAliasName;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * @param sqlClause The SQL clause for base table. (NotNull)
      * @param subQueryPath The property path of sub-query. (NotNull)
      * @param selectClause The select clause of sub-query. (NotNull)
-     * @param subQueryClause The SQL clause for sub-query. (NotNull)
-     * @param tableAliasName The alias name of sub-query table. (Nullable: if plain)
+     * @param subQuerySqlClause The SQL clause for sub-query. (NotNull)
+     * @param localAliasName The alias name of sub-query local table. (Nullable: if plain)
      */
-    public SubQueryClause(SqlClause sqlClause, SubQueryPath subQueryPath, String selectClause,
-            SqlClause subQueryClause, String tableAliasName) {
-        _sqlClause = sqlClause;
+    public SubQueryClause(SubQueryPath subQueryPath, String selectClause, SqlClause subQuerySqlClause,
+            String localAliasName) {
         _subQueryPath = subQueryPath;
         _selectClause = selectClause;
-        _subQueryClause = subQueryClause;
-        _tableAliasName = tableAliasName;
+        _subQuerySqlClause = subQuerySqlClause;
+        _localAliasName = localAliasName;
     }
 
     // ===================================================================================
     //                                                                               Plain
     //                                                                               =====
     public String buildPlainSubQueryFromWhereClause() {
-        String fromWhereClause = _subQueryClause.getClauseFromWhereWithUnionTemplate();
-
-        // Replace the alias names for local table with alias name of sub-query unique.
-        // However when it's inScope this replacement is unnecessary. 
-        // (Override base alias name at sub-query on SQL)
-        // So if the argument 'tableAliasName' is not null, replace it. 
-        if (_tableAliasName != null) {
-            fromWhereClause = replaceString(fromWhereClause, getBasePointAliasName(), _tableAliasName);
-        }
+        String fromWhereClause = _subQuerySqlClause.getClauseFromWhereWithUnionTemplate();
 
         // Resolve the location path for the condition-query of sub-query. 
         fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + _subQueryPath + ".");
 
         // Replace template marks. These are very important!
-        final SqlClause sc = _sqlClause;
-        fromWhereClause = replaceString(fromWhereClause, sc.getUnionSelectClauseMark(), _selectClause);
-        fromWhereClause = replaceString(fromWhereClause, sc.getUnionWhereClauseMark(), "");
-        fromWhereClause = replaceString(fromWhereClause, sc.getUnionWhereFirstConditionMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), _selectClause);
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
         return fromWhereClause;
     }
 
     // ===================================================================================
     //                                                                         Correlation
     //                                                                         ===========
-    public String buildCorrelationSubQueryFromWhereClause(ColumnSqlName relatedColumnSqlName,
-            ColumnRealName correlatedColumnRealName) {
+    /**
+     * Build the clause of correlation sub-query from from-where clause.
+     * @param correlatedColumnRealName The real name of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlName The real name of related column that is sub-query table's column. (NotNull)
+     * @return The clause string of correlation sub-query. (NotNull)
+     */
+    public String buildCorrelationSubQueryFromWhereClause(ColumnRealName correlatedColumnRealName,
+            ColumnSqlName relatedColumnSqlName) {
         String clause = xprepareCorrelationSubQueryFromWhereClause();
-        final String joinCondition = _tableAliasName + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
+        final String joinCondition = _localAliasName + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
         clause = xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition);
         return clause;
     }
 
-    public String buildCorrelationSubQueryFromWhereClause(ColumnSqlName[] relatedColumnSqlNames,
-            ColumnRealName[] correlatedColumnRealNames) {
+    /**
+     * Build the clause of correlation sub-query from from-where clause.
+     * @param correlatedColumnRealNames The real names of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlNames The real names of related column that is sub-query table's column. (NotNull)
+     * @return The clause string of correlation sub-query. (NotNull)
+     */
+    public String buildCorrelationSubQueryFromWhereClause(ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames) {
         String clause = xprepareCorrelationSubQueryFromWhereClause();
 
         final String joinCondition;
@@ -86,7 +86,7 @@ public class SubQueryClause {
             if (sb.length() > 0) {
                 sb.append(ln()).append("   and ");
             }
-            sb.append(_tableAliasName).append(".").append(relatedColumnSqlNames[i]);
+            sb.append(_localAliasName).append(".").append(relatedColumnSqlNames[i]);
             sb.append(" = ").append(correlatedColumnRealNames[i]);
         }
         joinCondition = sb.toString();
@@ -96,10 +96,7 @@ public class SubQueryClause {
     }
 
     protected String xprepareCorrelationSubQueryFromWhereClause() {
-        String clause = _subQueryClause.getClauseFromWhereWithWhereUnionTemplate();
-
-        // Replace the alias names for local table with alias name of sub-query unique. 
-        clause = replaceString(clause, getBasePointAliasName(), _tableAliasName);
+        String clause = _subQuerySqlClause.getClauseFromWhereWithWhereUnionTemplate();
 
         // Resolve the location path for the condition-query of sub-query. 
         clause = replaceString(clause, ".conditionQuery.", "." + _subQueryPath + ".");
@@ -110,20 +107,42 @@ public class SubQueryClause {
     protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String joinCondition) {
         // Replace template marks. These are very important!
         final String firstConditionAfter = ln() + "   and ";
-        final SqlClause sc = _sqlClause;
-        clause = replaceString(clause, sc.getWhereClauseMark(), ln() + " where " + joinCondition);
-        clause = replaceString(clause, sc.getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        clause = replaceString(clause, sc.getUnionSelectClauseMark(), _selectClause);
-        clause = replaceString(clause, sc.getUnionWhereClauseMark(), ln() + " where " + joinCondition);
-        clause = replaceString(clause, sc.getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        clause = replaceString(clause, getWhereClauseMark(), ln() + " where " + joinCondition);
+        clause = replaceString(clause, getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        clause = replaceString(clause, getUnionSelectClauseMark(), _selectClause);
+        clause = replaceString(clause, getUnionWhereClauseMark(), ln() + " where " + joinCondition);
+        clause = replaceString(clause, getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return clause;
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                          Alias Name
+    //                                                                          ==========
     protected String getBasePointAliasName() {
-        return _sqlClause.getBasePointAliasName();
+        return _subQuerySqlClause.getBasePointAliasName();
+    }
+
+    // ===================================================================================
+    //                                                                       Template Mark
+    //                                                                       =============
+    protected String getWhereClauseMark() {
+        return _subQuerySqlClause.getWhereClauseMark();
+    }
+
+    protected String getWhereFirstConditionMark() {
+        return _subQuerySqlClause.getWhereFirstConditionMark();
+    }
+
+    protected String getUnionSelectClauseMark() {
+        return _subQuerySqlClause.getUnionSelectClauseMark();
+    }
+
+    protected String getUnionWhereClauseMark() {
+        return _subQuerySqlClause.getUnionWhereClauseMark();
+    }
+
+    protected String getUnionWhereFirstConditionMark() {
+        return _subQuerySqlClause.getUnionWhereFirstConditionMark();
     }
 
     // ===================================================================================

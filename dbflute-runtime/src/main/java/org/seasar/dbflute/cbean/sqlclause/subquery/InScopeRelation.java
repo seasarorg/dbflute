@@ -21,11 +21,10 @@ public class InScopeRelation extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InScopeRelation(SqlClause sqlClause, SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            boolean suppressLocalAliasName) {
-        super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+    public InScopeRelation(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
+            String subQueryIdentity, DBMeta subQueryDBMeta, boolean suppressLocalAliasName) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
                 subQueryIdentity, subQueryDBMeta);
         _suppressLocalAliasName = suppressLocalAliasName;
     }
@@ -40,8 +39,8 @@ public class InScopeRelation extends AbstractSubQuery {
             final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
             subQueryClause = getSubQueryClause(relatedColumnSqlName);
         }
-        final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
-        final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
+        final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
+        final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
         final ColumnRealName columnRealName;
         {
@@ -57,13 +56,14 @@ public class InScopeRelation extends AbstractSubQuery {
     }
 
     protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName) {
-        final String tableAliasName = getBasePointAliasName();
+        final String tableAliasName = getSubQueryLocalAliasName();
         final String selectClause;
         {
             final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
             selectClause = "select " + relatedColumnRealName;
         }
         final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
-        return selectClause + " " + fromWhereClause;
+        final String subQueryClause = selectClause + " " + fromWhereClause;
+        return resolveSubQueryLevelVariable(subQueryClause);
     }
 }

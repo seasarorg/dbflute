@@ -24,11 +24,10 @@ public class ScalarCondition extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ScalarCondition(SqlClause sqlClause, SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            String mainSubQueryIdentity, String operand) {
-        super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+    public ScalarCondition(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
+            String subQueryIdentity, DBMeta subQueryDBMeta, String mainSubQueryIdentity, String operand) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
                 subQueryIdentity, subQueryDBMeta);
         _mainSubQueryIdentity = mainSubQueryIdentity;
         _operand = operand;
@@ -41,7 +40,7 @@ public class ScalarCondition extends AbstractSubQuery {
         // Get the specified column before it disappears at sub-query making.
         final ColumnRealName columnRealName;
         {
-            final String columnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
+            final String columnDbName = _subQuerySqlClause.getSpecifiedColumnDbNameAsOne();
             if (columnDbName == null || columnDbName.trim().length() == 0) {
                 throwScalarConditionInvalidColumnSpecificationException(function);
             }
@@ -49,8 +48,8 @@ public class ScalarCondition extends AbstractSubQuery {
         }
 
         final String subQueryClause = getSubQueryClause(function);
-        final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
-        final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
+        final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
+        final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
         return columnRealName + " " + _operand + " (" + beginMark + subQueryClause + ln() + endIndent + ") " + endMark;
     }
@@ -61,28 +60,30 @@ public class ScalarCondition extends AbstractSubQuery {
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final String tableAliasName = buildLocalTableAliasName();
-        final String derivedColumnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
+        final String tableAliasName = getSubQueryLocalAliasName();
+        final String derivedColumnDbName = _subQuerySqlClause.getSpecifiedColumnDbNameAsOne();
         if (derivedColumnDbName == null) {
             throwScalarConditionInvalidColumnSpecificationException(function);
         }
-        final ColumnSqlName derivedColumnSqlName = _subQueryClause.getSpecifiedColumnSqlNameAsOne();
+        final ColumnSqlName derivedColumnSqlName = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
         final ColumnRealName derivedColumnRealName = new ColumnRealName(tableAliasName, derivedColumnSqlName);
         assertScalarConditionColumnType(function, derivedColumnDbName);
-        _subQueryClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        if (_subQueryClause.hasUnionQuery()) {
-            return getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName);
+        _subQuerySqlClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        final String subQueryClause;
+        if (_subQuerySqlClause.hasUnionQuery()) {
+            subQueryClause = getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName);
         } else {
             final String selectClause = "select " + function + "(" + derivedColumnRealName + ")";
             final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
-            return selectClause + " " + fromWhereClause;
+            subQueryClause = selectClause + " " + fromWhereClause;
         }
+        return resolveSubQueryLevelVariable(subQueryClause);
     }
 
     protected String getUnionSubQuerySql(String function, String tableAliasName, ColumnSqlName derivedColumnSqlName,
             ColumnRealName derivedColumnRealName) {
-        final String beginMark = _sqlClause.resolveSubQueryBeginMark(_mainSubQueryIdentity) + ln();
-        final String endMark = _sqlClause.resolveSubQueryEndMark(_mainSubQueryIdentity);
+        final String beginMark = resolveSubQueryBeginMark(_mainSubQueryIdentity) + ln();
+        final String endMark = resolveSubQueryEndMark(_mainSubQueryIdentity);
         final String mainSql;
         {
             final ColumnSqlName pkSqlName = _subQueryDBMeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();

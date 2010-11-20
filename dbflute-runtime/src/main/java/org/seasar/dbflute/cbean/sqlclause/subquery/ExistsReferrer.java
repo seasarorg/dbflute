@@ -19,78 +19,87 @@ public class ExistsReferrer extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ExistsReferrer(SqlClause sqlClause, SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause,
+    public ExistsReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
             String subQueryIdentity, DBMeta subQueryDBMeta) {
-        super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
                 subQueryIdentity, subQueryDBMeta);
     }
 
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildExistsReferrer(String columnDbName, String relatedColumnDbName, String existsOption) {
+    /**
+     * Build the clause of sub-query by single primary key.
+     * @param correlatedColumnDbName The DB name of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnDbName The DB name of related column that is sub-query table's column. (NotNull)
+     * @param existsOption The option of ExistsReferrer. (basically for NotExistsReferrer) (Nullable)
+     * @return The clause of sub-query. (NotNull)
+     */
+    public String buildExistsReferrer(String correlatedColumnDbName, String relatedColumnDbName, String existsOption) {
         existsOption = existsOption != null ? existsOption + " " : "";
         final String subQueryClause;
-        if (columnDbName.contains(",") && relatedColumnDbName.contains(",")) {
+        if (correlatedColumnDbName.contains(",") && relatedColumnDbName.contains(",")) {
             // two-or-more primary keys
             final List<String> relatedColumnSplit = Srl.splitList(relatedColumnDbName, ",");
             final ColumnSqlName[] relatedColumnSqlNames = new ColumnSqlName[relatedColumnSplit.size()];
             for (int i = 0; i < relatedColumnSplit.size(); i++) {
                 relatedColumnSqlNames[i] = _subQuerySqlNameProvider.provide(relatedColumnSplit.get(i).trim());
             }
-            final List<String> columnDbNameSplit = Srl.splitList(columnDbName, ",");
+            final List<String> columnDbNameSplit = Srl.splitList(correlatedColumnDbName, ",");
             final ColumnRealName[] correlatedColumnRealNames = new ColumnRealName[columnDbNameSplit.size()];
             for (int i = 0; i < columnDbNameSplit.size(); i++) {
                 correlatedColumnRealNames[i] = _localRealNameProvider.provide(columnDbNameSplit.get(i).trim());
             }
-            subQueryClause = getSubQueryClause(relatedColumnSqlNames, correlatedColumnRealNames);
+            subQueryClause = getSubQueryClause(correlatedColumnRealNames, relatedColumnSqlNames);
         } else {
             // single primary key
             final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
-            final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(columnDbName);
-            subQueryClause = getSubQueryClause(relatedColumnSqlName, correlatedColumnRealName);
+            final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(correlatedColumnDbName);
+            subQueryClause = getSubQueryClause(correlatedColumnRealName, relatedColumnSqlName);
         }
-        final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
-        final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
+        final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
+        final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
         return existsOption + "exists (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
     }
 
     /**
-     * Get the clause of sub-query by single primary key.
-     * @param relatedColumnSqlName The SQL name of related column. (NotNull)
-     * @param correlatedColumnRealName The real name of correlated column. (NotNull)
+     * Build the clause of sub-query by single primary key.
+     * @param correlatedColumnRealName The real name of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlName The real name of related column that is sub-query table's column. (NotNull)
      * @return The clause of sub-query. (NotNull)
      */
-    protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName, ColumnRealName correlatedColumnRealName) {
-        final String tableAliasName = buildLocalTableAliasName();
+    protected String getSubQueryClause(ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName) {
+        final String localAliasName = getSubQueryLocalAliasName();
         final String selectClause;
         {
-            final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
+            final ColumnRealName relatedColumnRealName = new ColumnRealName(localAliasName, relatedColumnSqlName);
             selectClause = "select " + relatedColumnRealName;
         }
-        final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
-                relatedColumnSqlName, correlatedColumnRealName);
-        return selectClause + " " + fromWhereClause;
+        final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, localAliasName,
+                correlatedColumnRealName, relatedColumnSqlName);
+        final String subQueryClause = selectClause + " " + fromWhereClause;
+        return resolveSubQueryLevelVariable(subQueryClause);
     }
 
     /**
-     * Get the clause of sub-query by two-or-more primary keys.
-     * @param relatedColumnSqlNames The SQL names of related column. (NotNull)
-     * @param correlatedColumnNames The real names of correlated column. (NotNull)
+     * Build the clause of sub-query by two-or-more primary keys.
+     * @param correlatedColumnRealNames The real names of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlNames The real names of related column that is sub-query table's column. (NotNull)
      * @return The clause of sub-query. (NotNull)
      */
-    protected String getSubQueryClause(ColumnSqlName[] relatedColumnSqlNames, ColumnRealName[] correlatedColumnNames) {
-        final String tableAliasName = buildLocalTableAliasName();
+    protected String getSubQueryClause(ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames) {
+        final String localAliasName = getSubQueryLocalAliasName();
         final String selectClause;
         {
             // because sub-query may be only allowed to return a single column.
-            final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlNames[0]);
+            final ColumnRealName relatedColumnRealName = new ColumnRealName(localAliasName, relatedColumnSqlNames[0]);
             selectClause = "select " + relatedColumnRealName;
         }
-        final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
-                relatedColumnSqlNames, correlatedColumnNames);
-        return selectClause + " " + fromWhereClause;
+        final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, localAliasName,
+                correlatedColumnRealNames, relatedColumnSqlNames);
+        final String subQueryClause = selectClause + " " + fromWhereClause;
+        return resolveSubQueryLevelVariable(subQueryClause);
     }
 }

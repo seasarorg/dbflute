@@ -227,21 +227,20 @@ public class DerivedReferrerOption implements ParameterOption {
     // ===================================================================================
     //                                                                    Create Processor
     //                                                                    ================
-    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
+    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
             int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
             String mainSubQueryIdentity, String aliasName) {
-        return new SpecifyDerivedReferrer(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider,
-                subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
+        return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
+                subQueryClause, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
     }
 
-    public QueryDerivedReferrer createQueryDerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
+    public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
             int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
             String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
-        return new QueryDerivedReferrer(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider,
-                subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value,
-                parameterPath);
+        return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
+                subQueryClause, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
     }
 
     // ===================================================================================

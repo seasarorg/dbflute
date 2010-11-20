@@ -884,7 +884,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return _purpose;
     }
 
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // very internal (super very important)
+    // these are called immediate after creation of condition-bean
+    // because there are important initializations here
+    // - - - - - - - - - -/
+
     public void xsetupForUnion(ConditionBean baseCB) {
         xinheritSubQueryInfo(baseCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);
@@ -915,26 +920,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // *defined at base condition-bean per table
-    //public void xsetupForColumnQuery() {
-    //    xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
-    //}
-
-    // *defined at base condition-bean per table
-    //public void xsetupForVaryingUpdate() {
-    //    xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
-    //}
+    //  o xsetupForColumnQuery()
+    //  o xsetupForVaryingUpdate()
 
     protected void xinheritSubQueryInfo(ConditionQuery baseCQ) {
         if (baseCQ.xgetSqlClause().isForSubQuery()) { // inherits it
-            localCQ().xsetSubQueryLevel(baseCQ.xgetSubQueryLevel());
-            getSqlClause().setupForSubQuery();
+            // the reason of call order is same as xprepareSubQueryInfo()
+            getSqlClause().setupForSubQuery(); // first
+            localCQ().xsetSubQueryLevel(baseCQ.xgetSubQueryLevel()); // second
         }
     }
 
     protected void xprepareSubQueryInfo(ConditionQuery baseCQ) {
         final int nextSubQueryLevel = baseCQ.xgetSubQueryLevel() + 1;
-        localCQ().xsetSubQueryLevel(nextSubQueryLevel);
-        getSqlClause().setupForSubQuery();
+        // setting up for sub-query should be called
+        // before first localCQ() to switch a base point alias name
+        getSqlClause().setupForSubQuery(); // first
+        localCQ().xsetSubQueryLevel(nextSubQueryLevel); // second
     }
 
     protected void xchangePurposeSqlClause(HpCBPurpose purpose) {

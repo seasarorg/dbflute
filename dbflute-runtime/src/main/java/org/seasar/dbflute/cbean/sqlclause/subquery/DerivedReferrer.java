@@ -27,11 +27,10 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DerivedReferrer(SqlClause sqlClause, SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            String mainSubQueryIdentity) {
-        super(sqlClause, subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+    public DerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
+            String subQueryIdentity, DBMeta subQueryDBMeta, String mainSubQueryIdentity) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
                 subQueryIdentity, subQueryDBMeta);
         _mainSubQueryIdentity = mainSubQueryIdentity;
     }
@@ -39,75 +38,64 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildDerivedReferrer(String function, String columnDbName, String relatedColumnDbName,
+    public String buildDerivedReferrer(String function, String correlatedColumnDbName, String relatedColumnDbName,
             DerivedReferrerOption option) {
         setupOptionAttribute(option);
-        final ColumnRealName columnRealName = _localRealNameProvider.provide(columnDbName);
+        final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(correlatedColumnDbName);
         final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
-        final String subQueryClause = getSubQueryClause(function, columnRealName, relatedColumnSqlName, option);
-        final String beginMark = _sqlClause.resolveSubQueryBeginMark(_subQueryIdentity) + ln();
-        final String endMark = _sqlClause.resolveSubQueryEndMark(_subQueryIdentity);
+        final String subQueryClause = getSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName,
+                option);
+        final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
+        final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
-        return doBuildDerivedReferrer(function, columnRealName, relatedColumnSqlName, subQueryClause, beginMark,
-                endMark, endIndent);
+        return doBuildDerivedReferrer(function, correlatedColumnRealName, relatedColumnSqlName, subQueryClause,
+                beginMark, endMark, endIndent);
     }
 
     protected void setupOptionAttribute(DerivedReferrerOption option) {
-        option.setTargetColumnInfo(_subQueryClause.getSpecifiedColumnInfoAsOne());
-        option.setDatabaseMySQL(_subQueryClause instanceof SqlClauseMySql);
-        option.setDatabasePostgreSQL(_subQueryClause instanceof SqlClausePostgreSql);
-        option.setDatabaseSQLServer(_subQueryClause instanceof SqlClauseSqlServer);
-        option.setDatabaseH2(_subQueryClause instanceof SqlClauseH2);
+        option.setTargetColumnInfo(_subQuerySqlClause.getSpecifiedColumnInfoAsOne());
+        option.setDatabaseMySQL(_subQuerySqlClause instanceof SqlClauseMySql);
+        option.setDatabasePostgreSQL(_subQuerySqlClause instanceof SqlClausePostgreSql);
+        option.setDatabaseSQLServer(_subQuerySqlClause instanceof SqlClauseSqlServer);
+        option.setDatabaseH2(_subQuerySqlClause instanceof SqlClauseH2);
     }
 
     protected abstract String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent);
 
-    protected String getSubQueryClause(String function, ColumnRealName columnRealName,
+    protected String getSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option) {
         if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final String tableAliasName = buildLocalTableAliasName();
-        final ColumnSqlName derivedColumnSqlName = _subQueryClause.getSpecifiedColumnSqlNameAsOne();
+        final String tableAliasName = getSubQueryLocalAliasName();
+        final ColumnSqlName derivedColumnSqlName = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
         if (derivedColumnSqlName == null) {
             throwDerivedReferrerInvalidColumnSpecificationException(function);
         }
-        final ColumnRealName derivedColumnRealName;
-        {
-            final String specifiedColumnDbName = _subQueryClause.getSpecifiedColumnDbNameAsOne();
-            final ColumnRealName specifiedColumnRealName = _subQueryClause.getSpecifiedColumnRealNameAsOne();
-            if (!specifiedColumnRealName.getTableAliasName().equals(getBasePointAliasName())) {
-                // The column is on sub-query local table.
-                derivedColumnRealName = specifiedColumnRealName;
-            } else {
-                // The column is on sub-query related table.
-                derivedColumnRealName = new ColumnRealName(tableAliasName, derivedColumnSqlName);
-
-                // Assert about column type when local table only.
-                assertDerivedReferrerColumnType(function, specifiedColumnDbName);
-            }
-        }
-        _subQueryClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        if (_subQueryClause.hasUnionQuery()) {
-            return getUnionSubQueryClause(function, columnRealName, relatedColumnSqlName, option, tableAliasName,
-                    derivedColumnRealName, derivedColumnSqlName);
+        final ColumnRealName derivedColumnRealName = _subQuerySqlClause.getSpecifiedColumnRealNameAsOne();
+        _subQuerySqlClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        final String subQueryClause;
+        if (_subQuerySqlClause.hasUnionQuery()) {
+            subQueryClause = getUnionSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName, option,
+                    tableAliasName, derivedColumnRealName, derivedColumnSqlName);
         } else {
             final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option);
             final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
-                    relatedColumnSqlName, columnRealName);
-            return selectClause + " " + fromWhereClause;
+                    correlatedColumnRealName, relatedColumnSqlName);
+            subQueryClause = selectClause + " " + fromWhereClause;
         }
+        return resolveSubQueryLevelVariable(subQueryClause);
     }
 
-    protected String getUnionSubQueryClause(String function, ColumnRealName columnRealName,
+    protected String getUnionSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option, String tableAliasName,
             ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName) {
-        final String beginMark = _sqlClause.resolveSubQueryBeginMark(_mainSubQueryIdentity) + ln();
-        final String endMark = _sqlClause.resolveSubQueryEndMark(_mainSubQueryIdentity);
+        final String beginMark = resolveSubQueryBeginMark(_mainSubQueryIdentity) + ln();
+        final String endMark = resolveSubQueryEndMark(_mainSubQueryIdentity);
         final String mainSql;
         {
             final ColumnSqlName pkSqlName = _subQueryDBMeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
@@ -118,7 +106,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             mainSql = selectClause + " " + fromWhereClause;
         }
         final String mainAlias = buildSubQueryMainAliasName();
-        final String joinCondition = mainAlias + "." + relatedColumnSqlName + " = " + columnRealName;
+        final String joinCondition = mainAlias + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
         final ColumnRealName mainDerivedColumnRealName = new ColumnRealName(mainAlias, derivedColumnSqlName);
         return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) + ln() + "  from ("
                 + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark + ln() + " where " + joinCondition;
