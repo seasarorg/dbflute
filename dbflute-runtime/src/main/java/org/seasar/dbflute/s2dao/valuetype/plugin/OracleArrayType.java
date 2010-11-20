@@ -173,12 +173,12 @@ public abstract class OracleArrayType implements ValueType {
 
     protected Object toBindValue(Connection conn, Object parameterExp, Object value) throws SQLException {
         assertArrayPropertyValueCollection(parameterExp, value);
-        final Object mappedArray = toMappedArray(conn, parameterExp, value);
+        final Object mappedArray = toMappedArray(conn, parameterExp, (Collection<?>) value);
         return toOracleArray(getOracleConnection(conn), _arrayTypeName, mappedArray);
     }
 
-    protected Object toMappedArray(Connection conn, Object parameterExp, Object value) throws SQLException {
-        final Object[] array = ((Collection<?>) value).toArray();
+    protected Object toMappedArray(Connection conn, Object parameterExp, Collection<?> value) throws SQLException {
+        final Object[] array = value.toArray();
         if (array.length == 0) {
             return array;
         }
@@ -187,7 +187,7 @@ public abstract class OracleArrayType implements ValueType {
             for (Object element : array) {
                 assertArrayElementValueStructEntity(parameterExp, element);
                 final Entity entity = (Entity) element; // must be entity
-                structList.add(mappingStruct(conn, entity));
+                structList.add(mappingStruct(conn, parameterExp, entity));
             }
             return structList.toArray();
         } else {
@@ -205,12 +205,21 @@ public abstract class OracleArrayType implements ValueType {
         }
     }
 
-    protected Object mappingStruct(Connection conn, Entity entity) throws SQLException {
+    protected Object mappingStruct(Connection conn, Object parameterExp, Entity entity) throws SQLException {
         final DBMeta dbmeta = _entityPrototype.getDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         final List<Object> attrList = new ArrayList<Object>();
         for (ColumnInfo columnInfo : columnInfoList) {
-            attrList.add(mappingScalarToSqlValue(columnInfo.read(entity)));
+            final Object propertyValue = columnInfo.read(entity);
+            final Object mappedValue;
+            if (propertyValue instanceof Collection<?>) {
+                mappedValue = toMappedArray(conn, parameterExp, (Collection<?>) propertyValue);
+            } else if (propertyValue instanceof Entity) {
+                mappedValue = mappingStruct(conn, parameterExp, (Entity) propertyValue);
+            } else {
+                mappedValue = mappingScalarToSqlValue(propertyValue);
+            }
+            attrList.add(mappedValue);
         }
         final String structTypeName = dbmeta.getTableSqlName().toString();
         return toOracleStruct(getOracleConnection(conn), structTypeName, attrList.toArray());
