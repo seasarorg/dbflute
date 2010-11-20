@@ -662,6 +662,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final Table tbl = new Table();
             tbl.setSql2EntityCustomize(true);
             tbl.setName(entityInfo.getTableDbName());
+            if (entityInfo.hasForcedEntityName()) { // for example, STRUCT
+                tbl.setSql2EntityForcedEntityName(entityInfo.getForcedEntityName());
+            }
             tbl.setupNeedsJavaNameConvertFalse();
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);

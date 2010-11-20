@@ -10,9 +10,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
@@ -234,10 +236,14 @@ public class DfProcedurePmbSetupper {
 
     protected String doProcessStructProperty(DfProcedureColumnMetaInfo column, DfTypeStructInfo structInfo,
             ProcedurePropertyInfo processInfo) {
-        final String entityName = convertStructNameToEntityName(structInfo);
-        if (!_entityInfoMap.containsKey(entityName)) { // because STRUCTs are independent objects
-            _entityInfoMap.put(entityName, new DfCustomizeEntityInfo(structInfo.getTypeName(), structInfo
-                    .getAttributeInfoMap()));
+        final String typeName = structInfo.getTypeName();
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String entityName = projectPrefix + "Struct" + Srl.camelize(typeName);
+        if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
+            final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
+            final DfCustomizeEntityInfo entityInfo = new DfCustomizeEntityInfo(typeName, attrMap);
+            entityInfo.setForcedEntityName(entityName); // entity name is fixed
+            _entityInfoMap.put(typeName, entityInfo);
         }
         structInfo.setEntityType(entityName);
         processInfo.setPropertyType(getGenericListClassName(entityName));
@@ -302,10 +308,11 @@ public class DfProcedurePmbSetupper {
     //                                                                        Convert Name
     //                                                                        ============
     protected String convertProcedureNameToPmbName(String procedureName) {
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        // here you do not need to handle project prefix
+        // because the prefix is resolved at table object
         procedureName = Srl.replace(procedureName, ".", "_");
         procedureName = resolveVendorProcedureNameHeadache(procedureName);
-        return projectPrefix + Srl.camelize(procedureName) + "Pmb";
+        return Srl.camelize(procedureName) + "Pmb";
     }
 
     protected String resolveVendorProcedureNameHeadache(String procedureName) {
@@ -321,9 +328,8 @@ public class DfProcedurePmbSetupper {
     }
 
     protected String convertStructNameToEntityName(DfTypeStructInfo structInfo) {
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String typeName = structInfo.getTypeName();
-        return projectPrefix + "Struct" + Srl.camelize(typeName);
+        return "Struct" + Srl.camelize(typeName);
     }
 
     protected String convertProcedureListPropertyType(String entityName) {
