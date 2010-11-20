@@ -165,7 +165,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         return entity;
     }
 
-    protected Object adjustScalarToPropertyValue(Object value, Class<?> propertyType) {
+    protected Object adjustScalarToPropertyValue(Object value, Class<?> propertyType) throws SQLException {
         if (propertyType == null) { // no check
             return value;
         }
@@ -240,18 +240,14 @@ public abstract class GreatWallOfOracleType implements ValueType {
             }
             preparedArray = structList.toArray();
         } else {
-            if (java.util.Date.class.equals(elementType)) {
-                final List<Object> elementList = DfCollectionUtil.newArrayList();
-                for (Object element : array) {
-                    if (element == null) {
-                        continue;
-                    }
-                    elementList.add(mappingScalarToSqlValue(conn, paramExp, element));
+            final List<Object> elementList = DfCollectionUtil.newArrayList();
+            for (Object element : array) {
+                if (element == null) {
+                    continue;
                 }
-                preparedArray = elementList.toArray();
-            } else {
-                preparedArray = array;
+                elementList.add(mappingScalarToSqlValue(conn, paramExp, element, null));
             }
+            preparedArray = elementList.toArray();
         }
         return toOracleArray(conn, arrayTypeName, preparedArray);
     }
@@ -282,7 +278,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
                 // (but property type is Object because Sql2Entity does not support this)
                 mappedValue = mappingEntityToOracleStruct(conn, paramExp, (Entity) propertyValue);
             } else {
-                mappedValue = mappingScalarToSqlValue(conn, paramExp, propertyValue);
+                mappedValue = mappingScalarToSqlValue(conn, paramExp, propertyValue, columnInfo);
             }
             attrList.add(mappedValue);
         }
@@ -290,7 +286,16 @@ public abstract class GreatWallOfOracleType implements ValueType {
         return toOracleStruct(getOracleConnection(conn), structTypeName, attrList.toArray());
     }
 
-    protected Object mappingScalarToSqlValue(Connection conn, Object paramExp, Object value) {
+    /**
+     * @param conn The connection for the database. (NotNull)
+     * @param paramExp The expression of bind parameter (index or name). (NotNull)
+     * @param value The property value as scalar. (Nullable: if null, returns null)
+     * @param columnInfo The information of column. (Nullable: if null, several filter does not work)
+     * @return The mapped value for SQL. (Nullable)
+     * @throws SQLException 
+     */
+    protected Object mappingScalarToSqlValue(Connection conn, Object paramExp, Object value, ColumnInfo columnInfo)
+            throws SQLException {
         if (value == null) {
             return null;
         }
