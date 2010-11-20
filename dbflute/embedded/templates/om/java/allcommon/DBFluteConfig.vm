@@ -21,6 +21,7 @@ import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.s2dao.valuetype.plugin.OracleAgent;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleArrayType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleStructType;
@@ -532,26 +533,17 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                                                Oracle
     //                                                ------
-    public static class ImplementedOracleDateType extends OracleDateType {
+    public static class ImplementedOracleAgent implements OracleAgent {
 
-        @Override
-        protected Object toOracleDate(Timestamp timestamp) {
+        public Object toOracleDate(Timestamp timestamp) {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             return new oracle.sql.DATE(timestamp);
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
 #end
         }
-    }
 
-    public static class ImplementedOracleArrayType extends OracleArrayType {
-
-        public ImplementedOracleArrayType(String arrayTypeName, Class<?> elementType) {
-            super(arrayTypeName, elementType);
-        }
-
-        @Override
-        protected Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
+        public Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             oracle.sql.ArrayDescriptor desc = oracle.sql.ArrayDescriptor.createDescriptor(arrayTypeName, conn);
             return new oracle.sql.ARRAY(desc, conn, arrayValue);
@@ -560,8 +552,7 @@ public class ${glDBFluteConfig} {
 #end
         }
 
-        @Override
-        protected Object toStandardArray(Object oracleArray) throws SQLException {
+        public Object toStandardArray(Object oracleArray) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             return ((oracle.sql.ARRAY)oracleArray).getArray();
 #else
@@ -569,8 +560,7 @@ public class ${glDBFluteConfig} {
 #end
         }
 
-        @Override
-        protected Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
+        public Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
             return new ImplementedOracleStructWrapper(new oracle.sql.STRUCT(desc, conn, attrs));
@@ -579,8 +569,7 @@ public class ${glDBFluteConfig} {
 #end
         }
 
-        @Override
-        protected Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
+        public Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             return ((oracle.sql.STRUCT)oracleStruct).getAttributes();
 #else
@@ -588,8 +577,7 @@ public class ${glDBFluteConfig} {
 #end
         }
 
-        @Override
-        protected PhysicalConnectionDigger getPhysicalConnectionDigger() {
+        public PhysicalConnectionDigger getPhysicalConnectionDigger() {
             return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
         }
     }
@@ -606,6 +594,26 @@ public class ${glDBFluteConfig} {
     }
 #end
 
+    public static class ImplementedOracleDateType extends OracleDateType {
+
+        @Override
+        protected OracleAgent createOracleAgent() {
+            return new ImplementedOracleAgent();
+        }
+    }
+
+    public static class ImplementedOracleArrayType extends OracleArrayType {
+
+        public ImplementedOracleArrayType(String arrayTypeName, Class<?> elementType) {
+            super(arrayTypeName, elementType);
+        }
+
+        @Override
+        protected OracleAgent createOracleAgent() {
+            return new ImplementedOracleAgent();
+        }
+    }
+
     public static class ImplementedOracleStructType extends OracleStructType {
 
         public ImplementedOracleStructType(String structTypeName, Class<?> entityType) {
@@ -613,27 +621,8 @@ public class ${glDBFluteConfig} {
         }
 
         @Override
-        protected Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
-            oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
-            return new oracle.sql.STRUCT(desc, conn, attrs);
-#else
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-#end
-        }
-
-        @Override
-        protected Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
-            return ((oracle.sql.STRUCT)oracleStruct).getAttributes();
-#else
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-#end
-        }
-
-        @Override
-        protected PhysicalConnectionDigger getPhysicalConnectionDigger() {
-            return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
+        protected OracleAgent createOracleAgent() {
+            return new ImplementedOracleAgent();
         }
     }
 
