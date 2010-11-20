@@ -98,6 +98,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     // for getting schema
     protected AppData _schemaData;
+    // to use same process as generating here
+    protected final Database _database = new Database();
 
     // ===================================================================================
     //                                                                          DataSource
@@ -624,7 +626,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected DfProcedurePmbSetupper createProcedurePmbSetupper() {
-        return new DfProcedurePmbSetupper(getDataSource(), _entityInfoMap, _pmbMetaDataMap);
+        return new DfProcedurePmbSetupper(getDataSource(), _entityInfoMap, _pmbMetaDataMap, _database);
     }
 
     protected void throwProcedureSetupFailureException(SQLException e) {
@@ -651,7 +653,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                 ===================
     @Override
     public Context initControlContext() throws Exception {
-        final Database database = new Database();
+        final Database database = _database;
         database.setSql2EntitySchemaData(_schemaData);
         database.setPmbMetaDataMap(_pmbMetaDataMap);
         database.setSkipDeleteOldClass(DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile() != null);
@@ -664,7 +666,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final Table tbl = new Table();
             tbl.setSql2EntityCustomize(true);
             tbl.setName(entityInfo.getTableDbName());
-            tbl.setupNeedsJavaNameConvertFalse();
+            if (!entityInfo.needsJavaNameConvert()) {
+                tbl.suppressJavaNameConvert(); // basically here (except STRUCT type)
+            }
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);
             _log.info(entityName);

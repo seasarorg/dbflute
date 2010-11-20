@@ -11,30 +11,27 @@ public class DfCustomizeEntityInfo {
 
     protected final String _tableDbName;
     protected final Map<String, DfColumnMetaInfo> _columnMap;
-    protected String _forcedEntityName;
+    protected boolean _needsJavaNameConvert;
 
     public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMetaInfo> columnMap) {
         _tableDbName = tableDbName;
         _columnMap = columnMap;
     }
 
-    public boolean hasForcedEntityName() {
-        return _forcedEntityName != null;
+    public boolean needsJavaNameConvert() {
+        return _needsJavaNameConvert;
     }
-    
+
+    public DfCustomizeEntityInfo setupJavaNameConvert() {
+        _needsJavaNameConvert = true;
+        return this;
+    }
+
     public String getTableDbName() {
         return _tableDbName;
     }
 
     public Map<String, DfColumnMetaInfo> getColumnMap() {
         return _columnMap;
-    }
-
-    public String getForcedEntityName() {
-        return _forcedEntityName;
-    }
-
-    public void setForcedEntityName(String forcedEntityName) {
-        this._forcedEntityName = forcedEntityName;
     }
 }

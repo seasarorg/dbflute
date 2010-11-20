@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -46,6 +47,7 @@ public class DfProcedurePmbSetupper {
     protected final DataSource _dataSource;
     protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap;
     protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
+    protected final Database _database;
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
     protected final DfProcedureHandler _procedureHandler = new DfProcedureHandler();
 
@@ -53,10 +55,11 @@ public class DfProcedurePmbSetupper {
     //                                                                         Constructor
     //                                                                         ===========
     public DfProcedurePmbSetupper(DataSource dataSource, Map<String, DfCustomizeEntityInfo> entityInfoMap,
-            Map<String, DfPmbMetaData> pmbMetaDataMap) {
+            Map<String, DfPmbMetaData> pmbMetaDataMap, Database database) {
         _dataSource = dataSource;
         _entityInfoMap = entityInfoMap;
         _pmbMetaDataMap = pmbMetaDataMap;
+        _database = database;
     }
 
     // ===================================================================================
@@ -236,16 +239,23 @@ public class DfProcedurePmbSetupper {
 
     protected String doProcessStructProperty(DfProcedureColumnMetaInfo column, DfTypeStructInfo structInfo,
             ProcedurePropertyInfo propertyInfo, boolean inArray) {
-        final String entityName = Srl.camelize(structInfo.getTypeName());
-        if (!_entityInfoMap.containsKey(entityName)) { // because of independent objects and so called several times
+        final String typeName = structInfo.getTypeName();
+        if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            final DfCustomizeEntityInfo entityInfo = new DfCustomizeEntityInfo(entityName, attrMap);
-            _entityInfoMap.put(entityName, entityInfo);
+            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap));
         }
+
+        // type name becomes entity name plainly but it will be converted as java name
+        // so it uses database's convert that is same conversion way as generating
+        // because this process needs entityType on program
+        final String entityName = _database.convertJavaNameByJdbcNameAsTable(typeName);
+
+        // entityType is class name can used on program
+        // so it adjusts project prefix here
         final String projectPrefix = getBasicProperties().getProjectPrefix();
-        final String realEntityName = projectPrefix + entityName; // adjusts project prefix here
-        structInfo.setEntityType(realEntityName);
-        propertyInfo.setPropertyType(inArray ? getGenericListClassName(realEntityName) : realEntityName);
+        final String entityType = projectPrefix + entityName;
+        structInfo.setEntityType(entityType);
+        propertyInfo.setPropertyType(inArray ? getGenericListClassName(entityType) : entityType);
         propertyInfo.setRefCustomizeEntity(true);
         return entityName;
     }
@@ -327,9 +337,12 @@ public class DfProcedurePmbSetupper {
     }
 
     protected String convertProcedureListPropertyType(String entityName) {
+        // propertyType is class name can used on program
+        // so it adjusts project prefix here
         final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String propertyType = projectPrefix + entityName;
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-        return grammarInfo.getGenericListClassName(projectPrefix + entityName); // adjusts project prefix here
+        return grammarInfo.getGenericListClassName(propertyType);
     }
 
     protected String convertColumnNameToPropertyName(String columnName) {

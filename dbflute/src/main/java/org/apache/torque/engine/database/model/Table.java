@@ -1656,7 +1656,7 @@ public class Table {
     //                                             ---------
     protected boolean _needsJavaNameConvert = true;
 
-    public void setupNeedsJavaNameConvertFalse() {
+    public void suppressJavaNameConvert() {
         _needsJavaNameConvert = false;
     }
 

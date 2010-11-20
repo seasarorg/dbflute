@@ -540,9 +540,8 @@ public class ${glDBFluteConfig} {
         @Override
         protected Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
-            Connection physConn = getOracleConnection(conn);
-            oracle.sql.ArrayDescriptor desc = oracle.sql.ArrayDescriptor.createDescriptor(arrayTypeName, physConn);
-            return new oracle.sql.ARRAY(desc, physConn, arrayValue);
+            oracle.sql.ArrayDescriptor desc = oracle.sql.ArrayDescriptor.createDescriptor(arrayTypeName, conn);
+            return new oracle.sql.ARRAY(desc, conn, arrayValue);
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
 #end
@@ -576,10 +575,7 @@ public class ${glDBFluteConfig} {
 #end
         }
 
-        protected Connection getOracleConnection(Connection conn) throws SQLException {
-            return getPhysicalConnectionDigger().getConnection(conn);
-        }
-
+        @Override
         protected PhysicalConnectionDigger getPhysicalConnectionDigger() {
             return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
         }
