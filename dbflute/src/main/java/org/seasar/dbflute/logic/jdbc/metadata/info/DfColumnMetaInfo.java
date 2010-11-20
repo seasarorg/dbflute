@@ -35,10 +35,16 @@ public class DfColumnMetaInfo {
     protected boolean _required;
     protected String _columnComment;
     protected String _defaultValue;
+
+    // only when Sql2Entity task
     protected String _sql2entityRelatedTableName;
     protected String _sql2entityRelatedColumnName;
     protected String _sql2entityForcedJavaNative;
     protected boolean _procedureParameter;
+
+    // basically only when procedure parameter
+    protected String arrayTypeName;
+    protected String structTypeName;
 
     // ===================================================================================
     //                                                                       Determination
@@ -170,5 +176,21 @@ public class DfColumnMetaInfo {
 
     public void setProcedureParameter(boolean procedureParameter) {
         this._procedureParameter = procedureParameter;
+    }
+
+    public String getArrayTypeName() {
+        return arrayTypeName;
+    }
+
+    public void setArrayTypeName(String arrayTypeName) {
+        this.arrayTypeName = arrayTypeName;
+    }
+
+    public String getStructTypeName() {
+        return structTypeName;
+    }
+
+    public void setStructTypeName(String structTypeName) {
+        this.structTypeName = structTypeName;
     }
 }

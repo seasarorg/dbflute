@@ -323,7 +323,7 @@ namespace ${glPackageBaseCommonCBean} {
         // because there are important initializations here
         // - - - - - - - - - -/
 
-        public void xsetupForUnion(${ConditionBean} mainCB) {
+        public void xsetupForUnion(${glConditionBean} mainCB) {
             xinheritSubQueryInfo(mainCB.LocalCQ);
             _forUnion = true;
         }
@@ -459,7 +459,7 @@ namespace ${glPackageBaseCommonCBean} {
     // [DBFlute-0.7.4]
     public abstract class AbstractSpecification<CQ> where CQ : ${glConditionQuery} {
         protected ${glConditionBean} _baseCB;
-        protected SpQyCall<CQ> _qyCall;
+        protected HpSpQyCall<CQ> _qyCall;
         protected HpSpQyCall<CQ> _syncQyCall;
         protected bool _forDerivedReferrer;
         protected bool _forScalarSelect;
@@ -468,7 +468,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected CQ _query;
         protected bool _alreadySpecifiedRequiredColumn;
 
-        protected AbstractSpecification(${glConditionBean} baseCB, SpQyCall<CQ> qyCall
+        protected AbstractSpecification(${glConditionBean} baseCB, HpSpQyCall<CQ> qyCall
                                       , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery, bool forColumnQuery) {
             _baseCB = baseCB;
             _qyCall = qyCall;
@@ -519,7 +519,7 @@ namespace ${glPackageBaseCommonCBean} {
             return _syncQyCall;
         }
 
-        public void xsetSyncQyCall(SpQyCall<CQ> qyCall) {
+        public void xsetSyncQyCall(HpSpQyCall<CQ> qyCall) {
             _qyCall = qyCall;
         }
 
@@ -648,7 +648,7 @@ namespace ${glPackageBaseCommonCBean} {
         }
     }
 
-    public interface SpQyCall<CQ> where CQ : ${glConditionQuery} {
+    public interface HpSpQyCall<CQ> where CQ : ${glConditionQuery} {
         bool has(); 
         CQ qy(); 
     }

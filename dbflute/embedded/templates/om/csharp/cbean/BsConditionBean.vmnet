@@ -174,7 +174,7 @@ namespace ${glPackageBaseCB} {
         protected bool HasSpecifiedColumn { get {
             return _specification != null && _specification.IsAlreadySpecifiedRequiredColumn;
         }}
-        protected class MySpQyCall : SpQyCall<${myConditionQueryClassName}> {
+        protected class MySpQyCall : HpSpQyCall<${myConditionQueryClassName}> {
 			protected ${myClassName} _myCB;
 			public MySpQyCall(${myClassName} myCB) { _myCB = myCB; }
     		public bool has() { return true; } public ${myConditionQueryClassName} qy() { return _myCB.Query(); }
@@ -218,7 +218,7 @@ namespace ${glPackageBaseCB} {
         }
     }
 
-    public class ${myConditionBeanClassName}ColQySpQyCall : SpQyCall<${myConditionQueryClassName}> {
+    public class ${myConditionBeanClassName}ColQySpQyCall : HpSpQyCall<${myConditionQueryClassName}> {
         protected ${myConditionBeanClassName} _mainCB;
         public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} mainCB) {
             _mainCB = mainCB;
@@ -240,7 +240,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
         protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
-        public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
+        public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, HpSpQyCall<${myConditionQueryClassName}> qyCall
                                                       , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery, bool forColumnQuery)
         : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect, forScalarSubQuery, forColumnQuery) { }
 #foreach ($col in $table.columns)
@@ -280,9 +280,9 @@ namespace ${glPackageBaseCB} {
             }
             return _${tmpPropertyName};
         }
-		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
-		    protected SpQyCall<${myConditionQueryClassName}> _qyCall;
-		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
+		public class ${tmpPropertyNameInitCap}SpQyCall : HpSpQyCall<${tmpCQClassName}> {
+		    protected HpSpQyCall<${myConditionQueryClassName}> _qyCall;
+		    public ${tmpPropertyNameInitCap}SpQyCall(HpSpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
 		    public bool has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 #if ($fk.hasDynamicFixedCondition())
 			public ${tmpCQClassName} qy() { return _qyCall.qy().ConditionQuery${tmpPropertyNameInitCap}; }
@@ -305,9 +305,9 @@ namespace ${glPackageBaseCB} {
             }
             return _${tmpPropertyName};
         }
-		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
-		    protected SpQyCall<${myConditionQueryClassName}> _qyCall;
-		    public ${tmpPropertyNameInitCap}SpQyCall(SpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
+		public class ${tmpPropertyNameInitCap}SpQyCall : HpSpQyCall<${tmpCQClassName}> {
+		    protected HpSpQyCall<${myConditionQueryClassName}> _qyCall;
+		    public ${tmpPropertyNameInitCap}SpQyCall(HpSpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
 		    public bool has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
 			public ${tmpCQClassName} qy() { return _qyCall.qy().Query${tmpPropertyNameInitCap}(); }
 		}

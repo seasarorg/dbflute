@@ -649,8 +649,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     // ===================================================================================
-    //                                                                 Initialize Override
-    //                                                                 ===================
+    //                                                                  Prepare Generation
+    //                                                                  ==================
     @Override
     public Context initControlContext() throws Exception {
         final Database database = _database;
