@@ -651,15 +651,15 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
-    public void xsetupForColumnQuery(final ${myConditionBeanClassName} baseCB) {
-        xinheritSubQueryInfo(baseCB.localCQ());
+    public void xsetupForColumnQuery(final ${myConditionBeanClassName} mainCB) {
+        xinheritSubQueryInfo(mainCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
 
         // inherits a parent query to synchronize real name
         // (and also for suppressing query check) 
         specify().xsetSyncQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
             public boolean has() { return true; }
-            public ${myConditionQueryClassName} qy() { return baseCB.query(); }
+            public ${myConditionQueryClassName} qy() { return mainCB.query(); }
         });
     }
 

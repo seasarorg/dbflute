@@ -518,7 +518,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${foreignCQClassName} cq = new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
         cq.xsetForeignPropertyName("${fk.foreignPropertyName}");
-        cq.xsetSubQueryLevel(xgetSubQueryLevel()); cq.xsetRelationPath(nrp); return cq;
+        cq.xsetRelationPath(nrp); return cq;
     }
     protected void xsetupOuterJoin${fk.foreignPropertyNameInitCap}() {
         ${foreignCQClassName} cq = getConditionQuery${fk.foreignPropertyNameInitCap}();
@@ -562,7 +562,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${relatedCQClassName} cq = new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
         cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
-        cq.xsetSubQueryLevel(xgetSubQueryLevel()); cq.xsetRelationPath(nrp); return cq;
+        cq.xsetRelationPath(nrp); return cq;
     }
     protected void xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}() {
         ${relatedCQClassName} cq = getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();

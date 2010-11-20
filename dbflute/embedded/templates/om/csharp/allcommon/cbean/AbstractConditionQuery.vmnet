@@ -115,14 +115,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return (xgetReferrerQuery() == null);
     }
 
-	public int xgetSubQueryLevel() {
-	    return _subQueryLevel;
-	}
-
-    public void xsetSubQueryLevel(int subQueryLevel) {
-        _subQueryLevel = subQueryLevel;
-    }
-
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
@@ -580,11 +572,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
-        String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
+        String subQueryClause = getInScopeSubQueryClause(subQuery, relatedColumnName, propertyName);
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = realColumnName + " " + inScopeOption
                      + "in (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
@@ -595,10 +587,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return toColumnRealName(columnName);
     }
 
-    protected virtual String getInScopeSubQuerySql(${glConditionQuery} subQuery
+    protected virtual String getInScopeSubQueryClause(${glConditionQuery} subQuery
                                  , String relatedColumnName, String propertyName) {
-        String tableAliasName = xgetSqlClause().getBasePointAliasName();
-        String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
+        String tableAliasName = subQuery.xgetSqlClause().getBasePointAliasName();
+        String selectClause = "select " + tableAliasName + "." + relatedColumnName;
         String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                  , selectClause, tableAliasName);
         return selectClause + " " + fromWhereClause;
@@ -623,11 +615,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
         existsOption = existsOption != null ? existsOption + " " : "";
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
-        String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
+        String subQueryClause = getExistsSubQueryClause(subQuery, realColumnName, relatedColumnName, propertyName);
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = existsOption + "exists (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
         registerWhereClause(clause);
@@ -641,10 +633,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return toColumnRealName(columnName);
     }
 
-    protected virtual String getExistsSubQuerySql(${glConditionQuery} subQuery
+    protected virtual String getExistsSubQueryClause(${glConditionQuery} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
-		int subQueryLevel = subQuery.xgetSubQueryLevel();
-		String tableAliasName = "sub" + subQueryLevel + "loc";
+		int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
+		String tableAliasName = subQuery.xgetSqlClause().getBasePointAliasName();
         String selectClause = "select " + tableAliasName + "." + relatedColumnName;
         String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                        , selectClause, tableAliasName, realColumnName);
@@ -661,12 +653,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("DerivedReferrerSubQuery(function)", function);
         assertObjectNotNull("DerivedReferrerSubQuery(" + columnName + ")", subQuery);
         String realColumnName = getSpecifyDerivedReferrerRealColumnName(columnName);
-        String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName
-                                                                   , relatedColumnName, propertyName, aliasName);
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
+        String subQueryClause = getSpecifyDerivedReferrerSubQueryClause(function, subQuery, realColumnName
+                                                                      , relatedColumnName, propertyName, aliasName);
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + aliasName + endMark;
         xgetSqlClause().specifyDeriveSubQuery(aliasName, clause);
@@ -676,11 +668,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return toColumnRealName(columnName);
     }
 
-    protected String getSpecifyDerivedReferrerSubQuerySql(String function, ${glConditionQuery} subQuery
-                                                        , String realColumnName, String relatedColumnName
-                                                        , String propertyName, String aliasName) {
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
-        String tableAliasName = "sub" + subQueryLevel + "loc";
+    protected String getSpecifyDerivedReferrerSubQueryClause(String function, ${glConditionQuery} subQuery
+                                                           , String realColumnName, String relatedColumnName
+                                                           , String propertyName, String aliasName) {
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
+        String tableAliasName = subQuery.xgetSqlClause().getBasePointAliasName();
         String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
@@ -690,8 +682,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String connect = xbuildFunctionConnector(function);
         if (subQuery.xgetSqlClause().hasUnionQuery()) {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
             if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
@@ -815,12 +807,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
         assertObjectNotNull("QueryDerivedReferrer(" + columnName + ")", subQuery);
         String realColumnName = getQueryDerivedReferrerRealColumnName(columnName);
-        String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName
-                                                                 , relatedColumnName, propertyName, value);
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
+        String subQueryClause = getQueryDerivedReferrerSubQueryClause(function, subQuery, realColumnName
+                                                                    , relatedColumnName, propertyName, value);
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String parameter = "/*pmb." + xgetLocationBase(parameterPropertyName) + "*/null";
         String clause = "(" + beginMark
@@ -833,11 +825,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return toColumnRealName(columnName);
     }
 
-    protected String getQueryDerivedReferrerSubQuerySql(String function, ${glConditionQuery} subQuery
-                                                      , String realColumnName, String relatedColumnName
-                                                      , String propertyName, Object value) {
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
-        String tableAliasName = "sub" + subQueryLevel + "loc";
+    protected String getQueryDerivedReferrerSubQueryClause(String function, ${glConditionQuery} subQuery
+                                                         , String realColumnName, String relatedColumnName
+                                                         , String propertyName, Object value) {
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
+        String tableAliasName = subQuery.xgetSqlClause().getBasePointAliasName();
         String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
@@ -847,8 +839,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String connect = xbuildFunctionConnector(function);
         if (subQuery.xgetSqlClause().hasUnionQuery()) {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
             if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
@@ -1148,11 +1140,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             deriveRealColumnName = getScalarSubQueryRealColumnName(deriveColumnName);
         }
 
-        String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
+        String subQueryClause = getScalarSubQueryClause(function, subQuery, propertyName);
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = deriveRealColumnName + " " + operand + " ("
                       + beginMark + subQueryClause + ln() + endIndent
@@ -1164,10 +1156,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return toColumnRealName(columnName);
     }
 
-    protected String getScalarSubQuerySql(String function, ${glConditionQuery} subQuery
-                                        , String propertyName) {
-        int subQueryLevel = subQuery.xgetSubQueryLevel();
-        String tableAliasName = "sub" + subQueryLevel + "loc";
+    protected String getScalarSubQueryClause(String function, ${glConditionQuery} subQuery
+                                           , String propertyName) {
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
+        String tableAliasName = subQuery.xgetSqlClause().getBasePointAliasName();
         String deriveColumnName = subQuery.xgetSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwScalarSubQueryInvalidColumnSpecificationException(function);
@@ -1305,22 +1297,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                      , String selectClause
                                                      , String tableAliasName) {
         String fromWhereClause = subQuery.xgetSqlClause().getClauseFromWhereWithUnionTemplate();
-        
-        // Replace the alias names for local table with alias name of sub-query unique.
-        // However when it's inScope this replacement is unnecessary so comment out here. 
-        // (Override base alias name at sub-query on SQL)
-        // So if the argument 'tableAliasName' is not null, replace it. 
-        if (tableAliasName != null) {
-            fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getBasePointAliasName(), tableAliasName);
-        }
 
         // Resolve the location path for the condition-query of sub-query. 
         fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + xgetLocationBase(propertyName) + ".");
 
 		// Replace template marks. These are very important!
-		fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionSelectClauseMark(), selectClause);
-		fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereClauseMark(), "");
-		fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereFirstConditionMark(), "");
+		fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionSelectClauseMark(), selectClause);
+		fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereClauseMark(), "");
+		fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereFirstConditionMark(), "");
 		return fromWhereClause;
     }
 
@@ -1332,21 +1316,18 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                            , String realColumnName) {
         String fromWhereClause = subQuery.xgetSqlClause().getClauseFromWhereWithWhereUnionTemplate();
 
-        // Replace the alias names for local table with alias name of sub-query unique. 
-        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getBasePointAliasName(), tableAliasName);
-        
         // Resolve the location path for the condition-query of sub-query. 
         fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + xgetLocationBase(propertyName) + ".");
-        
+
         String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
         String firstConditionAfter = ln() + "   and ";
         
         // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
-        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
-        fromWhereClause = replaceString(fromWhereClause, xgetSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return fromWhereClause;
     }
 
@@ -1540,7 +1521,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                                                       Name Resolver
     //                                                                       =============
     protected String resolveJoinAliasName(String relationPath, int nestLevel) {
-        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel, _subQueryLevel);
+        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
     }
 
 	protected String resolveNextRelationPath(String tableName, String relationPropertyName) {

@@ -13,9 +13,10 @@ namespace ${glPackageBaseCommonSqlClause} {
 public interface ${myClassName} {
 
     // ===================================================================================
-    //                                                                              Manage
-    //                                                                              ======
-    void setupForSubQuery();
+    //                                                                      SubQuery Level
+    //                                                                      ==============
+    int getSubQueryLevel();
+    void setupForSubQuery(int subQueryLevel);
     bool isForSubQuery();
 
     // ===================================================================================

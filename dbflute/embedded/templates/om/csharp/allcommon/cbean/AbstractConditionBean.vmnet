@@ -317,23 +317,29 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                    Purpose Type
         //                                                                    ============
-        public void xsetupForUnion(${ConditionBean} baseCB) {
-            xinheritSubQueryInfo(baseCB.LocalCQ);
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // very internal (super very important)
+        // these are called immediate after creation of condition-bean
+        // because there are important initializations here
+        // - - - - - - - - - -/
+
+        public void xsetupForUnion(${ConditionBean} mainCB) {
+            xinheritSubQueryInfo(mainCB.LocalCQ);
             _forUnion = true;
         }
 
-        public void xsetupForExistsReferrer(${glConditionQuery} baseCQ) {
-            xprepareSubQueryInfo(baseCQ);
+        public void xsetupForExistsReferrer(${glConditionQuery} mainCQ) {
+            xprepareSubQueryInfo(mainCQ);
             _forExistsReferrer = true;
         }
 
-        public void xsetupForInScopeRelation(${glConditionQuery} baseCQ) {
-            xprepareSubQueryInfo(baseCQ);
+        public void xsetupForInScopeRelation(${glConditionQuery} mainCQ) {
+            xprepareSubQueryInfo(mainCQ);
             _forInScopeRelation = true;
         }
 
-        public void xsetupForDerivedReferrer(${glConditionQuery} baseCQ) {
-            xprepareSubQueryInfo(baseCQ);
+        public void xsetupForDerivedReferrer(${glConditionQuery} mainCQ) {
+            xprepareSubQueryInfo(mainCQ);
             _forDerivedReferrer = true;
         }
 
@@ -341,22 +347,24 @@ namespace ${glPackageBaseCommonCBean} {
             _forScalarSelect = true;
         }
 
-        public void xsetupForScalarCondition(${glConditionQuery} baseCQ) {
-            xprepareSubQueryInfo(baseCQ);
+        public void xsetupForScalarCondition(${glConditionQuery} mainCQ) {
+            xprepareSubQueryInfo(mainCQ);
             _forScalarCondition = true;
         }
 
-        protected void xinheritSubQueryInfo(${glConditionQuery} baseCQ) {
-            if (baseCQ.xgetSqlClause().isForSubQuery()) { // inherits it
-                this.LocalCQ.xsetSubQueryLevel(baseCQ.xgetSubQueryLevel());
-                this.SqlClause.setupForSubQuery();
+        // *defined at base condition-bean per table
+        //  o xsetupForColumnQuery()
+        //  o xsetupForVaryingUpdate()
+
+        protected void xinheritSubQueryInfo(${glConditionQuery} mainCQ) {
+            if (mainCQ.xgetSqlClause().isForSubQuery()) {
+                this.SqlClause.setupForSubQuery(mainCQ.xgetSqlClause().getSubQueryLevel()); // inherited
             }
         }
 
-        protected void xprepareSubQueryInfo(${glConditionQuery} baseCQ) {
-            int nextSubQueryLevel = baseCQ.xgetSubQueryLevel() + 1;
-            this.LocalCQ.xsetSubQueryLevel(nextSubQueryLevel);
-            this.SqlClause.setupForSubQuery();
+        protected void xprepareSubQueryInfo(${glConditionQuery} mainCQ) {
+            int nextSubQueryLevel = mainCQ.xgetSqlClause().getSubQueryLevel() + 1;
+            this.SqlClause.setupForSubQuery(nextSubQueryLevel); // incremented
         }
 
         // ===============================================================================
@@ -484,7 +492,7 @@ namespace ${glPackageBaseCommonCBean} {
             if (_query.isBaseQuery()) {
                 tableAliasName = _baseCB.SqlClause.getBasePointAliasName();
             } else {
-                tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel(), _query.xgetSubQueryLevel());
+                tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel());
             }
             _baseCB.SqlClause.specifySelectColumn(tableAliasName, columnName);
         }

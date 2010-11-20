@@ -207,24 +207,24 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                    Purpose Type
         //                                                                    ============
-        public void xsetupForColumnQuery(${myConditionBeanClassName} baseCB) {
-            xinheritSubQueryInfo(baseCB.LocalCQ);
+        public void xsetupForColumnQuery(${myConditionBeanClassName} mainCB) {
+            xinheritSubQueryInfo(mainCB.LocalCQ);
             //xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
             _forColumnQuery = true; // old style
 
             // inherits a parent query to synchronize real name
             // (and also for suppressing query check) 
-            Specify().xsetSyncQyCall(new ${myConditionBeanClassName}ColQySpQyCall(baseCB));
+            Specify().xsetSyncQyCall(new ${myConditionBeanClassName}ColQySpQyCall(mainCB));
         }
     }
 
     public class ${myConditionBeanClassName}ColQySpQyCall : SpQyCall<${myConditionQueryClassName}> {
-        protected ${myConditionBeanClassName} _baseCB;
-        public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} baseCB) {
-            _baseCB = baseCB;
+        protected ${myConditionBeanClassName} _mainCB;
+        public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} mainCB) {
+            _mainCB = mainCB;
         }
         public bool has() { return true; } 
-        public ${myConditionQueryClassName} qy() { return _baseCB.Query(); } 
+        public ${myConditionQueryClassName} qy() { return _mainCB.Query(); } 
     }
 
     public class ${myConditionBeanClassName}Specification : AbstractSpecification<${myConditionQueryClassName}> {
