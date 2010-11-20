@@ -22,7 +22,7 @@ public class DfCustomizeEntityInfo {
         return _needsJavaNameConvert;
     }
 
-    public DfCustomizeEntityInfo setupJavaNameConvert() {
+    public DfCustomizeEntityInfo enableJavaNameConvert() {
         _needsJavaNameConvert = true;
         return this;
     }

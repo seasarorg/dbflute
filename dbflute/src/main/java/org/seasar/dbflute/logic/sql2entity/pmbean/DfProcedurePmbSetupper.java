@@ -242,7 +242,7 @@ public class DfProcedurePmbSetupper {
         final String typeName = structInfo.getTypeName();
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap));
+            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap).enableJavaNameConvert());
         }
 
         // type name becomes entity name plainly but it will be converted as java name
