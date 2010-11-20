@@ -21,8 +21,9 @@ import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleArrayType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.OracleArrayType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.OracleStructType;
 import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
 import org.seasar.dbflute.util.DfReflectionUtil;
 #if ($database.isTargetContainerSeasar())
@@ -531,6 +532,18 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                                                Oracle
     //                                                ------
+    public static class ImplementedOracleDateType extends OracleDateType {
+
+        @Override
+        protected Object toOracleDate(Timestamp timestamp) {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            return new oracle.sql.DATE(timestamp);
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+    }
+
     public static class ImplementedOracleArrayType extends OracleArrayType {
 
         public ImplementedOracleArrayType(String arrayTypeName, Class<?> elementType) {
@@ -621,18 +634,6 @@ public class ${glDBFluteConfig} {
         @Override
         protected PhysicalConnectionDigger getPhysicalConnectionDigger() {
             return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
-        }
-    }
-
-    public static class ImplementedOracleDateType extends OracleDateType {
-
-        @Override
-        protected Object toOracleDate(Timestamp timestamp) {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
-            return new oracle.sql.DATE(timestamp);
-#else
-            throw new UnsupportedOperationException("This method is only for Oracle.");
-#end
         }
     }
 
