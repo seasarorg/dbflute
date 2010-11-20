@@ -30,5 +30,5 @@ public interface PhysicalConnectionDigger {
      * @return The instance of connection as physical one. (NotNull)
      * @throws java.sql.SQLException
      */
-    Connection getConnection(Connection conn) throws SQLException;
+    Connection digUp(Connection conn) throws SQLException;
 }

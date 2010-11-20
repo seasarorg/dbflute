@@ -29,6 +29,24 @@ import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 public abstract class OracleDateType extends UtilDateAsTimestampType {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final OracleAgent _agent;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public OracleDateType() {
+        _agent = createOracleAgent();
+    }
+
+    /**
+     * Create the agent for Oracle.
+     * @return The instance of agent. (NotNull)
+     */
+    protected abstract OracleAgent createOracleAgent();
+
+    // ===================================================================================
     //                                                                          Bind Value
     //                                                                          ==========
     @Override
@@ -58,5 +76,7 @@ public abstract class OracleDateType extends UtilDateAsTimestampType {
      * @param timestamp The value of time-stamp. (NotNull) 
      * @return The instance of oracle.sql.DATE for the time-stamp argument. (NotNull)
      */
-    protected abstract Object toOracleDate(Timestamp timestamp);
+    protected Object toOracleDate(Timestamp timestamp) {
+        return _agent.toOracleDate(timestamp);
+    }
 }
