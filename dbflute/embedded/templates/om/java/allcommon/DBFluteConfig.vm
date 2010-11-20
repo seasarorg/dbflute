@@ -560,7 +560,7 @@ public class ${glDBFluteConfig} {
         protected Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
-            return new oracle.sql.STRUCT(desc, conn, attrs);
+            return new ImplementedOracleStructWrapper(new oracle.sql.STRUCT(desc, conn, attrs));
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
 #end
@@ -580,6 +580,18 @@ public class ${glDBFluteConfig} {
             return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
         }
     }
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+
+    public static class ImplementedOracleStructWrapper implements oracle.sql.ORAData {
+        protected oracle.sql.STRUCT _struct;
+        public ImplementedOracleStructWrapper(oracle.sql.STRUCT struct) {
+            _struct = struct;
+        }
+        public oracle.sql.Datum toDatum(Connection conn) throws SQLException {
+            return _struct;
+        }
+    }
+#end
 
     public static class ImplementedOracleStructType extends OracleStructType {
 
