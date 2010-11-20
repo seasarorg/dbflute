@@ -50,12 +50,19 @@ public interface OracleAgent {
     Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException;
 
     /**
-     * Convert the Oracle's array to a standard array.
+     * Convert the Oracle's ARRAY to a standard array.
      * @param oracleArray The value of Oracle's ARRAY (oracle.sql.ARRAY). (NotNull) 
      * @return The instance of standard array for the Oracle's array argument. (NotNull)
      * @throws java.sql.SQLException
      */
     Object toStandardArray(Object oracleArray) throws SQLException;
+
+    /**
+     * Is this object Oracle's ARRAY?
+     * @param obj The doubtful instance. (NotNull)
+     * @return Determination.
+     */
+    boolean isOracleArray(Object obj);
 
     // ===================================================================================
     //                                                                       Oracle STRUCT
@@ -77,6 +84,13 @@ public interface OracleAgent {
      * @throws java.sql.SQLException
      */
     Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException;
+
+    /**
+     * Is this object Oracle's STRUCT?
+     * @param obj The doubtful instance. (NotNull)
+     * @return Determination.
+     */
+    boolean isOracleStruct(Object obj);
 
     // ===================================================================================
     //                                                                          Connection

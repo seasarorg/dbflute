@@ -63,7 +63,7 @@ public abstract class OracleArrayType extends GreatWallOfOracleType {
     }
 
     protected Collection<Object> toPropertyValue(Object oracleArray) throws SQLException {
-        return mappingOracleArrayToCollection(oracleArray, true);
+        return mappingOracleArrayToCollection(oracleArray, _mainObjectType);
     }
 
     // ===================================================================================

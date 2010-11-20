@@ -16,6 +16,9 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class DfReflectionUtilTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                              Method
+    //                                                                              ======
     public void test_getPublicMethod_basic() throws Exception {
         // ## Arrange ##
         String methodName = "fooNoArg";
@@ -39,6 +42,9 @@ public class DfReflectionUtilTest extends PlainTestCase {
         assertEquals("foo", result);
     }
 
+    // ===================================================================================
+    //                                                                             Generic
+    //                                                                             =======
     public void test_getElementType_List() throws Exception {
         // ## Arrange ##
         Type genericType = getListMethod().getGenericReturnType();
@@ -78,6 +84,19 @@ public class DfReflectionUtilTest extends PlainTestCase {
         assertEquals(String.class, elementType);
     }
 
+    public void test_getElementType_NestedList() throws Exception {
+        // ## Arrange ##
+        Type genericType = getNestedListMethod().getGenericReturnType();
+
+        // ## Act ##
+        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+
+        // ## Assert ##
+        log("genericType = " + genericType);
+        log("elementType = " + elementType);
+        assertEquals(List.class, elementType);
+    }
+
     public void test_getElementType_nonGeneric() throws Exception {
         // ## Arrange ##
         Type genericType = getNonGenericMethod().getGenericReturnType();
@@ -103,6 +122,10 @@ public class DfReflectionUtilTest extends PlainTestCase {
         return FooGeneric.class.getMethod("fooCollection", (Class<?>[]) null);
     }
 
+    protected Method getNestedListMethod() throws Exception {
+        return FooGeneric.class.getMethod("fooNestedList", (Class<?>[]) null);
+    }
+
     protected Method getNonGenericMethod() throws Exception {
         return FooGeneric.class.getMethod("fooNonGeneric", (Class<?>[]) null);
     }
@@ -118,6 +141,10 @@ public class DfReflectionUtilTest extends PlainTestCase {
 
         public Collection<String> fooCollection() {
             return new ArrayList<String>();
+        }
+
+        public List<List<String>> fooNestedList() {
+            return new ArrayList<List<String>>();
         }
 
         public String fooNonGeneric() {

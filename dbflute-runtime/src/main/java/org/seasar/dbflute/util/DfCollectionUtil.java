@@ -41,6 +41,27 @@ public class DfCollectionUtil {
     private static final Set<?> EMPTY_SET = Collections.unmodifiableSet(new HashSet<Object>());
 
     // ===================================================================================
+    //                                                                          Collection
+    //                                                                          ==========
+    public static Class<?> findFirstElementType(Collection<?> collection) {
+        for (Object object : collection) {
+            if (object != null) {
+                return object.getClass();
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasValidElement(Collection<?> collection) {
+        for (Object object : collection) {
+            if (object != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                                List
     //                                                                                ====
     public static <ELEMENT> List<ELEMENT> newArrayList() {
