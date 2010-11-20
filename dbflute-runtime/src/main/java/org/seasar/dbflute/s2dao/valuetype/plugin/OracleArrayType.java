@@ -21,11 +21,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
@@ -43,15 +45,19 @@ public abstract class OracleArrayType implements ValueType {
     protected final int _sqlType;
     protected final String _arrayTypeName;
     protected final Class<?> _elementType;
-    protected final Entity _entityPrototype; // when element is STRUCT type
+
+    // when element is STRUCT type
+    protected final String _structTypeName;
+    protected final Entity _entityPrototype; // not always
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OracleArrayType(String arrayTypeName, Class<?> elementType) {
+    public OracleArrayType(String arrayTypeName, Class<?> elementType, String structTypeName) {
         _sqlType = Types.ARRAY;
         _arrayTypeName = arrayTypeName;
         _elementType = elementType;
+        _structTypeName = structTypeName;
         if (Entity.class.isAssignableFrom(elementType)) {
             _entityPrototype = (Entity) DfReflectionUtil.newInstance(elementType);
         } else {
@@ -88,7 +94,7 @@ public abstract class OracleArrayType implements ValueType {
         }
         final List<Object> resultList = DfCollectionUtil.newArrayList();
         final Class<? extends Object> elementType = array[0].getClass();
-        if (_entityPrototype != null && _entityPrototype.getClass().isAssignableFrom(elementType)) {
+        if (_entityPrototype != null) {
             for (Object element : array) {
                 resultList.add(mappingEntity(element));
             }
@@ -109,15 +115,12 @@ public abstract class OracleArrayType implements ValueType {
     }
 
     protected Object mappingScalarValue(Object value, Class<?> elementType) {
-        final Object filtered;
         if (Number.class.isAssignableFrom(elementType)) {
-            filtered = DfTypeUtil.toNumber(value, elementType);
+            value = DfTypeUtil.toNumber(value, elementType);
         } else if (java.util.Date.class.isAssignableFrom(elementType)) {
-            filtered = DfTypeUtil.toPointDate(value, elementType);
-        } else {
-            filtered = value;
+            value = DfTypeUtil.toPointDate(value, elementType);
         }
-        return filtered;
+        return value;
     }
 
     // ===================================================================================
@@ -127,7 +130,7 @@ public abstract class OracleArrayType implements ValueType {
         if (value == null) { // basically for insert and update
             setNull(ps, index);
         } else {
-            ps.setObject(index, toOracleArray(conn, _arrayTypeName, toArrayFromCollection(value)));
+            ps.setObject(index, toOracleArray(conn, _arrayTypeName, toMappedArray(conn, value)));
         }
     }
 
@@ -136,15 +139,38 @@ public abstract class OracleArrayType implements ValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setObject(parameterName, toOracleArray(conn, _arrayTypeName, toArrayFromCollection(value)));
+            cs.setObject(parameterName, toOracleArray(conn, _arrayTypeName, toMappedArray(conn, value)));
         }
     }
 
-    protected Object toArrayFromCollection(Object value) {
-        if (value instanceof Collection<?>) {
-            return ((Collection<?>) value).toArray();
+    protected Object toMappedArray(Connection conn, Object value) throws SQLException {
+        if (!(value instanceof Collection<?>)) {
+            return value;
         }
-        return value;
+        final Object[] array = ((Collection<?>) value).toArray();
+        if (array.length == 0) {
+            return array;
+        }
+        if (_entityPrototype != null) {
+            final List<Object> structList = new ArrayList<Object>();
+            for (Object element : array) {
+                final Entity entity = (Entity) element; // must be entity
+                structList.add(mappingStruct(conn, entity));
+            }
+            return structList;
+        } else {
+            return array;
+        }
+    }
+
+    protected Object mappingStruct(Connection conn, Entity entity) throws SQLException {
+        final DBMeta dbmeta = _entityPrototype.getDBMeta();
+        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        final List<Object> attrList = new ArrayList<Object>();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            attrList.add(columnInfo.read(entity));
+        }
+        return toOracleStruct(conn, _structTypeName, attrList.toArray());
     }
 
     // ===================================================================================
@@ -190,6 +216,9 @@ public abstract class OracleArrayType implements ValueType {
      * @throws java.sql.SQLException
      */
     protected abstract Object toStandardArray(Object oracleArray) throws SQLException;
+
+    protected abstract Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs)
+            throws SQLException;
 
     // ===================================================================================
     //                                                                            SQL Type
