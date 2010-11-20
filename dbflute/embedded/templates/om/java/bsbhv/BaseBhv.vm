@@ -509,7 +509,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
             public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls) { e.set${referrer.referrerPropertyNameInitCap}(ls); }
             public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
             public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls) {
-                final String aliasName = cb.getSqlClause().getLocalTableAliasName();
+                final String aliasName = cb.getSqlClause().getBasePointAliasName();
                 String identity = null;
                 StringBuilder sb = new StringBuilder();
                 int index = 0;
