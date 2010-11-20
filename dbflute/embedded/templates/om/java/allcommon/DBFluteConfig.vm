@@ -557,6 +557,15 @@ public class ${glDBFluteConfig} {
 #end
         }
 
+        @Override
+        protected Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
+#else
+            return new oracle.sql.STRUCT(desc, conn, attrs);
+#end
+        }
+
         protected Connection getOracleConnection(Connection conn) throws SQLException {
             return getPhysicalConnectionDigger().getConnection(conn);
         }
