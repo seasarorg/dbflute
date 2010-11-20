@@ -70,18 +70,18 @@ public abstract class OracleArrayType extends GreatWallOfOracleType {
     //                                                                          Bind Value
     //                                                                          ==========
     @Override
-    protected Object toBindValue(Connection conn, Object parameterExp, Object value) throws SQLException {
-        assertArrayPropertyValueCollection(parameterExp, value);
-        return mappingCollectionToOracleArray(conn, parameterExp, (Collection<?>) value, _mainTypeName, _mainObjectType);
+    protected Object toBindValue(Connection conn, Object paramExp, Object value) throws SQLException {
+        assertArrayPropertyValueCollection(paramExp, value);
+        return mappingCollectionToOracleArray(conn, paramExp, (Collection<?>) value, _mainTypeName, _mainObjectType);
     }
 
-    protected void assertArrayPropertyValueCollection(Object parameterExp, Object value) {
+    protected void assertArrayPropertyValueCollection(Object paramExp, Object value) {
         if (!(value instanceof Collection<?>)) {
-            throwArrayPropertyValueNotCollectionException(parameterExp, value);
+            throwArrayPropertyValueNotCollectionException(paramExp, value);
         }
     }
 
-    protected void throwArrayPropertyValueNotCollectionException(Object parameterExp, Object value) {
+    protected void throwArrayPropertyValueNotCollectionException(Object paramExp, Object value) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The property value for struct should be entity type:");
         br.addItem("Array");
@@ -89,7 +89,7 @@ public abstract class OracleArrayType extends GreatWallOfOracleType {
         br.addItem("Element");
         br.addElement(DfTypeUtil.toClassTitle(_mainObjectType));
         br.addItem("Parameter");
-        br.addElement(parameterExp);
+        br.addElement(paramExp);
         br.addItem("Property Value");
         if (value != null) {
             br.addElement(value.getClass());

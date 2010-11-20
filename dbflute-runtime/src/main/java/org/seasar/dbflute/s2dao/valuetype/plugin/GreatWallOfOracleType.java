@@ -139,9 +139,9 @@ public abstract class GreatWallOfOracleType implements ValueType {
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         final Object[] attrs = toStandardStructAttributes(oracleStruct);
         assertStructAttributeSizeMatched(entity, attrs, columnInfoList);
-        int index = 0;
-        for (Object attr : attrs) {
-            final ColumnInfo columnInfo = columnInfoList.get(index);
+        for (int i = 0; i < attrs.length; i++) {
+            final Object attr = attrs[i];
+            final ColumnInfo columnInfo = columnInfoList.get(i);
             final String propertyName = columnInfo.getPropertyName();
             final Class<?> propertyType = columnInfo.getPropertyType();
             if (attr == null) {
@@ -161,7 +161,6 @@ public abstract class GreatWallOfOracleType implements ValueType {
                 mappedValue = adjustScalarToPropertyValue(attr, propertyType);
             }
             dbmeta.setupEntityProperty(propertyName, entity, mappedValue);
-            ++index;
         }
         return entity;
     }
@@ -220,7 +219,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         }
     }
 
-    protected abstract Object toBindValue(Connection conn, Object parameterExp, Object value) throws SQLException;
+    protected abstract Object toBindValue(Connection conn, Object paramExp, Object value) throws SQLException;
 
     protected Object mappingCollectionToOracleArray(Connection conn, Object paramExp, Collection<?> value,
             String arrayTypeName, Class<?> elementType) throws SQLException {
@@ -230,7 +229,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         }
         final Object preparedArray;
         if (Entity.class.isAssignableFrom(elementType)) {
-            final List<Object> structList = new ArrayList<Object>();
+            final List<Object> structList = DfCollectionUtil.newArrayList();
             for (Object element : array) {
                 if (element == null) {
                     continue;
@@ -242,16 +241,14 @@ public abstract class GreatWallOfOracleType implements ValueType {
             preparedArray = structList.toArray();
         } else {
             if (java.util.Date.class.equals(elementType)) {
-                final Object[] filteredArray = new Object[array.length];
-                int index = 0;
+                final List<Object> elementList = DfCollectionUtil.newArrayList();
                 for (Object element : array) {
                     if (element == null) {
                         continue;
                     }
-                    filteredArray[index] = mappingScalarToSqlValue(element);
-                    ++index;
+                    elementList.add(mappingScalarToSqlValue(conn, paramExp, element));
                 }
-                preparedArray = filteredArray;
+                preparedArray = elementList.toArray();
             } else {
                 preparedArray = array;
             }
@@ -285,7 +282,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
                 // (but property type is Object because Sql2Entity does not support this)
                 mappedValue = mappingEntityToOracleStruct(conn, paramExp, (Entity) propertyValue);
             } else {
-                mappedValue = mappingScalarToSqlValue(propertyValue);
+                mappedValue = mappingScalarToSqlValue(conn, paramExp, propertyValue);
             }
             attrList.add(mappedValue);
         }
@@ -293,7 +290,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         return toOracleStruct(getOracleConnection(conn), structTypeName, attrList.toArray());
     }
 
-    protected Object mappingScalarToSqlValue(Object value) {
+    protected Object mappingScalarToSqlValue(Connection conn, Object paramExp, Object value) {
         if (value == null) {
             return null;
         }

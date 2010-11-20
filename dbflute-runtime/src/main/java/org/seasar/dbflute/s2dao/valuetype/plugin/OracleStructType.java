@@ -74,18 +74,18 @@ public abstract class OracleStructType extends GreatWallOfOracleType {
     //                                                                          Bind Value
     //                                                                          ==========
     @Override
-    protected Object toBindValue(Connection conn, Object parameterExp, Object value) throws SQLException {
-        assertStructPropertyValueNotEntity(parameterExp, value);
-        return mappingEntityToOracleStruct(conn, parameterExp, (Entity) value);
+    protected Object toBindValue(Connection conn, Object paramExp, Object value) throws SQLException {
+        assertStructPropertyValueNotEntity(paramExp, value);
+        return mappingEntityToOracleStruct(conn, paramExp, (Entity) value);
     }
 
-    protected void assertStructPropertyValueNotEntity(Object parameterExp, Object value) {
+    protected void assertStructPropertyValueNotEntity(Object paramExp, Object value) {
         if (!(value instanceof Entity)) {
-            throwStructPropertyValueNotEntityException(parameterExp, value);
+            throwStructPropertyValueNotEntityException(paramExp, value);
         }
     }
 
-    protected void throwStructPropertyValueNotEntityException(Object parameterExp, Object value) {
+    protected void throwStructPropertyValueNotEntityException(Object paramExp, Object value) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The property value for struct should be entity type.");
         br.addItem("Struct");
@@ -93,7 +93,7 @@ public abstract class OracleStructType extends GreatWallOfOracleType {
         br.addItem("Entity");
         br.addElement(DfTypeUtil.toClassTitle(_mainObjectType));
         br.addItem("Parameter");
-        br.addElement(parameterExp);
+        br.addElement(paramExp);
         br.addItem("Property Value");
         if (value != null) {
             br.addElement(value.getClass());
