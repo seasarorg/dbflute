@@ -581,6 +581,37 @@ public class ${glDBFluteConfig} {
         }
     }
 
+    public static class ImplementedOracleStructType extends OracleStructType {
+
+        public ImplementedOracleStructType(String structTypeName, Class<?> entityType) {
+            super(structTypeName, entityType);
+        }
+
+        @Override
+        protected Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
+            return new oracle.sql.STRUCT(desc, conn, attrs);
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+
+        @Override
+        protected Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            return ((oracle.sql.STRUCT)oracleStruct).getAttributes();
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+
+        @Override
+        protected PhysicalConnectionDigger getPhysicalConnectionDigger() {
+            return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
+        }
+    }
+
     public static class ImplementedOracleDateType extends OracleDateType {
 
         @Override

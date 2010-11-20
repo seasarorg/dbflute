@@ -83,7 +83,12 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.needsPmbMetaDataProcedureParameterOracleArrayHandling($pmbClassName, $propertyName))
     public static final ValueType ${annotationPropName}_VALUE_TYPE
             = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleArrayType
-                  ("${database.getPmbMetaDataProcedureParameterArrayTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterElementJavaNative($pmbClassName, $propertyName)}.class);
+                  ("${database.getPmbMetaDataProcedureParameterOracleArrayTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterOracleArrayElementJavaNative($pmbClassName, $propertyName)}.class);
+#end
+#if ($database.needsPmbMetaDataProcedureParameterOracleStructHandling($pmbClassName, $propertyName))
+    public static final ValueType ${annotationPropName}_VALUE_TYPE
+            = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleStructType
+                  ("${database.getPmbMetaDataProcedureParameterOracleStructTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterOracleStructEntityType($pmbClassName, $propertyName)}.class);
 #end
 #end
 #end

@@ -31,8 +31,8 @@ public class DfTypeStructInfo {
     protected String _entityType; // is set after analyzing
 
     // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();

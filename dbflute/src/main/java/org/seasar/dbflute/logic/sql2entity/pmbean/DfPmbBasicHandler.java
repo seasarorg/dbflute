@@ -253,18 +253,19 @@ public class DfPmbBasicHandler {
     public boolean needsOracleArrayHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
-        if (metaInfo == null) {
-            return false;
-        }
-        final String dbTypeName = metaInfo.getDbTypeName();
-        final String elementType = getProcedureParameterElementTypeName(className, propertyName);
-        return elementType != null && _columnHandler.isOracleTreatedAsArray(dbTypeName);
+        return metaInfo != null && metaInfo.hasTypeArrayElementType();
+    }
+
+    public boolean needsOracleStructHandling(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
+        return metaInfo != null && metaInfo.hasTypeStructInfo();
     }
 
     // -----------------------------------------------------
-    //                                           Column Info
+    //                                           Oracle Type
     //                                           -----------
-    public String getProcedureParameterArrayTypeName(String className, String propertyName) {
+    public String getProcedureParameterOracleArrayTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
@@ -273,7 +274,7 @@ public class DfPmbBasicHandler {
         return "";
     }
 
-    public String getProcedureParameterElementTypeName(String className, String propertyName) {
+    public String getProcedureParameterOracleArrayElementTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
@@ -282,7 +283,7 @@ public class DfPmbBasicHandler {
         return "";
     }
 
-    public String getProcedureParameterElementJavaNative(String className, String propertyName) {
+    public String getProcedureParameterOracleArrayElementJavaNative(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
@@ -291,6 +292,27 @@ public class DfPmbBasicHandler {
         return "Object"; // as default
     }
 
+    public String getProcedureParameterOracleStructTypeName(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
+        if (columnInfo != null && columnInfo.hasTypeStructInfo()) {
+            return columnInfo.getTypeStructInfo().getTypeName();
+        }
+        return "";
+    }
+
+    public String getProcedureParameterOracleStructEntityType(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
+        if (columnInfo != null && columnInfo.hasTypeStructInfo()) {
+            return columnInfo.getTypeStructInfo().getEntityType();
+        }
+        return "";
+    }
+
+    // -----------------------------------------------------
+    //                                           Column Info
+    //                                           -----------
     protected DfProcedureColumnMetaInfo getProcedureColumnInfo(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap(className);
