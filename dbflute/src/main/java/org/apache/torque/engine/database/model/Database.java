@@ -1423,6 +1423,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();
     }
 
+    public boolean isAvailableOracleNativeJDBC() { // Oracle facade
+        return isDatabaseOracle() && isAvailableDatabaseNativeJDBC();
+    }
+
     public boolean isMakeDeprecated() {
         return getProperties().getLittleAdjustmentProperties().isMakeDeprecated();
     }

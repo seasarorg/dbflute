@@ -536,7 +536,7 @@ public class ${glDBFluteConfig} {
     public static class ImplementedOracleAgent implements OracleAgent {
 
         public Object toOracleDate(Timestamp timestamp) {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#if ($database.isAvailableOracleNativeJDBC())
             return new oracle.sql.DATE(timestamp);
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
@@ -544,7 +544,7 @@ public class ${glDBFluteConfig} {
         }
 
         public Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#if ($database.isAvailableOracleNativeJDBC())
             oracle.sql.ArrayDescriptor desc = oracle.sql.ArrayDescriptor.createDescriptor(arrayTypeName, conn);
             return new oracle.sql.ARRAY(desc, conn, arrayValue);
 #else
@@ -553,7 +553,7 @@ public class ${glDBFluteConfig} {
         }
 
         public Object toStandardArray(Object oracleArray) throws SQLException {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#if ($database.isAvailableOracleNativeJDBC())
             return ((oracle.sql.ARRAY)oracleArray).getArray();
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
@@ -561,7 +561,7 @@ public class ${glDBFluteConfig} {
         }
 
         public Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#if ($database.isAvailableOracleNativeJDBC())
             oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
             return new ImplementedOracleStructWrapper(new oracle.sql.STRUCT(desc, conn, attrs));
 #else
@@ -570,7 +570,7 @@ public class ${glDBFluteConfig} {
         }
 
         public Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#if ($database.isAvailableOracleNativeJDBC())
             return ((oracle.sql.STRUCT)oracleStruct).getAttributes();
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
@@ -581,7 +581,7 @@ public class ${glDBFluteConfig} {
             return ${glDBFluteConfig}.getInstance().getPhysicalConnectionDigger();
         }
     }
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#if ($database.isAvailableOracleNativeJDBC())
 
     public static class ImplementedOracleStructWrapper implements oracle.sql.ORAData {
         protected oracle.sql.STRUCT _struct;
@@ -631,7 +631,7 @@ public class ${glDBFluteConfig} {
     //                                   -------------------
     public static class ImplementedPhysicalConnectionDigger implements PhysicalConnectionDigger {
 
-        public Connection getConnection(Connection conn) throws SQLException {
+        public Connection digUp(Connection conn) throws SQLException {
             if (conn instanceof NotClosingConnectionWrapper) {
                 conn = ((NotClosingConnectionWrapper) conn).getActualConnection();
             }
