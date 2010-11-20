@@ -53,6 +53,7 @@ import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
 import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
@@ -83,7 +84,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, Object> _cursorInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, DfPmbMetaData> _pmbMetaDataMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, File> _entitySqlFileMap = DfCollectionUtil.newLinkedHashMap();
@@ -290,7 +291,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         if (entityName != null) {
                             entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
                             assertDuplicateEntity(entityName, _sqlFile);
-                            _entityInfoMap.put(entityName, columnMetaInfoMap);
+                            _entityInfoMap.put(entityName, new DfCustomizeEntityInfo(entityName, columnMetaInfoMap));
                             if (isCursor(sql)) {
                                 _cursorInfoMap.put(entityName, new Object());
                             }
@@ -655,11 +656,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         final Set<String> entityNameSet = _entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
-            final Map<String, DfColumnMetaInfo> metaMap = _entityInfoMap.get(entityName);
+            final DfCustomizeEntityInfo entityInfo = _entityInfoMap.get(entityName);
+            final Map<String, DfColumnMetaInfo> metaMap = entityInfo.getColumnMap();
 
             final Table tbl = new Table();
             tbl.setSql2EntityCustomize(true);
-            tbl.setName(entityName);
+            tbl.setName(entityInfo.getTableDbName());
             tbl.setupNeedsJavaNameConvertFalse();
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);
@@ -780,7 +782,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return prop.getCommonColumnMap();
     }
 
-    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
+    protected String getColumnTorqueType(DfColumnMetaInfo columnMetaInfo) {
         if (columnMetaInfo.isProcedureParameter() && !_columnHandler.hasMappingJdbcType(columnMetaInfo)) {
             // unknown type of procedure parameter should be treated as Object
             return TypeMap.OTHER;
@@ -789,7 +791,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> metaMap, String columnName,
+    protected void setupColumnSizeContainsDigit(Map<String, DfColumnMetaInfo> metaMap, String columnName,
             final Column column) {
         final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
         final int columnSize = metaInfo.getColumnSize();

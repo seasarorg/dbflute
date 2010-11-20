@@ -13,7 +13,6 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
@@ -21,6 +20,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
+import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfProcedureExecutionMetaExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
@@ -42,7 +42,7 @@ public class DfProcedurePmbSetupper {
     //                                                                           Attribute
     //                                                                           =========
     protected final DataSource _dataSource;
-    protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap;
+    protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap;
     protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
     protected final DfProcedureHandler _procedureHandler = new DfProcedureHandler();
@@ -50,7 +50,7 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedurePmbSetupper(DataSource dataSource, Map<String, Map<String, DfColumnMetaInfo>> entityInfoMap,
+    public DfProcedurePmbSetupper(DataSource dataSource, Map<String, DfCustomizeEntityInfo> entityInfoMap,
             Map<String, DfPmbMetaData> pmbMetaDataMap) {
         _dataSource = dataSource;
         _entityInfoMap = entityInfoMap;
@@ -131,7 +131,8 @@ public class DfProcedurePmbSetupper {
                 final String propertyType;
                 if (result.hasResultSetColumnInfo()) {
                     final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
-                    _entityInfoMap.put(entityName, result.getResultSetColumnInfoMap());
+                    _entityInfoMap.put(entityName, new DfCustomizeEntityInfo(entityName, result
+                            .getResultSetColumnInfoMap()));
                     propertyType = convertProcedureListPropertyType(entityName);
                     refCustomizeEntity = true;
                 } else {
@@ -182,7 +183,8 @@ public class DfProcedurePmbSetupper {
         if (isResultSetProperty(column)) {
             if (column.hasResultSetColumnInfo()) {
                 final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
-                _entityInfoMap.put(entityName, column.getResultSetColumnInfoMap());
+                _entityInfoMap.put(entityName,
+                        new DfCustomizeEntityInfo(entityName, column.getResultSetColumnInfoMap()));
                 processInfo.setPropertyType(convertProcedureListPropertyType(entityName));
                 processInfo.setRefCustomizeEntity(true);
             } else {
@@ -234,7 +236,8 @@ public class DfProcedurePmbSetupper {
             ProcedurePropertyInfo processInfo) {
         final String entityName = convertStructNameToEntityName(structInfo);
         if (!_entityInfoMap.containsKey(entityName)) { // because STRUCTs are independent objects
-            _entityInfoMap.put(entityName, structInfo.getAttributeInfoMap());
+            _entityInfoMap.put(entityName, new DfCustomizeEntityInfo(structInfo.getTypeName(), structInfo
+                    .getAttributeInfoMap()));
         }
         structInfo.setEntityType(entityName);
         processInfo.setPropertyType(getGenericListClassName(entityName));

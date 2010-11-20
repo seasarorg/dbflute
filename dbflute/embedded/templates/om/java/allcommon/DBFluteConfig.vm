@@ -561,8 +561,18 @@ public class ${glDBFluteConfig} {
         protected Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
             oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
-#else
             return new oracle.sql.STRUCT(desc, conn, attrs);
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+
+        @Override
+        protected Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
+#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+            return ((oracle.sql.STRUCT)oracleStruct).getAttributes();
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
 #end
         }
 
