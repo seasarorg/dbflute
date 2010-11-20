@@ -560,6 +560,14 @@ public class ${glDBFluteConfig} {
 #end
         }
 
+        public boolean isOracleArray(Object obj) {
+#if ($database.isAvailableOracleNativeJDBC())
+            return obj instanceof oracle.sql.ARRAY;
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+
         public Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
 #if ($database.isAvailableOracleNativeJDBC())
             oracle.sql.StructDescriptor desc = new oracle.sql.StructDescriptor(structTypeName, conn);
@@ -572,6 +580,14 @@ public class ${glDBFluteConfig} {
         public Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
 #if ($database.isAvailableOracleNativeJDBC())
             return ((oracle.sql.STRUCT)oracleStruct).getAttributes();
+#else
+            throw new UnsupportedOperationException("This method is only for Oracle.");
+#end
+        }
+
+        public boolean isOracleStruct(Object obj) {
+#if ($database.isAvailableOracleNativeJDBC())
+            return obj instanceof oracle.sql.STRUCT;
 #else
             throw new UnsupportedOperationException("This method is only for Oracle.");
 #end
