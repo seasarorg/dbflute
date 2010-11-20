@@ -294,6 +294,12 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                              Number
     //                                                                              ======
+    /**
+     * Convert to number object.
+     * @param obj The resource of number. (Nullable: if null, returns null)
+     * @param type The type of number. (NotNull)
+     * @return The number object from resource. (Nullable: if type is not number, returns null)
+     */
     public static Number toNumber(Object obj, Class<?> type) {
         if (obj == null) {
             return null;
@@ -316,7 +322,7 @@ public final class DfTypeUtil {
         } else if (type == BigInteger.class) {
             return toBigInteger(obj);
         }
-        return null;
+        return null; // could not convert
     }
 
     // -----------------------------------------------------
@@ -694,6 +700,31 @@ public final class DfTypeUtil {
     }
 
     // ===================================================================================
+    //                                                                          Point Date
+    //                                                                          ==========
+    /**
+     * Convert to point date object.
+     * @param obj The resource of number. (Nullable: if null, returns null)
+     * @param type The type of number. (NotNull)
+     * @return The point date object from resource. (Nullable: if type is not date, returns null)
+     */
+    public static Date toPointDate(Object obj, Class<?> type) {
+        if (obj == null) {
+            return null;
+        }
+        if (java.sql.Date.class.isAssignableFrom(type)) {
+            return toSqlDate(obj);
+        } else if (java.sql.Timestamp.class.isAssignableFrom(type)) {
+            return toTimestamp(obj);
+        } else if (java.sql.Time.class.isAssignableFrom(type)) {
+            return toTime(obj);
+        } else if (Date.class.isAssignableFrom(type)) {
+            return toDate(obj);
+        }
+        return null; // could not convert
+    }
+
+    // ===================================================================================
     //                                                                          (util)Date
     //                                                                          ==========
     /**
@@ -708,7 +739,7 @@ public final class DfTypeUtil {
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
     public static Date toDate(Object obj) {
-        return toDate(obj, null);
+        return toDate(obj, (String) null);
     }
 
     /**

@@ -222,20 +222,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return (xgetReferrerQuery() == null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public int xgetSubQueryLevel() {
-        return _subQueryLevel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void xsetSubQueryLevel(int subQueryLevel) {
-        _subQueryLevel = subQueryLevel;
-    }
-
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
@@ -739,7 +725,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertObjectNotNull("ExistsReferrer(" + columnDbName + ")", subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -775,7 +761,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertObjectNotNull("InScopeRelation(" + columnDbName + ")", subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -810,7 +796,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -842,7 +828,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -870,7 +856,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertObjectNotNull("ScalarCondition(" + propertyName + ")", subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
-        final int subQueryLevel = subQuery.xgetSubQueryLevel();
+        final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
@@ -1089,7 +1075,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The resolved name. (NotNull)
      */
     protected String resolveJoinAliasName(String relationPath, int nestLevel) {
-        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel, _subQueryLevel);
+        return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
     }
 
     /**

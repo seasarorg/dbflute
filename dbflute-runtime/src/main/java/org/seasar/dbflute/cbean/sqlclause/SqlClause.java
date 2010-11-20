@@ -38,12 +38,19 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 public interface SqlClause {
 
     // ===================================================================================
-    //                                                                              Manage
-    //                                                                              ======
+    //                                                                      SubQuery Level
+    //                                                                      ==============
+    /**
+     * Get the hierarchy level of sub-query.
+     * @return The hierarchy level of sub-query. (NotMinus: if zero, not for sub-query)
+     */
+    int getSubQueryLevel();
+
     /**
      * Set up this SQL for sub-query.
+     * @param subQueryLevel The hierarchy level of sub-query. (NotMinus: if zero, not for sub-query)
      */
-    void setupForSubQuery();
+    void setupForSubQuery(int subQueryLevel);
 
     /**
      * Is this SQL for sub-query?
@@ -473,10 +480,9 @@ public interface SqlClause {
      * Resolve alias name for join table.
      * @param relationPath Relation path. (NotNull)
      * @param nestLevel The nest level of condition query.
-     * @param subQueryLevel The level of sub-query
      * @return The resolved name. (NotNull)
      */
-    String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel);
+    String resolveJoinAliasName(String relationPath, int nestLevel);
 
     /**
      * Resolve relation no.

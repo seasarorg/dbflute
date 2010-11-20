@@ -92,8 +92,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The cache map of DB meta for basically related tables. */
     protected Map<String, DBMeta> _cachedDBMetaMap;
 
-    /** Is this SQL for sub-query? (for example, used by alias name adjustment) */
-    protected boolean _forSubQuery;
+    /** The hierarchy level of sub-query. (NotMinus: if zero, not for sub-query) */
+    protected int _subQueryLevel;
 
     // -----------------------------------------------------
     //                                       Clause Resource
@@ -247,20 +247,27 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
-    //                                                                              Manage
-    //                                                                              ======
+    //                                                                      SubQuery Level
+    //                                                                      ==============
     /**
      * {@inheritDoc}
      */
-    public void setupForSubQuery() {
-        _forSubQuery = true;
+    public int getSubQueryLevel() {
+        return _subQueryLevel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setupForSubQuery(int subQueryLevel) {
+        _subQueryLevel = subQueryLevel;
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean isForSubQuery() {
-        return _forSubQuery;
+        return _subQueryLevel > 0;
     }
 
     // ===================================================================================
@@ -1697,14 +1704,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     public String getBasePointAliasName() {
         // the variable should be resolved when making a sub-query clause
-        return _forSubQuery ? "sub${subQueryLevel}loc" : "dfloc";
+        return isForSubQuery() ? "sub" + getSubQueryLevel() + "loc" : "dfloc";
     }
 
     /**
      * {@inheritDoc}
      */
-    public String resolveJoinAliasName(String relationPath, int nestLevel, int subQueryLevel) {
-        return (_forSubQuery ? "sub" + subQueryLevel : "df") + "rel" + relationPath;
+    public String resolveJoinAliasName(String relationPath, int nestLevel) {
+        return (isForSubQuery() ? "sub" + getSubQueryLevel() : "df") + "rel" + relationPath;
 
         // nestLevel is unused because relationPath has same role
         // (that was used long long ago)

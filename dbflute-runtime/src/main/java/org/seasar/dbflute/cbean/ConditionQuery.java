@@ -93,18 +93,6 @@ public interface ConditionQuery {
     boolean isBaseQuery();
 
     /**
-     * Get the level of subQuery.
-     * @return The level of subQuery.
-     */
-    int xgetSubQueryLevel();
-
-    /**
-     * Set the level of subQuery.
-     * @param subQueryLevel The level of subQuery.
-     */
-    void xsetSubQueryLevel(int subQueryLevel);
-
-    /**
      * Get the property name of foreign relation.
      * @return The property name of foreign relation. (NotNull)
      */

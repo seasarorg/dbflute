@@ -61,9 +61,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         if (_query.isBaseQuery()) {
             tableAliasName = sqlClause.getBasePointAliasName();
         } else {
-            final int nestLevel = _query.xgetNestLevel();
-            final int subQueryLevel = _query.xgetSubQueryLevel();
-            tableAliasName = sqlClause.resolveJoinAliasName(relationPath, nestLevel, subQueryLevel);
+            tableAliasName = sqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel());
         }
         sqlClause.specifySelectColumn(tableAliasName, columnName, _query.getTableDbName());
     }

@@ -22,11 +22,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
+import java.util.List;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The type of Oracle's array for a property of collection type.
@@ -60,27 +63,61 @@ public abstract class OracleArrayType implements ValueType {
     //                                                                           Get Value
     //                                                                           =========
     public Object getValue(ResultSet rs, int index) throws SQLException {
-        return toCollectionFromArray(rs.getArray(index));
+        return toMappedCollection(rs.getArray(index));
     }
 
     public Object getValue(ResultSet rs, String columnName) throws SQLException {
-        return toCollectionFromArray(rs.getArray(columnName));
+        return toMappedCollection(rs.getArray(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return toCollectionFromArray(cs.getArray(index));
+        return toMappedCollection(cs.getArray(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return toCollectionFromArray(cs.getArray(parameterName));
+        return toMappedCollection(cs.getArray(parameterName));
     }
 
-    protected Object toCollectionFromArray(Object value) throws SQLException {
-        if (value == null) {
+    protected Object toMappedCollection(Object oracleArray) throws SQLException {
+        if (oracleArray == null) {
             return null;
         }
-        Object[] array = (Object[]) toStandardArray(value);
-        return DfCollectionUtil.newArrayList(array);
+        final Object[] array = (Object[]) toStandardArray(oracleArray);
+        if (array == null || array.length == 0) {
+            return DfCollectionUtil.newArrayList();
+        }
+        final List<Object> resultList = DfCollectionUtil.newArrayList();
+        final Class<? extends Object> elementType = array[0].getClass();
+        if (_entityPrototype != null && _entityPrototype.getClass().isAssignableFrom(elementType)) {
+            for (Object element : array) {
+                resultList.add(mappingEntity(element));
+            }
+        } else {
+            for (Object element : array) {
+                resultList.add(mappingScalarValue(element, elementType));
+            }
+        }
+        return resultList;
+    }
+
+    protected Entity mappingEntity(Object oracleStruct) {
+        final String propertyName = null; // TODO
+        final DBMeta dbmeta = _entityPrototype.getDBMeta();
+        final Entity entity = dbmeta.newEntity();
+        dbmeta.setupEntityProperty(propertyName, entity, null);
+        return entity;
+    }
+
+    protected Object mappingScalarValue(Object value, Class<?> elementType) {
+        final Object filtered;
+        if (Number.class.isAssignableFrom(elementType)) {
+            filtered = DfTypeUtil.toNumber(value, elementType);
+        } else if (java.util.Date.class.isAssignableFrom(elementType)) {
+            filtered = DfTypeUtil.toPointDate(value, elementType);
+        } else {
+            filtered = value;
+        }
+        return filtered;
     }
 
     // ===================================================================================

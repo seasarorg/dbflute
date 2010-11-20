@@ -890,23 +890,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // because there are important initializations here
     // - - - - - - - - - -/
 
-    public void xsetupForUnion(ConditionBean baseCB) {
-        xinheritSubQueryInfo(baseCB.localCQ());
+    public void xsetupForUnion(ConditionBean mainCB) {
+        xinheritSubQueryInfo(mainCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);
     }
 
-    public void xsetupForExistsReferrer(ConditionQuery baseCQ) {
-        xprepareSubQueryInfo(baseCQ);
+    public void xsetupForExistsReferrer(ConditionQuery mainCQ) {
+        xprepareSubQueryInfo(mainCQ);
         xchangePurposeSqlClause(HpCBPurpose.EXISTS_REFERRER);
     }
 
-    public void xsetupForInScopeRelation(ConditionQuery baseCQ) {
-        xprepareSubQueryInfo(baseCQ);
+    public void xsetupForInScopeRelation(ConditionQuery mainCQ) {
+        xprepareSubQueryInfo(mainCQ);
         xchangePurposeSqlClause(HpCBPurpose.IN_SCOPE_RELATION);
     }
 
-    public void xsetupForDerivedReferrer(ConditionQuery baseCQ) {
-        xprepareSubQueryInfo(baseCQ);
+    public void xsetupForDerivedReferrer(ConditionQuery mainCQ) {
+        xprepareSubQueryInfo(mainCQ);
         xchangePurposeSqlClause(HpCBPurpose.DERIVED_REFERRER);
     }
 
@@ -914,8 +914,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_SELECT);
     }
 
-    public void xsetupForScalarCondition(ConditionQuery baseCQ) {
-        xprepareSubQueryInfo(baseCQ);
+    public void xsetupForScalarCondition(ConditionQuery mainCQ) {
+        xprepareSubQueryInfo(mainCQ);
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION);
     }
 
@@ -923,20 +923,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //  o xsetupForColumnQuery()
     //  o xsetupForVaryingUpdate()
 
-    protected void xinheritSubQueryInfo(ConditionQuery baseCQ) {
-        if (baseCQ.xgetSqlClause().isForSubQuery()) { // inherits it
-            // the reason of call order is same as xprepareSubQueryInfo()
-            getSqlClause().setupForSubQuery(); // first
-            localCQ().xsetSubQueryLevel(baseCQ.xgetSubQueryLevel()); // second
+    protected void xinheritSubQueryInfo(ConditionQuery mainCQ) {
+        if (mainCQ.xgetSqlClause().isForSubQuery()) {
+            getSqlClause().setupForSubQuery(mainCQ.xgetSqlClause().getSubQueryLevel()); // inherited
         }
     }
 
-    protected void xprepareSubQueryInfo(ConditionQuery baseCQ) {
-        final int nextSubQueryLevel = baseCQ.xgetSubQueryLevel() + 1;
-        // setting up for sub-query should be called
-        // before first localCQ() to switch a base point alias name
-        getSqlClause().setupForSubQuery(); // first
-        localCQ().xsetSubQueryLevel(nextSubQueryLevel); // second
+    protected void xprepareSubQueryInfo(ConditionQuery mainCQ) {
+        final int nextSubQueryLevel = mainCQ.xgetSqlClause().getSubQueryLevel() + 1;
+        getSqlClause().setupForSubQuery(nextSubQueryLevel); // incremented
     }
 
     protected void xchangePurposeSqlClause(HpCBPurpose purpose) {
