@@ -133,10 +133,11 @@ public abstract class GreatWallOfOracleType implements ValueType {
         int index = 0;
         for (Object attr : attrs) {
             final ColumnInfo columnInfo = columnInfoList.get(index);
+            final String propertyName = columnInfo.getPropertyName();
             final Class<?> propertyType = columnInfo.getPropertyType();
             if (attr == null) {
                 if (Collection.class.isAssignableFrom(propertyType)) {
-                    columnInfo.write(entity, DfCollectionUtil.newArrayList());
+                    dbmeta.setupEntityProperty(propertyName, entity, DfCollectionUtil.newArrayList());
                 }
                 continue;
             }
@@ -148,7 +149,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
             } else {
                 mappedValue = adjustScalarToPropertyValue(attr, propertyType);
             }
-            columnInfo.write(entity, mappedValue);
+            dbmeta.setupEntityProperty(propertyName, entity, mappedValue);
             ++index;
         }
         return entity;
@@ -324,7 +325,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
     //                                                                       Oracle's Type
     //                                                                       =============
     protected Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException {
-        return _agent.toOracleArray(conn, arrayTypeName, arrayValue);
+        return _agent.toOracleArray(getOracleConnection(conn), arrayTypeName, arrayValue);
     }
 
     protected Object toStandardArray(Object oracleArray) throws SQLException {
@@ -332,7 +333,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
     }
 
     protected Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException {
-        return _agent.toOracleStruct(conn, structTypeName, attrs);
+        return _agent.toOracleStruct(getOracleConnection(conn), structTypeName, attrs);
     }
 
     protected Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException {
