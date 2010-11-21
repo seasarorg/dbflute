@@ -9,6 +9,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
@@ -292,6 +293,12 @@ public class DfPmbBasicHandler {
         return "Object"; // as default
     }
 
+    public String getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String className, String propertyName) {
+        final String javaNative = getProcedureParameterOracleArrayElementJavaNative(className, propertyName);
+        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(javaNative, "<"));
+    }
+
     public String getProcedureParameterOracleStructTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
@@ -307,7 +314,13 @@ public class DfPmbBasicHandler {
         if (columnInfo != null && columnInfo.hasTypeStructInfo()) {
             return columnInfo.getTypeStructInfo().getEntityType();
         }
-        return "";
+        return "Object"; // as default
+    }
+
+    public String getProcedureParameterOracleStructEntityTypeTypeLiteral(String className, String propertyName) {
+        final String entityType = getProcedureParameterOracleStructEntityType(className, propertyName);
+        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(entityType, "<"));
     }
 
     // -----------------------------------------------------
@@ -579,6 +592,10 @@ public class DfPmbBasicHandler {
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
     }
 
     // ===================================================================================

@@ -299,7 +299,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 flatArrayInfoMap.put(allArrayTypeName, arrayInfo);
             }
         }
-        log("Flat All Array: " + unifiedSchema);
+        log("All Array (Flat): " + unifiedSchema);
         for (DfTypeArrayInfo arrayInfo : flatArrayInfoMap.values()) {
             log("  " + arrayInfo);
         }

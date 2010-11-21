@@ -453,12 +453,23 @@ public class Database {
         return getPmbBasicHandler().getProcedureParameterOracleArrayElementJavaNative(className, propertyName);
     }
 
+    public String getPmbMetaDataProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String className,
+            String propertyName) {
+        return getPmbBasicHandler().getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(className,
+                propertyName);
+    }
+
     public String getPmbMetaDataProcedureParameterOracleStructTypeName(String className, String propertyName) {
         return getPmbBasicHandler().getProcedureParameterOracleStructTypeName(className, propertyName);
     }
 
     public String getPmbMetaDataProcedureParameterOracleStructEntityType(String className, String propertyName) {
         return getPmbBasicHandler().getProcedureParameterOracleStructEntityType(className, propertyName);
+    }
+
+    public String getPmbMetaDataProcedureParameterOracleStructEntityTypeTypeLiteral(String className,
+            String propertyName) {
+        return getPmbBasicHandler().getProcedureParameterOracleStructEntityTypeTypeLiteral(className, propertyName);
     }
 
     // -----------------------------------------------------

@@ -37,12 +37,23 @@ public class DfTypeStructInfo {
         return _entityType != null;
     }
 
-    public boolean hasNestedStruct() {
+    public boolean hasNestedStructEntityRef() {
         for (DfColumnMetaInfo columnInfo : _attributeInfoMap.values()) {
-            if (columnInfo.hasTypeArrayInfo() && columnInfo.getTypeArrayInfo().hasElementStructInfo()) {
-                return true;
-            }
-            if (columnInfo.hasTypeStructInfo()) {
+            if (columnInfo.hasTypeArrayInfo()) { // array in struct
+                final DfTypeArrayInfo arrayInfo = columnInfo.getTypeArrayInfo();
+                DfTypeArrayInfo nestedArrayInfo = arrayInfo;
+                while (true) {
+                    if (nestedArrayInfo.hasNestedArray()) { // array in ... in array in struct
+                        nestedArrayInfo = nestedArrayInfo.getNestedArrayInfo();
+                        continue;
+                    }
+                    if (nestedArrayInfo.hasElementStructInfo()) {
+                        return true; // found, last element of nested array is struct
+                    } else {
+                        break; // not found in nested array
+                    }
+                }
+            } else if (columnInfo.hasTypeStructInfo()) {
                 return true;
             }
         }

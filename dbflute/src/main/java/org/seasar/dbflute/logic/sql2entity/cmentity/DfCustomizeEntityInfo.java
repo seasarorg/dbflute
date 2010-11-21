@@ -43,7 +43,7 @@ public class DfCustomizeEntityInfo {
     }
 
     public boolean hasNestedCustomizeEntity() {
-        return hasTypeStructInfo() && _typeStructInfo.hasNestedStruct();
+        return hasTypeStructInfo() && _typeStructInfo.hasNestedStructEntityRef();
     }
 
     // ===================================================================================
