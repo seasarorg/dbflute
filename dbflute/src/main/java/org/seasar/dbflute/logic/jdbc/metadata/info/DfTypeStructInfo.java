@@ -26,8 +26,8 @@ public class DfTypeStructInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _typeName;
-    protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered();
+    protected String _typeName; // required at first
+    protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered(); // required at first
     protected String _entityType; // is set after analyzing
 
     // ===================================================================================

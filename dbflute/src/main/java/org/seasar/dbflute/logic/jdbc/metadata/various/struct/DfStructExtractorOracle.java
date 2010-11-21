@@ -60,6 +60,7 @@ public class DfStructExtractorOracle {
     /**
      * Extract the map of struct info. <br />
      * The info is so simple, for example, no nested info.
+     * And this sets type name and attributes only.
      * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of struct info. {key=struct type name} (NotNull)
      */

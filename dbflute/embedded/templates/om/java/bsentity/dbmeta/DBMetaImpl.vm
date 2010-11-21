@@ -312,6 +312,7 @@ public class ${myClassName} extends AbstractDBMeta {
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctl(v)); } }
 #elseif ($col.isJavaNativeBigDecimal())
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctb(v)); } }
+#elseif ($col.isJavaNativeList())
 #else
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctn(v, ${col.javaNative}.class)); } }
 #end
