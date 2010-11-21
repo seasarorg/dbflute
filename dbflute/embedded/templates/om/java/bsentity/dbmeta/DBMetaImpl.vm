@@ -312,13 +312,17 @@ public class ${myClassName} extends AbstractDBMeta {
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctl(v)); } }
 #elseif ($col.isJavaNativeBigDecimal())
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctb(v)); } }
-#elseif ($col.isJavaNativeList())
 #else
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctn(v, ${col.javaNative}.class)); } }
 #end
 #else
     public static class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
+#if ($col.isJavaNativeUtilList())
+    { @SuppressWarnings("unchecked")
+    public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
+#else
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
+#end
 #end
 #end
 #end

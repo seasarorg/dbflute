@@ -1464,6 +1464,11 @@ public class Column {
         return getJavaNative().equals("java.util.UUID");
     }
 
+    public boolean isJavaNativeUtilList() { // only for array type
+        return getJavaNative().equals("java.util.List")
+                || (Srl.startsWith(getJavaNative(), "List<") && Srl.endsWith(getJavaNative(), ">"));
+    }
+
     public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able by String
         List<String> ls = DfCollectionUtil.newArrayList("Integer", "Long", "Short", "Byte", "Boolean", "Character");
         return Srl.endsWith(getJavaNative(), ls.toArray(new String[] {}));
