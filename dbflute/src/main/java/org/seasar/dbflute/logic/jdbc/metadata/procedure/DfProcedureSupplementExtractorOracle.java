@@ -245,15 +245,20 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             final String elementType = foundInfo.getElementType();
             typeArrayInfo.setElementType(elementType);
             if (flatAllArrayInfoMap.containsKey(elementType)) { // array in array
-                return doResolveStructAttributeArray(structInfoMap, flatAllArrayInfoMap, elementType); // recursive call
+                final DfTypeArrayInfo nestedArrayInfo = doResolveStructAttributeArray(structInfoMap,
+                        flatAllArrayInfoMap, elementType); // recursive call
+                typeArrayInfo.setNestedArrayInfo(nestedArrayInfo);
+                return typeArrayInfo;
             } else if (structInfoMap.containsKey(elementType)) { // struct in array
                 final DfTypeStructInfo elementStructInfo = structInfoMap.get(elementType);
                 typeArrayInfo.setElementStructInfo(elementStructInfo);
+                return typeArrayInfo;
             } else {
                 return typeArrayInfo;
             }
+        } else {
+            return null;
         }
-        return null;
     }
 
     // ===================================================================================
