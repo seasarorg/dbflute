@@ -34,7 +34,7 @@ public interface DfProcedureSupplementExtractor {
      * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    public Map<String, Integer> extractOverloadInfoMap(UnifiedSchema unifiedSchema);
+    public Map<String, Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema);
 
     /**
      * Extract the map of array info. <br />
@@ -42,7 +42,7 @@ public interface DfProcedureSupplementExtractor {
      * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    public Map<String, DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema);
+    public Map<String, DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema);
 
     /**
      * Extract the map of struct info for procedure. <br />

@@ -77,12 +77,12 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                            Overload
     //                                                                            ========
     /**
-     * Extract the map of overload info. <br />
+     * Extract the map of parameter's overload info. <br />
      * Same name and different type parameters of overload are unsupported. 
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of array info. {key = (packageName.)procedureName.columnName, value = overloadNo} (NotNull)
+     * @return The map of parameter's array info. {key = (packageName.)procedureName.columnName, value = overloadNo} (NotNull)
      */
-    public StringKeyMap<Integer> extractOverloadInfoMap(UnifiedSchema unifiedSchema) {
+    public StringKeyMap<Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
         final List<ProcedureArgumentInfo> infoList = findProcedureArgumentInfoList(unifiedSchema);
         final StringKeyMap<Integer> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
@@ -102,19 +102,19 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                               Array
     //                                                                               =====
     /**
-     * Extract the map of array info. <br />
+     * Extract the map of parameter's array info. <br />
      * Same name and different type parameters of overload are unsupported. 
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of array info. {key = (packageName.)procedureName.columnName} (NotNull)
+     * @return The map of parameter's array info. {key = (packageName.)procedureName.columnName} (NotNull)
      */
-    public StringKeyMap<DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema) {
-        StringKeyMap<DfTypeArrayInfo> arrayInfoMap = _arrayInfoMapMap.get(unifiedSchema);
-        if (arrayInfoMap != null) {
-            return arrayInfoMap;
+    public StringKeyMap<DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema) {
+        StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = _arrayInfoMapMap.get(unifiedSchema);
+        if (parameterArrayInfoMap != null) {
+            return parameterArrayInfoMap;
         }
         final List<ProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
-        arrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
-        _arrayInfoMapMap.put(unifiedSchema, arrayInfoMap);
+        parameterArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        _arrayInfoMapMap.put(unifiedSchema, parameterArrayInfoMap);
         for (int i = 0; i < argInfoList.size(); i++) {
             final ProcedureArgumentInfo argInfo = argInfoList.get(i);
             final String argumentName = argInfo.getArgumentName();
@@ -138,9 +138,13 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             processArrayStructElement(unifiedSchema, arrayInfo);
             final String key = generateParameterInfoMapKey(argInfo.getPackageName(), argInfo.getObjectName(),
                     argumentName);
-            arrayInfoMap.put(key, arrayInfo);
+            parameterArrayInfoMap.put(key, arrayInfo);
         }
-        resolveNestedTemporaryInfo(arrayInfoMap); // should be called after argInfo loop
+        final StringKeyMap<DfTypeArrayInfo> uniqueArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        for (DfTypeArrayInfo arrayInfo : parameterArrayInfoMap.values()) {
+            uniqueArrayInfoMap.put(arrayInfo.getTypeName(), arrayInfo);
+        }
+        resolveNestedTemporaryInfo(uniqueArrayInfoMap); // should be called after argInfo loop
         return _arrayInfoMapMap.get(unifiedSchema);
     }
 
@@ -194,33 +198,35 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     // -----------------------------------------------------
     //                                       Nest Resolution
     //                                       ---------------
-    protected void resolveNestedTemporaryInfo(StringKeyMap<DfTypeArrayInfo> arrayInfoMap) {
-        for (DfTypeArrayInfo arrayInfo : arrayInfoMap.values()) {
-            doResolveNestedTemporaryInfo(arrayInfoMap, arrayInfo);
+    protected void resolveNestedTemporaryInfo(StringKeyMap<DfTypeArrayInfo> uniqueArrayInfoMap) {
+        for (DfTypeArrayInfo arrayInfo : uniqueArrayInfoMap.values()) {
+            doResolveNestedTemporaryInfo(uniqueArrayInfoMap, arrayInfo);
         }
     }
 
-    protected void doResolveNestedTemporaryInfo(StringKeyMap<DfTypeArrayInfo> arrayInfoMap, DfTypeArrayInfo arrayInfo) {
+    protected void doResolveNestedTemporaryInfo(StringKeyMap<DfTypeArrayInfo> uniqueArrayInfoMap,
+            DfTypeArrayInfo arrayInfo) {
         if (arrayInfo.hasNestedArray()) {
             final String nestedArrayTypeName = arrayInfo.getNestedArrayInfo().getTypeName();
-            final DfTypeArrayInfo foundInfo = arrayInfoMap.get(nestedArrayTypeName);
+            final DfTypeArrayInfo foundInfo = uniqueArrayInfoMap.get(nestedArrayTypeName);
             if (foundInfo != null) {
                 arrayInfo.setNestedArrayInfo(foundInfo); // override (resolved)
             }
         }
         if (arrayInfo.hasElementStructInfo()) {
             final DfTypeStructInfo elementStructInfo = arrayInfo.getElementStructInfo();
-            doResolveNestedTemporaryArray(arrayInfoMap, elementStructInfo);
+            doResolveNestedTemporaryArray(uniqueArrayInfoMap, elementStructInfo);
         }
     }
 
-    protected void doResolveNestedTemporaryArray(StringKeyMap<DfTypeArrayInfo> arrayInfoMap, DfTypeStructInfo structInfo) {
+    protected void doResolveNestedTemporaryArray(StringKeyMap<DfTypeArrayInfo> uniqueArrayInfoMap,
+            DfTypeStructInfo structInfo) {
         final StringKeyMap<DfColumnMetaInfo> attrInfoMap = structInfo.getAttributeInfoMap();
         for (DfColumnMetaInfo columnInfo : attrInfoMap.values()) {
             if (columnInfo.hasTypeArrayInfo()) {
                 final DfTypeArrayInfo attrArrayInfo = columnInfo.getTypeArrayInfo();
                 final String attrArrayTypeName = attrArrayInfo.getTypeName();
-                final DfTypeArrayInfo foundInfo = arrayInfoMap.get(attrArrayTypeName);
+                final DfTypeArrayInfo foundInfo = uniqueArrayInfoMap.get(attrArrayTypeName);
                 if (foundInfo != null) {
                     columnInfo.setTypeArrayInfo(foundInfo); // override (resolved)
                 }
@@ -230,7 +236,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 // if self reference, don't call recursive call, or infinity loop
                 // but basically no way because Oracle does not support self reference struct
                 if (!structInfo.getTypeName().equalsIgnoreCase(nestedStructInfo.getTypeName())) {
-                    doResolveNestedTemporaryArray(arrayInfoMap, nestedStructInfo); // recursive call
+                    doResolveNestedTemporaryArray(uniqueArrayInfoMap, nestedStructInfo); // recursive call
                 }
             }
         }

@@ -372,8 +372,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     protected void doResolveAssistInfoOracle(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMetaInfo> metaInfoList) {
         final DfProcedureSupplementExtractorOracle extractor = new DfProcedureSupplementExtractorOracle(dataSource);
-        final Map<String, Integer> overloadInfoMap = extractor.extractOverloadInfoMap(unifiedSchema);
-        final Map<String, DfTypeArrayInfo> arrayInfoMap = extractor.extractArrayInfoMap(unifiedSchema);
+        final Map<String, Integer> parameterOverloadInfoMap = extractor.extractParameterOverloadInfoMap(unifiedSchema);
+        final Map<String, DfTypeArrayInfo> parameterArrayInfoMap = extractor
+                .extractParameterArrayInfoMap(unifiedSchema);
         final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
         final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
         final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
@@ -386,13 +387,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 final String key = extractor.generateParameterInfoMapKey(catalog, procedureName, columnName);
 
                 // Overload
-                final Integer overloadNo = overloadInfoMap.get(key);
+                final Integer overloadNo = parameterOverloadInfoMap.get(key);
                 if (overloadNo != null) {
                     columnInfo.setOverloadNo(overloadNo);
                 }
 
                 // Array
-                final DfTypeArrayInfo arrayInfo = arrayInfoMap.get(key);
+                final DfTypeArrayInfo arrayInfo = parameterArrayInfoMap.get(key);
                 if (arrayInfo != null) {
                     resolvedArrayDispSet.add(arrayInfo.toString());
                     columnInfo.setTypeArrayInfo(arrayInfo);

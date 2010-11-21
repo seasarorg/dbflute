@@ -273,19 +273,24 @@ public class DfProcedurePmbSetupper {
                     final DfTypeStructInfo elementStructInfo = typeArrayInfo.getElementStructInfo();
                     registerEntityInfoIfNeeds(elementStructInfo);
                 }
+                System.out.println("***: " + structInfo.getTypeName() + " -> " + typeArrayInfo.getTypeName());
                 if (typeArrayInfo.hasElementJavaNative()) {
+                    System.out.println("A");
                     attrInfo.setSql2EntityForcedJavaNative(typeArrayInfo.getElementJavaNative());
                 } else {
+                    System.out.println("B");
                     if (typeArrayInfo.hasElementStructInfo()) {
                         final DfTypeStructInfo elementStructInfo = typeArrayInfo.getElementStructInfo();
                         final String entityType = buildStructEntityType(elementStructInfo);
                         typeArrayInfo.setElementJavaNative(entityType);
                         attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(entityType));
+                        System.out.println("C: " + entityType);
                     } else {
                         final String elementType = attrInfo.getTypeArrayInfo().getElementType();
                         final String propertyType = findPlainPropertyType(Types.OTHER, elementType, null, null);
                         typeArrayInfo.setElementJavaNative(propertyType);
                         attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(propertyType));
+                        System.out.println("D: " + elementType + ", " + propertyType);
                     }
                 }
             } else if (attrInfo.hasTypeStructInfo()) {
