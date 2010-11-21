@@ -222,7 +222,6 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
             StringKeyMap<DfTypeStructInfo> structInfoMap, StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap,
             DfTypeStructInfo structInfo, DfColumnMetaInfo columnInfo) {
-        System.out.println("**: " + structInfo.getTypeName() + ", " + columnInfo.getColumnName());
         final String dbTypeName = columnInfo.getDbTypeName();
         final DfTypeArrayInfo arrayInfo = doResolveStructAttributeArray(structInfoMap, flatAllArrayInfoMap, dbTypeName);
         if (arrayInfo != null) {
@@ -237,7 +236,6 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
 
     protected DfTypeArrayInfo doResolveStructAttributeArray(StringKeyMap<DfTypeStructInfo> structInfoMap,
             StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap, String typeName) {
-        System.out.println("****: " + typeName + "  -  " + flatAllArrayInfoMap.keySet());
         if (!flatAllArrayInfoMap.containsKey(typeName)) {
             return null;
         }
@@ -246,14 +244,12 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         typeArrayInfo.setTypeName(foundInfo.getTypeName());
         final String elementType = foundInfo.getElementType();
         typeArrayInfo.setElementType(elementType);
-        System.out.println("******: found -> " + elementType + " of " + typeArrayInfo.getTypeName());
         if (flatAllArrayInfoMap.containsKey(elementType)) { // array in array
             final DfTypeArrayInfo nestedArrayInfo = doResolveStructAttributeArray(structInfoMap, flatAllArrayInfoMap,
                     elementType); // recursive call
             typeArrayInfo.setNestedArrayInfo(nestedArrayInfo);
             return typeArrayInfo;
         } else if (structInfoMap.containsKey(elementType)) { // struct in array
-            System.out.println("********: fofofofound -> " + elementType + " of " + typeArrayInfo.getTypeName());
             final DfTypeStructInfo elementStructInfo = structInfoMap.get(elementType);
             typeArrayInfo.setElementStructInfo(elementStructInfo);
             return typeArrayInfo;
@@ -404,7 +400,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             info.setSequence(map.get("SEQUENCE"));
             info.setArgumentName(map.get("ARGUMENT_NAME"));
             info.setDataType(map.get("DATA_TYPE"));
-            info.setTypeName(map.get("TYPE_OWNER"));
+            info.setTypeOwner(map.get("TYPE_OWNER"));
             info.setTypeName(map.get("TYPE_NAME"));
             info.setTypeSubName(map.get("TYPE_SUBNAME"));
             infoList.add(info);

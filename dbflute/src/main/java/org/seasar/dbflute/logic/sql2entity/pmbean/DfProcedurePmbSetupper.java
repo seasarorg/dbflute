@@ -201,33 +201,23 @@ public class DfProcedurePmbSetupper {
         final int jdbcDefType = column.getJdbcDefType();
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
+        final String propertyType;
         if (column.isOracleNumber()) {
             // because the length setting of procedure parameter is unsupported on Oracle
-            propertyInfo.setPropertyType(TypeMap.getDefaultDecimalJavaNativeType());
-            return propertyInfo;
-        }
-        if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
-            // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY" (it's not useful for type mapping)
+            propertyType = TypeMap.getDefaultDecimalJavaNativeType();
+        } else if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
+            // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY"
+            // (it's not useful for type mapping, so search like this)
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
-            if (arrayInfo.hasElementStructInfo()) {
-                final DfTypeStructInfo structInfo = arrayInfo.getElementStructInfo();
-                final String entityType = doProcessStructProperty(column, structInfo, propertyInfo, true);
-                arrayInfo.setElementJavaNative(entityType);
-            } else {
-                final String elementType = arrayInfo.getElementType();
-                final String propertyType = findPlainPropertyType(jdbcDefType, elementType, columnSize, decimalDigits);
-                arrayInfo.setElementJavaNative(propertyType);
-                propertyInfo.setPropertyType(getGenericListClassName(propertyType));
-            }
-            return propertyInfo;
-        }
-        if (column.isOracleStruct() && column.hasTypeStructInfo()) {
+            propertyType = getGenericListClassName(doProcessArrayProperty(column, arrayInfo, propertyInfo));
+        } else if (column.isOracleStruct() && column.hasTypeStructInfo()) {
             final DfTypeStructInfo structInfo = column.getTypeStructInfo();
-            doProcessStructProperty(column, structInfo, propertyInfo, false);
-            return propertyInfo;
+            propertyType = doProcessStructProperty(column, structInfo, propertyInfo);
+        } else {
+            final String dbTypeName = column.getDbTypeName();
+            propertyType = findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits);
         }
-        final String dbTypeName = column.getDbTypeName();
-        propertyInfo.setPropertyType(findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits));
+        propertyInfo.setPropertyType(propertyType);
         return propertyInfo;
     }
 
@@ -238,8 +228,25 @@ public class DfProcedurePmbSetupper {
         return column.isPostgreSQLCursor() || column.isOracleCursor();
     }
 
+    protected String doProcessArrayProperty(DfProcedureColumnMetaInfo column, DfTypeArrayInfo arrayInfo,
+            ProcedurePropertyInfo propertyInfo) {
+        final String propertyType;
+        if (arrayInfo.hasNestedArray()) {
+            final DfTypeArrayInfo nestedArrayInfo = arrayInfo.getNestedArrayInfo();
+            propertyType = doProcessArrayProperty(column, nestedArrayInfo, propertyInfo); // recursive call
+        } else if (arrayInfo.hasElementStructInfo()) {
+            final DfTypeStructInfo structInfo = arrayInfo.getElementStructInfo();
+            propertyType = doProcessStructProperty(column, structInfo, propertyInfo);
+        } else {
+            final String elementType = arrayInfo.getElementType();
+            propertyType = findPlainPropertyType(Types.OTHER, elementType, null, null);
+        }
+        arrayInfo.setElementJavaNative(propertyType);
+        return propertyType;
+    }
+
     protected String doProcessStructProperty(DfProcedureColumnMetaInfo column, DfTypeStructInfo structInfo,
-            ProcedurePropertyInfo propertyInfo, boolean inArray) {
+            ProcedurePropertyInfo propertyInfo) {
         final String typeName = structInfo.getTypeName();
 
         // handling for entity generation and nested array & struct 
@@ -250,8 +257,7 @@ public class DfProcedurePmbSetupper {
         // entityType is class name can used on program
         // so it adjusts project prefix here
         final String entityType = buildStructEntityType(structInfo);
-        propertyInfo.setPropertyType(inArray ? getGenericListClassName(entityType) : entityType);
-        propertyInfo.setRefCustomizeEntity(true);
+        propertyInfo.setRefCustomizeEntity(true); // why propertyInfo is here, is only for this
         return entityType;
     }
 
