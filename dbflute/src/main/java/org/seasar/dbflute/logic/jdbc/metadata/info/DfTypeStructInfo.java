@@ -37,6 +37,18 @@ public class DfTypeStructInfo {
         return _entityType != null;
     }
 
+    public boolean hasNestedStruct() {
+        for (DfColumnMetaInfo columnInfo : _attributeInfoMap.values()) {
+            if (columnInfo.hasTypeArrayInfo() && columnInfo.getTypeArrayInfo().hasStructInfo()) {
+                return true;
+            }
+            if (columnInfo.hasTypeStructInfo()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

@@ -154,6 +154,7 @@ public class Table {
     //                                 Sql2Entity Definition
     //                                 ---------------------
     private boolean _sql2entityCustomize;
+    private boolean _sql2entityCustomizeHasNested;
     private boolean _sql2entityTypeSafeCursor;
 
     // -----------------------------------------------------
@@ -1918,6 +1919,14 @@ public class Table {
 
     public void setSql2EntityCustomize(boolean sql2entityCustomize) {
         _sql2entityCustomize = sql2entityCustomize;
+    }
+
+    public boolean isSql2EntityCustomizeHasNested() {
+        return _sql2entityCustomizeHasNested;
+    }
+
+    public void setSql2EntityCustomizeHasNested(boolean sql2entityCustomizeHasNested) {
+        _sql2entityCustomizeHasNested = sql2entityCustomizeHasNested;
     }
 
     public boolean isSql2EntityTypeSafeCursor() {

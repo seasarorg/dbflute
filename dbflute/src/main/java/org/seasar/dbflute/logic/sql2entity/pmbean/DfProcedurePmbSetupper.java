@@ -245,35 +245,6 @@ public class DfProcedurePmbSetupper {
         // handling for entity generation and nested array & struct 
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             registerEntityInfoIfNeeds(structInfo);
-
-            final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            for (DfColumnMetaInfo attrInfo : attrMap.values()) { // nested array or struct handling
-                if (attrInfo.hasTypeArrayInfo()) {
-                    final DfTypeArrayInfo typeArrayInfo = attrInfo.getTypeArrayInfo();
-                    if (typeArrayInfo.hasElementJavaNative()) {
-                        attrInfo.setSql2EntityForcedJavaNative(typeArrayInfo.getElementJavaNative());
-                    } else {
-                        if (typeArrayInfo.hasStructInfo()) {
-                            final DfTypeStructInfo nestedStructInfo = typeArrayInfo.getStructInfo();
-                            registerEntityInfoIfNeeds(nestedStructInfo);
-                            attrInfo.setSql2EntityForcedJavaNative(buildStructEntityType(nestedStructInfo));
-                        } else {
-                            final String elementType = attrInfo.getTypeArrayInfo().getElementType();
-                            final String propertyType = findPlainPropertyType(Types.OTHER, elementType, null, null);
-                            typeArrayInfo.setElementJavaNative(propertyType);
-                            attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(propertyType));
-                        }
-                    }
-                } else if (attrInfo.hasTypeStructInfo()) {
-                    final DfTypeStructInfo nestedStructInfo = attrInfo.getTypeStructInfo();
-                    if (nestedStructInfo.hasEntityType()) {
-                        attrInfo.setSql2EntityForcedJavaNative(nestedStructInfo.getEntityType());
-                    } else {
-                        registerEntityInfoIfNeeds(nestedStructInfo);
-                        attrInfo.setSql2EntityForcedJavaNative(buildStructEntityType(nestedStructInfo));
-                    }
-                }
-            }
         }
 
         // entityType is class name can used on program
@@ -288,7 +259,44 @@ public class DfProcedurePmbSetupper {
         final String typeName = structInfo.getTypeName();
         if (!_entityInfoMap.containsKey(typeName)) {
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap).enableJavaNameConvert());
+            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap, structInfo));
+            setupStructAttribute(structInfo);
+        }
+    }
+
+    protected void setupStructAttribute(DfTypeStructInfo structInfo) {
+        final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
+        for (DfColumnMetaInfo attrInfo : attrMap.values()) { // nested array or struct handling
+            if (attrInfo.hasTypeArrayInfo()) {
+                final DfTypeArrayInfo typeArrayInfo = attrInfo.getTypeArrayInfo();
+                if (typeArrayInfo.hasStructInfo()) {
+                    final DfTypeStructInfo elementStructInfo = typeArrayInfo.getStructInfo();
+                    registerEntityInfoIfNeeds(elementStructInfo);
+                }
+                if (typeArrayInfo.hasElementJavaNative()) {
+                    attrInfo.setSql2EntityForcedJavaNative(typeArrayInfo.getElementJavaNative());
+                } else {
+                    if (typeArrayInfo.hasStructInfo()) {
+                        final DfTypeStructInfo elementStructInfo = typeArrayInfo.getStructInfo();
+                        final String entityType = buildStructEntityType(elementStructInfo);
+                        typeArrayInfo.setElementJavaNative(entityType);
+                        attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(entityType));
+                    } else {
+                        final String elementType = attrInfo.getTypeArrayInfo().getElementType();
+                        final String propertyType = findPlainPropertyType(Types.OTHER, elementType, null, null);
+                        typeArrayInfo.setElementJavaNative(propertyType);
+                        attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(propertyType));
+                    }
+                }
+            } else if (attrInfo.hasTypeStructInfo()) {
+                final DfTypeStructInfo nestedStructInfo = attrInfo.getTypeStructInfo();
+                registerEntityInfoIfNeeds(nestedStructInfo);
+                if (nestedStructInfo.hasEntityType()) {
+                    attrInfo.setSql2EntityForcedJavaNative(nestedStructInfo.getEntityType());
+                } else {
+                    attrInfo.setSql2EntityForcedJavaNative(buildStructEntityType(nestedStructInfo));
+                }
+            }
         }
     }
 

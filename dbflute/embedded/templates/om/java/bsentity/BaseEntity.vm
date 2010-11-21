@@ -20,7 +20,7 @@ import ${glPackageBaseCommon}.${glCDef};
 #if ($table.isBuriTarget())
 import ${glPackagePluginBuri}.${glBuriDef};
 #end
-#if ($table.hasRelation())
+#if ($table.hasRelation() || $table.isSql2EntityCustomizeHasNested())
 import ${myExtendedEntityPackageName}.*;
 #end
 #if ($table.isLoadableCustomizeEntity())

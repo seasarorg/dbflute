@@ -669,6 +669,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             if (!entityInfo.needsJavaNameConvert()) {
                 tbl.suppressJavaNameConvert(); // basically here (except STRUCT type)
             }
+            if (entityInfo.hasNestedCustomizeEntity()) {
+                tbl.setSql2EntityCustomizeHasNested(true); // basically when STRUCT type
+            }
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);
             _log.info(entityName);
@@ -727,7 +730,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (commonColumnMap.isEmpty()) {
             return false;
         }
-        Set<String> commonColumnSet = commonColumnMap.keySet();
+        final Set<String> commonColumnSet = commonColumnMap.keySet();
         for (String commonColumnName : commonColumnSet) {
             if (!columnJdbcTypeMap.containsKey(commonColumnName)) {
                 return false; // Not All!
