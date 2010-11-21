@@ -55,11 +55,11 @@ public class DfTypeArrayInfo {
         if (_nestedArrayInfo != null) {
             sb.append("(").append(_nestedArrayInfo.toString()).append(")");
         }
-        sb.append(">");
         if (_elementStructInfo != null) {
-            sb.append(":{").append(_elementStructInfo.getTypeName());
-            sb.append("(").append(_elementStructInfo.getAttributeInfoMap().size()).append(")}");
+            sb.append("(").append(_elementStructInfo.getTypeName());
+            sb.append(":").append(_elementStructInfo.getAttributeInfoMap().size()).append(")");
         }
+        sb.append(">");
         return sb.toString();
     }
 
