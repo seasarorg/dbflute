@@ -24,8 +24,8 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _typeName;
-    protected String _elementType;
+    protected String _typeName; // required
+    protected String _elementType; // required
     protected DfTypeStructInfo _structInfo; // if element type is STRUCT
     protected String _elementJavaNative; // is set after analyzing
 

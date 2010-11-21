@@ -25,10 +25,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.various.array.DfArrayExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -53,6 +55,9 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     /** The info map of argument for cache. */
     protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = DfCollectionUtil
             .newHashMap();
+
+    /** The info map of array set for cache. */
+    protected final Map<UnifiedSchema, StringSet> _arrayTypeSetMap = DfCollectionUtil.newHashMap();
 
     /** The info map of STRUCT type for cache. */
     protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structInfoMapMap = DfCollectionUtil
@@ -166,15 +171,28 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         _structInfoMapMap.put(unifiedSchema, structInfoMap);
 
         // column's additional info (should be after initialization)
+        initializeStructAttributeInfo(unifiedSchema, structInfoMap);
+
+        return _structInfoMapMap.get(unifiedSchema);
+    }
+
+    protected void initializeStructAttributeInfo(UnifiedSchema unifiedSchema,
+            StringKeyMap<DfTypeStructInfo> structInfoMap) {
         // arrayInfo getting is OK after structInfoMapMap initialization
         // and additional schema's nested things are unsupported, same schema's only
-        final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractArrayInfoMap(unifiedSchema);
+        final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractArrayInfoMap(unifiedSchema); // first priority
+        final StringSet arrayTypeSet = extractArrayTypeSet(unifiedSchema); // second priority
         for (DfTypeStructInfo structInfo : structInfoMap.values()) {
             for (DfColumnMetaInfo metaInfo : structInfo.getAttributeInfoMap().values()) {
                 final String dbTypeName = metaInfo.getDbTypeName();
                 final DfTypeArrayInfo nestedArrayInfo = arrayInfoMap.get(dbTypeName);
-                if (nestedArrayInfo != null) { // nested array
+                if (nestedArrayInfo != null) { // nested array used in procedure parameter
                     metaInfo.setTypeArrayInfo(nestedArrayInfo);
+                } else if (arrayTypeSet.contains(dbTypeName)) { // nested array unused in procedure parameter
+                    final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo();
+                    typeArrayInfo.setTypeName(dbTypeName);
+                    typeArrayInfo.setElementType("UNKNOWN"); // *the way to get the info is unknown
+                    metaInfo.setTypeArrayInfo(typeArrayInfo);
                 }
                 final DfTypeStructInfo nestedStructInfo = structInfoMap.get(dbTypeName);
                 if (nestedStructInfo != null) { // nested struct
@@ -183,7 +201,17 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 metaInfo.setProcedureParameter(true); // for default mapping type
             }
         }
-        return _structInfoMapMap.get(unifiedSchema);
+    }
+
+    protected StringSet extractArrayTypeSet(UnifiedSchema unifiedSchema) {
+        StringSet arrayInfoSet = _arrayTypeSetMap.get(unifiedSchema);
+        if (arrayInfoSet != null) {
+            return arrayInfoSet;
+        }
+
+        DfArrayExtractorOracle extractor = new DfArrayExtractorOracle(_dataSource);
+        _arrayTypeSetMap.put(unifiedSchema, extractor.extractArrayTypeSet(unifiedSchema));
+        return _arrayTypeSetMap.get(unifiedSchema);
     }
 
     // ===================================================================================
