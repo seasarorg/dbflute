@@ -51,13 +51,14 @@ public class DfTypeArrayInfo {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(_typeName).append("<").append(_elementType);
+        sb.append(_typeName).append("<");
         if (_nestedArrayInfo != null) {
-            sb.append("(").append(_nestedArrayInfo.toString()).append(")");
-        }
-        if (_elementStructInfo != null) {
-            sb.append("(").append(_elementStructInfo.getTypeName());
-            sb.append(":").append(_elementStructInfo.getAttributeInfoMap().size()).append(")");
+            sb.append(_nestedArrayInfo.toString());
+        } else if (_elementStructInfo != null) {
+            sb.append(_elementStructInfo.getTypeName());
+            sb.append("(").append(_elementStructInfo.getAttributeInfoMap().size()).append(")");
+        } else {
+            sb.append(_elementType);
         }
         sb.append(">");
         return sb.toString();

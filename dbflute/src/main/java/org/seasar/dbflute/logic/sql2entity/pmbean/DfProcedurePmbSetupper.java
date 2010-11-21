@@ -279,7 +279,6 @@ public class DfProcedurePmbSetupper {
         final String typeName = structInfo.getTypeName();
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            _log.info("...Registering generation for struct: " + structInfo);
             _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap, structInfo));
             setupStructAttribute(structInfo, propertyInfo);
         }

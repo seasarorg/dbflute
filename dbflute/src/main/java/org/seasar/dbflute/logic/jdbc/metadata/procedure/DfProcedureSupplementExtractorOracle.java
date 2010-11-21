@@ -219,12 +219,13 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
             StringKeyMap<DfTypeStructInfo> structInfoMap, StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap,
             DfTypeStructInfo structInfo, DfColumnMetaInfo columnInfo) {
-        final String dbTypeName = columnInfo.getDbTypeName();
-        final DfTypeArrayInfo arrayInfo = doResolveStructAttributeArray(structInfoMap, flatAllArrayInfoMap, dbTypeName);
-        if (arrayInfo != null) {
+        final String attrTypeName = columnInfo.getDbTypeName();
+        final DfTypeArrayInfo arrayInfo = doResolveStructAttributeArray(structInfoMap, flatAllArrayInfoMap,
+                attrTypeName);
+        if (arrayInfo != null) { // array attribute
             columnInfo.setTypeArrayInfo(arrayInfo);
         }
-        final DfTypeStructInfo nestedStructInfo = structInfoMap.get(dbTypeName);
+        final DfTypeStructInfo nestedStructInfo = structInfoMap.get(attrTypeName);
         if (nestedStructInfo != null) { // nested struct
             columnInfo.setTypeStructInfo(nestedStructInfo);
         }
@@ -232,27 +233,24 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     }
 
     protected DfTypeArrayInfo doResolveStructAttributeArray(StringKeyMap<DfTypeStructInfo> structInfoMap,
-            StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap, String typeName) {
-        if (!flatAllArrayInfoMap.containsKey(typeName)) {
+            StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap, String attrTypeName) {
+        if (!flatAllArrayInfoMap.containsKey(attrTypeName)) {
             return null;
         }
-        final DfTypeArrayInfo foundInfo = flatAllArrayInfoMap.get(typeName);
+        final DfTypeArrayInfo foundInfo = flatAllArrayInfoMap.get(attrTypeName);
         final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo();
         typeArrayInfo.setTypeName(foundInfo.getTypeName());
         final String elementType = foundInfo.getElementType();
         typeArrayInfo.setElementType(elementType);
-        if (flatAllArrayInfoMap.containsKey(elementType)) { // array in array
+        if (flatAllArrayInfoMap.containsKey(elementType)) { // array in array in ...
             final DfTypeArrayInfo nestedArrayInfo = doResolveStructAttributeArray(structInfoMap, flatAllArrayInfoMap,
                     elementType); // recursive call
             typeArrayInfo.setNestedArrayInfo(nestedArrayInfo);
-            return typeArrayInfo;
-        } else if (structInfoMap.containsKey(elementType)) { // struct in array
+        } else if (structInfoMap.containsKey(elementType)) { // struct in array in ...
             final DfTypeStructInfo elementStructInfo = structInfoMap.get(elementType);
             typeArrayInfo.setElementStructInfo(elementStructInfo);
-            return typeArrayInfo;
-        } else {
-            return typeArrayInfo;
         }
+        return typeArrayInfo;
     }
 
     // ===================================================================================
