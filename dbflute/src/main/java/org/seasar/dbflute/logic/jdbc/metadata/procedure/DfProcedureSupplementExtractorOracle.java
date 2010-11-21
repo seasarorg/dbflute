@@ -144,7 +144,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             return;
         }
         arrayInfo.setStructInfo(structInfo);
-        // *STRUCT type of other schema is unsupported for now
+        // *STRUCT type of additional schema is unsupported for now
     }
 
     // ===================================================================================
@@ -159,14 +159,30 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (structInfoMap != null) {
             return structInfoMap;
         }
+
+        // initialize per schema
         final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
         structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
+        _structInfoMapMap.put(unifiedSchema, structInfoMap);
+
+        // column's additional info (should be after initialization)
+        // arrayInfo getting is OK after structInfoMapMap initialization
+        // and additional schema's nested things are unsupported, same schema's only
+        final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractArrayInfoMap(unifiedSchema);
         for (DfTypeStructInfo structInfo : structInfoMap.values()) {
             for (DfColumnMetaInfo metaInfo : structInfo.getAttributeInfoMap().values()) {
+                final String dbTypeName = metaInfo.getDbTypeName();
+                final DfTypeArrayInfo nestedArrayInfo = arrayInfoMap.get(dbTypeName);
+                if (nestedArrayInfo != null) { // nested array
+                    metaInfo.setTypeArrayInfo(nestedArrayInfo);
+                }
+                final DfTypeStructInfo nestedStructInfo = structInfoMap.get(dbTypeName);
+                if (nestedStructInfo != null) { // nested struct
+                    metaInfo.setTypeStructInfo(nestedStructInfo);
+                }
                 metaInfo.setProcedureParameter(true); // for default mapping type
             }
         }
-        _structInfoMapMap.put(unifiedSchema, structInfoMap);
         return _structInfoMapMap.get(unifiedSchema);
     }
 
