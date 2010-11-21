@@ -241,13 +241,14 @@ public class DfProcedurePmbSetupper {
     //                                        --------------
     protected String doProcessArrayProperty(DfTypeArrayInfo arrayInfo, ProcedurePropertyInfo propertyInfo) {
         final String propertyType;
-        if (arrayInfo.hasNestedArray()) {
+        if (arrayInfo.hasNestedArray()) { // array in array
             final DfTypeArrayInfo nestedArrayInfo = arrayInfo.getNestedArrayInfo();
-            propertyType = doProcessArrayProperty(nestedArrayInfo, propertyInfo); // recursive call
-        } else if (arrayInfo.hasElementStructInfo()) {
+            final String nestedType = doProcessArrayProperty(nestedArrayInfo, propertyInfo); // recursive call
+            propertyType = getGenericListClassName(nestedType);
+        } else if (arrayInfo.hasElementStructInfo()) { // struct in array
             final DfTypeStructInfo structInfo = arrayInfo.getElementStructInfo();
             propertyType = doProcessStructProperty(structInfo, propertyInfo);
-        } else {
+        } else { // scalar in array
             final String dbTypeName = arrayInfo.getElementType();
             propertyType = findPlainPropertyType(Types.OTHER, dbTypeName, null, null);
         }
