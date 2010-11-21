@@ -294,7 +294,8 @@ public class DfProcedurePmbSetupper {
                     registerEntityInfoIfNeeds(typeArrayInfo.getElementStructInfo(), propertyInfo);
                 }
                 if (typeArrayInfo.hasElementJavaNative()) {
-                    attrInfo.setSql2EntityForcedJavaNative(typeArrayInfo.getElementJavaNative());
+                    final String elementJavaNative = typeArrayInfo.getElementJavaNative();
+                    attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(elementJavaNative));
                 } else {
                     final String elementType;
                     if (typeArrayInfo.hasNestedArray()) { // array in array in struct
@@ -304,8 +305,7 @@ public class DfProcedurePmbSetupper {
                         final DfTypeStructInfo elementStructInfo = typeArrayInfo.getElementStructInfo();
                         elementType = buildStructEntityType(elementStructInfo);
                     } else { // scalar in array in struct
-                        final String dbTypeName = attrInfo.getTypeArrayInfo().getElementType();
-                        elementType = findPlainPropertyType(Types.OTHER, dbTypeName, null, null);
+                        elementType = findArrayScalarElementPropertyType(attrInfo.getTypeArrayInfo());
                     }
                     typeArrayInfo.setElementJavaNative(elementType);
                     attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(elementType));
