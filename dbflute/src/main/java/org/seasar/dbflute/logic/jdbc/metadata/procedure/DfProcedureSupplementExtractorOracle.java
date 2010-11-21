@@ -227,7 +227,9 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 final DfTypeArrayInfo attrArrayInfo = columnInfo.getTypeArrayInfo();
                 final String attrArrayTypeName = attrArrayInfo.getTypeName();
                 final DfTypeArrayInfo foundInfo = uniqueArrayInfoMap.get(attrArrayTypeName);
+                System.out.println("*point:" + columnInfo.getColumnName() + " / " + attrArrayTypeName);
                 if (foundInfo != null) {
+                    System.out.println(" -> found");
                     columnInfo.setTypeArrayInfo(foundInfo); // override (resolved)
                 }
             }
