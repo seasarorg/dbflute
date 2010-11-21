@@ -67,7 +67,7 @@ public abstract class OracleStructType extends GreatWallOfOracleType {
     }
 
     protected Entity toPropertyValue(Object oracleStruct) throws SQLException {
-        return mappingOracleStructToEntity(oracleStruct, _mainObjectType);
+        return mappingOracleStructToEntity(oracleStruct, _mainEntityPrototype);
     }
 
     // ===================================================================================

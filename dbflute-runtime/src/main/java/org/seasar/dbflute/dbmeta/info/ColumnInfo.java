@@ -163,6 +163,14 @@ public class ColumnInfo {
         return prefix + initCap(_propertyName);
     }
 
+    /**
+     * Get the generic type of property type for list property.
+     * @return The type instance. (Nullable: when not list type)
+     */
+    public Class<?> getGenericType() {
+        return DfReflectionUtil.getGenericType(reader().getGenericReturnType());
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

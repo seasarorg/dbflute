@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
+import java.util.List;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -63,7 +64,7 @@ public abstract class OracleArrayType extends GreatWallOfOracleType {
     }
 
     protected Collection<Object> toPropertyValue(Object oracleArray) throws SQLException {
-        return mappingOracleArrayToCollection(oracleArray, _mainObjectType);
+        return mappingOracleArrayToList(oracleArray, _mainObjectType);
     }
 
     // ===================================================================================
@@ -72,7 +73,7 @@ public abstract class OracleArrayType extends GreatWallOfOracleType {
     @Override
     protected Object toBindValue(Connection conn, Object paramExp, Object value) throws SQLException {
         assertArrayPropertyValueCollection(paramExp, value);
-        return mappingCollectionToOracleArray(conn, paramExp, (Collection<?>) value, _mainTypeName, _mainObjectType);
+        return mappingListToOracleArray(conn, paramExp, (List<?>) value, _mainTypeName, _mainObjectType);
     }
 
     protected void assertArrayPropertyValueCollection(Object paramExp, Object value) {

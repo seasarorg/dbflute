@@ -42,6 +42,12 @@ public class DfReflectionUtilTest extends PlainTestCase {
         assertEquals("foo", result);
     }
 
+    public static class FooTarget {
+        public String fooNoArg() {
+            return "foo";
+        }
+    }
+
     // ===================================================================================
     //                                                                             Generic
     //                                                                             =======
@@ -84,7 +90,7 @@ public class DfReflectionUtilTest extends PlainTestCase {
         assertEquals(String.class, elementType);
     }
 
-    public void test_getElementType_NestedList() throws Exception {
+    public void test_getElementType_nestedList() throws Exception {
         // ## Arrange ##
         Type genericType = getNestedListMethod().getGenericReturnType();
 
@@ -95,6 +101,19 @@ public class DfReflectionUtilTest extends PlainTestCase {
         log("genericType = " + genericType);
         log("elementType = " + elementType);
         assertEquals(List.class, elementType);
+    }
+
+    public void test_getElementType_beanList() throws Exception {
+        // ## Arrange ##
+        Type genericType = getBeanListMethod().getGenericReturnType();
+
+        // ## Act ##
+        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+
+        // ## Assert ##
+        log("genericType = " + genericType);
+        log("elementType = " + elementType);
+        assertEquals(FooGeneric.class, elementType);
     }
 
     public void test_getElementType_nonGeneric() throws Exception {
@@ -126,6 +145,10 @@ public class DfReflectionUtilTest extends PlainTestCase {
         return FooGeneric.class.getMethod("fooNestedList", (Class<?>[]) null);
     }
 
+    protected Method getBeanListMethod() throws Exception {
+        return BarGeneric.class.getMethod("barBeanList", (Class<?>[]) null);
+    }
+
     protected Method getNonGenericMethod() throws Exception {
         return FooGeneric.class.getMethod("fooNonGeneric", (Class<?>[]) null);
     }
@@ -152,9 +175,9 @@ public class DfReflectionUtilTest extends PlainTestCase {
         }
     }
 
-    public static class FooTarget {
-        public String fooNoArg() {
-            return "foo";
+    public static class BarGeneric {
+        public List<FooGeneric> barBeanList() {
+            return new ArrayList<FooGeneric>();
         }
     }
 }

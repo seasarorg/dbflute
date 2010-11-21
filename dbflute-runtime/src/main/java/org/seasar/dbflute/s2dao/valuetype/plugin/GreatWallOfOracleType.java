@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.seasar.dbflute.Entity;
@@ -75,8 +74,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
     // ===================================================================================
     //                                                                           Get Value
     //                                                                           =========
-    protected Collection<Object> mappingOracleArrayToCollection(Object oracleArray, Class<?> elementType)
-            throws SQLException {
+    protected List<Object> mappingOracleArrayToList(Object oracleArray, Object elementType) throws SQLException {
         if (oracleArray == null) {
             return DfCollectionUtil.newArrayList();
         }
@@ -99,6 +97,11 @@ public abstract class GreatWallOfOracleType implements ValueType {
             }
             array = objList.toArray(); // null removed
         }
+        return doMappingOracleArrayToList(array, firstValue, elementType);
+    }
+
+    protected List<Object> doMappingOracleArrayToList(Object[] array, Object firstValue, Object elementType)
+            throws SQLException {
         if (firstValue == null) { // means empty array
             return DfCollectionUtil.newArrayList();
         }
@@ -106,7 +109,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         if (isOracleArray(firstValue)) { // unsupported
             //for (Object element : array) {
             //    // next elementType is unknown if second or more level
-            //    resultList.add(mappingOracleArrayToCollection(element, unknown));
+            //    resultList.add(mappingOracleArrayToList(element, unknown));
             //}
             throw new UnsupportedOperationException("array in array is unsupported");
         } else if (isOracleStruct(firstValue)) { // first level is only supported 
@@ -114,8 +117,13 @@ public abstract class GreatWallOfOracleType implements ValueType {
                 resultList.add(mappingOracleStructToEntity(element, elementType));
             }
         } else {
+            if (!Class.class.equals(elementType.getClass())) {
+                String msg = "The element type should be class type when scalar element:";
+                msg = msg + " firstValue=" + firstValue + " elementType=" + elementType;
+                throw new IllegalStateException(msg);
+            }
             for (Object element : array) {
-                resultList.add(adjustScalarToPropertyValue(element, elementType));
+                resultList.add(adjustScalarToPropertyValue(element, (Class<?>) elementType));
             }
         }
         return resultList;
@@ -135,9 +143,13 @@ public abstract class GreatWallOfOracleType implements ValueType {
             throw new IllegalArgumentException(msg);
         }
         final DBMeta dbmeta = prototype.getDBMeta();
+        final Object[] attrs = toStandardStructAttributes(oracleStruct);
+        return doMappingOracleStructToEntity(dbmeta, attrs);
+    }
+
+    protected Entity doMappingOracleStructToEntity(DBMeta dbmeta, Object[] attrs) throws SQLException {
         final Entity entity = dbmeta.newEntity();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
-        final Object[] attrs = toStandardStructAttributes(oracleStruct);
         assertStructAttributeSizeMatched(entity, attrs, columnInfoList);
         for (int i = 0; i < attrs.length; i++) {
             final Object attr = attrs[i];
@@ -145,18 +157,17 @@ public abstract class GreatWallOfOracleType implements ValueType {
             final String propertyName = columnInfo.getPropertyName();
             final Class<?> propertyType = columnInfo.getPropertyType();
             if (attr == null) {
-                if (Collection.class.isAssignableFrom(propertyType)) {
+                if (List.class.isAssignableFrom(propertyType)) {
                     dbmeta.setupEntityProperty(propertyName, entity, DfCollectionUtil.newArrayList());
                 }
                 continue;
             }
             final Object mappedValue;
-            if (Collection.class.isAssignableFrom(propertyType)) { // unsupported
-                // if it supports, it needs to get element type
-                //mappedValue = mappingOracleArrayToCollection(attr, elementType);
-                throw new UnsupportedOperationException("array in struct is unsupported");
+            if (List.class.isAssignableFrom(propertyType)) {
+                final Class<?> elementType = columnInfo.getGenericType();
+                mappedValue = mappingOracleArrayToList(attr, elementType);
             } else if (Entity.class.isAssignableFrom(propertyType)) {
-                mappedValue = mappingOracleStructToEntity(oracleStruct, propertyType);
+                mappedValue = mappingOracleStructToEntity(attr, propertyType);
             } else {
                 mappedValue = adjustScalarToPropertyValue(attr, propertyType);
             }
@@ -221,9 +232,9 @@ public abstract class GreatWallOfOracleType implements ValueType {
 
     protected abstract Object toBindValue(Connection conn, Object paramExp, Object value) throws SQLException;
 
-    protected Object mappingCollectionToOracleArray(Connection conn, Object paramExp, Collection<?> value,
+    protected Object mappingListToOracleArray(Connection conn, Object paramExp, List<?> valueList,
             String arrayTypeName, Class<?> elementType) throws SQLException {
-        final Object[] array = value.toArray();
+        final Object[] array = valueList.toArray();
         if (array.length == 0) {
             return array;
         }
@@ -259,22 +270,24 @@ public abstract class GreatWallOfOracleType implements ValueType {
         for (ColumnInfo columnInfo : columnInfoList) {
             final Object propertyValue = columnInfo.read(entity);
             final Object mappedValue;
-            if (propertyValue instanceof Collection<?>) { // ARRAY in STRUCT
+            if (propertyValue instanceof List<?>) { // array in struct
                 // it works only when the element type is scalar
                 // (but property type is Object because Sql2Entity does not support this)
-                final Collection<?> nested = ((Collection<?>) propertyValue);
+                final List<?> nested = ((List<?>) propertyValue);
                 final String arrayTypeName = columnInfo.getColumnDbType();
                 final Class<?> propertyType = columnInfo.getPropertyType();
                 Class<?> elementType = propertyType;
-                if (Object.class.equals(propertyType) && DfCollectionUtil.hasValidElement(nested)) {
+                if (List.class.isAssignableFrom(propertyType)) {
+                    elementType = columnInfo.getGenericType();
+                } else if (Object.class.equals(propertyType) && DfCollectionUtil.hasValidElement(nested)) {
                     final Class<?> firstElementType = DfCollectionUtil.findFirstElementType(nested);
                     if (firstElementType != null) {
                         elementType = nested.iterator().next().getClass();
                     }
                 }
-                mappedValue = mappingCollectionToOracleArray(conn, paramExp, nested, arrayTypeName, elementType);
-            } else if (propertyValue instanceof Entity) { // STRUCT in STRUCT
-                // it works only when the entity structure matches with the STRUCT type
+                mappedValue = mappingListToOracleArray(conn, paramExp, nested, arrayTypeName, elementType);
+            } else if (propertyValue instanceof Entity) { // struct in struct
+                // it works only when the entity structure matches with the struct type
                 // (but property type is Object because Sql2Entity does not support this)
                 mappedValue = mappingEntityToOracleStruct(conn, paramExp, (Entity) propertyValue);
             } else {
