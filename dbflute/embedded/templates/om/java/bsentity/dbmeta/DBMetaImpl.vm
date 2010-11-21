@@ -14,7 +14,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import ${glPackageBaseCommon}.${glCDef};
 #end
 import ${glPackageBaseCommon}.${glDBCurrent};
-import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
+import ${myExtendedEntityPackageName}.*;
 
 /**
  * The DB meta of ${table.name}. (Singleton)
