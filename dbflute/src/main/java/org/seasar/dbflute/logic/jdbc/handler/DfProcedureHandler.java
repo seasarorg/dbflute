@@ -410,13 +410,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
         }
         if (!resolvedArrayDispSet.isEmpty()) {
-            log("Resolved array type: " + resolvedArrayDispSet.size());
+            log("Array related to parameter: " + resolvedArrayDispSet.size());
             for (String arrayInfo : resolvedArrayDispSet) {
                 log("  " + arrayInfo);
             }
         }
         if (!resolvedStructDispSet.isEmpty()) {
-            log("Resolved struct type: " + resolvedStructDispSet.size());
+            log("Struct related to parameter: " + resolvedStructDispSet.size());
             for (String structInfo : resolvedStructDispSet) {
                 log("  " + structInfo);
             }

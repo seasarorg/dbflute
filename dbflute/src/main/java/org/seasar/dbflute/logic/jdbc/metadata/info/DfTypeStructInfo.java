@@ -62,14 +62,14 @@ public class DfTypeStructInfo {
             sb.append(info.getColumnName());
             if (info.hasTypeArrayInfo()) {
                 DfTypeArrayInfo typeArrayInfo = info.getTypeArrayInfo();
-                sb.append("(").append(typeArrayInfo.toString()).append(")");
+                sb.append("{").append(typeArrayInfo.toString()).append("}");
             }
             if (info.hasTypeStructInfo()) {
                 DfTypeStructInfo typeStructInfo = info.getTypeStructInfo();
-                sb.append("(").append(typeStructInfo.getTypeName()).append(")");
+                sb.append("{").append(typeStructInfo.getTypeName()).append("}");
             }
         }
-        return _typeName + "(" + sb.toString() + ")";
+        return _typeName + ":{" + sb.toString() + "}";
     }
 
     // ===================================================================================

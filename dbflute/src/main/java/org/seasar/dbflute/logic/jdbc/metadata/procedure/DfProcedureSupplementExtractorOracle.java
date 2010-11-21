@@ -116,6 +116,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (parameterArrayInfoMap != null) {
             return parameterArrayInfoMap;
         }
+        _log.info("...Extracting array parameter: " + unifiedSchema);
         final List<ProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
         parameterArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
         final StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap = extractFlatAllArrayInfoMap(unifiedSchema);
@@ -140,6 +141,9 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             parameterArrayInfoMap.put(key, arrayInfo);
         }
         _arrayInfoMapMap.put(unifiedSchema, parameterArrayInfoMap);
+        for (DfTypeArrayInfo arrayInfo : parameterArrayInfoMap.values()) {
+            _log.info("  " + arrayInfo.toString());
+        }
         return _arrayInfoMapMap.get(unifiedSchema);
     }
 
@@ -180,6 +184,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (structInfoMap != null) {
             return structInfoMap;
         }
+        _log.info("...Extracting struct info: " + unifiedSchema);
 
         // initialize per schema
         final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
@@ -188,6 +193,9 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         // set up struct attribute's additional info
         resolveStructAttributeInfo(unifiedSchema, structInfoMap);
 
+        for (DfTypeStructInfo structInfo : structInfoMap.values()) {
+            _log.info("  " + structInfo.toString());
+        }
         _structInfoMapMap.put(unifiedSchema, structInfoMap);
         return _structInfoMapMap.get(unifiedSchema);
     }

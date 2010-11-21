@@ -24,10 +24,9 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _typeName; // required
-    protected String _elementType; // required
-    protected boolean _elementArray; // required
-    protected DfTypeArrayInfo _nestedArrayInfo;
+    protected String _typeName; // required at first
+    protected String _elementType; // required at first (if unknown, the value is "UNKNOWN")
+    protected DfTypeArrayInfo _nestedArrayInfo; // if element type is ARRAY (nested)
     protected DfTypeStructInfo _elementStructInfo; // if element type is STRUCT
     protected String _elementJavaNative; // is set after analyzing
 
@@ -51,7 +50,13 @@ public class DfTypeArrayInfo {
     //                                                                       =============
     @Override
     public String toString() {
-        return _typeName + "<" + _elementType + ">" + (_elementStructInfo != null ? " (struct)" : "");
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_typeName).append("<").append(_elementType).append(">");
+        if (_elementStructInfo != null) {
+            sb.append(":{").append(_elementStructInfo.getTypeName());
+            sb.append("(").append(_elementStructInfo.getAttributeInfoMap().size()).append("}");
+        }
+        return sb.toString();
     }
 
     // ===================================================================================
