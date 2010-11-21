@@ -54,7 +54,7 @@ public class DfTypeArrayInfo {
         sb.append(_typeName).append("<").append(_elementType).append(">");
         if (_elementStructInfo != null) {
             sb.append(":{").append(_elementStructInfo.getTypeName());
-            sb.append("(").append(_elementStructInfo.getAttributeInfoMap().size()).append("}");
+            sb.append("(").append(_elementStructInfo.getAttributeInfoMap().size()).append(")}");
         }
         return sb.toString();
     }

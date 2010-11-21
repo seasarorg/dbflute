@@ -265,12 +265,8 @@ public class DfProcedurePmbSetupper {
     //                                       Struct Property
     //                                       ---------------
     protected String doProcessStructProperty(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
-        final String typeName = structInfo.getTypeName();
-
-        // handling for entity generation and nested array & struct 
-        if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
-            registerEntityInfoIfNeeds(structInfo, propertyInfo);
-        }
+        // register entity generation for struct that contains nested array & struct 
+        registerEntityInfoIfNeeds(structInfo, propertyInfo);
 
         // entityType is class name can used on program
         // so it adjusts project prefix here
@@ -281,8 +277,9 @@ public class DfProcedurePmbSetupper {
 
     protected void registerEntityInfoIfNeeds(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
         final String typeName = structInfo.getTypeName();
-        if (!_entityInfoMap.containsKey(typeName)) {
+        if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
+            _log.info("...Registering generation for struct: " + structInfo);
             _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap, structInfo));
             setupStructAttribute(structInfo, propertyInfo);
         }
@@ -294,8 +291,7 @@ public class DfProcedurePmbSetupper {
             if (attrInfo.hasTypeArrayInfo()) { // array in struct
                 final DfTypeArrayInfo typeArrayInfo = attrInfo.getTypeArrayInfo();
                 if (typeArrayInfo.hasElementStructInfo()) { // struct in array in struct
-                    final DfTypeStructInfo elementStructInfo = typeArrayInfo.getElementStructInfo();
-                    registerEntityInfoIfNeeds(elementStructInfo, propertyInfo);
+                    registerEntityInfoIfNeeds(typeArrayInfo.getElementStructInfo(), propertyInfo);
                 }
                 if (typeArrayInfo.hasElementJavaNative()) {
                     attrInfo.setSql2EntityForcedJavaNative(typeArrayInfo.getElementJavaNative());
