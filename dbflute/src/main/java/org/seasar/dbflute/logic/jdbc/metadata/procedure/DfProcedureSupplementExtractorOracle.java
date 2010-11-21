@@ -150,9 +150,6 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         return _arrayInfoMapMap.get(unifiedSchema);
     }
 
-    // -----------------------------------------------------
-    //                                        Struct Element
-    //                                        --------------
     protected void processArrayNestedElement(UnifiedSchema unifiedSchema,
             final StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap, DfTypeArrayInfo arrayInfo) {
         // ARRAY element
