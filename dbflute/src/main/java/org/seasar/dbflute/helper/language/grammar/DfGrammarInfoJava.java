@@ -21,6 +21,10 @@ public class DfGrammarInfoJava implements DfGrammarInfo {
         return "public static final";
     }
 
+    public String getClassTypeLiteral(String className) {
+        return className + ".class";
+    }
+
     public String getGenericListClassName(String element) {
         return "List<" + element + ">";
     }

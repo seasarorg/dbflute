@@ -26,14 +26,20 @@ public class DfTypeArrayInfo {
     //                                                                           =========
     protected String _typeName; // required
     protected String _elementType; // required
-    protected DfTypeStructInfo _structInfo; // if element type is STRUCT
+    protected boolean _elementArray; // required
+    protected DfTypeArrayInfo _nestedArrayInfo;
+    protected DfTypeStructInfo _elementStructInfo; // if element type is STRUCT
     protected String _elementJavaNative; // is set after analyzing
 
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public boolean hasStructInfo() { // means the element type is STRUCT
-        return _structInfo != null;
+    public boolean hasNestedArray() { // means the element type is ARRAY
+        return _nestedArrayInfo != null;
+    }
+
+    public boolean hasElementStructInfo() { // means the element type is STRUCT
+        return _elementStructInfo != null;
     }
 
     public boolean hasElementJavaNative() {
@@ -45,7 +51,7 @@ public class DfTypeArrayInfo {
     //                                                                       =============
     @Override
     public String toString() {
-        return _typeName + "<" + _elementType + ">" + (_structInfo != null ? " (struct)" : "");
+        return _typeName + "<" + _elementType + ">" + (_elementStructInfo != null ? " (struct)" : "");
     }
 
     // ===================================================================================
@@ -67,12 +73,20 @@ public class DfTypeArrayInfo {
         this._elementType = elementType;
     }
 
-    public DfTypeStructInfo getStructInfo() {
-        return _structInfo;
+    public DfTypeArrayInfo getNestedArrayInfo() {
+        return _nestedArrayInfo;
     }
 
-    public void setStructInfo(DfTypeStructInfo structInfo) {
-        this._structInfo = structInfo;
+    public void setNestedArrayInfo(DfTypeArrayInfo nestedArrayInfo) {
+        this._nestedArrayInfo = nestedArrayInfo;
+    }
+
+    public DfTypeStructInfo getElementStructInfo() {
+        return _elementStructInfo;
+    }
+
+    public void setElementStructInfo(DfTypeStructInfo structInfo) {
+        this._elementStructInfo = structInfo;
     }
 
     public String getElementJavaNative() {

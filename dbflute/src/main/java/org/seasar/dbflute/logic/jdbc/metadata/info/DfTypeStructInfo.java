@@ -39,7 +39,7 @@ public class DfTypeStructInfo {
 
     public boolean hasNestedStruct() {
         for (DfColumnMetaInfo columnInfo : _attributeInfoMap.values()) {
-            if (columnInfo.hasTypeArrayInfo() && columnInfo.getTypeArrayInfo().hasStructInfo()) {
+            if (columnInfo.hasTypeArrayInfo() && columnInfo.getTypeArrayInfo().hasElementStructInfo()) {
                 return true;
             }
             if (columnInfo.hasTypeStructInfo()) {

@@ -10,10 +10,7 @@ import org.seasar.dbflute.dbmeta.AbstractDBMeta;
 import org.seasar.dbflute.dbmeta.info.*;
 import org.seasar.dbflute.dbmeta.name.*;
 import org.seasar.dbflute.helper.StringKeyMap;
-#if ($table.hasClassification())
-import ${glPackageBaseCommon}.${glCDef};
-#end
-import ${glPackageBaseCommon}.${glDBCurrent};
+import ${glPackageBaseCommon}.*;
 import ${myExtendedEntityPackageName}.*;
 
 /**
@@ -56,7 +53,7 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
-    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
+    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNativeTypeLiteral}, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
 #end
 
 #foreach ($col in $table.columns)

@@ -26,6 +26,11 @@ public interface DfGrammarInfo {
     public String getPublicStaticDefinition();
 
     /**
+     * @return The type literal of the class. (NotNull)
+     */
+    public String getClassTypeLiteral(String className);
+
+    /**
      * @return The definition of 'List(element)'. (NotNull)
      */
     public String getGenericListClassName(String element);

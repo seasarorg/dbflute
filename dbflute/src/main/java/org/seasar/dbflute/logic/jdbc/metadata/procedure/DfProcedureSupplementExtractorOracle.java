@@ -52,15 +52,18 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                           =========
     protected final DataSource _dataSource;
 
-    /** The info map of argument for cache. */
-    protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = DfCollectionUtil
-            .newHashMap();
-
-    /** The info map of array set for cache. */
-    protected final Map<UnifiedSchema, StringSet> _arrayTypeSetMap = DfCollectionUtil.newHashMap();
+    /** The info map of ARRAY for cache. */
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _arrayInfoMapMap = DfCollectionUtil.newHashMap();
 
     /** The info map of STRUCT type for cache. */
     protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structInfoMapMap = DfCollectionUtil
+            .newHashMap();
+
+    /** The info map of ARRAY set for cache. */
+    protected final Map<UnifiedSchema, StringSet> _arrayTypeSetMap = DfCollectionUtil.newHashMap();
+
+    /** The info map of procedure argument for cache. */
+    protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = DfCollectionUtil
             .newHashMap();
 
     // ===================================================================================
@@ -105,18 +108,23 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
      * @return The map of array info. {key = (packageName.)procedureName.columnName} (NotNull)
      */
     public StringKeyMap<DfTypeArrayInfo> extractArrayInfoMap(UnifiedSchema unifiedSchema) {
-        final List<ProcedureArgumentInfo> infoList = findProcedureArgumentInfoList(unifiedSchema);
-        final StringKeyMap<DfTypeArrayInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
-        for (int i = 0; i < infoList.size(); i++) {
-            final ProcedureArgumentInfo info = infoList.get(i);
-            final String argumentName = info.getArgumentName();
-            final String dataType = info.getDataType();
-            if (Srl.is_Null_or_TrimmedEmpty(argumentName) || !Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY")) {
+        StringKeyMap<DfTypeArrayInfo> arrayInfoMap = _arrayInfoMapMap.get(unifiedSchema);
+        if (arrayInfoMap != null) {
+            return arrayInfoMap;
+        }
+        final List<ProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
+        arrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        _arrayInfoMapMap.put(unifiedSchema, arrayInfoMap);
+        for (int i = 0; i < argInfoList.size(); i++) {
+            final ProcedureArgumentInfo argInfo = argInfoList.get(i);
+            final String argumentName = argInfo.getArgumentName();
+            final String dataType = argInfo.getDataType();
+            if (Srl.is_Null_or_TrimmedEmpty(argumentName) || !isDataTypeArray(dataType)) {
                 continue;
             }
             final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
-            final String typeName = info.getTypeName();
-            final String typeSubName = info.getTypeSubName();
+            final String typeName = argInfo.getTypeName();
+            final String typeSubName = argInfo.getTypeSubName();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(typeSubName)) {
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(typeName)) {
                     arrayInfo.setTypeName(typeName + "." + typeSubName);
@@ -126,30 +134,106 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             } else {
                 arrayInfo.setTypeName(typeName);
             }
-            if (infoList.size() > (i + 1)) { // element type is in data type of next record
-                final ProcedureArgumentInfo nextInfo = infoList.get(i + 1);
-                final String nextDataType = nextInfo.getDataType();
-                if (Srl.equalsIgnoreCase("OBJECT", nextDataType)) { // element is struct type
-                    arrayInfo.setElementType(nextInfo.getTypeName());
-                } else {
-                    arrayInfo.setElementType(nextDataType);
-                }
-            }
-            processStructElement(unifiedSchema, arrayInfo);
-            final String key = generateParameterInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
-            infoMap.put(key, arrayInfo);
+            reflectArrayElementType(argInfoList, i, arrayInfo);
+            processArrayStructElement(unifiedSchema, arrayInfo);
+            final String key = generateParameterInfoMapKey(argInfo.getPackageName(), argInfo.getObjectName(),
+                    argumentName);
+            arrayInfoMap.put(key, arrayInfo);
         }
-        return infoMap;
+        resolveNestedTemporaryInfo(arrayInfoMap); // should be called after argInfo loop
+        return _arrayInfoMapMap.get(unifiedSchema);
     }
 
-    protected void processStructElement(UnifiedSchema unifiedSchema, DfTypeArrayInfo arrayInfo) {
+    // -----------------------------------------------------
+    //                                          Element Type
+    //                                          ------------
+    protected void reflectArrayElementType(List<ProcedureArgumentInfo> argInfoList, int i, DfTypeArrayInfo arrayInfo) {
+        if (argInfoList.size() > (i + 1)) { // element type is in data type of next record
+            final ProcedureArgumentInfo nextInfo = argInfoList.get(i + 1);
+            final String nextDataType = nextInfo.getDataType();
+            if (Srl.equalsIgnoreCase("OBJECT", nextDataType)) { // element is struct type
+                arrayInfo.setElementType(nextInfo.getTypeName());
+            } else if (isDataTypeArray(nextDataType)) { // element is array type
+                arrayInfo.setElementType(nextDataType);
+
+                // temporary setup (resolved later)
+                // hierarchy resolution is not needed here
+                // because next element is processed at next loop
+                final String nestedArrayTypeName = nextInfo.getTypeName();
+                final DfTypeArrayInfo nestedArrayInfo = new DfTypeArrayInfo();
+                nestedArrayInfo.setTypeName(nestedArrayTypeName);
+                nestedArrayInfo.setElementType("UNKNOWN");
+                arrayInfo.setNestedArrayInfo(nestedArrayInfo);
+            } else {
+                arrayInfo.setElementType(nextDataType);
+            }
+        }
+    }
+
+    protected boolean isDataTypeArray(String dataType) {
+        return Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY");
+    }
+
+    protected boolean isDataTypeStruct(String dataType) {
+        return Srl.equalsIgnoreCase(dataType, "OBJECT");
+    }
+
+    // -----------------------------------------------------
+    //                                        Struct Element
+    //                                        --------------
+    protected void processArrayStructElement(UnifiedSchema unifiedSchema, DfTypeArrayInfo arrayInfo) {
         final StringKeyMap<DfTypeStructInfo> structInfoMap = findStructInfoMap(unifiedSchema);
         final DfTypeStructInfo structInfo = structInfoMap.get(arrayInfo.getElementType());
         if (structInfo == null) {
             return;
         }
-        arrayInfo.setStructInfo(structInfo);
+        arrayInfo.setElementStructInfo(structInfo);
         // *STRUCT type of additional schema is unsupported for now
+    }
+
+    // -----------------------------------------------------
+    //                                       Nest Resolution
+    //                                       ---------------
+    protected void resolveNestedTemporaryInfo(StringKeyMap<DfTypeArrayInfo> arrayInfoMap) {
+        for (DfTypeArrayInfo arrayInfo : arrayInfoMap.values()) {
+            doResolveNestedTemporaryInfo(arrayInfoMap, arrayInfo);
+        }
+    }
+
+    protected void doResolveNestedTemporaryInfo(StringKeyMap<DfTypeArrayInfo> arrayInfoMap, DfTypeArrayInfo arrayInfo) {
+        if (arrayInfo.hasNestedArray()) {
+            final String nestedArrayTypeName = arrayInfo.getNestedArrayInfo().getTypeName();
+            final DfTypeArrayInfo foundInfo = arrayInfoMap.get(nestedArrayTypeName);
+            if (foundInfo != null) {
+                arrayInfo.setNestedArrayInfo(foundInfo); // override (resolved)
+            }
+        }
+        if (arrayInfo.hasElementStructInfo()) {
+            final DfTypeStructInfo elementStructInfo = arrayInfo.getElementStructInfo();
+            doResolveNestedTemporaryArray(arrayInfoMap, elementStructInfo);
+        }
+    }
+
+    protected void doResolveNestedTemporaryArray(StringKeyMap<DfTypeArrayInfo> arrayInfoMap, DfTypeStructInfo structInfo) {
+        final StringKeyMap<DfColumnMetaInfo> attrInfoMap = structInfo.getAttributeInfoMap();
+        for (DfColumnMetaInfo columnInfo : attrInfoMap.values()) {
+            if (columnInfo.hasTypeArrayInfo()) {
+                final DfTypeArrayInfo attrArrayInfo = columnInfo.getTypeArrayInfo();
+                final String attrArrayTypeName = attrArrayInfo.getTypeName();
+                final DfTypeArrayInfo foundInfo = arrayInfoMap.get(attrArrayTypeName);
+                if (foundInfo != null) {
+                    columnInfo.setTypeArrayInfo(foundInfo); // override (resolved)
+                }
+            }
+            if (columnInfo.hasTypeStructInfo()) {
+                final DfTypeStructInfo nestedStructInfo = columnInfo.getTypeStructInfo();
+                // if self reference, don't call recursive call, or infinity loop
+                // but basically no way because Oracle does not support self reference struct
+                if (!structInfo.getTypeName().equalsIgnoreCase(nestedStructInfo.getTypeName())) {
+                    doResolveNestedTemporaryArray(arrayInfoMap, nestedStructInfo); // recursive call
+                }
+            }
+        }
     }
 
     // ===================================================================================
@@ -171,35 +255,38 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         _structInfoMapMap.put(unifiedSchema, structInfoMap);
 
         // column's additional info (should be after initialization)
-        initializeStructAttributeInfo(unifiedSchema, structInfoMap);
+        resolveStructAttributeInfo(unifiedSchema, structInfoMap);
 
         return _structInfoMapMap.get(unifiedSchema);
     }
 
-    protected void initializeStructAttributeInfo(UnifiedSchema unifiedSchema,
-            StringKeyMap<DfTypeStructInfo> structInfoMap) {
+    protected void resolveStructAttributeInfo(UnifiedSchema unifiedSchema, StringKeyMap<DfTypeStructInfo> structInfoMap) {
         // arrayInfo getting is OK after structInfoMapMap initialization
         // and additional schema's nested things are unsupported, same schema's only
-        final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractArrayInfoMap(unifiedSchema); // first priority
-        final StringSet arrayTypeSet = extractArrayTypeSet(unifiedSchema); // second priority
         for (DfTypeStructInfo structInfo : structInfoMap.values()) {
-            for (DfColumnMetaInfo metaInfo : structInfo.getAttributeInfoMap().values()) {
-                final String dbTypeName = metaInfo.getDbTypeName();
-                final DfTypeArrayInfo nestedArrayInfo = arrayInfoMap.get(dbTypeName);
-                if (nestedArrayInfo != null) { // nested array used in procedure parameter
-                    metaInfo.setTypeArrayInfo(nestedArrayInfo);
-                } else if (arrayTypeSet.contains(dbTypeName)) { // nested array unused in procedure parameter
-                    final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo();
-                    typeArrayInfo.setTypeName(dbTypeName);
-                    typeArrayInfo.setElementType("UNKNOWN"); // *the way to get the info is unknown
-                    metaInfo.setTypeArrayInfo(typeArrayInfo);
-                }
-                final DfTypeStructInfo nestedStructInfo = structInfoMap.get(dbTypeName);
-                if (nestedStructInfo != null) { // nested struct
-                    metaInfo.setTypeStructInfo(nestedStructInfo);
-                }
-                metaInfo.setProcedureParameter(true); // for default mapping type
+            doResolveStructAttributeInfo(unifiedSchema, structInfoMap, structInfo);
+        }
+    }
+
+    protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
+            StringKeyMap<DfTypeStructInfo> structInfoMap, DfTypeStructInfo structInfo) {
+        final StringSet arrayTypeSet = extractArrayTypeSet(unifiedSchema);
+        for (DfColumnMetaInfo metaInfo : structInfo.getAttributeInfoMap().values()) {
+            final String dbTypeName = metaInfo.getDbTypeName();
+            if (arrayTypeSet.contains(dbTypeName)) { // nested array unused in procedure parameter
+                // temporary setup (resolved when calling extractArrayInfoMap())
+                // same reason as the process in reflectArrayElementType()
+                // *the way to get the info from Oracle is unknown in the first plain
+                final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo();
+                typeArrayInfo.setTypeName(dbTypeName);
+                typeArrayInfo.setElementType("UNKNOWN");
+                metaInfo.setTypeArrayInfo(typeArrayInfo);
             }
+            final DfTypeStructInfo nestedStructInfo = structInfoMap.get(dbTypeName);
+            if (nestedStructInfo != null) { // nested struct
+                metaInfo.setTypeStructInfo(nestedStructInfo);
+            }
+            metaInfo.setProcedureParameter(true); // for default mapping type
         }
     }
 
@@ -209,7 +296,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             return arrayInfoSet;
         }
 
-        DfArrayExtractorOracle extractor = new DfArrayExtractorOracle(_dataSource);
+        final DfArrayExtractorOracle extractor = new DfArrayExtractorOracle(_dataSource);
         _arrayTypeSetMap.put(unifiedSchema, extractor.extractArrayTypeSet(unifiedSchema));
         return _arrayTypeSetMap.get(unifiedSchema);
     }

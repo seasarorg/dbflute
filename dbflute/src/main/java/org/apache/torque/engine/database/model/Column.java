@@ -65,6 +65,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -1391,6 +1392,13 @@ public class Column {
             throw new IllegalStateException(msg);
         }
         return TypeMap.findJavaNativeByJdbcType(_jdbcType, getIntegerColumnSize(), getDecimalDigits());
+    }
+
+    public String getJavaNativeTypeLiteral() {
+        final String javaNative = getJavaNative();
+        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final String pureNative = Srl.substringFirstFront(javaNative, "<"); // for example, List<String>
+        return grammarInfo.getClassTypeLiteral(pureNative);
     }
 
     public String getJavaNativeRemovedPackage() { // for SchemaHTML

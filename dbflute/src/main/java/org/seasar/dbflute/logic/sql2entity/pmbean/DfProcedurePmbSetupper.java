@@ -209,8 +209,8 @@ public class DfProcedurePmbSetupper {
         if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
             // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY" (it's not useful for type mapping)
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
-            if (arrayInfo.hasStructInfo()) {
-                final DfTypeStructInfo structInfo = arrayInfo.getStructInfo();
+            if (arrayInfo.hasElementStructInfo()) {
+                final DfTypeStructInfo structInfo = arrayInfo.getElementStructInfo();
                 final String entityType = doProcessStructProperty(column, structInfo, propertyInfo, true);
                 arrayInfo.setElementJavaNative(entityType);
             } else {
@@ -269,15 +269,15 @@ public class DfProcedurePmbSetupper {
         for (DfColumnMetaInfo attrInfo : attrMap.values()) { // nested array or struct handling
             if (attrInfo.hasTypeArrayInfo()) {
                 final DfTypeArrayInfo typeArrayInfo = attrInfo.getTypeArrayInfo();
-                if (typeArrayInfo.hasStructInfo()) {
-                    final DfTypeStructInfo elementStructInfo = typeArrayInfo.getStructInfo();
+                if (typeArrayInfo.hasElementStructInfo()) {
+                    final DfTypeStructInfo elementStructInfo = typeArrayInfo.getElementStructInfo();
                     registerEntityInfoIfNeeds(elementStructInfo);
                 }
                 if (typeArrayInfo.hasElementJavaNative()) {
                     attrInfo.setSql2EntityForcedJavaNative(typeArrayInfo.getElementJavaNative());
                 } else {
-                    if (typeArrayInfo.hasStructInfo()) {
-                        final DfTypeStructInfo elementStructInfo = typeArrayInfo.getStructInfo();
+                    if (typeArrayInfo.hasElementStructInfo()) {
+                        final DfTypeStructInfo elementStructInfo = typeArrayInfo.getElementStructInfo();
                         final String entityType = buildStructEntityType(elementStructInfo);
                         typeArrayInfo.setElementJavaNative(entityType);
                         attrInfo.setSql2EntityForcedJavaNative(getGenericListClassName(entityType));

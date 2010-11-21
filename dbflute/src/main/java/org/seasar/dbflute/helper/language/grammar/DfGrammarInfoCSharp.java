@@ -21,6 +21,10 @@ public class DfGrammarInfoCSharp implements DfGrammarInfo {
         return "public static readonly";
     }
 
+    public String getClassTypeLiteral(String className) {
+        return "typeof(" + className + ")";
+    }
+
     public String getGenericListClassName(String element) {
         return "IList<" + element + ">";
     }
