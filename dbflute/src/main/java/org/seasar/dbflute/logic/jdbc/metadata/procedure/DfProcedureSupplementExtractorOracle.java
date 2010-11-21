@@ -18,6 +18,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -70,6 +71,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = DfCollectionUtil
             .newHashMap();
 
+    protected boolean _suppressLogging;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -116,7 +119,6 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (parameterArrayInfoMap != null) {
             return parameterArrayInfoMap;
         }
-        _log.info("...Extracting array parameter: " + unifiedSchema);
         final List<ProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
         parameterArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
         final StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap = extractFlatAllArrayInfoMap(unifiedSchema);
@@ -140,10 +142,11 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             final String key = generateParameterInfoMapKey(packageName, objectName, argumentName);
             parameterArrayInfoMap.put(key, arrayInfo);
         }
-        _arrayInfoMapMap.put(unifiedSchema, parameterArrayInfoMap);
-        for (DfTypeArrayInfo arrayInfo : parameterArrayInfoMap.values()) {
-            _log.info("  " + arrayInfo.toString());
+        log("Array Parameter: " + unifiedSchema);
+        for (Entry<String, DfTypeArrayInfo> entry : parameterArrayInfoMap.entrySet()) {
+            log("  " + entry.getKey() + " = " + entry.getValue());
         }
+        _arrayInfoMapMap.put(unifiedSchema, parameterArrayInfoMap);
         return _arrayInfoMapMap.get(unifiedSchema);
     }
 
@@ -184,7 +187,6 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (structInfoMap != null) {
             return structInfoMap;
         }
-        _log.info("...Extracting struct info: " + unifiedSchema);
 
         // initialize per schema
         final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
@@ -193,8 +195,9 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         // set up struct attribute's additional info
         resolveStructAttributeInfo(unifiedSchema, structInfoMap);
 
+        log("Struct Info: " + unifiedSchema);
         for (DfTypeStructInfo structInfo : structInfoMap.values()) {
-            _log.info("  " + structInfo.toString());
+            log("  " + structInfo.toString());
         }
         _structInfoMapMap.put(unifiedSchema, structInfoMap);
         return _structInfoMapMap.get(unifiedSchema);
@@ -219,6 +222,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
             StringKeyMap<DfTypeStructInfo> structInfoMap, StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap,
             DfTypeStructInfo structInfo, DfColumnMetaInfo columnInfo) {
+        System.out.println("**: " + structInfo.getTypeName() + ", " + columnInfo.getColumnName());
         final String dbTypeName = columnInfo.getDbTypeName();
         final DfTypeArrayInfo arrayInfo = doResolveStructAttributeArray(structInfoMap, flatAllArrayInfoMap, dbTypeName);
         if (arrayInfo != null) {
@@ -233,6 +237,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
 
     protected DfTypeArrayInfo doResolveStructAttributeArray(StringKeyMap<DfTypeStructInfo> structInfoMap,
             StringKeyMap<DfTypeArrayInfo> flatAllArrayInfoMap, String typeName) {
+        System.out.println("*********: " + typeName + "  -  " + flatAllArrayInfoMap.keySet());
         if (flatAllArrayInfoMap.containsKey(typeName)) { // nested array unused in procedure parameter
             final DfTypeArrayInfo foundInfo = flatAllArrayInfoMap.get(typeName);
             final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo();
@@ -377,11 +382,11 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         columnList.add("TYPE_SUBNAME");
         final List<Map<String, String>> resultList;
         try {
-            _log.info(sql);
+            log(sql);
             resultList = facade.selectStringList(sql, columnList);
         } catch (Exception continued) {
             // because of assist info
-            _log.info("Failed to select supplement info: " + continued.getMessage());
+            log("Failed to select supplement info: " + continued.getMessage());
             return new ArrayList<ProcedureArgumentInfo>();
         }
         final List<ProcedureArgumentInfo> infoList = DfCollectionUtil.newArrayList();
@@ -493,5 +498,19 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         public void setTypeSubName(String typeSubName) {
             this._typeSubName = typeSubName;
         }
+    }
+
+    // ===================================================================================
+    //                                                                             Logging
+    //                                                                             =======
+    protected void log(String msg) {
+        if (_suppressLogging) {
+            return;
+        }
+        _log.info(msg);
+    }
+
+    public void suppressLogging() {
+        _suppressLogging = true;
     }
 }
