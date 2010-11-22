@@ -15,6 +15,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
@@ -253,12 +254,20 @@ public class DfPmbBasicHandler {
 
     public boolean needsOracleArrayHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        if (!getBasicProperties().isDatabaseOracle()
+                || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
+            return false;
+        }
         final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
         return metaInfo != null && metaInfo.hasTypeArrayElementType();
     }
 
     public boolean needsOracleStructHandling(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
+        if (!getBasicProperties().isDatabaseOracle()
+                || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
+            return false;
+        }
         final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
         return metaInfo != null && metaInfo.hasTypeStructInfo();
     }
@@ -287,7 +296,7 @@ public class DfPmbBasicHandler {
     public String getProcedureParameterOracleArrayElementJavaNative(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
-        if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
+        if (columnInfo != null && columnInfo.hasTypeArrayElementJavaNative()) {
             return columnInfo.getTypeArrayInfo().getElementJavaNative();
         }
         return "Object"; // as default
@@ -311,7 +320,7 @@ public class DfPmbBasicHandler {
     public String getProcedureParameterOracleStructEntityType(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
-        if (columnInfo != null && columnInfo.hasTypeStructInfo()) {
+        if (columnInfo != null && columnInfo.hasTypeStructEntityType()) {
             return columnInfo.getTypeStructInfo().getEntityType();
         }
         return "Object"; // as default
@@ -596,6 +605,10 @@ public class DfPmbBasicHandler {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

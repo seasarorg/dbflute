@@ -44,12 +44,20 @@ public class DfProcedureColumnMetaInfo {
         return _typeArrayInfo != null;
     }
 
-    public boolean hasTypeArrayElementType() {
-        return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getElementType());
+    public boolean hasTypeArrayElementType() { // just in case
+        return hasTypeArrayInfo() && _typeArrayInfo.hasElementType();
+    }
+
+    public boolean hasTypeArrayElementJavaNative() {
+        return hasTypeArrayInfo() && _typeArrayInfo.hasElementJavaNative();
     }
 
     public boolean hasTypeStructInfo() {
         return _typeStructInfo != null;
+    }
+
+    public boolean hasTypeStructEntityType() {
+        return hasTypeStructInfo() && _typeStructInfo.hasEntityType();
     }
 
     // ===================================================================================
