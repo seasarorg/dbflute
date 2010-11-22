@@ -65,6 +65,26 @@ public class DfTypeStructInfo {
     //                                                                      ==============
     @Override
     public String toString() {
+        return doToString(false);
+    }
+
+    public String toStringForHtml() {
+        return doToString(true);
+    }
+
+    public String doToString(boolean escape) {
+        return _typeName + ":{" + (escape ? toStringAttributeOnlyForHtml() : toStringAttributeOnly()) + "}";
+    }
+
+    public String toStringAttributeOnly() {
+        return doToStringAttributeOnly(false);
+    }
+
+    public String toStringAttributeOnlyForHtml() {
+        return doToStringAttributeOnly(true);
+    }
+
+    protected String doToStringAttributeOnly(boolean escape) {
         final StringBuilder sb = new StringBuilder();
         for (DfColumnMetaInfo info : _attributeInfoMap.values()) {
             if (sb.length() > 0) {
@@ -72,15 +92,20 @@ public class DfTypeStructInfo {
             }
             sb.append(info.getColumnName());
             if (info.hasTypeArrayInfo()) {
-                DfTypeArrayInfo typeArrayInfo = info.getTypeArrayInfo();
-                sb.append("(").append(typeArrayInfo.toString()).append(")");
-            }
-            if (info.hasTypeStructInfo()) {
-                DfTypeStructInfo typeStructInfo = info.getTypeStructInfo();
-                sb.append("(").append(typeStructInfo.getTypeName()).append(")");
+                final DfTypeArrayInfo typeArrayInfo = info.getTypeArrayInfo();
+                sb.append("(");
+                sb.append(escape ? typeArrayInfo.toStringForHtml() : typeArrayInfo.toString());
+                sb.append(")");
+            } else if (info.hasTypeStructInfo()) {
+                final DfTypeStructInfo typeStructInfo = info.getTypeStructInfo();
+                sb.append("(").append(typeStructInfo.toStringSimple()).append(")");
             }
         }
-        return _typeName + ":{" + sb.toString() + "}";
+        return sb.toString();
+    }
+
+    public String toStringSimple() {
+        return _typeName + "(" + _attributeInfoMap.size() + ")";
     }
 
     // ===================================================================================

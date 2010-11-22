@@ -50,17 +50,32 @@ public class DfTypeArrayInfo {
     //                                                                       =============
     @Override
     public String toString() {
+        return _typeName + toStringElementOnly();
+    }
+
+    public String toStringForHtml() {
+        return _typeName + toStringElementOnlyForHtml();
+    }
+
+    public String toStringElementOnly() {
+        return doToStringElementOnly(false);
+    }
+
+    public String toStringElementOnlyForHtml() {
+        return doToStringElementOnly(true);
+    }
+
+    protected String doToStringElementOnly(boolean escape) {
         final StringBuilder sb = new StringBuilder();
-        sb.append(_typeName).append("<");
+        sb.append(escape ? "&lt;" : "<");
         if (_nestedArrayInfo != null) {
-            sb.append(_nestedArrayInfo.toString());
+            sb.append(escape ? _nestedArrayInfo.toStringForHtml() : _nestedArrayInfo.toString());
         } else if (_elementStructInfo != null) {
-            sb.append(_elementStructInfo.getTypeName());
-            sb.append("(").append(_elementStructInfo.getAttributeInfoMap().size()).append(")");
+            sb.append(_elementStructInfo.toStringSimple());
         } else {
             sb.append(_elementType);
         }
-        sb.append(">");
+        sb.append(escape ? "&gt;" : ">");
         return sb.toString();
     }
 

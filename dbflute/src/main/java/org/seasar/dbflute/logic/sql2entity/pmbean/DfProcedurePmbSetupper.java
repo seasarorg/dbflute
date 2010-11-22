@@ -27,6 +27,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedu
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfProcedureExecutionMetaExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -201,11 +202,41 @@ public class DfProcedurePmbSetupper {
         final int jdbcDefType = column.getJdbcDefType();
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
+
+        final String specialType = doProcessSpecialType(pmbName, column, propertyInfo);
+        final String propertyType;
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(specialType)) {
+            propertyType = specialType;
+        } else {
+            final String dbTypeName = column.getDbTypeName();
+            propertyType = findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits);
+        }
+        propertyInfo.setPropertyType(propertyType);
+        return propertyInfo;
+    }
+
+    protected String doProcessSpecialType(String pmbName, DfProcedureColumnMetaInfo column,
+            ProcedurePropertyInfo propertyInfo) {
+        if (getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
+            final String wallOfOracleType = doProcessGreatWallOfOracleType(pmbName, column, propertyInfo);
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(wallOfOracleType)) {
+                return wallOfOracleType;
+            }
+        }
         final String propertyType;
         if (column.isOracleNumber()) {
             // because the length setting of procedure parameter is unsupported on Oracle
             propertyType = TypeMap.getDefaultDecimalJavaNativeType();
-        } else if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
+        } else {
+            propertyType = null;
+        }
+        return propertyType;
+    }
+
+    protected String doProcessGreatWallOfOracleType(String pmbName, DfProcedureColumnMetaInfo column,
+            ProcedurePropertyInfo propertyInfo) {
+        final String propertyType;
+        if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
             // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY"
             // (it's not useful for type mapping, so search like this)
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
@@ -214,11 +245,9 @@ public class DfProcedurePmbSetupper {
             final DfTypeStructInfo structInfo = column.getTypeStructInfo();
             propertyType = doProcessStructProperty(structInfo, propertyInfo);
         } else {
-            final String dbTypeName = column.getDbTypeName();
-            propertyType = findPlainPropertyType(jdbcDefType, dbTypeName, columnSize, decimalDigits);
+            propertyType = null;
         }
-        propertyInfo.setPropertyType(propertyType);
-        return propertyInfo;
+        return propertyType;
     }
 
     // -----------------------------------------------------
@@ -434,6 +463,10 @@ public class DfProcedurePmbSetupper {
     //                                                                          ==========
     protected DfBasicProperties getBasicProperties() {
         return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {

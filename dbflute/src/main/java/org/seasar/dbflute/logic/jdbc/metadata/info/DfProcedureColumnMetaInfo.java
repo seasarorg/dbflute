@@ -44,16 +44,8 @@ public class DfProcedureColumnMetaInfo {
         return _typeArrayInfo != null;
     }
 
-    public boolean hasTypeArrayTypeName() {
-        return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getTypeName());
-    }
-
     public boolean hasTypeArrayElementType() {
         return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getElementType());
-    }
-
-    public boolean hasTypeArrayElementJavaNativeType() {
-        return hasTypeArrayInfo() && Srl.is_NotNull_and_NotTrimmedEmpty(_typeArrayInfo.getElementJavaNative());
     }
 
     public boolean hasTypeStructInfo() {
@@ -66,7 +58,11 @@ public class DfProcedureColumnMetaInfo {
     public String getColumnDisplayName() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getColumnNameDisp());
-        sb.append(": ").append(_dbTypeName);
+        sb.append(": ");
+        sb.append(_dbTypeName);
+        if (hasTypeArrayInfo()) {
+            sb.append("(").append(getTypeArrayInfo().toString()).append(")");
+        }
         sb.append(getColumnSizeDisp());
         sb.append(" as ").append(_procedureColumnType.alias());
         return sb.toString();
@@ -75,8 +71,18 @@ public class DfProcedureColumnMetaInfo {
     public String getColumnDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getColumnNameDisp());
-        sb.append(" - ").append(_dbTypeName);
+        sb.append(" - ");
+        sb.append(_dbTypeName);
         sb.append(getColumnSizeDisp());
+        if (hasTypeArrayInfo()) {
+            sb.append(" <span class=\"attrs\">{");
+            sb.append(getTypeArrayInfo().toStringForHtml());
+            sb.append("}</span>");
+        } else if (hasTypeStructInfo()) {
+            sb.append(" <span class=\"attrs\">{");
+            sb.append(getTypeStructInfo().toStringAttributeOnlyForHtml());
+            sb.append("}</span>");
+        }
         sb.append(" <span class=\"type\">(").append(_procedureColumnType.alias()).append(")</span>");
         return sb.toString();
     }
