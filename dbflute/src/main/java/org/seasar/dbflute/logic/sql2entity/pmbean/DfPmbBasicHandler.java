@@ -259,7 +259,7 @@ public class DfPmbBasicHandler {
             return false;
         }
         final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(className, propertyName);
-        return metaInfo != null && metaInfo.hasTypeArrayElementType();
+        return metaInfo != null && metaInfo.hasTypeArrayInfo();
     }
 
     public boolean needsOracleStructHandling(String className, String propertyName) {
@@ -278,7 +278,7 @@ public class DfPmbBasicHandler {
     public String getProcedureParameterOracleArrayTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
-        if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
+        if (columnInfo != null && columnInfo.hasTypeArrayInfo()) {
             return columnInfo.getTypeArrayInfo().getTypeName();
         }
         return "";
@@ -287,7 +287,7 @@ public class DfPmbBasicHandler {
     public String getProcedureParameterOracleArrayElementTypeName(String className, String propertyName) {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
-        if (columnInfo != null && columnInfo.hasTypeArrayElementType()) {
+        if (columnInfo != null && columnInfo.hasTypeArrayInfo()) {
             return columnInfo.getTypeArrayInfo().getElementType();
         }
         return "";

@@ -44,10 +44,6 @@ public class DfProcedureColumnMetaInfo {
         return _typeArrayInfo != null;
     }
 
-    public boolean hasTypeArrayElementType() { // just in case
-        return hasTypeArrayInfo() && _typeArrayInfo.hasElementType();
-    }
-
     public boolean hasTypeArrayElementJavaNative() {
         return hasTypeArrayInfo() && _typeArrayInfo.hasElementJavaNative();
     }

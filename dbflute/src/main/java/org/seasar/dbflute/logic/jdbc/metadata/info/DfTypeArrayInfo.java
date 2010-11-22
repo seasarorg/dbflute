@@ -33,10 +33,6 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public boolean hasElementType() {
-        return _elementType != null;
-    }
-
     public boolean hasNestedArray() { // means the element type is ARRAY
         return _nestedArrayInfo != null;
     }

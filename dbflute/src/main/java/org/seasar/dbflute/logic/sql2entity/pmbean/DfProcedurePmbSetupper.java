@@ -236,7 +236,7 @@ public class DfProcedurePmbSetupper {
     protected String doProcessGreatWallOfOracleType(String pmbName, DfProcedureColumnMetaInfo column,
             ProcedurePropertyInfo propertyInfo) {
         final String propertyType;
-        if (column.isOracleTreatedAsArray() && column.hasTypeArrayElementType()) {
+        if (column.isOracleTreatedAsArray() && column.hasTypeArrayInfo()) {
             // here dbTypeName is "PL/SQL TABLE" or "TABLE" or "VARRAY"
             // (it's not useful for type mapping, so search like this)
             final DfTypeArrayInfo arrayInfo = column.getTypeArrayInfo();
