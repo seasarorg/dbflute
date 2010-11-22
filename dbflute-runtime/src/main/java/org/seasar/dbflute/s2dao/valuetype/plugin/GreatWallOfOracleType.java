@@ -106,13 +106,13 @@ public abstract class GreatWallOfOracleType implements ValueType {
             return DfCollectionUtil.newArrayList();
         }
         final List<Object> resultList = DfCollectionUtil.newArrayList();
-        if (isOracleArray(firstValue)) { // unsupported
+        if (isOracleArray(firstValue)) { // array in array *unsupported
             //for (Object element : array) {
-            //    // next elementType is unknown if second or more level
+            //    // next elementType is unknown
             //    resultList.add(mappingOracleArrayToList(element, unknown));
             //}
-            throw new UnsupportedOperationException("array in array is unsupported");
-        } else if (isOracleStruct(firstValue)) { // first level is only supported 
+            throw new UnsupportedOperationException("array in array is unsupported: " + _mainTypeName);
+        } else if (isOracleStruct(firstValue)) { // struct in array 
             for (Object element : array) {
                 resultList.add(mappingOracleStructToEntity(element, elementType));
             }
@@ -239,7 +239,23 @@ public abstract class GreatWallOfOracleType implements ValueType {
             return array;
         }
         final Object preparedArray;
-        if (Entity.class.isAssignableFrom(elementType)) {
+        if (List.class.isAssignableFrom(elementType)) { // array in array *unsupported
+            //final List<Object> arrayList = DfCollectionUtil.newArrayList();
+            //for (Object element : array) {
+            //    if (element == null) {
+            //        continue;
+            //    }
+            //    final List<?> nestedList = (List<?>) element;
+            //    if (nestedList == null || nestedList.isEmpty()) {
+            //        continue;
+            //    }
+            //    final Class<? extends Object> nestedElementType = nestedList.get(0).getClass();
+            //    // next arrayTypeName is unknown
+            //    arrayList.add(mappingListToOracleArray(conn, paramExp, nestedList, unknown, nestedElementType));
+            //}
+            //preparedArray = arrayList.toArray();
+            throw new UnsupportedOperationException("array in array is unsupported: " + _mainTypeName);
+        } else if (Entity.class.isAssignableFrom(elementType)) { // struct in array
             final List<Object> structList = DfCollectionUtil.newArrayList();
             for (Object element : array) {
                 if (element == null) {
@@ -250,7 +266,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
                 structList.add(mappingEntityToOracleStruct(conn, paramExp, entity));
             }
             preparedArray = structList.toArray();
-        } else {
+        } else { // scalar in array
             final List<Object> elementList = DfCollectionUtil.newArrayList();
             for (Object element : array) {
                 if (element == null) {
