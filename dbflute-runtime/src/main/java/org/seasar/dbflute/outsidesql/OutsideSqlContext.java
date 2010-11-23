@@ -185,16 +185,14 @@ public class OutsideSqlContext {
     //                                                                            Read SQL
     //                                                                            ========
     /**
+     * Read outside-SQL with filter. Required attribute is 'outsideSqlPath'.
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
      * @param dbmsSuffix The suffix of DBMS. (NotNull)
      * @return The filtered outside-SQL. (NotNull)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
      */
-    public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
-        if (_internalDebug && _log.isDebugEnabled()) {
-            _log.debug("...Reading outside SQL: " + sqlFileEncoding + ", " + dbmsSuffix);
-        }
-        String sql = readOutsideSql(sqlFileEncoding, dbmsSuffix);
+    public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) { // entry here
+        String sql = readPlainOutsideSql(sqlFileEncoding, dbmsSuffix);
         sql = replaceOutsideSqlBindCharacterOnLineComment(sql);
         return sql;
     }
@@ -236,13 +234,16 @@ public class OutsideSqlContext {
     }
 
     /**
-     * Read outside-SQL path. Required attribute is 'outsideSqlPath'.
+     * Read outside-SQL without filter. Required attribute is 'outsideSqlPath'.
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
      * @param dbmsSuffix The suffix of DBMS. (NotNull)
      * @return The text of SQL. (NotNull)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
      */
-    public String readOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+    protected String readPlainOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+        if (_internalDebug && _log.isDebugEnabled()) {
+            _log.debug("...Reading outside SQL: " + sqlFileEncoding + ", " + dbmsSuffix);
+        }
         final String standardPath = _outsideSqlPath;
         final String dbmsPath = buildDbmsPath(standardPath, dbmsSuffix);
         String sql;

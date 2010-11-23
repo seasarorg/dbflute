@@ -54,22 +54,7 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
     //                                                                    ================
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
-        final String path = _outsideSqlPath;
-        final Object pmb = _parameterBean;
-        final OutsideSqlOption option = _outsideSqlOption;
-        final OutsideSqlContext outsideSqlContext = createOutsideSqlContext();
-        outsideSqlContext.setOutsideSqlPath(path);
-        outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setMethodName(getCommandName());
-        outsideSqlContext.setStatementConfig(option.getStatementConfig());
-        outsideSqlContext.setTableDbName(option.getTableDbName());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
-        outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
-        outsideSqlContext.setFormatSql(option.isFormatSql());
-        outsideSqlContext.setupBehaviorQueryPathIfNeeds();
-        OutsideSqlContext.setOutsideSqlContextOnThread(outsideSqlContext);
+        OutsideSqlContext.setOutsideSqlContextOnThread(createOutsideSqlContext());
     }
 
     public void afterExecuting() {

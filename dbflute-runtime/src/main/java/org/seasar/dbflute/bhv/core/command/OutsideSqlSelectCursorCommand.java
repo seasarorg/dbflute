@@ -49,8 +49,8 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
     //                                                                    Process Callback
     //                                                                    ================
     @Override
-    protected void setupOutsideSqlContext(OutsideSqlContext outsideSqlContext) {
-        super.setupOutsideSqlContext(outsideSqlContext);
+    protected void setupOutsideSqlContextProperty(OutsideSqlContext outsideSqlContext) {
+        super.setupOutsideSqlContextProperty(outsideSqlContext);
         outsideSqlContext.setCursorHandler(_cursorHandler);
     }
 

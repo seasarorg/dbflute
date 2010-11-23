@@ -38,7 +38,7 @@ public class OutsideSqlOption {
 
     protected boolean _formatSql;
 
-    /** The configuration of statement. (Nullable) */
+    /** The configuration of statement specified by configure(). (Nullable) */
     protected StatementConfig _statementConfig;
 
     protected String _sourcePagingRequestType = "non";
@@ -76,7 +76,10 @@ public class OutsideSqlOption {
     //                                                                          Unique Key
     //                                                                          ==========
     public String generateUniqueKey() {
-        return "{" + _pagingRequestType + "/" + _formatSql + "}";
+        // these options are used only when outside-SQL initialization
+        // for example, statementConfig is used after initialization
+        // so the instance is not needed to be contained in this unique key
+        return "{" + _pagingRequestType + "/" + _removeBlockComment + "/" + _removeLineComment + "/" + _formatSql + "}";
     }
 
     // ===================================================================================

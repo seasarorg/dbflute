@@ -48,9 +48,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
     //                                                                    ================
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
-        final OutsideSqlContext outsideSqlContext = createOutsideSqlContext();
-        setupOutsideSqlContext(outsideSqlContext);
-        OutsideSqlContext.setOutsideSqlContextOnThread(outsideSqlContext);
+        OutsideSqlContext.setOutsideSqlContextOnThread(createOutsideSqlContext());
 
         // Set up fetchNarrowingBean.
         final Object pmb = _parameterBean;
@@ -58,25 +56,13 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         setupFetchBean(pmb, option);
     }
 
-    protected void setupOutsideSqlContext(OutsideSqlContext outsideSqlContext) {
-        final String path = _outsideSqlPath;
-        final Object pmb = _parameterBean;
+    @Override
+    protected void setupOutsideSqlContextProperty(OutsideSqlContext outsideSqlContext) {
+        super.setupOutsideSqlContextProperty(outsideSqlContext);
+        outsideSqlContext.setResultType(getResultType());
         final OutsideSqlOption option = _outsideSqlOption;
-        final Class<?> resultType = getResultType();
         final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
-        outsideSqlContext.setOutsideSqlPath(path);
-        outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setResultType(resultType);
-        outsideSqlContext.setMethodName(getCommandName());
-        outsideSqlContext.setStatementConfig(option.getStatementConfig());
-        outsideSqlContext.setTableDbName(option.getTableDbName());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
-        outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
-        outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
-        outsideSqlContext.setFormatSql(option.isFormatSql());
-        outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }
 
     protected void setupFetchBean(Object pmb, OutsideSqlOption option) {

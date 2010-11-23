@@ -86,7 +86,28 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     protected OutsideSqlContext createOutsideSqlContext() {
         final DBMetaProvider dbmetaProvider = ResourceContext.dbmetaProvider();
         final String outsideSqlPackage = ResourceContext.getOutsideSqlPackage();
-        return _outsideSqlContextFactory.createContext(dbmetaProvider, outsideSqlPackage);
+        final OutsideSqlContext context = _outsideSqlContextFactory.createContext(dbmetaProvider, outsideSqlPackage);
+        setupOutsideSqlContextProperty(context);
+        context.setupBehaviorQueryPathIfNeeds();
+        return context;
+    }
+
+    protected void setupOutsideSqlContextProperty(OutsideSqlContext outsideSqlContext) {
+        final String path = _outsideSqlPath;
+        final Object pmb = _parameterBean;
+        final OutsideSqlOption option = _outsideSqlOption;
+        outsideSqlContext.setOutsideSqlPath(path);
+        outsideSqlContext.setParameterBean(pmb);
+        outsideSqlContext.setMethodName(getCommandName());
+        outsideSqlContext.setStatementConfig(option.getStatementConfig());
+        outsideSqlContext.setTableDbName(option.getTableDbName());
+        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
+        outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
+        outsideSqlContext.setFormatSql(option.isFormatSql());
+        outsideSqlContext.setInternalDebug(ResourceContext.isInternalDebug());
+        outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }
 
     protected String buildDbmsSuffix() {
