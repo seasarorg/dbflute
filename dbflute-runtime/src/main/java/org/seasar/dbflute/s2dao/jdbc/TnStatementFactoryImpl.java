@@ -150,7 +150,10 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return ResourceContext.createSQLExceptionHandler();
     }
 
-    protected boolean isInternalDebugEnabled() {
+    // ===================================================================================
+    //                                                                      Internal Debug
+    //                                                                      ==============
+    private boolean isInternalDebugEnabled() { // because log instance is private
         return _internalDebug && _log.isDebugEnabled();
     }
 

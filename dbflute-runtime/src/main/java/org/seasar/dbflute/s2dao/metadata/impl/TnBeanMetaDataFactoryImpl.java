@@ -48,6 +48,8 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     //                                                                           =========
     protected DataSource _dataSource;
 
+    protected boolean _internalDebug;
+
     // ===================================================================================
     //                                                                            Creation
     //                                                                            ========
@@ -185,7 +187,14 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return 1;
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public void setDataSource(final DataSource dataSource) {
         this._dataSource = dataSource;
+    }
+
+    public void setInternalDebug(final boolean internalDebug) {
+        this._internalDebug = internalDebug;
     }
 }

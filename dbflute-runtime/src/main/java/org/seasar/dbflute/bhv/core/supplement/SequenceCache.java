@@ -37,7 +37,7 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance for internal debug. (XLog is used instead for normal debug) */
+    /** Log instance for internal debug. (XLog should be used instead for execute-status log) */
     private static final Log _log = LogFactory.getLog(SequenceCacheHandler.class);
 
     protected static final BigDecimal INITIAL_ADDED_COUNT = BigDecimal.ZERO;
@@ -174,6 +174,11 @@ public class SequenceCache {
             _sequenceValue = _cachedList.remove(0);
             _batchFirstValue = _sequenceValue;
             _batchWay = true;
+            if (isInternalDebugEnabled()) {
+                final int size = selectedList.size();
+                final String exp = selectedList.get(0) + " to " + selectedList.get(size - 1);
+                _log.debug("Cached sequence values by batch way: " + exp);
+            }
         } else { // incrementWay
             _sequenceValue = toInternalType(obj);
             _batchWay = false;
@@ -215,17 +220,20 @@ public class SequenceCache {
     }
 
     // ===================================================================================
-    //                                                                                 Log
-    //                                                                                 ===
-    protected void log(String msg) {
-        XLog.log(msg);
-    }
-
+    //                                                                  Execute Status Log
+    //                                                                  ==================
     protected boolean isLogEnabled() {
         return XLog.isLogEnabled();
     }
 
-    protected boolean isInternalDebugEnabled() {
+    protected void log(String msg) {
+        XLog.log(msg);
+    }
+
+    // ===================================================================================
+    //                                                                      Internal Debug
+    //                                                                      ==============
+    private boolean isInternalDebugEnabled() { // because log instance is private
         return _internalDebug && _log.isDebugEnabled();
     }
 

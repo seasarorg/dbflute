@@ -223,6 +223,11 @@ public class ResourceContext {
         return resourceParameter != null ? resourceParameter.getLogTimestampFormat() : null;
     }
 
+    public static boolean isInternalDebug() {
+        final ResourceParameter resourceParameter = resourceParameter();
+        return resourceParameter != null ? resourceParameter.isInternalDebug() : false;
+    }
+
     protected static ResourceParameter resourceParameter() {
         if (!isExistResourceContextOnThread()) {
             return null;

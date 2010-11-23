@@ -21,20 +21,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The extension of the factory of bean meta data.
  * @author jflute
  */
 public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance for internal debug. (XLog should be used instead for execute-status log) */
+    private static final Log _log = LogFactory.getLog(TnBeanMetaDataFactoryExtension.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -114,11 +124,14 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             // for cache
             // = = = = =/
             @Override
-            public void initialize() { // non thread safe
+            public void initialize() { // non thread safe so this should be called immediately after creation 
                 final Class<?> myBeanClass = getBeanClass();
                 if (isDBFluteEntity(myBeanClass)) {
                     final TnBeanMetaData cachedMeta = getMetaFromCache(myBeanClass);
                     if (cachedMeta == null) {
+                        if (isInternalDebugEnabled()) {
+                            _log.debug("...Caching the bean: " + DfTypeUtil.toClassTitle(myBeanClass));
+                        }
                         _metaMap.put(myBeanClass, this);
                     }
                 }
@@ -178,13 +191,6 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
-        return new ConcurrentHashMap<KEY, VALUE>();
-    }
-
-    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected boolean isDBFluteEntity(Class<?> beanClass) {
@@ -193,5 +199,19 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
 
     protected TnBeanMetaData getMetaFromCache(Class<?> beanClass) {
         return _metaMap.get(beanClass);
+    }
+
+    // ===================================================================================
+    //                                                                      Internal Debug
+    //                                                                      ==============
+    private boolean isInternalDebugEnabled() { // because log instance is private
+        return ResourceContext.isInternalDebug() && _log.isDebugEnabled();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
     }
 }

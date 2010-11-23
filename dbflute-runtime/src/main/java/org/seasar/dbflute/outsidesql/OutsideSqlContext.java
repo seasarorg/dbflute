@@ -382,6 +382,9 @@ public class OutsideSqlContext {
                 try {
                     reader.close();
                 } catch (IOException ignored) {
+                    if (_internalDebug && _log.isDebugEnabled()) {
+                        _log.debug("Failed to close the reader: path=" + path, ignored);
+                    }
                 }
             }
         }

@@ -22,11 +22,14 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnFetchAssistResultSet;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
@@ -35,6 +38,12 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
  * @author jflute
  */
 public class TnBasicSelectHandler extends TnBasicHandler {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance for internal debug. (XLog is used instead for execute-status log) */
+    private static final Log _log = LogFactory.getLog(TnBasicSelectHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -86,12 +95,12 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         if (resultSetHandler == null) {
             throw new IllegalStateException("The resultSetHandler should not be null!");
         }
-        ResultSet resultSet = null;
+        ResultSet rs = null;
         try {
-            resultSet = createResultSet(ps);
-            return resultSetHandler.handle(resultSet);
+            rs = createResultSet(ps);
+            return resultSetHandler.handle(rs);
         } finally {
-            close(resultSet);
+            close(rs);
         }
     }
 
@@ -99,9 +108,12 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
         // All select statements on DBFlute use this result set. 
         // - - - - - - - - - -/
-        final ResultSet resultSet = ps.executeQuery();
+        final ResultSet rs = ps.executeQuery();
         if (!isUseFunctionalResultSet()) {
-            return resultSet;
+            return rs;
+        }
+        if (isInternalDebugEnabled()) {
+            _log.debug("...Wrapping result set by functional one");
         }
         final FetchBean selbean = FetchAssistContext.getFetchBeanOnThread();
         final TnFetchAssistResultSet wrapper;
@@ -109,9 +121,9 @@ public class TnBasicSelectHandler extends TnBasicHandler {
             final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
             final boolean offsetByCursorForcedly = context.isOffsetByCursorForcedly();
             final boolean limitByCursorForcedly = context.isLimitByCursorForcedly();
-            wrapper = createFunctionalResultSet(resultSet, selbean, offsetByCursorForcedly, limitByCursorForcedly);
+            wrapper = createFunctionalResultSet(rs, selbean, offsetByCursorForcedly, limitByCursorForcedly);
         } else {
-            wrapper = createFunctionalResultSet(resultSet, selbean, false, false);
+            wrapper = createFunctionalResultSet(rs, selbean, false, false);
         }
         return wrapper;
     }
@@ -145,6 +157,13 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean, boolean offset,
             boolean limit) {
         return new TnFetchAssistResultSet(rs, fcbean, offset, limit);
+    }
+
+    // ===================================================================================
+    //                                                                      Internal Debug
+    //                                                                      ==============
+    private boolean isInternalDebugEnabled() { // because log instance is private
+        return ResourceContext.isInternalDebug() && _log.isDebugEnabled();
     }
 
     // ===================================================================================

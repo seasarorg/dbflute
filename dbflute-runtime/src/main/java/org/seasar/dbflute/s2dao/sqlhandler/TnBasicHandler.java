@@ -23,6 +23,8 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.QLog;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
@@ -42,6 +44,12 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * @author jflute
  */
 public class TnBasicHandler {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance for internal debug. (QLog should be used instead for query log) */
+    private static final Log _log = LogFactory.getLog(TnBasicHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -140,7 +148,7 @@ public class TnBasicHandler {
         if (args == null) {
             return null;
         }
-        Class<?>[] argTypes = new Class[args.length];
+        final Class<?>[] argTypes = new Class[args.length];
         for (int i = 0; i < args.length; ++i) {
             Object arg = args[i];
             if (arg != null) {
@@ -167,9 +175,13 @@ public class TnBasicHandler {
         final boolean existsSqlLogRegistry = sqlLogRegistry != null;
 
         if (isLogEnabled() || existsSqlLogHandler || existsSqlResultHandler || existsSqlLogRegistry) {
+            if (isInternalDebugEnabled()) {
+                _log.debug("...Building displaySql because of " + isLogEnabled() + ", " + existsSqlLogHandler + ", "
+                        + existsSqlResultHandler + ", " + existsSqlLogRegistry);
+            }
             final String displaySql = getDisplaySql(args);
             if (isLogEnabled()) {
-                log((isContainsLineSeparatorInSql() ? getLineSeparator() : "") + displaySql);
+                log((isContainsLineSeparatorInSql() ? ln() : "") + displaySql);
             }
             if (existsSqlLogHandler) { // DBFlute provides
                 sqlLogHandler.handle(getSql(), displaySql, args, argTypes);
@@ -214,7 +226,7 @@ public class TnBasicHandler {
     }
 
     protected boolean isContainsLineSeparatorInSql() {
-        return _sql != null ? _sql.contains(getLineSeparator()) : false;
+        return _sql != null ? _sql.contains(ln()) : false;
     }
 
     // -----------------------------------------------------
@@ -341,9 +353,16 @@ public class TnBasicHandler {
     }
 
     // ===================================================================================
+    //                                                                      Internal Debug
+    //                                                                      ==============
+    private boolean isInternalDebugEnabled() { // because log instance is private
+        return ResourceContext.isInternalDebug() && _log.isDebugEnabled();
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
