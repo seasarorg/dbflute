@@ -114,11 +114,31 @@ public class StatementConfig implements Serializable {
     }
 
     // ===================================================================================
+    //                                                                             Display
+    //                                                                             =======
+    public String buildResultSetTypeDisp() {
+        if (_resultSetType == null) {
+            return "default";
+        }
+        final String typeDisp;
+        if (_resultSetType == ResultSet.TYPE_FORWARD_ONLY) {
+            typeDisp = "forward";
+        } else if (_resultSetType == ResultSet.TYPE_SCROLL_INSENSITIVE) {
+            typeDisp = "scroll(ins)";
+        } else if (_resultSetType == ResultSet.TYPE_SCROLL_SENSITIVE) {
+            typeDisp = "scroll(sen)";
+        } else {
+            typeDisp = "unknown";
+        }
+        return typeDisp;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _resultSetType + ", " + _queryTimeout + ", " + _fetchSize + ", " + _maxRows + "}";
+        return "{" + buildResultSetTypeDisp() + ", " + _queryTimeout + ", " + _fetchSize + ", " + _maxRows + "}";
     }
 
     // ===================================================================================

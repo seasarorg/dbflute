@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author jflute
  */
@@ -24,14 +27,14 @@ public class QLog {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(QLog.class);
+    private static final Log _log = LogFactory.getLog(QLog.class);
     protected static boolean _queryLogLevelInfo;
     protected static boolean _locked = true;
 
     // ===================================================================================
     //                                                                             Logging
     //                                                                             =======
-    public static void log(String sql) {// Very Internal
+    public static void log(String sql) { // very Internal
         if (isQueryLogLevelInfo()) {
             _log.info(sql);
         } else {
@@ -39,7 +42,7 @@ public class QLog {
         }
     }
 
-    public static boolean isLogEnabled() {
+    public static boolean isLogEnabled() { // very internal
         if (isQueryLogLevelInfo()) {
             return _log.isInfoEnabled();
         } else {

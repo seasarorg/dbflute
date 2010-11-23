@@ -19,6 +19,8 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectCursorCommand;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlContextFactory;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
@@ -45,15 +47,24 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     /** The option of outside-SQL. (NotNull) */
     protected final OutsideSqlOption _outsideSqlOption;
 
+    /** The factory of outside-SQL context. (NotNull) */
+    protected final OutsideSqlContextFactory _outsideSqlContextFactory;
+
+    /** The factory of outside-SQL executor. (NotNull) */
+    protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, OutsideSqlOption outsideSqlOption) {
-        this._behaviorCommandInvoker = behaviorCommandInvoker;
-        this._tableDbName = tableDbName;
-        this._currentDBDef = currentDBDef;
-        this._outsideSqlOption = outsideSqlOption;
+            DBDef currentDBDef, OutsideSqlOption outsideSqlOption, OutsideSqlContextFactory outsideSqlContextFactory,
+            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+        _behaviorCommandInvoker = behaviorCommandInvoker;
+        _tableDbName = tableDbName;
+        _currentDBDef = currentDBDef;
+        _outsideSqlOption = outsideSqlOption;
+        _outsideSqlContextFactory = outsideSqlContextFactory;
+        _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
 
     // ===================================================================================
@@ -104,16 +115,17 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
         return new OutsideSqlSelectCursorCommand();
     }
 
-    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand command, String path,
+    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand cmd, String path,
             PARAMETER_BEAN pmb, CursorHandler handler) {
-        command.setTableDbName(_tableDbName);
-        _behaviorCommandInvoker.injectComponentProperty(command);
-        command.setOutsideSqlPath(path);
-        command.setParameterBean(pmb);
-        command.setOutsideSqlOption(_outsideSqlOption);
-        command.setCurrentDBDef(_currentDBDef);
-        command.setCursorHandler(handler);
-        return command;
+        cmd.setTableDbName(_tableDbName);
+        _behaviorCommandInvoker.injectComponentProperty(cmd);
+        cmd.setOutsideSqlPath(path);
+        cmd.setParameterBean(pmb);
+        cmd.setOutsideSqlOption(_outsideSqlOption);
+        cmd.setCurrentDBDef(_currentDBDef);
+        cmd.setOutsideSqlContextFactory(_outsideSqlContextFactory);
+        cmd.setCursorHandler(handler);
+        return cmd;
     }
 
     /**
@@ -129,17 +141,6 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    /**
-     * Set up dynamic-binding for this outside-SQL. <br />
-     * You can use bind variable in embedded variable by this.
-     * @return this. (NotNull)
-     * @deprecated You does not need to call this to set bind variable in embedded variable.
-     */
-    public OutsideSqlCursorExecutor<PARAMETER_BEAN> dynamicBinding() {
-        _outsideSqlOption.dynamicBinding();
-        return this;
-    }
-
     /**
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)

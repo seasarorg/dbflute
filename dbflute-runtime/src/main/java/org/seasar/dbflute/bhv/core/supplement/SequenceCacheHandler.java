@@ -39,8 +39,9 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Map<String, SequenceCache> _sequenceCacheMap = new ConcurrentHashMap<String, SequenceCache>();
+    protected final Map<String, SequenceCache> _sequenceCacheMap = new ConcurrentHashMap<String, SequenceCache>();
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
+    protected boolean _internalDebug;
 
     // ===================================================================================
     //                                                                            Handling
@@ -89,7 +90,9 @@ public class SequenceCacheHandler {
 
     protected SequenceCache createSequenceCache(String sequenceName, DataSource dataSource, Class<?> resultType,
             Integer cacheSize, Integer incrementSize) {
-        return new SequenceCache(resultType, new BigDecimal(cacheSize), incrementSize);
+        final SequenceCache cache = new SequenceCache(resultType, new BigDecimal(cacheSize), incrementSize);
+        cache.setInternalDebug(_internalDebug);
+        return cache;
     }
 
     protected String generateKey(String tableName, String sequenceName, DataSource dataSource) {
@@ -264,5 +267,9 @@ public class SequenceCacheHandler {
     //                                                                            ========
     public void setSequenceCacheKeyGenerator(SequenceCacheKeyGenerator sequenceCacheKeyGenerator) {
         _sequenceCacheKeyGenerator = sequenceCacheKeyGenerator;
+    }
+
+    public void setInternalDebug(boolean internalDebug) {
+        _internalDebug = internalDebug;
     }
 }

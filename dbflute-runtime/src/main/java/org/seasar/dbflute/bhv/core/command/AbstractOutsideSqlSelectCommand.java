@@ -70,7 +70,6 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging

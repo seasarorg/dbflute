@@ -25,6 +25,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.OutsideSqlNotFoundException;
+import org.seasar.dbflute.exception.OutsideSqlReadFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.util.DfResourceUtil;
@@ -103,18 +106,17 @@ public class OutsideSqlContext {
     //                                                                  Exception Handling
     //                                                                  ==================
     public static void throwOutsideSqlNotFoundException(String path) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The outsideSql was not found!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of your target file of outsideSql on your classpath."
-                + getLineSeparator();
-        msg = msg + "And please confirm the file name and the file path STRICTLY!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified OutsideSql Path]" + getLineSeparator() + path + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
-        throw new org.seasar.dbflute.exception.OutsideSqlNotFoundException(msg);
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The outsideSql was not found!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the existence of your target file of outsideSql on your classpath." + ln();
+        msg = msg + "And please confirm the file name and the file path STRICTLY!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified OutsideSql Path]" + ln() + path + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new OutsideSqlNotFoundException(msg);
     }
 
     // ===================================================================================
@@ -149,8 +151,6 @@ public class OutsideSqlContext {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
-    protected boolean _dynamicBinding;
-
     protected boolean _offsetByCursorForcedly;
 
     protected boolean _limitByCursorForcedly;
@@ -162,6 +162,8 @@ public class OutsideSqlContext {
     protected boolean removeLineComment;
 
     protected boolean _formatSql;
+
+    protected boolean _internalDebug;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -189,6 +191,9 @@ public class OutsideSqlContext {
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
      */
     public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+        if (_internalDebug && _log.isDebugEnabled()) {
+            _log.debug("...Reading outside SQL: " + sqlFileEncoding + ", " + dbmsSuffix);
+        }
         String sql = readOutsideSql(sqlFileEncoding, dbmsSuffix);
         sql = replaceOutsideSqlBindCharacterOnLineComment(sql);
         return sql;
@@ -241,19 +246,37 @@ public class OutsideSqlContext {
         final String standardPath = _outsideSqlPath;
         final String dbmsPath = buildDbmsPath(standardPath, dbmsSuffix);
         String sql;
-        if (isExistResource(dbmsPath)) {
+        if (isExistResource(dbmsPath)) { // at first
+            if (_internalDebug && _log.isDebugEnabled()) {
+                _log.debug("Found the outside SQL for the DBMS: " + dbmsPath);
+            }
             sql = readText(dbmsPath, sqlFileEncoding);
-        } else if ("_postgresql".equals(dbmsSuffix) && isExistResource("_postgre")) {
-            sql = readText("_postgre", sqlFileEncoding); // Patch for name difference
-        } else if ("_sqlserver".equals(dbmsSuffix) && isExistResource("_mssql")) {
-            sql = readText("_mssql", sqlFileEncoding); // Patch for name difference
-        } else if (isExistResource(standardPath)) {
-            sql = readText(standardPath, sqlFileEncoding);
         } else {
-            throwOutsideSqlNotFoundException(standardPath);
-            return null; // Non Reachable.
+            final String resolvedSql = doReadOutsideSqlWithAliasSuffix(standardPath, sqlFileEncoding, dbmsSuffix);
+            if (resolvedSql != null) {
+                sql = resolvedSql;
+            } else if (isExistResource(standardPath)) { // main
+                sql = readText(standardPath, sqlFileEncoding);
+            } else {
+                throwOutsideSqlNotFoundException(standardPath);
+                return null; // unreachable
+            }
         }
         return removeInitialUnicodeBomIfNeeds(sqlFileEncoding, sql);
+    }
+
+    protected String doReadOutsideSqlWithAliasSuffix(String standardPath, String sqlFileEncoding, String dbmsSuffix) {
+        String anotherPath = null;
+        if ("_postgresql".equals(dbmsSuffix)) {
+            anotherPath = buildDbmsPath(standardPath, "_postgre");
+        } else if ("_sqlserver".equals(dbmsSuffix)) {
+            anotherPath = buildDbmsPath(standardPath, "_mssql");
+        }
+        if (anotherPath != null && isExistResource(anotherPath)) { // patch for name difference
+            return readText(anotherPath, sqlFileEncoding);
+        } else {
+            return null;
+        }
     }
 
     protected String buildDbmsPath(String standardPath, String dbmsSuffix) {
@@ -341,46 +364,59 @@ public class OutsideSqlContext {
 
     protected String readText(final String path, String sqlFileEncoding) {
         final InputStream ins = DfResourceUtil.getResourceStream(path);
-        final Reader reader = createInputStreamReader(ins, sqlFileEncoding);
-        return readText(reader);
-    }
-
-    protected Reader createInputStreamReader(InputStream ins, String encoding) {
+        Reader reader = null;
         try {
-            return new InputStreamReader(ins, encoding);
+            reader = createInputStreamReader(ins, sqlFileEncoding);
+            return readText(reader);
         } catch (IOException e) {
-            String msg = "Failed to create the reader of the input stream:";
-            msg = msg + " ins=" + ins + " encoding=" + encoding;
-            throw new IllegalStateException(msg, e);
-        }
-    }
-
-    public String readText(Reader reader) {
-        final BufferedReader bfreader = new BufferedReader(reader);
-        final StringBuilder out = new StringBuilder(100);
-        try {
-            try {
-                final char[] buf = new char[8192];
-                int n;
-                while ((n = bfreader.read(buf)) >= 0) {
-                    out.append(buf, 0, n);
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to read the text for outside-SQL.");
+            br.addItem("OutsideSql Path");
+            br.addElement(path);
+            br.addItem("SQL File Encoding");
+            br.addElement(sqlFileEncoding);
+            final String msg = br.buildExceptionMessage();
+            throw new OutsideSqlReadFailureException(msg);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {
                 }
-            } finally {
-                bfreader.close();
             }
-        } catch (IOException e) {
-            String msg = "Failed to read the input stream:";
-            msg = msg + " bfreader=" + bfreader + " reader=" + reader;
-            throw new IllegalStateException(msg, e);
         }
-        return out.toString();
+    }
+
+    protected Reader createInputStreamReader(InputStream ins, String encoding) throws IOException {
+        return new InputStreamReader(ins, encoding);
+    }
+
+    public String readText(Reader reader) throws IOException {
+        final StringBuilder sb = new StringBuilder(100);
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(reader);
+            final char[] buf = new char[8192];
+            int n;
+            while ((n = br.read(buf)) >= 0) {
+                sb.append(buf, 0, n);
+            }
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+        return sb.toString();
     }
 
     protected static String replaceString(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
     }
 
-    protected static String getLineSeparator() {
+    protected static String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
@@ -449,14 +485,6 @@ public class OutsideSqlContext {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
-    public boolean isDynamicBinding() {
-        return _dynamicBinding;
-    }
-
-    public void setDynamicBinding(boolean dynamicBinding) {
-        this._dynamicBinding = dynamicBinding;
-    }
-
     public boolean isOffsetByCursorForcedly() {
         return _offsetByCursorForcedly;
     }
@@ -503,5 +531,13 @@ public class OutsideSqlContext {
 
     public void setFormatSql(boolean formatSql) {
         this._formatSql = formatSql;
+    }
+
+    public boolean isInternalDebug() {
+        return _internalDebug;
+    }
+
+    public void setInternalDebug(boolean internalDebug) {
+        this._internalDebug = internalDebug;
     }
 }

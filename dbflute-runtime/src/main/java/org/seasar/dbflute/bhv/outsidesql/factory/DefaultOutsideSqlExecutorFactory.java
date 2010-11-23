@@ -18,7 +18,11 @@ package org.seasar.dbflute.bhv.outsidesql.factory;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
+import org.seasar.dbflute.bhv.outsidesql.OutsideSqlCursorExecutor;
+import org.seasar.dbflute.bhv.outsidesql.OutsideSqlEntityExecutor;
+import org.seasar.dbflute.bhv.outsidesql.OutsideSqlPagingExecutor;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
 /**
  * @author jflute
@@ -28,8 +32,49 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     /**
      * {@inheritDoc}
      */
-    public OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker invoker, String tableDbName, DBDef dbdef,
-            StatementConfig config) {
-        return new OutsideSqlBasicExecutor(invoker, tableDbName, dbdef, config);
+    public OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+        final OutsideSqlContextFactory outsideSqlContextFactory = createOutsideSqlContextFactory();
+        return new OutsideSqlBasicExecutor(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
+                outsideSqlOption, outsideSqlContextFactory, this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public <PARAMETER_BEAN> OutsideSqlCursorExecutor<PARAMETER_BEAN> createCursor(
+            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            OutsideSqlOption outsideSqlOption) {
+        final OutsideSqlContextFactory outsideSqlContextFactory = createOutsideSqlContextFactory();
+        return new OutsideSqlCursorExecutor<PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName, currentDBDef,
+                outsideSqlOption, outsideSqlContextFactory, this);
+    }
+
+    /**
+     * Create the factory of outside-SQL context. <br />
+     * This is the very point for an extension of the outside-SQL context. 
+     * @return The instance of the factory. (NotNull)
+     */
+    protected OutsideSqlContextFactory createOutsideSqlContextFactory() { // extension point
+        return new DefaultOutsideSqlContextFactory();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public <PARAMETER_BEAN> OutsideSqlEntityExecutor<PARAMETER_BEAN> createEntity(
+            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlEntityExecutor<PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName, currentDBDef,
+                defaultStatementConfig, outsideSqlOption, this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OutsideSqlPagingExecutor createPaging(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlPagingExecutor(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
+                outsideSqlOption, this);
     }
 }

@@ -319,8 +319,8 @@ public class BehaviorCommandInvoker {
     //                                                                      ==============
     protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution,
             long beforeCmd, long afterCmd) {
-        log("SqlExecution Initialization Cost: [" + DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd)
-                + "]");
+        final String view = DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd);
+        log("SqlExecution Initialization Cost: [" + view + "]");
     }
 
     // ===================================================================================
@@ -823,7 +823,7 @@ public class BehaviorCommandInvoker {
         final OutsideSqlExecutorFactory factory = _invokerAssistant.assistOutsideSqlExecutorFactory();
         final DBDef dbdef = _invokerAssistant.assistCurrentDBDef();
         final StatementConfig config = _invokerAssistant.assistDefaultStatementConfig();
-        return factory.createBasic(this, tableDbName, dbdef, config);
+        return factory.createBasic(this, tableDbName, dbdef, config, null); // for an entry instance
     }
 
     // ===================================================================================

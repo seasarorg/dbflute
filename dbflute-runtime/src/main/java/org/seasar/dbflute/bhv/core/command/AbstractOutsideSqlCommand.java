@@ -16,7 +16,9 @@
 package org.seasar.dbflute.bhv.core.command;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -44,6 +46,9 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
 
     /** The current database definition. (Required) */
     protected DBDef _currentDBDef;
+
+    /** The factory of outside-SQL context. (NotNull) */
+    protected OutsideSqlContextFactory _outsideSqlContextFactory;
 
     // ===================================================================================
     //                                                                  Detail Information
@@ -76,10 +81,12 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                  OutsideSql Element
+    //                                                                  ==================
     protected OutsideSqlContext createOutsideSqlContext() {
-        return new OutsideSqlContext(ResourceContext.dbmetaProvider(), ResourceContext.getOutsideSqlPackage());
+        final DBMetaProvider dbmetaProvider = ResourceContext.dbmetaProvider();
+        final String outsideSqlPackage = ResourceContext.getOutsideSqlPackage();
+        return _outsideSqlContextFactory.createContext(dbmetaProvider, outsideSqlPackage);
     }
 
     protected String buildDbmsSuffix() {
@@ -97,12 +104,12 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     }
 
     protected boolean needsToRemoveBlockComment() {
-        assertOutsideSqlBasic("isCurrentDBDef");
+        assertOutsideSqlBasic("needsToRemoveBlockComment");
         return !_currentDBDef.dbway().isBlockCommentSupported();
     }
 
     protected boolean needsToRemoveLineComment() {
-        assertOutsideSqlBasic("isCurrentDBDef");
+        assertOutsideSqlBasic("needsToRemoveLineComment");
         return !_currentDBDef.dbway().isLineCommentSupported();
     }
 
@@ -138,5 +145,9 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
 
     public void setCurrentDBDef(DBDef currentDBDef) {
         _currentDBDef = currentDBDef;
+    }
+
+    public void setOutsideSqlContextFactory(OutsideSqlContextFactory outsideSqlContextFactory) {
+        _outsideSqlContextFactory = outsideSqlContextFactory;
     }
 }

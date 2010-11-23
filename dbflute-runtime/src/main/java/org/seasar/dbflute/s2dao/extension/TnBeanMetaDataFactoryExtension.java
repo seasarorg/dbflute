@@ -170,7 +170,11 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
      */
     @Override
     protected int getLimitRelationNestLevel() {
-        return 2; // for Compatible to old version DBFlute
+        // for Compatible to old version DBFlute
+        // and this is actually unused on ConditionBean for now
+        // CB covers an infinity nest level scope by its own original way
+        // this method is used only when you use runtime classes as plain S2Dao
+        return 2;
     }
 
     // ===================================================================================

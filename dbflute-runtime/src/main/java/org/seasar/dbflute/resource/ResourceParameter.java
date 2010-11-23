@@ -27,6 +27,7 @@ public class ResourceParameter {
     protected String _outsideSqlPackage;
     protected String _logDateFormat;
     protected String _logTimestampFormat;
+    protected boolean _internalDebug;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -53,5 +54,13 @@ public class ResourceParameter {
 
     public void setLogTimestampFormat(String logTimestampFormat) {
         _logTimestampFormat = logTimestampFormat;
+    }
+
+    public boolean isInternalDebug() {
+        return _internalDebug;
+    }
+
+    public void setInternalDebug(boolean internalDebug) {
+        _internalDebug = internalDebug;
     }
 }

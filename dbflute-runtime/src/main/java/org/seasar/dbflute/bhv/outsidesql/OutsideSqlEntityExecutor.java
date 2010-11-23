@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.FetchBean;
@@ -52,16 +53,21 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     /** The option of outside-SQL. (NotNull) */
     protected final OutsideSqlOption _outsideSqlOption;
 
+    /** The factory of outside-SQL executor. (NotNull) */
+    protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlEntityExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
+            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
         _defaultStatementConfig = defaultStatementConfig;
         _outsideSqlOption = outsideSqlOption;
+        _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
 
     // ===================================================================================
@@ -96,7 +102,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         try {
             ls = doSelectList(path, pmb, entityType);
         } catch (DangerousResultSizeException e) {
-            final String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            final String searchKey4Log = buildSearchKey4Exception(path, pmb, entityType);
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
         } finally {
@@ -106,7 +112,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
             return null;
         }
         if (ls.size() > 1) {
-            final String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            final String searchKey4Log = buildSearchKey4Exception(path, pmb, entityType);
             throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
         return ls.get(0);
@@ -117,7 +123,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     }
 
     protected OutsideSqlBasicExecutor createBasicExecutor() {
-        return new OutsideSqlBasicExecutor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+        return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
 
@@ -144,13 +150,12 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         final ENTITY entity = selectEntity(path, pmb, entityType);
         if (entity == null) {
-            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
-            throwSelectEntityAlreadyDeletedException(searchKey4Log);
+            throwSelectEntityAlreadyDeletedException(buildSearchKey4Exception(path, pmb, entityType));
         }
         return entity;
     }
 
-    protected <ENTITY> String buildSearchKey4Log(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+    protected <ENTITY> String buildSearchKey4Exception(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         String tmp = "table  = " + _outsideSqlOption.getTableDbName() + ln();
         tmp = tmp + "path   = " + path + ln();
         tmp = tmp + "pmbean = " + DfTypeUtil.toClassTitle(pmb) + ":" + pmb + ln();
@@ -185,17 +190,6 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    /**
-     * Set up dynamic-binding for this outside-SQL. <br />
-     * You can use bind variable in embedded variable by this.
-     * @return this. (NotNull)
-     * @deprecated You does not need to call this to set bind variable in embedded variable.
-     */
-    public OutsideSqlEntityExecutor<PARAMETER_BEAN> dynamicBinding() {
-        _outsideSqlOption.dynamicBinding();
-        return this;
-    }
-
     /**
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)

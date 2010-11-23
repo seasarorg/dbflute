@@ -15,14 +15,8 @@
  */
 package org.seasar.dbflute.bhv.core.execution;
 
-import java.util.List;
-
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.XLog;
-import org.seasar.dbflute.helper.beans.DfBeanDesc;
-import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -65,80 +59,13 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
      */
     public Object execute(Object[] args) {
         final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
-        if (isDynamicBinding(outsideSqlContext)) { // basically to use FOR comment
-            // *dynamic binding is supported in select statement only
-            logDynamicBinding();
-            return executeOutsideSqlAsDynamic(args, outsideSqlContext);
-        } else { // main case
-            return executeOutsideSqlAsStatic(args, outsideSqlContext);
-        }
-    }
-
-    protected void logDynamicBinding() {
-        if (XLog.isLogEnabled()) {
-            XLog.log("...Executing as dynamic binding");
-        }
-    }
-
-    protected boolean isDynamicBinding(OutsideSqlContext outsideSqlContext) {
-        return outsideSqlContext.isDynamicBinding();
-    }
-
-    // -----------------------------------------------------
-    //                                               Dynamic
-    //                                               -------
-    /**
-     * Execute outside-SQL as Dynamic.
-     * @param args The array of argument. (NotNull, The first element should be the instance of parameter-bean)
-     * @param outsideSqlContext The context of outside-SQL. (NotNull)
-     * @return Result. (Nullable)
-     */
-    protected Object executeOutsideSqlAsDynamic(Object[] args, OutsideSqlContext outsideSqlContext) {
-        // *It will be deleted at the future because of deprecated
-        final Object pmb = args[0];
-        String dynamicSql = getSql();
-        if (pmb != null) {
-            // *embedded comment has get dynamic binding independently
-            dynamicSql = resolveDynamicEmbedded(pmb, dynamicSql);
-        }
-        final OutsideSqlSelectExecution dynamicSqlFactory = createDynamicSqlFactory();
-        dynamicSqlFactory.setArgNames(getArgNames());
-        dynamicSqlFactory.setArgTypes(getArgTypes());
-        dynamicSqlFactory.setSql(dynamicSql);
-        final CommandContext ctx = dynamicSqlFactory.apply(args);
-        return doExecuteOutsideSql(ctx);
-    }
-
-    protected String resolveDynamicEmbedded(Object pmb, String dynamicSql) {
-        if (pmb == null) {
-            return dynamicSql;
-        }
-        // *nested properties are unsupported 
-        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(pmb.getClass());
-        final List<String> proppertyNameList = beanDesc.getProppertyNameList();
-        for (String proppertyName : proppertyNameList) {
-            final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(proppertyName);
-            final Class<?> propertyType = propertyDesc.getPropertyType();
-            if (!propertyType.equals(String.class)) {
-                continue;
-            }
-            final String outsideSqlPiece = (String) propertyDesc.getValue(pmb);
-            if (outsideSqlPiece == null) {
-                continue;
-            }
-            final String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
-            dynamicSql = replaceString(dynamicSql, embeddedComment, outsideSqlPiece);
-        }
-        return dynamicSql;
-    }
-
-    protected OutsideSqlSelectExecution createDynamicSqlFactory() {
-        return new OutsideSqlSelectExecution(getDataSource(), getStatementFactory(), _resultSetHandler);
+        return executeOutsideSqlAsStatic(args, outsideSqlContext);
     }
 
     // -----------------------------------------------------
     //                                                Static
     //                                                ------
+    // AsStatic means DynamicBinding existed (deleted now) 
     /**
      * Execute outside-SQL as static.
      * @param args The array of argument. (NotNull, The first element should be the instance of parameter-bean)

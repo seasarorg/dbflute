@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
@@ -55,16 +56,21 @@ public class OutsideSqlPagingExecutor {
     /** The option of outside-SQL. (NotNull) */
     protected final OutsideSqlOption _outsideSqlOption;
 
+    /** The factory of outside-SQL executor. (NotNull) */
+    protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
+            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
         _defaultStatementConfig = defaultStatementConfig;
         _outsideSqlOption = outsideSqlOption;
+        _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
 
     // ===================================================================================
@@ -174,7 +180,7 @@ public class OutsideSqlPagingExecutor {
 
     protected OutsideSqlEntityExecutor<PagingBean> createCountExecutor() {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
-        return new OutsideSqlEntityExecutor<PagingBean>(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, countOption);
     }
 
@@ -274,24 +280,13 @@ public class OutsideSqlPagingExecutor {
     }
 
     protected OutsideSqlBasicExecutor createBasicExecutor() {
-        return new OutsideSqlBasicExecutor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+        return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    /**
-     * Set up dynamic-binding for this outside-SQL. <br />
-     * You can use bind variable in embedded variable by this.
-     * @return this. (NotNull)
-     * @deprecated You does not need to call this to set bind variable in embedded variable.
-     */
-    public OutsideSqlPagingExecutor dynamicBinding() {
-        _outsideSqlOption.dynamicBinding();
-        return this;
-    }
-
     /**
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)

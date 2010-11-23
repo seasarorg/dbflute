@@ -32,8 +32,6 @@ public class OutsideSqlOption {
     /** The request type of paging. */
     protected String _pagingRequestType = "non";
 
-    protected boolean _dynamicBinding;
-
     protected boolean _removeBlockComment;
 
     protected boolean _removeLineComment;
@@ -62,10 +60,6 @@ public class OutsideSqlOption {
         _pagingRequestType = "manual";
     }
 
-    public void dynamicBinding() {
-        _dynamicBinding = true;
-    }
-
     public void removeBlockComment() {
         _removeBlockComment = true;
     }
@@ -82,7 +76,7 @@ public class OutsideSqlOption {
     //                                                                          Unique Key
     //                                                                          ==========
     public String generateUniqueKey() {
-        return "{" + _pagingRequestType + "/" + _dynamicBinding + "/" + _formatSql + "}";
+        return "{" + _pagingRequestType + "/" + _formatSql + "}";
     }
 
     // ===================================================================================
@@ -91,9 +85,6 @@ public class OutsideSqlOption {
     public OutsideSqlOption copyOptionWithoutPaging() {
         final OutsideSqlOption copyOption = new OutsideSqlOption();
         copyOption.setPagingSourceRequestType(_pagingRequestType);
-        if (isDynamicBinding()) {
-            copyOption.dynamicBinding();
-        }
         copyOption.setTableDbName(_tableDbName);
         return copyOption;
     }
@@ -103,8 +94,27 @@ public class OutsideSqlOption {
     //                                                                      ==============
     @Override
     public String toString() {
-        // not show formatSql because of not important
-        return "{paging=" + _pagingRequestType + ", dynamic=" + _dynamicBinding + "}";
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{").append("paging=").append(_pagingRequestType);
+        if (_statementConfig != null) {
+            if (_statementConfig.hasResultSetType()) {
+                sb.append(", rs-type=").append(_statementConfig.buildResultSetTypeDisp());
+            }
+            if (_statementConfig.hasQueryTimeout()) {
+                sb.append(", timeout=").append(_statementConfig.getQueryTimeout());
+            }
+            if (_statementConfig.hasFetchSize()) {
+                sb.append(", fetchSize=").append(_statementConfig.getFetchSize());
+            }
+            if (_statementConfig.hasMaxRows()) {
+                sb.append(", maxRows=").append(_statementConfig.getMaxRows());
+            }
+        } else {
+            sb.append(", config=default");
+        }
+        sb.append("}");
+        return sb.toString();
+        // not show formatSql and other comment adjustments because of not important
     }
 
     // ===================================================================================
@@ -119,10 +129,6 @@ public class OutsideSqlOption {
 
     public boolean isManualPaging() {
         return "manual".equals(_pagingRequestType);
-    }
-
-    public boolean isDynamicBinding() {
-        return _dynamicBinding;
     }
 
     public boolean isRemoveBlockComment() {
@@ -145,11 +151,11 @@ public class OutsideSqlOption {
         _statementConfig = statementConfig;
     }
 
-    protected void setPagingSourceRequestType(String sourcePagingRequestType) { // Very Internal
+    protected void setPagingSourceRequestType(String sourcePagingRequestType) { // very internal
         _sourcePagingRequestType = sourcePagingRequestType;
     }
 
-    public boolean isSourcePagingRequestTypeAuto() { // Very Internal
+    public boolean isSourcePagingRequestTypeAuto() { // very internal
         return "auto".equals(_sourcePagingRequestType);
     }
 

@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author jflute
  */
@@ -24,14 +27,14 @@ public class XLog {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(XLog.class);
+    private static final Log _log = LogFactory.getLog(XLog.class);
     protected static boolean _executeStatusLogLevelInfo;
     protected static boolean _locked = true;
 
     // ===================================================================================
     //                                                                             Logging
     //                                                                             =======
-    public static void log(String msg) {// Very Internal
+    public static void log(String msg) { // very internal
         if (isExecuteStatusLogLevelInfo()) {
             _log.info(msg);
         } else {
@@ -39,7 +42,7 @@ public class XLog {
         }
     }
 
-    public static boolean isLogEnabled() {// Very Internal
+    public static boolean isLogEnabled() { // very internal
         if (isExecuteStatusLogLevelInfo()) {
             return _log.isInfoEnabled();
         } else {

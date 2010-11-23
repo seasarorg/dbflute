@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -35,6 +37,9 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    /** Log instance for internal debug. (XLog is used instead for normal debug) */
+    private static final Log _log = LogFactory.getLog(SequenceCacheHandler.class);
+
     protected static final BigDecimal INITIAL_ADDED_COUNT = BigDecimal.ZERO;
     protected static final BigDecimal DEFAULT_ADD_SIZE = BigDecimal.ONE;
 
@@ -70,7 +75,11 @@ public class SequenceCache {
         }
     });
 
+    /** Is the batch way valid? */
     protected volatile boolean _batchWay;
+
+    /** Is the internal debug valid? (should be set when immediately after initialization because of no volatile) */
+    protected boolean _internalDebug;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -104,10 +113,11 @@ public class SequenceCache {
                 _addedCount = _addedCount.add(getAddSize());
                 if (_addedCount.intValue() < _incrementSize) {
                     if (isLogEnabled()) {
-                        String msg = "...Getting next value from (cached-size) added count:";
-                        msg = msg + " (" + _sequenceValue + " + " + _addedCount + ":";
-                        msg = msg + " cache-point=" + _batchFirstValue + ")";
-                        log(msg);
+                        final StringBuilder sb = new StringBuilder();
+                        sb.append("...Getting next value from (cached-size) added count:");
+                        sb.append(" (").append(_sequenceValue).append(" + ").append(_addedCount).append(":");
+                        sb.append(" cache-point=").append(_batchFirstValue).append(")");
+                        log(sb.toString());
                     }
                     return toResultType(_sequenceValue.add(_addedCount));
                 }
@@ -116,9 +126,11 @@ public class SequenceCache {
             if (!_cachedList.isEmpty()) {
                 _sequenceValue = _cachedList.remove(0);
                 if (isLogEnabled()) {
-                    String msg = "...Getting next value from cached list:";
-                    msg = msg + " (" + _sequenceValue + ": cache-point=" + _batchFirstValue + ")";
-                    log(msg);
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append("...Getting next value from cached list:");
+                    sb.append(" (").append(_sequenceValue).append(":");
+                    sb.append(" cache-point=").append(_batchFirstValue).append(")");
+                    log(sb.toString());
                 }
                 return toResultType(_sequenceValue);
             }
@@ -126,17 +138,16 @@ public class SequenceCache {
             _addedCount = _addedCount.add(getAddSize());
             if (_sequenceValue != null && _addedCount.compareTo(_cacheSize) < 0) {
                 if (isLogEnabled()) {
-                    String msg = "...Getting next value from added count:";
-                    msg = msg + " (" + _sequenceValue + " + " + _addedCount + ")";
-                    log(msg);
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append("...Getting next value from added count:");
+                    sb.append(" (").append(_sequenceValue).append(" + ").append(_addedCount).append(")");
+                    log(sb.toString());
                 }
                 return toResultType(_sequenceValue.add(_addedCount));
             }
         }
         if (isLogEnabled()) {
-            String msg = "...Selecting next value and cache values:";
-            msg = msg + " cacheSize=" + _cacheSize;
-            log(msg);
+            log("...Selecting next value and cache values: cacheSize=" + _cacheSize);
         }
         setupSequence(executor);
         return toResultType(_sequenceValue);
@@ -148,6 +159,9 @@ public class SequenceCache {
 
     protected void setupSequence(SequenceRealExecutor executor) {
         initialize();
+        if (isInternalDebugEnabled()) {
+            _log.debug("...Executing sequence cache: " + executor);
+        }
         final Object obj = executor.execute();
         assertSequenceRealExecutorReturnsNotNull(obj, executor);
         if (obj instanceof List<?>) { // batchWay
@@ -211,6 +225,10 @@ public class SequenceCache {
         return XLog.isLogEnabled();
     }
 
+    protected boolean isInternalDebugEnabled() {
+        return _internalDebug && _log.isDebugEnabled();
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -218,5 +236,12 @@ public class SequenceCache {
     public String toString() {
         final String hash = Integer.toHexString(hashCode());
         return "{" + "type=" + _resultType + ", cache=" + _cacheSize + ", increment=" + _incrementSize + "}@" + hash;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setInternalDebug(boolean internalDebug) {
+        _internalDebug = internalDebug;
     }
 }

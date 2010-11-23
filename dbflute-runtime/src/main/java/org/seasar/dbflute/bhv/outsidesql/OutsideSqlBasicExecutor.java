@@ -24,6 +24,8 @@ import org.seasar.dbflute.bhv.core.command.AbstractOutsideSqlCommand;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlCallCommand;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlExecuteCommand;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlContextFactory;
+import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
@@ -34,7 +36,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 
 /**
- * The executor of outside-SQL. <br />
+ * The executor of outside-SQL.
  * <pre>
  * {Basic}
  *   o selectList()
@@ -82,6 +84,12 @@ public class OutsideSqlBasicExecutor {
     /** The option of outside-SQL. (NotNull) */
     protected final OutsideSqlOption _outsideSqlOption;
 
+    /** The factory of outside-SQL context. (NotNull) */
+    protected final OutsideSqlContextFactory _outsideSqlContextFactory;
+
+    /** The factory of outside-SQL executor. (NotNull) */
+    protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
+
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
 
@@ -101,29 +109,27 @@ public class OutsideSqlBasicExecutor {
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig) { // for entry call
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
+            OutsideSqlContextFactory outsideSqlContextFactory, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
         _defaultStatementConfig = defaultStatementConfig;
-        _outsideSqlOption = new OutsideSqlOption();
-        _outsideSqlOption.setTableDbName(tableDbName); // as information
-    }
-
-    public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) { // for nested call
-        _behaviorCommandInvoker = behaviorCommandInvoker;
-        _tableDbName = tableDbName;
-        _currentDBDef = currentDBDef;
-        _defaultStatementConfig = defaultStatementConfig;
-        _outsideSqlOption = outsideSqlOption;
+        if (outsideSqlOption != null) { // for nested call (inherits options)
+            _outsideSqlOption = outsideSqlOption;
+        } else { // for entry call (initializes an option instance)
+            _outsideSqlOption = new OutsideSqlOption();
+            _outsideSqlOption.setTableDbName(tableDbName); // as information
+        }
+        _outsideSqlContextFactory = outsideSqlContextFactory;
+        _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
 
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select the list of the entity by the outside-SQL.
+     * Select the list of the entity by the outsideSql.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -149,7 +155,7 @@ public class OutsideSqlBasicExecutor {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
-     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
@@ -183,7 +189,7 @@ public class OutsideSqlBasicExecutor {
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute the outside-SQL. {insert, update, delete, etc...}
+     * Execute the outsideSql. {insert, update, delete, etc...}
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -193,7 +199,7 @@ public class OutsideSqlBasicExecutor {
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @return The count of execution.
-     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
     public int execute(String path, Object pmb) {
         return invoke(createExecuteCommand(path, pmb));
@@ -261,15 +267,15 @@ public class OutsideSqlBasicExecutor {
         return new OutsideSqlCallCommand();
     }
 
-    protected <COMMAND extends AbstractOutsideSqlCommand<?>> COMMAND xsetupCommand(COMMAND command, String path,
-            Object pmb) {
-        command.setTableDbName(_tableDbName);
-        _behaviorCommandInvoker.injectComponentProperty(command);
-        command.setOutsideSqlPath(path);
-        command.setParameterBean(pmb);
-        command.setOutsideSqlOption(_outsideSqlOption);
-        command.setCurrentDBDef(_currentDBDef);
-        return command;
+    protected <COMMAND extends AbstractOutsideSqlCommand<?>> COMMAND xsetupCommand(COMMAND cmd, String path, Object pmb) {
+        cmd.setTableDbName(_tableDbName);
+        _behaviorCommandInvoker.injectComponentProperty(cmd);
+        cmd.setOutsideSqlPath(path);
+        cmd.setParameterBean(pmb);
+        cmd.setOutsideSqlOption(_outsideSqlOption);
+        cmd.setCurrentDBDef(_currentDBDef);
+        cmd.setOutsideSqlContextFactory(_outsideSqlContextFactory);
+        return cmd;
     }
 
     /**
@@ -328,7 +334,7 @@ public class OutsideSqlBasicExecutor {
     }
 
     protected OutsideSqlPagingExecutor createOutsideSqlPagingExecutor() {
-        return new OutsideSqlPagingExecutor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+        return _outsideSqlExecutorFactory.createPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
 
@@ -340,14 +346,14 @@ public class OutsideSqlBasicExecutor {
      * <pre>
      * memberBhv.outsideSql().<span style="color: #FD4747">cursorHandling()</span>.selectCursor(path, pmb, handler);
      * </pre>
-     * @return The cursor executor of outside-SQL. (NotNull)
+     * @return The cursor executor of outsideSql. (NotNull)
      */
     public OutsideSqlCursorExecutor<Object> cursorHandling() {
         return createOutsideSqlCursorExecutor();
     }
 
     protected OutsideSqlCursorExecutor<Object> createOutsideSqlCursorExecutor() {
-        return new OutsideSqlCursorExecutor<Object>(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+        return _outsideSqlExecutorFactory.createCursor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _outsideSqlOption);
     }
 
@@ -356,14 +362,14 @@ public class OutsideSqlBasicExecutor {
      * <pre>
      * memberBhv.outsideSql().<span style="color: #FD4747">entityHandling()</span>.selectEntityWithDeletedCheck(path, pmb, SimpleMember.class);
      * </pre>
-     * @return The cursor executor of outside-SQL. (NotNull)
+     * @return The cursor executor of outsideSql. (NotNull)
      */
     public OutsideSqlEntityExecutor<Object> entityHandling() {
         return createOutsideSqlEntityExecutor();
     }
 
     protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor() {
-        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
 
@@ -371,24 +377,10 @@ public class OutsideSqlBasicExecutor {
     //                                                                              Option
     //                                                                              ======
     // -----------------------------------------------------
-    //                                       Dynamic Binding
-    //                                       ---------------
-    /**
-     * Set up dynamic-binding for this outside-SQL. <br />
-     * You can use bind variable comment in embedded variable comment by this.
-     * @return this. (NotNull)
-     * @deprecated You does not need to call this to set bind variable in embedded variable.
-     */
-    public OutsideSqlBasicExecutor dynamicBinding() {
-        _outsideSqlOption.dynamicBinding();
-        return this;
-    }
-
-    // -----------------------------------------------------
     //                                       Remove from SQL
     //                                       ---------------
     /**
-     * Set up remove-block-comment for this outside-SQL.
+     * Set up remove-block-comment for this outsideSql.
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor removeBlockComment() {
@@ -397,7 +389,7 @@ public class OutsideSqlBasicExecutor {
     }
 
     /**
-     * Set up remove-line-comment for this outside-SQL.
+     * Set up remove-line-comment for this outsideSql.
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor removeLineComment() {
@@ -409,7 +401,7 @@ public class OutsideSqlBasicExecutor {
     //                                            Format SQL
     //                                            ----------
     /**
-     * Set up format-SQL for this outside-SQL. <br />
+     * Set up format-SQL for this outsideSql. <br />
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */

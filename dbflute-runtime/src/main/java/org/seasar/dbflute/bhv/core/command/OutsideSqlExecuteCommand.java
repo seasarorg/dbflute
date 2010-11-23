@@ -63,7 +63,6 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());

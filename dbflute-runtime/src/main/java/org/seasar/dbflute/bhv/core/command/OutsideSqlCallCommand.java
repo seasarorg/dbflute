@@ -64,7 +64,6 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
         final Object pmb = _parameterBean;
         final OutsideSqlOption option = _outsideSqlOption;
         final OutsideSqlContext outsideSqlContext = createOutsideSqlContext();
-        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setOutsideSqlPath(path);

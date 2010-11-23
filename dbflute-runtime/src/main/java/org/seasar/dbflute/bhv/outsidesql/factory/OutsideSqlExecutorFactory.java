@@ -18,7 +18,11 @@ package org.seasar.dbflute.bhv.outsidesql.factory;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
+import org.seasar.dbflute.bhv.outsidesql.OutsideSqlCursorExecutor;
+import org.seasar.dbflute.bhv.outsidesql.OutsideSqlEntityExecutor;
+import org.seasar.dbflute.bhv.outsidesql.OutsideSqlPagingExecutor;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
 /**
  * @author jflute
@@ -26,13 +30,53 @@ import org.seasar.dbflute.jdbc.StatementConfig;
 public interface OutsideSqlExecutorFactory {
 
     /**
-     * Create the basic executor of outside SQL.
-     * @param invoker The invoker of behavior command. (NotNull)
+     * Create the basic executor of outside-SQL.
+     * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
-     * @param dbdef The definition of DBMS. (NotNull)
-     * @param config The default configuration of statement. (Nullable)
+     * @param currentDBDef The definition of current DBMS. (NotNull)
+     * @param defaultStatementConfig The default configuration of statement. (Nullable)
+     * @param outsideSqlOption The option of outsideSql. (Nullable: if null, means for an entry instance)
      * @return The instance of executor. (NotNull)
      */
-    OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker invoker, String tableDbName, DBDef dbdef,
-            StatementConfig config);
+    OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
+
+    /**
+     * Create the cursor executor of outside-SQL.
+     * @param <PARAMETER_BEAN> The type of parameter-bean.
+     * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
+     * @param currentDBDef The definition of current DBMS. (NotNull)
+     * @param outsideSqlOption The option of outsideSql. (NotNull)
+     * @return The instance of executor. (NotNull)
+     */
+    <PARAMETER_BEAN> OutsideSqlCursorExecutor<PARAMETER_BEAN> createCursor(
+            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            OutsideSqlOption outsideSqlOption);
+
+    /**
+     * Create the entity executor of outside-SQL.
+     * @param <PARAMETER_BEAN> The type of parameter-bean.
+     * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
+     * @param currentDBDef The definition of DBMS. (NotNull)
+     * @param defaultStatementConfig The default configuration of statement. (Nullable)
+     * @param outsideSqlOption The option of outsideSql. (NotNull)
+     * @return The instance of executor. (NotNull)
+     */
+    <PARAMETER_BEAN> OutsideSqlEntityExecutor<PARAMETER_BEAN> createEntity(
+            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
+
+    /**
+     * Create the paging executor of outside-SQL.
+     * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
+     * @param currentDBDef The definition of current DBMS. (NotNull)
+     * @param defaultStatementConfig The default configuration of statement. (Nullable)
+     * @param outsideSqlOption The option of outsideSql. (NotNull)
+     * @return The instance of executor. (NotNull)
+     */
+    OutsideSqlPagingExecutor createPaging(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
 }
