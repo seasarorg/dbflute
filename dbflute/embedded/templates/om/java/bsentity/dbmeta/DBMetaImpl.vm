@@ -34,9 +34,10 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
-    protected final String _tableDbName = "$table.name";
-    protected final String _tablePropertyName = "$table.javaBeansRulePropertyName";
-    protected final TableSqlName _tableSqlName = new TableSqlName("$table.tableSqlName");
+    protected final String _tableDbName = "${table.name}";
+    protected final String _tablePropertyName = "${table.javaBeansRulePropertyName}";
+    protected final TableSqlName _tableSqlName
+            = new TableSqlName(${glDBFluteConfig}.getInstance().getTableSqlNameFilter().filter("${table.tableSqlName}"));
     public String getTableDbName() { return _tableDbName; }
     public String getTablePropertyName() { return _tablePropertyName; }
     public TableSqlName getTableSqlName() { return _tableSqlName; }

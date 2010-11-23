@@ -14,6 +14,7 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
 import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.seasar.dbflute.dbmeta.name.SqlNameFilter;
 import org.seasar.dbflute.exception.IllegalDBFluteConfigAccessException;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
@@ -79,6 +80,7 @@ public class ${glDBFluteConfig} {
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected SqlClauseCreator _sqlClauseCreator;
+    protected SqlNameFilter _tableSqlNameFilter;
     protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
     protected OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
     protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
@@ -108,6 +110,9 @@ public class ${glDBFluteConfig} {
      */
     private ${glDBFluteConfig}() { // adjusts default settings
         _physicalConnectionDigger = new ImplementedPhysicalConnectionDigger();
+        _tableSqlNameFilter = new SqlNameFilter() {
+            public String filter(String sqlName) { return sqlName; }
+        };
 
         if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
@@ -288,6 +293,34 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting sqlClauseCreator: " + sqlClauseCreator);
         }
         _sqlClauseCreator = sqlClauseCreator;
+    }
+
+    // [DBFlute-0.9.7.6]
+    // ===================================================================================
+    //                                                                 TableSqlName Filter
+    //                                                                 ===================
+    /**
+     * @return The SQL name filter for table. (NotNull: this has a default instance and null setting is not allowed)
+     */
+    public SqlNameFilter getTableSqlNameFilter() {
+        return _tableSqlNameFilter;
+    }
+
+    /**
+     * Set the SQL name filter for table. <br />
+     * This setting should be called before container's initialization.
+     * (its exact meaning is: before class loading of DBMeta for table)
+     * @param tableSqlNameFilter The SQL name filter for table. (NotNull)
+     */
+    public void setTableSqlNameFilter(SqlNameFilter tableSqlNameFilter) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting tableSqlNameFilter: " + tableSqlNameFilter);
+        }
+        if (tableSqlNameFilter == null) {
+            throw new IllegalArgumentException("The argument 'tableSqlNameFilter' should not be null.");
+        }
+        _tableSqlNameFilter = tableSqlNameFilter;
     }
 
     // ===================================================================================
