@@ -55,7 +55,7 @@ public class ScalarCondition extends AbstractSubQuery {
     }
 
     protected String getSubQueryClause(String function) {
-        if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasTwoOrMorePrimaryKeys()) {
+        if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasCompoundPrimaryKey()) {
             String msg = "The scalar-condition is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);

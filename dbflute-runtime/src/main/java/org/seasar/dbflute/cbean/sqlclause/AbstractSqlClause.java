@@ -2003,7 +2003,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
             ++index;
         }
-        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
+        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey()) {
             final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln()).append(subQuery);
@@ -2051,7 +2051,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         fromWhereClause = replace(fromWhereClause, getUnionWhereClauseMark(), "");
         fromWhereClause = replace(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
-        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
+        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey()) {
             final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
             final StringBuilder sb = new StringBuilder();
             sb.append("delete from ").append(tableSqlName).append(ln());

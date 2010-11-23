@@ -341,7 +341,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      */
     protected void injectSequenceToPrimaryKeyIfNeeds(Entity entity) {
         final DBMeta dbmeta = entity.getDBMeta();
-        if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
+        if (!dbmeta.hasSequence() || dbmeta.hasCompoundPrimaryKey() || entity.hasPrimaryKeyValue()) {
             return;
         }
         // basically property(column) type is same as next value type

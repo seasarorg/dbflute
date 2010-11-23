@@ -101,7 +101,7 @@ public class MockDBMeta extends AbstractDBMeta {
         return false;
     }
 
-    public boolean hasTwoOrMorePrimaryKeys() {
+    public boolean hasCompoundPrimaryKey() {
         return false;
     }
 

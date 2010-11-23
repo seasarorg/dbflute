@@ -130,7 +130,8 @@ public interface DBMeta {
     //                                                                         Unique Info
     //                                                                         ===========
     /**
-     * Get primary unique info.
+     * Get primary unique info that means unique info for primary key. <br />
+     * If this table does not have primary-key, this method throws UnsupportedOperationException.
      * @return Primary unique info. (NotNull)
      */
     UniqueInfo getPrimaryUniqueInfo();
@@ -142,10 +143,12 @@ public interface DBMeta {
     boolean hasPrimaryKey();
 
     /**
-     * Has two or more primary-keys?
+     * Has compound primary-key? <br />
+     * If this table does not have primary-key in the first place,
+     * this method returns false. 
      * @return Determination.
      */
-    boolean hasTwoOrMorePrimaryKeys();
+    boolean hasCompoundPrimaryKey();
 
     // ===================================================================================
     //                                                                       Relation Info
