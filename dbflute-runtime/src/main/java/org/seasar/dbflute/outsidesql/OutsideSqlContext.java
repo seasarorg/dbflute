@@ -241,15 +241,18 @@ public class OutsideSqlContext {
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
      */
     protected String readPlainOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
-        if (_internalDebug && _log.isDebugEnabled()) {
-            _log.debug("...Reading outside SQL: " + sqlFileEncoding + ", " + dbmsSuffix);
-        }
         final String standardPath = _outsideSqlPath;
         final String dbmsPath = buildDbmsPath(standardPath, dbmsSuffix);
+        if (_internalDebug && _log.isDebugEnabled()) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("...Reading the outside-SQL: ").append(standardPath);
+            sb.append(" {").append(sqlFileEncoding).append(", ").append(dbmsSuffix).append("}");
+            _log.debug(sb.toString());
+        }
         String sql;
         if (isExistResource(dbmsPath)) { // at first
             if (_internalDebug && _log.isDebugEnabled()) {
-                _log.debug("Found the outside SQL for the DBMS: " + dbmsPath);
+                _log.debug("Found the outside-SQL for the DBMS: " + dbmsPath);
             }
             sql = readText(dbmsPath, sqlFileEncoding);
         } else {
