@@ -583,7 +583,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
 #end
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
     // ===================================================================================
     //                                                                     Scalar SubQuery
     //                                                                     ===============

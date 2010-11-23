@@ -2145,7 +2145,7 @@ public class Column {
             return true;
         }
         final Table table = getTable();
-        if (isPrimaryKey() && table.hasOnlyOnePrimaryKey() && table.isUseSequence()) {
+        if (isPrimaryKey() && table.hasSinglePrimaryKey() && table.isUseSequence()) {
             return true;
         }
         return false;

@@ -280,7 +280,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
 #end
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
     public String keepScalarCondition(${myConditionQueryClassName} subQuery)
     { throwIICBOE("ScalarCondition"); return null; }
     public String keepMyselfInScopeRelation(${myConditionQueryClassName} subQuery)

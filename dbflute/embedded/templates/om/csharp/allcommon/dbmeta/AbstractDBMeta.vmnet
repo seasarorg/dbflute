@@ -86,7 +86,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                     ===========
         public abstract ${glUniqueInfo} PrimaryUniqueInfo { get; }
         public abstract bool HasPrimaryKey { get; }
-        public abstract bool HasTwoOrMorePrimaryKeys { get; }
+        public abstract bool HasCompoundPrimaryKey { get; }
 
         protected ${glUniqueInfo} cpui(${glColumnInfo} uniqueColumnInfo) { // createPrimaryUniqueInfo()
             List<${glColumnInfo}> uniqueColumnInfoList = new ArrayList<${glColumnInfo}>();

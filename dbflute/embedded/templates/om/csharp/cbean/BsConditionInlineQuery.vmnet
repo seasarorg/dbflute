@@ -332,7 +332,7 @@ namespace ${glPackageCIQ} {
 #end
 #end
 #end
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
 
         // ===================================================================================
         //                                                                     Scalar SubQuery

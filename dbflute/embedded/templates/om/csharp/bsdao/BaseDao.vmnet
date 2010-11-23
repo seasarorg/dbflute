@@ -36,12 +36,12 @@ namespace ${myExtendedDaoPackageName} {
         int Insert(${myExtendedObjectClassName} entity);
         int UpdateModifiedOnly(${myExtendedObjectClassName} entity);
         int UpdateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
-#if (${table.hasOnlyOnePrimaryKey()})
+#if (${table.hasSinglePrimaryKey()})
         int UpdateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);
 #end
         int Delete(${myExtendedObjectClassName} entity);
         int DeleteNonstrict(${myExtendedObjectClassName} entity);
-#if (${table.hasOnlyOnePrimaryKey()})
+#if (${table.hasSinglePrimaryKey()})
         int DeleteByQuery(${myConditionBeanClassName} cb);// {DBFlute-0.7.9}
 #end
 #end

@@ -75,7 +75,7 @@ namespace ${myDBMetaPackageName} {
         //                                                                     ===========
         public override ${glUniqueInfo} PrimaryUniqueInfo { get {
 #if ($table.hasPrimaryKey())
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
             return cpui(Column${table.primaryKeyAsOne.javaName});
 #else
             List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
@@ -93,7 +93,7 @@ namespace ${myDBMetaPackageName} {
         //                                   Primary Element
         //                                   ---------------
         public override bool HasPrimaryKey { get { return ${table.hasPrimaryKey()}; } }
-        public override bool HasTwoOrMorePrimaryKeys { get { return ${table.hasTwoOrMorePrimaryKeys()}; } }
+        public override bool HasCompoundPrimaryKey { get { return ${table.hasCompoundPrimaryKeys()}; } }
 
         // ===============================================================================
         //                                                                   Relation Info

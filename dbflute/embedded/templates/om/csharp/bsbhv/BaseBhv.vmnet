@@ -180,7 +180,7 @@ namespace ${glPackageExtendedBhv} {
         public ${table.sequenceReturnType} SelectNextVal() {
             return DelegateSelectNextVal();
         }
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
         protected override void SetupNextValueToPrimaryKey(${glEntity} entity) {// Very Internal
             ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
             myEntity.${table.primaryKeyJavaNameAsOne} = SelectNextVal();
@@ -188,7 +188,7 @@ namespace ${glPackageExtendedBhv} {
 #end
 #end
 
-#if (${table.hasOnlyOnePrimaryKey()})
+#if (${table.hasSinglePrimaryKey()})
         // ===============================================================================
         //                                                                   Load Referrer
         //                                                                   =============
@@ -372,7 +372,7 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                                    Query Update
         //                                                                    ============
-#if (${table.hasOnlyOnePrimaryKey()})
+#if (${table.hasSinglePrimaryKey()})
         public int QueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
             AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertConditionBeanNotNull(cb);
             SetupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});

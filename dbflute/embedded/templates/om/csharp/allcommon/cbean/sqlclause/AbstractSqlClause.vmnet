@@ -2130,7 +2130,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         String aliasName = getBasePointAliasName();
         ${glDBMeta} dbmeta = getDBMeta();
-        if (dbmeta.HasTwoOrMorePrimaryKeys) {
+        if (dbmeta.HasCompoundPrimaryKey) {
             String msg = "The target table of queryUpdate() should have only one primary key:";
             msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
             throw new IllegalStateException(msg);
@@ -2184,7 +2184,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public String getClauseQueryDelete() {
         String aliasName = getBasePointAliasName();
         ${glDBMeta} dbmeta = getDBMeta();
-        if (dbmeta.HasTwoOrMorePrimaryKeys) {
+        if (dbmeta.HasCompoundPrimaryKey) {
             String msg = "The target table of queryDelete() should have only one primary key:";
             msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
             throw new IllegalStateException(msg);

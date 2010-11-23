@@ -77,7 +77,7 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                       Primary Element
     //                                       ---------------
 #if ($table.hasPrimaryKey())
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
     public UniqueInfo getPrimaryUniqueInfo() { return cpui(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
 #else
     public UniqueInfo getPrimaryUniqueInfo() {
@@ -94,7 +94,7 @@ public class ${myClassName} extends AbstractDBMeta {
     }
 #end
     public boolean hasPrimaryKey() { return ${table.hasPrimaryKey()}; }
-    public boolean hasTwoOrMorePrimaryKeys() { return ${table.hasTwoOrMorePrimaryKeys()}; }
+    public boolean hasCompoundPrimaryKey() { return ${table.hasCompoundPrimaryKey()}; }
 
     // ===================================================================================
     //                                                                       Relation Info

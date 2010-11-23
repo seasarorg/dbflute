@@ -685,7 +685,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
             String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
-            if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
+            if (!dbmeta.HasPrimaryKey || dbmeta.HasCompoundPrimaryKey) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
                 throw new NotSupportedException(msg);
@@ -842,7 +842,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             String beginMark = subQuery.xgetSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
             String endMark = subQuery.xgetSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
-            if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
+            if (!dbmeta.HasPrimaryKey || dbmeta.HasCompoundPrimaryKey) {
                 String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
                 throw new UnsupportedOperationException(msg);
@@ -1167,7 +1167,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
         subQuery.xgetSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
-        if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
+        if (!dbmeta.HasPrimaryKey || dbmeta.HasCompoundPrimaryKey) {
             String msg = "The scalar-sub-query is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + subQuery.getTableDbName();
             throw new UnsupportedOperationException(msg);

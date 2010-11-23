@@ -1120,7 +1120,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     protected void reg${tmpJavaName}(ConditionKey k, Object v) { regQ(k, v, getCValue${tmpJavaName}(), "${col.name}"); }
     abstract protected ConditionValue getCValue${tmpJavaName}();
 #end
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
 
     // ===================================================================================
     //                                                                    Scalar Condition

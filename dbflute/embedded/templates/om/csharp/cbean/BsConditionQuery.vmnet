@@ -525,7 +525,7 @@ namespace ${glPackageBaseCQ} {
             return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null;
         }
 #end
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
 
 	    // ===============================================================================
 	    //                                                                 Scalar SubQuery

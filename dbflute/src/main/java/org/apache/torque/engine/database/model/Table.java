@@ -926,18 +926,18 @@ public class Table {
     }
 
     /**
-     * Determine whether this table has two or more primary keys.
+     * Determine whether this table has a single primary key.
      * @return Determination.
      */
-    public boolean hasOnlyOnePrimaryKey() {
+    public boolean hasSinglePrimaryKey() {
         return (getPrimaryKey().size() == 1);
     }
 
     /**
-     * Determine whether this table has two or more primary keys.
+     * Determine whether this table has a compound primary key.
      * @return Determination.
      */
-    public boolean hasTwoOrMorePrimaryKeys() {
+    public boolean hasCompoundPrimaryKey() {
         return (getPrimaryKey().size() > 1);
     }
 
@@ -2240,7 +2240,7 @@ public class Table {
     public String getSequenceReturnType() {
         final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();
         final String sequenceReturnType = sequenceIdentityProperties.getSequenceReturnType();
-        if (hasTwoOrMorePrimaryKeys()) {
+        if (hasCompoundPrimaryKey()) {
             return sequenceReturnType;
         }
         final Column primaryKeyAsOne = getPrimaryKeyAsOne();
@@ -2680,7 +2680,7 @@ public class Table {
     //                                                            Buri(Friendly Framework)
     //                                                            ========================
     public boolean isBuriTarget() {
-        if (!hasOnlyOnePrimaryKey()) {
+        if (!hasSinglePrimaryKey()) {
             return false;
         }
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();

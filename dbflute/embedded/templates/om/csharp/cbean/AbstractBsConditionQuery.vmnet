@@ -512,7 +512,7 @@ namespace ${glPackageBaseCQ} {
         protected void reg${tmpJavaName}(${glConditionKey} k, Object v) { regQ(k, v, getCValue${tmpJavaName}(), "${col.name}"); }
         protected abstract ${glConditionValue} getCValue${tmpJavaName}();
 #end
-#if ($table.hasOnlyOnePrimaryKey())
+#if ($table.hasSinglePrimaryKey())
 
         // ===================================================================================
         //                                                                    Scalar Condition

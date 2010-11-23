@@ -579,7 +579,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             final String classificationName = element.getClassificationName();
             registerColumnClsIfNeeds(columnClsMap, element.getCode(), classificationName);
             final Table table = database.getTable(element.getTable());
-            if (table == null || table.hasTwoOrMorePrimaryKeys()) {
+            if (table == null || table.hasCompoundPrimaryKey()) {
                 continue;
             }
             final Column column = table.getColumn(element.getCode());

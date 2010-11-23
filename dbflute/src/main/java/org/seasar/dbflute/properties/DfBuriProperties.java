@@ -340,7 +340,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             String msg = "The table was not found: " + tableName;
             throw new IllegalStateException(msg);
         }
-        if (table.hasTwoOrMorePrimaryKeys()) {
+        if (table.hasCompoundPrimaryKey()) {
             String msg = "The table should have the only one primary key: " + tableName;
             throw new IllegalStateException(msg);
         }
@@ -384,7 +384,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             String msg = "The table was not found: " + tableName;
             throw new IllegalStateException(msg);
         }
-        if (table.hasTwoOrMorePrimaryKeys()) {
+        if (table.hasCompoundPrimaryKey()) {
             String msg = "The table should have the only one primary key: " + tableName;
             throw new IllegalStateException(msg);
         }
