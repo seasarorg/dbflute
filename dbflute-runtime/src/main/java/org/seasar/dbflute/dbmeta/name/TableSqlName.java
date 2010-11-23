@@ -16,6 +16,7 @@
 package org.seasar.dbflute.dbmeta.name;
 
 /**
+ * The value class for the SQL name of table. 
  * @author jflute
  */
 public class TableSqlName {
