@@ -172,6 +172,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected TnBeanMetaDataFactory createBeanMetaDataFactory() {
         final TnBeanMetaDataFactoryExtension factory = new TnBeanMetaDataFactoryExtension();
         factory.setDataSource(_dataSource);
+        factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return factory;
     }
 
