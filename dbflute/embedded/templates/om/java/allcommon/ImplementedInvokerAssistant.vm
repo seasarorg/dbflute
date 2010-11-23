@@ -273,6 +273,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (generator != null) {
             handler.setSequenceCacheKeyGenerator(generator);
         }
+        handler.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return handler;
     }
 
@@ -305,6 +306,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
         resourceParameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
         resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
+        resourceParameter.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return resourceParameter;
     }
 
