@@ -565,7 +565,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             sb.append(containsLn ? ln() : "").append(ln());
         }
         _log.warn("/* * * * * * * * * * * * * * * * * {Warning Exception}");
-        _log.warn(sb.toString());
+        _log.warn(ln() + sb.toString().trim());
         _log.warn("* * * * * * * * * */");
         _log.warn(" ");
     }
