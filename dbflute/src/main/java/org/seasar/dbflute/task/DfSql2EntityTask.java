@@ -38,6 +38,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.exception.DfProcedureSetupFailureException;
 import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
@@ -557,13 +558,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final StringBuilder sb = new StringBuilder();
         for (String name : nameSet) {
             final String exceptionInfo = _exceptionInfoMap.get(name);
-
-            sb.append(ln());
             sb.append("[" + name + "]");
+            final boolean containsLn = Srl.contains(exceptionInfo, ln());
+            sb.append(containsLn ? ln() : " ");
             sb.append(exceptionInfo);
+            sb.append(containsLn ? ln() : "").append(ln());
         }
-        _log.warn(" ");
-        _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+        _log.warn("/* * * * * * * * * * * * * * * * * {Warning Exception}");
         _log.warn(sb.toString());
         _log.warn("* * * * * * * * * */");
         _log.warn(" ");
@@ -630,12 +631,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void throwProcedureSetupFailureException(SQLException e) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to set up procedures!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL Exception]" + ln() + e.getClass() + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to set up procedures.");
+        br.addItem("SQL Exception");
+        br.addElement(DfJDBCException.extractMessage(e));
+        SQLException nextEx = e.getNextException();
+        if (nextEx != null) {
+            br.addElement(DfJDBCException.extractMessage(nextEx));
+        }
+        String msg = br.buildExceptionMessage();
         throw new DfProcedureSetupFailureException(msg, e);
     }
 
