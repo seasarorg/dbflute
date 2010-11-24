@@ -26,6 +26,7 @@ public class DfPmbMetaData {
     protected Map<String, String> _propertyNameColumnNameMap;
     protected Map<String, DfProcedureColumnMetaInfo> _propertyNameColumnInfoMap;
     protected File _sqlFile;
+    protected boolean _procedureCalledBySelect;
     protected boolean _refCustomizeEntity;
 
     // ===================================================================================
@@ -110,6 +111,14 @@ public class DfPmbMetaData {
 
     public void setSqlFile(File sqlFile) {
         this._sqlFile = sqlFile;
+    }
+
+    public boolean isProcedureCalledBySelect() {
+        return _procedureCalledBySelect;
+    }
+
+    public void setProcedureCalledBySelect(boolean procedureCalledBySelect) {
+        this._procedureCalledBySelect = procedureCalledBySelect;
     }
 
     public boolean isRefCustomizeEntity() {

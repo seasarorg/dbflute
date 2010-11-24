@@ -99,6 +99,9 @@ public class DfProcedurePmbSetupper {
             // Procedure Parameter handling
             int index = 0;
             for (DfProcedureColumnMetaInfo column : procedureColumnList) {
+                if (!column.isBindParameter()) {
+                    continue;
+                }
                 final String columnName;
                 {
                     final String plainColumnName = column.getColumnName();
@@ -160,6 +163,7 @@ public class DfProcedurePmbSetupper {
             parameterBeanMetaData.setProcedureName(procedure.buildProcedureSqlName());
             parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
             parameterBeanMetaData.setPropertyNameColumnInfoMap(propertyNameColumnInfoMap);
+            parameterBeanMetaData.setProcedureCalledBySelect(procedure.isCalledBySelect());
             parameterBeanMetaData.setRefCustomizeEntity(refCustomizeEntity);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
         }

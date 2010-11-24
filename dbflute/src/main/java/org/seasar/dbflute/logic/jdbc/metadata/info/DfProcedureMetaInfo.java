@@ -122,7 +122,7 @@ public class DfProcedureMetaInfo {
     // -----------------------------------------------------
     //                                               Calling
     //                                               -------
-    public boolean isCalledBySelectStatement() {
+    public boolean isCalledBySelect() {
         // SQLServer's table valued function cannot be called normally
         // (whether that others like this exist or not is unknown for now)
         return isSQLServerTableValuedFunction();

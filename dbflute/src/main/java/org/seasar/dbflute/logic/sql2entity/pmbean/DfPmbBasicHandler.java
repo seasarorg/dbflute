@@ -154,6 +154,11 @@ public class DfPmbBasicHandler {
         return findPmbMetaData(className).getProcedureName();
     }
 
+    public boolean isProcedureCalledBySelect(String className) {
+        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
+        return pmbMetaData.isProcedureCalledBySelect();
+    }
+
     public boolean isRefCustomizeEntity(String className) {
         final DfPmbMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {

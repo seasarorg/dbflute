@@ -31,6 +31,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.exception.DfProcedureExecutionMetaGettingFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
@@ -70,6 +72,7 @@ public class DfProcedureExecutionMetaExtractor {
     protected final ValueType _uuidAsStringType = TnValueTypes.UUID_AS_STRING;
     protected final ValueType _postgreSqlResultSetType = TnValueTypes.POSTGRESQL_RESULT_SET;
     protected final ValueType _oracleResultSetType = TnValueTypes.ORACLE_RESULT_SET;
+    protected final Map<String, String> _continuedFailureMessageMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                             Process
@@ -139,7 +142,17 @@ public class DfProcedureExecutionMetaExtractor {
                     }
                     final Map<String, DfColumnMetaInfo> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
                     final DfProcedureNotParamResultMetaInfo notParamResult = new DfProcedureNotParamResultMetaInfo();
-                    notParamResult.setPropertyName("notParamResult" + (closetIndex + 1));
+                    final String propertyName;
+                    if (procedure.isCalledBySelect() && closetIndex == 0) {
+                        // for example, table valued function
+                        // if the procedure of this type does not have
+                        // second or more result set basically
+                        // but checks closetIndex just in case
+                        propertyName = "tableReturnValue";
+                    } else { // basically here
+                        propertyName = "notParamResult" + (closetIndex + 1);
+                    }
+                    notParamResult.setPropertyName(propertyName);
                     notParamResult.setResultSetColumnInfoMap(columnMetaInfoMap);
                     procedure.addNotParamResult(notParamResult);
                     ++closetIndex;
@@ -168,19 +181,31 @@ public class DfProcedureExecutionMetaExtractor {
                 }
                 ++index;
             }
-        } catch (SQLException continued) {
-            String msg = "*Failed to execute the procedure for getting meta data:" + ln();
-            msg = msg + " " + sql + ln();
+        } catch (SQLException e) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to execute the procedure for getting meta data.");
+            br.addItem("SQL");
+            br.addElement(sql);
+            br.addItem("Parameter");
             for (DfProcedureColumnMetaInfo column : columnList) {
-                msg = msg + "   " + column.getColumnDisplayName() + ln();
+                br.addElement(column.getColumnDisplayName());
             }
-            msg = msg + " test values = " + buildTestValueDisp(testValueList) + ln();
-            msg = msg + " " + DfJDBCException.extractMessage(continued);
-            SQLException nextEx = continued.getNextException();
+            br.addItem("Test Value");
+            br.addElement(buildTestValueDisp(testValueList));
+            br.addItem("Exception Message");
+            br.addElement(DfJDBCException.extractMessage(e));
+            SQLException nextEx = e.getNextException();
             if (nextEx != null) {
-                msg = msg + ln() + " " + DfJDBCException.extractMessage(nextEx);
+                br.addElement(DfJDBCException.extractMessage(nextEx));
             }
-            _log.info(msg);
+            final String msg = br.buildExceptionMessage();
+            final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
+            if (prop.hasSpecifiedExecutionMetaProcedure()) {
+                throw new DfProcedureExecutionMetaGettingFailureException(msg, e);
+            } else { // if no specified, it continues
+                _continuedFailureMessageMap.put(procedure.getProcedureFullQualifiedName(), msg);
+                _log.info(msg);
+            }
         } finally {
             if (cs != null) {
                 cs.close();
@@ -332,7 +357,7 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     public String createSql(DfProcedureMetaInfo procedure, boolean existsReturn, boolean escape) {
-        final boolean calledBySelect = procedure.isCalledBySelectStatement();
+        final boolean calledBySelect = procedure.isCalledBySelect();
         if (calledBySelect) {
             existsReturn = false;
             escape = false;

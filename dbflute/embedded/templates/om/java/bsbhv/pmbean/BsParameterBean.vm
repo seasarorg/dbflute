@@ -137,6 +137,13 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
          return true; // as default
      }
 
+    /**
+     * {@inheritDoc}
+     */
+     public boolean isCalledBySelect() {
+         return ${database.isPmbMetaDataProcedureCalledBySelect($pmbClassName)}; // resolved by generator
+     }
+
 #end
 #if (!$database.hasPmbMetaDataCheckSafetyResult($pmbClassName))
     // ===================================================================================

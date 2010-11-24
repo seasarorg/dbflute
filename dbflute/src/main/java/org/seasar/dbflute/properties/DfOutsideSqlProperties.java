@@ -154,6 +154,10 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return _executionMetaProcedureNameList;
     }
 
+    public boolean hasSpecifiedExecutionMetaProcedure() {
+        return !getExecutionMetaProcedureNameList().isEmpty();
+    }
+
     public boolean isExecutionMetaProcedureName(String procedureName) {
         final List<String> executionMetaProcedureList = getExecutionMetaProcedureNameList();
         if (executionMetaProcedureList == null || executionMetaProcedureList.isEmpty()) {

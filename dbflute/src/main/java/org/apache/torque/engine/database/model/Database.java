@@ -392,6 +392,10 @@ public class Database {
         return getPmbBasicHandler().getProcedureName(className);
     }
 
+    public boolean isPmbMetaDataProcedureCalledBySelect(String className) {
+        return getPmbBasicHandler().isProcedureCalledBySelect(className);
+    }
+
     public boolean isPmbMetaDataRefCustomizeEntity(String className) {
         return getPmbBasicHandler().isRefCustomizeEntity(className);
     }
