@@ -25,12 +25,23 @@ public class TableSqlName {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _tableSqlName;
+    protected SqlNameFilter _sqlNameFilter;
+    protected boolean _locked;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TableSqlName(String tableSqlName) {
-        this._tableSqlName = tableSqlName;
+        _tableSqlName = tableSqlName;
+    }
+
+    public synchronized void xacceptFilter(SqlNameFilter sqlNameFilter) { // called only once
+        if (_locked) {
+            String msg = "The object was locked so your setting is invalid: " + sqlNameFilter;
+            throw new IllegalStateException(msg);
+        }
+        _sqlNameFilter = sqlNameFilter;
+        _locked = true;
     }
 
     // ===================================================================================
@@ -52,6 +63,6 @@ public class TableSqlName {
 
     @Override
     public String toString() {
-        return _tableSqlName;
+        return _sqlNameFilter != null ? _sqlNameFilter.filter(_tableSqlName) : _tableSqlName;
     }
 }
