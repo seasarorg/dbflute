@@ -18,6 +18,7 @@ package org.seasar.dbflute.dbmeta.name;
 /**
  * The filter call-back for SQL name.
  * @author jflute
+ * @since 0.9.7.6 (2010/11/23 Tuesday)
  */
 public interface SqlNameFilter {
 

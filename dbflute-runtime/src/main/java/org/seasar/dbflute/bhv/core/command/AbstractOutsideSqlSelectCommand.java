@@ -130,6 +130,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // Create SqlExecution.
         // - - - - - - - - - - -
         final OutsideSqlSelectExecution execution = createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
+        execution.setOutsideSqlFilter(_outsideSqlFilter);
         execution.setRemoveBlockComment(isRemoveBlockComment(outsideSqlContext));
         execution.setRemoveLineComment(isRemoveLineComment(outsideSqlContext));
         execution.setFormatSql(outsideSqlContext.isFormatSql());

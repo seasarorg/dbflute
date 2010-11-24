@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
@@ -44,15 +45,18 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
     protected TnProcedureMetaData _procedureMetaData;
     protected TnProcedureResultSetHandlerFactory _procedureResultSetHandlerFactory;
 
+    /** The filter of outside-SQL. (Nullable) */
+    protected OutsideSqlFilter _outsideSqlFilter;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnProcedureCommand(DataSource dataSource, StatementFactory statementFactory,
             TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerFactory procedureResultSetHandlerFactory) {
-        this._dataSource = dataSource;
-        this._statementFactory = statementFactory;
-        this._procedureMetaData = procedureMetaData;
-        this._procedureResultSetHandlerFactory = procedureResultSetHandlerFactory;
+        _dataSource = dataSource;
+        _statementFactory = statementFactory;
+        _procedureMetaData = procedureMetaData;
+        _procedureResultSetHandlerFactory = procedureResultSetHandlerFactory;
     }
 
     public static interface TnProcedureResultSetHandlerFactory { // is needed to construct an instance
@@ -81,7 +85,10 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
     }
 
     protected TnProcedureHandler createProcedureHandler(Object pmb) {
-        final String sql = buildSql(pmb);
+        String sql = buildSql(pmb);
+        if (_outsideSqlFilter != null && _outsideSqlFilter.containsProcedure()) {
+            sql = _outsideSqlFilter.filterExecution(sql);
+        }
         return new TnProcedureHandler(_dataSource, _statementFactory, sql, _procedureMetaData,
                 createProcedureResultSetHandlerFactory());
     }
@@ -169,5 +176,12 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
                 }
             }
         };
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setOutsideSqlFilter(OutsideSqlFilter outsideSqlFilter) {
+        _outsideSqlFilter = outsideSqlFilter;
     }
 }

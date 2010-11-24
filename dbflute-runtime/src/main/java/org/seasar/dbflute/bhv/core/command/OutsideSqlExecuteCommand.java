@@ -101,6 +101,7 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         final Class<?>[] argTypes = (pmb != null ? new Class<?>[] { pmb.getClass() } : new Class<?>[] {});
 
         final OutsideSqlExecuteExecution execution = createOutsideSqlExecuteExecution(argNames, argTypes, sql);
+        execution.setOutsideSqlFilter(_outsideSqlFilter);
         execution.setRemoveBlockComment(isRemoveBlockComment(outsideSqlContext));
         execution.setRemoveLineComment(isRemoveLineComment(outsideSqlContext));
         execution.setFormatSql(outsideSqlContext.isFormatSql());

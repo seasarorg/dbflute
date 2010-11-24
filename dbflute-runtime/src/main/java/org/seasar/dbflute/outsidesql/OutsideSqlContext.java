@@ -157,9 +157,11 @@ public class OutsideSqlContext {
 
     protected boolean _autoPagingLogging; // for logging
 
-    protected boolean removeBlockComment;
+    protected OutsideSqlFilter _outsideSqlFilter;
 
-    protected boolean removeLineComment;
+    protected boolean _removeBlockComment;
+
+    protected boolean _removeLineComment;
 
     protected boolean _formatSql;
 
@@ -194,6 +196,9 @@ public class OutsideSqlContext {
     public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) { // entry here
         String sql = readPlainOutsideSql(sqlFileEncoding, dbmsSuffix);
         sql = replaceOutsideSqlBindCharacterOnLineComment(sql);
+        if (_outsideSqlFilter != null) {
+            sql = _outsideSqlFilter.filterReading(sql);
+        }
         return sql;
     }
 
@@ -516,20 +521,28 @@ public class OutsideSqlContext {
         this._autoPagingLogging = autoPagingLogging;
     }
 
+    public OutsideSqlFilter getOutsideSqlFilter() {
+        return _outsideSqlFilter;
+    }
+
+    public void setOutsideSqlFilter(OutsideSqlFilter outsideSqlFilter) {
+        this._outsideSqlFilter = outsideSqlFilter;
+    }
+
     public boolean isRemoveBlockComment() {
-        return removeBlockComment;
+        return _removeBlockComment;
     }
 
     public void setRemoveBlockComment(boolean removeBlockComment) {
-        this.removeBlockComment = removeBlockComment;
+        this._removeBlockComment = removeBlockComment;
     }
 
     public boolean isRemoveLineComment() {
-        return removeLineComment;
+        return _removeLineComment;
     }
 
     public void setRemoveLineComment(boolean removeLineComment) {
-        this.removeLineComment = removeLineComment;
+        this._removeLineComment = removeLineComment;
     }
 
     public boolean isFormatSql() {

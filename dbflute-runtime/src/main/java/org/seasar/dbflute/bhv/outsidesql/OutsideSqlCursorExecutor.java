@@ -23,6 +23,7 @@ import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
 /**
@@ -50,6 +51,9 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     /** The factory of outside-SQL context. (NotNull) */
     protected final OutsideSqlContextFactory _outsideSqlContextFactory;
 
+    /** The filter of outside-SQL. (Nullable) */
+    protected final OutsideSqlFilter _outsideSqlFilter;
+
     /** The factory of outside-SQL executor. (NotNull) */
     protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
 
@@ -58,13 +62,14 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     //                                                                         ===========
     public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
             DBDef currentDBDef, OutsideSqlOption outsideSqlOption, OutsideSqlContextFactory outsideSqlContextFactory,
-            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+            OutsideSqlFilter outsideSqlFilter, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
         _outsideSqlOption = outsideSqlOption;
         _outsideSqlContextFactory = outsideSqlContextFactory;
         _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
+        _outsideSqlFilter = outsideSqlFilter;
     }
 
     // ===================================================================================
@@ -124,6 +129,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
         cmd.setOutsideSqlOption(_outsideSqlOption);
         cmd.setCurrentDBDef(_currentDBDef);
         cmd.setOutsideSqlContextFactory(_outsideSqlContextFactory);
+        cmd.setOutsideSqlFilter(_outsideSqlFilter);
         cmd.setCursorHandler(handler);
         return cmd;
     }

@@ -18,6 +18,7 @@ package org.seasar.dbflute.bhv.core.execution;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.seasar.dbflute.util.Srl;
 
@@ -32,6 +33,7 @@ public abstract class AbstractOutsideSqlExecution extends TnAbstractDynamicComma
     protected boolean _removeBlockComment;
     protected boolean _removeLineComment;
     protected boolean _formatSql;
+    protected OutsideSqlFilter _outsideSqlFilter;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -44,6 +46,9 @@ public abstract class AbstractOutsideSqlExecution extends TnAbstractDynamicComma
     //                                                                              Filter
     //                                                                              ======
     public String filterSql(String sql) {
+        if (_outsideSqlFilter != null) {
+            sql = _outsideSqlFilter.filterExecution(sql);
+        }
         if (_removeBlockComment) {
             sql = Srl.removeBlockComment(sql);
         }
@@ -81,5 +86,13 @@ public abstract class AbstractOutsideSqlExecution extends TnAbstractDynamicComma
 
     public void setFormatSql(boolean formatSql) {
         this._formatSql = formatSql;
+    }
+
+    public OutsideSqlFilter getOutsideSqlFilter() {
+        return _outsideSqlFilter;
+    }
+
+    public void setOutsideSqlFilter(OutsideSqlFilter outsideSqlFilter) {
+        this._outsideSqlFilter = outsideSqlFilter;
     }
 }

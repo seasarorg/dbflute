@@ -113,8 +113,10 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
     }
 
     protected TnProcedureCommand createProcedureCommand(TnProcedureMetaData metaData) {
-        return new TnProcedureCommand(_dataSource, _statementFactory, metaData,
-                createProcedureResultSetHandlerFactory());
+        final TnProcedureResultSetHandlerFactory factory = createProcedureResultSetHandlerFactory();
+        final TnProcedureCommand cmd = new TnProcedureCommand(_dataSource, _statementFactory, metaData, factory);
+        cmd.setOutsideSqlFilter(_outsideSqlFilter);
+        return cmd;
     }
 
     protected TnProcedureResultSetHandlerFactory createProcedureResultSetHandlerFactory() {

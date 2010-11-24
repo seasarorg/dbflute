@@ -20,6 +20,7 @@ import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.resource.ResourceContext;
 
@@ -49,6 +50,9 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
 
     /** The factory of outside-SQL context. (NotNull) */
     protected OutsideSqlContextFactory _outsideSqlContextFactory;
+
+    /** The filter of outside-SQL. (Nullable) */
+    protected OutsideSqlFilter _outsideSqlFilter;
 
     // ===================================================================================
     //                                                                  Detail Information
@@ -103,6 +107,7 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         outsideSqlContext.setTableDbName(option.getTableDbName());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setOutsideSqlFilter(_outsideSqlFilter);
         outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
         outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
         outsideSqlContext.setFormatSql(option.isFormatSql());
@@ -147,6 +152,9 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         if (_currentDBDef == null) {
             throw new IllegalStateException(buildAssertMessage("_currentDBDef", methodName));
         }
+        if (_outsideSqlContextFactory == null) {
+            throw new IllegalStateException(buildAssertMessage("_outsideSqlContextFactory", methodName));
+        }
     }
 
     // ===================================================================================
@@ -170,5 +178,9 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
 
     public void setOutsideSqlContextFactory(OutsideSqlContextFactory outsideSqlContextFactory) {
         _outsideSqlContextFactory = outsideSqlContextFactory;
+    }
+
+    public void setOutsideSqlFilter(OutsideSqlFilter outsideSqlFilter) {
+        _outsideSqlFilter = outsideSqlFilter;
     }
 }

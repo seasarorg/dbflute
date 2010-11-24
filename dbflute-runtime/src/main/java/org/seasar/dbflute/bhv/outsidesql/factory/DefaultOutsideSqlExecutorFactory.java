@@ -22,6 +22,7 @@ import org.seasar.dbflute.bhv.outsidesql.OutsideSqlCursorExecutor;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlEntityExecutor;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlPagingExecutor;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
 /**
@@ -35,8 +36,9 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     public OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
             DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
         final OutsideSqlContextFactory outsideSqlContextFactory = createOutsideSqlContextFactory();
+        final OutsideSqlFilter outsideSqlFilter = createOutsideSqlExecutionFilter();
         return new OutsideSqlBasicExecutor(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
-                outsideSqlOption, outsideSqlContextFactory, this);
+                outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
     }
 
     /**
@@ -46,8 +48,9 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
             BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
             OutsideSqlOption outsideSqlOption) {
         final OutsideSqlContextFactory outsideSqlContextFactory = createOutsideSqlContextFactory();
+        final OutsideSqlFilter outsideSqlFilter = createOutsideSqlExecutionFilter();
         return new OutsideSqlCursorExecutor<PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName, currentDBDef,
-                outsideSqlOption, outsideSqlContextFactory, this);
+                outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
     }
 
     /**
@@ -57,6 +60,15 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
      */
     protected OutsideSqlContextFactory createOutsideSqlContextFactory() { // extension point
         return new DefaultOutsideSqlContextFactory();
+    }
+
+    /**
+     * Create the filter of outside-SQL. <br />
+     * This is the very point for an extension of the outside-SQL filtering. 
+     * @return The instance of the filter. (Nullable)
+     */
+    protected OutsideSqlFilter createOutsideSqlExecutionFilter() { // extension point
+        return null; // as default (no filter)
     }
 
     /**

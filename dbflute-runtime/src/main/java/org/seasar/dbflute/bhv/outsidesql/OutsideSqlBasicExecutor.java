@@ -32,6 +32,7 @@ import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 
@@ -87,11 +88,11 @@ public class OutsideSqlBasicExecutor {
     /** The factory of outside-SQL context. (NotNull) */
     protected final OutsideSqlContextFactory _outsideSqlContextFactory;
 
+    /** The filter of outside-SQL. (Nullable) */
+    protected final OutsideSqlFilter _outsideSqlFilter;
+
     /** The factory of outside-SQL executor. (NotNull) */
     protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
-
-    /** Is it dynamic binding? */
-    protected boolean _dynamicBinding;
 
     /** Does it remove block comments from the SQL? */
     protected boolean _removeBlockComment;
@@ -110,7 +111,8 @@ public class OutsideSqlBasicExecutor {
     //                                                                         ===========
     public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
             DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
-            OutsideSqlContextFactory outsideSqlContextFactory, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+            OutsideSqlContextFactory outsideSqlContextFactory, OutsideSqlFilter outsideSqlFilter,
+            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
@@ -122,6 +124,7 @@ public class OutsideSqlBasicExecutor {
             _outsideSqlOption.setTableDbName(tableDbName); // as information
         }
         _outsideSqlContextFactory = outsideSqlContextFactory;
+        _outsideSqlFilter = outsideSqlFilter;
         _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
 
@@ -275,6 +278,7 @@ public class OutsideSqlBasicExecutor {
         cmd.setOutsideSqlOption(_outsideSqlOption);
         cmd.setCurrentDBDef(_currentDBDef);
         cmd.setOutsideSqlContextFactory(_outsideSqlContextFactory);
+        cmd.setOutsideSqlFilter(_outsideSqlFilter);
         return cmd;
     }
 
