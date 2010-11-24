@@ -18,6 +18,7 @@ package org.seasar.dbflute.bhv.core.execution;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
@@ -47,5 +48,13 @@ public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
     protected TnBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
         final String realSql = filterSql(ctx.getSql());
         return new TnBasicUpdateHandler(getDataSource(), getStatementFactory(), realSql);
+    }
+
+    // ===================================================================================
+    //                                                                              Filter
+    //                                                                              ======
+    @Override
+    protected OutsideSqlFilter.ExecutionFilterType getOutsideSqlExecutionFilterType() {
+        return OutsideSqlFilter.ExecutionFilterType.EXECUTE;
     }
 }

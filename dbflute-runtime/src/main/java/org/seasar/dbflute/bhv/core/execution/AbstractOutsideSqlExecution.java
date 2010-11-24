@@ -47,7 +47,7 @@ public abstract class AbstractOutsideSqlExecution extends TnAbstractDynamicComma
     //                                                                              ======
     public String filterSql(String sql) {
         if (_outsideSqlFilter != null) {
-            sql = _outsideSqlFilter.filterExecution(sql);
+            sql = _outsideSqlFilter.filterExecution(sql, getOutsideSqlExecutionFilterType());
         }
         if (_removeBlockComment) {
             sql = Srl.removeBlockComment(sql);
@@ -60,6 +60,8 @@ public abstract class AbstractOutsideSqlExecution extends TnAbstractDynamicComma
         }
         return sql;
     }
+
+    protected abstract OutsideSqlFilter.ExecutionFilterType getOutsideSqlExecutionFilterType();
 
     // ===================================================================================
     //                                                                            Accessor

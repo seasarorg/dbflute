@@ -86,8 +86,8 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
 
     protected TnProcedureHandler createProcedureHandler(Object pmb) {
         String sql = buildSql(pmb);
-        if (_outsideSqlFilter != null && _outsideSqlFilter.containsProcedure()) {
-            sql = _outsideSqlFilter.filterExecution(sql);
+        if (_outsideSqlFilter != null) {
+            sql = _outsideSqlFilter.filterExecution(sql, OutsideSqlFilter.ExecutionFilterType.PROCEDURE);
         }
         return new TnProcedureHandler(_dataSource, _statementFactory, sql, _procedureMetaData,
                 createProcedureResultSetHandlerFactory());

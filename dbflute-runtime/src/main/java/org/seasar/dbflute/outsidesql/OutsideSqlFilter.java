@@ -28,16 +28,10 @@ public interface OutsideSqlFilter {
      * (but removing comments and formatting options are after the filter) <br />
      * And whether a procedure's SQL is contained or not is determined by containsProcedure().
      * @param executedSql The string of executed outside-SQL already resolved parameter comments. (NotNull)
+     * @param filterType The type of execution filter. (NotNull)
      * @return The filtered SQL that is executed by JDBC directly. (NotNull)
      */
-    String filterExecution(String executedSql);
-
-    /**
-     * Does the filter contain procedure's SQLs? <br />
-     * filterExecution() is only target.
-     * @return Determination.
-     */
-    boolean containsProcedure();
+    String filterExecution(String executedSql, ExecutionFilterType filterType);
 
     /**
      * Filter the outside-SQL immediately after reading a SQL file. (for user customization) <br />
@@ -47,4 +41,11 @@ public interface OutsideSqlFilter {
      * @return The filtered SQL that is executed by JDBC directly. (NotNull)
      */
     String filterReading(String readSql);
+
+    /**
+     * The type of execution filter.
+     */
+    public enum ExecutionFilterType {
+        SELECT, EXECUTE, PROCEDURE
+    }
 }
