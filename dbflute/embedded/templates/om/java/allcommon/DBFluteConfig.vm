@@ -110,9 +110,6 @@ public class ${glDBFluteConfig} {
      */
     private ${glDBFluteConfig}() { // adjusts default settings
         _physicalConnectionDigger = new ImplementedPhysicalConnectionDigger();
-        _tableSqlNameFilter = new SqlNameFilter() {
-            public String filter(String sqlName) { return sqlName; }
-        };
 
         if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
@@ -234,19 +231,22 @@ public class ${glDBFluteConfig} {
     //                                                           PhysicalConnection Digger
     //                                                           =========================
     /**
-     * @return The digger of physical connection. (Nullable)
+     * @return The digger of physical connection. (NotNull: has a default instance)
      */
     public PhysicalConnectionDigger getPhysicalConnectionDigger() {
         return _physicalConnectionDigger;
     }
 
     /**
-     * @param physicalConnectionDigger The digger of physical connection. (Nullable)
+     * @param physicalConnectionDigger The digger of physical connection. (NotNull)
      */
     public void setPhysicalConnectionDigger(PhysicalConnectionDigger physicalConnectionDigger) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting physicalConnectionDigger: " + physicalConnectionDigger);
+        }
+        if (physicalConnectionDigger == null) {
+            throw new IllegalArgumentException("The argument 'physicalConnectionDigger' should not be null.");
         }
         _physicalConnectionDigger = physicalConnectionDigger;
     }
@@ -300,7 +300,7 @@ public class ${glDBFluteConfig} {
     //                                                                 TableSqlName Filter
     //                                                                 ===================
     /**
-     * @return The SQL name filter for table. (NotNull: this has a default instance and null setting is not allowed)
+     * @return The SQL name filter for table. (Nullable)
      */
     public SqlNameFilter getTableSqlNameFilter() {
         return _tableSqlNameFilter;
@@ -310,15 +310,12 @@ public class ${glDBFluteConfig} {
      * Set the SQL name filter for table. <br />
      * This setting should be called before container's initialization.
      * (its exact meaning is: before class loading of DBMeta for table)
-     * @param tableSqlNameFilter The SQL name filter for table. (NotNull)
+     * @param tableSqlNameFilter The SQL name filter for table. (Nullable)
      */
     public void setTableSqlNameFilter(SqlNameFilter tableSqlNameFilter) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting tableSqlNameFilter: " + tableSqlNameFilter);
-        }
-        if (tableSqlNameFilter == null) {
-            throw new IllegalArgumentException("The argument 'tableSqlNameFilter' should not be null.");
         }
         _tableSqlNameFilter = tableSqlNameFilter;
     }
