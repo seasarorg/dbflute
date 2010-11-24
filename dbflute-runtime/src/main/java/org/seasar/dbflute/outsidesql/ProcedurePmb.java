@@ -24,8 +24,8 @@ import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 public interface ProcedurePmb extends ParameterBean {
 
     /**
-     * Get the value of procedure name.
-     * @return The value of procedure name. (NotNull)
+     * Get the value of procedure name for calling.
+     * @return The string expression of procedure name. (NotNull)
      */
     String getProcedureName();
 
@@ -36,4 +36,12 @@ public interface ProcedurePmb extends ParameterBean {
      * @return Determination.
      */
     boolean isEscapeStatement();
+
+    /**
+     * Does it call the procedure statement by select statement? <br />
+     * If true, '{call SP_FOO()}' to 'select * from SP_FOO()'. <br />
+     * This default value is resolved by generator automatically.
+     * @return Determination.
+     */
+    boolean isCalledBySelect();
 }

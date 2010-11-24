@@ -91,16 +91,38 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
         final int bindSize = _procedureMetaData.getBindParameterTypeList().size();
         final boolean existsReturn = _procedureMetaData.hasReturnParameterType();
 
-        // default is that escape is valid
-        // but basically pmb is ProcedurePmb here
-        boolean kakou = true;
-        if (pmb instanceof ProcedurePmb) { // so you can specify through ProcedurePmb
-            kakou = ((ProcedurePmb) pmb).isEscapeStatement();
-        }
-        return doBuildSql(procedureName, bindSize, existsReturn, kakou);
+        return doBuildSql(pmb, procedureName, bindSize, existsReturn);
     }
 
-    protected String doBuildSql(String procedureName, int bindSize, boolean existsReturn, boolean kakou) {
+    protected String doBuildSql(Object pmb, String procedureName, int bindSize, boolean existsReturn) {
+        // normally escape and call
+        boolean kakou = true;
+        boolean calledBySelect = false;
+        if (pmb instanceof ProcedurePmb) { // so you can specify through ProcedurePmb
+            kakou = ((ProcedurePmb) pmb).isEscapeStatement();
+            calledBySelect = ((ProcedurePmb) pmb).isCalledBySelect();
+        }
+        if (calledBySelect) { // for example, table valued function
+            return doBuildSqlAsCalledBySelect(procedureName, bindSize);
+        } else { // basically here
+            return doBuildSqlAsProcedureCall(procedureName, bindSize, existsReturn, kakou);
+        }
+    }
+
+    protected String doBuildSqlAsCalledBySelect(String procedureName, int bindSize) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select * from ").append(procedureName).append("(");
+        for (int i = 0; i < bindSize; i++) {
+            sb.append("?, ");
+        }
+        if (bindSize > 0) {
+            sb.setLength(sb.length() - 2);
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    protected String doBuildSqlAsProcedureCall(String procedureName, int bindSize, boolean existsReturn, boolean kakou) {
         final StringBuilder sb = new StringBuilder();
         final int argSize;
         {
