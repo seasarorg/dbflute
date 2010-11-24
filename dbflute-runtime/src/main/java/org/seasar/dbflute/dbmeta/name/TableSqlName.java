@@ -39,7 +39,7 @@ public class TableSqlName {
 
     public synchronized void xacceptFilter(SqlNameFilter sqlNameFilter) { // called only once
         if (_locked) {
-            String msg = "The object was locked so your setting is invalid: " + sqlNameFilter;
+            String msg = "The object has been locked so your setting is invalid: " + sqlNameFilter;
             throw new IllegalStateException(msg);
         }
         _sqlNameFilter = sqlNameFilter;
