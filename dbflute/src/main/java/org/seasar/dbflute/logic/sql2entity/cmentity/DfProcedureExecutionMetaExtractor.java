@@ -99,7 +99,7 @@ public class DfProcedureExecutionMetaExtractor {
         final List<Object> testValueList = DfCollectionUtil.newArrayList();
         setupTestValueList(columnList, testValueList);
         final boolean existsReturn = existsReturnValue(columnList);
-        final String sql = createSql(procedure, columnList.size(), existsReturn, true);
+        final String sql = createSql(procedure, existsReturn, true);
         Connection conn = null;
         CallableStatement cs = null;
         try {
@@ -115,7 +115,7 @@ public class DfProcedureExecutionMetaExtractor {
             try {
                 executed = cs.execute();
             } catch (SQLException e) { // retry without escape because Oracle sometimes hates escape
-                final String retrySql = createSql(procedure, columnList.size(), existsReturn, false);
+                final String retrySql = createSql(procedure, existsReturn, false);
                 try {
                     try {
                         cs.close();
@@ -255,55 +255,48 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void doSetupTestValueList(DfProcedureColumnMetaInfo column, List<Object> testValueList) {
-        final DfProcedureColumnType columnType = column.getProcedureColumnType();
-        if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)
-                || DfProcedureColumnType.procedureColumnResult.equals(columnType)) {
-            // for example, SQLServer's table valued function is RESULT type
+        if (!column.isInputParameter()) {
             return;
         }
-        if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
-                || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-
-            // mapping by DB type name as pinpoint patch
-            if (column.isPostgreSQLUuid() || column.isSQLServerUniqueIdentifier()) {
-                testValueList.add("FD8C7155-3A0A-DB11-BAC4-0011F5099158");
-                return;
-            }
-
-            // mapping by JDBC type
-            final String stringValue = "0";
-            final String jdbcType = findJdbcType(column);
-            final String javaNative = findNativeType(jdbcType, column);
-            final Object testValue; // cannot be null
-            if (isJavaNativeStringObject(javaNative)) {
-                testValue = stringValue;
-            } else if (isJavaNativeNumberObject(javaNative)) {
-                testValue = 0;
-            } else if (isJavaNativeDateObject(javaNative)) {
-                if (TypeMap.isJdbcTypeDate(jdbcType)) {
-                    // Oracle date is mapped to java.util.Date in Generate task
-                    // but this ignores it because of execution only here
-                    testValue = DfTypeUtil.toSqlDate("2006-09-26");
-                } else if (TypeMap.isJdbcTypeTime(jdbcType)) {
-                    testValue = DfTypeUtil.toTime("18:21:00");
-                } else {
-                    testValue = DfTypeUtil.toTimestamp("2006-09-26 18:21:00");
-                }
-            } else if (isJavaNativeBooleanObject(javaNative)) {
-                testValue = Boolean.FALSE;
-            } else if (isJavaNativeBinaryObject(javaNative)) {
-                final String encoding = "UTF-8";
-                try {
-                    testValue = stringValue.getBytes(encoding);
-                } catch (UnsupportedEncodingException e) {
-                    String msg = "Unsupported encoding: " + encoding;
-                    throw new IllegalStateException(msg, e);
-                }
-            } else { // as string
-                testValue = stringValue;
-            }
-            testValueList.add(testValue);
+        // mapping by DB type name as pinpoint patch
+        if (column.isPostgreSQLUuid() || column.isSQLServerUniqueIdentifier()) {
+            testValueList.add("FD8C7155-3A0A-DB11-BAC4-0011F5099158");
+            return;
         }
+
+        // mapping by JDBC type
+        final String stringValue = "0";
+        final String jdbcType = findJdbcType(column);
+        final String javaNative = findNativeType(jdbcType, column);
+        final Object testValue; // cannot be null
+        if (isJavaNativeStringObject(javaNative)) {
+            testValue = stringValue;
+        } else if (isJavaNativeNumberObject(javaNative)) {
+            testValue = 0;
+        } else if (isJavaNativeDateObject(javaNative)) {
+            if (TypeMap.isJdbcTypeDate(jdbcType)) {
+                // Oracle date is mapped to java.util.Date in Generate task
+                // but this ignores it because of execution only here
+                testValue = DfTypeUtil.toSqlDate("2006-09-26");
+            } else if (TypeMap.isJdbcTypeTime(jdbcType)) {
+                testValue = DfTypeUtil.toTime("18:21:00");
+            } else {
+                testValue = DfTypeUtil.toTimestamp("2006-09-26 18:21:00");
+            }
+        } else if (isJavaNativeBooleanObject(javaNative)) {
+            testValue = Boolean.FALSE;
+        } else if (isJavaNativeBinaryObject(javaNative)) {
+            final String encoding = "UTF-8";
+            try {
+                testValue = stringValue.getBytes(encoding);
+            } catch (UnsupportedEncodingException e) {
+                String msg = "Unsupported encoding: " + encoding;
+                throw new IllegalStateException(msg, e);
+            }
+        } else { // as string
+            testValue = stringValue;
+        }
+        testValueList.add(testValue);
     }
 
     protected String findJdbcType(DfProcedureColumnMetaInfo column) {
@@ -338,13 +331,14 @@ public class DfProcedureExecutionMetaExtractor {
         return getTypeMappingProperties().isJavaNativeBinaryObject(javaNative);
     }
 
-    public String createSql(DfProcedureMetaInfo procedure, int bindSize, boolean existsReturn, boolean escape) {
-        final String procedureSqlName = procedure.buildProcedureSqlName();
+    public String createSql(DfProcedureMetaInfo procedure, boolean existsReturn, boolean escape) {
         final boolean calledBySelect = procedure.isCalledBySelectStatement();
         if (calledBySelect) {
             existsReturn = false;
             escape = false;
         }
+        final String procedureSqlName = procedure.buildProcedureSqlName();
+        final int bindSize = procedure.getBindParameterCount();
         final StringBuilder sb = new StringBuilder();
         if (escape) {
             sb.append("{");

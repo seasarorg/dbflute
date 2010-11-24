@@ -138,6 +138,35 @@ public class DfProcedureColumnMetaInfo {
     }
 
     // ===================================================================================
+    //                                                             Parameter Determination
+    //                                                             =======================
+    public boolean isBindParameter() {
+        final DfProcedureColumnType columnType = _procedureColumnType;
+        if (DfProcedureColumnType.procedureColumnResult.equals(columnType) // just in case
+                || isSQLServerTableReturnValue()) { // pinpoint patch
+            return false;
+        }
+        return true; // almost true
+
+        // RESULT type does not have a column info basically
+        // but sometimes it can be, so checks it just in case
+    }
+
+    public boolean isInputParameter() {
+        final DfProcedureColumnType columnType = _procedureColumnType;
+        if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)
+                || DfProcedureColumnType.procedureColumnResult.equals(columnType) // just in case
+                || isSQLServerTableReturnValue()) { // pinpoint patch
+            return false;
+        }
+        if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
+                || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
+            return true;
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                  Type Determination
     //                                                                  ==================
     public boolean isConceptTypeStringClob() {
@@ -210,6 +239,8 @@ public class DfProcedureColumnMetaInfo {
         if (!getBasicProperties().isDatabaseSQLServer()) {
             return false;
         }
+        // it ignores column type of procedure here
+        // (basically this has RESULT type but only a name is enough to determine)
         return "@TABLE_RETURN_VALUE".equalsIgnoreCase(getColumnName());
     }
 

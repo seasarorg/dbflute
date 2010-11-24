@@ -93,18 +93,32 @@ public class DfProcedureMetaInfo {
         return Srl.substringLastRear(_procedureName, ".");
     }
 
-    // -----------------------------------------------------
-    //                                              Overload
-    //                                              --------
-    public boolean hasOverloadParameter() {
-        for (DfProcedureColumnMetaInfo metaInfo : _procedureColumnList) {
-            if (metaInfo.getOverloadNo() != null) {
-                return true;
+    // ===================================================================================
+    //                                                                    Bind Information
+    //                                                                    ================
+    public int getBindParameterCount() {
+        int count = 0;
+        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+            if (columnInfo.isBindParameter()) {
+                ++count;
             }
         }
-        return false;
+        return count;
     }
 
+    public int getInputParameterCount() {
+        int count = 0;
+        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+            if (columnInfo.isInputParameter()) {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    // ===================================================================================
+    //                                                             Execution Determination
+    //                                                             =======================
     // -----------------------------------------------------
     //                                               Calling
     //                                               -------
@@ -115,8 +129,20 @@ public class DfProcedureMetaInfo {
     }
 
     // -----------------------------------------------------
-    //                                              Pinpoint
+    //                                              Overload
     //                                              --------
+    public boolean hasOverloadParameter() {
+        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+            if (columnInfo.getOverloadNo() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                              Pinpoint Determination
+    //                                                              ======================
     public boolean isSQLServerTableValuedFunction() {
         if (!getBasicProperties().isDatabaseSQLServer()) {
             return false;
