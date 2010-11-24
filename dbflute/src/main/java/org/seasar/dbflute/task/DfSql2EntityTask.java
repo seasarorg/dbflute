@@ -555,11 +555,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         final Set<String> nameSet = _exceptionInfoMap.keySet();
         final StringBuilder sb = new StringBuilder();
-        final String lineSeparator = System.getProperty("line.separator");
         for (String name : nameSet) {
             final String exceptionInfo = _exceptionInfoMap.get(name);
 
-            sb.append(lineSeparator);
+            sb.append(ln());
             sb.append("[" + name + "]");
             sb.append(exceptionInfo);
         }
@@ -620,6 +619,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         try {
             final DfProcedurePmbSetupper setupper = createProcedurePmbSetupper();
             setupper.setupProcedure();
+            _exceptionInfoMap.putAll(setupper.getContinuedFailureMessageMap());
         } catch (SQLException e) {
             throwProcedureSetupFailureException(e);
         }

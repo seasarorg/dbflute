@@ -148,7 +148,7 @@ public class DfProcedureExecutionMetaExtractor {
                         // if the procedure of this type does not have
                         // second or more result set basically
                         // but checks closetIndex just in case
-                        propertyName = "tableReturnValue";
+                        propertyName = "ReturnResult";
                     } else { // basically here
                         propertyName = "notParamResult" + (closetIndex + 1);
                     }
@@ -580,5 +580,12 @@ public class DfProcedureExecutionMetaExtractor {
     //                                                                      ==============
     protected String ln() {
         return "\n";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Map<String, String> getContinuedFailureMessageMap() {
+        return _continuedFailureMessageMap;
     }
 }

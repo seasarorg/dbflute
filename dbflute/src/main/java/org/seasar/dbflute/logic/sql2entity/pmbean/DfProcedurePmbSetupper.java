@@ -52,6 +52,7 @@ public class DfProcedurePmbSetupper {
     protected final Database _database;
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
     protected final DfProcedureHandler _procedureHandler = new DfProcedureHandler();
+    protected final Map<String, String> _continuedFailureMessageMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -180,6 +181,7 @@ public class DfProcedurePmbSetupper {
         if (getOutsideSqlProperties().isGenerateProcedureCustomizeEntity()) {
             final DfProcedureExecutionMetaExtractor executionMetaHandler = new DfProcedureExecutionMetaExtractor();
             executionMetaHandler.extractExecutionMetaData(_dataSource, procedureList);
+            _continuedFailureMessageMap.putAll(executionMetaHandler.getContinuedFailureMessageMap());
         }
         return procedureList;
     }
@@ -475,5 +477,12 @@ public class DfProcedurePmbSetupper {
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
         return DfBuildProperties.getInstance().getOutsideSqlProperties();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Map<String, String> getContinuedFailureMessageMap() {
+        return _continuedFailureMessageMap;
     }
 }
