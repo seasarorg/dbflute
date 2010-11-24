@@ -261,7 +261,9 @@ public class DfProcedureExecutionMetaExtractor {
 
     protected void doSetupTestValueList(DfProcedureColumnMetaInfo column, List<Object> testValueList) {
         final DfProcedureColumnType columnType = column.getProcedureColumnType();
-        if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
+        if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)
+                || DfProcedureColumnType.procedureColumnResult.equals(columnType)) {
+            // for example, SQLServer's table valued function is RESULT type
             return;
         }
         if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
@@ -277,7 +279,7 @@ public class DfProcedureExecutionMetaExtractor {
             final String stringValue = "0";
             final String jdbcType = findJdbcType(column);
             final String javaNative = findNativeType(jdbcType, column);
-            Object testValue = null;
+            final Object testValue; // cannot be null
             if (isJavaNativeStringObject(javaNative)) {
                 testValue = stringValue;
             } else if (isJavaNativeNumberObject(javaNative)) {
