@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
@@ -205,6 +206,36 @@ public class DfProcedureColumnMetaInfo {
         return _columnHandler.isSQLServerUniqueIdentifier(dbTypeName);
     }
 
+    public boolean isSQLServerTableReturnValue() {
+        if (!getBasicProperties().isDatabaseSQLServer()) {
+            return false;
+        }
+        return "@TABLE_RETURN_VALUE".equalsIgnoreCase(getColumnName());
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _columnName + ", " + _procedureColumnType + ", " + _jdbcDefType + ", " + _dbTypeName + "("
+                + _columnSize + ", " + _decimalDigits + ")" + _columnComment + "}";
+    }
+
+    // ===================================================================================
+    //                                                                      Procedure Type
+    //                                                                      ==============
     public enum DfProcedureColumnType {
         procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut(
                 "Out"), procedureColumnReturn("Return"), procedureColumnResult("Result");
@@ -217,15 +248,6 @@ public class DfProcedureColumnMetaInfo {
         public String alias() {
             return _alias;
         }
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public String toString() {
-        return "{" + _columnName + ", " + _procedureColumnType + ", " + _jdbcDefType + ", " + _dbTypeName + "("
-                + _columnSize + ", " + _decimalDigits + ")" + _columnComment + "}";
     }
 
     // ===================================================================================

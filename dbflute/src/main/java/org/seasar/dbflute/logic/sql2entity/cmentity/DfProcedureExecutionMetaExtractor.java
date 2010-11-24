@@ -98,9 +98,8 @@ public class DfProcedureExecutionMetaExtractor {
         }
         final List<Object> testValueList = DfCollectionUtil.newArrayList();
         setupTestValueList(columnList, testValueList);
-        final String procedureSqlName = procedure.buildProcedureSqlName();
         final boolean existsReturn = existsReturnValue(columnList);
-        final String sql = createSql(procedureSqlName, columnList.size(), existsReturn, true);
+        final String sql = createSql(procedure, columnList.size(), existsReturn, true);
         Connection conn = null;
         CallableStatement cs = null;
         try {
@@ -116,7 +115,7 @@ public class DfProcedureExecutionMetaExtractor {
             try {
                 executed = cs.execute();
             } catch (SQLException e) { // retry without escape because Oracle sometimes hates escape
-                final String retrySql = createSql(procedureSqlName, columnList.size(), existsReturn, false);
+                final String retrySql = createSql(procedure, columnList.size(), existsReturn, false);
                 try {
                     try {
                         cs.close();
@@ -339,7 +338,13 @@ public class DfProcedureExecutionMetaExtractor {
         return getTypeMappingProperties().isJavaNativeBinaryObject(javaNative);
     }
 
-    public String createSql(String procedureName, int bindSize, boolean existsReturn, boolean escape) {
+    public String createSql(DfProcedureMetaInfo procedure, int bindSize, boolean existsReturn, boolean escape) {
+        final String procedureSqlName = procedure.buildProcedureSqlName();
+        final boolean calledBySelect = procedure.isCalledBySelectStatement();
+        if (calledBySelect) {
+            existsReturn = false;
+            escape = false;
+        }
         final StringBuilder sb = new StringBuilder();
         if (escape) {
             sb.append("{");
@@ -353,7 +358,12 @@ public class DfProcedureExecutionMetaExtractor {
                 argSize = bindSize;
             }
         }
-        sb.append("call ").append(procedureName).append("(");
+        if (calledBySelect) {
+            sb.append("select * from ");
+        } else {
+            sb.append("call ");
+        }
+        sb.append(procedureSqlName).append("(");
         for (int i = 0; i < argSize; i++) {
             sb.append("?, ");
         }

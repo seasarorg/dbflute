@@ -105,6 +105,41 @@ public class DfProcedureMetaInfo {
         return false;
     }
 
+    // -----------------------------------------------------
+    //                                               Calling
+    //                                               -------
+    public boolean isCalledBySelectStatement() {
+        // SQLServer's table valued function cannot be called normally
+        // (whether that others like this exist or not is unknown for now)
+        return isSQLServerTableValuedFunction();
+    }
+
+    // -----------------------------------------------------
+    //                                              Pinpoint
+    //                                              --------
+    public boolean isSQLServerTableValuedFunction() {
+        if (!getBasicProperties().isDatabaseSQLServer()) {
+            return false;
+        }
+        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+            if (columnInfo.isSQLServerTableReturnValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
