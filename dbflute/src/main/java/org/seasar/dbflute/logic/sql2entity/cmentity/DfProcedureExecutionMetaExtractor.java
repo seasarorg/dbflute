@@ -195,16 +195,12 @@ public class DfProcedureExecutionMetaExtractor {
     protected String buildTestValueDisp(List<Object> testValueList) {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
-        int index = 0;
         for (Object value : testValueList) {
-            if (index == 0) {
-                sb.append("null");
-            } else if (value instanceof String) {
+            if (value instanceof String) {
                 sb.append("\"").append(value).append("\"");
             } else {
                 sb.append(value);
             }
-            ++index;
         }
         sb.append("}");
         return sb.toString();
