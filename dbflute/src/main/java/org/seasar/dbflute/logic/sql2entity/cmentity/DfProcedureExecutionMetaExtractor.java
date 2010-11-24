@@ -378,6 +378,9 @@ public class DfProcedureExecutionMetaExtractor {
         int index = 0;
         int testValueIndex = 0;
         for (DfProcedureColumnMetaInfo column : columnList) {
+            if (!column.isBindParameter()) {
+                continue; // must be no increment
+            }
             final int paramIndex = (index + 1);
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
             final int jdbcDefType = column.getJdbcDefType();
