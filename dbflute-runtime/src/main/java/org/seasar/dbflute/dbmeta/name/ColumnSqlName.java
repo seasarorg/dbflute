@@ -47,7 +47,7 @@ public class ColumnSqlName {
             return false;
         }
         final ColumnSqlName target = (ColumnSqlName) obj;
-        return _columnSqlName.equals(target.toString());
+        return _columnSqlName.equals(target._columnSqlName);
     }
 
     @Override

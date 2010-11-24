@@ -24,8 +24,9 @@ public interface SqlNameFilter {
 
     /**
      * Filter the SQL name of a object, for example, table or column.
-     * @param sqlName The original SQL name. (NotNull)
+     * @param sqlName The original SQL name (means a name can be used on SQL). (NotNull)
+     * @param correspondingDbName The corresponding DB name of the SQL name (to identity its table). (NotNull)
      * @return The filtered name. (NotNull)
      */
-    String filter(String sqlName);
+    String filter(String sqlName, String correspondingDbName);
 }

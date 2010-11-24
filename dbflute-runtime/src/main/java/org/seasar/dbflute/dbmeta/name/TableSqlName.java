@@ -25,14 +25,16 @@ public class TableSqlName {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _tableSqlName;
+    protected final String _correspondingDbName;
     protected SqlNameFilter _sqlNameFilter;
     protected boolean _locked;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TableSqlName(String tableSqlName) {
+    public TableSqlName(String tableSqlName, String correspondingDbName) {
         _tableSqlName = tableSqlName;
+        _correspondingDbName = correspondingDbName;
     }
 
     public synchronized void xacceptFilter(SqlNameFilter sqlNameFilter) { // called only once
@@ -58,11 +60,22 @@ public class TableSqlName {
             return false;
         }
         final TableSqlName target = (TableSqlName) obj;
-        return _tableSqlName.equals(target.toString());
+        return _tableSqlName.equals(target._tableSqlName);
     }
 
     @Override
     public String toString() {
-        return _sqlNameFilter != null ? _sqlNameFilter.filter(_tableSqlName) : _tableSqlName;
+        if (_sqlNameFilter != null) {
+            return _sqlNameFilter.filter(_tableSqlName, _correspondingDbName);
+        } else {
+            return _tableSqlName;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getCorrespondingDbName() {
+        return _correspondingDbName;
     }
 }
