@@ -29,6 +29,7 @@ import org.seasar.dbflute.dbway.WayOfOracle;
 import org.seasar.dbflute.dbway.WayOfPostgreSQL;
 import org.seasar.dbflute.dbway.WayOfSQLServer;
 import org.seasar.dbflute.dbway.WayOfSQLite;
+import org.seasar.dbflute.dbway.WayOfSybase;
 import org.seasar.dbflute.dbway.WayOfUnknown;
 
 /**
@@ -47,9 +48,10 @@ public enum DBDef {
     , SQLServer("sqlserver", "mssql", new WayOfSQLServer()) // supported
     , H2("h2", null, new WayOfH2()) // supported
     , Derby("derby", null, new WayOfDerby()) // supported
-    , SQLite("sqlite", null, new WayOfSQLite()) // semi-supported
-    , MSAccess("msaccess", null, new WayOfMSAccess()) // semi-supported
-    , FireBird("firebird", null, new WayOfFirebird()) // unsupported
+    , SQLite("sqlite", null, new WayOfSQLite()) // sub supported
+    , MSAccess("msaccess", null, new WayOfMSAccess()) // sub supported
+    , FireBird("firebird", null, new WayOfFirebird()) // a-little-bit supported
+    , Sybase("sybase", null, new WayOfSybase()) // a-little-bit supported
     , Unknown("unknown", null, new WayOfUnknown());
 
     // ===================================================================================
