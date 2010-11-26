@@ -16,7 +16,7 @@
 package org.seasar.dbflute.dbway;
 
 /**
- * The DB way of SQLServer.
+ * The DB way of Sybase.
  * @author jflute
  */
 public class WayOfSybase implements DBWay {
