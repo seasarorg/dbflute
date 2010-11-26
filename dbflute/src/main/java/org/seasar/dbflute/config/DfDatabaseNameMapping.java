@@ -36,21 +36,22 @@ public class DfDatabaseNameMapping {
     //                                                                       =========
     protected final String _databaseNameMappingString;
     {
-        String tmp = "map:{";
-        tmp = tmp + "     ; mysql      = map:{generateName = MySql      ; defName = mysql}";
-        tmp = tmp + "     ; postgresql = map:{generateName = PostgreSql ; defName = postgresql}";
-        tmp = tmp + "     ; oracle     = map:{generateName = Oracle     ; defName = oracle}";
-        tmp = tmp + "     ; db2        = map:{generateName = Db2        ; defName = db2}";
-        tmp = tmp + "     ; mssql      = map:{generateName = SqlServer  ; defName = sqlserver}";
-        tmp = tmp + "     ; h2         = map:{generateName = H2         ; defName = h2}";
-        tmp = tmp + "     ; derby      = map:{generateName = Derby      ; defName = derby}";
-        tmp = tmp + "     ; sqlite     = map:{generateName = Sqlite     ; defName = sqlite}";
-        tmp = tmp + "     ; msaccess   = map:{generateName = MsAccess   ; defName = msaccess}";
-        tmp = tmp + "     ; firebird   = map:{generateName = Firebird   ; defName = firebird}";
-        tmp = tmp + "     ; interbase  = map:{generateName = Interbase  ; defName = unknown}";
-        tmp = tmp + "     ; default    = map:{generateName = Default    ; defName = unknown}";
-        tmp = tmp + "}";
-        _databaseNameMappingString = tmp;
+        final StringBuilder sb = new StringBuilder();
+        sb.append("map:{");
+        sb.append("    ; mysql      = map:{generateName = MySql      ; defName = mysql}");
+        sb.append("    ; postgresql = map:{generateName = PostgreSql ; defName = postgresql}");
+        sb.append("    ; oracle     = map:{generateName = Oracle     ; defName = oracle}");
+        sb.append("    ; db2        = map:{generateName = Db2        ; defName = db2}");
+        sb.append("    ; mssql      = map:{generateName = SqlServer  ; defName = sqlserver}");
+        sb.append("    ; h2         = map:{generateName = H2         ; defName = h2}");
+        sb.append("    ; derby      = map:{generateName = Derby      ; defName = derby}");
+        sb.append("    ; sqlite     = map:{generateName = Sqlite     ; defName = sqlite}");
+        sb.append("    ; msaccess   = map:{generateName = MsAccess   ; defName = msaccess}");
+        sb.append("    ; firebird   = map:{generateName = Firebird   ; defName = firebird}");
+        sb.append("    ; sybase     = map:{generateName = Sybase     ; defName = sybase}");
+        sb.append("    ; default    = map:{generateName = Default    ; defName = unknown}");
+        sb.append("}");
+        _databaseNameMappingString = sb.toString();
     }
     protected final Map<String, Map<String, String>> _databaseNameMappingMap;
     {

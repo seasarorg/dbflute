@@ -62,6 +62,8 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
             sqlClause = createSqlClauseMsAccess(tableDbName, dbmetaProvider);
         } else if (isCurrentDBDef(DBDef.FireBird)) {
             sqlClause = createSqlClauseFirebird(tableDbName, dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.Sybase)) {
+            sqlClause = createSqlClauseSybase(tableDbName, dbmetaProvider);
         } else {
             // as the database when generating
             sqlClause = createSqlClause${database.generateDbName}(tableDbName, dbmetaProvider);
@@ -107,6 +109,10 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected SqlClause createSqlClauseFirebird(String tableDbName, DBMetaProvider dbmetaProvider) {
         return new SqlClauseFirebird(tableDbName).provider(dbmetaProvider);
+    }
+
+    protected SqlClause createSqlClauseSybase(String tableDbName, DBMetaProvider dbmetaProvider) {
+        return new SqlClauseSybase(tableDbName).provider(dbmetaProvider);
     }
 
     protected SqlClause createSqlClauseDefault(String tableDbName, DBMetaProvider dbmetaProvider) {

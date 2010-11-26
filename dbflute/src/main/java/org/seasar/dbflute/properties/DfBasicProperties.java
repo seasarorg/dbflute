@@ -124,16 +124,20 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseType().equalsIgnoreCase("derby");
     }
 
-    public boolean isDatabaseSQLite() {
+    public boolean isDatabaseSQLite() { // sub supported
         return getDatabaseType().equalsIgnoreCase("sqlite");
     }
 
-    public boolean isDatabaseMSAccess() {
+    public boolean isDatabaseMSAccess() { // sub supported
         return getDatabaseType().equalsIgnoreCase("msaccess");
     }
 
-    public boolean isDatabaseFirebird() {
+    public boolean isDatabaseFirebird() { // a-little-bit supported
         return getDatabaseType().equalsIgnoreCase("firebird");
+    }
+
+    public boolean isDatabaseSybase() { // a-little-bit supported
+        return getDatabaseType().equalsIgnoreCase("sybase");
     }
 
     public boolean isDatabase_Supported() {
