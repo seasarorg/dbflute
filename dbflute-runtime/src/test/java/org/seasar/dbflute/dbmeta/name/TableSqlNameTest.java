@@ -25,7 +25,7 @@ public class TableSqlNameTest extends PlainTestCase {
             tableSqlName.xacceptFilter(null);
 
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
             // OK
             log(e.getMessage());
         }
