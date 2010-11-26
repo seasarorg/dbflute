@@ -250,9 +250,6 @@ public class UnifiedSchema {
 
     public String buildSqlName(String elementName) {
         final String sqlPrefixSchema = getSqlPrefixSchema();
-        if (Srl.is_Null_or_TrimmedEmpty(sqlPrefixSchema)) {
-            return null; // unreachable
-        }
         return Srl.connectPrefix(elementName, sqlPrefixSchema, ".");
     }
 

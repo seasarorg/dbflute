@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -30,17 +32,44 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
  */
 public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
-    // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
     /**
-     * Is auto-increment column?
+     * Is the column auto-increment?
      * @param conn Connection.
      * @param tableInfo The meta information of table from which to retrieve PK information.
-     * @param primaryKeyColumnName Primary-key column-name.
-     * @return Auto-increment column name. (Nullable)
+     * @param primaryKeyColumnInfo The meta information of primary-key column.
+     * @return Determination.
+     */
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo,
+            DfColumnMetaInfo primaryKeyColumnInfo) throws SQLException {
+        if (analyzeByDatabaseDependencyMeta(tableInfo, primaryKeyColumnInfo)) {
+            return true;
+        }
+        final String primaryKeyColumnName = primaryKeyColumnInfo.getColumnName();
+        return isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnName);
+    }
+
+    protected boolean analyzeByDatabaseDependencyMeta(DfTableMetaInfo tableInfo, DfColumnMetaInfo primaryKeyColumnInfo) {
+        if (isDatabaseSybase()) {
+            final String defaultValue = primaryKeyColumnInfo.getDefaultValue();
+            return "autoincrement".equalsIgnoreCase(defaultValue);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Is the column auto-increment?
+     * @param conn Connection.
+     * @param tableInfo The meta information of table from which to retrieve PK information.
+     * @param primaryKeyColumnName The name of primary-key column.
+     * @return Determination.
      */
     public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
+            throws SQLException {
+        return analyzeByResultSetMeta(conn, tableInfo, primaryKeyColumnName);
+    }
+
+    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
             throws SQLException {
         final String tableSqlName = tableInfo.buildTableSqlName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableSqlName);
@@ -60,12 +89,11 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
             msg = msg + tableSqlName + "." + primaryKeyColumnName;
             throw new IllegalStateException(msg); // unreachable
         } catch (SQLException e) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "Failed to execute the SQL for getting auto-increment!" + ln();
-            msg = msg + ln();
-            msg = msg + "[SQL]" + ln() + sql + ln() + e.getMessage() + ln();
-            msg = msg + "* * * * * * * * * */";
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to execute the SQL for getting auto-increment");
+            br.addItem("SQL for getting");
+            br.addElement(sql);
+            String msg = br.buildExceptionMessage();
             throw new DfJDBCException(msg, e);
         } finally {
             if (st != null) {

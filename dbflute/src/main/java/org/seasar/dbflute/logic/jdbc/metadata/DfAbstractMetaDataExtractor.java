@@ -102,6 +102,10 @@ public abstract class DfAbstractMetaDataExtractor {
         return getBasicProperties().isDatabaseFirebird();
     }
 
+    protected boolean isDatabaseSybase() {
+        return getBasicProperties().isDatabaseSybase();
+    }
+
     protected boolean checkMetaTableDiffIfNeeds(String tableName, String metaTableName) {
         if (!needsToCheckMetaTable()) {
             return false;

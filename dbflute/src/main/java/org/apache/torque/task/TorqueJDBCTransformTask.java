@@ -419,7 +419,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             DfPrimaryKeyMetaInfo pkInfo, Connection conn, Element columnElement) throws SQLException {
         final String columnName = columnInfo.getColumnName();
         if (pkInfo.containsColumn(columnName)) {
-            if (isAutoIncrementColumn(conn, tableInfo, columnName)) {
+            if (isAutoIncrementColumn(conn, tableInfo, columnInfo)) {
                 columnElement.setAttribute("autoIncrement", "true");
             }
         }
@@ -741,14 +741,14 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /**
      * Get auto-increment column name.
      * @param tableInfo The meta information of table from which to retrieve PK information.
-     * @param primaryKeyColumnName Primary-key column-name.
+     * @param primaryKeyColumnInfo The meta information of primary-key column.
      * @param conn Connection.
      * @return Auto-increment column name. (Nullable)
      * @throws SQLException
      */
-    protected boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
-            throws SQLException {
-        if (_autoIncrementHandler.isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnName)) {
+    protected boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo,
+            DfColumnMetaInfo primaryKeyColumnInfo) throws SQLException {
+        if (_autoIncrementHandler.isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnInfo)) {
             return true;
         }
         if (canHandleSynonym(tableInfo)) {
@@ -760,7 +760,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (_identityMap == null) {
             return false;
         }
-        String columnName = _identityMap.get(tableInfo.getTableName());
+        final String primaryKeyColumnName = primaryKeyColumnInfo.getColumnName();
+        final String columnName = _identityMap.get(tableInfo.getTableName());
         return primaryKeyColumnName.equals(columnName);
     }
 

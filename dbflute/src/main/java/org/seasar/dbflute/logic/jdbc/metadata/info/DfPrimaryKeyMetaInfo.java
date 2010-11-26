@@ -28,7 +28,7 @@ public class DfPrimaryKeyMetaInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Map<String, String> _primaryKeyMap = new LinkedHashMap<String, String>();
+    protected final Map<String, String> _primaryKeyMap = new LinkedHashMap<String, String>();
 
     // ===================================================================================
     //                                                                         Easy-to-Use
