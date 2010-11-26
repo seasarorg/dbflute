@@ -7,6 +7,7 @@ import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerMySQL;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerPostgreSQL;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSQLServer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSQLite;
+import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSybase;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
@@ -59,6 +60,8 @@ public class DfUrlAnalyzerFactory {
             // MS Access (JDBC driver) does not support catalog
             //return new DfUrlAnalyzerMSAccess(_url);
             return createNullAnalyzer();
+        } else if (_basicProperties.isDatabaseSybase()) {
+            return new DfUrlAnalyzerSybase(_url);
         }
         return createNullAnalyzer();
     }

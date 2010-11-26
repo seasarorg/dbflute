@@ -1,6 +1,9 @@
 package org.apache.torque.engine.database.model;
 
+import java.util.List;
+
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -84,12 +87,12 @@ public class UnifiedSchema {
         return unifiedSchema;
     }
 
-    public static UnifiedSchema createAsDynamicSchema(String schemaExpression) {
-        return new UnifiedSchema(schemaExpression).judgeSchema();
-    }
-
     public static UnifiedSchema createAsDynamicSchema(String catalog, String schema) {
         return new UnifiedSchema(catalog, schema).judgeSchema();
+    }
+
+    public static UnifiedSchema createAsDynamicSchema(String schemaExpression) {
+        return new UnifiedSchema(schemaExpression).judgeSchema();
     }
 
     // -----------------------------------------------------
@@ -210,12 +213,23 @@ public class UnifiedSchema {
     }
 
     protected void throwUnknownSchemaCannotUseSQLPrefixException() {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Unknown schema is NOT supported to use SQL prefix!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Unified Schema]" + ln() + toString() + ln();
-        msg = msg + "* * * * * * * * * */";
+        final DfDatabaseProperties databaseProp = getDatabaseProperties();
+        final UnifiedSchema databaseSchema = databaseProp.getDatabaseSchema();
+        final List<UnifiedSchema> additionalSchemaList = databaseProp.getAdditionalSchemaList();
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown schema is NOT supported to use SQL prefix.");
+        br.addItem("Advice");
+        br.addElement("The schema is NOT recognized as main and additional schema.");
+        br.addElement("Please confirm your database settings.");
+        br.addElement("(the schema must match any schema in target schemas)");
+        br.addItem("Unknown Schema");
+        br.addElement(toString());
+        br.addItem("Target Schema");
+        br.addElement(databaseSchema);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            br.addElement(additionalSchema);
+        }
+        final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
     }
 
@@ -236,6 +250,9 @@ public class UnifiedSchema {
 
     public String buildSqlName(String elementName) {
         final String sqlPrefixSchema = getSqlPrefixSchema();
+        if (Srl.is_Null_or_TrimmedEmpty(sqlPrefixSchema)) {
+            return null; // unreachable
+        }
         return Srl.connectPrefix(elementName, sqlPrefixSchema, ".");
     }
 

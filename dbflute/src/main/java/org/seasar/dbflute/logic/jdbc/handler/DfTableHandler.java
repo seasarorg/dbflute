@@ -63,34 +63,34 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
             throws SQLException {
         final String[] objectTypes = getRealObjectTypeTargetArray(unifiedSchema);
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
-        ResultSet resultSet = null;
+        ResultSet rs = null;
         try {
             _log.info("...Getting tables:");
             _log.info("  schema = " + unifiedSchema);
             _log.info("  types  = " + DfCollectionUtil.newArrayList(objectTypes));
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
-            resultSet = metaData.getTables(catalogName, schemaName, "%", objectTypes);
-            while (resultSet.next()) {
+            rs = metaData.getTables(catalogName, schemaName, "%", objectTypes);
+            while (rs.next()) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // basically uses getString() because
                 // a JDBC driver might return an unexpected accident
                 // (other methods are used only when an item can be trust)
                 // - - - - - - - - - -/
 
-                final String tableName = resultSet.getString("TABLE_NAME");
-                final String tableType = resultSet.getString("TABLE_TYPE");
+                final String tableName = rs.getString("TABLE_NAME");
+                final String tableType = rs.getString("TABLE_TYPE");
                 final String tableCatalog;
                 {
-                    final String plainCatalog = resultSet.getString("TABLE_CAT");
+                    final String plainCatalog = rs.getString("TABLE_CAT");
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(plainCatalog)) { // because PostgreSQL returns null
                         tableCatalog = plainCatalog;
                     } else {
                         tableCatalog = catalogName;
                     }
                 }
-                final String tableSchema = resultSet.getString("TABLE_SCHEM");
-                final String tableComment = resultSet.getString("REMARKS");
+                final String tableSchema = rs.getString("TABLE_SCHEM");
+                final String tableComment = rs.getString("REMARKS");
 
                 // create new original unified schema for this table
                 final UnifiedSchema tableUnifiedSchema = createAsDynamicSchema(tableCatalog, tableSchema);
@@ -112,8 +112,8 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 tableList.add(tableMetaInfo);
             }
         } finally {
-            if (resultSet != null) {
-                resultSet.close();
+            if (rs != null) {
+                rs.close();
             }
         }
         return tableList;
