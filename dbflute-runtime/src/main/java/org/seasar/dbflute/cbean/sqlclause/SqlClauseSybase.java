@@ -35,8 +35,8 @@ public class SqlClauseSybase extends AbstractSqlClause {
     /** String of fetch-first as select-hint. */
     protected String _fetchFirstSelectHint = "";
 
-    /** String of lock as from-hint. */
-    protected String _lockFromHint = "";
+    /** String of lock as sql-suffix. */
+    protected String _lockSqlSuffix = "";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -122,7 +122,7 @@ public class SqlClauseSybase extends AbstractSqlClause {
      * {@inheritDoc}
      */
     public SqlClause lockForUpdate() {
-        _lockFromHint = " with (updlock)";
+        _lockSqlSuffix = " for update";
         return this;
     }
 
@@ -140,7 +140,7 @@ public class SqlClauseSybase extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected String createFromBaseTableHint() {
-        return _lockFromHint;
+        return "";
     }
 
     /**
@@ -154,6 +154,6 @@ public class SqlClauseSybase extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected String createSqlSuffix() {
-        return "";
+        return _lockSqlSuffix;
     }
 }
