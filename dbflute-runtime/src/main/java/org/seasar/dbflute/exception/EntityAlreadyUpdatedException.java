@@ -27,32 +27,33 @@ public class EntityAlreadyUpdatedException extends SQLFailureException {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private Object bean;
+    // legacy of S2Dao
+    private Object _bean;
 
-    private int rows;
+    private int _rows;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
      * Constructor.
-     * @param bean Bean. (NotNull)
-     * @param rows Rows.
+     * @param bean The instance of entity. (NotNull)
+     * @param rows The row count returned by update process. (basically zero)
      */
     public EntityAlreadyUpdatedException(Object bean, int rows) {
         super("The entity already been updated: rows=" + rows + ", bean=" + bean, null);
-        this.bean = bean;
-        this.rows = rows;
+        this._bean = bean;
+        this._rows = rows;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public Object getBean() {
-        return bean;
+        return _bean;
     }
 
     public int getRows() {
-        return rows;
+        return _rows;
     }
 }

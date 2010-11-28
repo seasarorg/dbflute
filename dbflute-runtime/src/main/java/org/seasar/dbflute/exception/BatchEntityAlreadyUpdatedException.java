@@ -34,8 +34,8 @@ public class BatchEntityAlreadyUpdatedException extends EntityAlreadyUpdatedExce
     //                                                                         ===========
     /**
      * Constructor.
-     * @param bean Bean. (NotNull)
-     * @param rows Rows(Update count per One entity).
+     * @param bean The instance of entity. (NotNull)
+     * @param rows The row count returned by update process. (basically zero)
      * @param batchUpdateCount Batch update count(Total).
      */
     public BatchEntityAlreadyUpdatedException(Object bean, int rows, Integer batchUpdateCount) {

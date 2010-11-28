@@ -158,10 +158,10 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
 
     protected void handleBatchUpdateResultWithOptimisticLockByUpdateCount(List<?> list, int updateCount) {
         if (list.isEmpty()) {
-            return;// for Safety!
+            return; // for safety
         }
         if (updateCount < 0) {
-            return;// for Safety!
+            return; // for safety
         }
         final int entityCount = list.size();
         if (updateCount < entityCount) {
@@ -179,7 +179,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
 
     protected void handleBatchUpdateResultWithOptimisticLockByResult(List<?> list, int[] result) {
         if (list.isEmpty()) {
-            return;// for Safety!
+            return; // for safety
         }
         final int[] updatedCountArray = result;
         final int entityCount = list.size();
@@ -187,7 +187,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         boolean alreadyUpdated = false;
         for (int oneUpdateCount : updatedCountArray) {
             if (entityCount <= index) {
-                break;// for Safety!
+                break; // for safety
             }
             if (oneUpdateCount == 0) {
                 alreadyUpdated = true;

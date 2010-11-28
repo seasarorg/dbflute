@@ -84,14 +84,14 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         setupBindVariables(bean);
         logSql(_bindVariables, getArgTypes(_bindVariables));
         final PreparedStatement ps = prepareStatement(conn);
-        int ret = -1;
+        final int ret;
         try {
             bindArgs(conn, ps, _bindVariables, _bindVariableValueTypes);
             ret = executeUpdate(ps);
         } finally {
             close(ps);
         }
-        if (_optimisticLockHandling && ret != 1) {
+        if (_optimisticLockHandling && ret < 1) { // means no update (contains minus just in case)
             throw createEntityAlreadyUpdatedException(bean, ret);
         }
         postUpdateBean(bean, ret);

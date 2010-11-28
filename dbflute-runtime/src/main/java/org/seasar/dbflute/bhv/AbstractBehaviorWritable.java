@@ -195,25 +195,23 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (!entity.hasPrimaryKeyValue()) {
             callback.callbackInsert(entity);
         } else {
-            RuntimeException exception = null;
+            RuntimeException updateException = null;
             try {
                 callback.callbackUpdate(entity);
-            } catch (org.seasar.dbflute.exception.EntityAlreadyUpdatedException e) {
-                if (e.getRows() == 0) {
-                    exception = e;
-                }
-            } catch (org.seasar.dbflute.exception.EntityAlreadyDeletedException e) {
-                exception = e;
-            } catch (OptimisticLockColumnValueNullException e) {
-                exception = e;
+            } catch (EntityAlreadyUpdatedException e) { // already updated (or means not found)
+                updateException = e;
+            } catch (EntityAlreadyDeletedException e) { // means not found
+                updateException = e;
+            } catch (OptimisticLockColumnValueNullException e) { // means insert?
+                updateException = e;
             }
-            if (exception != null) {
+            if (updateException != null) {
                 final CB_TYPE cb = callback.callbackNewMyConditionBean();
                 cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
-                if (callback.callbackSelectCount(cb) == 0) {
+                if (callback.callbackSelectCount(cb) == 0) { // anyway if not found, insert
                     callback.callbackInsert(entity);
                 } else {
-                    throw exception;
+                    throw updateException;
                 }
             }
         }
@@ -237,9 +235,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         } else {
             try {
                 callback.callbackUpdateNonstrict(entity);
-            } catch (EntityAlreadyUpdatedException e) {
-                callback.callbackInsert(entity);
-            } catch (EntityAlreadyDeletedException e) {
+            } catch (EntityAlreadyDeletedException ignored) { // means not found
                 callback.callbackInsert(entity);
             }
         }

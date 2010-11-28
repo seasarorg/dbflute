@@ -22,7 +22,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -40,7 +39,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     //                                                                           =========
     protected final DBMeta _targetDBMeta;
     protected TnPropertyType[] _propertyTypes;
-    protected boolean optimisticLockHandling;
+    protected boolean _optimisticLockHandling;
     protected boolean _versionNoAutoIncrementOnMemory;
 
     // ===================================================================================
@@ -51,7 +50,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
             boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory, beanMetaData);
         this._targetDBMeta = targetDBMeta;
-        this.optimisticLockHandling = optimisticLockHandling;
+        this._optimisticLockHandling = optimisticLockHandling;
         this._versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
         setupPropertyTypes(propertyNames);
         setupSql();
@@ -60,18 +59,14 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public Object execute(Object[] args) { // NOT for Batch. Batch should override.
+    public Object execute(Object[] args) { // NOT for batch (batch should override this)
         final TnAbstractAutoHandler handler = createAutoHandler();
-        handler.setOptimisticLockHandling(optimisticLockHandling);
+        handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
         handler.setExceptionMessageSqlArgs(args);
         int rows = handler.execute(args);
         return Integer.valueOf(rows);
-    }
-
-    protected EntityAlreadyUpdatedException createEntityAlreadyUpdatedException(Object bean, int rows) {
-        return new EntityAlreadyUpdatedException(bean, rows);
     }
 
     protected TnPropertyType[] getPropertyTypes() {
@@ -198,11 +193,11 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
             sb.append(bmd.getPrimaryKeySqlName(i)).append(" = ? and ");
         }
         sb.setLength(sb.length() - 5);
-        if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
+        if (_optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             TnPropertyType pt = bmd.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
-        if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
+        if (_optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             TnPropertyType pt = bmd.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
