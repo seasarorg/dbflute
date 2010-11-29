@@ -102,7 +102,7 @@ public class DfTypeArrayInfo {
         return _owner;
     }
 
-    public String getTypeName() {
+    public String getTypeName() { // unique name (with schema prefix)
         return _typeName;
     }
 

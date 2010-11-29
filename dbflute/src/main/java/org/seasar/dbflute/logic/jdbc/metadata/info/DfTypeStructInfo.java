@@ -134,12 +134,12 @@ public class DfTypeStructInfo {
         return _owner;
     }
 
-    public String getTypeName() {
+    public String getTypeName() { // unique name (with schema prefix)
         return _typeName;
     }
 
     public String getTypePureName() {
-        return Srl.substringFirstRear(_typeName, ".");
+        return Srl.substringLastRear(_typeName, ".");
     }
 
     public String getTypeSqlName() {

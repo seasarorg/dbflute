@@ -312,7 +312,7 @@ public class DfProcedurePmbSetupper {
     }
 
     protected void registerEntityInfoIfNeeds(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
-        final String typeName = structInfo.getTypePureName(); // *same names between schema is unsupported
+        final String typeName = structInfo.getTypePureName(); // *because same names between schema is unsupported
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
             _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap, structInfo));
@@ -361,7 +361,7 @@ public class DfProcedurePmbSetupper {
         // type name becomes entity name plainly but it will be converted as java name
         // so it uses database's convert that is same conversion way as generating
         // because this process needs entityType on program
-        final String entityName = _database.convertJavaNameByJdbcNameAsTable(structInfo.getTypeName());
+        final String entityName = _database.convertJavaNameByJdbcNameAsTable(structInfo.getTypePureName());
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String entityType = projectPrefix + entityName;
         structInfo.setEntityType(entityType);
