@@ -32,6 +32,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DBDef;
@@ -786,7 +787,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected void setupDbType(Map<String, DfColumnMetaInfo> metaMap, String columnName, Column column) {
         final DfColumnMetaInfo columnMetaInfo = metaMap.get(columnName);
-        column.setDbType(columnMetaInfo.getDbTypeName());
+        final String dbTypeName;
+        final String plainName = columnMetaInfo.getDbTypeName();
+        if (Srl.contains(plainName, ".")) { // basically for ARRAY and STRUCT type
+            final String catalogSchema = Srl.substringLastFront(plainName, ".");
+            final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalogSchema);
+            if (unifiedSchema.isMainSchema()) {
+                dbTypeName = Srl.substringLastRear(plainName, ".");
+            } else {
+                dbTypeName = plainName;
+            }
+        } else {
+            dbTypeName = plainName;
+        }
+        column.setDbType(dbTypeName);
     }
 
     protected String getCommonColumnTorqueType(String columnName) {
