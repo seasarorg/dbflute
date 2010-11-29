@@ -49,7 +49,7 @@ public class DfArrayExtractorOracle {
     //                                                                           =========
     protected final DataSource _dataSource;
 
-    protected boolean _suppressLogging;
+    protected final boolean _suppressLogging;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -78,9 +78,11 @@ public class DfArrayExtractorOracle {
         final List<Map<String, String>> resultList = selectFirstArray(unifiedSchema);
         final StringKeyMap<DfTypeArrayInfo> arrayTypeMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
-            final String typeName = DfTypeArrayInfo.generateTypeName(unifiedSchema, map.get("TYPE_NAME"));
+            final String typeName = buildArrayTypeName(map.get("TYPE_NAME"), unifiedSchema);
             final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(unifiedSchema, typeName);
-            final String elementType = map.get("ELEM_TYPE_NAME");
+            final String elementTypeOwner = map.get("ELEM_TYPE_OWNER"); // ARRAY and STRUCT only
+            final String elementTypeName = map.get("ELEM_TYPE_NAME");
+            final String elementType = Srl.connectPrefix(elementTypeName, elementTypeOwner, ".");
             arrayInfo.setElementType(elementType);
             arrayTypeMap.put(typeName, arrayInfo);
         }
@@ -208,11 +210,12 @@ public class DfArrayExtractorOracle {
     //                                                                       Argument Info
     //                                                                       =============
     protected List<ProcedureArgumentInfo> extractProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
-        final DfProcedureParameterExtractorOracle extractor = new DfProcedureParameterExtractorOracle(_dataSource);
-        if (_suppressLogging) {
-            extractor.suppressLogging();
-        }
+        final DfProcedureParameterExtractorOracle extractor = createProcedureParameterExtractorOracle();
         return extractor.extractProcedureArgumentInfoList(unifiedSchema);
+    }
+
+    protected DfProcedureParameterExtractorOracle createProcedureParameterExtractorOracle() {
+        return new DfProcedureParameterExtractorOracle(_dataSource, _suppressLogging);
     }
 
     // ===================================================================================
@@ -222,7 +225,7 @@ public class DfArrayExtractorOracle {
         final List<Map<String, String>> resultList = selectSimpleArray(unifiedSchema);
         final StringSet arrayTypeSet = StringSet.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
-            arrayTypeSet.add(DfTypeArrayInfo.generateTypeName(unifiedSchema, map.get("TYPE_NAME")));
+            arrayTypeSet.add(buildArrayTypeName(map.get("TYPE_NAME"), unifiedSchema));
         }
         return arrayTypeSet;
     }
@@ -252,6 +255,13 @@ public class DfArrayExtractorOracle {
         sb.append(" and TYPECODE = 'COLLECTION'");
         sb.append(" order by TYPE_NAME");
         return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    public String buildArrayTypeName(String typeName, UnifiedSchema unifiedSchema) {
+        return Srl.connectPrefix(typeName, unifiedSchema.getPureSchema(), ".");
     }
 
     // ===================================================================================

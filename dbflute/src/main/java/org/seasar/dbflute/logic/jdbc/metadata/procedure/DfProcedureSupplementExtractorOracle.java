@@ -132,7 +132,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             if (foundInfo == null) {
                 continue;
             }
-            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(foundInfo.getOwner(), foundInfo.getTypeName());
+            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(foundInfo.getUnifiedSchema(), foundInfo.getTypeName());
             arrayInfo.setElementType(foundInfo.getElementType());
             processArrayNestedElement(unifiedSchema, flatArrayInfoMap, arrayInfo);
             final String packageName = argInfo.getPackageName();
@@ -153,7 +153,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         // ARRAY element
         final DfTypeArrayInfo foundInfo = flatArrayInfoMap.get(arrayInfo.getElementType());
         if (foundInfo != null) {
-            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo(foundInfo.getOwner(), foundInfo.getTypeName());
+            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo(foundInfo.getUnifiedSchema(), foundInfo
+                    .getTypeName());
             nestedInfo.setElementType(foundInfo.getElementType());
             arrayInfo.setNestedArrayInfo(nestedInfo);
             processArrayNestedElement(unifiedSchema, flatArrayInfoMap, nestedInfo); // recursive call
@@ -243,7 +244,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             return null;
         }
         final DfTypeArrayInfo foundInfo = flatArrayInfoMap.get(attrTypeName);
-        final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo(foundInfo.getOwner(), foundInfo.getTypeName());
+        final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo(foundInfo.getUnifiedSchema(), foundInfo.getTypeName());
         final String elementType = foundInfo.getElementType();
         typeArrayInfo.setElementType(elementType);
         if (flatArrayInfoMap.containsKey(elementType)) { // array in array in ...
@@ -291,13 +292,14 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (argInfoList != null) {
             return argInfoList;
         }
-        final DfProcedureParameterExtractorOracle extractor = new DfProcedureParameterExtractorOracle(_dataSource);
-        if (_suppressLogging) {
-            extractor.suppressLogging();
-        }
+        final DfProcedureParameterExtractorOracle extractor = createProcedureParameterExtractorOracle();
         argInfoList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         _argumentInfoListMap.put(unifiedSchema, argInfoList);
         return _argumentInfoListMap.get(unifiedSchema);
+    }
+
+    protected DfProcedureParameterExtractorOracle createProcedureParameterExtractorOracle() {
+        return new DfProcedureParameterExtractorOracle(_dataSource, _suppressLogging);
     }
 
     // ===================================================================================

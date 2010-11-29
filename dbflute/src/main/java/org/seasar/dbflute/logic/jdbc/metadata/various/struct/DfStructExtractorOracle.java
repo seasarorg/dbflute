@@ -86,14 +86,9 @@ public class DfStructExtractorOracle {
 
             final String dbTypeName;
             {
-                final String attrTypeOwner = map.get("ATTR_TYPE_OWNER");
+                final String attrTypeOwner = map.get("ATTR_TYPE_OWNER"); // ARRAY and STRUCT only
                 final String attrTypeName = map.get("ATTR_TYPE_NAME");
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(attrTypeOwner)) {
-                    // basically ARRAY and STRUCT only
-                    dbTypeName = attrTypeOwner + "." + attrTypeName;
-                } else {
-                    dbTypeName = attrTypeName;
-                }
+                dbTypeName = Srl.connectPrefix(attrTypeName, attrTypeOwner, ".");
             }
             attributeInfo.setDbTypeName(dbTypeName);
             final String length = map.get("LENGTH");

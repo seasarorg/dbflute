@@ -44,13 +44,14 @@ public class DfProcedureParameterExtractorOracle {
     //                                                                           =========
     protected final DataSource _dataSource;
 
-    protected boolean _suppressLogging;
+    protected final boolean _suppressLogging;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedureParameterExtractorOracle(DataSource dataSource) {
+    public DfProcedureParameterExtractorOracle(DataSource dataSource, boolean suppressLogging) {
         _dataSource = dataSource;
+        _suppressLogging = suppressLogging;
     }
 
     // ===================================================================================
@@ -94,8 +95,10 @@ public class DfProcedureParameterExtractorOracle {
             info.setSequence(map.get("SEQUENCE"));
             info.setArgumentName(map.get("ARGUMENT_NAME"));
             info.setDataType(map.get("DATA_TYPE"));
-            info.setTypeOwner(map.get("TYPE_OWNER"));
-            info.setTypeName(map.get("TYPE_NAME"));
+            final String typeOwner = map.get("TYPE_OWNER"); // ARRAY and STRUCT only
+            final String typeName = Srl.connectPrefix(map.get("TYPE_NAME"), typeOwner, ".");
+            info.setTypeOwner(typeOwner);
+            info.setTypeName(typeName);
             info.setTypeSubName(map.get("TYPE_SUBNAME"));
             infoList.add(info);
         }
@@ -216,9 +219,5 @@ public class DfProcedureParameterExtractorOracle {
             return;
         }
         _log.info(msg);
-    }
-
-    public void suppressLogging() {
-        _suppressLogging = true;
     }
 }

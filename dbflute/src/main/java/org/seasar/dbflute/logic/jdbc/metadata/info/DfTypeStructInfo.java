@@ -143,11 +143,7 @@ public class DfTypeStructInfo {
     }
 
     public String getTypeSqlName() {
-        if (_owner.isAdditionalSchema()) {
-            return getTypeName();
-        } else {
-            return getTypePureName();
-        }
+        return _owner.isAdditionalSchema() ? getTypeName() : getTypePureName();
     }
 
     public StringKeyMap<DfColumnMetaInfo> getAttributeInfoMap() {

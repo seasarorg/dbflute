@@ -27,7 +27,7 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final UnifiedSchema _owner; // required at first
+    protected final UnifiedSchema _unifiedSchema; // required at first
     protected final String _typeName; // required at first
     protected String _elementType; // required at first (if unknown, the value is "Unknown")
     protected DfTypeArrayInfo _nestedArrayInfo; // if element type is ARRAY (nested)
@@ -37,13 +37,9 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfTypeArrayInfo(UnifiedSchema owner, String typeName) {
-        _owner = owner;
+    public DfTypeArrayInfo(UnifiedSchema unifiedSchema, String typeName) {
+        _unifiedSchema = unifiedSchema;
         _typeName = typeName;
-    }
-
-    public static String generateTypeName(UnifiedSchema owner, String pureTypeName) {
-        return owner.getPureSchema() + "." + pureTypeName;
     }
 
     // ===================================================================================
@@ -98,8 +94,8 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public UnifiedSchema getOwner() {
-        return _owner;
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema;
     }
 
     public String getTypeName() { // unique name (with schema prefix)
@@ -111,11 +107,7 @@ public class DfTypeArrayInfo {
     }
 
     public String getTypeSqlName() {
-        if (_owner.isAdditionalSchema()) {
-            return getTypeName();
-        } else {
-            return getTypePureName();
-        }
+        return _unifiedSchema.isAdditionalSchema() ? getTypeName() : getTypePureName();
     }
 
     public String getElementType() {
