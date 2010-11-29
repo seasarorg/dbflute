@@ -403,6 +403,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 }
 
                 // Struct
+                if (unifiedSchema.isAdditionalSchema()) {
+                    System.out.println("**:" + columnInfo.getColumnName() + ", " + columnInfo.getDbTypeName());
+                }
                 final String dbTypeName = columnInfo.getDbTypeName();
                 // filter because STRUCT type might have its schema prefix
                 final DfTypeStructInfo structInfo = structInfoMap.get(Srl.substringFirstRear(dbTypeName, "."));

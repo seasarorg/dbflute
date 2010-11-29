@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 
 /**
@@ -26,6 +27,7 @@ public class DfTypeStructInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected UnifiedSchema _owner; // required at first
     protected String _typeName; // required at first
     protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered(); // required at first
     protected String _entityType; // is set after analyzing
@@ -58,6 +60,10 @@ public class DfTypeStructInfo {
             }
         }
         return false;
+    }
+
+    public boolean isAdditinalSchema() {
+        return _owner.isAdditionalSchema();
     }
 
     // ===================================================================================
@@ -111,6 +117,14 @@ public class DfTypeStructInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public UnifiedSchema getOwner() {
+        return _owner;
+    }
+
+    public void setOwner(UnifiedSchema owner) {
+        this._owner = owner;
+    }
+
     public String getTypeName() {
         return _typeName;
     }
