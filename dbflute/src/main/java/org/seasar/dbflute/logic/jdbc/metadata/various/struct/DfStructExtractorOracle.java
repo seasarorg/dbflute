@@ -65,20 +65,18 @@ public class DfStructExtractorOracle {
      * The info is so simple, for example, no nested info.
      * And this sets type name and attributes only.
      * @param unifiedSchema The unified schema. (NotNull)
-     * @return The map of struct info. {key=struct type name} (NotNull)
+     * @return The map of struct info. {key = schema.struct-type-name} (NotNull)
      */
     public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
         final List<Map<String, String>> resultList = selectStructAttribute(unifiedSchema);
         final StringKeyMap<DfTypeStructInfo> structInfoMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
-            final String typeName = map.get("TYPE_NAME");
+            final String typeName = DfTypeStructInfo.generateTypeName(unifiedSchema, map.get("TYPE_NAME"));
             DfTypeStructInfo info = structInfoMap.get(typeName);
             if (info == null) {
-                info = new DfTypeStructInfo();
+                info = new DfTypeStructInfo(unifiedSchema, typeName);
                 structInfoMap.put(typeName, info);
             }
-            info.setOwner(unifiedSchema);
-            info.setTypeName(typeName);
             final DfColumnMetaInfo attributeInfo = new DfColumnMetaInfo();
             final String attrName = map.get("ATTR_NAME");
             if (Srl.is_Null_or_TrimmedEmpty(attrName)) {
@@ -86,10 +84,17 @@ public class DfStructExtractorOracle {
             }
             attributeInfo.setColumnName(attrName);
 
-            // in review
-            //final String typeOwner = map.get("ATTR_TYPE_OWNER");
-
-            final String dbTypeName = map.get("ATTR_TYPE_NAME");
+            final String dbTypeName;
+            {
+                final String attrTypeOwner = map.get("ATTR_TYPE_OWNER");
+                final String attrTypeName = map.get("ATTR_TYPE_NAME");
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(attrTypeOwner)) {
+                    // basically ARRAY and STRUCT only
+                    dbTypeName = attrTypeOwner + "." + attrTypeName;
+                } else {
+                    dbTypeName = attrTypeName;
+                }
+            }
             attributeInfo.setDbTypeName(dbTypeName);
             final String length = map.get("LENGTH");
             if (Srl.is_NotNull_and_NotTrimmedEmpty(length)) { // for example, varchar2

@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.sql2entity.cmentity;
 
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 
@@ -32,6 +33,13 @@ public class DfCustomizeEntityInfo {
     }
 
     // ===================================================================================
+    //                                                                   Additional Schema
+    //                                                                   =================
+    public UnifiedSchema getAdditionalSchema() {
+        return hasTypeStructInfo() ? _typeStructInfo.getOwner() : null;
+    }
+
+    // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean hasTypeStructInfo() {
@@ -44,6 +52,10 @@ public class DfCustomizeEntityInfo {
 
     public boolean hasNestedCustomizeEntity() {
         return hasTypeStructInfo() && _typeStructInfo.hasNestedStructEntityRef();
+    }
+
+    public boolean isAdditionalSchema() {
+        return hasTypeStructInfo() && _typeStructInfo.isAdditinalSchema();
     }
 
     // ===================================================================================

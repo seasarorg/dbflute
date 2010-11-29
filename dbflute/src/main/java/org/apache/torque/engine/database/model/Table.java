@@ -376,6 +376,10 @@ public class Table {
         return _unifiedSchema != null ? _unifiedSchema : null;
     }
 
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) { // basically for Sql2Entity
+        _unifiedSchema = unifiedSchema;
+    }
+
     public String getDocumentSchema() {
         if (_unifiedSchema == null) {
             return "";

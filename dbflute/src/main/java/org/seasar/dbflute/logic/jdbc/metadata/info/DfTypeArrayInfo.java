@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  * @since 0.9.7.6 (2010/11/18 Thursday)
@@ -24,11 +27,24 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _typeName; // required at first
-    protected String _elementType; // required at first (if unknown, the value is "UNKNOWN")
+    protected final UnifiedSchema _owner; // required at first
+    protected final String _typeName; // required at first
+    protected String _elementType; // required at first (if unknown, the value is "Unknown")
     protected DfTypeArrayInfo _nestedArrayInfo; // if element type is ARRAY (nested)
     protected DfTypeStructInfo _elementStructInfo; // if element type is STRUCT
     protected String _elementJavaNative; // is set after analyzing
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfTypeArrayInfo(UnifiedSchema owner, String typeName) {
+        _owner = owner;
+        _typeName = typeName;
+    }
+
+    public static String generateTypeName(UnifiedSchema owner, String pureTypeName) {
+        return owner.getPureSchema() + "." + pureTypeName;
+    }
 
     // ===================================================================================
     //                                                                       Determination
@@ -82,12 +98,24 @@ public class DfTypeArrayInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public UnifiedSchema getOwner() {
+        return _owner;
+    }
+
     public String getTypeName() {
         return _typeName;
     }
 
-    public void setTypeName(String typeName) {
-        this._typeName = typeName;
+    public String getTypePureName() {
+        return Srl.substringLastRear(_typeName, ".");
+    }
+
+    public String getTypeSqlName() {
+        if (_owner.isAdditionalSchema()) {
+            return getTypeName();
+        } else {
+            return getTypePureName();
+        }
     }
 
     public String getElementType() {

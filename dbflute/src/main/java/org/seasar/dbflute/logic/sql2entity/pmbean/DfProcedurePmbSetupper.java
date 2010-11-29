@@ -312,7 +312,7 @@ public class DfProcedurePmbSetupper {
     }
 
     protected void registerEntityInfoIfNeeds(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
-        final String typeName = structInfo.getTypeName();
+        final String typeName = structInfo.getTypePureName(); // *same names between schema is unsupported
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
             _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap, structInfo));

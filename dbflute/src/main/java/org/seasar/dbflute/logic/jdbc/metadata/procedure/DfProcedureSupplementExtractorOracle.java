@@ -132,8 +132,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             if (foundInfo == null) {
                 continue;
             }
-            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
-            arrayInfo.setTypeName(foundInfo.getTypeName());
+            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(foundInfo.getOwner(), foundInfo.getTypeName());
             arrayInfo.setElementType(foundInfo.getElementType());
             processArrayNestedElement(unifiedSchema, flatArrayInfoMap, arrayInfo);
             final String packageName = argInfo.getPackageName();
@@ -154,8 +153,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         // ARRAY element
         final DfTypeArrayInfo foundInfo = flatArrayInfoMap.get(arrayInfo.getElementType());
         if (foundInfo != null) {
-            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo();
-            nestedInfo.setTypeName(foundInfo.getTypeName());
+            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo(foundInfo.getOwner(), foundInfo.getTypeName());
             nestedInfo.setElementType(foundInfo.getElementType());
             arrayInfo.setNestedArrayInfo(nestedInfo);
             processArrayNestedElement(unifiedSchema, flatArrayInfoMap, nestedInfo); // recursive call
@@ -178,6 +176,11 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     // ===================================================================================
     //                                                                              Struct
     //                                                                              ======
+    /**
+     * Extract the map of struct info with nested info.
+     * @param unifiedSchema The unified schema. (NotNull)
+     * @return The map of struct info. {key = schema.struct-type-name} (NotNull)
+     */
     public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
         return findStructInfoMap(unifiedSchema);
     }
@@ -240,8 +243,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             return null;
         }
         final DfTypeArrayInfo foundInfo = flatArrayInfoMap.get(attrTypeName);
-        final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo();
-        typeArrayInfo.setTypeName(foundInfo.getTypeName());
+        final DfTypeArrayInfo typeArrayInfo = new DfTypeArrayInfo(foundInfo.getOwner(), foundInfo.getTypeName());
         final String elementType = foundInfo.getElementType();
         typeArrayInfo.setElementType(elementType);
         if (flatArrayInfoMap.containsKey(elementType)) { // array in array in ...

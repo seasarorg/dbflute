@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -27,10 +28,22 @@ public class DfTypeStructInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected UnifiedSchema _owner; // required at first
-    protected String _typeName; // required at first
+    protected final UnifiedSchema _owner; // required at first
+    protected final String _typeName; // required at first
     protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered(); // required at first
     protected String _entityType; // is set after analyzing
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfTypeStructInfo(UnifiedSchema owner, String typeName) {
+        _owner = owner;
+        _typeName = typeName;
+    }
+
+    public static String generateTypeName(UnifiedSchema owner, String pureTypeName) {
+        return owner.getPureSchema() + "." + pureTypeName;
+    }
 
     // ===================================================================================
     //                                                                       Determination
@@ -121,16 +134,20 @@ public class DfTypeStructInfo {
         return _owner;
     }
 
-    public void setOwner(UnifiedSchema owner) {
-        this._owner = owner;
-    }
-
     public String getTypeName() {
         return _typeName;
     }
 
-    public void setTypeName(String typeName) {
-        this._typeName = typeName;
+    public String getTypePureName() {
+        return Srl.substringFirstRear(_typeName, ".");
+    }
+
+    public String getTypeSqlName() {
+        if (_owner.isAdditionalSchema()) {
+            return getTypeName();
+        } else {
+            return getTypePureName();
+        }
     }
 
     public StringKeyMap<DfColumnMetaInfo> getAttributeInfoMap() {

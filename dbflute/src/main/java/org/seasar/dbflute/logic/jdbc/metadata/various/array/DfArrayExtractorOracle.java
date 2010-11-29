@@ -78,11 +78,9 @@ public class DfArrayExtractorOracle {
         final List<Map<String, String>> resultList = selectFirstArray(unifiedSchema);
         final StringKeyMap<DfTypeArrayInfo> arrayTypeMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
-            // filter because TYPE_NAME might have its schema prefix
-            final String typeName = Srl.substringFirstRear(map.get("TYPE_NAME"), ".");
+            final String typeName = DfTypeArrayInfo.generateTypeName(unifiedSchema, map.get("TYPE_NAME"));
+            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(unifiedSchema, typeName);
             final String elementType = map.get("ELEM_TYPE_NAME");
-            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
-            arrayInfo.setTypeName(typeName);
             arrayInfo.setElementType(elementType);
             arrayTypeMap.put(typeName, arrayInfo);
         }
@@ -146,8 +144,7 @@ public class DfArrayExtractorOracle {
         final StringSet allArrayTypeSet = extractSimpleArrayNameSet(unifiedSchema);
         for (String allArrayTypeName : allArrayTypeSet) {
             if (!flatArrayInfoMap.containsKey(allArrayTypeName)) {
-                final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
-                arrayInfo.setTypeName(allArrayTypeName);
+                final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(unifiedSchema, allArrayTypeName);
                 arrayInfo.setElementType("Unknown"); // the way to get the info is also unknown
                 flatArrayInfoMap.put(allArrayTypeName, arrayInfo);
             }
@@ -157,9 +154,9 @@ public class DfArrayExtractorOracle {
 
     protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
             List<ProcedureArgumentInfo> argInfoList, ProcedureArgumentInfo argInfo, int index) {
-        final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
+        final UnifiedSchema owner = UnifiedSchema.createAsDynamicSchema(null, argInfo.getTypeOwner());
         final String realTypeName = buildArrayTypeName(argInfo);
-        arrayInfo.setTypeName(realTypeName);
+        final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(owner, realTypeName);
         final boolean nestedArray = reflectArrayElementType(argInfoList, index, arrayInfo);
         flatArrayInfoMap.put(realTypeName, arrayInfo);
         if (nestedArray) {
@@ -225,9 +222,7 @@ public class DfArrayExtractorOracle {
         final List<Map<String, String>> resultList = selectSimpleArray(unifiedSchema);
         final StringSet arrayTypeSet = StringSet.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
-            // filter because TYPE_NAME might have its schema prefix
-            final String typeName = Srl.substringFirstRear(map.get("TYPE_NAME"), ".");
-            arrayTypeSet.add(typeName);
+            arrayTypeSet.add(DfTypeArrayInfo.generateTypeName(unifiedSchema, map.get("TYPE_NAME")));
         }
         return arrayTypeSet;
     }

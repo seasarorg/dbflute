@@ -676,6 +676,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             if (entityInfo.hasNestedCustomizeEntity()) {
                 tbl.setSql2EntityCustomizeHasNested(true); // basically when STRUCT type
             }
+            if (entityInfo.isAdditionalSchema()) {
+                tbl.setUnifiedSchema(entityInfo.getAdditionalSchema()); // basically when STRUCT type
+            }
             tbl.setSql2EntityTypeSafeCursor(_cursorInfoMap.get(entityName) != null);
             database.addTable(tbl);
             _log.info(entityName);

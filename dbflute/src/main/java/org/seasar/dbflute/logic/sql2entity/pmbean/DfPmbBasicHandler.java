@@ -284,7 +284,7 @@ public class DfPmbBasicHandler {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayInfo()) {
-            return columnInfo.getTypeArrayInfo().getTypeName();
+            return columnInfo.getTypeArrayInfo().getTypeSqlName();
         }
         return "";
     }
@@ -317,7 +317,7 @@ public class DfPmbBasicHandler {
         assertArgumentPmbMetaDataClassPropertyName(className, propertyName);
         final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(className, propertyName);
         if (columnInfo != null && columnInfo.hasTypeStructInfo()) {
-            return columnInfo.getTypeStructInfo().getTypeName();
+            return columnInfo.getTypeStructInfo().getTypeSqlName();
         }
         return "";
     }
