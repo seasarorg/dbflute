@@ -47,11 +47,14 @@ public class DfStructExtractorOracle {
     //                                                                           =========
     protected final DataSource _dataSource;
 
+    protected boolean _suppressLogging;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfStructExtractorOracle(DataSource dataSource) {
+    public DfStructExtractorOracle(DataSource dataSource, boolean suppressLogging) {
         _dataSource = dataSource;
+        _suppressLogging = suppressLogging;
     }
 
     // ===================================================================================
@@ -121,11 +124,11 @@ public class DfStructExtractorOracle {
         final String sql = buildStructAttributeSql(unifiedSchema);
         final List<Map<String, String>> resultList;
         try {
-            _log.info(sql);
+            log(sql);
             resultList = facade.selectStringList(sql, columnList);
         } catch (Exception continued) {
             // because of assist info
-            _log.info("Failed to select supplement info: " + continued.getMessage());
+            log("Failed to select supplement info: " + continued.getMessage());
             return DfCollectionUtil.emptyList();
         }
         return resultList;
@@ -142,5 +145,15 @@ public class DfStructExtractorOracle {
         sb.append(")");
         sb.append(" order by TYPE_NAME, ATTR_NO");
         return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                             Logging
+    //                                                                             =======
+    protected void log(String msg) {
+        if (_suppressLogging) {
+            return;
+        }
+        _log.info(msg);
     }
 }

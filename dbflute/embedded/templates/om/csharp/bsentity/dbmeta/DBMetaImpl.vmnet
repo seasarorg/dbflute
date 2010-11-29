@@ -93,7 +93,7 @@ namespace ${myDBMetaPackageName} {
         //                                   Primary Element
         //                                   ---------------
         public override bool HasPrimaryKey { get { return ${table.hasPrimaryKey()}; } }
-        public override bool HasCompoundPrimaryKey { get { return ${table.hasCompoundPrimaryKeys()}; } }
+        public override bool HasCompoundPrimaryKey { get { return ${table.hasCompoundPrimaryKey()}; } }
 
         // ===============================================================================
         //                                                                   Relation Info

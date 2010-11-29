@@ -54,8 +54,9 @@ public class DfArrayExtractorOracle {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfArrayExtractorOracle(DataSource dataSource) {
+    public DfArrayExtractorOracle(DataSource dataSource, boolean suppressLogging) {
         _dataSource = dataSource;
+        _suppressLogging = suppressLogging;
     }
 
     // ===================================================================================
@@ -101,11 +102,11 @@ public class DfArrayExtractorOracle {
         final String sql = buildFirstArraySql(unifiedSchema);
         final List<Map<String, String>> resultList;
         try {
-            _log.info(sql);
+            log(sql);
             resultList = facade.selectStringList(sql, columnList);
         } catch (Exception continued) {
             // because it's basically assist info
-            _log.info("Failed to select first array info: " + continued.getMessage());
+            log("Failed to select first array info: " + continued.getMessage());
             return DfCollectionUtil.emptyList();
         }
         return resultList;
@@ -150,10 +151,6 @@ public class DfArrayExtractorOracle {
                 arrayInfo.setElementType("Unknown"); // the way to get the info is also unknown
                 flatArrayInfoMap.put(allArrayTypeName, arrayInfo);
             }
-        }
-        log("All Array (Flat): " + unifiedSchema);
-        for (DfTypeArrayInfo arrayInfo : flatArrayInfoMap.values()) {
-            log("  " + arrayInfo);
         }
         return flatArrayInfoMap;
     }
@@ -242,11 +239,11 @@ public class DfArrayExtractorOracle {
         final String sql = buildSimpleArraySql(unifiedSchema);
         final List<Map<String, String>> resultList;
         try {
-            _log.info(sql);
+            log(sql);
             resultList = facade.selectStringList(sql, columnList);
         } catch (Exception continued) {
             // because it's basically assist info
-            _log.info("Failed to select simple array info: " + continued.getMessage());
+            log("Failed to select simple array info: " + continued.getMessage());
             return DfCollectionUtil.emptyList();
         }
         return resultList;
@@ -270,9 +267,5 @@ public class DfArrayExtractorOracle {
             return;
         }
         _log.info(msg);
-    }
-
-    public void suppressLogging() {
-        _suppressLogging = true;
     }
 }

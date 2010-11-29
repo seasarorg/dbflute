@@ -189,7 +189,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         }
 
         // initialize per schema
-        final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource);
+        final DfStructExtractorOracle extractor = new DfStructExtractorOracle(_dataSource, _suppressLogging);
         structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
 
         // set up struct attribute's additional info
@@ -275,10 +275,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (flatArrayInfoMap != null) {
             return flatArrayInfoMap;
         }
-        final DfArrayExtractorOracle extractor = new DfArrayExtractorOracle(_dataSource);
-        if (_suppressLogging) {
-            extractor.suppressLogging();
-        }
+        final DfArrayExtractorOracle extractor = new DfArrayExtractorOracle(_dataSource, _suppressLogging);
         flatArrayInfoMap = extractor.extractFlatArrayInfoMap(unifiedSchema);
         _flatArrayInfoMapMap.put(unifiedSchema, flatArrayInfoMap);
         return _flatArrayInfoMapMap.get(unifiedSchema); // all arrays are registered
