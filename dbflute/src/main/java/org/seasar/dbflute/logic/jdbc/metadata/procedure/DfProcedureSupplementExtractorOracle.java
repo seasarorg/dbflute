@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,10 +26,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.various.array.DfArrayExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -121,7 +120,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         }
         final List<ProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
         parameterArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
-        final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = extractFlatArrayInfoMap(unifiedSchema);
+        final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = findFlatArrayInfoMap(unifiedSchema);
         for (int i = 0; i < argInfoList.size(); i++) {
             final ProcedureArgumentInfo argInfo = argInfoList.get(i);
             final String argumentName = argInfo.getArgumentName();
@@ -172,6 +171,10 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         }
     }
 
+    protected String buildArrayTypeName(ProcedureArgumentInfo argInfo) {
+        return argInfo.buildArrayTypeName();
+    }
+
     // ===================================================================================
     //                                                                              Struct
     //                                                                              ======
@@ -201,7 +204,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     }
 
     protected void resolveStructAttributeInfo(UnifiedSchema unifiedSchema, StringKeyMap<DfTypeStructInfo> structInfoMap) {
-        final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = extractFlatArrayInfoMap(unifiedSchema);
+        final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = findFlatArrayInfoMap(unifiedSchema);
         // and additional schema's nested things are unsupported, same schema's only
         for (DfTypeStructInfo structInfo : structInfoMap.values()) {
             doResolveStructAttributeInfo(unifiedSchema, structInfoMap, flatArrayInfoMap, structInfo);
@@ -267,255 +270,35 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     // ===================================================================================
     //                                                                     Flat Array Info
     //                                                                     ===============
-    protected StringKeyMap<DfTypeArrayInfo> extractFlatArrayInfoMap(UnifiedSchema unifiedSchema) {
+    protected StringKeyMap<DfTypeArrayInfo> findFlatArrayInfoMap(UnifiedSchema unifiedSchema) {
         StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = _flatArrayInfoMapMap.get(unifiedSchema);
         if (flatArrayInfoMap != null) {
             return flatArrayInfoMap;
         }
-        flatArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
-        final List<ProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
-        for (int i = 0; i < argInfoList.size(); i++) {
-            final ProcedureArgumentInfo argInfo = argInfoList.get(i);
-            final String argumentName = argInfo.getArgumentName();
-            if (Srl.is_Null_or_TrimmedEmpty(argumentName)) {
-                continue;
-            }
-            final String dataType = argInfo.getDataType();
-            if (!isDataTypeArray(dataType)) {
-                continue;
-            }
-            final String typeName = argInfo.getTypeName();
-            if (Srl.is_Null_or_TrimmedEmpty(typeName)) {
-                continue;
-            }
-            setupFlatArrayInfo(flatArrayInfoMap, argInfoList, argInfo, i);
+        final DfArrayExtractorOracle extractor = new DfArrayExtractorOracle(_dataSource);
+        if (_suppressLogging) {
+            extractor.suppressLogging();
         }
-        final StringSet allArrayTypeSet = extractAllArrayTypeSet(unifiedSchema);
-        for (String allArrayTypeName : allArrayTypeSet) {
-            if (!flatArrayInfoMap.containsKey(allArrayTypeName)) {
-                final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
-                arrayInfo.setTypeName(allArrayTypeName);
-                arrayInfo.setElementType("Unknown"); // the way to get the info is also unknown
-                flatArrayInfoMap.put(allArrayTypeName, arrayInfo);
-            }
-        }
-        log("All Array (Flat): " + unifiedSchema);
-        for (DfTypeArrayInfo arrayInfo : flatArrayInfoMap.values()) {
-            log("  " + arrayInfo);
-        }
+        flatArrayInfoMap = extractor.extractFlatArrayInfoMap(unifiedSchema);
         _flatArrayInfoMapMap.put(unifiedSchema, flatArrayInfoMap);
         return _flatArrayInfoMapMap.get(unifiedSchema); // all arrays are registered
-    }
-
-    protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
-            List<ProcedureArgumentInfo> argInfoList, ProcedureArgumentInfo argInfo, int index) {
-        final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
-        final String realTypeName = buildArrayTypeName(argInfo);
-        arrayInfo.setTypeName(realTypeName);
-        final boolean nestedArray = reflectArrayElementType(argInfoList, index, arrayInfo);
-        flatArrayInfoMap.put(realTypeName, arrayInfo);
-        if (nestedArray) {
-            final int nextIndex = (index + 1);
-            final ProcedureArgumentInfo nextArgInfo = argInfoList.get(nextIndex);
-            setupFlatArrayInfo(flatArrayInfoMap, argInfoList, nextArgInfo, nextIndex); // recursive call
-        }
-    }
-
-    protected boolean reflectArrayElementType(List<ProcedureArgumentInfo> argInfoList, int i, DfTypeArrayInfo arrayInfo) {
-        boolean nestedArray = false;
-        final int nextIndex = (i + 1);
-        if (argInfoList.size() > nextIndex) { // element type is in data type of next record
-            final ProcedureArgumentInfo nextInfo = argInfoList.get(nextIndex);
-            if (Srl.is_Null_or_TrimmedEmpty(nextInfo.getArgumentName())) { // element record's argument is null
-                final String typeName = nextInfo.getTypeName();
-                final String dataType = nextInfo.getDataType();
-                final String elementType;
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(typeName)) { // not scalar (array or struct)
-                    if (isDataTypeArray(dataType)) { // can get one more record (Oracle's specification)
-                        nestedArray = true;
-                    }
-                    elementType = buildArrayTypeName(nextInfo);
-                } else { // scalar element
-                    elementType = dataType;
-                }
-                arrayInfo.setElementType(elementType);
-            }
-        } else {
-            log("*Unexpected, no next record for array meta: " + arrayInfo);
-            arrayInfo.setElementType("Unknown"); // basically no way but just in case
-        }
-        return nestedArray;
-    }
-
-    protected StringSet extractAllArrayTypeSet(UnifiedSchema unifiedSchema) {
-        StringSet arrayInfoSet = _arrayTypeSetMap.get(unifiedSchema);
-        if (arrayInfoSet != null) {
-            return arrayInfoSet;
-        }
-        final DfArrayExtractorOracle extractor = new DfArrayExtractorOracle(_dataSource);
-        _arrayTypeSetMap.put(unifiedSchema, extractor.extractArrayTypeSet(unifiedSchema));
-        return _arrayTypeSetMap.get(unifiedSchema);
-    }
-
-    protected boolean isDataTypeArray(String dataType) {
-        return Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY");
-    }
-
-    protected boolean isDataTypeStruct(String dataType) {
-        return Srl.equalsIgnoreCase(dataType, "OBJECT");
-    }
-
-    protected String buildArrayTypeName(ProcedureArgumentInfo argInfo) {
-        final String typeName = argInfo.getTypeName();
-        final String typeSubName = argInfo.getTypeSubName();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(typeSubName)) {
-            // *typeOwner handling is under review
-            //final String typeOwner = argInfo.getTypeOwner();
-            return typeName + "." + typeSubName;
-        } else {
-            // *it may need to add typeOwner if additional schema at the future
-            return typeName;
-        }
     }
 
     // ===================================================================================
     //                                                                       Argument Info
     //                                                                       =============
     protected List<ProcedureArgumentInfo> findProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
-        final List<ProcedureArgumentInfo> cachedList = _argumentInfoListMap.get(unifiedSchema);
-        if (cachedList != null) {
-            return cachedList;
+        List<ProcedureArgumentInfo> argInfoList = _argumentInfoListMap.get(unifiedSchema);
+        if (argInfoList != null) {
+            return argInfoList;
         }
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final String sql = buildProcedureArgumentSql(unifiedSchema);
-        final List<String> columnList = new ArrayList<String>();
-        columnList.add("PACKAGE_NAME");
-        columnList.add("OBJECT_NAME");
-        columnList.add("OVERLOAD");
-        columnList.add("SEQUENCE");
-        columnList.add("ARGUMENT_NAME");
-        columnList.add("DATA_TYPE");
-        columnList.add("TYPE_OWNER");
-        columnList.add("TYPE_NAME");
-        columnList.add("TYPE_SUBNAME");
-        final List<Map<String, String>> resultList;
-        try {
-            log(sql);
-            resultList = facade.selectStringList(sql, columnList);
-        } catch (Exception continued) {
-            // because of assist info
-            log("Failed to select supplement info: " + continued.getMessage());
-            return new ArrayList<ProcedureArgumentInfo>();
+        final DfProcedureParameterExtractorOracle extractor = new DfProcedureParameterExtractorOracle(_dataSource);
+        if (_suppressLogging) {
+            extractor.suppressLogging();
         }
-        final List<ProcedureArgumentInfo> infoList = DfCollectionUtil.newArrayList();
-        for (Map<String, String> map : resultList) {
-            ProcedureArgumentInfo info = new ProcedureArgumentInfo();
-            info.setPackageName(map.get("PACKAGE_NAME"));
-            info.setObjectName(map.get("OBJECT_NAME"));
-            info.setOverload(map.get("OVERLOAD"));
-            info.setSequence(map.get("SEQUENCE"));
-            info.setArgumentName(map.get("ARGUMENT_NAME"));
-            info.setDataType(map.get("DATA_TYPE"));
-            info.setTypeOwner(map.get("TYPE_OWNER"));
-            info.setTypeName(map.get("TYPE_NAME"));
-            info.setTypeSubName(map.get("TYPE_SUBNAME"));
-            infoList.add(info);
-        }
-        _argumentInfoListMap.put(unifiedSchema, infoList);
+        argInfoList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
+        _argumentInfoListMap.put(unifiedSchema, argInfoList);
         return _argumentInfoListMap.get(unifiedSchema);
-    }
-
-    protected String buildProcedureArgumentSql(UnifiedSchema unifiedSchema) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("select *");
-        sb.append(" from ALL_ARGUMENTS");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
-        sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
-        return sb.toString();
-    }
-
-    protected static class ProcedureArgumentInfo {
-        protected String _packageName;
-        protected String _objectName;
-        protected String _overload;
-        protected String _sequence;
-        protected String _argumentName;
-        protected String _dataType;
-        protected String _typeOwner;
-        protected String _typeName;
-        protected String _typeSubName;
-
-        public String getPackageName() {
-            return _packageName;
-        }
-
-        public void setPackageName(String packageName) {
-            this._packageName = packageName;
-        }
-
-        public String getObjectName() {
-            return _objectName;
-        }
-
-        public void setObjectName(String objectName) {
-            this._objectName = objectName;
-        }
-
-        public String getOverload() {
-            return _overload;
-        }
-
-        public void setOverload(String overload) {
-            this._overload = overload;
-        }
-
-        public String getSequence() {
-            return _sequence;
-        }
-
-        public void setSequence(String sequence) {
-            this._sequence = sequence;
-        }
-
-        public String getArgumentName() {
-            return _argumentName;
-        }
-
-        public void setArgumentName(String argumentName) {
-            this._argumentName = argumentName;
-        }
-
-        public String getDataType() {
-            return _dataType;
-        }
-
-        public void setDataType(String dataType) {
-            this._dataType = dataType;
-        }
-
-        public String getTypeName() {
-            return _typeName;
-        }
-
-        public void setTypeName(String typeName) {
-            this._typeName = typeName;
-        }
-
-        public String getTypeOwner() {
-            return _typeOwner;
-        }
-
-        public void setTypeOwner(String typeOwner) {
-            this._typeOwner = typeOwner;
-        }
-
-        public String getTypeSubName() {
-            return _typeSubName;
-        }
-
-        public void setTypeSubName(String typeSubName) {
-            this._typeSubName = typeSubName;
-        }
     }
 
     // ===================================================================================

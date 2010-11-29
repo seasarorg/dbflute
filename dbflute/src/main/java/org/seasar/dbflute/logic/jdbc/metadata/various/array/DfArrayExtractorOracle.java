@@ -24,8 +24,12 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -45,6 +49,8 @@ public class DfArrayExtractorOracle {
     //                                                                           =========
     protected final DataSource _dataSource;
 
+    protected boolean _suppressLogging;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -55,8 +61,171 @@ public class DfArrayExtractorOracle {
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
-    public StringSet extractArrayTypeSet(UnifiedSchema unifiedSchema) {
-        final List<Map<String, String>> resultList = selectArray(unifiedSchema);
+    public StringKeyMap<DfTypeArrayInfo> extractFlatArrayInfoMap(UnifiedSchema unifiedSchema) {
+        final StringKeyMap<DfTypeArrayInfo> firstMap = doExtractFlatArrayInfoFirstMap(unifiedSchema);
+        if (!firstMap.isEmpty()) {
+            return firstMap;
+        }
+        // if ALL_COLL_TYPES is unsupported at the Oracle version
+        return doExtractFlatArrayInfoSecondMap(unifiedSchema); // second
+    }
+
+    // ===================================================================================
+    //                                                                    First Array Info
+    //                                                                    ================
+    protected StringKeyMap<DfTypeArrayInfo> doExtractFlatArrayInfoFirstMap(UnifiedSchema unifiedSchema) {
+        final List<Map<String, String>> resultList = selectFirstArray(unifiedSchema);
+        final StringKeyMap<DfTypeArrayInfo> arrayTypeMap = StringKeyMap.createAsFlexibleOrdered();
+        for (Map<String, String> map : resultList) {
+            // filter because TYPE_NAME might have its schema prefix
+            final String typeName = Srl.substringFirstRear(map.get("TYPE_NAME"), ".");
+            final String elementType = map.get("ELEM_TYPE_NAME");
+            final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
+            arrayInfo.setTypeName(typeName);
+            arrayInfo.setElementType(elementType);
+            arrayTypeMap.put(typeName, arrayInfo);
+        }
+        return arrayTypeMap;
+    }
+
+    protected List<Map<String, String>> selectFirstArray(UnifiedSchema unifiedSchema) {
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final List<String> columnList = new ArrayList<String>();
+        columnList.add("TYPE_NAME");
+        columnList.add("COLL_TYPE");
+        columnList.add("ELEM_TYPE_OWNER");
+        columnList.add("ELEM_TYPE_NAME");
+        columnList.add("LENGTH");
+        columnList.add("PRECISION");
+        columnList.add("SCALE");
+        final String sql = buildFirstArraySql(unifiedSchema);
+        final List<Map<String, String>> resultList;
+        try {
+            _log.info(sql);
+            resultList = facade.selectStringList(sql, columnList);
+        } catch (Exception continued) {
+            // because it's basically assist info
+            _log.info("Failed to select first array info: " + continued.getMessage());
+            return DfCollectionUtil.emptyList();
+        }
+        return resultList;
+    }
+
+    protected String buildFirstArraySql(UnifiedSchema unifiedSchema) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select *");
+        sb.append(" from ALL_COLL_TYPES");
+        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" order by TYPE_NAME");
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                   Second Array Info
+    //                                                                   =================
+    protected StringKeyMap<DfTypeArrayInfo> doExtractFlatArrayInfoSecondMap(UnifiedSchema unifiedSchema) {
+        final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        final List<ProcedureArgumentInfo> argInfoList = extractProcedureArgumentInfoList(unifiedSchema);
+        for (int i = 0; i < argInfoList.size(); i++) {
+            final ProcedureArgumentInfo argInfo = argInfoList.get(i);
+            final String argumentName = argInfo.getArgumentName();
+            if (Srl.is_Null_or_TrimmedEmpty(argumentName)) {
+                continue;
+            }
+            final String dataType = argInfo.getDataType();
+            if (!isDataTypeArray(dataType)) {
+                continue;
+            }
+            final String typeName = argInfo.getTypeName();
+            if (Srl.is_Null_or_TrimmedEmpty(typeName)) {
+                continue;
+            }
+            setupFlatArrayInfo(flatArrayInfoMap, argInfoList, argInfo, i);
+        }
+        final StringSet allArrayTypeSet = extractSimpleArrayNameSet(unifiedSchema);
+        for (String allArrayTypeName : allArrayTypeSet) {
+            if (!flatArrayInfoMap.containsKey(allArrayTypeName)) {
+                final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
+                arrayInfo.setTypeName(allArrayTypeName);
+                arrayInfo.setElementType("Unknown"); // the way to get the info is also unknown
+                flatArrayInfoMap.put(allArrayTypeName, arrayInfo);
+            }
+        }
+        log("All Array (Flat): " + unifiedSchema);
+        for (DfTypeArrayInfo arrayInfo : flatArrayInfoMap.values()) {
+            log("  " + arrayInfo);
+        }
+        return flatArrayInfoMap;
+    }
+
+    protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
+            List<ProcedureArgumentInfo> argInfoList, ProcedureArgumentInfo argInfo, int index) {
+        final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo();
+        final String realTypeName = buildArrayTypeName(argInfo);
+        arrayInfo.setTypeName(realTypeName);
+        final boolean nestedArray = reflectArrayElementType(argInfoList, index, arrayInfo);
+        flatArrayInfoMap.put(realTypeName, arrayInfo);
+        if (nestedArray) {
+            final int nextIndex = (index + 1);
+            final ProcedureArgumentInfo nextArgInfo = argInfoList.get(nextIndex);
+            setupFlatArrayInfo(flatArrayInfoMap, argInfoList, nextArgInfo, nextIndex); // recursive call
+        }
+    }
+
+    protected boolean reflectArrayElementType(List<ProcedureArgumentInfo> argInfoList, int i, DfTypeArrayInfo arrayInfo) {
+        boolean nestedArray = false;
+        final int nextIndex = (i + 1);
+        if (argInfoList.size() > nextIndex) { // element type is in data type of next record
+            final ProcedureArgumentInfo nextInfo = argInfoList.get(nextIndex);
+            if (Srl.is_Null_or_TrimmedEmpty(nextInfo.getArgumentName())) { // element record's argument is null
+                final String typeName = nextInfo.getTypeName();
+                final String dataType = nextInfo.getDataType();
+                final String elementType;
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(typeName)) { // not scalar (array or struct)
+                    if (isDataTypeArray(dataType)) { // can get one more record (Oracle's specification)
+                        nestedArray = true;
+                    }
+                    elementType = buildArrayTypeName(nextInfo);
+                } else { // scalar element
+                    elementType = dataType;
+                }
+                arrayInfo.setElementType(elementType);
+            }
+        } else {
+            log("*Unexpected, no next record for array meta: " + arrayInfo);
+            arrayInfo.setElementType("Unknown"); // basically no way but just in case
+        }
+        return nestedArray;
+    }
+
+    protected boolean isDataTypeArray(String dataType) {
+        return Srl.containsAnyIgnoreCase(dataType, "TABLE", "VARRAY");
+    }
+
+    protected boolean isDataTypeStruct(String dataType) {
+        return Srl.equalsIgnoreCase(dataType, "OBJECT");
+    }
+
+    protected String buildArrayTypeName(ProcedureArgumentInfo argInfo) {
+        return argInfo.buildArrayTypeName();
+    }
+
+    // ===================================================================================
+    //                                                                       Argument Info
+    //                                                                       =============
+    protected List<ProcedureArgumentInfo> extractProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
+        final DfProcedureParameterExtractorOracle extractor = new DfProcedureParameterExtractorOracle(_dataSource);
+        if (_suppressLogging) {
+            extractor.suppressLogging();
+        }
+        return extractor.extractProcedureArgumentInfoList(unifiedSchema);
+    }
+
+    // ===================================================================================
+    //                                                                    Simple Type Info
+    //                                                                    ================
+    protected StringSet extractSimpleArrayNameSet(UnifiedSchema unifiedSchema) {
+        final List<Map<String, String>> resultList = selectSimpleArray(unifiedSchema);
         final StringSet arrayTypeSet = StringSet.createAsFlexibleOrdered();
         for (Map<String, String> map : resultList) {
             // filter because TYPE_NAME might have its schema prefix
@@ -66,24 +235,24 @@ public class DfArrayExtractorOracle {
         return arrayTypeSet;
     }
 
-    protected List<Map<String, String>> selectArray(UnifiedSchema unifiedSchema) {
+    protected List<Map<String, String>> selectSimpleArray(UnifiedSchema unifiedSchema) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("TYPE_NAME");
-        final String sql = buildArraySql(unifiedSchema);
+        final String sql = buildSimpleArraySql(unifiedSchema);
         final List<Map<String, String>> resultList;
         try {
             _log.info(sql);
             resultList = facade.selectStringList(sql, columnList);
         } catch (Exception continued) {
-            // because of assist info
-            _log.info("Failed to select supplement info: " + continued.getMessage());
+            // because it's basically assist info
+            _log.info("Failed to select simple array info: " + continued.getMessage());
             return DfCollectionUtil.emptyList();
         }
         return resultList;
     }
 
-    protected String buildArraySql(UnifiedSchema unifiedSchema) {
+    protected String buildSimpleArraySql(UnifiedSchema unifiedSchema) {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from ALL_TYPES");
@@ -91,5 +260,19 @@ public class DfArrayExtractorOracle {
         sb.append(" and TYPECODE = 'COLLECTION'");
         sb.append(" order by TYPE_NAME");
         return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                             Logging
+    //                                                                             =======
+    protected void log(String msg) {
+        if (_suppressLogging) {
+            return;
+        }
+        _log.info(msg);
+    }
+
+    public void suppressLogging() {
+        _suppressLogging = true;
     }
 }
