@@ -96,9 +96,11 @@ public class DfProcedureParameterExtractorOracle {
             info.setArgumentName(map.get("ARGUMENT_NAME"));
             info.setDataType(map.get("DATA_TYPE"));
             final String typeOwner = map.get("TYPE_OWNER"); // ARRAY and STRUCT only
-            final String typeName = Srl.connectPrefix(map.get("TYPE_NAME"), typeOwner, ".");
             info.setTypeOwner(typeOwner);
-            info.setTypeName(typeName);
+            final String typeName = map.get("TYPE_NAME"); // nullable
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(typeName)) {
+                info.setTypeName(Srl.connectPrefix(typeName, typeOwner, "."));
+            }
             info.setTypeSubName(map.get("TYPE_SUBNAME"));
             infoList.add(info);
         }
