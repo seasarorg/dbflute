@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
@@ -32,6 +33,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.various.array.DfArrayExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -85,10 +87,20 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     /**
      * Extract the map of parameter's overload info. <br />
      * Same name and different type parameters of overload are unsupported. 
-     * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of parameter's array info. {key = (packageName.)procedureName.columnName, value = overloadNo} (NotNull)
      */
-    public StringKeyMap<Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
+    public StringKeyMap<Integer> extractParameterOverloadInfoMap() {
+        final UnifiedSchema mainSchema = getMainSchema();
+        final List<UnifiedSchema> additionalSchemaList = getAdditionalSchemaList();
+        final StringKeyMap<Integer> resultMap = findParameterOverloadInfoMap(mainSchema);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            final StringKeyMap<Integer> additionalMap = findParameterOverloadInfoMap(additionalSchema);
+            resultMap.putAll(additionalMap);
+        }
+        return resultMap;
+    }
+
+    public StringKeyMap<Integer> findParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
         final List<ProcedureArgumentInfo> infoList = findProcedureArgumentInfoList(unifiedSchema);
         final StringKeyMap<Integer> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
@@ -110,10 +122,20 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     /**
      * Extract the map of parameter's array info. <br />
      * Same name and different type parameters of overload are unsupported. 
-     * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of parameter's array info. {key = (packageName.)procedureName.columnName} (NotNull)
      */
-    public StringKeyMap<DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema) {
+    public StringKeyMap<DfTypeArrayInfo> extractParameterArrayInfoMap() {
+        final UnifiedSchema mainSchema = getMainSchema();
+        final List<UnifiedSchema> additionalSchemaList = getAdditionalSchemaList();
+        final StringKeyMap<DfTypeArrayInfo> resultMap = findParameterArrayInfoMap(mainSchema);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            final StringKeyMap<DfTypeArrayInfo> additionalMap = findParameterArrayInfoMap(additionalSchema);
+            resultMap.putAll(additionalMap);
+        }
+        return resultMap;
+    }
+
+    protected StringKeyMap<DfTypeArrayInfo> findParameterArrayInfoMap(UnifiedSchema unifiedSchema) {
         StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = _arrayInfoMapMap.get(unifiedSchema);
         if (parameterArrayInfoMap != null) {
             return parameterArrayInfoMap;
@@ -179,11 +201,17 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                              ======
     /**
      * Extract the map of struct info with nested info.
-     * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of struct info. {key = schema.struct-type-name} (NotNull)
      */
-    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
-        return findStructInfoMap(unifiedSchema);
+    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap() {
+        final UnifiedSchema mainSchema = getMainSchema();
+        final List<UnifiedSchema> additionalSchemaList = getAdditionalSchemaList();
+        final StringKeyMap<DfTypeStructInfo> resultMap = findStructInfoMap(mainSchema);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            final StringKeyMap<DfTypeStructInfo> additionalMap = findStructInfoMap(additionalSchema);
+            resultMap.putAll(additionalMap);
+        }
+        return resultMap;
     }
 
     protected StringKeyMap<DfTypeStructInfo> findStructInfoMap(UnifiedSchema unifiedSchema) {
@@ -300,6 +328,21 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
 
     protected DfProcedureParameterExtractorOracle createProcedureParameterExtractorOracle() {
         return new DfProcedureParameterExtractorOracle(_dataSource, _suppressLogging);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected UnifiedSchema getMainSchema() {
+        return getDatabaseProperties().getDatabaseSchema();
+    }
+
+    protected List<UnifiedSchema> getAdditionalSchemaList() {
+        return getDatabaseProperties().getAdditionalSchemaList();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return DfBuildProperties.getInstance().getDatabaseProperties();
     }
 
     // ===================================================================================

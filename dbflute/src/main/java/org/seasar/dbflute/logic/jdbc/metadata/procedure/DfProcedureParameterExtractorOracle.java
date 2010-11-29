@@ -88,7 +88,7 @@ public class DfProcedureParameterExtractorOracle {
         }
         final List<ProcedureArgumentInfo> infoList = DfCollectionUtil.newArrayList();
         for (Map<String, String> map : resultList) {
-            ProcedureArgumentInfo info = new ProcedureArgumentInfo();
+            final ProcedureArgumentInfo info = new ProcedureArgumentInfo();
             info.setPackageName(map.get("PACKAGE_NAME"));
             info.setObjectName(map.get("OBJECT_NAME"));
             info.setOverload(map.get("OVERLOAD"));

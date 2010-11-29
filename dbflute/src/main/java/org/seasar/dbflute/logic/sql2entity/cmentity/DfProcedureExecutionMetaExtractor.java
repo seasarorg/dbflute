@@ -448,9 +448,9 @@ public class DfProcedureExecutionMetaExtractor {
         }
         try {
             if (column.isOracleTreatedAsArray() && column.hasTypeArrayInfo()) {
-                cs.registerOutParameter(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeName());
+                cs.registerOutParameter(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeSqlName());
             } else if (column.isOracleStruct() && column.hasTypeStructInfo()) {
-                cs.registerOutParameter(paramIndex, Types.STRUCT, column.getTypeStructInfo().getTypeName());
+                cs.registerOutParameter(paramIndex, Types.STRUCT, column.getTypeStructInfo().getTypeSqlName());
             } else {
                 valueType.registerOutParameter(conn, cs, paramIndex);
             }
@@ -484,9 +484,9 @@ public class DfProcedureExecutionMetaExtractor {
         }
         try {
             if (column.isOracleTreatedAsArray() && column.hasTypeArrayInfo()) {
-                cs.setNull(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeName());
+                cs.setNull(paramIndex, Types.ARRAY, column.getTypeArrayInfo().getTypeSqlName());
             } else if (column.isOracleStruct() && column.hasTypeStructInfo()) {
-                cs.setNull(paramIndex, Types.STRUCT, column.getTypeStructInfo().getTypeName());
+                cs.setNull(paramIndex, Types.STRUCT, column.getTypeStructInfo().getTypeSqlName());
             } else {
                 valueType.bindValue(conn, cs, paramIndex, value);
             }

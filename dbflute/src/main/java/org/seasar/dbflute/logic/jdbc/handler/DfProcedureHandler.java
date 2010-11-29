@@ -372,13 +372,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     protected void doResolveAssistInfoOracle(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMetaInfo> metaInfoList) {
         final DfProcedureSupplementExtractorOracle extractor = new DfProcedureSupplementExtractorOracle(dataSource);
-        if (_suppressLogging) {
+        if (_suppressLogging || unifiedSchema.isAdditionalSchema()) {
+            // contains additional schema because it has no change
             extractor.suppressLogging();
         }
-        final Map<String, Integer> parameterOverloadInfoMap = extractor.extractParameterOverloadInfoMap(unifiedSchema);
-        final Map<String, DfTypeArrayInfo> parameterArrayInfoMap = extractor
-                .extractParameterArrayInfoMap(unifiedSchema);
-        final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
+        final Map<String, Integer> parameterOverloadInfoMap = extractor.extractParameterOverloadInfoMap();
+        final StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = extractor.extractParameterArrayInfoMap();
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap();
         final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
         final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
         for (DfProcedureMetaInfo metaInfo : metaInfoList) {

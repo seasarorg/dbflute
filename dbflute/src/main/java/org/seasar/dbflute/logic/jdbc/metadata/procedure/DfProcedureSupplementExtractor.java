@@ -17,7 +17,6 @@ package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
 import java.util.Map;
 
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
@@ -31,26 +30,23 @@ public interface DfProcedureSupplementExtractor {
     /**
      * Extract the map of overload info. <br />
      * Same name and different type parameters of overload are unsupported. 
-     * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    public Map<String, Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema);
+    public Map<String, Integer> extractParameterOverloadInfoMap();
 
     /**
      * Extract the map of array info. <br />
      * Same name and different type parameters of overload are unsupported. 
-     * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    public Map<String, DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema);
+    public Map<String, DfTypeArrayInfo> extractParameterArrayInfoMap();
 
     /**
      * Extract the map of struct info for procedure. <br />
      * (but it contains structs that are not defined as procedure parameters)
-     * @param unifiedSchema The unified schema. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema);
+    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap();
 
     /**
      * @param catalog The catalog for procedure. (Nullable)
