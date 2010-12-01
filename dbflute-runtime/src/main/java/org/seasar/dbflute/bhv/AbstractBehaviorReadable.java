@@ -548,9 +548,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final Map<PK, LOCAL_ENTITY> pkLocalEntityMap = new LinkedHashMap<PK, LOCAL_ENTITY>();
         final List<PK> pkList = new ArrayList<PK>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
+            // PK value should not be null
+            // though it has no blow-by-blow check for compatibility
             final PK primaryKeyValue = callback.getPKVal(localEntity);
             pkList.add(primaryKeyValue);
-            pkLocalEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
+            pkLocalEntityMap.put(toLoadReferrerUniqueKey(primaryKeyValue), localEntity);
         }
 
         // - - - - - - - - - - - - - - - -
@@ -594,7 +596,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             final PK referrerListKey;
             {
                 final PK foreignKeyValue = callback.getFKVal(referrerEntity);
-                referrerListKey = toLowerCasePrimaryKeyIfString(foreignKeyValue);
+                referrerListKey = toLoadReferrerUniqueKey(foreignKeyValue);
             }
             if (!pkReferrerListMap.containsKey(referrerListKey)) {
                 pkReferrerListMap.put(referrerListKey, new ArrayList<REFERRER_ENTITY>());
@@ -613,7 +615,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             final PK referrerListKey;
             {
                 final PK primaryKey = callback.getPKVal(localEntity);
-                referrerListKey = toLowerCasePrimaryKeyIfString(primaryKey);
+                referrerListKey = toLoadReferrerUniqueKey(primaryKey);
             }
             if (pkReferrerListMap.containsKey(referrerListKey)) {
                 callback.setRfLs(localEntity, pkReferrerListMap.get(referrerListKey));
@@ -624,13 +626,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * To lower case for primary key if the value is string.
+     * Convert the primary key to unique key for load-referrer. <br />
+     * This default implementation is to-lower if string type.
      * @param <PK> The type of primary key.
-     * @param value The value of primary key. (Nullable)
-     * @return The value of primary key. (Nullable)
+     * @param value The value of primary key. (NotNull)
+     * @return The value of primary key. (NotNull)
      */
     @SuppressWarnings("unchecked")
-    protected <PK> PK toLowerCasePrimaryKeyIfString(PK value) {
+    protected <PK> PK toLoadReferrerUniqueKey(PK value) {
         return (PK) toLowerCaseIfString(value);
     }
 

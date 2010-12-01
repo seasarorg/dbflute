@@ -57,7 +57,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     public String resolveVariable(String fixedCondition) {
         final String localAliasName = _localCQ.xgetAliasName();
         final String foreignAliasName = _foreignCQ.xgetAliasName();
-        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatible
+        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatibility
         fixedCondition = replaceString(fixedCondition, getLocalAliasMark(), localAliasName);
         fixedCondition = replaceString(fixedCondition, getForeignAliasMark(), foreignAliasName);
         final String locationBase = _localCQ.xgetLocationBase();
