@@ -160,7 +160,7 @@ public class DfJdbcTypeMapper {
             return getTimeJdbcType();
         }
         if (isOracleCompatibleDate(jdbcDefValue, dbTypeName)) {
-            // for compatible to Oracle's JDBC driver
+            // for compatibility to Oracle's JDBC driver
             return getDateJdbcType();
         }
         return null;

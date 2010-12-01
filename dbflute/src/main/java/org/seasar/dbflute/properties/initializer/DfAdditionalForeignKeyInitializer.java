@@ -76,7 +76,7 @@ public class DfAdditionalForeignKeyInitializer {
             final String localTableName = getLocalTableName(foreignKeyName);
 
             _log.info(foreignKeyName);
-            if (localTableName.equals("$$ALL$$") || localTableName.equals("*")) { // "*" is for compatible
+            if (localTableName.equals("$$ALL$$") || localTableName.equals("*")) { // "*" is for compatibility
                 processAllTableFK(foreignKeyName, foreignTableName, foreignColumnNameList);
             } else {
                 processOneTableFK(foreignKeyName, localTableName, foreignTableName, foreignColumnNameList);

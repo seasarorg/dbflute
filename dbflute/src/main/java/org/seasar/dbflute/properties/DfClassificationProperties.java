@@ -230,7 +230,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             {
                 String tmpType = map.get(DfClassificationTop.KEY_CODE_TYPE);
                 if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
-                    // for compatible
+                    // for compatibility
                     tmpType = map.get(DfClassificationTop.KEY_DATA_TYPE);
                 }
                 codeType = tmpType;

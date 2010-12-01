@@ -121,7 +121,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             // (for example, MySQL)
             // 
             // even if it's not retry, it is continued only about primary key
-            // (for compatible: implemented like this at old versions)
+            // (for compatibility: implemented like this at old versions)
             return null;
         }
     }

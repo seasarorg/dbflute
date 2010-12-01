@@ -1367,11 +1367,11 @@ public class Table {
         return referrerListAsWhat;
     }
 
-    public List<ForeignKey> getRefererList() { // for compatible (spell miss)
+    public List<ForeignKey> getRefererList() { // for compatibility (spell miss)
         return getReferrerList();
     }
 
-    public List<ForeignKey> getReferrers() { // for compatible (old style)
+    public List<ForeignKey> getReferrers() { // for compatibility (old style)
         return getReferrerList();
     }
 

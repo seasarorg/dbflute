@@ -1096,7 +1096,7 @@ public class Database {
             return resulList;
         }
 
-        // for compatible and default value
+        // for compatibility and default value
         final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties()
                 .getDBFluteDiconPackageNameList();
         if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {
@@ -1150,7 +1150,7 @@ public class Database {
             return resulList;
         }
 
-        // for compatible and default value
+        // for compatibility and default value
         final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties()
                 .getDBFluteBeansPackageNameList();
         if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {

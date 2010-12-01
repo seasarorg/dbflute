@@ -16,7 +16,7 @@ public class DfVelocityContextFactory {
         final VelocityContext context = new VelocityContext();
         final List<AppData> dataModels = new ArrayList<AppData>();
         dataModels.add(appData);
-        context.put("dataModels", dataModels); // for compatible
+        context.put("dataModels", dataModels); // for compatibility
         context.put("schemaData", appData);
         return context;
     }

@@ -784,7 +784,7 @@ public class Column {
             // same table reference was found
             final List<String> columnsNameList = fks[i].getLocalColumns();
 
-            // the bug exists but it doesn't have heavy problem so not fixed for compatible
+            // the bug exists but it doesn't have heavy problem so not fixed for compatibility
             //  if FOO_ID, BAR_ID, QUX_ID : FK_ONE(FOO_ID, BAR_ID), FK_TWO(BAR_ID, QUX_ID)
             //  then BAR_ID column returns false here (actually it also be multiple FK)
             if (!Srl.containsElementIgnoreCase(columnsNameList, myColumnName)) {

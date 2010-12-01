@@ -55,7 +55,7 @@ public class DfClassificationTop {
         {
             String tmpType = (String) elementMap.get(codeTypeKey);
             if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
-                // for compatible
+                // for compatibility
                 tmpType = (String) elementMap.get(dataTypeKey);
             }
             codeType = tmpType;

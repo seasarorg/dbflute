@@ -567,7 +567,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
      */
     public String getFlatDirectoryPackage() {
         final String key = "flatDirectoryPackage";
-        final String defaultProp = getProperty(key, null); // for compatible
+        final String defaultProp = getProperty(key, null); // for compatibility
         return getProperty(key, defaultProp, getOutputPackageAdjustmentMap());
     }
 
@@ -583,7 +583,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
      */
     public String getOmitDirectoryPackage() {
         final String key = "omitDirectoryPackage";
-        final String defaultProp = getProperty(key, null); // for compatible
+        final String defaultProp = getProperty(key, null); // for compatibility
         return getProperty(key, defaultProp, getOutputPackageAdjustmentMap());
     }
 
