@@ -18,7 +18,6 @@ package org.seasar.dbflute.logic.jdbc.handler;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -73,55 +73,20 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      */
     public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
-        final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
-        ResultSet columnResultSet = null;
-        ResultSet lowerSpare = null;
-        ResultSet upperSpare = null;
-        try {
-            final String catalogName = unifiedSchema.getPureCatalog();
-            final String schemaName = unifiedSchema.getPureSchema();
-            columnResultSet = metaData.getColumns(catalogName, schemaName, tableName, null);
-            setupColumnMetaInfo(columns, columnResultSet, unifiedSchema, tableName);
-            if (columns.isEmpty()) { // for lower case
-                lowerSpare = metaData.getColumns(catalogName, schemaName, tableName.toLowerCase(), null);
-                setupColumnMetaInfo(columns, lowerSpare, unifiedSchema, tableName);
-            }
-            if (columns.isEmpty()) { // for upper case
-                upperSpare = metaData.getColumns(catalogName, schemaName, tableName.toUpperCase(), null);
-                setupColumnMetaInfo(columns, upperSpare, unifiedSchema, tableName);
-            }
-            // *because it exists supplementary process for getting columns after here
-            //if (columns.isEmpty()) {
-            //    String msg = "Failed to get columns:";
-            //    msg = msg + " catalogName=" + catalogName + " schemaName=" + schemaName;
-            //    msg = msg + " tableName=" + tableName;
-            //    throw new DfColumnNotFoundException(msg);
-            //}
-        } finally {
-            if (columnResultSet != null) {
-                try {
-                    columnResultSet.close();
-                } catch (SQLException ignored) {
-                }
-            }
-            if (lowerSpare != null) {
-                try {
-                    lowerSpare.close();
-                } catch (SQLException ignored) {
-                }
-            }
-            if (upperSpare != null) {
-                try {
-                    upperSpare.close();
-                } catch (SQLException ignored) {
-                }
-            }
+        List<DfColumnMetaInfo> ls = doGetColumnList(metaData, unifiedSchema, tableName, false);
+        if (ls.isEmpty()) { // retry by lower case
+            ls = doGetColumnList(metaData, unifiedSchema, tableName.toLowerCase(), true);
         }
-        return columns;
+        if (ls.isEmpty()) { // retry by upper case
+            ls = doGetColumnList(metaData, unifiedSchema, tableName.toUpperCase(), true);
+        }
+        return ls;
     }
 
-    protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet,
-            UnifiedSchema unifiedSchema, String tableName) throws SQLException {
+    protected List<DfColumnMetaInfo> doGetColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, boolean retry) throws SQLException {
+        final List<DfColumnMetaInfo> columnList = DfCollectionUtil.newArrayList();
+
         // Column names for duplicate check
         final StringSet columnNameSet = StringSet.createAsFlexible();
 
@@ -129,47 +94,58 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         final StringSet duplicateTableNameSet = StringSet.createAsFlexible();
         final StringSet duplicateColumnNameSet = StringSet.createAsFlexible();
 
-        while (columnResultSet.next()) {
-            // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // same policy of table process (see DfTableHandler.java)
-            // - - - - - - - - - -/
-
-            final String columnName = columnResultSet.getString(4);
-            if (isColumnExcept(unifiedSchema, tableName, columnName)) {
-                continue;
+        ResultSet rs = null;
+        try {
+            rs = extractColumnMetaData(metaData, unifiedSchema, tableName, retry);
+            if (rs == null) {
+                return DfCollectionUtil.newArrayList();
             }
+            while (rs.next()) {
+                // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // same policy of table process (see DfTableHandler.java)
+                // - - - - - - - - - -/
 
-            final String metaTableName = columnResultSet.getString(3);
-            if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
-                continue;
+                final String columnName = rs.getString(4);
+                if (isColumnExcept(unifiedSchema, tableName, columnName)) {
+                    continue;
+                }
+
+                final String metaTableName = rs.getString(3);
+                if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
+                    continue;
+                }
+
+                // Filter duplicate objects
+                if (columnNameSet.contains(columnName)) {
+                    duplicateTableNameSet.add(metaTableName);
+                    duplicateColumnNameSet.add(columnName);
+                    continue; // ignored with warning
+                }
+                columnNameSet.add(columnName);
+
+                final Integer jdbcTypeCode = Integer.valueOf(rs.getString(5));
+                final String dbTypeName = rs.getString(6);
+                final Integer columnSize = Integer.valueOf(rs.getInt(7));
+                final Integer decimalDigits = rs.getInt(9);
+                final Integer nullType = Integer.valueOf(rs.getInt(11));
+                final String columnComment = rs.getString(12);
+                final String defaultValue = rs.getString(13);
+
+                final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
+                columnMetaInfo.setColumnName(columnName);
+                columnMetaInfo.setJdbcDefValue(jdbcTypeCode);
+                columnMetaInfo.setDbTypeName(dbTypeName);
+                columnMetaInfo.setColumnSize(columnSize);
+                columnMetaInfo.setDecimalDigits(decimalDigits);
+                columnMetaInfo.setRequired(nullType == 0);
+                columnMetaInfo.setColumnComment(columnComment);
+                columnMetaInfo.setDefaultValue(defaultValue);
+                columnList.add(columnMetaInfo);
             }
-
-            // Filter duplicate objects
-            if (columnNameSet.contains(columnName)) {
-                duplicateTableNameSet.add(metaTableName);
-                duplicateColumnNameSet.add(columnName);
-                continue; // ignored with warning
+        } finally {
+            if (rs != null) {
+                rs.close();
             }
-            columnNameSet.add(columnName);
-
-            final Integer jdbcTypeCode = Integer.valueOf(columnResultSet.getString(5));
-            final String dbTypeName = columnResultSet.getString(6);
-            final Integer columnSize = Integer.valueOf(columnResultSet.getInt(7));
-            final Integer decimalDigits = columnResultSet.getInt(9);
-            final Integer nullType = Integer.valueOf(columnResultSet.getInt(11));
-            final String columnComment = columnResultSet.getString(12);
-            final String defaultValue = columnResultSet.getString(13);
-
-            final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
-            columnMetaInfo.setColumnName(columnName);
-            columnMetaInfo.setJdbcDefValue(jdbcTypeCode);
-            columnMetaInfo.setDbTypeName(dbTypeName);
-            columnMetaInfo.setColumnSize(columnSize);
-            columnMetaInfo.setDecimalDigits(decimalDigits);
-            columnMetaInfo.setRequired(nullType == 0);
-            columnMetaInfo.setColumnComment(columnComment);
-            columnMetaInfo.setDefaultValue(defaultValue);
-            columns.add(columnMetaInfo);
         }
 
         // Show duplicate objects if exists
@@ -184,6 +160,24 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = 
         // The duplication handling is mainly for Oracle Synonym.
         // = = = = = = = = = =/
+
+        return columnList;
+    }
+
+    protected ResultSet extractColumnMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            boolean retry) throws SQLException {
+        final String catalogName = unifiedSchema.getPureCatalog();
+        final String schemaName = unifiedSchema.getPureSchema();
+        try {
+            return metaData.getColumns(catalogName, schemaName, tableName, null);
+        } catch (SQLException e) {
+            if (retry) {
+                // because the exception may be thrown when the table is not found
+                return null;
+            } else {
+                throw e;
+            }
+        }
     }
 
     public Map<String, DfColumnMetaInfo> getColumnMap(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)

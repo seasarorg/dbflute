@@ -70,10 +70,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
         DfPrimaryKeyMetaInfo info = doGetPrimaryKey(metaData, unifiedSchema, tableName);
-        if (!info.hasPrimaryKey()) {
+        if (!info.hasPrimaryKey()) { // retry by lower case
             info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toLowerCase());
         }
-        if (!info.hasPrimaryKey()) {
+        if (!info.hasPrimaryKey()) { // retry by upper case
             info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toUpperCase());
         }
         return info;
@@ -90,7 +90,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         }
         ResultSet rs = null;
         try {
-            rs = getPrimaryKeyResultSetFromDBMeta(metaData, unifiedSchema, tableName);
+            rs = extractPrimaryKeyMetaData(metaData, unifiedSchema, tableName);
             if (rs == null) {
                 return info;
             }
@@ -111,14 +111,17 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return info;
     }
 
-    protected ResultSet getPrimaryKeyResultSetFromDBMeta(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema,
-            String tableName) {
+    protected ResultSet extractPrimaryKeyMetaData(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema, String tableName) {
         try {
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
             return dbMeta.getPrimaryKeys(catalogName, schemaName, tableName);
-        } catch (SQLException ignored) {
-            // patch: MySQL throws SQLException when the table was not found
+        } catch (SQLException continued) {
+            // because the exception may be thrown when the table is not found
+            // (for example, MySQL)
+            // 
+            // even if it's not retry, it is continued only about primary key
+            // (for compatible: implemented like this at old versions)
             return null;
         }
     }
@@ -191,27 +194,27 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      */
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
-        Map<String, Map<Integer, String>> resultMap = doGetUniqueKeyMap(metaData, unifiedSchema, tableName, pkList);
-        if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), pkList);
+        Map<String, Map<Integer, String>> map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName, pkList, false);
+        if (map.isEmpty()) { // retry by lower case
+            map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), pkList, true);
         }
-        if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), pkList);
+        if (map.isEmpty()) { // retry by upper case
+            map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), pkList, true);
         }
-        return resultMap;
+        return map;
     }
 
     protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData metaData,
-            UnifiedSchema unifiedSchema, String tableName, List<String> pkList) throws SQLException { // non primary key only
+            UnifiedSchema unifiedSchema, String tableName, List<String> pkList, boolean retry) throws SQLException { // non primary key only
         final StringSet pkSet = StringSet.createAsFlexible();
         pkSet.addAll(pkList);
         final Map<String, Map<Integer, String>> uniqueKeyMap = newLinkedHashMap();
         ResultSet rs = null;
         try {
-            final boolean uniqueKeyOnly = true;
-            final String catalogName = unifiedSchema.getPureCatalog();
-            final String schemaName = unifiedSchema.getPureSchema();
-            rs = metaData.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
+            rs = extractUniqueKeyMetaData(metaData, unifiedSchema, tableName, retry);
+            if (rs == null) {
+                return DfCollectionUtil.newHashMap();
+            }
             while (rs.next()) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - -
                 // same policy as table process about JDBC handling
@@ -286,6 +289,24 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             }
         }
         return uniqueKeyMap;
+    }
+
+    protected ResultSet extractUniqueKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, boolean retry) throws SQLException {
+        try {
+            final boolean uniqueKeyOnly = true;
+            final String catalogName = unifiedSchema.getPureCatalog();
+            final String schemaName = unifiedSchema.getPureSchema();
+            return metaData.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
+        } catch (SQLException e) {
+            if (retry) {
+                // because the exception may be thrown when the table is not found
+                // (for example, Sybase)
+                return null;
+            } else {
+                throw e;
+            }
+        }
     }
 
     protected void assertUQColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {

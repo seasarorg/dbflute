@@ -28,10 +28,10 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * This class generates an XML schema of an existing database from JDBC metadata..
  * @author jflute
  */
 public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
@@ -73,18 +73,18 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
      */
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName) throws SQLException {
-        Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName);
-        if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName.toLowerCase());
+        Map<String, DfForeignKeyMetaInfo> map = doGetForeignKeyMap(metaData, unifiedSchema, tableName, false);
+        if (map.isEmpty()) { // retry by lower case
+            map = doGetForeignKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), true);
         }
-        if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetForeignKeyMetaInfo(metaData, unifiedSchema, tableName.toUpperCase());
+        if (map.isEmpty()) { // retry by upper case
+            map = doGetForeignKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), true);
         }
-        return resultMap;
+        return map;
     }
 
-    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMetaInfo(DatabaseMetaData dbMeta,
-            UnifiedSchema unifiedSchema, String tableName) throws SQLException {
+    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMap(DatabaseMetaData metaData,
+            UnifiedSchema unifiedSchema, String tableName, boolean retry) throws SQLException {
         final Map<String, DfForeignKeyMetaInfo> fkMap = newLinkedHashMap();
         if (isForeignKeyExtractingUnsupported()) {
             return fkMap;
@@ -92,9 +92,10 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         final Map<String, String> exceptedFKMap = newLinkedHashMap();
         ResultSet rs = null;
         try {
-            final String catalogName = unifiedSchema.getPureCatalog();
-            final String schemaName = unifiedSchema.getPureSchema();
-            rs = dbMeta.getImportedKeys(catalogName, schemaName, tableName);
+            rs = extractForeignKeyMetaData(metaData, unifiedSchema, tableName, retry);
+            if (rs == null) {
+                return DfCollectionUtil.newHashMap();
+            }
             while (rs.next()) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - -
                 // same policy as table process about JDBC handling
@@ -180,6 +181,22 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         }
         handleExceptedForeignKey(exceptedFKMap, tableName);
         return filterSameStructureForeignKey(fkMap);
+    }
+
+    protected ResultSet extractForeignKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, boolean retry) throws SQLException {
+        try {
+            final String catalogName = unifiedSchema.getPureCatalog();
+            final String schemaName = unifiedSchema.getPureSchema();
+            return metaData.getImportedKeys(catalogName, schemaName, tableName);
+        } catch (SQLException e) {
+            if (retry) {
+                // because the exception may be thrown when the table is not found
+                return null;
+            } else {
+                throw e;
+            }
+        }
     }
 
     protected void assertFKColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {

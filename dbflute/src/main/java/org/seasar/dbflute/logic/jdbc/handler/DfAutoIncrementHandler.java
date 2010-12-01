@@ -93,7 +93,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
             br.addNotice("Failed to execute the SQL for getting auto-increment");
             br.addItem("SQL for getting");
             br.addElement(sql);
-            String msg = br.buildExceptionMessage();
+            final String msg = br.buildExceptionMessage();
             throw new DfJDBCException(msg, e);
         } finally {
             if (st != null) {

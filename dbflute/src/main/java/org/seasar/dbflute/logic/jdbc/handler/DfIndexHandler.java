@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -52,25 +53,25 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
 
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
-        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
-        if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetIndexMap(metaData, unifiedSchema, tableName.toLowerCase(), uniqueKeyMap);
+        Map<String, Map<Integer, String>> map = doGetIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap, false);
+        if (map.isEmpty()) { // retry by lower case
+            map = doGetIndexMap(metaData, unifiedSchema, tableName.toLowerCase(), uniqueKeyMap, true);
         }
-        if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetIndexMap(metaData, unifiedSchema, tableName.toUpperCase(), uniqueKeyMap);
+        if (map.isEmpty()) { // retry by upper case
+            map = doGetIndexMap(metaData, unifiedSchema, tableName.toUpperCase(), uniqueKeyMap, true);
         }
-        return resultMap;
+        return map;
     }
 
-    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema,
-            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
+    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap, boolean retry) throws SQLException { // non unique only
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet rs = null;
         try {
-            final boolean uniqueKeyOnly = false;
-            final String catalogName = unifiedSchema.getPureCatalog();
-            final String schemaName = unifiedSchema.getPureSchema();
-            rs = dbMeta.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
+            rs = extractIndexMetaData(metaData, unifiedSchema, tableName, retry);
+            if (rs == null) {
+                return DfCollectionUtil.newHashMap();
+            }
             while (rs.next()) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - -
                 // same policy as table process about JDBC handling
@@ -143,5 +144,23 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
             }
         }
         return indexMap;
+    }
+
+    protected ResultSet extractIndexMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            boolean retry) throws SQLException {
+        try {
+            final boolean uniqueKeyOnly = false;
+            final String catalogName = unifiedSchema.getPureCatalog();
+            final String schemaName = unifiedSchema.getPureSchema();
+            return metaData.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
+        } catch (SQLException e) {
+            if (retry) {
+                // because the exception may be thrown when the table is not found
+                // (for example, Sybase)
+                return null;
+            } else {
+                throw e;
+            }
+        }
     }
 }
