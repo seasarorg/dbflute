@@ -206,9 +206,13 @@ namespace ${glPackageBaseCommonBhv} {
             IList<PK> pkList = new List<PK>();
             foreach (LOCAL_ENTITY localEntity in localEntityList) {
                 PK primaryKeyValue = callback.getPKVal(localEntity);
+                if (primaryKeyValue == null) {
+                    String msg = "PK value of local entity should not be null: " + localEntity;
+                    throw new SystemException(msg);
+                }
                 pkList.Add(primaryKeyValue);
                 if (!pkLocalEntityMap.ContainsKey(primaryKeyValue)) {
-                    pkLocalEntityMap.Add(ToLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
+                    pkLocalEntityMap.Add(ToLoadReferrerMappingKey(primaryKeyValue), localEntity);
                 }
             }
 
@@ -250,7 +254,7 @@ namespace ${glPackageBaseCommonBhv} {
                 PK referrerListKey;
                 {
                     PK foreignKeyValue = callback.getFKVal(referrerEntity);
-                    referrerListKey = ToLowerCasePrimaryKeyIfString(foreignKeyValue);
+                    referrerListKey = ToLoadReferrerMappingKey(foreignKeyValue);
                 }
                 if (!pkReferrerListMap.ContainsKey(referrerListKey)) {
                     pkReferrerListMap.Add(referrerListKey, new List<REFERRER_ENTITY>());
@@ -269,7 +273,7 @@ namespace ${glPackageBaseCommonBhv} {
                 PK referrerListKey;
                 {
                     PK primaryKey = callback.getPKVal(localEntity);
-                    referrerListKey = ToLowerCasePrimaryKeyIfString(primaryKey);
+                    referrerListKey = ToLoadReferrerMappingKey(primaryKey);
                 }
                 if (pkReferrerListMap.ContainsKey(referrerListKey)) {
                     callback.setRfLs(localEntity, pkReferrerListMap[referrerListKey]);
@@ -279,13 +283,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        /**
-         * To lower case for primary key if the value is string.
-         * @param <PK> The type of primary key.
-         * @param value The value of primary key. (Nullable)
-         * @return The value of primary key. (Nullable)
-         */
-        protected PK ToLowerCasePrimaryKeyIfString<PK>(PK value) {
+        protected PK ToLoadReferrerMappingKey<PK>(PK value) {
             return (PK)ToLowerCaseIfString(value);
         }
 
