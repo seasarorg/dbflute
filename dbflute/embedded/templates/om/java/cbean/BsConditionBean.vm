@@ -653,7 +653,7 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                        ============
     public void xsetupForColumnQuery(final ${myConditionBeanClassName} mainCB) {
         xinheritSubQueryInfo(mainCB.localCQ());
-        xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
+        xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY, mainCB.localCQ());
 
         // inherits a parent query to synchronize real name
         // (and also for suppressing query check) 
@@ -664,7 +664,7 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     public void xsetupForVaryingUpdate() {
-        xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE);
+        xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE, null);
 
         // for suppressing query check
         final ${myConditionBeanClassName} nonCheckCB = new ${myConditionBeanClassName}();
