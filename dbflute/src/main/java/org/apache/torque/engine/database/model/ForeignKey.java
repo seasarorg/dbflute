@@ -264,7 +264,7 @@ public class ForeignKey {
         }
         return isForeignColumnPrimaryKey() || isForeignColumnUnique();
 
-        // *reference to unique key is unsupported basically)
+        // *reference to unique key is unsupported basically
     }
 
     /**
