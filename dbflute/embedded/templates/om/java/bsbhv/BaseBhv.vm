@@ -114,7 +114,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Count Select
     //                                                                        ============
     /**
-     * Select the count by the condition-bean. {IgnorePagingCondition}
+     * Select the count of uniquely-selected records by the condition-bean. {IgnorePagingCondition, IgnoreSpecifyColumn}<br />
+     * SpecifyColumn is ignored but you can use it only to remove text type column for union's distinct.
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
@@ -124,12 +125,17 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The selected count.
      */
     public int selectCount(${myConditionBeanClassName} cb) {
-        return doSelectCount(cb);
+        return doSelectCountUniquely(cb);
     }
 
-    protected int doSelectCount(${myConditionBeanClassName} cb) {
+    protected int doSelectCountUniquely(${myConditionBeanClassName} cb) { // called by selectCount(cb) 
         assertCBNotNull(cb);
-        return delegateSelectCount(cb);
+        return delegateSelectCountUniquely(cb);
+    }
+
+    protected int doSelectCountPlainly(${myConditionBeanClassName} cb) { // called by selectPage(cb)
+        assertCBNotNull(cb);
+        return delegateSelectCountPlainly(cb);
     }
 
     @Override
@@ -332,7 +338,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     protected <ENTITY extends ${myExtendedObjectClassName}> PagingResultBean<ENTITY> doSelectPage(${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
         assertCBNotNull(cb); assertObjectNotNull("entityType", entityType);
         return helpSelectPageInternally(cb, entityType, new InternalSelectPageCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public int callbackSelectCount(${myConditionBeanClassName} cb) { return doSelectCount(cb); }
+            public int callbackSelectCount(${myConditionBeanClassName} cb) { return doSelectCountPlainly(cb); }
             public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); }
         });
     }
@@ -346,7 +352,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                       Scalar Select
     //                                                                       =============
     /**
-     * Select the scalar value derived by a function. <br />
+     * Select the scalar value derived by a function from uniquely-selected records. <br />
      * You should call a function method after this method called like as follows:
      * <pre>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">scalarSelect</span>(Date.class).max(new ScalarQuery() {
@@ -1225,7 +1231,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     // -----------------------------------------------------
     //                                                Select
     //                                                ------
-    protected int delegateSelectCount(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb)); }
+    protected int delegateSelectCountUniquely(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb, true)); }
+    protected int delegateSelectCountPlainly(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb, false)); }
     protected <ENTITY extends ${myExtendedObjectClassName}> void delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType)
     { invoke(createSelectCursorCBCommand(cb, entityRowHandler, entityType)); }
     protected <ENTITY extends ${myExtendedObjectClassName}> List<ENTITY> delegateSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType)
