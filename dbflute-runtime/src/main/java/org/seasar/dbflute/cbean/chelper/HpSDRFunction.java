@@ -7,6 +7,7 @@ import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The function of specify-derived-referrer.
@@ -258,9 +259,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
                 throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
             }
         } else { // normal
-            //            if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {
-            //                throwSpecifyDerivedReferrerInvalidAliasNameException();
-            //            }
+            if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {
+                throwSpecifyDerivedReferrerInvalidAliasNameException();
+            }
         }
         // *this check was moved to runtime (when creating a behavior command)
         //String tableDbName = _baseCB.getTableDbName();
