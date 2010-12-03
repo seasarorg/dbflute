@@ -651,20 +651,23 @@ public interface SqlClause {
      * The type of select clause.
      */
     public static enum SelectClauseType {
-        COLUMNS(false, false, false) // normal
+        COLUMNS(false, false, false, false) // normal
         // count (also scalar) mainly for Behavior.selectCount(cb) or selectPage(cb)
-        , UNIQUE_COUNT(true, true, true), PLAIN_COUNT(true, true, false)
+        , UNIQUE_COUNT(true, true, true, false), PLAIN_COUNT(true, true, false, false)
         // scalar mainly for Behavior.scalarSelect(cb)
-        , MAX(false, true, true), MIN(false, true, true), SUM(false, true, true), AVG(false, true, true);
+        , MAX(false, true, true, true), MIN(false, true, true, true) // max(), min()
+        , SUM(false, true, true, true), AVG(false, true, true, true); // sum(), avg()
 
         private final boolean _count;
         private final boolean _scalar;
         private final boolean _uniqueScalar;
+        private final boolean _specifiedScalar;
 
-        private SelectClauseType(boolean count, boolean scalar, boolean uniqueScalar) {
+        private SelectClauseType(boolean count, boolean scalar, boolean uniqueScalar, boolean specifiedScalar) {
             _count = count;
             _scalar = scalar;
             _uniqueScalar = uniqueScalar;
+            _specifiedScalar = specifiedScalar;
         }
 
         public boolean isCount() {
@@ -681,6 +684,14 @@ public interface SqlClause {
          */
         public boolean isUniqueScalar() { // not contains plain-count
             return _uniqueScalar;
+        }
+
+        /**
+         * Does the scalar need specified only-one column?
+         * @return Determination.
+         */
+        public boolean isSpecifiedScalar() { // not contains all-count
+            return _specifiedScalar;
         }
     }
 

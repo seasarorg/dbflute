@@ -425,18 +425,33 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (isSelectClauseTypeScalar() && !hasUnionQuery()) {
             return buildSelectClauseScalar(basePointAliasName);
         }
-        // /- - - - - - - - - - - - - - - - - - - - - - - - 
-        // The type of select clause is COLUMNS since here.
-        // - - - - - - - - - -/
+        // if it's a scalar-select, it always has union-query since here
         final StringBuilder sb = new StringBuilder();
         final DBMeta dbmeta = getDBMeta();
-        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
 
         Map<String, String> localSpecifiedMap = null;
         if (_specifiedSelectColumnMap != null) {
             localSpecifiedMap = _specifiedSelectColumnMap.get(basePointAliasName);
         }
-        final boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
+        final List<ColumnInfo> columnInfoList;
+        final boolean needsSpecifiedColumnFilter;
+        if (isSelectClauseTypeUniqueScalar()) {
+            // it always has union-query because it's handled before this process
+            if (dbmeta.hasPrimaryKey()) {
+                columnInfoList = new ArrayList<ColumnInfo>();
+                columnInfoList.addAll(dbmeta.getPrimaryUniqueInfo().getUniqueColumnList());
+                if (isSelectClauseTypeSpecifiedScalar()) {
+                    columnInfoList.add(getSpecifiedColumnInfoAsOne());
+                }
+            } else {
+                // all columns are target if no-PK and unique-scalar and union-query
+                columnInfoList = dbmeta.getColumnInfoList();
+            }
+            needsSpecifiedColumnFilter = false;
+        } else {
+            columnInfoList = dbmeta.getColumnInfoList();
+            needsSpecifiedColumnFilter = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
+        }
 
         Integer selectIndex = 0; // because 1 origin in JDBC
         if (_useSelectIndex) {
@@ -451,11 +466,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String columnDbName = columnInfo.getColumnDbName();
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
 
-            if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
-                if (!(!dbmeta.hasPrimaryKey() && isSelectClauseTypeUniqueScalar() && hasUnionQuery())) {
-                    continue;
-                }
-                // all columns are target if no-PK and unique-scalar and union-query
+            if (needsSpecifiedColumnFilter && !localSpecifiedMap.containsKey(columnDbName)) {
+                // a case for scalar-select has been already resolved here
+                continue;
             }
 
             if (needsDelimiter) {
@@ -563,6 +576,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected boolean isSelectClauseTypeUniqueScalar() {
         return _selectClauseType.isUniqueScalar();
+    }
+
+    protected boolean isSelectClauseTypeSpecifiedScalar() {
+        return _selectClauseType.isSpecifiedScalar();
     }
 
     protected String buildSelectClauseScalar(String aliasName) {
