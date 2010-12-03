@@ -329,7 +329,7 @@ public class ConditionBeanExceptionThrower {
     public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB,
             String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for derived-referrer specification.");
+        br.addNotice("The two-or-more derived-referrers was specifed.");
         br.addItem("Advice");
         br.addElement("This condition-bean is not allowed to specify two-or-more derived referrers.");
         br.addElement("Because this is for " + purpose + ".");
