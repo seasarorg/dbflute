@@ -1751,6 +1751,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return "dfscalar";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getDerivedReferrerNestedAlias() {
+        return "dfnestedreferrer";
+    }
+
     // ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============

@@ -898,31 +898,31 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     public void xsetupForUnion(ConditionBean mainCB) {
         xinheritSubQueryInfo(mainCB.localCQ());
-        xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY);
+        xchangePurposeSqlClause(HpCBPurpose.UNION_QUERY, mainCB.localCQ());
     }
 
     public void xsetupForExistsReferrer(ConditionQuery mainCQ) {
         xprepareSubQueryInfo(mainCQ);
-        xchangePurposeSqlClause(HpCBPurpose.EXISTS_REFERRER);
+        xchangePurposeSqlClause(HpCBPurpose.EXISTS_REFERRER, mainCQ);
     }
 
     public void xsetupForInScopeRelation(ConditionQuery mainCQ) {
         xprepareSubQueryInfo(mainCQ);
-        xchangePurposeSqlClause(HpCBPurpose.IN_SCOPE_RELATION);
+        xchangePurposeSqlClause(HpCBPurpose.IN_SCOPE_RELATION, mainCQ);
     }
 
     public void xsetupForDerivedReferrer(ConditionQuery mainCQ) {
         xprepareSubQueryInfo(mainCQ);
-        xchangePurposeSqlClause(HpCBPurpose.DERIVED_REFERRER);
+        xchangePurposeSqlClause(HpCBPurpose.DERIVED_REFERRER, mainCQ);
     }
 
     public void xsetupForScalarSelect() { // not sub-query (used independently)
-        xchangePurposeSqlClause(HpCBPurpose.SCALAR_SELECT);
+        xchangePurposeSqlClause(HpCBPurpose.SCALAR_SELECT, null);
     }
 
     public void xsetupForScalarCondition(ConditionQuery mainCQ) {
         xprepareSubQueryInfo(mainCQ);
-        xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION);
+        xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION, mainCQ);
     }
 
     // *defined at base condition-bean per table
@@ -940,9 +940,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().setupForSubQuery(nextSubQueryLevel); // incremented
     }
 
-    protected void xchangePurposeSqlClause(HpCBPurpose purpose) {
+    protected void xchangePurposeSqlClause(HpCBPurpose purpose, ConditionQuery mainCQ) {
         _purpose = purpose;
         getSqlClause().setPurpose(purpose); // synchronize
+        // mainCQ is not needed but just in case
     }
 
     // ===================================================================================

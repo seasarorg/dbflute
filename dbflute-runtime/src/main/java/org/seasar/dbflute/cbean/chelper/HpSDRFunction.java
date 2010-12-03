@@ -7,7 +7,6 @@ import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * The function of specify-derived-referrer.
@@ -259,9 +258,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
                 throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
             }
         } else { // normal
-            if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {
-                throwSpecifyDerivedReferrerInvalidAliasNameException();
-            }
+            //            if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {
+            //                throwSpecifyDerivedReferrerInvalidAliasNameException();
+            //            }
         }
         // *this check was moved to runtime (when creating a behavior command)
         //String tableDbName = _baseCB.getTableDbName();
@@ -285,7 +284,8 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
 
     protected boolean isPurposeNullAlias() {
         final HpCBPurpose purpose = _baseCB.getPurpose();
-        return purpose.equals(HpCBPurpose.COLUMN_QUERY) || purpose.equals(HpCBPurpose.SCALAR_SELECT);
+        return purpose.equals(HpCBPurpose.COLUMN_QUERY) || purpose.equals(HpCBPurpose.SCALAR_SELECT)
+                || purpose.equals(HpCBPurpose.DERIVED_REFERRER);
     }
 
     protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {
@@ -305,9 +305,15 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
             return aliasName.trim();
         } else {
             final HpCBPurpose purpose = _baseCB.getPurpose();
-            if (isPurposeNullAlias() && purpose.equals(HpCBPurpose.SCALAR_SELECT)) {
-                return _baseCB.getSqlClause().getScalarSelectColumnAlias();
-            } else { // for example, ColumnQuery
+            if (isPurposeNullAlias()) {
+                if (purpose.equals(HpCBPurpose.SCALAR_SELECT)) {
+                    return _baseCB.getSqlClause().getScalarSelectColumnAlias();
+                } else if (purpose.equals(HpCBPurpose.DERIVED_REFERRER)) {
+                    return _baseCB.getSqlClause().getDerivedReferrerNestedAlias();
+                } else { // for example, ColumnQuery
+                    return null;
+                }
+            } else { // basically no way because of checked before
                 return null;
             }
         }

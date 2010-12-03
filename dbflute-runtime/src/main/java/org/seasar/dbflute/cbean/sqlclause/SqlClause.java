@@ -502,6 +502,12 @@ public interface SqlClause {
      */
     String getScalarSelectColumnAlias();
 
+    /**
+     * Get the alias name for derived column of nested DerivedReferrer.
+     * @return The string name for alias. (NotNull)
+     */
+    String getDerivedReferrerNestedAlias();
+
     // ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============

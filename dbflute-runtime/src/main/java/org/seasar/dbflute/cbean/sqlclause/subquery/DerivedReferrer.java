@@ -72,11 +72,11 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             throw new IllegalConditionBeanOperationException(msg);
         }
         final String tableAliasName = getSubQueryLocalAliasName();
-        final ColumnSqlName derivedColumnSqlName = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
+        final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
         if (derivedColumnSqlName == null) {
             throwDerivedReferrerInvalidColumnSpecificationException(function);
         }
-        final ColumnRealName derivedColumnRealName = _subQuerySqlClause.getSpecifiedColumnRealNameAsOne();
+        final ColumnRealName derivedColumnRealName = getDerivedColumnRealName();
         _subQuerySqlClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
@@ -89,6 +89,34 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             subQueryClause = selectClause + " " + fromWhereClause;
         }
         return resolveSubQueryLevelVariable(subQueryClause);
+    }
+
+    protected ColumnSqlName getDerivedColumnSqlName() {
+        final ColumnSqlName specifiedColumn = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
+        if (specifiedColumn != null) {
+            return specifiedColumn;
+        } else {
+            final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
+            if (nestedSubQuery == null) {
+                return null;
+            } else {
+                return new ColumnSqlName(nestedSubQuery);
+            }
+        }
+    }
+
+    protected ColumnRealName getDerivedColumnRealName() {
+        final ColumnRealName specifiedColumn = _subQuerySqlClause.getSpecifiedColumnRealNameAsOne();
+        if (specifiedColumn != null) {
+            return specifiedColumn;
+        } else {
+            final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
+            if (nestedSubQuery == null) {
+                return null; // checked before
+            } else {
+                return new ColumnRealName(null, new ColumnSqlName(nestedSubQuery));
+            }
+        }
     }
 
     protected String getUnionSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
@@ -114,7 +142,17 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
 
     protected String buildFunctionPart(String function, ColumnRealName columnRealName, DerivedReferrerOption option) {
         final String connector = buildFunctionConnector(function);
-        final String functionExp = function + connector + columnRealName + ")";
+        final String columnWithEndExp;
+        {
+            final String specifiedExp = columnRealName.toString();
+            final String dummyAlias = " as " + _subQuerySqlClause.getDerivedReferrerNestedAlias();
+            if (specifiedExp.contains(dummyAlias)) {
+                columnWithEndExp = replace(specifiedExp, dummyAlias, ")");
+            } else {
+                columnWithEndExp = specifiedExp + ")";
+            }
+        }
+        final String functionExp = function + connector + columnWithEndExp;
         return option.filterFunction(functionExp);
     }
 
