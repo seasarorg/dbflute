@@ -41,16 +41,12 @@ public class SubQueryClause {
     //                                                                               Plain
     //                                                                               =====
     public String buildPlainSubQueryFromWhereClause() {
-        String fromWhereClause = _subQuerySqlClause.getClauseFromWhereWithUnionTemplate();
-
-        // Resolve the location path for the condition-query of sub-query. 
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + _subQueryPath + ".");
-
-        // Replace template marks. These are very important!
-        fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), _selectClause);
-        fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
-        fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
-        return fromWhereClause;
+        String clause = _subQuerySqlClause.getClauseFromWhereWithUnionTemplate();
+        clause = resolveParameterLocationPath(clause, _subQueryPath);
+        clause = replaceString(clause, getUnionSelectClauseMark(), _selectClause);
+        clause = replaceString(clause, getUnionWhereClauseMark(), "");
+        clause = replaceString(clause, getUnionWhereFirstConditionMark(), "");
+        return clause;
     }
 
     // ===================================================================================
@@ -64,10 +60,9 @@ public class SubQueryClause {
      */
     public String buildCorrelationSubQueryFromWhereClause(ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName) {
-        String clause = xprepareCorrelationSubQueryFromWhereClause();
+        final String clause = xprepareCorrelationSubQueryFromWhereClause();
         final String joinCondition = _localAliasName + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
-        clause = xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition);
-        return clause;
+        return xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition);
     }
 
     /**
@@ -96,16 +91,11 @@ public class SubQueryClause {
     }
 
     protected String xprepareCorrelationSubQueryFromWhereClause() {
-        String clause = _subQuerySqlClause.getClauseFromWhereWithWhereUnionTemplate();
-
-        // Resolve the location path for the condition-query of sub-query. 
-        clause = replaceString(clause, ".conditionQuery.", "." + _subQueryPath + ".");
-
-        return clause;
+        final String clause = _subQuerySqlClause.getClauseFromWhereWithWhereUnionTemplate();
+        return resolveParameterLocationPath(clause, _subQueryPath);
     }
 
     protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String joinCondition) {
-        // Replace template marks. These are very important!
         final String firstConditionAfter = ln() + "   and ";
         clause = replaceString(clause, getWhereClauseMark(), ln() + " where " + joinCondition);
         clause = replaceString(clause, getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
@@ -113,6 +103,13 @@ public class SubQueryClause {
         clause = replaceString(clause, getUnionWhereClauseMark(), ln() + " where " + joinCondition);
         clause = replaceString(clause, getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         return clause;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String resolveParameterLocationPath(String clause, SubQueryPath subQueryPath) {
+        return subQueryPath.resolveParameterLocationPath(clause);
     }
 
     // ===================================================================================

@@ -1,5 +1,7 @@
 package org.seasar.dbflute.cbean.sqlclause.subquery;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  * @since 0.9.7.2 (2010/06/20 Sunday)
@@ -19,6 +21,20 @@ public class SubQueryPath {
      */
     public SubQueryPath(String subQueryPath) {
         _subQueryPath = subQueryPath;
+    }
+
+    // ===================================================================================
+    //                                                                   Location Resolver
+    //                                                                   =================
+    public String resolveParameterLocationPath(String clause) {
+        return replaceString(clause, ".conditionQuery.", "." + _subQueryPath + ".");
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected final String replaceString(String text, String fromText, String toText) {
+        return Srl.replace(text, fromText, toText);
     }
 
     // ===================================================================================

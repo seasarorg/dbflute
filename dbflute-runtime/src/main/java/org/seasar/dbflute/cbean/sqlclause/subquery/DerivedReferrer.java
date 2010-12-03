@@ -146,8 +146,9 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         {
             final String specifiedExp = columnRealName.toString();
             final String dummyAlias = " as " + _subQuerySqlClause.getDerivedReferrerNestedAlias();
-            if (specifiedExp.contains(dummyAlias)) {
-                columnWithEndExp = replace(specifiedExp, dummyAlias, ")");
+            if (specifiedExp.contains(dummyAlias)) { // means nested DerivedReferrer
+                final String resolved = _subQueryPath.resolveParameterLocationPath(specifiedExp);
+                columnWithEndExp = replace(resolved, dummyAlias, ")");
             } else {
                 columnWithEndExp = specifiedExp + ")";
             }
