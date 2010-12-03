@@ -470,8 +470,7 @@ public interface SqlClause {
     //                                                                    ================
     /**
      * Get the alias name for base point table. <br />
-     * This returns the fixed name for base point table in spite of sub-query.
-     * @return The string name. (NotNull)
+     * @return The string name for alias. (NotNull)
      */
     String getBasePointAliasName();
 
@@ -490,6 +489,18 @@ public interface SqlClause {
      * @return The resolved relation No.
      */
     int resolveRelationNo(String localTableName, String foreignPropertyName);
+
+    /**
+     * Get the alias name for in-line view of union-query.
+     * @return The string name for alias. (NotNull)
+     */
+    String getUnionQueryInlineViewAlias();
+
+    /**
+     * Get the alias name for specified column of scalar-select.
+     * @return The string name for alias. (NotNull)
+     */
+    String getScalarSelectColumnAlias();
 
     // ===================================================================================
     //                                                                       Template Mark
@@ -594,7 +605,12 @@ public interface SqlClause {
     // -----------------------------------------------------
     //                                      Specify Deriving
     //                                      ----------------
-    void specifyDerivingSubQuery(String aliasName, String deriveSubQuery);
+    /**
+     * Specify deriving sub-query for DerivedReferrer.
+     * @param aliasName The alias name for sub-query. (Nullable: if null, means as-one use in other functions)
+     * @param derivingSubQuery The sub-query for deriving. (NotNull)
+     */
+    void specifyDerivingSubQuery(String aliasName, String derivingSubQuery);
 
     boolean hasSpecifiedDerivingSubQuery(String aliasName);
 

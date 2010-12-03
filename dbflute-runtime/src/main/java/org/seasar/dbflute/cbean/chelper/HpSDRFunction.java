@@ -252,10 +252,6 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String filterAliasName(String aliasName) {
-        return aliasName != null ? aliasName.trim() : null;
-    }
-
     protected void assertAliasName(String aliasName) {
         if (isPurposeNullAlias()) {
             if (aliasName != null) {
@@ -288,7 +284,8 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     protected boolean isPurposeNullAlias() {
-        return _baseCB.getPurpose().equals(HpCBPurpose.COLUMN_QUERY);
+        final HpCBPurpose purpose = _baseCB.getPurpose();
+        return purpose.equals(HpCBPurpose.COLUMN_QUERY) || purpose.equals(HpCBPurpose.SCALAR_SELECT);
     }
 
     protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {
@@ -302,6 +299,19 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     //protected String replaceString(String text, String fromText, String toText) {
     //    return Srl.replace(text, fromText, toText);
     //}
+
+    protected String filterAliasName(String aliasName) {
+        if (aliasName != null) {
+            return aliasName.trim();
+        } else {
+            final HpCBPurpose purpose = _baseCB.getPurpose();
+            if (isPurposeNullAlias() && purpose.equals(HpCBPurpose.SCALAR_SELECT)) {
+                return _baseCB.getSqlClause().getScalarSelectColumnAlias();
+            } else { // for example, ColumnQuery
+                return null;
+            }
+        }
+    }
 
     // ===================================================================================
     //                                                                    Exception Helper

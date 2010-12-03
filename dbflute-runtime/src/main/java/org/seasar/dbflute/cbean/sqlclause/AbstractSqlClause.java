@@ -110,7 +110,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
     protected Map<String, Map<String, String>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
-    /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
+    /** Specified derive sub-query map. A null key is acceptable. (Nullable: This is lazy-loaded) */
     protected Map<String, String> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
@@ -380,23 +380,30 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             return sql;
         }
         final String selectClause = "select" + SELECT_HINT + " *";
-        final String ln = ln();
-        final String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
-        final String endMark = resolveSubQueryEndMark("dfmain");
-        String clause = selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
-        clause = clause + prepareClauseOrderBy() + prepareClauseSqlSuffix();
-        return clause;
+        final String inlineViewAlias = getUnionQueryInlineViewAlias();
+        final String beginMark = resolveSubQueryBeginMark(inlineViewAlias) + ln();
+        final String endMark = resolveSubQueryEndMark(inlineViewAlias);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(selectClause).append(ln());
+        sb.append("  from (").append(beginMark).append(sql).append(ln()).append("       ) ");
+        sb.append(inlineViewAlias).append(endMark);
+        sb.append(prepareClauseOrderBy()).append(prepareClauseSqlSuffix());
+        return sb.toString();
     }
 
     protected String filterUnionCountOrScalarEnclosing(String sql) {
         if (!needsUnionCountOrScalarEnclosing()) {
             return sql;
         }
-        final String selectClause = buildSelectClauseScalar("dfmain");
-        final String ln = ln();
-        final String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
-        final String endMark = resolveSubQueryEndMark("dfmain");
-        return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
+        final String inlineViewAlias = getUnionQueryInlineViewAlias();
+        final String selectClause = buildSelectClauseScalar(inlineViewAlias);
+        final String beginMark = resolveSubQueryBeginMark(inlineViewAlias) + ln();
+        final String endMark = resolveSubQueryEndMark(inlineViewAlias);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(selectClause).append(ln());
+        sb.append("  from (").append(beginMark).append(sql).append(ln()).append("       ) ");
+        sb.append(inlineViewAlias).append(endMark);
+        return sb.toString();
     }
 
     protected boolean needsUnionNormalSelectEnclosing() {
@@ -441,7 +448,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 columnInfoList = new ArrayList<ColumnInfo>();
                 columnInfoList.addAll(dbmeta.getPrimaryUniqueInfo().getUniqueColumnList());
                 if (isSelectClauseTypeSpecifiedScalar()) {
-                    columnInfoList.add(getSpecifiedColumnInfoAsOne());
+                    final ColumnInfo specifiedColumn = getSpecifiedColumnInfoAsOne();
+                    if (specifiedColumn != null) {
+                        columnInfoList.add(specifiedColumn);
+                    }
+                    // derivingSubQuery is handled after this process
                 }
             } else {
                 // all columns are target if no-PK and unique-scalar and union-query
@@ -529,23 +540,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
         }
 
-        // [DBFlute-0.7.4]
+        // columns of DerivedReferrer
         if (_specifiedDerivingSubQueryMap != null && !_specifiedDerivingSubQueryMap.isEmpty()) {
-            final Collection<String> deriveSubQuerySet = _specifiedDerivingSubQueryMap.values();
-            for (String deriveSubQuery : deriveSubQuerySet) {
+            for (Entry<String, String> entry : _specifiedDerivingSubQueryMap.entrySet()) {
+                final String subQueryAlias = entry.getKey();
+                final String derivingSubQuery = entry.getValue();
                 sb.append(ln()).append("     ");
-                sb.append(", ").append(deriveSubQuery);
+                sb.append(", ").append(derivingSubQuery);
 
-                // [DBFlute-0.8.3]
-                final int beginIndex = deriveSubQuery.lastIndexOf(" as ");
-                if (beginIndex >= 0) { // basically true
-                    String aliasName = deriveSubQuery.substring(beginIndex + " as ".length());
-                    final int endIndex = aliasName.indexOf(SubQueryIndentProcessor.END_MARK_PREFIX);
-                    if (endIndex >= 0) { // basically true
-                        aliasName = aliasName.substring(0, endIndex);
-                    }
+                if (subQueryAlias != null) {
                     // for SpecifiedDerivedOrderBy
-                    selectClauseRealColumnAliasMap.put(aliasName, aliasName);
+                    selectClauseRealColumnAliasMap.put(subQueryAlias, subQueryAlias);
                 }
             }
         }
@@ -604,37 +609,42 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String buildSelectClauseMax(String aliasName) {
-        final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
-        assertScalarSelectSpecifiedColumnOnlyOne(columnSqlName);
-        return "select max(" + aliasName + "." + columnSqlName + ")";
+        return buildSelectClauseSpecifiedScalar(aliasName, "max");
     }
 
     protected String buildSelectClauseMin(String aliasName) {
-        final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
-        assertScalarSelectSpecifiedColumnOnlyOne(columnSqlName);
-        return "select min(" + aliasName + "." + columnSqlName + ")";
+        return buildSelectClauseSpecifiedScalar(aliasName, "min");
     }
 
     protected String buildSelectClauseSum(String aliasName) {
-        final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
-        assertScalarSelectSpecifiedColumnOnlyOne(columnSqlName);
-        return "select sum(" + aliasName + "." + columnSqlName + ")";
+        return buildSelectClauseSpecifiedScalar(aliasName, "sum");
     }
 
     protected String buildSelectClauseAvg(String aliasName) {
-        final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
-        assertScalarSelectSpecifiedColumnOnlyOne(columnSqlName);
-        return "select avg(" + aliasName + "." + columnSqlName + ")";
+        return buildSelectClauseSpecifiedScalar(aliasName, "avg");
     }
 
-    protected void assertScalarSelectSpecifiedColumnOnlyOne(ColumnSqlName columnSqlName) {
+    protected String buildSelectClauseSpecifiedScalar(String aliasName, String function) {
+        final String columnAlias = getScalarSelectColumnAlias();
+        final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
         if (columnSqlName != null) {
-            return;
+            return "select " + function + "(" + aliasName + "." + columnSqlName + ") as " + columnAlias;
         }
-        String msg = "The specified column exists one";
-        msg = msg + " when the type of select clause is for scalar:";
-        msg = msg + " specifiedSelectColumnMap=" + _specifiedSelectColumnMap;
-        throw new IllegalStateException(msg);
+        final String subQuery = getSpecifiedDerivingSubQueryAsOne();
+        if (subQuery != null) {
+            if (hasUnionQuery()) {
+                return "select " + function + "(" + aliasName + "." + columnAlias + ")";
+            } else {
+                final String aliasDef = " as " + columnAlias;
+                final StringBuilder sb = new StringBuilder();
+                sb.append("select ").append(function).append("(");
+                // adjusts alias definition target (move to function's scope)
+                sb.append(replace(subQuery, aliasDef, ")" + aliasDef));
+                return sb.toString();
+            }
+        }
+        String msg = "Not found specifed column for scalar: function=" + function;
+        throw new IllegalStateException(msg); // basically no way (checked before)
     }
 
     // -----------------------------------------------------
@@ -1727,6 +1737,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return foreignInfo.getRelationNo();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getUnionQueryInlineViewAlias() {
+        return "dfunionview";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getScalarSelectColumnAlias() {
+        return "dfscalar";
+    }
+
     // ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============
@@ -1882,11 +1906,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                      Specify Deriving
     //                                      ----------------
-    public void specifyDerivingSubQuery(String aliasName, String deriveSubQuery) {
+    public void specifyDerivingSubQuery(String aliasName, String derivingSubQuery) {
         if (_specifiedDerivingSubQueryMap == null) {
             _specifiedDerivingSubQueryMap = StringKeyMap.createAsFlexibleOrdered();
         }
-        _specifiedDerivingSubQueryMap.put(aliasName, deriveSubQuery);
+        _specifiedDerivingSubQueryMap.put(aliasName, derivingSubQuery);
     }
 
     public boolean hasSpecifiedDerivingSubQuery(String aliasName) {
