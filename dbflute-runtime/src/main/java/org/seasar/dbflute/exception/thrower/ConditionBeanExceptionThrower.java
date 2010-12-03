@@ -548,7 +548,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
         msg = msg + "        public void query(PurchaseCB subCB) {" + ln();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + ln();
+        msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + ln();
         msg = msg + "        }" + ln();
         msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + ln();
         msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"LATEST_PURCHASE_DATETIME\");" + ln();

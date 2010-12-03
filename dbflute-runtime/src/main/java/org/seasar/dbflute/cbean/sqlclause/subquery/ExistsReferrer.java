@@ -40,7 +40,7 @@ public class ExistsReferrer extends AbstractSubQuery {
         existsOption = existsOption != null ? existsOption + " " : "";
         final String subQueryClause;
         if (correlatedColumnDbName.contains(",") && relatedColumnDbName.contains(",")) {
-            // two-or-more primary keys
+            // compound primary keys
             final List<String> relatedColumnSplit = Srl.splitList(relatedColumnDbName, ",");
             final ColumnSqlName[] relatedColumnSqlNames = new ColumnSqlName[relatedColumnSplit.size()];
             for (int i = 0; i < relatedColumnSplit.size(); i++) {
@@ -84,7 +84,7 @@ public class ExistsReferrer extends AbstractSubQuery {
     }
 
     /**
-     * Build the clause of sub-query by two-or-more primary keys.
+     * Build the clause of sub-query by compound primary key.
      * @param correlatedColumnRealNames The real names of correlated column that is main-query table's column. (NotNull)
      * @param relatedColumnSqlNames The real names of related column that is sub-query table's column. (NotNull)
      * @return The clause of sub-query. (NotNull)

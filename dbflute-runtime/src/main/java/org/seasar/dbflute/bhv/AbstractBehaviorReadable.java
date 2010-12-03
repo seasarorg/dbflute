@@ -775,23 +775,29 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                    ================
     public void warmUpCommand() {
         {
-            SelectCountCBCommand cmd = createSelectCountCBCommand(newConditionBean());
+            final SelectCountCBCommand cmd = createSelectCountCBCommand(newConditionBean(), true);
             cmd.setInitializeOnly(true);
             invoke(cmd);
         }
         {
-            SelectListCBCommand<? extends Entity> cmd = createSelectListCBCommand(newConditionBean(), getDBMeta()
-                    .getEntityType());
+            final SelectCountCBCommand cmd = createSelectCountCBCommand(newConditionBean(), false);
+            cmd.setInitializeOnly(true);
+            invoke(cmd);
+        }
+        {
+            final Class<? extends Entity> entityType = getDBMeta().getEntityType();
+            final SelectListCBCommand<? extends Entity> cmd = createSelectListCBCommand(newConditionBean(), entityType);
             cmd.setInitializeOnly(true);
             invoke(cmd);
         }
     }
 
-    protected SelectCountCBCommand createSelectCountCBCommand(ConditionBean cb) {
+    protected SelectCountCBCommand createSelectCountCBCommand(ConditionBean cb, boolean uniqueCount) {
         assertBehaviorCommandInvoker("createSelectCountCBCommand");
         final SelectCountCBCommand command = xsetupSelectCommand(new SelectCountCBCommand());
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
+        command.setUniqueCount(uniqueCount);
         return command;
     }
 

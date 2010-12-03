@@ -64,10 +64,8 @@ public interface BehaviorReadable {
     //                                                                    Basic Read Count
     //                                                                    ================
     /**
-     * Read count by condition-bean. <br />
-     * If the argument 'condition-bean' is effective about fetch-scope,
-     * this method invoke select count ignoring the fetch-scope.
-     * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
+     * Read count by condition-bean. {dispatched to selectCount(cb)}<br />
+     * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return Read count. (NotNull)
      */
     int readCount(ConditionBean cb);
@@ -76,16 +74,16 @@ public interface BehaviorReadable {
     //                                                                   Basic Read Entity
     //                                                                   =================
     /**
-     * Read entity by condition-bean.
-     * @param cb Condition-bean. (NotNull)
+     * Read entity by condition-bean. {dispatched to selectEntity(cb)}
+     * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     Entity readEntity(ConditionBean cb);
 
     /**
-     * Read simple entity by condition-bean with deleted check.
-     * @param cb Condition-bean. (NotNull)
+     * Read simple entity by condition-bean with deleted check. {dispatched to selectEntityWithDeletedCheck(cb)}
+     * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return Read entity. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -96,15 +94,15 @@ public interface BehaviorReadable {
     //                                                                     Basic Read List
     //                                                                     ===============
     /**
-     * Read list as result-bean.
-     * @param cb Condition-bean. (NotNull)
+     * Read list as result-bean. {dispatched to selectList(cb)}
+     * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return The list of entity as result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
     ListResultBean<? extends Entity> readList(ConditionBean cb);
 
     /**
-     * Read page as result-bean.
-     * @param cb Condition-bean. (NotNull)
+     * Read page as result-bean. {dispatched to selectPage(cb)}
+     * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return The page of entity as result-bean. (NotNull)
      */
     PagingResultBean<? extends Entity> readPage(final ConditionBean cb);
@@ -113,7 +111,7 @@ public interface BehaviorReadable {
     //                                                                            Sequence
     //                                                                            ========
     /**
-     * Read next value of sequence.
+     * Read next value of sequence. {dispatched to selectNextVal(cb)}
      * @return The next value of sequence. (NotNull)
      */
     Number readNextVal();

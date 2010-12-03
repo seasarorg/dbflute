@@ -651,7 +651,37 @@ public interface SqlClause {
      * The type of select clause.
      */
     public static enum SelectClauseType {
-        COLUMNS, COUNT, MAX, MIN, SUM, AVG
+        COLUMNS(false, false, false) // normal
+        // count (also scalar) mainly for Behavior.selectCount(cb) or selectPage(cb)
+        , UNIQUE_COUNT(true, true, true), PLAIN_COUNT(true, true, false)
+        // scalar mainly for Behavior.scalarSelect(cb)
+        , MAX(false, true, true), MIN(false, true, true), SUM(false, true, true), AVG(false, true, true);
+
+        private final boolean _count;
+        private final boolean _scalar;
+        private final boolean _uniqueScalar;
+
+        private SelectClauseType(boolean count, boolean scalar, boolean uniqueScalar) {
+            _count = count;
+            _scalar = scalar;
+            _uniqueScalar = uniqueScalar;
+        }
+
+        public boolean isCount() {
+            return _count;
+        }
+
+        public boolean isScalar() { // also contains count
+            return _scalar;
+        }
+
+        /**
+         * Should the scalar be selected uniquely?
+         * @return Determination.
+         */
+        public boolean isUniqueScalar() { // not contains plain-count
+            return _uniqueScalar;
+        }
     }
 
     // [DBFlute-0.9.7.2]

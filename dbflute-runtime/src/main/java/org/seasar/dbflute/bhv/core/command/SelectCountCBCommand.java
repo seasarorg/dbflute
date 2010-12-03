@@ -27,6 +27,12 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Is it unique-count select? (Required) */
+    protected Boolean _uniqueCount;
+
+    // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
     public String getCommandName() {
@@ -43,7 +49,7 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ConditionBean cb = _conditionBean;
-        cb.xsetupSelectCountIgnoreFetchScope(); // *Point!
+        cb.xsetupSelectCountIgnoreFetchScope(_uniqueCount); // *Point!
         ConditionBeanContext.setConditionBeanOnThread(cb);
     }
 
@@ -63,6 +69,11 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
+    @Override
+    public String buildSqlExecutionKey() {
+        return super.buildSqlExecutionKey() + ":" + (_uniqueCount ? "unique" : "plain");
+    }
+
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
@@ -71,5 +82,22 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
                 return createSelectCBExecution(_conditionBeanType, handler);
             }
         };
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertStatus(String methodName) {
+        super.assertStatus(methodName);
+        if (_uniqueCount == null) {
+            throw new IllegalStateException(buildAssertMessage("_uniqueCount", methodName));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setUniqueCount(boolean uniqueCount) {
+        _uniqueCount = uniqueCount;
     }
 }

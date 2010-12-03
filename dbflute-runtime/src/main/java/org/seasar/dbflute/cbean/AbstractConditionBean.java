@@ -663,10 +663,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public ConditionBean xsetupSelectCountIgnoreFetchScope() {
+    public ConditionBean xsetupSelectCountIgnoreFetchScope(boolean uniqueCount) {
         _isSelectCountIgnoreFetchScope = true;
 
-        getSqlClause().classifySelectClauseType(SqlClause.SelectClauseType.COUNT);
+        final SqlClause.SelectClauseType clauseType;
+        if (uniqueCount) {
+            clauseType = SqlClause.SelectClauseType.UNIQUE_COUNT;
+        } else {
+            clauseType = SqlClause.SelectClauseType.PLAIN_COUNT;
+        }
+        getSqlClause().classifySelectClauseType(clauseType);
         getSqlClause().ignoreOrderBy();
         getSqlClause().ignoreFetchScope();
         return this;

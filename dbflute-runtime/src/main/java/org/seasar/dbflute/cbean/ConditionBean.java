@@ -103,9 +103,10 @@ public interface ConditionBean extends PagingBean {
     /**
      * Set up various things for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't call this!
+     * @param uniqueCount Is it unique-count select?
      * @return this. (NotNull)
      */
-    ConditionBean xsetupSelectCountIgnoreFetchScope();
+    ConditionBean xsetupSelectCountIgnoreFetchScope(boolean uniqueCount);
 
     /**
      * Do after-care for select-count-ignore-fetch-scope. {Internal}

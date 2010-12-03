@@ -77,7 +77,7 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public ConditionBean xsetupSelectCountIgnoreFetchScope() {
+    public ConditionBean xsetupSelectCountIgnoreFetchScope(boolean uniqueCount) {
         return null;
     }
 

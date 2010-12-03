@@ -67,7 +67,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     protected String getSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option) {
         if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasCompoundPrimaryKey()) {
-            String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
+            String msg = "The derived-referrer is unsupported when no primary key or compound primary key:";
             msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }

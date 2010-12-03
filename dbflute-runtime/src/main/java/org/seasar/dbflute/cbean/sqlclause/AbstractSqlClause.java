@@ -392,7 +392,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (!needsUnionCountOrScalarEnclosing()) {
             return sql;
         }
-        final String selectClause = buildSelectClauseCountOrScalar("dfmain");
+        final String selectClause = buildSelectClauseScalar("dfmain");
         final String ln = ln();
         final String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
         final String endMark = resolveSubQueryEndMark("dfmain");
@@ -403,7 +403,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (!isUnionNormalSelectEnclosingRequired()) {
             return false;
         }
-        return hasUnionQuery() && !isSelectClauseTypeCountOrScalar();
+        return hasUnionQuery() && !isSelectClauseTypeScalar();
     }
 
     protected boolean isUnionNormalSelectEnclosingRequired() { // for extension
@@ -411,7 +411,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected boolean needsUnionCountOrScalarEnclosing() {
-        return hasUnionQuery() && isSelectClauseTypeCountOrScalar();
+        return hasUnionQuery() && isSelectClauseTypeScalar();
     }
 
     // ===================================================================================
@@ -422,8 +422,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         -------------
     public String getSelectClause() {
         final String basePointAliasName = getBasePointAliasName();
-        if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
-            return buildSelectClauseCountOrScalar(basePointAliasName);
+        if (isSelectClauseTypeScalar() && !hasUnionQuery()) {
+            return buildSelectClauseScalar(basePointAliasName);
         }
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
@@ -445,26 +445,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         final Map<String, String> selectClauseRealColumnAliasMap = getSelectClauseRealColumnAliasMap();
 
-        // Columns of local table.
+        // columns of local table.
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
 
-            // [DBFlute-0.7.4]
             if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
-                if (isSelectClauseTypeCountOrScalar() && hasUnionQuery()) {
-                    // Here it must be with union query.
-                    // So the primary Key is target for saving unique.
-                    // But if it does not have primary keys, all column is target.
-                    if (dbmeta.hasPrimaryKey()) {
-                        if (!columnInfo.isPrimary()) {
-                            continue;
-                        }
-                    }
-                } else {
+                if (!(!dbmeta.hasPrimaryKey() && isSelectClauseTypeUniqueScalar() && hasUnionQuery())) {
                     continue;
                 }
+                // all columns are target if no-PK and unique-scalar and union-query
             }
 
             if (needsDelimiter) {
@@ -488,7 +479,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
         }
 
-        // Columns of foreign tables.
+        // columns of foreign tables.
         final Set<Entry<String, Map<String, SelectedSelectColumnInfo>>> entrySet = getSelectedSelectColumnMap()
                 .entrySet();
         for (Entry<String, Map<String, SelectedSelectColumnInfo>> entry : entrySet) {
@@ -566,23 +557,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                       Count or Scalar
     //                                       ---------------
-    protected boolean isSelectClauseTypeCountOrScalar() {
-        if (_selectClauseType.equals(SelectClauseType.COUNT)) {
-            return true;
-        } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
-            return true;
-        } else if (_selectClauseType.equals(SelectClauseType.MIN)) {
-            return true;
-        } else if (_selectClauseType.equals(SelectClauseType.SUM)) {
-            return true;
-        } else if (_selectClauseType.equals(SelectClauseType.AVG)) {
-            return true;
-        }
-        return false;
+    protected boolean isSelectClauseTypeScalar() {
+        return _selectClauseType.isScalar();
     }
 
-    protected String buildSelectClauseCountOrScalar(String aliasName) {
-        if (_selectClauseType.equals(SelectClauseType.COUNT)) {
+    protected boolean isSelectClauseTypeUniqueScalar() {
+        return _selectClauseType.isUniqueScalar();
+    }
+
+    protected String buildSelectClauseScalar(String aliasName) {
+        if (_selectClauseType.isCount()) {
             return buildSelectClauseCount();
         } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
             return buildSelectClauseMax(aliasName);
@@ -2015,13 +1999,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         } else {
             if (hasOuterJoin()) {
                 String msg = "The queryUpdate() with outer join is unavailable";
-                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " because your DB does not support it or the table has compound primary key:";
                 msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
                 String msg = "The queryUpdate() with union is unavailable";
-                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " because your DB does not support it or the table has compound primary key:";
                 msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
@@ -2062,16 +2046,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
             sb.append(")");
             return sb.toString();
-        } else { // unsupported or two-or-more primary keys
+        } else { // unsupported or compound primary keys
             if (hasOuterJoin()) {
                 String msg = "The queryDelete() with outer join is unavailable";
-                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " because your DB does not support it or the table has compound primary keys:";
                 msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
                 String msg = "The queryDelete() with union is unavailable";
-                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " because your DB does not support it or the table has compound primary keys:";
                 msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
