@@ -235,7 +235,7 @@ namespace ${myExtendedEntityPackageName} {
 #set ($foreignKeyIndex = 0)
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignTable = $foreignKey.foreignTable)
-#set ($foreignEntityClassName = "${glProjectPrefix}${foreignKey.foreignTable.JavaName}")
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
 #set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
         protected ${foreignEntityClassName} ${foreignVariableName};
 
@@ -256,7 +256,7 @@ namespace ${myExtendedEntityPackageName} {
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
         protected ${referrerEntityClassName} ${referrerVariableName};
 
@@ -283,7 +283,7 @@ namespace ${myExtendedEntityPackageName} {
         #region Referrer Property
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         protected IList<${referrerEntityClassName}> $referrerVariableName;
 
