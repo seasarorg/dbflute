@@ -214,7 +214,7 @@ public class DerivedReferrerOption implements ParameterOption {
         final StringBuilder sb = new StringBuilder();
         sb.append(functionName).append("(");
         final String sqend = SubQueryIndentProcessor.END_MARK_PREFIX;
-        final boolean handleSqEnd = needsHandleSubQueryEnd(functionExp);
+        final boolean handleSqEnd = hasSubQueryEndOnLastLine(functionExp);
         final String pureFunction = handleSqEnd ? Srl.substringLastFront(functionExp, sqend) : functionExp;
         if (leftArg) { // for example, PostgreSQL's date_trunc()
             // add line separator and indent for SQL format
@@ -235,7 +235,7 @@ public class DerivedReferrerOption implements ParameterOption {
         return sb.toString();
     }
 
-    protected boolean needsHandleSubQueryEnd(String functionExp) {
+    protected boolean hasSubQueryEndOnLastLine(String functionExp) {
         return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(functionExp);
     }
 

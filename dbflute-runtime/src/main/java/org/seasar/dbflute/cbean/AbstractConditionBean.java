@@ -267,33 +267,53 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new QueryClause() {
             @Override
             public String toString() {
-                final StringBuilder sb = new StringBuilder();
-                sb.append(leftColumn);
-                if (needsHandleSubQueryEnd(leftColumn)) {
-                    sb.append("       "); // because sub-query has line separator at its latest line
-                } else {
-                    sb.append(" ");
-                }
-                sb.append(operand).append(" ");
-                final String statement = rightCalcSp.buildStatementAsRealName();
-                if (statement != null) { // exists calculation
-                    final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
-                    if (!columnInfo.isPropertyTypeNumber()) {
-                        // *simple message because other types may be supported at the future
-                        String msg = "Not number column specified: " + columnInfo;
-                        throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
+                final String rightExp;
+                {
+                    final String statement = rightCalcSp.buildStatementAsRealName();
+                    if (statement != null) { // exists calculation
+                        final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
+                        if (!columnInfo.isPropertyTypeNumber()) {
+                            // *simple message because other types may be supported at the future
+                            String msg = "Not number column specified: " + columnInfo;
+                            throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
+                        }
+                        rightExp = statement;
+                    } else {
+                        rightExp = rightColumn;
                     }
-                    sb.append(statement);
-                } else {
-                    sb.append(rightColumn);
+                }
+                return xbuildColQyClause(leftColumn, operand, rightExp);
+            }
+
+            protected String xbuildColQyClause(String leftExp, String operand, String rightExp) {
+                final StringBuilder sb = new StringBuilder();
+                if (hasSubQueryEndOnLastLine(leftExp)) {
+                    if (hasSubQueryEndOnLastLine(rightExp)) { // (sub-query = sub-query)
+                        // add line separator before right expression
+                        // because of independent format for right query
+                        sb.append(insertSubQueryEndOnLastLine(leftExp, " " + operand + " "));
+                        sb.append(ln() + "       ").append(rightExp);
+                    } else { // (sub-query = column)
+                        sb.append(insertSubQueryEndOnLastLine(leftExp, " " + operand + " " + rightExp));
+                    }
+                } else { // (column = sub-query) or (column = column) 
+                    sb.append(leftExp).append(" ").append(operand).append(" ").append(rightExp);
                 }
                 return sb.toString();
             }
         };
     }
 
-    protected boolean needsHandleSubQueryEnd(String columnExp) {
+    protected boolean hasSubQueryBeginOnFirstLine(String columnExp) {
+        return SubQueryIndentProcessor.hasSubQueryBeginOnFirstLine(columnExp);
+    }
+
+    protected boolean hasSubQueryEndOnLastLine(String columnExp) {
         return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(columnExp);
+    }
+
+    protected String insertSubQueryEndOnLastLine(String columnExp, String inserted) {
+        return SubQueryIndentProcessor.insertSubQueryEndOnLastLine(columnExp, inserted);
     }
 
     // [DBFlute-0.9.6.3]

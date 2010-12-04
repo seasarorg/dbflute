@@ -177,6 +177,17 @@ public class SubQueryIndentProcessor implements Serializable {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
+    public static boolean hasSubQueryBeginOnFirstLine(String exp) {
+        final String sqbegin = BEGIN_MARK_PREFIX;
+        if (exp.contains(ln())) {
+            final String firstLine = Srl.substringFirstFront(exp, ln());
+            if (firstLine.contains(sqbegin)) {
+                return true; // a first line has sub-query end mark
+            }
+        }
+        return false;
+    }
+
     public static boolean hasSubQueryEndOnLastLine(String exp) {
         final String sqend = END_MARK_PREFIX;
         if (exp.contains(ln())) {
@@ -186,6 +197,13 @@ public class SubQueryIndentProcessor implements Serializable {
             }
         }
         return false;
+    }
+
+    public static String insertSubQueryEndOnLastLine(String exp, String inserted) {
+        final String sqend = END_MARK_PREFIX;
+        final String front = Srl.substringLastFront(exp, sqend);
+        final String rear = Srl.substringLastRear(exp, sqend);
+        return front + inserted + sqend + rear;
     }
 
     // ===================================================================================

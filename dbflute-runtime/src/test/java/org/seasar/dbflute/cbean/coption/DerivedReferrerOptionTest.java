@@ -165,10 +165,10 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
         String sqend = SubQueryIndentProcessor.END_MARK_PREFIX;
 
         // ## Act & Assert ##
-        assertFalse(option.needsHandleSubQueryEnd("FOO"));
-        assertFalse(option.needsHandleSubQueryEnd("FOO" + ln() + "BAR"));
-        assertTrue(option.needsHandleSubQueryEnd("FOO" + ln() + "BAR" + sqend));
-        assertFalse(option.needsHandleSubQueryEnd("FOO" + sqend + ln() + "BAR"));
-        assertFalse(option.needsHandleSubQueryEnd("FOO" + sqend));
+        assertFalse(option.hasSubQueryEndOnLastLine("FOO"));
+        assertFalse(option.hasSubQueryEndOnLastLine("FOO" + ln() + "BAR"));
+        assertTrue(option.hasSubQueryEndOnLastLine("FOO" + ln() + "BAR" + sqend));
+        assertFalse(option.hasSubQueryEndOnLastLine("FOO" + sqend + ln() + "BAR"));
+        assertFalse(option.hasSubQueryEndOnLastLine("FOO" + sqend));
     }
 }
