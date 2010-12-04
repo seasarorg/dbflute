@@ -223,6 +223,7 @@ namespace ${glPackageExtendedBhv} {
             HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>
                     (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(referrerBhv));
         }
+#if ($referrer.isSimpleKeyFK())
 #set ($referrerColumn = ${referrer.localColumnAsOne})
 #set ($localColumn = ${referrer.foreignColumnAsOne})
 #set ($keyJavaNative = "${referrerColumn.javaNative}")
@@ -239,6 +240,7 @@ namespace ${glPackageExtendedBhv} {
             public ${keyJavaNative} getFKVal(${referrerEntityClassName} e) { return e.${referrerColumn.javaName}; }
             public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} be) { re.${referrer.foreignPropertyNameInitCap} = be; }
         }
+#end
 #end
 #end
         #endregion
