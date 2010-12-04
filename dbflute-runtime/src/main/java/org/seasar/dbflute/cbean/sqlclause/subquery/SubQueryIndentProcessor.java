@@ -175,13 +175,27 @@ public class SubQueryIndentProcessor implements Serializable {
     }
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public static boolean hasSubQueryEndOnLastLine(String exp) {
+        final String sqend = END_MARK_PREFIX;
+        if (exp.contains(ln())) {
+            final String lastLine = Srl.substringLastRear(exp, ln());
+            if (lastLine.contains(sqend)) {
+                return true; // a last line has sub-query end mark
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
     }
 
-    protected String ln() {
+    protected static String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 }

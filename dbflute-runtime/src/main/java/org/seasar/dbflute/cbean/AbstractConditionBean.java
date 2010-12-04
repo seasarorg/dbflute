@@ -30,6 +30,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
+import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -267,7 +268,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
             @Override
             public String toString() {
                 final StringBuilder sb = new StringBuilder();
-                sb.append(leftColumn).append(" ").append(operand).append(" ");
+                sb.append(leftColumn);
+                if (needsHandleSubQueryEnd(leftColumn)) {
+                    sb.append("       "); // because sub-query has line separator at its latest line
+                } else {
+                    sb.append(" ");
+                }
+                sb.append(operand).append(" ");
                 final String statement = rightCalcSp.buildStatementAsRealName();
                 if (statement != null) { // exists calculation
                     final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
@@ -283,6 +290,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 return sb.toString();
             }
         };
+    }
+
+    protected boolean needsHandleSubQueryEnd(String columnExp) {
+        return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(columnExp);
     }
 
     // [DBFlute-0.9.6.3]

@@ -236,14 +236,7 @@ public class DerivedReferrerOption implements ParameterOption {
     }
 
     protected boolean needsHandleSubQueryEnd(String functionExp) {
-        final String sqend = SubQueryIndentProcessor.END_MARK_PREFIX;
-        if (functionExp.contains(ln())) {
-            final String lastLine = Srl.substringLastRear(functionExp, ln());
-            if (lastLine.contains(sqend)) {
-                return true; // a last line has sub-query end mark
-            }
-        }
-        return false;
+        return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(functionExp);
     }
 
     protected String buildBindParameter(String propertyName) {
