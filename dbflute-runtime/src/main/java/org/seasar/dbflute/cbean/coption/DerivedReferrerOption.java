@@ -35,7 +35,8 @@ import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * The option for DerivedReferrer.
+ * The option for DerivedReferrer. <br />
+ * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
 public class DerivedReferrerOption implements ParameterOption {
@@ -112,6 +113,12 @@ public class DerivedReferrerOption implements ParameterOption {
     // ===================================================================================
     //                                                                              Filter
     //                                                                              ======
+    /**
+     * Filter the expression of function part. <br />
+     * For example, an expression is like: max(foo.FOO_DATE), sum(bar.BAR_PRICE), ...
+     * @param functionExp The expression of function part that is not filtered. (NotNull) 
+     * @return The filtered expression. (NotNull)
+     */
     public String filterFunction(String functionExp) {
         String filtered = functionExp;
         final LinkedHashMap<String, ProcessCallback> callbackMap = _callbackMap;
