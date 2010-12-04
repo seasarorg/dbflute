@@ -23,12 +23,14 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.subquery.QueryDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
+import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -196,16 +198,33 @@ public class DerivedReferrerOption implements ParameterOption {
         final String bindParameter = buildBindParameter(propertyName);
         final StringBuilder sb = new StringBuilder();
         sb.append(functionName).append("(");
+        final String sqend = SubQueryIndentProcessor.END_MARK_PREFIX;
+        final boolean handleSqEnd = needsHandleSubQueryEnd(functionExp);
+        final String pureFunction = handleSqEnd ? Srl.substringLastFront(functionExp, sqend) : functionExp;
         if (leftArg) { // for example, PostgreSQL's date_trunc()
-            sb.append(bindParameter).append(", ").append(functionExp);
+            sb.append(bindParameter).append(", ").append(pureFunction);
         } else { // normal
-            sb.append(functionExp).append(", ").append(bindParameter);
+            sb.append(pureFunction).append(", ").append(bindParameter);
         }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(thirdArg)) {
             sb.append(", ").append(thirdArg);
         }
         sb.append(")");
+        if (handleSqEnd) {
+            sb.append(sqend).append(Srl.substringLastRear(functionExp, sqend));
+        }
         return sb.toString();
+    }
+
+    protected boolean needsHandleSubQueryEnd(String functionExp) {
+        final String sqend = SubQueryIndentProcessor.END_MARK_PREFIX;
+        if (functionExp.contains(ln())) {
+            final String lastLine = Srl.substringLastRear(functionExp, ln());
+            if (lastLine.contains(sqend)) {
+                return true; // a last line has sub-query end mark
+            }
+        }
+        return false;
     }
 
     protected String buildBindParameter(String propertyName) {
@@ -241,6 +260,13 @@ public class DerivedReferrerOption implements ParameterOption {
             String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
         return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
                 subQueryClause, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected final String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
