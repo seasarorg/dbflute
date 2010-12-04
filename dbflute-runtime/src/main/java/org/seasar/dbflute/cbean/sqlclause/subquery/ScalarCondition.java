@@ -68,7 +68,6 @@ public class ScalarCondition extends AbstractSubQuery {
         final ColumnSqlName derivedColumnSqlName = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
         final ColumnRealName derivedColumnRealName = new ColumnRealName(tableAliasName, derivedColumnSqlName);
         assertScalarConditionColumnType(function, derivedColumnDbName);
-        _subQuerySqlClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
             subQueryClause = getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName);

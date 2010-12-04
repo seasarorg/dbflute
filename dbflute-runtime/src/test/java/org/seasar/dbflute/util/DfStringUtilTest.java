@@ -53,6 +53,7 @@ import static org.seasar.dbflute.util.Srl.hasSuffixAll;
 import static org.seasar.dbflute.util.Srl.hasSuffixAllIgnoreCase;
 import static org.seasar.dbflute.util.Srl.hasSuffixAny;
 import static org.seasar.dbflute.util.Srl.hasSuffixAnyIgnoreCase;
+import static org.seasar.dbflute.util.Srl.indent;
 import static org.seasar.dbflute.util.Srl.indexOfFirst;
 import static org.seasar.dbflute.util.Srl.indexOfFirstIgnoreCase;
 import static org.seasar.dbflute.util.Srl.indexOfLast;
@@ -1356,5 +1357,18 @@ public class DfStringUtilTest extends PlainTestCase {
         assertFalse(actual.contains("--"));
         assertFalse(actual.contains("\r"));
         assertEquals("aaaa\nbbbb\ncccc\n", actual);
+    }
+
+    // ===================================================================================
+    //                                                                     Indent Handling
+    //                                                                     ===============
+    public void test_indent_basic() {
+        assertEquals("   ", indent(3));
+        assertEquals("    ", indent(4));
+        assertEquals("  foo", indent(2, "foo"));
+        assertEquals("  foo\n  bar\n  qux", indent(2, "foo\nbar\nqux"));
+        assertEquals("  foo\n  bar\n  qux", indent(2, "foo\r\nbar\r\nqux"));
+        assertEquals("  foo\n  bar\n  qux\n  ", indent(2, "foo\nbar\nqux\n"));
+        assertEquals("  \n  foo\n  bar\n  qux\n  ", indent(2, "\nfoo\nbar\nqux\n"));
     }
 }

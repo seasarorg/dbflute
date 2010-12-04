@@ -2,11 +2,15 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseDerby;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseH2;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
 import org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseSqlServer;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -53,11 +57,18 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     }
 
     protected void setupOptionAttribute(DerivedReferrerOption option) {
-        option.setTargetColumnInfo(_subQuerySqlClause.getSpecifiedColumnInfoAsOne());
+        ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+        if (columnInfo == null) {
+            columnInfo = _subQuerySqlClause.getSpecifiedDerivingColumnInfoAsOne();
+        }
+        option.setTargetColumnInfo(columnInfo); // basically not null (checked before)
         option.setDatabaseMySQL(_subQuerySqlClause instanceof SqlClauseMySql);
         option.setDatabasePostgreSQL(_subQuerySqlClause instanceof SqlClausePostgreSql);
+        option.setDatabaseOracle(_subQuerySqlClause instanceof SqlClauseOracle);
+        option.setDatabaseDB2(_subQuerySqlClause instanceof SqlClauseDb2);
         option.setDatabaseSQLServer(_subQuerySqlClause instanceof SqlClauseSqlServer);
         option.setDatabaseH2(_subQuerySqlClause instanceof SqlClauseH2);
+        option.setDatabaseDerby(_subQuerySqlClause instanceof SqlClauseDerby);
     }
 
     protected abstract String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
@@ -77,7 +88,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             throwDerivedReferrerInvalidColumnSpecificationException(function);
         }
         final ColumnRealName derivedColumnRealName = getDerivedColumnRealName();
-        _subQuerySqlClause.clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
             subQueryClause = getUnionSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName, option,
@@ -97,10 +108,10 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             return specifiedColumn;
         } else {
             final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
-            if (nestedSubQuery == null) {
-                return null;
-            } else {
+            if (nestedSubQuery != null) {
                 return new ColumnSqlName(nestedSubQuery);
+            } else {
+                return null;
             }
         }
     }
@@ -111,10 +122,10 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             return specifiedColumn;
         } else {
             final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
-            if (nestedSubQuery == null) {
-                return null; // checked before
-            } else {
+            if (nestedSubQuery != null) {
                 return new ColumnRealName(null, new ColumnSqlName(nestedSubQuery));
+            } else {
+                return null;
             }
         }
     }

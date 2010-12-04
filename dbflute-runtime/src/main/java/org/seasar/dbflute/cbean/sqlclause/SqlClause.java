@@ -27,6 +27,7 @@ import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
+import org.seasar.dbflute.cbean.sqlclause.subquery.DerivedReferrer;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -615,16 +616,21 @@ public interface SqlClause {
      * Specify deriving sub-query for DerivedReferrer.
      * @param aliasName The alias name for sub-query. (Nullable: if null, means as-one use in other functions)
      * @param derivingSubQuery The sub-query for deriving. (NotNull)
+     * @param derivedReferrer The handler of DerivedReferrer. (NotNull)  
      */
-    void specifyDerivingSubQuery(String aliasName, String derivingSubQuery);
+    void specifyDerivingSubQuery(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer);
 
     boolean hasSpecifiedDerivingSubQuery(String aliasName);
 
     List<String> getSpecifiedDerivingAliasList();
 
+    ColumnInfo getSpecifiedDerivingColumnInfoAsOne();
+
     String getSpecifiedDerivingAliasNameAsOne();
 
     String getSpecifiedDerivingSubQueryAsOne();
+
+    void clearSpecifiedDerivingSubQuery();
 
     // ===================================================================================
     //                                                                  Invalid Query Info

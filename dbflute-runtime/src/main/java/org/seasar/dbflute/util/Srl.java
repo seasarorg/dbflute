@@ -1863,6 +1863,31 @@ public class Srl {
     }
 
     // ===================================================================================
+    //                                                                     Indent Handling
+    //                                                                     ===============
+    public static String indent(int size) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+
+    public static String indent(int size, String str) {
+        final List<String> splitList = splitList(removeCR(str), "\n");
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (String element : splitList) {
+            if (index > 0) {
+                sb.append("\n");
+            }
+            sb.append(indent(size)).append(element);
+            ++index;
+        }
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                  Character Handling
     //                                                                  ==================
     protected static boolean isUpperCase(char c) {

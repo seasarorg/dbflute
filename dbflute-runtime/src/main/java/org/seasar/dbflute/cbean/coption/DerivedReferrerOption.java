@@ -57,8 +57,11 @@ public class DerivedReferrerOption implements ParameterOption {
     protected ColumnInfo _targetColumnInfo;
     protected boolean _databaseMySQL;
     protected boolean _databasePostgreSQL;
+    protected boolean _databaseOracle;
+    protected boolean _databaseDB2;
     protected boolean _databaseSQLServer;
     protected boolean _databaseH2;
+    protected boolean _databaseDerby;
 
     // ===================================================================================
     //                                                                              Option
@@ -193,6 +196,11 @@ public class DerivedReferrerOption implements ParameterOption {
         return isDatabaseMySQL() || isDatabaseH2();
     }
 
+    /**
+     * Process various filters defined by user. (for extension)
+     * @param functionExp The expression of derived function. (NotNull)
+     * @return The filtered expression. (NotNull)
+     */
     protected String processVarious(String functionExp) { // for extension
         return functionExp;
     }
@@ -209,7 +217,11 @@ public class DerivedReferrerOption implements ParameterOption {
         final boolean handleSqEnd = needsHandleSubQueryEnd(functionExp);
         final String pureFunction = handleSqEnd ? Srl.substringLastFront(functionExp, sqend) : functionExp;
         if (leftArg) { // for example, PostgreSQL's date_trunc()
-            sb.append(bindParameter).append(", ").append(pureFunction);
+            // add line separator and indent for SQL format
+            // because a left bind parameter destroys its format
+            // also this is not perfect but almost OK 
+            final String indent = Srl.indent(("select ").length());
+            sb.append(bindParameter).append(ln()).append(indent).append(", ").append(pureFunction);
         } else { // normal
             sb.append(pureFunction).append(", ").append(bindParameter);
         }
@@ -323,6 +335,22 @@ public class DerivedReferrerOption implements ParameterOption {
         _databasePostgreSQL = databasePostgreSQL;
     }
 
+    protected boolean isDatabaseOracle() {
+        return _databaseOracle;
+    }
+
+    public void setDatabaseOracle(boolean databaseOracle) {
+        _databaseOracle = databaseOracle;
+    }
+
+    protected boolean isDatabaseDB2() {
+        return _databaseDB2;
+    }
+
+    public void setDatabaseDB2(boolean databaseDB2) {
+        _databaseDB2 = databaseDB2;
+    }
+
     protected boolean isDatabaseSQLServer() {
         return _databaseSQLServer;
     }
@@ -337,5 +365,13 @@ public class DerivedReferrerOption implements ParameterOption {
 
     public void setDatabaseH2(boolean databaseH2) {
         _databaseH2 = databaseH2;
+    }
+
+    protected boolean isDatabaseDerby() {
+        return _databaseDerby;
+    }
+
+    public void setDatabaseDerby(boolean databaseDerby) {
+        _databaseDerby = databaseDerby;
     }
 }

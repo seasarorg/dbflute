@@ -811,7 +811,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 subQueryDBMeta, mainSubQueryIdentity, aliasName);
         registerParameterOption(option);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
-        xgetSqlClause().specifyDerivingSubQuery(aliasName, clause);
+        xgetSqlClause().specifyDerivingSubQuery(aliasName, clause, derivedReferrer);
     }
 
     // [DBFlute-0.8.8.1]

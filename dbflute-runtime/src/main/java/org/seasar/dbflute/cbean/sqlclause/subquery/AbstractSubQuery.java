@@ -148,4 +148,19 @@ public abstract class AbstractSubQuery {
     protected final String ln() {
         return DfSystemUtil.getLineSeparator();
     }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public SubQueryPath getSubQueryPath() {
+        return _subQueryPath;
+    }
+
+    public int getSubQueryLevel() {
+        return _subQueryLevel;
+    }
+
+    public SqlClause getSubQuerySqlClause() {
+        return _subQuerySqlClause;
+    }
 }

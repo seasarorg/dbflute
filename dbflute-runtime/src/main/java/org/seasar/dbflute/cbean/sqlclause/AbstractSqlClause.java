@@ -45,6 +45,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.cbean.sqlclause.select.SelectedSelectColumnInfo;
+import org.seasar.dbflute.cbean.sqlclause.subquery.DerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -111,7 +112,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected Map<String, Map<String, String>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
     /** Specified derive sub-query map. A null key is acceptable. (Nullable: This is lazy-loaded) */
-    protected Map<String, String> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
+    protected Map<String, DerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
     protected Map<String, String> _selectClauseRealColumnAliasMap;
@@ -542,9 +543,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         // columns of DerivedReferrer
         if (_specifiedDerivingSubQueryMap != null && !_specifiedDerivingSubQueryMap.isEmpty()) {
-            for (Entry<String, String> entry : _specifiedDerivingSubQueryMap.entrySet()) {
+            for (Entry<String, DerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
                 final String subQueryAlias = entry.getKey();
-                final String derivingSubQuery = entry.getValue();
+                final String derivingSubQuery = entry.getValue().getDerivingSubQuery();
                 sb.append(ln()).append("     ");
                 sb.append(", ").append(derivingSubQuery);
 
@@ -1913,11 +1914,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                      Specify Deriving
     //                                      ----------------
-    public void specifyDerivingSubQuery(String aliasName, String derivingSubQuery) {
+    public void specifyDerivingSubQuery(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
         if (_specifiedDerivingSubQueryMap == null) {
             _specifiedDerivingSubQueryMap = StringKeyMap.createAsFlexibleOrdered();
         }
-        _specifiedDerivingSubQueryMap.put(aliasName, derivingSubQuery);
+        final DerivingSubQueryInfo info = new DerivingSubQueryInfo(aliasName, derivingSubQuery, derivedReferrer);
+        _specifiedDerivingSubQueryMap.put(aliasName, info);
     }
 
     public boolean hasSpecifiedDerivingSubQuery(String aliasName) {
@@ -1933,18 +1935,68 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return new ArrayList<String>(_specifiedDerivingSubQueryMap.keySet());
     }
 
-    public String getSpecifiedDerivingAliasNameAsOne() {
-        if (_specifiedDerivingSubQueryMap != null && _specifiedDerivingSubQueryMap.size() == 1) {
-            return _specifiedDerivingSubQueryMap.keySet().iterator().next();
+    // -----------------------------------------------------
+    //                                       Deriving as One
+    //                                       ---------------
+    public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
+        final DerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        if (derivingInfo == null) {
+            return null;
         }
-        return null;
+        final SqlClause subQuerySqlClause = derivingInfo.getDerivedReferrer().getSubQuerySqlClause();
+        final ColumnInfo columnInfo = subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+        if (columnInfo != null) {
+            return columnInfo;
+        }
+        return subQuerySqlClause.getSpecifiedDerivingColumnInfoAsOne(); // nested
+    }
+
+    public String getSpecifiedDerivingAliasNameAsOne() {
+        final DerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        return derivingInfo != null ? derivingInfo.getAliasName() : null;
     }
 
     public String getSpecifiedDerivingSubQueryAsOne() {
+        final DerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        return derivingInfo != null ? derivingInfo.getDerivingSubQuery() : null;
+    }
+
+    protected DerivingSubQueryInfo getSpecifiedDerivingInfoAsOne() {
         if (_specifiedDerivingSubQueryMap != null && _specifiedDerivingSubQueryMap.size() == 1) {
             return _specifiedDerivingSubQueryMap.values().iterator().next();
         }
         return null;
+    }
+
+    public void clearSpecifiedDerivingSubQuery() {
+        if (_specifiedDerivingSubQueryMap != null) {
+            _specifiedDerivingSubQueryMap.clear();
+            _specifiedDerivingSubQueryMap = null;
+        }
+    }
+
+    protected static class DerivingSubQueryInfo {
+        protected String _aliasName;
+        protected String _derivingSubQuery;
+        protected DerivedReferrer _derivedReferrer;
+
+        public DerivingSubQueryInfo(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
+            this._aliasName = aliasName;
+            this._derivingSubQuery = derivingSubQuery;
+            this._derivedReferrer = derivedReferrer;
+        }
+
+        public String getAliasName() {
+            return _aliasName;
+        }
+
+        public String getDerivingSubQuery() {
+            return _derivingSubQuery;
+        }
+
+        public DerivedReferrer getDerivedReferrer() {
+            return _derivedReferrer;
+        }
     }
 
     // ===================================================================================
