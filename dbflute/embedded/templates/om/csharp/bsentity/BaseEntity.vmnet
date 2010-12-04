@@ -233,21 +233,21 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                ================
         #region Foreign Property
 #set ($foreignKeyIndex = 0)
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignTable = $foreignKey.foreignTable)
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignTable = $fk.foreignTable)
 #set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+#set ($foreignVariableName = "_${fk.foreignPropertyName}")
         protected ${foreignEntityClassName} ${foreignVariableName};
 
-        /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignPropertyNameInitCap}'.</summary>
-        [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$foreignKey.RelationKeysCommaString")]
-        public ${foreignEntityClassName} ${foreignKey.foreignPropertyNameInitCap} {
+        /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${fk.foreignPropertyNameInitCap}'.</summary>
+        [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$fk.RelationKeysCommaString")]
+        public ${foreignEntityClassName} ${fk.foreignPropertyNameInitCap} {
             get { return ${foreignVariableName}; }
             set { ${foreignVariableName} = value; }
         }
 #if ($database.isMakeEntityChaseRelation())
 
-        public ${foreignEntityClassName} Chase${foreignKey.foreignPropertyNameInitCap}() {
+        public ${foreignEntityClassName} Chase${fk.foreignPropertyNameInitCap}() {
             return ${foreignVariableName} != null ? ${foreignVariableName} : new ${foreignEntityClassName}();
         }
 #end
