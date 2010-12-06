@@ -157,7 +157,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
             List<TnPropertyType> boundPropTypeList) {
         final Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
         final DBMeta dbmeta = entity.getDBMeta();
-        final Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
+        final Set<String> modifiedPropertyNames = entity.modifiedProperties();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             if (columnInfo.isOptimisticLock()) {

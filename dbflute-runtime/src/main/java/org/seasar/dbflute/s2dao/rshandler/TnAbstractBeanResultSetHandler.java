@@ -120,7 +120,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      */
     protected void postCreateRow(final Object row) {
         if (row instanceof Entity) { // DBFlute target
-            ((Entity) row).clearModifiedPropertyNames();
+            ((Entity) row).clearModifiedInfo();
         } else { // basically unreachable
             final TnBeanMetaData bmd = getBeanMetaData();
             final Set<String> names = bmd.getModifiedPropertyNames(row);

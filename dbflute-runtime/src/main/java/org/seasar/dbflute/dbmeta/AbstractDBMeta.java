@@ -649,7 +649,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             msg = msg + " primaryKeyMap=" + primaryKeyMap;
             throw new IllegalArgumentException(msg);
         }
-        entity.clearModifiedPropertyNames();
+        entity.clearModifiedInfo();
         final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(primaryKeyMap);
         final List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
         for (ColumnInfo columnInfo : columnInfoList) {

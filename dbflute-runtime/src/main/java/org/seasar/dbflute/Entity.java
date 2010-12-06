@@ -67,16 +67,16 @@ public interface Entity {
     //                                                                 Modified Properties
     //                                                                 ===================
     /**
-     * Get modified property names. (basically for Framework)<br />
+     * Get the set of modified properties. (basically for Framework)<br />
      * The properties needs to be according to Java Beans rule.
-     * @return The set instance that contains property names. (NotNull)
+     * @return The set instance that contains names of modified property. (NotNull)
      */
-    Set<String> getModifiedPropertyNames();
+    Set<String> modifiedProperties();
 
     /**
-     * Clear modified property names. (basically for Framework)
+     * Clear the information of modified properties. (basically for Framework)
      */
-    void clearModifiedPropertyNames();
+    void clearModifiedInfo();
 
     /**
      * Does it have modifications of property names. (basically for Framework)
@@ -93,11 +93,11 @@ public interface Entity {
         private static final long serialVersionUID = 1L;
 
         /** Set of properties. */
-        protected Set<String> _propertiesSet = new LinkedHashSet<String>();
+        protected final Set<String> _propertiesSet = new LinkedHashSet<String>();
 
         /**
          * Add property name. (according to Java Beans rule)
-         * @param propertyName The string for name. (Nullable)
+         * @param propertyName The string for name. (NotNull)
          */
         public void addPropertyName(String propertyName) {
             _propertiesSet.add(propertyName);
@@ -128,7 +128,7 @@ public interface Entity {
 
         /**
          * Remove property name from the set. (according to Java Beans rule)
-         * @param propertyName The string for name. (Nullable)
+         * @param propertyName The string for name. (NotNull)
          */
         public void remove(String propertyName) {
             _propertiesSet.remove(propertyName);

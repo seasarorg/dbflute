@@ -288,7 +288,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         final Set<Entry<String, Entity>> entrySet = alreadyRegisteredEntityMap.entrySet();
         for (Entry<String, Entity> entry : entrySet) {
             final Entity currentRegisteredEntity = entry.getValue();
-            currentRegisteredEntity.clearModifiedPropertyNames();
+            currentRegisteredEntity.clearModifiedInfo();
         }
 
         return localTableList;
