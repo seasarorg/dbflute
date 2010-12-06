@@ -610,12 +610,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #if ($table.hasUtilDateColumn())
     protected String xfUD(Date date) { // formatUtilDate()
+        return InternalUtil.toString(date, xgDP());
+    }
+    protected String xgDP() { // getDatePattern
 #if ($database.isDatabaseOracle())
-        String pattern = "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
+        return "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
 #else
-        String pattern = "yyyy-MM-dd";
+        return "yyyy-MM-dd";
 #end
-        return InternalUtil.toString(date, pattern);
     }
 #end
 #if ($table.hasByteArrayColumn())

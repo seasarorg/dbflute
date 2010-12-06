@@ -169,12 +169,14 @@ public abstract class $myClassName implements Serializable {
     }
 #if ($table.hasUtilDateColumn())
     protected String xfUD(java.util.Date date) { // formatUtilDate()
+        return date != null ? new java.text.SimpleDateFormat(xgDP()).format(date) : null;
+    }
+    protected String xgDP() { // getDatePattern
 #if ($database.isDatabaseOracle())
-        String pattern = "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
+        return "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
 #else
-        String pattern = "yyyy-MM-dd";
+        return "yyyy-MM-dd";
 #end
-        return new java.text.SimpleDateFormat(pattern).format(date);
     }
 #end
 #if ($table.hasByteArrayColumn())
