@@ -91,7 +91,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                              Internal
     //                                              --------
     /** The modified properties for this entity. */
-    protected EntityModifiedProperties __modifiedProperties = newEntityModifiedProperties();
+    protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
 #if ($table.hasAllCommonColumn())
 
     /** Is common column auto set up effective? */
@@ -439,18 +439,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     /**
      * {@inheritDoc}
      */
-    public Set<String> getModifiedPropertyNames() {
+    public Set<String> modifiedProperties() {
         return __modifiedProperties.getPropertyNames();
-    }
-
-    protected EntityModifiedProperties newEntityModifiedProperties() {
-        return new EntityModifiedProperties();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void clearModifiedPropertyNames() {
+    public void clearModifiedInfo() {
         __modifiedProperties.clear();
     }
 
@@ -459,6 +455,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public boolean hasModification() {
         return !__modifiedProperties.isEmpty();
+    }
+
+    protected EntityModifiedProperties newModifiedProperties() {
+        return new EntityModifiedProperties();
     }
 #if (${table.hasAllCommonColumn()})
     

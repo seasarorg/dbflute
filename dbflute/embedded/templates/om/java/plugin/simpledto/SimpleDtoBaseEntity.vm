@@ -2,9 +2,7 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 import java.io.Serializable;
-#if ($table.hasReferrerAsMany())
 import java.util.*;
-#end
 
 #if ($table.hasRelation())
 import ${myExtendedEntityPackageName}.*;
@@ -56,11 +54,20 @@ public abstract class $myClassName implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
 #foreach ($col in $table.columns)
     /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
     protected ${col.javaNative} ${col.simpleDtoVariableName};
 
 #end
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /** The modified properties for this DTO. */
+    protected final Set<String> __modifiedProperties = new LinkedHashSet<String>();
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -118,6 +125,20 @@ public abstract class $myClassName implements Serializable {
     }
 
 #end
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    public Set<String> modifiedProperties() {
+        return __modifiedProperties;
+    }
+
+    public void clearModifiedInfo() {
+        __modifiedProperties.clear();
+    }
+
+    public boolean hasModification() {
+        return !__modifiedProperties.isEmpty();
+    }
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -208,6 +229,7 @@ public abstract class $myClassName implements Serializable {
      * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
+        __modifiedProperties.add("${col.javaBeansRulePropertyName}");
         this.${col.simpleDtoVariableName} = ${col.uncapitalisedJavaName};
     }
 

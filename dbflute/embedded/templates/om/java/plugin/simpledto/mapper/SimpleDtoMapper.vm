@@ -1,10 +1,7 @@
 ${database.allClassCopyright}package ${myDtoMapperPackageName};
 #set ($myClassName = "${myDtoMapperClassName}")
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 import org.seasar.dbflute.Entity;
 import ${myDomainEntityPackageName}.*;
@@ -75,6 +72,9 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
+    // -----------------------------------------------------
+    //                                                to DTO
+    //                                                ------
     /**
      * Do mapping from an entity to a DTO with relation data.
      * @param entity The entity as mapping resource. (NotNull)
@@ -149,11 +149,12 @@ public class ${myClassName} {
         return dtoList;
     }
 
+    // -----------------------------------------------------
+    //                                             to Entity
+    //                                             ---------
     /**
-     * Do mapping from a DTO to an entity without relation data. <br />
-     * A setter of an entity is called if the corresponding value of the DTO is null.
-     * You can change the rule by overriding this.isMappingToEntityContainsNull()
-     * that returns whether the mapping contains null value or not.
+     * Do mapping from a DTO to an entity with relation data. <br />
+     * A setter of an entity is called under the rule of this.needsMapping().
      * @param dto The DTO as mapping resource. (NotNull)
      * @return The mapped entity. (NotNull)
      */
@@ -167,7 +168,7 @@ public class ${myClassName} {
 #end
         ${table.extendedEntityClassName} entity = new ${table.extendedEntityClassName}();
 #foreach ($col in $table.columns)
-        if (isMappingToEntityContainsNull() || dto.get${col.javaName}() != null) {
+        if (needsMapping(dto, dto.get${col.javaName}(), "${col.javaBeansRulePropertyName}")) {
             entity.set${col.javaName}(dto.get${col.javaName}());
         }
 #end
@@ -215,8 +216,24 @@ public class ${myClassName} {
     }
 
     /**
-     * Does the mapping to an entity contain null values? <br />
+     * Does the property need to be mapped to an entity? <br />
+     * If modified info of DTO has at least one property, only modified properties are mapped.
+     * And if no property is modified, all properties are mapped (but the other option exists).
+     * @return Determination.
+     */
+    protected boolean needsMapping(${myExtendedObjectClassName} dto, Object value, String propName) {
+        Set<String> modifiedProperties = dto.modifiedProperties();
+        if (modifiedProperties.isEmpty()) {
+            return isMappingToEntityContainsNull() || value != null;
+        } else {
+            return modifiedProperties.contains(propName);
+        }
+    }
+
+    /**
+     * Does the mapping to an entity contain null values? (when no property is modified)<br />
      * Default is true that means a setter is called if the value is null.
+     * But this method is valid only when no property is modified. 
      * @return Determination.
      */
     protected boolean isMappingToEntityContainsNull() { // for extension
@@ -224,7 +241,7 @@ public class ${myClassName} {
     }
 
     /**
-     * Do mapping from a DTO list to an entity list without relation data. <br />
+     * Do mapping from a DTO list to an entity list with relation data. <br />
      * This calls this.mappingToEntity() in loop of the list.
      * @param dtoList The list of DTO as mapping resource. (NotNull)
      * @return The mapped entity. (NotNull)
