@@ -83,9 +83,9 @@ public class ${myClassName} {
     public ${myExtendedObjectClassName} mappingToDto(${table.extendedEntityClassName} entity) {
 #if ($table.hasRelation())
         Entity localKey = entity;
-        Object localDto = _relationDtoMap.get(localKey);
-        if (localDto != null) {
-            return (${myExtendedObjectClassName})localDto;
+        Object cachedLocalDto = _relationDtoMap.get(localKey);
+        if (cachedLocalDto != null) {
+            return (${myExtendedObjectClassName})cachedLocalDto;
         }
 #end
         ${myExtendedObjectClassName} dto = new ${myExtendedObjectClassName}();
@@ -136,7 +136,8 @@ public class ${myClassName} {
     }
 
     /**
-     * Do mapping from an entity list to a DTO list with relation data.
+     * Do mapping from an entity list to a DTO list with relation data. <br />
+     * This calls this.mappingToDto() in a loop of the list.
      * @param entityList The list of entity as mapping resource. (NotNull)
      * @return The mapped DTO. (NotNull)
      */
@@ -149,15 +150,19 @@ public class ${myClassName} {
     }
 
     /**
-     * Do mapping from a DTO to an entity without relation data.
+     * Do mapping from a DTO to an entity without relation data. <br />
+     * A setter of an entity is called if the corresponding value of the DTO is null.
+     * You can change the rule by overriding this.isMappingToEntityContainsNull()
+     * that returns whether the mapping contains null value or not.
      * @param dto The DTO as mapping resource. (NotNull)
      * @return The mapped entity. (NotNull)
      */
     public ${table.extendedEntityClassName} mappingToEntity(${myExtendedObjectClassName} dto) {
 #if ($table.hasRelation())
-        Entity localEntity = _relationEntityMap.get(dto);
-        if (localEntity != null) {
-            return (${table.extendedEntityClassName})localEntity;
+        Object localKey = dto;
+        Entity cachedLocalEntity = _relationEntityMap.get(localKey);
+        if (cachedLocalEntity != null) {
+            return (${table.extendedEntityClassName})cachedLocalEntity;
         }
 #end
         ${table.extendedEntityClassName} entity = new ${table.extendedEntityClassName}();
@@ -167,7 +172,7 @@ public class ${myClassName} {
         }
 #end
 #if ($table.hasRelation())
-        _relationEntityMap.put(dto, entity);
+        _relationEntityMap.put(localKey, entity);
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
@@ -211,7 +216,7 @@ public class ${myClassName} {
 
     /**
      * Does the mapping to an entity contain null values? <br />
-     * Default is true that means a setter is set if the value is null.
+     * Default is true that means a setter is called if the value is null.
      * @return Determination.
      */
     protected boolean isMappingToEntityContainsNull() { // for extension
@@ -219,7 +224,8 @@ public class ${myClassName} {
     }
 
     /**
-     * Do mapping from a DTO list to an entity list without relation data.
+     * Do mapping from a DTO list to an entity list without relation data. <br />
+     * This calls this.mappingToEntity() in loop of the list.
      * @param dtoList The list of DTO as mapping resource. (NotNull)
      * @return The mapped entity. (NotNull)
      */

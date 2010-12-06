@@ -463,17 +463,11 @@ $database.info(" ")
   #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
   $database.makeDirectory($path)
 
-  #if ($database.isSimpleDtoUseDtoMapper())
-    #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
-    $database.makeDirectory($path)
-  #end
-
+  $database.enableSimpleDtoOutputDirectory()
   #foreach ($table in $database.tables)
     #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
     #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
-    #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
-    $database.enableSimpleDtoOutputDirectory()
     $database.info("    parse('${myExtendedObjectClassName}');")
 
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
@@ -486,15 +480,26 @@ $database.info(" ")
       #end
       $database.reflectAllExCopyright($path)
     #end
+  #end
+
+  #if ($database.isSimpleDtoUseDtoMapper())
+    #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
+    $database.makeDirectory($path)
 
     $database.enableDtoMapperOutputDirectory()
-    #if ($database.isSimpleDtoUseDtoMapper())
+    #foreach ($table in $database.tables)
+      #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
+      #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
+      #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+
+      $database.info("    parse('${myDtoMapperClassName}');")
+
       #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
     #end
   #end
   $database.info("}")
-  $database.enableGenerateOutputDirectory()
+  $database.backToGenerateOutputDirectory()
 #end
 
 ## ===================================================================================
@@ -531,6 +536,6 @@ $database.info(" ")
     #end
   #end
   $database.info("}")
-  $database.enableGenerateOutputDirectory()
+  $database.backToGenerateOutputDirectory()
 #end
 

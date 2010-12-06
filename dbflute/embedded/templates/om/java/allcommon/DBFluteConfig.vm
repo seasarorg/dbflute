@@ -542,7 +542,7 @@ public class ${glDBFluteConfig} {
 #if ($database.isTargetContainerSpring())
             return DataSourceUtils.getConnection(ds);
 #else
-            throw new UnsupportedOperationException("This method is only for Spring Framework.");
+            throw new IllegalStateException("This method is only for Spring Framework.");
 #end
         }
 
@@ -550,7 +550,7 @@ public class ${glDBFluteConfig} {
 #if ($database.isTargetContainerSpring())
             return DataSourceUtils.isConnectionTransactional(conn, ds);
 #else
-            throw new UnsupportedOperationException("This method is only for Spring Framework.");
+            throw new IllegalStateException("This method is only for Spring Framework.");
 #end
         }
 

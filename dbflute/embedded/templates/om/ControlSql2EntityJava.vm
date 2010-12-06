@@ -242,37 +242,47 @@ $database.debug("}")
   #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
   $database.makeDirectory($path)
 
+  $database.enableSimpleDtoOutputDirectory()
+  #foreach ($table in $database.tables)
+    #if (!$table.isSql2EntityTypeSafeCursor())
+      #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
+      #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
+
+      $database.debug("    parse('${myExtendedObjectClassName}');")
+
+      #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+
+      #if (!$database.isStopGenerateExtendedEntity())
+        #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+        #if (!$files.file(${generator.outputPath},$path).exists())
+          $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+        #end
+        $database.reflectAllExCopyright($path)
+      #end
+    #end
+  #end
+
   #if ($database.isSimpleDtoUseDtoMapper())
     #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
     $database.makeDirectory($path)
-  #end
 
-  #foreach ($table in $database.tables)
-    #if (!$table.isSql2EntityTypeSafeCursor())
-    #set ($myBaseObjectClassName = "${database.simpleDtoBaseDtoPrefix}${table.javaName}${database.simpleDtoBaseDtoSuffix}")
-    #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-    #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+    $database.enableDtoMapperOutputDirectory()
+    #foreach ($table in $database.tables)
+      #if (!$table.isSql2EntityTypeSafeCursor())
+        #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
+        #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
+        #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
-    $database.debug("    parse('${myExtendedObjectClassName}');")
-
-    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
-
-    #if (!$database.isStopGenerateExtendedEntity())
-      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+        $database.info("    parse('${myDtoMapperClassName}');")
+    
+        #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
       #end
-      $database.reflectAllExCopyright($path)
-    #end
-
-    #if ($database.isSimpleDtoUseDtoMapper())
-      #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
-    #end
     #end
   #end
   $database.debug("}")
+  $database.backToSql2EntityOutputDirectory()
 #end
 
 ## ===================================================================================
@@ -311,5 +321,5 @@ $database.debug("}")
     #end
   #end
   $database.debug("}")
-  $database.enableSql2EntityOutputDirectory()
+  $database.backToSql2EntityOutputDirectory()
 #end

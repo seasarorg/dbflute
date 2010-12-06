@@ -700,14 +700,34 @@ public class Database {
     //                                                                    Output Directory
     //                                                                    ================
     public void enableGenerateOutputDirectory() {
+        doEnableGenerateOutputDirectory(true);
+    }
+
+    public void backToGenerateOutputDirectory() {
+        doEnableGenerateOutputDirectory(false);
+    }
+
+    protected void doEnableGenerateOutputDirectory(boolean logging) {
         final String outputDirectory = getProperties().getBasicProperties().getGenerateOutputDirectory();
-        _log.info("...Setting up generateOutputDirectory: " + outputDirectory);
+        if (logging) {
+            _log.info("...Setting up generateOutputDirectory: " + outputDirectory);
+        }
         getGeneratorInstance().setOutputPath(outputDirectory);
     }
 
     public void enableSql2EntityOutputDirectory() {
+        doEnableSql2EntityOutputDirectory(true);
+    }
+
+    public void backToSql2EntityOutputDirectory() {
+        doEnableSql2EntityOutputDirectory(false);
+    }
+
+    protected void doEnableSql2EntityOutputDirectory(boolean logging) {
         final String outputDirectory = getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory();
-        _log.info("...Setting up sql2EntityOutputDirectory: " + outputDirectory);
+        if (logging) {
+            _log.info("...Setting up sql2EntityOutputDirectory: " + outputDirectory);
+        }
         getGeneratorInstance().setOutputPath(outputDirectory);
     }
 

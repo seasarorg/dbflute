@@ -138,25 +138,50 @@ public abstract class $myClassName implements Serializable {
 
     public int hashCode() {
         int result = 17;
-        result = result + "${table.name}".hashCode();
+        result = xCH(result, "${table.name}");
 #foreach ($col in $table.equalsHashcodeColumnList)
-        if (this.get${col.javaName}() != null) { result = result + get${col.javaName}().hashCode(); }
+        result = xCH(result, get${col.JavaName}());
 #end
         return result;
     }
+    protected int xCH(int result, Object value) { // calculateHashcode()
+        if (value == null) {
+            return result;
+        }
+        return (31 * result) + (value instanceof byte[] ? ((byte[]) value).length : value.hashCode());
+    }
 
     public String toString() {
-        final String delimiter = ",";
-        final StringBuilder sb = new StringBuilder();
-
-#foreach ($col in $table.Columns)
-        sb.append(delimiter).append(get${col.javaName}());
+        String c = ", ";
+        StringBuilder sb = new StringBuilder();
+#foreach ($col in $table.columns)
+#if ($col.isJavaNativeUtilDate())
+        sb.append(c).append(xfUD(get${col.javaName}()));
+#elseif ($col.isJavaNativeByteArray())
+        sb.append(c).append(xfBA(get${col.javaName}()));
+#else
+        sb.append(c).append(get${col.javaName}());
 #end
-
-        sb.delete(0, delimiter.length());
+#end
+        if (sb.length() > 0) { sb.delete(0, c.length()); }
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
+#if ($table.hasUtilDateColumn())
+    protected String xfUD(java.util.Date date) { // formatUtilDate()
+#if ($database.isDatabaseOracle())
+        String pattern = "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
+#else
+        String pattern = "yyyy-MM-dd";
+#end
+        return new java.text.SimpleDateFormat(pattern).format(date);
+    }
+#end
+#if ($table.hasByteArrayColumn())
+    protected String xfBA(byte[] bytes) { // formatByteArray()
+        return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
+    }
+#end
 
     // ===================================================================================
     //                                                                            Accessor
