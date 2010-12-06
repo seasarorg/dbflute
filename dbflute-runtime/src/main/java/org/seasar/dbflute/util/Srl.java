@@ -1675,19 +1675,19 @@ public class Srl {
     /**
      * Adjust initial character(s) as beans property. <br />
      * Basically same as initUncap() method except only when
-     * it starts with two upper case character, for example 'EMecha'
-     * @param resourceName The resource name for beans property that has'nt been adjusted yet. (NotNull)
+     * it starts with two upper case character, for example, 'EMecha'
+     * @param capitalizedName The capitalized name for beans property. (NotNull)
      * @return The name as beans property that initial is adjusted. (NotNull)
      */
-    public static String initBeansProp(String resourceName) { // according to Java Beans rule
-        assertObjectNotNull("resourceName", resourceName);
-        if (is_Null_or_TrimmedEmpty(resourceName)) {
-            return resourceName;
+    public static String initBeansProp(String capitalizedName) { // according to Java Beans rule
+        assertObjectNotNull("capitalizedName", capitalizedName);
+        if (is_Null_or_TrimmedEmpty(capitalizedName)) {
+            return capitalizedName;
         }
-        if (isInitTwoUpperCase(resourceName)) { // for example 'EMecha'
-            return resourceName;
+        if (isInitTwoUpperCase(capitalizedName)) { // for example, 'EMecha'
+            return capitalizedName;
         }
-        return initUncap(resourceName);
+        return initUncap(capitalizedName);
     }
 
     public static boolean isInitUpperCase(String str) {
