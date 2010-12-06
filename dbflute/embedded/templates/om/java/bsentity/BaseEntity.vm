@@ -487,7 +487,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #end
 #if ($table.isBuriTarget())
-    
+
     // ===================================================================================
     //                                                                      Buri Interface
     //                                                                      ==============
@@ -525,6 +525,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public int hashCode() {
         int result = 17;
+        result = xCH(result, getTableDbName());
 #foreach ($col in $table.equalsHashcodeColumnList)
         result = xCH(result, get${col.JavaName}());
 #end

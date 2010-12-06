@@ -78,6 +78,13 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
+cd ../../dbflute-flex-example/dbflute_exampledb
+rm ./log/*.log
+. jdbc.sh
+. doc.sh
+. generate.sh
+. sql2entity.sh
+
 cd ../../dbflute-ymir-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh

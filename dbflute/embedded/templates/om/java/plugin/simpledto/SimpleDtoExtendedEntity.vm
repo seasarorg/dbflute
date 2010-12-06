@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${myExtendedEntityPackageName};
 #set ($myClassName = "${myExtendedObjectClassName}")
 
+import ${myBaseEntityPackageName}.${myBaseObjectClassName};
+
 /**
  * The entity of ${table.name}.
  * <p>
@@ -9,7 +11,7 @@ ${database.allClassCopyright}package ${myExtendedEntityPackageName};
  * </p>
  * @author ${database.classAuthor}
  */
-public class $myClassName extends ${myBaseEntityPackageName}.${myBaseObjectClassName} {
+public class $myClassName extends ${myBaseObjectClassName} {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;

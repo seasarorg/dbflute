@@ -3,6 +3,9 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  */
@@ -35,43 +38,52 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                     Detail Property
-    //                                                                     ===============
-    // Unsupported yet
-    //    public String getOutputDirectory() {
-    //        final String value = (String)getDtoDefinitionMap().get("outputDirectory");
-    //        if (value == null) {
-    //            return getBasicProperties().getJavaDir();
-    //        }
-    //        return getBasicProperties().getJavaDir() + "/" + value;
-    //    }
+    //                                                                    Output Directory
+    //                                                                    ================
+    public String getSimpleDtoOutputDirectory() {
+        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
+        final String value = (String) getSimpleDtoDefinitionMap().get("simpleDtoOutputDirectory");
+        return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
+    }
 
+    public String getDtoMapperOutputDirectory() {
+        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
+        final String value = (String) getSimpleDtoDefinitionMap().get("dtoMapperOutputDirectory");
+        return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
+    }
+
+    // ===================================================================================
+    //                                                                            DTO Info
+    //                                                                            ========
     public String getBaseDtoPackage() {
-        return getDtoPropertyRequired("baseDtoPackage");
+        return getPropertyRequired("baseDtoPackage");
     }
 
     public String getExtendedDtoPackage() {
-        return getDtoPropertyRequired("extendedDtoPackage");
+        return getPropertyRequired("extendedDtoPackage");
     }
 
     public String getBaseDtoPrefix() {
-        return getDtoPropertyIfNullEmpty("baseDtoPrefix");
+        return getPropertyIfNullEmpty("baseDtoPrefix");
     }
 
     public String getBaseDtoSuffix() {
-        return getDtoPropertyIfNullEmpty("baseDtoSuffix");
+        return getPropertyIfNullEmpty("baseDtoSuffix");
     }
 
     public String getExtendedDtoPrefix() {
-        return getDtoPropertyIfNullEmpty("extendedDtoPrefix");
+        return getPropertyIfNullEmpty("extendedDtoPrefix");
     }
 
     public String getExtendedDtoSuffix() {
-        return getDtoPropertyIfNullEmpty("extendedDtoSuffix");
+        return getPropertyIfNullEmpty("extendedDtoSuffix");
     }
 
+    // ===================================================================================
+    //                                                                              Mapper
+    //                                                                              ======
     public String getMapperPackage() {
-        return getDtoPropertyIfNullEmpty("dtoMapperPackage");
+        return getPropertyIfNullEmpty("dtoMapperPackage");
     }
 
     public boolean isUseDtoMapper() {
@@ -79,8 +91,63 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return dtoMapperPackage != null && dtoMapperPackage.trim().length() > 0;
     }
 
-    protected String getDtoPropertyRequired(String key) {
-        final String value = getDtoProperty(key);
+    // ===================================================================================
+    //                                                                       Variable Name
+    //                                                                       =============
+    public String getVariableInitCharType() {
+        return getPropertyIfNullEmpty("variableInitCharType");
+    }
+
+    public boolean isVariableNonPrefix() {
+        return isProperty("isVariableNonPrefix", false);
+    }
+
+    public String buildVariableName(String javaName) {
+        final String variableInitCharType = getVariableInitCharType();
+        final boolean nonPrefix = isVariableNonPrefix();
+        return doBuildVariableName(javaName, variableInitCharType, nonPrefix);
+    }
+
+    protected static String doBuildVariableName(String javaName, String variableInitCharType, boolean nonPrefix) {
+        final String defaultType = "UNCAP";
+        if (Srl.is_Null_or_TrimmedEmpty(variableInitCharType)) {
+            variableInitCharType = defaultType;
+        }
+        if (Srl.equalsIgnoreCase(variableInitCharType, "BEANS")) {
+            return doBuildVariableName(javaName, true, false, nonPrefix);
+        } else if (Srl.equalsIgnoreCase(variableInitCharType, "CAP")) {
+            return doBuildVariableName(javaName, false, true, nonPrefix);
+        } else if (Srl.equalsIgnoreCase(variableInitCharType, defaultType)) {
+            return doBuildVariableName(javaName, false, false, nonPrefix);
+        } else {
+            String msg = "Unknown variableInitCharType: " + variableInitCharType;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected static String doBuildVariableName(String javaName, boolean initBeansProp, boolean initCap,
+            boolean nonPrefix) {
+        String name = javaName;
+        if (initBeansProp) {
+            name = Srl.initBeansProp(name);
+        } else {
+            if (initCap) {
+                name = Srl.initCap(name);
+            } else {
+                name = Srl.initUncap(name);
+            }
+        }
+        if (!nonPrefix) {
+            name = Srl.connectPrefix(name, "_", "");
+        }
+        return name;
+    }
+
+    // ===================================================================================
+    //                                                                     Property Helper
+    //                                                                     ===============
+    protected String getPropertyRequired(String key) {
+        final String value = getProperty(key);
         if (value == null || value.trim().length() == 0) {
             String msg = "The property '" + key + "' should not be null or empty:";
             msg = msg + " simpleDtoDefinitionMap=" + getSimpleDtoDefinitionMap();
@@ -89,16 +156,19 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return value;
     }
 
-    protected String getDtoPropertyIfNullEmpty(String key) {
-        final String value = getDtoProperty(key);
+    protected String getPropertyIfNullEmpty(String key) {
+        final String value = getProperty(key);
         if (value == null) {
             return "";
         }
         return value;
     }
 
-    protected String getDtoProperty(String key) {
-        final String value = (String) getSimpleDtoDefinitionMap().get(key);
-        return value;
+    protected String getProperty(String key) {
+        return (String) getSimpleDtoDefinitionMap().get(key);
+    }
+
+    protected boolean isProperty(String key, boolean defaultValue) {
+        return isProperty(key, defaultValue, getSimpleDtoDefinitionMap());
     }
 }

@@ -722,6 +722,18 @@ public class Database {
         getGeneratorInstance().setOutputPath(outputDirectory);
     }
 
+    public void enableSimpleDtoOutputDirectory() {
+        final String outputDirectory = getProperties().getSimpleDtoProperties().getSimpleDtoOutputDirectory();
+        _log.info("...Setting up simpleDtoOutputDirectory: " + outputDirectory);
+        getGeneratorInstance().setOutputPath(outputDirectory);
+    }
+
+    public void enableDtoMapperOutputDirectory() {
+        final String outputDirectory = getProperties().getSimpleDtoProperties().getDtoMapperOutputDirectory();
+        _log.info("...Setting up dtoMapperOutputDirectory: " + outputDirectory);
+        getGeneratorInstance().setOutputPath(outputDirectory);
+    }
+
     public void enableFlexDtoOutputDirectory() {
         final String outputDirectory = getProperties().getFlexDtoProperties().getOutputDirectory();
         _log.info("...Setting up flexDtoOutputDirectory: " + outputDirectory);

@@ -2233,6 +2233,13 @@ public class Column {
     }
 
     // ===================================================================================
+    //                                                                          Simple DTO
+    //                                                                          ==========
+    public String getSimpleDtoVariableName() {
+        return getProperties().getSimpleDtoProperties().buildVariableName(getJavaName());
+    }
+
+    // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============
     private String _behaviorFilterBeforeInsertColumnExpression;

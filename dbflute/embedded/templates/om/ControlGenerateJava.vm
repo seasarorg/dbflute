@@ -451,7 +451,7 @@ $database.info(" ")
 ##                                                                          Simple Dto
 ##                                                                          ==========
 #if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
-  $database.info("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
+  $database.info("parseSimpleDto() { // mapper=$database.isSimpleDtoUseDtoMapper()")
   #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}")
   #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}")
   #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}")
@@ -469,10 +469,11 @@ $database.info(" ")
   #end
 
   #foreach ($table in $database.tables)
-    #set ($myBaseObjectClassName = "${database.simpleDtoBaseDtoPrefix}${table.javaName}${database.simpleDtoBaseDtoSuffix}")
-    #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
+    #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
+    #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
     #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
+    $database.enableSimpleDtoOutputDirectory()
     $database.info("    parse('${myExtendedObjectClassName}');")
 
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
@@ -486,12 +487,14 @@ $database.info(" ")
       $database.reflectAllExCopyright($path)
     #end
 
+    $database.enableDtoMapperOutputDirectory()
     #if ($database.isSimpleDtoUseDtoMapper())
       #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
     #end
   #end
   $database.info("}")
+  $database.enableGenerateOutputDirectory()
 #end
 
 ## ===================================================================================

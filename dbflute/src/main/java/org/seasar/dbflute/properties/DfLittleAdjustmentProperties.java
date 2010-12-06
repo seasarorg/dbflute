@@ -43,7 +43,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isProperty(String key, boolean defaultValue) {
-        return isPropertyIfNotBuildProp(key, defaultValue, getLittleAdjustmentMap());
+        return isPropertyIfNotExistsFromBuildProp(key, defaultValue, getLittleAdjustmentMap());
     }
 
     // ===================================================================================

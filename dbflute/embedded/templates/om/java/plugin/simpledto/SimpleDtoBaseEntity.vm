@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+import java.io.Serializable;
 #if ($table.hasReferrerAsMany())
 import java.util.*;
 #end
@@ -10,7 +11,10 @@ import ${myExtendedEntityPackageName}.*;
 #end
 
 /**
- * The simple DTO of ${table.basicInfoDispString}.
+ * The simple DTO of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
@@ -41,7 +45,7 @@ import ${myExtendedEntityPackageName}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class $myClassName implements java.io.Serializable {
+public abstract class $myClassName implements Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -53,8 +57,8 @@ public abstract class $myClassName implements java.io.Serializable {
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($col in $table.columns)
-    /** The value of ${col.javaBeansRulePropertyName}. {${col.columnDefinitionLineDisp}} */
-    protected ${col.javaNative} _${col.uncapitalisedJavaName};
+    /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
+    protected ${col.javaNative} ${col.simpleDtoVariableName};
 
 #end
     // ===================================================================================
@@ -66,73 +70,42 @@ public abstract class $myClassName implements java.io.Serializable {
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
-#set ($foreignKeysIndex = 0)
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
-#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKey.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
-    /** The entity of foreign table. */
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
+#set ($foreignVariableName = "${fk.simpleDtoForeignVariableName}")
     protected ${foreignEntityClassName} ${foreignVariableName};
 
-    /**
-     * Get the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}. {without lazyload}
-     * @return The entity of foreign table. (Nullable: If the foreign key does not have NotNull-constraint, please check null.)
-     */
-    public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
-    /**
-     * Set the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}.
-     * @param ${foreignKey.foreignPropertyName} The entity of foreign table. (Nullable)
-     */
-    public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
-        this.${foreignVariableName} = ${foreignKey.foreignPropertyName};
+    public void set${fk.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${fk.foreignPropertyName}) {
+        this.${foreignVariableName} = ${fk.foreignPropertyName};
     }
 
 #end
-#foreach ($referrer in $table.referrers)
-#set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-#if (${referrer.isOneToOne()})
-    /** The entity of referrer-as-one table. */
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedSimpleDtoClassName}")
+#set ($referrerVariableName = "${referrer.simpleDtoReferrerAsOneVariableName}")
     protected ${referrerEntityClassName} ${referrerVariableName};
 
-    /**
-     * Get the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}. {without lazy-load} <br />
-     * @return The entity of referrer-as-one table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
-     * @exception IllegalStateException When the size of the referrer table list is duplicate.
-     */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
         return ${referrerVariableName};
     }
 
-    /**
-     * Set the entity of referrer-as-one table of ${referrer.referrerPropertyNameAsOne}.
-     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of referrer-as-one table. (Nullable)
-     */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
-        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+        this.${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
 
-#set ($foreignKeysIndex = $foreignKeysIndex + 1)
-#end
 #end
     // ===================================================================================
     //                                                                      Referrer Table
     //                                                                      ==============
-#foreach ($referrer in $table.referrers)
-#set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($referrerVariableName = "${referrer.referrerPropertyName}")
-#if (!${referrer.isOneToOne()})
-    /** The list of referrer table '${referrer.table.name}'. */
+#foreach ($referrer in $table.referrerAsManyList)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedSimpleDtoClassName}")
+#set ($referrerVariableName = "${referrer.simpleDtoReferrerVariableName}")
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
-    /**
-     * Get the list of referrer table. {without lazyload} <br />
-     * @return The list of referrer table. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
-     */
     public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
 #if (!$database.isOneToManyReturnNullIfNonSelect())
         if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
@@ -140,29 +113,20 @@ public abstract class $myClassName implements java.io.Serializable {
         return ${referrerVariableName};
     }
 
-    /**
-     * Set the list of referrer table.
-     * @param ${referrer.referrerPropertyName} The list of referrer table. (Nullable)
-     */
     public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
-        ${referrerVariableName} = ${referrer.referrerPropertyName};
+        this.${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
-#end
 #end
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-#if ($table.hasPrimaryKey())
-    /**
-     * ${database.overrideComment}
-     */
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.primaryKey)
-        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
+#foreach ($col in $table.equalsHashcodeColumnList)
+        if (!helpComparingValue(get${col.javaName}(), otherEntity.get${col.javaName}())) { return false; }
 #end
         return true;
     }
@@ -172,56 +136,21 @@ public abstract class $myClassName implements java.io.Serializable {
         return value1 != null && value2 != null && value1.equals(value2);
     }
 
-    /**
-     * ${database.overrideComment}
-     */
     public int hashCode() {
-        int result = 0;
-#foreach ($col in $table.primaryKey)
-        if (this.get${col.JavaName}() != null) { result = result + get${col.JavaName}().hashCode(); }
+        int result = 17;
+        result = result + "${table.name}".hashCode();
+#foreach ($col in $table.equalsHashcodeColumnList)
+        if (this.get${col.javaName}() != null) { result = result + get${col.javaName}().hashCode(); }
 #end
         return result;
     }
 
-#else
-    /**
-     * ${database.overrideComment}
-     */
-    public boolean equals(Object other) {
-        if (other == null || !(other instanceof $myClassName)) { return false; }
-        final $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.columns)
-        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
-#end
-        return true;
-    }
-
-    protected boolean helpComparingValue(Object value1, Object value2) {
-        if (value1 == null && value2 == null) { return true; }
-        return value1 != null && value2 != null && value1.equals(value2);
-    }
-
-    /**
-     * ${database.overrideComment}
-     */
-    public int hashCode() {
-        int result = 0;
-#foreach ($col in $table.columns)
-        if (this.get${col.JavaName}() != null) { result = result + this.get${col.JavaName}().hashCode(); }
-#end
-        return result;
-    }
-#end
-
-    /**
-     * ${database.overrideComment}
-     */
     public String toString() {
         final String delimiter = ",";
         final StringBuilder sb = new StringBuilder();
 
 #foreach ($col in $table.Columns)
-        sb.append(delimiter).append(get${col.JavaName}());
+        sb.append(delimiter).append(get${col.javaName}());
 #end
 
         sb.delete(0, delimiter.length());
@@ -234,21 +163,25 @@ public abstract class $myClassName implements java.io.Serializable {
     //                                                                            ========
 #foreach ($col in $table.columns)
     /**
-     * Get the value of ${col.UncapitalisedJavaName}. <br />
-     * {${col.columnDefinitionLineDisp}}
-     * @return The value of ${col.UncapitalisedJavaName}. (Nullable)
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     * @return The value of the column '${col.name}'. (Nullable)
      */
-    public ${col.JavaNative} get${col.JavaName}() {
-        return _${col.uncapitalisedJavaName};
+    public ${col.javaNative} get${col.javaName}() {
+        return ${col.simpleDtoVariableName};
     }
 
     /**
-     * Set the value of ${col.UncapitalisedJavaName}. <br />
-     * {${col.columnDefinitionLineDisp}}
-     * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
-    public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
-        this._${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
+    public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
+        this.${col.simpleDtoVariableName} = ${col.uncapitalisedJavaName};
     }
 
 #end

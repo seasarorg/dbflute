@@ -322,12 +322,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                                     OutputDirectory
     //                                                                     ===============
     public String getSql2EntityOutputDirectory() {
+        final String defaultDir = getBasicProperties().getGenerateOutputDirectory();
         final String value = (String) getOutsideSqlDefinitionMap().get("sql2EntityOutputDirectory");
-        if (value == null || value.trim().length() == 0) {
-            return getBasicProperties().getGenerateOutputDirectory();
-        } else {
-            return value;
-        }
+        return value != null && value.trim().length() > 0 ? value : defaultDir;
     }
 
     // ===================================================================================

@@ -82,6 +82,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -1738,8 +1739,8 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                            Class Name
-    //                                            ----------
+    //                                       Base Class Name
+    //                                       ---------------
     public String getBaseEntityClassName() {
         final String projectPrefix = getDatabase().getProjectPrefix();
         final String basePrefix = getDatabase().getBasePrefix();
@@ -1774,6 +1775,9 @@ public class Table {
         return getBaseEntityClassName() + "CQ";
     }
 
+    // -----------------------------------------------------
+    //                                   Extended Class Name
+    //                                   -------------------
     public String getExtendedEntityClassName() {
         final String projectPrefix = getDatabase().getProjectPrefix();
         return buildExtendedEntityClassName(projectPrefix);
@@ -2671,6 +2675,23 @@ public class Table {
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                          Simple DTO
+    //                                                                          ==========
+    public String getBaseSimpleDtoClassName() {
+        final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
+        final String prefix = prop.getBaseDtoPrefix();
+        final String suffix = prop.getBaseDtoSuffix();
+        return prefix + getJavaName() + suffix;
+    }
+
+    public String getExtendedSimpleDtoClassName() {
+        final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
+        final String prefix = prop.getExtendedDtoPrefix();
+        final String suffix = prop.getExtendedDtoSuffix();
+        return prefix + getJavaName() + suffix;
     }
 
     // ===================================================================================

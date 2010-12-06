@@ -188,6 +188,10 @@ public class ForeignKey {
         return getForeignTable().getNestSelectSetupperTerminalClassName();
     }
 
+    public String getForeignTableExtendedSimpleDtoClassName() {
+        return getForeignTable().getExtendedSimpleDtoClassName();
+    }
+
     // -----------------------------------------------------
     //                                   Referrer Class Name
     //                                   -------------------
@@ -217,6 +221,10 @@ public class ForeignKey {
 
     public String getReferrerTableNestSelectSetupperTerminalClassName() {
         return getTable().getNestSelectSetupperTerminalClassName();
+    }
+
+    public String getReferrerTableExtendedSimpleDtoClassName() {
+        return getTable().getExtendedSimpleDtoClassName();
     }
 
     // ===================================================================================
@@ -1175,6 +1183,40 @@ public class ForeignKey {
     }
 
     // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfClassificationProperties getClassificationProperties() {
+        return getProperties().getClassificationProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    // ===================================================================================
+    //                                                                          Simple DTO
+    //                                                                          ==========
+    public String getSimpleDtoForeignVariableName() {
+        return getProperties().getSimpleDtoProperties().buildVariableName(getForeignPropertyNameInitCap());
+    }
+
+    public String getSimpleDtoReferrerAsOneVariableName() {
+        return getProperties().getSimpleDtoProperties().buildVariableName(getReferrerPropertyNameAsOneInitCap());
+    }
+
+    public String getSimpleDtoReferrerVariableName() {
+        return getProperties().getSimpleDtoProperties().buildVariableName(getReferrerPropertyNameInitCap());
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {
@@ -1191,21 +1233,6 @@ public class ForeignKey {
 
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
-    }
-
-    // ===================================================================================
-    //                                                                          Properties
-    //                                                                          ==========
-    protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
-    }
-
-    protected DfClassificationProperties getClassificationProperties() {
-        return DfBuildProperties.getInstance().getClassificationProperties();
-    }
-
-    protected DfDocumentProperties getDocumentProperties() {
-        return DfBuildProperties.getInstance().getDocumentProperties();
     }
 
     // ===================================================================================

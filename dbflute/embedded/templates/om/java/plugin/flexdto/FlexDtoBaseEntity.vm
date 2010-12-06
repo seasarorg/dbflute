@@ -61,7 +61,7 @@ public class $myClassName {
     }
 
     public function set ${foreignKey.foreignJavaBeansRulePropertyName}(${foreignKey.foreignPropertyName}:${foreignEntityClassName}):void {
-        ${foreignVariableName} = ${foreignKey.foreignPropertyName};
+        this.${foreignVariableName} = ${foreignKey.foreignPropertyName};
     }
 
 #end
@@ -76,7 +76,7 @@ public class $myClassName {
     }
 
     public function set ${referrer.referrerJavaBeansRulePropertyNameAsOne}(${referrer.referrerJavaBeansRulePropertyNameAsOne}:${referrerEntityClassName}):void {
-        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+        this.${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
 #end
 #end

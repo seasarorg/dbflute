@@ -165,7 +165,8 @@ public abstract class DfAbstractHelperProperties {
         return defaultValue;
     }
 
-    public boolean isPropertyIfNotBuildProp(String key, boolean defaultValue, Map<String, ? extends Object> map) {
+    public boolean isPropertyIfNotExistsFromBuildProp(String key, boolean defaultValue,
+            Map<String, ? extends Object> map) {
         Object obj = map.get(key);
         if (obj == null) {
             final String anotherKey = deriveBooleanAnotherKey(key);

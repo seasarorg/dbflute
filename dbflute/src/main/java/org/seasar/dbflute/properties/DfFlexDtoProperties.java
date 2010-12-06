@@ -40,12 +40,52 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
         return !getFlexDtoDefinitionMap().isEmpty();
     }
 
-    public boolean isOverrideExtended() {
-        return isDtoProperty("overrideExtended");
+    // ===================================================================================
+    //                                                                    Output Directory
+    //                                                                    ================
+    /**
+     * @return The directory for output. (NotNull)
+     */
+    public String getOutputDirectory() {
+        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
+        final String value = (String) getFlexDtoDefinitionMap().get("outputDirectory");
+        return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
     }
 
-    public boolean isBindable(String tableName) {
-        return isDtoProperty("bindable") && !isBindableTableExcept(tableName);
+    // ===================================================================================
+    //                                                                          Native Map
+    //                                                                          ==========
+    public Map<String, String> getJavaToFlexNativeMap() {
+        final Map<String, Object> map = getDtoPropertyMap("javaToFlexNativeMap");
+        if (map == null) {
+            return new LinkedHashMap<String, String>();
+        }
+        final Set<String> keySet = map.keySet();
+        final LinkedHashMap<String, String> resultMap = new LinkedHashMap<String, String>();
+        for (String key : keySet) {
+            String value = (String) map.get(key);
+            resultMap.put(key, value);
+        }
+        return resultMap;
+    }
+
+    // ===================================================================================
+    //                                                                       Target/Except
+    //                                                                       =============
+    public List<String> getBindableTableTargetList() {
+        final List<String> ls = getDtoPropertyList("bindableTableTargetList");
+        if (ls == null) {
+            return new ArrayList<String>();
+        }
+        return ls;
+    }
+
+    public List<String> getBindableTableExceptList() {
+        final List<String> ls = getDtoPropertyList("bindableTableExceptList");
+        if (ls == null) {
+            return new ArrayList<String>();
+        }
+        return ls;
     }
 
     protected boolean isBindableTableExcept(final String tableName) {
@@ -63,78 +103,45 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                     Detail Property
-    //                                                                     ===============
-    /**
-     * @return The directory for output. (NotNull)
-     */
-    public String getOutputDirectory() {
-        final String value = (String) getFlexDtoDefinitionMap().get("outputDirectory");
-        if (value == null) {
-            return getBasicProperties().getGenerateOutputDirectory();
-        }
-        return getBasicProperties().getGenerateOutputDirectory() + "/" + value;
-    }
-
-    public Map<String, String> getJavaToFlexNativeMap() {
-        final Map<String, Object> map = getDtoPropertyMap("javaToFlexNativeMap");
-        if (map == null) {
-            return new LinkedHashMap<String, String>();
-        }
-        final Set<String> keySet = map.keySet();
-        final LinkedHashMap<String, String> resultMap = new LinkedHashMap<String, String>();
-        for (String key : keySet) {
-            String value = (String) map.get(key);
-            resultMap.put(key, value);
-        }
-        return resultMap;
-    }
-
-    public List<String> getBindableTableTargetList() {
-        final List<String> ls = getDtoPropertyList("bindableTableTargetList");
-        if (ls == null) {
-            return new ArrayList<String>();
-        }
-        return ls;
-    }
-
-    public List<String> getBindableTableExceptList() {
-        final List<String> ls = getDtoPropertyList("bindableTableExceptList");
-        if (ls == null) {
-            return new ArrayList<String>();
-        }
-        return ls;
-    }
-
+    //                                                                            DTO Info
+    //                                                                            ========
     public String getBaseDtoPackage() {
-        return getDtoPropertyAsRequired("baseDtoPackage");
+        return getPropertyAsRequired("baseDtoPackage");
     }
 
     public String getExtendedDtoPackage() {
-        return getDtoPropertyAsRequired("extendedDtoPackage");
+        return getPropertyAsRequired("extendedDtoPackage");
     }
 
     public String getBaseDtoPrefix() {
-        return getDtoPropertyIfNullEmpty("baseDtoPrefix");
+        return getPropertyIfNullEmpty("baseDtoPrefix");
     }
 
     public String getBaseDtoSuffix() {
-        return getDtoPropertyIfNullEmpty("baseDtoSuffix");
+        return getPropertyIfNullEmpty("baseDtoSuffix");
     }
 
     public String getExtendedDtoPrefix() {
-        return getDtoPropertyIfNullEmpty("extendedDtoPrefix");
+        return getPropertyIfNullEmpty("extendedDtoPrefix");
     }
 
     public String getExtendedDtoSuffix() {
-        return getDtoPropertyIfNullEmpty("extendedDtoSuffix");
+        return getPropertyIfNullEmpty("extendedDtoSuffix");
+    }
+
+    public boolean isOverrideExtended() {
+        return isProperty("isOverrideExtended", false);
+    }
+
+    public boolean isBindable(String tableName) {
+        return isProperty("isBindable", false) && !isBindableTableExcept(tableName);
     }
 
     // ===================================================================================
     //                                                                     Property Helper
     //                                                                     ===============
-    protected String getDtoPropertyAsRequired(String key) {
-        final String value = getDtoProperty(key);
+    protected String getPropertyAsRequired(String key) {
+        final String value = getProperty(key);
         if (value == null || value.trim().length() == 0) {
             String msg = "The property '" + key + "' should not be null or empty:";
             msg = msg + " flexDtoDefinitionMap=" + getFlexDtoDefinitionMap();
@@ -143,22 +150,20 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
         return value;
     }
 
-    protected String getDtoPropertyIfNullEmpty(String key) {
-        final String value = getDtoProperty(key);
+    protected String getPropertyIfNullEmpty(String key) {
+        final String value = getProperty(key);
         if (value == null) {
             return "";
         }
         return value;
     }
 
-    protected String getDtoProperty(String key) {
-        final String value = (String) getFlexDtoDefinitionMap().get(key);
-        return value;
+    protected String getProperty(String key) {
+        return (String) getFlexDtoDefinitionMap().get(key);
     }
 
-    protected boolean isDtoProperty(String key) {
-        final String value = (String) getFlexDtoDefinitionMap().get(key);
-        return value != null && value.trim().equalsIgnoreCase("true");
+    protected boolean isProperty(String key, boolean defaultValue) {
+        return isProperty(key, defaultValue, getFlexDtoDefinitionMap());
     }
 
     @SuppressWarnings("unchecked")
