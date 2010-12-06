@@ -1299,11 +1299,11 @@ public class Table {
         return hasForeignKey() || hasReferrerAsOne();
     }
 
-    public boolean hasTwoOrMoreKeyReferrer() {
-        return xhasTwoOrMoreKeyReferrer(getPrimaryKey()) || xhasTwoOrMoreKeyReferrer(getUniqueColumnList());
+    public boolean hasCompoundKeyReferrer() {
+        return doHasCompoundKeyReferrer(getPrimaryKey()) || doHasCompoundKeyReferrer(getUniqueColumnList());
     }
 
-    protected boolean xhasTwoOrMoreKeyReferrer(List<Column> columnList) {
+    protected boolean doHasCompoundKeyReferrer(List<Column> columnList) {
         for (Column col : columnList) {
             for (ForeignKey referrer : col.getReferrers()) {
                 if (!referrer.isSimpleKeyFK()) {

@@ -607,12 +607,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
 #end
-#if (${table.hasTwoOrMoreKeyReferrer()})
+#if (${table.hasCompoundKeyReferrer()})
     // ===================================================================================
-    //                                                    Two-or-More PK's Exists Referrer
-    //                                                    ================================
+    //                                                       Compound PK's Exists Referrer
+    //                                                       =============================
 #foreach ($referrer in $table.referrerList)
-#if (${referrer.isTwoOrMoreKeyFK()})
+#if (${referrer.isCompoundFK()})
 #set ($tmpJavaName = "TwoOrMorePk")
 #set ($tmpUncapitalisedJavaName = "twoOrMorePk")
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")

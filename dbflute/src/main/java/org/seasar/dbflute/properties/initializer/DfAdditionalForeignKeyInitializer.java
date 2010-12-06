@@ -174,17 +174,23 @@ public class DfAdditionalForeignKeyInitializer {
     }
 
     protected void processImplicitReverseForeignKey(Table table, Table foreignTable, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) {
+            List<String> foreignColumnNameList) { // called only when a fixed condition exists 
         // name is "FK_ + foreign + local" because it's reversed
         final String reverseName = "FK_" + foreignTable.getName() + table.getName();
         final ForeignKey fk = createAdditionalForeignKey(reverseName, table.getName(), foreignColumnNameList,
                 localColumnNameList, null, null, null);
+        final List<Column> primaryKey = table.getPrimaryKey();
+        if (localColumnNameList.size() != primaryKey.size()) {
+            return; // may be biz-many-to-one (not biz-one-to-one)
+        }
         for (String localColumnName : localColumnNameList) {
             final Column localColumn = table.getColumn(localColumnName);
             if (!localColumn.isPrimaryKey()) { // check PK just in case
-                return;
+                return; // basically no way because a fixed condition exists
+                // and FK to unique key is unsupported
             }
         }
+        // here all local columns are elements of primary key
         if (foreignTable.existsForeignKey(table.getName(), foreignColumnNameList, localColumnNameList, null)) {
             return;
         }
@@ -195,8 +201,8 @@ public class DfAdditionalForeignKeyInitializer {
                 final Column localColumn = table.getColumn(localColumnName);
                 localColumn.addReferrer(fk);
             }
+            _log.info("  *Reversed FK was also made implicitly");
         }
-        _log.info("  *Reversed FK was also made implicitly");
     }
 
     protected ForeignKey createAdditionalForeignKey(String foreignKeyName, String foreignTableName,

@@ -258,7 +258,7 @@ public class ForeignKey {
         return _localColumns.size() == 1;
     }
 
-    public boolean isTwoOrMoreKeyFK() {
+    public boolean isCompoundFK() {
         return _localColumns.size() > 1;
     }
 
@@ -273,6 +273,7 @@ public class ForeignKey {
         return isForeignColumnPrimaryKey() || isForeignColumnUnique();
 
         // *reference to unique key is unsupported basically
+        //  (a-little-supported)
     }
 
     /**
