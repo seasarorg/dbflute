@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -116,18 +117,21 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         bmd.setModifiedPropertySupport(new TnModifiedPropertySupport() {
             @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
-                DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
-                final String propertyName = "modifiedPropertyNames";
-                if (!beanDesc.hasPropertyDesc(propertyName)) {
-                    return Collections.EMPTY_SET;
+                if (bean instanceof Entity) { // all entities of DBFlute are here
+                    return ((Entity) bean).modifiedProperties();
                 } else {
-                    final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
-                    final Object value = propertyDesc.getValue(bean);
-                    final Set<String> names = (Set<String>) value;
-                    return names;
+                    final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
+                    final String propertyName = "modifiedPropertyNames"; // S2Dao's specification
+                    if (!beanDesc.hasPropertyDesc(propertyName)) {
+                        return Collections.EMPTY_SET;
+                    } else {
+                        final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
+                        final Object value = propertyDesc.getValue(bean);
+                        final Set<String> names = (Set<String>) value;
+                        return names;
+                    }
                 }
             }
-
         });
 
         return bmd;
