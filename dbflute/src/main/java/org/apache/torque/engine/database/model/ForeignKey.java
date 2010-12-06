@@ -1205,15 +1205,15 @@ public class ForeignKey {
     //                                                                          Simple DTO
     //                                                                          ==========
     public String getSimpleDtoForeignVariableName() {
-        return getProperties().getSimpleDtoProperties().buildVariableName(getForeignPropertyNameInitCap());
+        return getProperties().getSimpleDtoProperties().buildFieldName(getForeignPropertyNameInitCap());
     }
 
     public String getSimpleDtoReferrerAsOneVariableName() {
-        return getProperties().getSimpleDtoProperties().buildVariableName(getReferrerPropertyNameAsOneInitCap());
+        return getProperties().getSimpleDtoProperties().buildFieldName(getReferrerPropertyNameAsOneInitCap());
     }
 
     public String getSimpleDtoReferrerVariableName() {
-        return getProperties().getSimpleDtoProperties().buildVariableName(getReferrerPropertyNameInitCap());
+        return getProperties().getSimpleDtoProperties().buildFieldName(getReferrerPropertyNameInitCap());
     }
 
     // ===================================================================================

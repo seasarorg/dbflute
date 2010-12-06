@@ -2236,7 +2236,7 @@ public class Column {
     //                                                                          Simple DTO
     //                                                                          ==========
     public String getSimpleDtoVariableName() {
-        return getProperties().getSimpleDtoProperties().buildVariableName(getJavaName());
+        return getProperties().getSimpleDtoProperties().buildFieldName(getJavaName());
     }
 
     // ===================================================================================

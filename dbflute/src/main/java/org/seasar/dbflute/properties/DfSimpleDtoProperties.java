@@ -92,41 +92,40 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                       Variable Name
-    //                                                                       =============
-    public String getVariableInitCharType() {
-        return getPropertyIfNullEmpty("variableInitCharType");
+    //                                                                          Field Name
+    //                                                                          ==========
+    public String getFieldInitCharType() {
+        return getPropertyIfNullEmpty("fieldInitCharType");
     }
 
-    public boolean isVariableNonPrefix() {
-        return isProperty("isVariableNonPrefix", false);
+    public boolean isFieldNonPrefix() {
+        return isProperty("isFieldNonPrefix", false);
     }
 
-    public String buildVariableName(String javaName) {
-        final String variableInitCharType = getVariableInitCharType();
-        final boolean nonPrefix = isVariableNonPrefix();
-        return doBuildVariableName(javaName, variableInitCharType, nonPrefix);
+    public String buildFieldName(String javaName) {
+        final String fieldInitCharType = getFieldInitCharType();
+        final boolean nonPrefix = isFieldNonPrefix();
+        return doBuildFieldName(javaName, fieldInitCharType, nonPrefix);
     }
 
-    protected static String doBuildVariableName(String javaName, String variableInitCharType, boolean nonPrefix) {
+    protected static String doBuildFieldName(String javaName, String fieldInitCharType, boolean nonPrefix) {
         final String defaultType = "UNCAP";
-        if (Srl.is_Null_or_TrimmedEmpty(variableInitCharType)) {
-            variableInitCharType = defaultType;
+        if (Srl.is_Null_or_TrimmedEmpty(fieldInitCharType)) {
+            fieldInitCharType = defaultType;
         }
-        if (Srl.equalsIgnoreCase(variableInitCharType, "BEANS")) {
-            return doBuildVariableName(javaName, true, false, nonPrefix);
-        } else if (Srl.equalsIgnoreCase(variableInitCharType, "CAP")) {
-            return doBuildVariableName(javaName, false, true, nonPrefix);
-        } else if (Srl.equalsIgnoreCase(variableInitCharType, defaultType)) {
-            return doBuildVariableName(javaName, false, false, nonPrefix);
+        if (Srl.equalsIgnoreCase(fieldInitCharType, "BEANS")) {
+            return doBuildFieldName(javaName, true, false, nonPrefix);
+        } else if (Srl.equalsIgnoreCase(fieldInitCharType, "CAP")) {
+            return doBuildFieldName(javaName, false, true, nonPrefix);
+        } else if (Srl.equalsIgnoreCase(fieldInitCharType, defaultType)) {
+            return doBuildFieldName(javaName, false, false, nonPrefix);
         } else {
-            String msg = "Unknown variableInitCharType: " + variableInitCharType;
+            String msg = "Unknown fieldInitCharType: " + fieldInitCharType;
             throw new DfIllegalPropertySettingException(msg);
         }
     }
 
-    protected static String doBuildVariableName(String javaName, boolean initBeansProp, boolean initCap,
-            boolean nonPrefix) {
+    protected static String doBuildFieldName(String javaName, boolean initBeansProp, boolean initCap, boolean nonPrefix) {
         String name = javaName;
         if (initBeansProp) {
             name = Srl.initBeansProp(name);
