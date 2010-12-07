@@ -10,6 +10,7 @@ ${table.aliasExpression}${table.name}
 <table summary="Columns in ${table.name}">
 	<thead>
 	<tr>
+		<th class="rownumhead">No.</th>
 		<th>PK</th>
 		<th>ID</th>
 		<th>UQ</th>
@@ -30,8 +31,10 @@ ${table.aliasExpression}${table.name}
 		<th>${table.database.targetLanguageInitCap}Type</th>
 	</tr>
 	</thead>
+#set ($rownum = 1)
 #foreach ($col in $table.columns)
 	<tr>
+		<td class="rownumcell">${rownum}</td>
 		<td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end"${col.primaryKeyTitleForSchemaHtml}>${col.primaryKeyMarkForSchemaHtml}</td>
 		<td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
 		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
@@ -51,5 +54,6 @@ ${table.aliasExpression}${table.name}
 		<td class="subcell">${col.javaBeansRulePropertyName}</td>
 		<td class="subcell">${col.javaNativeRemovedPackage}</td>
 	</tr>
+#set ($rownum = $rownum + 1)
 #end
 </table>

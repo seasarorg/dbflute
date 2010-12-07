@@ -73,6 +73,15 @@
 		border-left: 1px solid #555;
 		padding:2px;
 	}
+	.rownumhead {
+		text-align: center;
+		font-size: 0.4em;
+	}
+	.rownumcell {
+		text-align: center;
+		font-size: 0.4em;
+		color: #444;
+	}
 	.schemacell {
 		font-size: 0.8em;
 		white-space: nowrap;
@@ -88,6 +97,7 @@
 	}
 	.numcell {
 		text-align: center;
+		font-size: 0.8em;
 	}
 	.linkcell {
 		font-size: 0.8em;
@@ -209,6 +219,7 @@
 <table summary="Tables in the Schema">
 	<thead>
 	<tr>
+		<th class="rownumhead">No.</th>
 #if ($database.hasAdditionalSchema())
 		<th>Schema</th>
 #end
@@ -224,8 +235,10 @@
 	</tr>
 	</thead>
 	<tbody>
+#set ($rownum = 1)
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
+		<td class="rownumcell">${rownum}</td>
 #if ($database.hasAdditionalSchema())
 		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
 #end
@@ -239,6 +252,7 @@
 		<td class="commentcell">#if ($table.hasComment()) ${table.commentForSchemaHtml}#else &nbsp;#end</td>
 		<td class="subcell">${table.javaName}</td>
 	</tr>
+#set ($rownum = $rownum + 1)
 #end
 	</tbody>
 </table>
