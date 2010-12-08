@@ -50,8 +50,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
     protected boolean analyzeByDatabaseDependencyMeta(DfTableMetaInfo tableInfo, DfColumnMetaInfo primaryKeyColumnInfo) {
         if (isDatabaseSybase()) {
-            final String defaultValue = primaryKeyColumnInfo.getDefaultValue();
-            return "autoincrement".equalsIgnoreCase(defaultValue);
+            return primaryKeyColumnInfo.isSybaseAutoIncrement();
         } else {
             return false;
         }

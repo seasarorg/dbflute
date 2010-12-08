@@ -77,7 +77,7 @@ public abstract class DfAbsractDataWriter {
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
 
     /** The cache map of meta info. The key is table name. (ordered for display) */
-    protected final Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap
+    protected final Map<String, Map<String, DfColumnMetaInfo>> _columnInfoCacheMap = StringKeyMap
             .createAsFlexibleOrdered();
 
     /** The cache map of bind type. The key is table name. (ordered for display) */
@@ -721,11 +721,11 @@ public abstract class DfAbsractDataWriter {
     }
 
     // ===================================================================================
-    //                                                                    Column Meta Info
-    //                                                                    ================
-    protected Map<String, DfColumnMetaInfo> getColumnMetaInfo(String tableName) {
-        if (_metaInfoCacheMap.containsKey(tableName)) {
-            return _metaInfoCacheMap.get(tableName);
+    //                                                                         Column Info
+    //                                                                         ===========
+    protected Map<String, DfColumnMetaInfo> getColumnInfoMap(String tableName) {
+        if (_columnInfoCacheMap.containsKey(tableName)) {
+            return _columnInfoCacheMap.get(tableName);
         }
         final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
@@ -736,7 +736,7 @@ public abstract class DfAbsractDataWriter {
             for (DfColumnMetaInfo columnMetaInfo : columnList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
             }
-            _metaInfoCacheMap.put(tableName, columnMetaInfoMap);
+            _columnInfoCacheMap.put(tableName, columnMetaInfoMap);
             return columnMetaInfoMap;
         } catch (SQLException e) {
             String msg = "Failed to get column meta informations: table=" + tableName;

@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -26,6 +27,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 
 /**
  * @author jflute
@@ -56,14 +58,14 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-    public void processBeforeHandlingTable(String tableName) {
-        if (hasIdentityColumn(_dataSource, tableName)) {
+    public void processBeforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
+        if (hasIdentityColumn(_dataSource, tableName, columnMap)) {
             turnOnIdentityInsert(_dataSource, tableName);
             _identityTableSet.add(tableName);
         }
     }
 
-    public void processFinallyHandlingTable(String tableName) {
+    public void processFinallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
         if (_identityTableSet.contains(tableName)) {
             turnOffIdentityInsert(_dataSource, tableName);
         }
@@ -72,7 +74,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
-    private boolean hasIdentityColumn(DataSource dataSource, String tableName) {
+    protected boolean hasIdentityColumn(DataSource dataSource, String tableName, Map<String, DfColumnMetaInfo> columnMap) {
         final String sql = "select ident_current ('" + tableName + "') as IDENT_CURRENT";
         final Connection conn = getConnection(dataSource);
         Statement stmt = null;
@@ -109,16 +111,16 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
         }
     }
 
-    private void turnOnIdentityInsert(DataSource dataSource, String tableName) {
-        setIdentityInsert(dataSource, tableName, "on");
+    protected void turnOnIdentityInsert(DataSource dataSource, String tableName) {
+        setIdentityInsert(dataSource, tableName, true);
     }
 
-    private void turnOffIdentityInsert(DataSource dataSource, String tableName) {
-        setIdentityInsert(dataSource, tableName, "off");
+    protected void turnOffIdentityInsert(DataSource dataSource, String tableName) {
+        setIdentityInsert(dataSource, tableName, false);
     }
 
-    private void setIdentityInsert(DataSource dataSource, String tableName, final String command) {
-        final String sql = "set identity_insert " + tableName + " " + command;
+    protected void setIdentityInsert(DataSource dataSource, String tableName, boolean insertOn) {
+        final String sql = buildIdentityInsertSettingSql(tableName, insertOn);
         if (_loggingSql) {
             _log.info(sql);
         }
@@ -143,7 +145,11 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
         }
     }
 
-    private static Connection getConnection(DataSource dataSource) {
+    protected String buildIdentityInsertSettingSql(String tableName, boolean insertOn) {
+        return "set identity_insert " + tableName + " " + (insertOn ? "on" : "off");
+    }
+
+    protected static Connection getConnection(DataSource dataSource) {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
@@ -151,7 +157,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
         }
     }
 
-    private static Statement createStatement(Connection conn) {
+    protected static Statement createStatement(Connection conn) {
         try {
             return conn.createStatement();
         } catch (SQLException e) {
@@ -159,7 +165,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
         }
     }
 
-    private static void close(Connection conn) {
+    protected static void close(Connection conn) {
         if (conn == null)
             return;
         try {

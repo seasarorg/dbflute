@@ -15,12 +15,16 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr;
 
+import java.util.Map;
+
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+
 /**
  * @author jflute
  */
 public interface DfDataWritingInterceptor {
 
-    void processBeforeHandlingTable(String tableName);
+    void processBeforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap);
 
-    void processFinallyHandlingTable(String tableName);
+    void processFinallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap);
 }

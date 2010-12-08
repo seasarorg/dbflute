@@ -126,10 +126,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
 
         // set up columnMetaInfo
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(tableName);
+        final Map<String, DfColumnMetaInfo> columnMap = getColumnInfoMap(tableName);
 
         // process before handling table
-        beforeHandlingTable(dataTable.getTableName());
+        beforeHandlingTable(dataTable.getTableName(), columnMap);
 
         // set up columnNameList
         final List<String> columnNameList = new ArrayList<String>();
@@ -150,7 +150,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
                     ps = conn.prepareStatement(preparedSql);
                 }
-                doWriteDataRow(file, dataTable, dataRow, columnMetaInfoMap, columnNameList, conn, ps);
+                doWriteDataRow(file, dataTable, dataRow, columnMap, columnNameList, conn, ps);
             }
             if (!_suppressBatchUpdate) {
                 ps.executeBatch();
@@ -180,7 +180,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 }
             }
             // process after (finally) handling table
-            finallyHandlingTable(dataTable.getTableName());
+            finallyHandlingTable(dataTable.getTableName(), columnMap);
         }
     }
 
@@ -212,15 +212,15 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return br.buildExceptionMessage();
     }
 
-    protected void beforeHandlingTable(String tableName) {
+    protected void beforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processBeforeHandlingTable(tableName);
+            _dataWritingInterceptor.processBeforeHandlingTable(tableName, columnMap);
         }
     }
 
-    protected void finallyHandlingTable(String tableName) {
+    protected void finallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processFinallyHandlingTable(tableName);
+            _dataWritingInterceptor.processFinallyHandlingTable(tableName, columnMap);
         }
     }
 
@@ -324,7 +324,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final DfDataTable table = dataSet.getTable(i);
             final String tableName = table.getTableName();
 
-            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(tableName);
+            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnInfoMap(tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DfDataColumn dataColumn = table.getColumn(j);
                 if (!metaInfoMap.containsKey(dataColumn.getColumnName())) {
@@ -344,7 +344,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableName();
 
-            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(tableName);
+            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnInfoMap(tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 

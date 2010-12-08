@@ -15,7 +15,11 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr;
 
+import java.util.Map;
+
 import javax.sql.DataSource;
+
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 
 /**
  * @author jflute
@@ -24,5 +28,21 @@ public class DfDataWritingInterceptorSybase extends DfDataWritingInterceptorSQLS
 
     public DfDataWritingInterceptorSybase(DataSource dataSource, boolean loggingSql) {
         super(dataSource, loggingSql);
+    }
+
+    @Override
+    protected boolean hasIdentityColumn(DataSource dataSource, String tableName, Map<String, DfColumnMetaInfo> columnMap) {
+        for (DfColumnMetaInfo info : columnMap.values()) {
+            if (info.isSybaseAutoIncrement()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected String buildIdentityInsertSettingSql(String tableName, boolean insertOn) {
+        final String settingValue = (insertOn ? tableName : "");
+        return "set option identity_insert = '" + settingValue + "'";
     }
 }

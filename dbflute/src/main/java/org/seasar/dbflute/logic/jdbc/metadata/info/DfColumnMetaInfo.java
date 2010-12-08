@@ -18,6 +18,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 import java.util.Map;
 
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -59,6 +60,13 @@ public class DfColumnMetaInfo {
 
     public boolean hasTypeStructInfo() {
         return _typeStructInfo != null;
+    }
+
+    // ===================================================================================
+    //                                                                     DBMS Dependency
+    //                                                                     ===============
+    public boolean isSybaseAutoIncrement() {
+        return Srl.equalsIgnoreCase("autoincrement", _defaultValue);
     }
 
     // ===================================================================================

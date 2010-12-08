@@ -92,14 +92,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         if (tableName.indexOf("-") >= 0) {
             tableName = tableName.substring(tableName.indexOf("-") + "-".length());
         }
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(tableName);
-        if (columnMetaInfoMap.isEmpty()) {
+        final Map<String, DfColumnMetaInfo> columnMap = getColumnInfoMap(tableName);
+        if (columnMap.isEmpty()) {
             String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
             throw new IllegalStateException(msg);
         }
 
         // process before handling table
-        beforeHandlingTable(tableName);
+        beforeHandlingTable(tableName, columnMap);
 
         String lineString = null;
         String preContinueString = "";
@@ -169,7 +169,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
 
                     final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
                     sqlBuilder.setTableName(tableName);
-                    sqlBuilder.setColumnMap(columnMetaInfoMap);
+                    sqlBuilder.setColumnMap(columnMap);
                     sqlBuilder.setColumnNameList(columnNameList);
                     sqlBuilder.setValueList(valueList);
                     sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
@@ -194,7 +194,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // - - - - - - - - - - - - - - - - - - -
                         // Process Null (against Null Headache)
                         // - - - - - - - - - - - - - - - - - - -
-                        if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                        if (processNull(tableName, columnName, obj, ps, bindCount, columnMap)) {
                             bindCount++;
                             continue;
                         }
@@ -204,7 +204,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // - - - - - - - - - - - - - - -
                         // If the value is not null and the value has the own type except string,
                         // It registers the value to statement by the type.
-                        if (processNotNullNotString(tableName, columnName, obj, conn, ps, bindCount, columnMetaInfoMap)) {
+                        if (processNotNullNotString(tableName, columnName, obj, conn, ps, bindCount, columnMap)) {
                             bindCount++;
                             continue;
                         }
@@ -213,7 +213,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // Process NotNull and StringExpression
                         // - - - - - - - - - - - - - - - - - - -
                         final String value = (String) obj;
-                        processNotNullString(tableName, columnName, value, conn, ps, bindCount, columnMetaInfoMap);
+                        processNotNullString(tableName, columnName, value, conn, ps, bindCount, columnMap);
                         bindCount++;
                     }
                     if (_suppressBatchUpdate) {
@@ -282,7 +282,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
             }
             // process after (finally) handling table
-            finallyHandlingTable(tableName);
+            finallyHandlingTable(tableName, columnMap);
         }
     }
 
@@ -316,15 +316,15 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         return br.buildExceptionMessage();
     }
 
-    protected void beforeHandlingTable(String tableName) {
+    protected void beforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processBeforeHandlingTable(tableName);
+            _dataWritingInterceptor.processBeforeHandlingTable(tableName, columnMap);
         }
     }
 
-    protected void finallyHandlingTable(String tableName) {
+    protected void finallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processFinallyHandlingTable(tableName);
+            _dataWritingInterceptor.processFinallyHandlingTable(tableName, columnMap);
         }
     }
 
