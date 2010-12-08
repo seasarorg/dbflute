@@ -43,6 +43,6 @@ public class DfDataWritingInterceptorSybase extends DfDataWritingInterceptorSQLS
     @Override
     protected String buildIdentityInsertSettingSql(String tableName, boolean insertOn) {
         final String settingValue = (insertOn ? tableName : "");
-        return "set option identity_insert = '" + settingValue + "'";
+        return "set temporary option identity_insert = '" + settingValue + "'";
     }
 }
