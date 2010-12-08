@@ -881,7 +881,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Batch Update
     //                                                                        ============
     /**
-     * Batch-insert the list. This method uses 'Batch Update' of java.sql.PreparedStatement.
+     * Batch-insert the list. <br />
+     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
+     * All columns are insert target. (so default constraints are not available) <br />
+     * And if the table has an identity, entities after the process do not have incremented values.
+     * (When you use the (normal) insert(), an entity after the process has an incremented value)
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of inserted count.
      */
@@ -892,8 +896,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     /**
      * Batch-update the list. <br />
-     * All columns are update target. {NOT modified only} <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement.
+     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
+     * All columns are update target. {NOT modified only}
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
 #if ($table.hasOptimisticLock())
@@ -910,8 +914,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     /**
      * Batch-update the list non-strictly. <br />
-     * All columns are update target. {NOT modified only} <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement.
+     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
+     * All columns are update target. {NOT modified only}
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
