@@ -38,6 +38,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -68,6 +69,9 @@ public abstract class DfAbsractDataWriter {
 
     /** Does it suppress batch updates? */
     protected boolean _suppressBatchUpdate;
+
+    /** The interceptor of data writing. (Nullable) */
+    protected DfDataWritingInterceptor _dataWritingInterceptor;
 
     /** The handler of columns for getting column meta information(as helper). */
     protected final DfColumnHandler _columnHandler = new DfColumnHandler();
@@ -790,5 +794,13 @@ public abstract class DfAbsractDataWriter {
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
         this._suppressBatchUpdate = suppressBatchUpdate;
+    }
+
+    public DfDataWritingInterceptor getDataWritingInterceptor() {
+        return _dataWritingInterceptor;
+    }
+
+    public void setDataWritingInterceptor(DfDataWritingInterceptor interceptor) {
+        this._dataWritingInterceptor = interceptor;
     }
 }

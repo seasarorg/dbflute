@@ -125,13 +125,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             return;
         }
 
-        // Set up columnMetaInfo.
+        // set up columnMetaInfo
         final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(tableName);
 
-        // Extension Point as Before.
-        beforeHandlingTable(dataTable);
+        // process before handling table
+        beforeHandlingTable(dataTable.getTableName());
 
-        // Set up columnNameList.
+        // set up columnNameList
         final List<String> columnNameList = new ArrayList<String>();
         for (int j = 0; j < dataTable.getColumnSize(); j++) {
             final DfDataColumn dataColumn = dataTable.getColumn(j);
@@ -179,8 +179,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     _log.info("Connection#close() threw the exception!", ignored);
                 }
             }
-            // Extension Point as Finally.
-            finallyHandlingTable(dataTable);
+            // process after (finally) handling table
+            finallyHandlingTable(dataTable.getTableName());
         }
     }
 
@@ -212,10 +212,16 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return br.buildExceptionMessage();
     }
 
-    protected void beforeHandlingTable(DfDataTable dataTable) {
+    protected void beforeHandlingTable(String tableName) {
+        if (_dataWritingInterceptor != null) {
+            _dataWritingInterceptor.processBeforeHandlingTable(tableName);
+        }
     }
 
-    protected void finallyHandlingTable(DfDataTable dataTable) {
+    protected void finallyHandlingTable(String tableName) {
+        if (_dataWritingInterceptor != null) {
+            _dataWritingInterceptor.processFinallyHandlingTable(tableName);
+        }
     }
 
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,

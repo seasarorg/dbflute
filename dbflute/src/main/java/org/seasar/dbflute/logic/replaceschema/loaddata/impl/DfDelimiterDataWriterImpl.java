@@ -98,6 +98,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             throw new IllegalStateException(msg);
         }
 
+        // process before handling table
+        beforeHandlingTable(tableName);
+
         String lineString = null;
         String preContinueString = "";
         final List<String> columnNameList = new ArrayList<String>();
@@ -278,6 +281,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     _log.info("Connection.close() threw the exception!", ignored);
                 }
             }
+            // process after (finally) handling table
+            finallyHandlingTable(tableName);
         }
     }
 
@@ -309,6 +314,18 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             }
         }
         return br.buildExceptionMessage();
+    }
+
+    protected void beforeHandlingTable(String tableName) {
+        if (_dataWritingInterceptor != null) {
+            _dataWritingInterceptor.processBeforeHandlingTable(tableName);
+        }
+    }
+
+    protected void finallyHandlingTable(String tableName) {
+        if (_dataWritingInterceptor != null) {
+            _dataWritingInterceptor.processFinallyHandlingTable(tableName);
+        }
     }
 
     // ===================================================================================

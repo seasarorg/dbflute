@@ -36,6 +36,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHandlingInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**
@@ -56,6 +57,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     protected DataSource _dataSource;
     protected UnifiedSchema _unifiedSchema;
     protected boolean _suppressBatchUpdate;
+    protected DfDataWritingInterceptor _interceptor;
 
     // ===================================================================================
     //                                                                                Main
@@ -199,5 +201,13 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
         this._suppressBatchUpdate = suppressBatchUpdate;
+    }
+
+    public DfDataWritingInterceptor getInterceptor() {
+        return _interceptor;
+    }
+
+    public void setInterceptor(DfDataWritingInterceptor interceptor) {
+        this._interceptor = interceptor;
     }
 }

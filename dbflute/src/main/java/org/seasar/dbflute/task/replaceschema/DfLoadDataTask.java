@@ -12,7 +12,9 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHan
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerSQLServer;
+import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
+import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptorSQLServer;
+import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptorSybase;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.Srl;
@@ -112,6 +114,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         handler.setDataSource(getDataSource());
         handler.setUnifiedSchema(_mainSchema);
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        handler.setInterceptor(getDataWritingInterceptor());
         _delimiterDataHandlerImpl = handler;
         return _delimiterDataHandlerImpl;
     }
@@ -179,19 +182,28 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         if (_xlsDataHandlerImpl != null) {
             return _xlsDataHandlerImpl;
         }
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        final DfXlsDataHandlerImpl xlsDataHandler;
-        if (basicProperties.isDatabaseSQLServer()) {
-            xlsDataHandler = new DfXlsDataHandlerSQLServer(getDataSource());
-        } else {
-            xlsDataHandler = new DfXlsDataHandlerImpl(getDataSource());
-        }
-        xlsDataHandler.setUnifiedSchema(_mainSchema); // for getting database meta data
-        xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
-        xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-        xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
-        _xlsDataHandlerImpl = xlsDataHandler;
+        final DfXlsDataHandlerImpl handler = new DfXlsDataHandlerImpl(getDataSource());
+        handler.setUnifiedSchema(_mainSchema); // for getting database meta data
+        handler.setLoggingInsertSql(isLoggingInsertSql());
+        handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        handler.setSkipSheet(getMyProperties().getSkipSheet());
+        handler.setDataWritingInterceptor(getDataWritingInterceptor());
+        _xlsDataHandlerImpl = handler;
         return _xlsDataHandlerImpl;
+    }
+
+    // --------------------------------------------
+    //                          Writing Interceptor
+    //                          -------------------
+    protected DfDataWritingInterceptor getDataWritingInterceptor() {
+        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
+        if (basicProp.isDatabaseSQLServer()) { // needs identity insert
+            return new DfDataWritingInterceptorSQLServer(getDataSource(), isLoggingInsertSql());
+        } else if (basicProp.isDatabaseSybase()) { // needs identity insert
+            return new DfDataWritingInterceptorSybase(getDataSource(), isLoggingInsertSql());
+        } else {
+            return null;
+        }
     }
 
     // --------------------------------------------

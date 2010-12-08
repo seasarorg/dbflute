@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
+package org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -26,54 +26,54 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
  * @author jflute
  */
-public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
+public class DfDataWritingInterceptorSQLServer implements DfDataWritingInterceptor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfXlsDataHandlerSQLServer.class);
+    private static final Log _log = LogFactory.getLog(DfDataWritingInterceptorSQLServer.class);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DataSource _dataSource;
+    protected boolean _loggingSql;
     protected final Set<String> _identityTableSet = StringSet.createAsFlexible();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsDataHandlerSQLServer(DataSource dataSource) {
-        super(dataSource);
+    public DfDataWritingInterceptorSQLServer(DataSource dataSource, boolean loggingSql) {
+        _dataSource = dataSource;
+        _loggingSql = loggingSql;
     }
 
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-    @Override
-    protected void beforeHandlingTable(DfDataTable dataTable) {
-        if (hasIdentityColumn(_dataSource, dataTable)) {
-            turnOnIdentityInsert(_dataSource, dataTable);
-            _identityTableSet.add(dataTable.getTableName());
+    public void processBeforeHandlingTable(String tableName) {
+        if (hasIdentityColumn(_dataSource, tableName)) {
+            turnOnIdentityInsert(_dataSource, tableName);
+            _identityTableSet.add(tableName);
         }
     }
 
-    @Override
-    protected void finallyHandlingTable(DfDataTable dataTable) {
-        if (_identityTableSet.contains(dataTable.getTableName())) {
-            turnOffIdentityInsert(_dataSource, dataTable);
+    public void processFinallyHandlingTable(String tableName) {
+        if (_identityTableSet.contains(tableName)) {
+            turnOffIdentityInsert(_dataSource, tableName);
         }
     }
 
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
-    private boolean hasIdentityColumn(DataSource dataSource, final DfDataTable dataTable) {
-        final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableName() + "') AS IDENT_CURRENT";
+    private boolean hasIdentityColumn(DataSource dataSource, String tableName) {
+        final String sql = "select IDENT_CURRENT ('" + tableName + "') as IDENT_CURRENT";
         final Connection conn = getConnection(dataSource);
         Statement stmt = null;
         ResultSet rs = null;
@@ -109,17 +109,17 @@ public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
         }
     }
 
-    private void turnOnIdentityInsert(DataSource dataSource, final DfDataTable dataTable) {
-        setIdentityInsert(dataSource, dataTable, "ON");
+    private void turnOnIdentityInsert(DataSource dataSource, String tableName) {
+        setIdentityInsert(dataSource, tableName, "ON");
     }
 
-    private void turnOffIdentityInsert(DataSource dataSource, final DfDataTable dataTable) {
-        setIdentityInsert(dataSource, dataTable, "OFF");
+    private void turnOffIdentityInsert(DataSource dataSource, String tableName) {
+        setIdentityInsert(dataSource, tableName, "OFF");
     }
 
-    private void setIdentityInsert(DataSource dataSource, final DfDataTable dataTable, final String command) {
-        final String sql = "SET IDENTITY_INSERT " + dataTable.getTableName() + " " + command;
-        if (_loggingInsertSql) {
+    private void setIdentityInsert(DataSource dataSource, String tableName, final String command) {
+        final String sql = "set IDENTITY_INSERT " + tableName + " " + command;
+        if (_loggingSql) {
             _log.info(sql);
         }
         Connection conn = null;
@@ -167,5 +167,16 @@ public class DfXlsDataHandlerSQLServer extends DfXlsDataHandlerImpl {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isLoggingInsertSql() {
+        return _loggingSql;
+    }
+
+    public void setLoggingInsertSql(boolean loggingSql) {
+        this._loggingSql = loggingSql;
     }
 }
