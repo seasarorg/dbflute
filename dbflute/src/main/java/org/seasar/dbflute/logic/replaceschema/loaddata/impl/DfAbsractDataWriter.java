@@ -800,7 +800,7 @@ public abstract class DfAbsractDataWriter {
         return _dataWritingInterceptor;
     }
 
-    public void setDataWritingInterceptor(DfDataWritingInterceptor interceptor) {
-        this._dataWritingInterceptor = interceptor;
+    public void setDataWritingInterceptor(DfDataWritingInterceptor dataWritingInterceptor) {
+        this._dataWritingInterceptor = dataWritingInterceptor;
     }
 }

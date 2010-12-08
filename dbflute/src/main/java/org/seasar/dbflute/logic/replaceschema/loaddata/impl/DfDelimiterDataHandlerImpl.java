@@ -57,7 +57,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     protected DataSource _dataSource;
     protected UnifiedSchema _unifiedSchema;
     protected boolean _suppressBatchUpdate;
-    protected DfDataWritingInterceptor _interceptor;
+    protected DfDataWritingInterceptor _dataWritingInterceptor;
 
     // ===================================================================================
     //                                                                                Main
@@ -110,6 +110,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setConvertValueMap(convertValueMap);
                     writer.setDefaultValueMap(defaultValueMap);
                     writer.setSuppressBatchUpdate(isSuppressBatchUpdate());
+                    writer.setDataWritingInterceptor(_dataWritingInterceptor);
                     writer.writeData(notFoundColumnMap);
                 }
             }
@@ -203,11 +204,11 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
         this._suppressBatchUpdate = suppressBatchUpdate;
     }
 
-    public DfDataWritingInterceptor getInterceptor() {
-        return _interceptor;
+    public DfDataWritingInterceptor getDataWritingInterceptor() {
+        return _dataWritingInterceptor;
     }
 
-    public void setInterceptor(DfDataWritingInterceptor interceptor) {
-        this._interceptor = interceptor;
+    public void setDataWritingInterceptor(DfDataWritingInterceptor dataWritingInterceptor) {
+        this._dataWritingInterceptor = dataWritingInterceptor;
     }
 }

@@ -114,7 +114,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         handler.setDataSource(getDataSource());
         handler.setUnifiedSchema(_mainSchema);
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-        handler.setInterceptor(getDataWritingInterceptor());
+        handler.setDataWritingInterceptor(getDataWritingInterceptor());
         _delimiterDataHandlerImpl = handler;
         return _delimiterDataHandlerImpl;
     }
