@@ -73,7 +73,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     //                                                                            Identity
     //                                                                            ========
     private boolean hasIdentityColumn(DataSource dataSource, String tableName) {
-        final String sql = "select IDENT_CURRENT ('" + tableName + "') as IDENT_CURRENT";
+        final String sql = "select ident_current ('" + tableName + "') as IDENT_CURRENT";
         final Connection conn = getConnection(dataSource);
         Statement stmt = null;
         ResultSet rs = null;
@@ -110,15 +110,15 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     }
 
     private void turnOnIdentityInsert(DataSource dataSource, String tableName) {
-        setIdentityInsert(dataSource, tableName, "ON");
+        setIdentityInsert(dataSource, tableName, "on");
     }
 
     private void turnOffIdentityInsert(DataSource dataSource, String tableName) {
-        setIdentityInsert(dataSource, tableName, "OFF");
+        setIdentityInsert(dataSource, tableName, "off");
     }
 
     private void setIdentityInsert(DataSource dataSource, String tableName, final String command) {
-        final String sql = "set IDENTITY_INSERT " + tableName + " " + command;
+        final String sql = "set identity_insert " + tableName + " " + command;
         if (_loggingSql) {
             _log.info(sql);
         }
