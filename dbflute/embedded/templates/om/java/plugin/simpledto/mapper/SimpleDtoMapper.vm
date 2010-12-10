@@ -93,7 +93,9 @@ public class ${myClassName} {
         dto.set${col.javaName}(entity.get${col.javaName}());
 #end
 #if ($table.hasRelation())
-        _relationDtoMap.put(localKey, dto);
+        if (entity.hasPrimaryKeyValue()) { // caches only a DTO that has a primary key value
+            _relationDtoMap.put(localKey, dto);
+        }
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
@@ -105,7 +107,9 @@ public class ${myClassName} {
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}(mapper.mappingToDto(relationEntity));
-                _relationDtoMap.put(relationKey, dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
+                if (relationEntity.hasPrimaryKeyValue()) {
+                    _relationDtoMap.put(relationKey, dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
+                }
             }
         };
 #end
@@ -121,7 +125,9 @@ public class ${myClassName} {
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(mapper.mappingToDto(relationEntity));
-                _relationDtoMap.put(relationKey, dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
+                if (relationEntity.hasPrimaryKeyValue()) {
+                    _relationDtoMap.put(relationKey, dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
+                }
             }
         };
 #else
@@ -173,7 +179,9 @@ public class ${myClassName} {
         }
 #end
 #if ($table.hasRelation())
-        _relationEntityMap.put(localKey, entity);
+        if (entity.hasPrimaryKeyValue()) { // caches only an entity that has a primary key value
+            _relationEntityMap.put(localKey, entity);
+        }
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
@@ -185,7 +193,9 @@ public class ${myClassName} {
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 entity.set${fk.foreignJavaBeansRulePropertyNameInitCap}(mapper.mappingToEntity(relationDto));
-                _relationEntityMap.put(relationKey, entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
+                if (entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}().hasPrimaryKeyValue()) {
+                    _relationEntityMap.put(relationKey, entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
+                }
             }
         };
 #end
@@ -201,7 +211,9 @@ public class ${myClassName} {
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 entity.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(mapper.mappingToEntity(relationDto));
-                _relationEntityMap.put(relationKey, entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
+                if (entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}().hasPrimaryKeyValue()) {
+                    _relationEntityMap.put(relationKey, entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
+                }
             }
         };
 #else
