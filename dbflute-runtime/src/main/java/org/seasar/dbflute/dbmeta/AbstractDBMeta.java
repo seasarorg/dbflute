@@ -44,6 +44,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -587,6 +588,18 @@ public abstract class AbstractDBMeta implements DBMeta {
         return false;
     }
 
+    public List<ColumnInfo> getCommonColumnList() {
+        return DfCollectionUtil.emptyList();
+    }
+
+    public List<ColumnInfo> getCommonColumnBeforeInsertList() {
+        return DfCollectionUtil.emptyList();
+    }
+
+    public List<ColumnInfo> getCommonColumnBeforeUpdateList() {
+        return DfCollectionUtil.emptyList();
+    }
+
     // ===================================================================================
     //                                                                       Name Handling
     //                                                                       =============
@@ -998,10 +1011,12 @@ public abstract class AbstractDBMeta implements DBMeta {
         return new ArrayList<ELEMENT>();
     }
 
-    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT element) {
-        final ArrayList<ELEMENT> arrayList = new ArrayList<ELEMENT>();
-        arrayList.add(element);
-        return arrayList;
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
+        final List<ELEMENT> list = newArrayList();
+        for (ELEMENT element : elements) {
+            list.add(element);
+        }
+        return list;
     }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {

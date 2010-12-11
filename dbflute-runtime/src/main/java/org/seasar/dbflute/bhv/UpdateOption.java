@@ -17,6 +17,7 @@ package org.seasar.dbflute.bhv;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
@@ -45,11 +46,12 @@ public class UpdateOption<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<HpCalcSpecification<CB>> _selfSpecificationList = DfCollectionUtil.newArrayList();
-    protected final Map<String, HpCalcSpecification<CB>> _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
+    protected List<HpCalcSpecification<CB>> _selfSpecificationList;
+    protected Map<String, HpCalcSpecification<CB>> _selfSpecificationMap;
 
     protected SpecifyQuery<CB> _updateColumnSpecification;
     protected CB _updateColumnSpecifiedCB;
+    protected Set<String> _forcedSpecifiedUpdateColumnSet;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -99,16 +101,23 @@ public class UpdateOption<CB extends ConditionBean> {
             String msg = "The argument 'specifyQuery' should not be null.";
             throw new IllegalArgumentException(msg);
         }
+        if (_selfSpecificationList == null) {
+            _selfSpecificationList = DfCollectionUtil.newArrayList();
+        }
         final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(specifyQuery);
         _selfSpecificationList.add(specification);
         return specification;
     }
 
     public boolean hasSelfSpecification() {
-        return !_selfSpecificationList.isEmpty();
+        return _selfSpecificationList != null && !_selfSpecificationList.isEmpty();
     }
 
     public void resolveSelfSpecification(CB cb) {
+        if (_selfSpecificationList == null || _selfSpecificationList.isEmpty()) {
+            return;
+        }
+        _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
         for (HpCalcSpecification<CB> specification : _selfSpecificationList) {
             specification.specify(cb);
             final String columnDbName = specification.getSpecifiedColumnInfo().getColumnDbName();
@@ -217,11 +226,11 @@ public class UpdateOption<CB extends ConditionBean> {
     //                                                                     Build Statement
     //                                                                     ===============
     public boolean hasStatement(String columnDbName) {
-        return findSpecification(columnDbName) != null;
+        return findStatementSpecification(columnDbName) != null;
     }
 
     public String buildStatement(String columnDbName) {
-        final HpCalcSpecification<CB> calcSp = findSpecification(columnDbName);
+        final HpCalcSpecification<CB> calcSp = findStatementSpecification(columnDbName);
         if (calcSp == null) {
             return null;
         }
@@ -232,9 +241,9 @@ public class UpdateOption<CB extends ConditionBean> {
         return statement;
     }
 
-    protected HpCalcSpecification<CB> findSpecification(String columnDbName) {
-        // only "self" supported
-        return _selfSpecificationMap.get(columnDbName);
+    protected HpCalcSpecification<CB> findStatementSpecification(String columnDbName) {
+        // only "self" supported yet
+        return _selfSpecificationMap != null ? _selfSpecificationMap.get(columnDbName) : null;
     }
 
     protected void throwVaryingUpdateNotFoundCalculationException(String columnDbName) {
@@ -281,10 +290,22 @@ public class UpdateOption<CB extends ConditionBean> {
     }
 
     public boolean isSpecifiedUpdateColumn(String columnDbName) {
+        if (_forcedSpecifiedUpdateColumnSet != null && _forcedSpecifiedUpdateColumnSet.contains(columnDbName)) {
+            return true; // basically common column
+        }
         if (_updateColumnSpecifiedCB == null) {
             return false;
         }
         final SqlClause sqlClause = _updateColumnSpecifiedCB.getSqlClause();
         return sqlClause.hasSpecifiedSelectColumn(sqlClause.getBasePointAliasName(), columnDbName);
+    }
+
+    public void xacceptForcedSpecifiedUpdateColumn(List<ColumnInfo> columnInfoList) { // internal
+        if (_forcedSpecifiedUpdateColumnSet == null) {
+            _forcedSpecifiedUpdateColumnSet = DfCollectionUtil.newHashSet();
+        }
+        for (ColumnInfo columnInfo : columnInfoList) {
+            _forcedSpecifiedUpdateColumnSet.add(columnInfo.getColumnDbName());
+        }
     }
 }

@@ -36,6 +36,7 @@ import org.seasar.dbflute.bhv.core.command.QueryUpdateEntityCBCommand;
 import org.seasar.dbflute.bhv.core.command.UpdateEntityCommand;
 import org.seasar.dbflute.bhv.core.command.UpdateNonstrictEntityCommand;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
@@ -822,6 +823,18 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         final QueryUpdateEntityCBCommand cmd = createQueryUpdateEntityCBCommand(entity, cb);
         cmd.setUpdateOption(option);
         return cmd;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected <CB extends ConditionBean> UpdateOption<CB> createSpecifiedUpdateOption(
+            SpecifyQuery<CB> updateColumnSpec, CB cb) {
+        final UpdateOption<CB> option = new UpdateOption<CB>();
+        option.specify(updateColumnSpec);
+        option.resolveUpdateColumnSpecification(cb);
+        option.xacceptForcedSpecifiedUpdateColumn(getDBMeta().getCommonColumnBeforeUpdateList());
+        return option;
     }
 
     // ===================================================================================

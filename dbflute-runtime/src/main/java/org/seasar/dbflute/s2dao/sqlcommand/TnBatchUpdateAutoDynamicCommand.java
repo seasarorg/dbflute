@@ -43,6 +43,7 @@ public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
+    @Override
     protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
             UpdateOption<ConditionBean> option) {
         final List<?> beanList;

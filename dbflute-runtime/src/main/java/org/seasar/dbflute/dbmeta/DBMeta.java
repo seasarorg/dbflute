@@ -294,7 +294,7 @@ public interface DBMeta {
     //                                                                Optimistic Lock Info
     //                                                                ====================
     /**
-     * Has version no?
+     * Does the table have a column for version no?
      * @return Determination.
      */
     boolean hasVersionNo();
@@ -306,7 +306,7 @@ public interface DBMeta {
     ColumnInfo getVersionNoColumnInfo();
 
     /**
-     * Has update date?
+     * Does the table have a column for update date?
      * @return Determination.
      */
     boolean hasUpdateDate();
@@ -321,16 +321,34 @@ public interface DBMeta {
     //                                                                  Common Column Info
     //                                                                  ==================
     /**
-     * Has common column?
+     * Does the table have common columns?
      * @return Determination.
      */
     boolean hasCommonColumn();
+
+    /**
+     * Get the list of common column.
+     * @return The list of column info. (NotNull)
+     */
+    List<ColumnInfo> getCommonColumnList();
+
+    /**
+     * Get the list of common column auto-setup before insert.
+     * @return The list of column info. (NotNull)
+     */
+    List<ColumnInfo> getCommonColumnBeforeInsertList();
+
+    /**
+     * Get the list of common column auto-setup before update.
+     * @return The list of column info. (NotNull)
+     */
+    List<ColumnInfo> getCommonColumnBeforeUpdateList();
 
     // ===================================================================================
     //                                                                       Name Handling
     //                                                                       =============
     /**
-     * Has object of flexible name? {Target objects are TABLE and COLUMN}
+     * Does the table have an object for the flexible name? {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Determination.
      */
