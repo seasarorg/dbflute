@@ -32,6 +32,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -47,11 +48,11 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     protected final TnPropertyType[] _boundPropTypes; // not only completely bounds (needs to filter)
     protected Object[] _bindVariables;
     protected ValueType[] _bindVariableValueTypes;
-    protected Timestamp _timestamp;
-    protected Integer _versionNo;
     protected boolean _optimisticLockHandling;
     protected boolean _versionNoAutoIncrementOnMemory; // for filtering
     protected UpdateOption<ConditionBean> _updateOption; // for filtering
+    protected List<Timestamp> _newTimestampList;
+    protected List<Long> _newVersionNoList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -94,6 +95,8 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         if (_optimisticLockHandling && ret < 1) { // means no update (contains minus just in case)
             throw createEntityAlreadyUpdatedException(bean, ret);
         }
+        // a value of optimistic lock column should be synchronized
+        // after handling optimistic lock
         postUpdateBean(bean, ret);
         return ret;
     }
@@ -112,7 +115,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     }
 
     // ===================================================================================
-    //                                                                       Bind Setupper
+    //                                                                       Bind Variable
     //                                                                       =============
     protected abstract void setupBindVariables(Object bean);
 
@@ -125,11 +128,13 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         for (int i = 0; i < _boundPropTypes.length; ++i) {
             final TnPropertyType pt = _boundPropTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
-                setTimestamp(ResourceContext.getAccessTimestamp());
-                varList.add(_timestamp);
+                final Timestamp timestamp = ResourceContext.getAccessTimestamp();
+                addNewTimestamp(timestamp);
+                varList.add(timestamp);
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
-                setVersionNo(Integer.valueOf(0));
-                varList.add(_versionNo);
+                final Long firstNo = Long.valueOf(0);
+                addNewVersionNo(firstNo);
+                varList.add(firstNo);
             } else {
                 varList.add(pt.getPropertyDesc().getValue(bean));
             }
@@ -148,16 +153,18 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         for (int i = 0; i < _boundPropTypes.length; ++i) {
             final TnPropertyType pt = _boundPropTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
-                setTimestamp(ResourceContext.getAccessTimestamp());
-                varList.add(_timestamp);
+                final Timestamp timestamp = ResourceContext.getAccessTimestamp();
+                addNewTimestamp(timestamp);
+                varList.add(timestamp);
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
                 if (!_versionNoAutoIncrementOnMemory) { // means OnQuery
                     continue; // because of 'VERSION_NO = VERSION_NO + 1'
                 }
                 final Object value = pt.getPropertyDesc().getValue(bean); // already null-checked
-                final int intValue = DfTypeUtil.toPrimitiveInt(value) + 1;
-                setVersionNo(Integer.valueOf(intValue));
-                varList.add(_versionNo);
+                final long longValue = DfTypeUtil.toPrimitiveLong(value) + 1L;
+                final Long versionNo = Long.valueOf(longValue);
+                addNewVersionNo(versionNo);
+                varList.add(versionNo);
             } else if (_updateOption != null && _updateOption.hasStatement(pt.getColumnDbName())) {
                 continue; // because of 'FOO_COUNT = FOO_COUNT + 1'
             } else {
@@ -200,18 +207,39 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         }
     }
 
-    protected void updateTimestampIfNeed(Object bean) {
-        if (_timestamp != null) {
-            final DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
-            pd.setValue(bean, _timestamp);
+    // ===================================================================================
+    //                                                                 Timestamp/VersionNo
+    //                                                                 ===================
+    protected void addNewTimestamp(Timestamp timestamp) {
+        if (_newTimestampList == null) {
+            _newTimestampList = DfCollectionUtil.newArrayList();
         }
+        _newTimestampList.add(timestamp);
+    }
+
+    protected void addNewVersionNo(Long versionNo) {
+        if (_newVersionNoList == null) {
+            _newVersionNoList = DfCollectionUtil.newArrayList();
+        }
+        _newVersionNoList.add(versionNo);
+    }
+
+    protected void updateTimestampIfNeed(Object bean) {
+        final List<Timestamp> newTimestampList = _newTimestampList;
+        if (newTimestampList == null || newTimestampList.isEmpty()) {
+            return;
+        }
+        final DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
+        pd.setValue(bean, newTimestampList.remove(0));
     }
 
     protected void updateVersionNoIfNeed(Object bean) {
-        if (_versionNo != null) {
-            final DfPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
-            pd.setValue(bean, _versionNo);
+        final List<Long> newVersionNoList = _newVersionNoList;
+        if (newVersionNoList == null || newVersionNoList.isEmpty()) {
+            return;
         }
+        final DfPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
+        pd.setValue(bean, newVersionNoList.remove(0));
     }
 
     // ===================================================================================
@@ -235,14 +263,6 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
 
     protected void setBindVariableValueTypes(ValueType[] bindVariableValueTypes) {
         this._bindVariableValueTypes = bindVariableValueTypes;
-    }
-
-    protected void setTimestamp(Timestamp timestamp) {
-        this._timestamp = timestamp;
-    }
-
-    protected void setVersionNo(Integer versionNo) {
-        this._versionNo = versionNo;
     }
 
     public void setOptimisticLockHandling(boolean optimisticLockHandling) {

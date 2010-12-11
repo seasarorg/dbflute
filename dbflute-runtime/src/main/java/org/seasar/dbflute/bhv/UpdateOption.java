@@ -301,6 +301,9 @@ public class UpdateOption<CB extends ConditionBean> {
     }
 
     public void xacceptForcedSpecifiedUpdateColumn(List<ColumnInfo> columnInfoList) { // internal
+        if (columnInfoList == null || columnInfoList.isEmpty()) {
+            return;
+        }
         if (_forcedSpecifiedUpdateColumnSet == null) {
             _forcedSpecifiedUpdateColumnSet = DfCollectionUtil.newHashSet();
         }

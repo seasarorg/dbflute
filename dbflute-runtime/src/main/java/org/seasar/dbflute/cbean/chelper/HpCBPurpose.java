@@ -26,6 +26,7 @@ public enum HpCBPurpose {
             .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
     , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
+    , SPECIFIED_UPDATE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyDerivedReferrer().noQuery()) // SpecifiedUpdate
 
     // QueryUpdate and QueryDelete are not defined here
     // because their condition-beans are created by an application

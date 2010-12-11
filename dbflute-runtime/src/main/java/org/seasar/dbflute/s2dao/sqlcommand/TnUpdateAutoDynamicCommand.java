@@ -129,8 +129,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         if (option != null && option.hasSpecifiedUpdateColumn()) {
             return option.isSpecifiedUpdateColumn(pt.getColumnDbName());
         } else { // basically here when UpdateEntity
-            // process for ModifiedColumnUpdate
-            return isModifiedProperty(modifiedSet, pt);
+            return isModifiedProperty(modifiedSet, pt); // process for ModifiedColumnUpdate
         }
     }
 

@@ -78,10 +78,16 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             final PreparedStatement ps = prepareStatement(conn);
             try {
                 for (Object bean : beanList) {
+                    preBatchUpdateBean(bean);
                     prepareBatchElement(conn, ps, bean);
                 }
                 final int[] result = executeBatch(ps, beanList);
                 handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
+                // a value of optimistic lock column should be synchronized
+                // after handling optimistic lock
+                for (Object bean : beanList) {
+                    postBatchUpdateBean(bean);
+                }
                 return result;
             } finally {
                 close(ps);
@@ -89,8 +95,6 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         } finally {
             close(conn);
         }
-        // Reflection to bean is unsupported at batch update.
-        // postBatchUpdateBean(...);
     }
 
     protected void prepareBatchElement(Connection conn, PreparedStatement ps, Object bean) {
@@ -98,6 +102,17 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         logSql(getBindVariables(), getArgTypes(getBindVariables()));
         bindArgs(conn, ps, getBindVariables(), getBindVariableValueTypes());
         addBatch(ps);
+    }
+
+    // ===================================================================================
+    //                                                                       Pre/Post Bean
+    //                                                                       =============
+    protected void preBatchUpdateBean(Object bean) {
+    }
+
+    protected void postBatchUpdateBean(Object bean) {
+        updateTimestampIfNeed(bean);
+        updateVersionNoIfNeed(bean);
     }
 
     // ===================================================================================

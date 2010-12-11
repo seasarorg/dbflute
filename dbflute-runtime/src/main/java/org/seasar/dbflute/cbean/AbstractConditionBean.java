@@ -959,6 +959,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // *defined at base condition-bean per table
     //  o xsetupForColumnQuery()
     //  o xsetupForVaryingUpdate()
+    //  o xsetupForSpecifiedUpdate()
 
     protected void xinheritSubQueryInfo(ConditionQuery mainCQ) {
         if (mainCQ.xgetSqlClause().isForSubQuery()) {
