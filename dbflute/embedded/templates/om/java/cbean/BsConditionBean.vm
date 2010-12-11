@@ -647,7 +647,6 @@ public class ${myClassName} extends AbstractConditionBean {
         return query().hasUnionQueryOrUnionAllQuery();
     }
 
-    // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
@@ -657,20 +656,23 @@ public class ${myClassName} extends AbstractConditionBean {
 
         // inherits a parent query to synchronize real name
         // (and also for suppressing query check) 
-        specify().xsetSyncQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
-            public boolean has() { return true; }
-            public ${myConditionQueryClassName} qy() { return mainCB.query(); }
-        });
+        xprepareSyncQyCall(mainCB);
     }
 
     public void xsetupForVaryingUpdate() {
         xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE, null);
+        xprepareSyncQyCall(new ${myConditionBeanClassName}()); // for suppressing query check
+    }
 
-        // for suppressing query check
-        final ${myConditionBeanClassName} nonCheckCB = new ${myConditionBeanClassName}();
+    public void xsetupForSpecifiedUpdate() {
+        xchangePurposeSqlClause(HpCBPurpose.SPECIFIED_UPDATE, null);
+        xprepareSyncQyCall(new ${myConditionBeanClassName}()); // for suppressing query check
+    }
+
+    protected void xprepareSyncQyCall(final ${myConditionBeanClassName} cb) {
         specify().xsetSyncQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
             public boolean has() { return true; }
-            public ${myConditionQueryClassName} qy() { return nonCheckCB.query(); }
+            public ${myConditionQueryClassName} qy() { return cb.query(); }
         });
     }
 

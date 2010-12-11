@@ -87,6 +87,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                     Column Conversion
     //                                     -----------------
+    // *basically unsupported but this logic is remained for the future
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
     // ex) If common columns start with table name
     // map:{
