@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -43,13 +45,24 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
     //                                                                             =======
     @Override
     public Object execute(Object[] args) {
+        if (args == null || args.length == 0) {
+            String msg = "The argument 'args' should not be null or empty.";
+            throw new IllegalArgumentException(msg);
+        }
+        final List<?> beanList;
+        if (args[0] instanceof List<?>) {
+            beanList = (List<?>) args[0];
+        } else {
+            String msg = "The argument 'args[0]' should be list: " + args[0];
+            throw new IllegalArgumentException(msg);
+        }
         final TnAbstractBatchAutoHandler handler = createBatchAutoHandler();
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
-        // The logging message SQL of procedure is unnecessary.
+        // The logging message SQL of batch is unnecessary.
         // handler.setLoggingMessageSqlArgs(args);
-        return handler.executeBatch(args);
+        return handler.executeBatch(beanList);
     }
 
     protected abstract TnAbstractBatchAutoHandler createBatchAutoHandler();

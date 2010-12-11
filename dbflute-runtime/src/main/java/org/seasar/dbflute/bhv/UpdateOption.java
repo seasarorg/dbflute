@@ -22,6 +22,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.VaryingUpdateCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
@@ -46,6 +47,9 @@ public class UpdateOption<CB extends ConditionBean> {
     //                                                                           =========
     protected final List<HpCalcSpecification<CB>> _selfSpecificationList = DfCollectionUtil.newArrayList();
     protected final Map<String, HpCalcSpecification<CB>> _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
+
+    protected SpecifyQuery<CB> _updateColumnSpecification;
+    protected CB _updateColumnSpecifiedCB;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -100,10 +104,11 @@ public class UpdateOption<CB extends ConditionBean> {
         return specification;
     }
 
-    // ===================================================================================
-    //                                                               Resolve Specification
-    //                                                               =====================
-    public void resolveSpecification(CB cb) {
+    public boolean hasSelfSpecification() {
+        return !_selfSpecificationList.isEmpty();
+    }
+
+    public void resolveSelfSpecification(CB cb) {
         for (HpCalcSpecification<CB> specification : _selfSpecificationList) {
             specification.specify(cb);
             final String columnDbName = specification.getSpecifiedColumnInfo().getColumnDbName();
@@ -255,5 +260,31 @@ public class UpdateOption<CB extends ConditionBean> {
         br.addElement(columnDbName);
         final String msg = br.buildExceptionMessage();
         throw new VaryingUpdateNotFoundCalculationException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                       Update Column
+    //                                                                       =============
+    public void specify(SpecifyQuery<CB> updateColumnSpecification) {
+        _updateColumnSpecification = updateColumnSpecification;
+    }
+
+    public boolean hasSpecifiedUpdateColumn() {
+        return _updateColumnSpecifiedCB != null;
+    }
+
+    public void resolveUpdateColumnSpecification(CB cb) {
+        if (_updateColumnSpecification != null) {
+            _updateColumnSpecification.specify(cb);
+            _updateColumnSpecifiedCB = cb;
+        }
+    }
+
+    public boolean isSpecifiedUpdateColumn(String columnDbName) {
+        if (_updateColumnSpecifiedCB == null) {
+            return false;
+        }
+        final SqlClause sqlClause = _updateColumnSpecifiedCB.getSqlClause();
+        return sqlClause.hasSpecifiedSelectColumn(sqlClause.getBasePointAliasName(), columnDbName);
     }
 }

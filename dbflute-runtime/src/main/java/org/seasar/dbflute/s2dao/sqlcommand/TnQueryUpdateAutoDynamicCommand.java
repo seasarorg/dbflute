@@ -45,7 +45,7 @@ import org.seasar.dbflute.util.Srl;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
+public class TnQueryUpdateAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -57,7 +57,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateQueryAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnQueryUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         this._dataSource = dataSource;
         this._statementFactory = statementFactory;
     }

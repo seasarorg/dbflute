@@ -568,6 +568,14 @@ public interface SqlClause {
     boolean hasSpecifiedSelectColumn(String tableAliasName);
 
     /**
+     * Does it have the specified select column?
+     * @param tableAliasName The alias name of table. (NotNull)
+     * @param columnDbName The DB name of column. (NotNull)
+     * @return Determination.
+     */
+    boolean hasSpecifiedSelectColumn(String tableAliasName, String columnDbName);
+
+    /**
      * Back up specified select columns.
      */
     void backupSpecifiedSelectColumn();

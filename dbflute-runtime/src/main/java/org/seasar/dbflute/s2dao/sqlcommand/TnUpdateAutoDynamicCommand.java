@@ -15,6 +15,10 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.XLog;
@@ -33,7 +37,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
+public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     // ===================================================================================
     //                                                                          Definition
@@ -61,86 +65,101 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
+        if (args == null || args.length == 0) {
+            String msg = "The argument 'args' should not be null or empty.";
+            throw new IllegalArgumentException(msg);
+        }
         final Object bean = args[0];
         @SuppressWarnings("unchecked")
         final UpdateOption<ConditionBean> option = (args.length > 1 ? (UpdateOption<ConditionBean>) args[1] : null);
 
-        final TnBeanMetaData bmd = getBeanMetaData();
-        final TnPropertyType[] propertyTypes = createUpdatePropertyTypes(bmd, bean, getPropertyNames(), option);
+        final TnPropertyType[] propertyTypes = createUpdatePropertyTypes(bean, option);
         if (propertyTypes.length == 0) {
             if (isLogEnabled()) {
-                log(createNonUpdateLogMessage(bean, bmd));
+                log(createNonUpdateLogMessage(bean));
             }
             return NON_UPDATE;
         }
-        final String sql = createUpdateSql(bmd, propertyTypes, bean, option);
-        final TnUpdateAutoHandler handler = createUpdateAutoHandler(bmd, propertyTypes, sql, option);
+        final String sql = createUpdateSql(propertyTypes, option);
+        return doExecute(bean, propertyTypes, sql, option);
+    }
+
+    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
+            UpdateOption<ConditionBean> option) {
+        final TnUpdateAutoHandler handler = createUpdateAutoHandler(propertyTypes, sql, option);
         final Object[] realArgs = new Object[] { bean };
         handler.setExceptionMessageSqlArgs(realArgs);
         final int result = handler.execute(realArgs);
-
-        // [Comment Out]: This statement moved to the handler at [DBFlute-0.8.0].
-        //if (isCheckSingleRowUpdate() && i < 1) {
-        //    throw createNotSingleRowUpdatedRuntimeException(args[0], i);
-        //}
-
         return Integer.valueOf(result);
     }
 
-    protected TnUpdateAutoHandler createUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] boundPropTypes,
-            String sql, UpdateOption<ConditionBean> option) {
-        final TnUpdateAutoHandler handler = new TnUpdateAutoHandler(getDataSource(), getStatementFactory(), bmd,
-                boundPropTypes);
-        handler.setSql(sql);
-        handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]
-        handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
-        handler.setUpdateOption(option);
-        return handler;
-    }
-
-    // abstract because DBFlute uses only modified only
-    protected abstract TnPropertyType[] createUpdatePropertyTypes(TnBeanMetaData bmd, Object bean,
-            String[] propertyNames, UpdateOption<ConditionBean> option);
-
-    protected String createNonUpdateLogMessage(final Object bean, final TnBeanMetaData bmd) {
-        final StringBuilder sb = new StringBuilder();
-        final String tableDbName = _targetDBMeta.getTableDbName();
-        sb.append("...Skipping update because of non-modification: table=").append(tableDbName);
-        final int size = bmd.getPrimaryKeySize();
-        for (int i = 0; i < size; i++) {
-            if (i == 0) {
-                sb.append(", primaryKey={");
-            } else {
-                sb.append(", ");
+    // ===================================================================================
+    //                                                                       Update Column
+    //                                                                       =============
+    protected TnPropertyType[] createUpdatePropertyTypes(Object bean, UpdateOption<ConditionBean> option) {
+        final Set<?> modifiedSet = getModifiedPropertyNames(bean);
+        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
+        final String timestampProp = _beanMetaData.getTimestampPropertyName();
+        final String versionNoProp = _beanMetaData.getVersionNoPropertyName();
+        final String[] propertyNames = getPropertyNames();
+        for (int i = 0; i < propertyNames.length; ++i) {
+            final TnPropertyType pt = _beanMetaData.getPropertyType(propertyNames[i]);
+            if (pt.isPrimaryKey()) {
+                continue;
             }
-            final String keyName = bmd.getPrimaryKeyDbName(i);
-            sb.append(keyName).append("=");
-            sb.append(bmd.getPropertyTypeByColumnName(keyName).getPropertyDesc().getValue(bean));
-            if (i == size - 1) {
-                sb.append("}");
+            if (isOptimisticLockProperty(timestampProp, versionNoProp, pt) // OptimisticLock
+                    || isSpecifiedProperty(option, modifiedSet, pt) // Specified
+                    || isStatementProperty(option, pt)) { // Statement
+                types.add(pt);
             }
         }
-        return sb.toString();
+        return types.toArray(new TnPropertyType[types.size()]);
     }
 
+    protected Set<?> getModifiedPropertyNames(Object bean) {
+        return getBeanMetaData().getModifiedPropertyNames(bean);
+    }
+
+    protected boolean isOptimisticLockProperty(String timestampProp, String versionNoProp, TnPropertyType pt) {
+        final String propertyName = pt.getPropertyName();
+        return propertyName.equalsIgnoreCase(timestampProp) || propertyName.equalsIgnoreCase(versionNoProp);
+    }
+
+    protected boolean isSpecifiedProperty(UpdateOption<ConditionBean> option, Set<?> modifiedSet, TnPropertyType pt) {
+        if (option != null && option.hasSpecifiedUpdateColumn()) {
+            return option.isSpecifiedUpdateColumn(pt.getColumnDbName());
+        } else { // basically here when UpdateEntity
+            // process for ModifiedColumnUpdate
+            return isModifiedProperty(modifiedSet, pt);
+        }
+    }
+
+    protected boolean isModifiedProperty(Set<?> modifiedSet, TnPropertyType pt) {
+        return modifiedSet.contains(pt.getPropertyName());
+    }
+
+    protected boolean isStatementProperty(UpdateOption<ConditionBean> option, TnPropertyType pt) {
+        return option != null && option.hasStatement(pt.getColumnDbName());
+    }
+
+    // ===================================================================================
+    //                                                                          Update SQL
+    //                                                                          ==========
     /**
      * Create update SQL. The update is by the primary keys.
-     * @param bmd The meta data of bean. (NotNull & RequiredPrimaryKeys)
      * @param propertyTypes The types of property for update. (NotNull)
-     * @param bean A bean for update for handling version no and so on. (NotNull)
      * @param option An option of update. (Nullable)
      * @return The update SQL. (NotNull)
      */
-    protected String createUpdateSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes, Object bean,
-            UpdateOption<ConditionBean> option) {
+    protected String createUpdateSql(TnPropertyType[] propertyTypes, UpdateOption<ConditionBean> option) {
         final TableSqlName tableSqlName = _targetDBMeta.getTableSqlName();
-        if (bmd.getPrimaryKeySize() == 0) {
+        if (_beanMetaData.getPrimaryKeySize() == 0) {
             String msg = "The table '" + tableSqlName + "' does not have primary keys!";
             throw new IllegalStateException(msg);
         }
         final StringBuilder sb = new StringBuilder(100);
         sb.append("update ").append(tableSqlName).append(" set ");
-        final String versionNoPropertyName = bmd.getVersionNoPropertyName();
+        final String versionNoPropertyName = _beanMetaData.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; i++) {
             final TnPropertyType pt = propertyTypes[i];
             final String columnDbName = pt.getColumnDbName();
@@ -154,11 +173,6 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
                     setupVersionNoAutoIncrementOnQuery(sb, columnSqlName);
                     continue;
                 }
-                final Object versionNo = pt.getPropertyDesc().getValue(bean);
-                if (versionNo == null) {
-                    setupVersionNoAutoIncrementOnQuery(sb, columnSqlName);
-                    continue;
-                }
             }
             if (option != null && option.hasStatement(columnDbName)) {
                 final String statement = option.buildStatement(columnDbName);
@@ -168,16 +182,16 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             sb.append(columnSqlName).append(" = ?");
         }
         sb.append(ln()).append(" where ");
-        for (int i = 0; i < bmd.getPrimaryKeySize(); i++) { // never zero loop
-            sb.append(bmd.getPrimaryKeySqlName(i)).append(" = ? and ");
+        for (int i = 0; i < _beanMetaData.getPrimaryKeySize(); i++) { // never zero loop
+            sb.append(_beanMetaData.getPrimaryKeySqlName(i)).append(" = ? and ");
         }
         sb.setLength(sb.length() - 5); // for deleting extra ' and '
-        if (_optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
-            TnPropertyType pt = bmd.getVersionNoPropertyType();
+        if (_optimisticLockHandling && _beanMetaData.hasVersionNoPropertyType()) {
+            TnPropertyType pt = _beanMetaData.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
-        if (_optimisticLockHandling && bmd.hasTimestampPropertyType()) {
-            TnPropertyType pt = bmd.getTimestampPropertyType();
+        if (_optimisticLockHandling && _beanMetaData.hasTimestampPropertyType()) {
+            TnPropertyType pt = _beanMetaData.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
         return sb.toString();
@@ -185,6 +199,44 @@ public abstract class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     protected void setupVersionNoAutoIncrementOnQuery(StringBuilder sb, ColumnSqlName columnSqlName) {
         sb.append(columnSqlName).append(" = ").append(columnSqlName).append(" + 1");
+    }
+
+    // ===================================================================================
+    //                                                                             Handler
+    //                                                                             =======
+    protected TnUpdateAutoHandler createUpdateAutoHandler(TnPropertyType[] boundPropTypes, String sql,
+            UpdateOption<ConditionBean> option) {
+        final TnUpdateAutoHandler handler = new TnUpdateAutoHandler(getDataSource(), getStatementFactory(),
+                _beanMetaData, boundPropTypes);
+        handler.setSql(sql);
+        handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]
+        handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
+        handler.setUpdateOption(option);
+        return handler;
+    }
+
+    // ===================================================================================
+    //                                                                  Non Update Message
+    //                                                                  ==================
+    protected String createNonUpdateLogMessage(final Object bean) {
+        final StringBuilder sb = new StringBuilder();
+        final String tableDbName = _targetDBMeta.getTableDbName();
+        sb.append("...Skipping update because of non-modification: table=").append(tableDbName);
+        final int size = _beanMetaData.getPrimaryKeySize();
+        for (int i = 0; i < size; i++) {
+            if (i == 0) {
+                sb.append(", primaryKey={");
+            } else {
+                sb.append(", ");
+            }
+            final String keyName = _beanMetaData.getPrimaryKeyDbName(i);
+            sb.append(keyName).append("=");
+            sb.append(_beanMetaData.getPropertyTypeByColumnName(keyName).getPropertyDesc().getValue(bean));
+            if (i == size - 1) {
+                sb.append("}");
+            }
+        }
+        return sb.toString();
     }
 
     // ===================================================================================

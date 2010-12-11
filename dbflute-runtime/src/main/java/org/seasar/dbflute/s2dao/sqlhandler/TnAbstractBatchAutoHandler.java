@@ -18,8 +18,6 @@ package org.seasar.dbflute.s2dao.sqlhandler;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -60,47 +58,16 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     //                                                                             =======
     @Override
     public int execute(Object[] args) {
-        List<?> list = null;
-        if (args[0] instanceof Object[]) {
-            list = Arrays.asList((Object[]) args[0]);
-        } else if (args[0] instanceof List<?>) {
-            list = (List<?>) args[0];
-        }
-        if (list == null) {
-            throw new IllegalArgumentException("args[0]");
-        }
-        int[] ret = execute(list);
-        int updatedRow = 0;
-        for (int i = 0; i < ret.length; i++) {
-            if (ret[i] > 0) {
-                updatedRow += ret[i];
-            }
-        }
-        return updatedRow;
+        String msg = "This method should not be called when BatchUpdate.";
+        throw new IllegalStateException(msg);
     }
 
-    public int[] executeBatch(Object[] args) {
-        List<?> list = null;
-        if (args[0] instanceof Object[]) {
-            list = Arrays.asList((Object[]) args[0]);
-        } else if (args[0] instanceof List<?>) {
-            list = (List<?>) args[0];
+    public int[] executeBatch(List<?> beanList) {
+        if (beanList == null) {
+            String msg = "The argument 'beanList' should not be null";
+            throw new IllegalArgumentException(msg);
         }
-        if (list == null) {
-            throw new IllegalArgumentException("args[0]");
-        }
-        return execute(list);
-    }
-
-    public int[] execute(List<?> list, Class<?>[] argTypes) {
-        return execute(list);
-    }
-
-    public int[] execute(List<?> list) {
-        if (list == null) {
-            throw new IllegalArgumentException("list");
-        }
-        if (list.isEmpty()) {
+        if (beanList.isEmpty()) {
             if (_log.isDebugEnabled()) {
                 _log.debug("Skip executeBatch() bacause of the empty list.");
             }
@@ -110,12 +77,11 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         try {
             final PreparedStatement ps = prepareStatement(conn);
             try {
-                for (Iterator<?> iter = list.iterator(); iter.hasNext();) {
-                    final Object bean = (Object) iter.next();
+                for (Object bean : beanList) {
                     prepareBatchElement(conn, ps, bean);
                 }
-                final int[] result = executeBatch(ps, list);
-                handleBatchUpdateResultWithOptimisticLock(ps, list, result);
+                final int[] result = executeBatch(ps, beanList);
+                handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
                 return result;
             } finally {
                 close(ps);

@@ -22,22 +22,20 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
-import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateBatchAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnBatchDeleteAutoHandler;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
+public class TnBatchDeleteAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateBatchAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
-            boolean versionNoAutoIncrementOnMemory) {
-        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling,
-                versionNoAutoIncrementOnMemory);
+    public TnBatchDeleteAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false);
     }
 
     // ===================================================================================
@@ -50,19 +48,21 @@ public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCom
 
     @Override
     protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
-        final TnUpdateBatchAutoHandler handler = new TnUpdateBatchAutoHandler(getDataSource(), getStatementFactory(),
-                getBeanMetaData(), getPropertyTypes());
-        handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
-        return handler;
+        return newInternalBatchAutoHandler();
+    }
+
+    protected TnBatchDeleteAutoHandler newInternalBatchAutoHandler() {
+        return new TnBatchDeleteAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(),
+                getPropertyTypes());
     }
 
     @Override
     protected void setupSql() {
-        setupUpdateSql();
+        setupDeleteSql();
     }
 
     @Override
     protected void setupPropertyTypes(String[] propertyNames) {
-        setupUpdatePropertyTypes(propertyNames);
+        setupDeletePropertyTypes(propertyNames);
     }
 }

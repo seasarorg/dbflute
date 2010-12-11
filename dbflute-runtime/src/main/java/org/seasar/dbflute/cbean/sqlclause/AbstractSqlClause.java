@@ -1849,6 +1849,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _specifiedSelectColumnMap != null && _specifiedSelectColumnMap.containsKey(tableAliasName);
     }
 
+    public boolean hasSpecifiedSelectColumn(String tableAliasName, String columnDbName) {
+        final Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        if (elementMap == null) {
+            return false;
+        }
+        return elementMap.containsKey(columnDbName);
+    }
+
     public void backupSpecifiedSelectColumn() {
         _backupSpecifiedSelectColumnMap = _specifiedSelectColumnMap;
     }

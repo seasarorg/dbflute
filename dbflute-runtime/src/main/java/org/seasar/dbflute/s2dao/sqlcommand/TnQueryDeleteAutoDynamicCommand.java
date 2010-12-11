@@ -31,7 +31,7 @@ import org.seasar.dbflute.twowaysql.node.Node;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
+public class TnQueryDeleteAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -42,7 +42,7 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnDeleteQueryAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnQueryDeleteAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         this.dataSource = dataSource;
         this.statementFactory = statementFactory;
     }

@@ -18,7 +18,7 @@ package org.seasar.dbflute.bhv.core.command;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateModifiedOnlyCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateAutoDynamicCommand;
 
 /**
  * @author jflute
@@ -47,12 +47,12 @@ public class UpdateEntityCommand extends AbstractUpdateEntityCommand {
 
     protected SqlExecution createUpdateEntitySqlExecution(TnBeanMetaData bmd) {
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        return createUpdateModifiedOnlyCommand(bmd, propertyNames);
+        return createUpdateAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnUpdateModifiedOnlyCommand createUpdateModifiedOnlyCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnUpdateModifiedOnlyCommand cmd = new TnUpdateModifiedOnlyCommand(_dataSource, _statementFactory);
-        cmd.setBeanMetaData(bmd); // extension point
+    protected TnUpdateAutoDynamicCommand createUpdateAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnUpdateAutoDynamicCommand cmd = new TnUpdateAutoDynamicCommand(_dataSource, _statementFactory);
+        cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling());

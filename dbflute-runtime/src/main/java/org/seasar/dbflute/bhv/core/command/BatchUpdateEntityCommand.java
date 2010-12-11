@@ -15,16 +15,23 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
-import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateBatchAutoStaticCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnBatchUpdateAutoDynamicCommand;
 
 /**
  * @author jflute
  */
 public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The option of update. (NotRequired) */
+    protected UpdateOption<? extends ConditionBean> _updateOption;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -36,6 +43,12 @@ public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
+    @Override
+    public Object[] getSqlExecutionArgument() {
+        assertStatus("getSqlExecutionArgument");
+        return new Object[] { _entityList, _updateOption };
+    }
+
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
@@ -48,17 +61,32 @@ public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
 
     protected SqlExecution createBatchUpdateEntitySqlExecution(TnBeanMetaData bmd) {
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        return createUpdateBatchAutoStaticCommand(bmd, propertyNames);
+        return createBatchUpdateAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnUpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(TnBeanMetaData bmd,
+    protected TnBatchUpdateAutoDynamicCommand createBatchUpdateAutoDynamicCommand(TnBeanMetaData bmd,
             String[] propertyNames) {
-        final DBMeta dbmeta = findDBMeta();
-        final boolean opt = isOptimisticLockHandling();
-        return new TnUpdateBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt, opt);
+        final TnBatchUpdateAutoDynamicCommand cmd = new TnBatchUpdateAutoDynamicCommand(_dataSource, _statementFactory);
+        cmd.setBeanMetaData(bmd);
+        cmd.setTargetDBMeta(findDBMeta());
+        cmd.setPropertyNames(propertyNames);
+        cmd.setOptimisticLockHandling(isOptimisticLockHandling());
+        cmd.setVersionNoAutoIncrementOnMemory(isVersionNoAutoIncrementOnMemory());
+        return cmd;
     }
 
     protected boolean isOptimisticLockHandling() {
         return true;
+    }
+
+    protected boolean isVersionNoAutoIncrementOnMemory() {
+        return isOptimisticLockHandling();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setUpdateOption(UpdateOption<? extends ConditionBean> updateOption) {
+        _updateOption = updateOption;
     }
 }

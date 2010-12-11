@@ -16,7 +16,6 @@
 package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -81,6 +80,9 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
 
     protected abstract void setupPropertyTypes(String[] propertyNames);
 
+    // ===================================================================================
+    //                                                                              Insert
+    //                                                                              ======
     protected void setupInsertPropertyTypes(String[] propertyNames) {
         final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         for (int i = 0; i < propertyNames.length; ++i) {
@@ -99,23 +101,6 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
             return generator.isSelfGenerate();
         }
         return true;
-    }
-
-    protected void setupUpdatePropertyTypes(String[] propertyNames) {
-        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
-        for (int i = 0; i < propertyNames.length; ++i) {
-            final TnPropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
-            if (pt.isPrimaryKey()) {
-                continue;
-            }
-            types.add(pt);
-        }
-        if (types.size() == 0) {
-            String msg = "The property type that is not primary key was not found:";
-            msg = msg + " propertyNames=" + Arrays.asList(propertyNames);
-            throw new IllegalStateException(msg);
-        }
-        _propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
     }
 
     protected void setupDeletePropertyTypes(String[] propertyNames) {
@@ -148,26 +133,14 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         setSql(sb.toString());
     }
 
-    protected void setupUpdateSql() {
-        checkPrimaryKey();
-        final StringBuilder sb = new StringBuilder(100);
-        sb.append("update ");
-        sb.append(_targetDBMeta.getTableSqlName());
-        sb.append(" set ");
-        final String versionNoPropertyName = getBeanMetaData().getVersionNoPropertyName();
-        for (int i = 0; i < _propertyTypes.length; ++i) {
-            final TnPropertyType pt = _propertyTypes[i];
-            if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName) && !_versionNoAutoIncrementOnMemory) {
-                sb.append(pt.getColumnSqlName()).append(" = ").append(pt.getColumnSqlName()).append(" + 1, ");
-                continue;
-            }
-            sb.append(pt.getColumnSqlName()).append(" = ?, ");
-        }
-        sb.setLength(sb.length() - 2);
-        setupUpdateWhere(sb);
-        setSql(sb.toString());
-    }
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
+    // *static update is unused on DBFlute
 
+    // ===================================================================================
+    //                                                                              Delete
+    //                                                                              ======
     protected void setupDeleteSql() {
         checkPrimaryKey();
         final StringBuilder sb = new StringBuilder(100);

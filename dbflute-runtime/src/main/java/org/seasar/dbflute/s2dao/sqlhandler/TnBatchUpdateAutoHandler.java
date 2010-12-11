@@ -25,12 +25,12 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnDeleteBatchAutoHandler extends TnAbstractBatchAutoHandler {
+public class TnBatchUpdateAutoHandler extends TnAbstractBatchAutoHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnDeleteBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
+    public TnBatchUpdateAutoHandler(DataSource dataSource, StatementFactory statementFactory,
             TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, beanMetaData, boundPropTypes);
     }
@@ -40,6 +40,6 @@ public class TnDeleteBatchAutoHandler extends TnAbstractBatchAutoHandler {
     //                                                                            ========
     @Override
     protected void setupBindVariables(Object bean) {
-        setupDeleteBindVariables(bean);
+        setupUpdateBindVariables(bean);
     }
 }

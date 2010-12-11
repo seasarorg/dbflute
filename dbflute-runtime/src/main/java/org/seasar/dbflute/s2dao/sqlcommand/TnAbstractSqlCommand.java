@@ -31,7 +31,7 @@ public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution
     //                                                                           =========
     private DataSource _dataSource;
     private StatementFactory _statementFactory;
-    private String _sql;
+    private String _sql; // is not always used
 
     // ===================================================================================
     //                                                                         Constructor

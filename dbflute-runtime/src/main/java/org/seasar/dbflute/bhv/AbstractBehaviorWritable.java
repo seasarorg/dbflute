@@ -681,6 +681,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected InsertEntityCommand createInsertEntityCommand(Entity entity) {
         assertBehaviorCommandInvoker("createInsertEntityCommand");
         return xsetupEntityCommand(new InsertEntityCommand(), entity);
@@ -714,20 +717,29 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return command;
     }
 
+    // -----------------------------------------------------
+    //                                                 Batch
+    //                                                 -----
     protected BatchInsertEntityCommand createBatchInsertEntityCommand(List<? extends Entity> entityList) {
         assertBehaviorCommandInvoker("createBatchInsertEntityCommand");
         return xsetupListEntityCommand(new BatchInsertEntityCommand(), entityList);
     }
 
-    protected BatchUpdateEntityCommand createBatchUpdateEntityCommand(List<? extends Entity> entityList) {
+    protected BatchUpdateEntityCommand createBatchUpdateEntityCommand(List<? extends Entity> entityList,
+            UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchUpdateEntityCommand");
-        return xsetupListEntityCommand(new BatchUpdateEntityCommand(), entityList);
+        final BatchUpdateEntityCommand cmd = xsetupListEntityCommand(new BatchUpdateEntityCommand(), entityList);
+        cmd.setUpdateOption(option);
+        return cmd;
     }
 
     protected BatchUpdateNonstrictEntityCommand createBatchUpdateNonstrictEntityCommand(
-            List<? extends Entity> entityList) {
+            List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchUpdateNonstrictEntityCommand");
-        return xsetupListEntityCommand(new BatchUpdateNonstrictEntityCommand(), entityList);
+        final BatchUpdateNonstrictEntityCommand cmd = xsetupListEntityCommand(new BatchUpdateNonstrictEntityCommand(),
+                entityList);
+        cmd.setUpdateOption(option);
+        return cmd;
     }
 
     protected BatchDeleteEntityCommand createBatchDeleteEntityCommand(List<? extends Entity> entityList) {
@@ -760,6 +772,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return command;
     }
 
+    // -----------------------------------------------------
+    //                                                 Query
+    //                                                 -----
     protected QueryUpdateEntityCBCommand createQueryUpdateEntityCBCommand(Entity entity, ConditionBean cb) {
         assertBehaviorCommandInvoker("createQueryUpdateEntityCBCommand");
         final QueryUpdateEntityCBCommand cmd = new QueryUpdateEntityCBCommand();
@@ -782,6 +797,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return cmd;
     }
 
+    // -----------------------------------------------------
+    //                                               Varying
+    //                                               -------
     protected UpdateEntityCommand createVaryingUpdateEntityCommand(Entity entity,
             UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createVaryingUpdateEntityCommand");

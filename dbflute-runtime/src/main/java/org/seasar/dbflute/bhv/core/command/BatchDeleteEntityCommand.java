@@ -19,7 +19,7 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnDeleteBatchAutoStaticCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnBatchDeleteAutoStaticCommand;
 
 /**
  * @author jflute
@@ -51,11 +51,11 @@ public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
         return createDeleteBatchAutoStaticCommand(bmd, propertyNames);
     }
 
-    protected TnDeleteBatchAutoStaticCommand createDeleteBatchAutoStaticCommand(TnBeanMetaData bmd,
+    protected TnBatchDeleteAutoStaticCommand createDeleteBatchAutoStaticCommand(TnBeanMetaData bmd,
             String[] propertyNames) {
         final DBMeta dbmeta = findDBMeta();
         final boolean opt = isOptimisticLockHandling();
-        return new TnDeleteBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
+        return new TnBatchDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
     }
 
     protected boolean isOptimisticLockHandling() {

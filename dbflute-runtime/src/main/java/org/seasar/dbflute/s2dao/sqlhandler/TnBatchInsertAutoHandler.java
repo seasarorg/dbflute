@@ -13,56 +13,34 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.sqlcommand;
+package org.seasar.dbflute.s2dao.sqlhandler;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
-import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
-import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteBatchAutoHandler;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnDeleteBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
+public class TnBatchInsertAutoHandler extends TnAbstractBatchAutoHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnDeleteBatchAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling) {
-        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false);
+    public TnBatchInsertAutoHandler(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
+        setOptimisticLockHandling(false);
     }
 
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected TnAbstractAutoHandler createAutoHandler() {
-        return createBatchAutoHandler();
-    }
-
-    @Override
-    protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
-        return newInternalBatchAutoHandler();
-    }
-
-    protected TnDeleteBatchAutoHandler newInternalBatchAutoHandler() {
-        return new TnDeleteBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(),
-                getPropertyTypes());
-    }
-
-    @Override
-    protected void setupSql() {
-        setupDeleteSql();
-    }
-
-    @Override
-    protected void setupPropertyTypes(String[] propertyNames) {
-        setupDeletePropertyTypes(propertyNames);
+    protected void setupBindVariables(Object bean) {
+        setupInsertBindVariables(bean);
     }
 }
