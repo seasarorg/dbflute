@@ -8,10 +8,7 @@ import org.seasar.dbflute.bhv.*;
 #if ($table.isAvailableNonPrimaryKeyWritable())
 import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
 #end
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.EntityRowHandler;
-import org.seasar.dbflute.cbean.ListResultBean;
-import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyArranger;
@@ -908,7 +905,25 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return delegateUpdateList(${myEntityListVariableName});
+        return delegateUpdateList(${myEntityListVariableName}, null);
+    }
+
+    /**
+     * Batch-update the list. <br />
+     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
+     * You can specify update columns used on set clause of update statement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param updateColumnSpec The specification of update columns. (NotNull)
+     * @return The array of updated count.
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     */
+    public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        return delegateUpdateList(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec, createCBForVaryingUpdate()));
     }
 #if ($table.hasOptimisticLock())
 
@@ -922,7 +937,21 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return delegateUpdateListNonstrict(${myEntityListVariableName});
+        return delegateUpdateListNonstrict(${myEntityListVariableName}, null);
+    }
+
+    /**
+     * Batch-update the list non-strictly. <br />
+     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
+     * You can specify update columns used on set clause of update statement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param updateColumnSpec The specification of update columns. (NotNull)
+     * @return The array of updated count.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     */
+    public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        return delegateUpdateListNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec, createCBForVaryingUpdate()));
     }
 #end
 
@@ -1094,9 +1123,18 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     protected void processVaryingUpdate(UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
+        if (option.hasSelfSpecification()) {
+            option.resolveSelfSpecification(createCBForVaryingUpdate());
+        }
+        if (option.hasSpecifiedUpdateColumn()) {
+            option.resolveUpdateColumnSpecification(createCBForVaryingUpdate());
+        }
+    }
+
+    protected ${myConditionBeanClassName} createCBForVaryingUpdate() {
         ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.xsetupForVaryingUpdate();
-        option.resolveSpecification(cb);
+        return cb;
     }
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
@@ -1276,17 +1314,17 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls))); }
     @SuppressWarnings("unchecked")
     protected int[] doCreateList(List<Entity> ls) { return delegateInsertList((List)ls); }
-    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls)
+    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
 #if ($table.hasOptimisticLock())
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls), op)); }
 #else
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls), op)); }
 #end
     @SuppressWarnings("unchecked")
-    protected int[] doModifyList(List<Entity> ls) { return delegateUpdateList((List)ls); }
+    protected int[] doModifyList(List<Entity> ls) { return delegateUpdateList((List)ls, null); }
 #if ($table.hasOptimisticLock())
-    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls), op)); }
 #end
     protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls)
 #if ($table.hasOptimisticLock())

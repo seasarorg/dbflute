@@ -2591,6 +2591,64 @@ public class Table {
         return ls;
     }
 
+    public String getCommonColumnListSetupExpression() {
+        return buildCommonColumnListSetupExpression(getCommonColumnList());
+    }
+
+    public List<Column> getCommonColumnBeforeInsertList() {
+        final List<Column> commonColumnList = getCommonColumnList();
+        final List<Column> commonColumnBeforeInsertList = DfCollectionUtil.newArrayList();
+        for (Column column : commonColumnList) {
+            final String name = column.getName();
+            if (getDatabase().containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(name)) {
+                commonColumnBeforeInsertList.add(column);
+            }
+        }
+        return commonColumnBeforeInsertList;
+    }
+
+    public String getCommonColumnBeforeInsertListSetupExpression() {
+        return buildCommonColumnListSetupExpression(getCommonColumnBeforeInsertList());
+    }
+
+    public List<Column> getCommonColumnBeforeUpdateList() {
+        final List<Column> commonColumnList = getCommonColumnList();
+        final List<Column> commonColumnBeforeUpdateList = DfCollectionUtil.newArrayList();
+        for (Column column : commonColumnList) {
+            final String name = column.getName();
+            if (getDatabase().containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(name)) {
+                commonColumnBeforeUpdateList.add(column);
+            }
+        }
+        return commonColumnBeforeUpdateList;
+    }
+
+    public String getCommonColumnBeforeUpdateListSetupExpression() {
+        return buildCommonColumnListSetupExpression(getCommonColumnBeforeUpdateList());
+    }
+
+    protected String buildCommonColumnListSetupExpression(List<Column> commonColumnList) {
+        final String prefix;
+        final String suffix;
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            prefix = "Column";
+            suffix = "";
+        } else {
+            prefix = "column";
+            suffix = "()";
+        }
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (Column column : commonColumnList) {
+            if (index > 0) {
+                sb.append(", ");
+            }
+            sb.append(prefix + column.getJavaName() + suffix);
+            ++index;
+        }
+        return sb.toString();
+    }
+
     public String findTargetColumnJavaNameByCommonColumnName(String commonColumnName) {
         final DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
         if (prop.isCommonColumnConversion(commonColumnName)) {
