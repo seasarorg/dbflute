@@ -107,6 +107,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     // ===================================================================================
     //                                                                       Pre/Post Bean
     //                                                                       =============
+    // *after case about identity is unsupported at Batch Update   
     protected void preBatchUpdateBean(Object bean) {
     }
 
