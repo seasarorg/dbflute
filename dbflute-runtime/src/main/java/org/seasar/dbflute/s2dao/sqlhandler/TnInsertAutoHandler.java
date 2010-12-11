@@ -48,9 +48,9 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
 
     @Override
     protected void preUpdateBean(Object bean) {
-        TnBeanMetaData bmd = getBeanMetaData();
+        final TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
-            TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
+            final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (generator.isSelfGenerate()) {
                 generator.setIdentifier(bean, getDataSource());
             }
@@ -59,9 +59,9 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
 
     @Override
     protected void postUpdateBean(Object bean, int ret) {
-        TnBeanMetaData bmd = getBeanMetaData();
+        final TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
-            TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
+            final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (!generator.isSelfGenerate()) {
                 generator.setIdentifier(bean, getDataSource());
             }

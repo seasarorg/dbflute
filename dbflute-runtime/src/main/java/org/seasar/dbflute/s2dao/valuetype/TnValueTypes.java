@@ -147,13 +147,18 @@ public class TnValueTypes {
     protected static TnPlainValueTypes findValueTypes(DBDef dbdef) {
         assertObjectNotNull("dbdef", dbdef);
         TnPlainValueTypes valueTypes = _valueTypesMap.get(dbdef);
-        if (valueTypes == null) {
-            synchronized (_valueTypesMap) {
-                valueTypes = new TnPlainValueTypes();
-                _valueTypesMap.put(dbdef, valueTypes);
-            }
+        if (valueTypes != null) {
+            return valueTypes;
         }
-        return valueTypes;
+        synchronized (_valueTypesMap) {
+            valueTypes = _valueTypesMap.get(dbdef);
+            if (valueTypes != null) {
+                return valueTypes;
+            }
+            valueTypes = new TnPlainValueTypes();
+            _valueTypesMap.put(dbdef, valueTypes);
+            return _valueTypesMap.get(dbdef);
+        }
     }
 
     // ===================================================================================

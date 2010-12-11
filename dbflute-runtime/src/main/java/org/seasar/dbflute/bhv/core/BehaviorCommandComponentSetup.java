@@ -25,11 +25,11 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
  */
 public interface BehaviorCommandComponentSetup {
 
-    public void setDataSource(DataSource dataSource);
+    void setDataSource(DataSource dataSource);
 
-    public void setStatementFactory(StatementFactory statementFactory);
+    void setStatementFactory(StatementFactory statementFactory);
 
-    public void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory);
+    void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory);
 
-    public void setSqlFileEncoding(String sqlFileEncoding);
+    void setSqlFileEncoding(String sqlFileEncoding);
 }

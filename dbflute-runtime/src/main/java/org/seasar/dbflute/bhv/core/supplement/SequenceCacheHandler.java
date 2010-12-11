@@ -39,7 +39,7 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, SequenceCache> _sequenceCacheMap = new ConcurrentHashMap<String, SequenceCache>();
+    protected final Map<String, SequenceCache> _sequenceCacheMap = newConcurrentHashMap();
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected boolean _internalDebug;
 
@@ -258,6 +258,10 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }

@@ -68,6 +68,7 @@ public class SequenceCache {
     /** The sequence value as first value for batch way only. (Nullable: at first or not batch way) */
     protected volatile BigDecimal _batchFirstValue;
 
+    // should be used in a process synchronized
     protected final List<BigDecimal> _cachedList = new ArrayList<BigDecimal>();
     protected final SortedSet<BigDecimal> _tmpSortedSet = new TreeSet<BigDecimal>(new Comparator<BigDecimal>() {
         public int compare(BigDecimal arg0, BigDecimal arg1) {
@@ -157,7 +158,7 @@ public class SequenceCache {
         return DEFAULT_ADD_SIZE;
     }
 
-    protected void setupSequence(SequenceRealExecutor executor) {
+    protected void setupSequence(SequenceRealExecutor executor) { // should be called in a process synchronized
         initialize();
         if (isInternalDebugEnabled()) {
             _log.debug("...Executing sequence cache: " + executor);
@@ -185,12 +186,15 @@ public class SequenceCache {
         }
     }
 
-    protected void initialize() {
+    protected void initialize() { // should be called in a process synchronized
         _addedCount = INITIAL_ADDED_COUNT;
         _cachedList.clear();
         _tmpSortedSet.clear();
     }
 
+    // -----------------------------------------------------
+    //                                                Assert
+    //                                                ------
     protected void assertSequenceRealExecutorReturnsNotNull(Object obj, SequenceRealExecutor executor) {
         if (obj == null) {
             String msg = "The sequence real executor should not return null:";
@@ -207,16 +211,22 @@ public class SequenceCache {
         }
     }
 
-    public static interface SequenceRealExecutor {
-        Object execute();
-    }
-
+    // -----------------------------------------------------
+    //                                               Convert
+    //                                               -------
     protected BigDecimal toInternalType(Object value) {
         return DfTypeUtil.toBigDecimal(value);
     }
 
     protected Object toResultType(BigDecimal value) {
         return DfTypeUtil.toNumber(value, _resultType);
+    }
+
+    // ===================================================================================
+    //                                                              Sequence Real Executor
+    //                                                              ======================
+    public static interface SequenceRealExecutor {
+        Object execute();
     }
 
     // ===================================================================================

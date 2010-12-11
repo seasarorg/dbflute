@@ -42,15 +42,15 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected TnPropertyType propertyType;
-    protected TnResultSetHandler resultSetHandler;
+    protected final TnPropertyType _propertyType;
+    protected final TnResultSetHandler _resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnIdentifierAbstractGenerator(TnPropertyType propertyType) {
-        this.propertyType = propertyType;
-        resultSetHandler = new InternalIdentifierResultSetHandler(propertyType.getValueType());
+        _propertyType = propertyType;
+        _resultSetHandler = new InternalIdentifierResultSetHandler(propertyType.getValueType());
     }
 
     // ===================================================================================
@@ -66,7 +66,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
 
     protected TnBasicSelectHandler createSelectHandler(DataSource ds, String sql) {
         // Use original statement factory for identifier generator.
-        return new TnBasicSelectHandler(ds, sql, resultSetHandler, createStatementFactory(ds, sql));
+        return new TnBasicSelectHandler(ds, sql, _resultSetHandler, createStatementFactory(ds, sql));
     }
 
     protected StatementFactory createStatementFactory(DataSource ds, String sql) {
@@ -74,11 +74,11 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     }
 
     protected void reflectIdentifier(Object bean, Object value) {
-        if (propertyType == null) {
+        if (_propertyType == null) {
             String msg = "The arguement[propertyType] should not be null: value=" + value;
             throw new IllegalArgumentException(msg);
         }
-        DfPropertyDesc pd = propertyType.getPropertyDesc();
+        DfPropertyDesc pd = _propertyType.getPropertyDesc();
         pd.setValue(bean, value);
     }
 
@@ -135,6 +135,6 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     //                                                                            Accessor
     //                                                                            ========
     public String getPropertyName() {
-        return propertyType.getPropertyName();
+        return _propertyType.getPropertyName();
     }
 }

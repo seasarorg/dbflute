@@ -27,54 +27,54 @@ public interface BehaviorCommand<RESULT> {
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
-    public String getTableDbName();
+    String getTableDbName();
 
-    public String getCommandName();
+    String getCommandName();
 
     /**
      * Get the return type of command.
      * This type is not related to generic type because this is for conversion and check only.
      * @return The return type of command. (NotNull)
      */
-    public Class<?> getCommandReturnType();
+    Class<?> getCommandReturnType();
 
-    public boolean isInitializeOnly();
+    boolean isInitializeOnly();
 
     // ===================================================================================
     //                                                                  Detail Information
     //                                                                  ==================
-    public boolean isConditionBean();
+    boolean isConditionBean();
 
-    public boolean isOutsideSql();
+    boolean isOutsideSql();
 
-    public boolean isProcedure();
+    boolean isProcedure();
 
-    public boolean isSelect();
+    boolean isSelect();
 
-    public boolean isSelectCount();
+    boolean isSelectCount();
 
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================
-    public void beforeGettingSqlExecution();
+    void beforeGettingSqlExecution();
 
-    public void afterExecuting();
+    void afterExecuting();
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    public String buildSqlExecutionKey();
+    String buildSqlExecutionKey();
 
-    public SqlExecutionCreator createSqlExecutionCreator();
+    SqlExecutionCreator createSqlExecutionCreator();
 
-    public Object[] getSqlExecutionArgument();
+    Object[] getSqlExecutionArgument();
 
     // ===================================================================================
     //                                                                Argument Information
     //                                                                ====================
-    public ConditionBean getConditionBean();
+    ConditionBean getConditionBean();
 
-    public String getOutsideSqlPath();
+    String getOutsideSqlPath();
 
-    public OutsideSqlOption getOutsideSqlOption();
+    OutsideSqlOption getOutsideSqlOption();
 }

@@ -23,9 +23,9 @@ import javax.sql.DataSource;
  */
 public interface TnIdentifierGenerator {
 
-    public boolean isSelfGenerate();
+    boolean isSelfGenerate();
 
-    public void setIdentifier(Object bean, DataSource ds);
+    void setIdentifier(Object bean, DataSource ds);
 
-    public String getPropertyName();
+    String getPropertyName();
 }

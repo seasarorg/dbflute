@@ -56,12 +56,16 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     /** The name of table. (NotNull: If it's not entity, this value is 'df:Unknown') */
     protected String _tableName;
 
-    protected Map<String, TnPropertyType> _columnPropertyTypeMap = StringKeyMap.createAsCaseInsensitive();
-    protected List<TnRelationPropertyType> _relationPropertyTypes = new ArrayList<TnRelationPropertyType>();
+    /** The array of property type for primary key. */
     protected TnPropertyType[] _primaryKeys;
-    protected List<TnIdentifierGenerator> _identifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
-    protected Map<String, TnIdentifierGenerator> _identifierGeneratorsByPropertyName = StringKeyMap
+
+    // should be initialized in a process synchronized
+    protected final Map<String, TnPropertyType> _columnPropertyTypeMap = StringKeyMap.createAsCaseInsensitive();
+    protected final List<TnRelationPropertyType> _relationPropertyTypes = new ArrayList<TnRelationPropertyType>();
+    protected final List<TnIdentifierGenerator> _identifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
+    protected final Map<String, TnIdentifierGenerator> _identifierGeneratorsByPropertyName = StringKeyMap
             .createAsCaseInsensitive();
+
     protected String _versionNoPropertyName;
     protected String _timestampPropertyName;
     protected TnModifiedPropertySupport _modifiedPropertySupport;
@@ -105,14 +109,14 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     // ===================================================================================
     //                                                                          Initialize
     //                                                                          ==========
-    public void initialize() { // non thread safe
-        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(getBeanClass());
+    public void initialize() { // non thread safe so this is called immediately after creation
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(getBeanClass());
         setupTableName(beanDesc);
         setupProperty();
         setupPrimaryKey();
     }
 
-    protected void setupTableName(DfBeanDesc beanDesc) {
+    protected void setupTableName(DfBeanDesc beanDesc) { // only called in the initialize() process 
         final String ta = _beanAnnotationReader.getTableAnnotation();
         if (ta != null) {
             _tableName = ta;
@@ -121,7 +125,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         }
     }
 
-    protected void setupProperty() {
+    protected void setupProperty() { // only called in the initialize() process
         final TnPropertyType[] propertyTypes = _propertyTypeFactory.createBeanPropertyTypes();
         for (int i = 0; i < propertyTypes.length; i++) {
             TnPropertyType pt = propertyTypes[i];
@@ -129,19 +133,19 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
             _columnPropertyTypeMap.put(pt.getColumnDbName(), pt);
         }
 
-        final TnRelationPropertyType[] rpTypes = _relationPropertyTypeFactory.createRelationPropertyTypes();
-        for (int i = 0; i < rpTypes.length; i++) {
-            TnRelationPropertyType rpt = rpTypes[i];
+        final TnRelationPropertyType[] rptTypes = _relationPropertyTypeFactory.createRelationPropertyTypes();
+        for (int i = 0; i < rptTypes.length; i++) {
+            TnRelationPropertyType rpt = rptTypes[i];
             addRelationPropertyType(rpt);
         }
     }
 
-    protected void addPropertyType(TnPropertyType propertyType) {
+    protected void addPropertyType(TnPropertyType propertyType) { // only called in the initialize() process
         _propertyTypeMap.put(propertyType.getPropertyName(), propertyType);
         _propertyTypeList.add(propertyType);
     }
 
-    protected void setupPrimaryKey() {
+    protected void setupPrimaryKey() { // only called in the initialize() process
         final List<TnPropertyType> keys = new ArrayList<TnPropertyType>();
         for (TnPropertyType pt : _propertyTypeList) {
             if (pt.isPrimaryKey()) {
@@ -152,7 +156,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         _primaryKeys = (TnPropertyType[]) keys.toArray(new TnPropertyType[keys.size()]);
     }
 
-    protected void setupIdentifierGenerator(TnPropertyType pt) {
+    protected void setupIdentifierGenerator(TnPropertyType pt) { // only called in the initialize() process
         final DfPropertyDesc pd = pt.getPropertyDesc();
         final String propertyName = pt.getPropertyName();
         final String idType = _beanAnnotationReader.getId(pd);
@@ -161,7 +165,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         _identifierGeneratorsByPropertyName.put(propertyName, generator);
     }
 
-    protected void addRelationPropertyType(TnRelationPropertyType rpt) {
+    protected void addRelationPropertyType(TnRelationPropertyType rpt) { // only called in the initialize() process
         for (int i = _relationPropertyTypes.size(); i <= rpt.getRelationNo(); ++i) {
             _relationPropertyTypes.add(null);
         }

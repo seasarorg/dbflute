@@ -117,14 +117,17 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         // for ConditionBean and insert() and update() and delete() and so on...
         // = = = = = = = = = =/
         return new TnBeanMetaDataImpl(beanClass) {
+            /** The internal list of identifier generator. Elements of this list should be added when initializing. */
             protected final List<TnIdentifierGenerator> _internalIdentifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
+
+            /** The internal map of identifier generator by property name. */
             protected final Map<String, TnIdentifierGenerator> _internalIdentifierGeneratorsByPropertyName = newConcurrentHashMap();
 
             // /= = = = = = =
             // for cache
             // = = = = =/
             @Override
-            public void initialize() { // non thread safe so this should be called immediately after creation 
+            public void initialize() { // non thread safe so this is called immediately after creation 
                 final Class<?> myBeanClass = getBeanClass();
                 if (isDBFluteEntity(myBeanClass)) {
                     final TnBeanMetaData cachedMeta = getMetaFromCache(myBeanClass);
@@ -142,9 +145,9 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             // for insert()
             // = = = = =/
             // The attributes 'identifierGenerators' and 'identifierGeneratorsByPropertyName'
-            // of super class are unused. It prepares original atributes here.
+            // of super class are unused. It prepares original attributes here.
             @Override
-            protected void setupIdentifierGenerator(TnPropertyType propertyType) {
+            protected void setupIdentifierGenerator(TnPropertyType propertyType) { // only called in the initialize() process
                 final DfPropertyDesc pd = propertyType.getPropertyDesc();
                 final String propertyName = propertyType.getPropertyName();
                 final String idType = _beanAnnotationReader.getId(pd);

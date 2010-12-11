@@ -360,7 +360,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (!determineExecuteInsert(entity)) {
             return false;
         }
-        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        assertEntityNotNull(entity); // If this table use identity, the entity does not have primary-key.
         frameworkFilterEntityOfInsert(entity);
         filterEntityOfInsert(entity);
         assertEntityOfInsert(entity);

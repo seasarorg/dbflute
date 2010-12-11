@@ -37,12 +37,12 @@ public class TnIdentifierIdentityGenerator extends TnIdentifierAbstractGenerator
     //                                                                      Implementation
     //                                                                      ==============
     public void setIdentifier(Object bean, DataSource ds) {
-        String identitySelectSql = ResourceContext.currentDBDef().dbway().getIdentitySelectSql();
+        final String identitySelectSql = ResourceContext.currentDBDef().dbway().getIdentitySelectSql();
         if (identitySelectSql == null) {
             String msg = "Identity is unsupported at the DB: " + ResourceContext.currentDBDef();
             throw new IllegalStateException(msg);
         }
-        Object value = executeSql(ds, identitySelectSql, null);
+        final Object value = executeSql(ds, identitySelectSql, null);
         reflectIdentifier(bean, value);
     }
 

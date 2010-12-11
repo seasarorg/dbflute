@@ -17,10 +17,10 @@ package org.seasar.dbflute.s2dao.identity;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -37,7 +37,7 @@ public class TnIdentifierGeneratorFactory {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static Map<String, Class<?>> generatorClasses = new HashMap<String, Class<?>>();
+    private static final Map<String, Class<?>> _generatorClasses = newConcurrentHashMap();
 
     static {
         addIdentifierGeneratorClass("assigned", TnIdentifierAssignedGenerator.class);
@@ -51,12 +51,16 @@ public class TnIdentifierGeneratorFactory {
     }
 
     // ===================================================================================
-    //                                                                Identifier Generator
-    //                                                                ====================
-    public static void addIdentifierGeneratorClass(String name, Class<?> clazz) {
-        generatorClasses.put(name, clazz);
+    //                                                                       Add Generator
+    //                                                                       =============
+    // for user's extension
+    public static synchronized void addIdentifierGeneratorClass(String name, Class<?> clazz) {
+        _generatorClasses.put(name, clazz);
     }
 
+    // ===================================================================================
+    //                                                                    Create Generator
+    //                                                                    ================
     public static TnIdentifierGenerator createIdentifierGenerator(TnPropertyType propertyType) {
         return createIdentifierGenerator(propertyType, null);
     }
@@ -69,9 +73,9 @@ public class TnIdentifierGeneratorFactory {
         if (annotation == null) {
             return new TnIdentifierAssignedGenerator(propertyType);
         }
-        String[] array = tokenize(annotation, "=, ");
-        Class<?> clazz = getGeneratorClass(array[0]);
-        TnIdentifierGenerator generator = createIdentifierGenerator(clazz, propertyType);
+        final String[] array = tokenize(annotation, "=, ");
+        final Class<?> clazz = getGeneratorClass(array[0]);
+        final TnIdentifierGenerator generator = createIdentifierGenerator(clazz, propertyType);
         for (int i = 1; i < array.length; i += 2) {
             setProperty(generator, array[i].trim(), array[i + 1].trim());
         }
@@ -91,7 +95,7 @@ public class TnIdentifierGeneratorFactory {
     }
 
     protected static Class<?> getGeneratorClass(String name) {
-        Class<?> clazz = generatorClasses.get(name);
+        final Class<?> clazz = _generatorClasses.get(name);
         if (clazz != null) {
             return clazz;
         }
@@ -99,13 +103,21 @@ public class TnIdentifierGeneratorFactory {
     }
 
     protected static TnIdentifierGenerator createIdentifierGenerator(Class<?> clazz, TnPropertyType propertyType) {
-        Constructor<?> constructor = DfReflectionUtil.getConstructor(clazz, new Class<?>[] { TnPropertyType.class });
+        final Constructor<?> constructor = DfReflectionUtil.getConstructor(clazz,
+                new Class<?>[] { TnPropertyType.class });
         return (TnIdentifierGenerator) DfReflectionUtil.newInstance(constructor, new Object[] { propertyType });
     }
 
     protected static void setProperty(TnIdentifierGenerator generator, String propertyName, String value) {
-        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(generator.getClass());
-        DfPropertyDesc pd = beanDesc.getPropertyDesc(propertyName);
+        final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(generator.getClass());
+        final DfPropertyDesc pd = beanDesc.getPropertyDesc(propertyName);
         pd.setValue(generator, value);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
     }
 }

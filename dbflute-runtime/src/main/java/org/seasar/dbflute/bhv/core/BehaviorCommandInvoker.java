@@ -73,7 +73,7 @@ public class BehaviorCommandInvoker {
     //                                       Execution Cache
     //                                       ---------------
     /** The map of SQL execution. (dispose target) */
-    protected final Map<String, SqlExecution> _executionMap = new ConcurrentHashMap<String, SqlExecution>();
+    protected final Map<String, SqlExecution> _executionMap = newConcurrentHashMap();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -887,6 +887,10 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
