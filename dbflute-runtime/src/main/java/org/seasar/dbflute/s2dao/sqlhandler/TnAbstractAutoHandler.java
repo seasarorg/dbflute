@@ -60,8 +60,8 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     public TnAbstractAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory);
-        this._beanMetaData = beanMetaData;
-        this._boundPropTypes = boundPropTypes;
+        _beanMetaData = beanMetaData;
+        _boundPropTypes = boundPropTypes;
     }
 
     // ===================================================================================
@@ -74,10 +74,6 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         } finally {
             close(conn);
         }
-    }
-
-    public int execute(Object[] args, Class<?>[] argTypes) {
-        return execute(args);
     }
 
     protected int execute(Connection conn, Object bean) {
@@ -225,21 +221,29 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     }
 
     protected void updateTimestampIfNeed(Object bean) {
+        updateTimestampIfNeed(bean, 0);
+    }
+
+    protected void updateTimestampIfNeed(Object bean, int index) {
         final List<Timestamp> newTimestampList = _newTimestampList;
         if (newTimestampList == null || newTimestampList.isEmpty()) {
             return;
         }
         final DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
-        pd.setValue(bean, newTimestampList.remove(0));
+        pd.setValue(bean, newTimestampList.get(index));
     }
 
     protected void updateVersionNoIfNeed(Object bean) {
+        updateVersionNoIfNeed(bean, 0);
+    }
+
+    protected void updateVersionNoIfNeed(Object bean, int index) {
         final List<Long> newVersionNoList = _newVersionNoList;
         if (newVersionNoList == null || newVersionNoList.isEmpty()) {
             return;
         }
         final DfPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
-        pd.setValue(bean, newVersionNoList.remove(0));
+        pd.setValue(bean, newVersionNoList.get(index));
     }
 
     // ===================================================================================

@@ -198,7 +198,7 @@ public class BehaviorCommandInvoker {
 
     protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
         assertInvokerAssistant();
-        ResourceContext resourceContext = new ResourceContext();
+        final ResourceContext resourceContext = new ResourceContext();
         resourceContext.setBehaviorCommand(behaviorCommand);
         resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
         resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
@@ -225,7 +225,7 @@ public class BehaviorCommandInvoker {
             boolean existsSqlResultHandler, SqlResultHandler sqlResultHander, Object ret, long before, long after) {
         if (existsSqlResultHandler) {
             final String displaySql = (String) InternalMapContext.getObject("df:DisplaySql");
-            SqlResultInfo info = new SqlResultInfo();
+            final SqlResultInfo info = new SqlResultInfo();
             info.setResult(ret);
             info.setTableDbName(behaviorCommand.getTableDbName());
             info.setCommandName(behaviorCommand.getCommandName());

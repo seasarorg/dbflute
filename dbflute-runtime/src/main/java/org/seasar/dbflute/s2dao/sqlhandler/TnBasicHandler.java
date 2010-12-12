@@ -181,7 +181,7 @@ public class TnBasicHandler {
             }
             final String displaySql = getDisplaySql(args);
             if (isLogEnabled()) {
-                log((isContainsLineSeparatorInSql() ? ln() : "") + displaySql);
+                logDisplaySql(displaySql);
             }
             if (existsSqlLogHandler) { // DBFlute provides
                 sqlLogHandler.handle(getSql(), displaySql, args, argTypes);
@@ -189,25 +189,13 @@ public class TnBasicHandler {
             if (existsSqlLogRegistry) { // S2Container provides
                 TnSqlLogRegistry.push(getSql(), displaySql, args, argTypes, sqlLogRegistry);
             }
-            putObjectToMapContext("df:DisplaySql", displaySql);
+            saveDisplaySqlToContext(displaySql);
         }
     }
 
-    protected void putObjectToMapContext(String key, Object value) {
-        InternalMapContext.setObject(key, value);
-    }
-
-    protected boolean isLogEnabled() {
-        return QLog.isLogEnabled();
-    }
-
-    protected void log(String msg) {
-        QLog.log(msg);
-    }
-
     protected String getDisplaySql(Object[] args) {
-        String logDateFormat = ResourceContext.getLogDateFormat();
-        String logTimestampFormat = ResourceContext.getLogTimestampFormat();
+        final String logDateFormat = ResourceContext.getLogDateFormat();
+        final String logTimestampFormat = ResourceContext.getLogTimestampFormat();
         return DisplaySqlBuilder.buildDisplaySql(_sql, args, logDateFormat, logTimestampFormat);
     }
 
@@ -225,8 +213,20 @@ public class TnBasicHandler {
         return CallbackContext.getCallbackContextOnThread().getSqlResultHandler();
     }
 
+    protected void logDisplaySql(String displaySql) {
+        log((isContainsLineSeparatorInSql() ? ln() : "") + displaySql);
+    }
+
     protected boolean isContainsLineSeparatorInSql() {
         return _sql != null ? _sql.contains(ln()) : false;
+    }
+
+    protected void saveDisplaySqlToContext(String displaySql) {
+        putObjectToMapContext("df:DisplaySql", displaySql);
+    }
+
+    protected void putObjectToMapContext(String key, Object value) {
+        InternalMapContext.setObject(key, value);
     }
 
     // -----------------------------------------------------
@@ -350,6 +350,17 @@ public class TnBasicHandler {
         } catch (SQLException e) {
             handleSQLException(e, null);
         }
+    }
+
+    // ===================================================================================
+    //                                                                           Query Log
+    //                                                                           =========
+    protected boolean isLogEnabled() {
+        return QLog.isLogEnabled();
+    }
+
+    protected void log(String msg) {
+        QLog.log(msg);
     }
 
     // ===================================================================================

@@ -46,6 +46,11 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     private static final Log _log = LogFactory.getLog(TnAbstractBatchAutoHandler.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final StringBuilder _logSqlSb = new StringBuilder();
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
@@ -81,12 +86,15 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
                     preBatchUpdateBean(bean);
                     prepareBatchElement(conn, ps, bean);
                 }
+                processBatchLogging();
                 final int[] result = executeBatch(ps, beanList);
                 handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
                 // a value of optimistic lock column should be synchronized
                 // after handling optimistic lock
+                int index = 0;
                 for (Object bean : beanList) {
-                    postBatchUpdateBean(bean);
+                    postBatchUpdateBean(bean, index);
+                    ++index;
                 }
                 return result;
             } finally {
@@ -104,6 +112,27 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         addBatch(ps);
     }
 
+    protected void processBatchLogging() {
+        if (_logSqlSb.length() == 0) {
+            return;
+        }
+        final String batchSql = _logSqlSb.toString();
+        if (isLogEnabled()) {
+            log(batchSql); // batch logging
+        }
+        super.saveDisplaySqlToContext(batchSql.trim()); // remove first line separator
+    }
+
+    @Override
+    protected void logDisplaySql(String displaySql) {
+        _logSqlSb.append(ln()).append(displaySql).append(";"); // for batch logging
+    }
+
+    @Override
+    protected void saveDisplaySqlToContext(String displaySql) {
+        // do nothing but it saves batch SQL in batch logging process
+    }
+
     // ===================================================================================
     //                                                                       Pre/Post Bean
     //                                                                       =============
@@ -111,9 +140,9 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     protected void preBatchUpdateBean(Object bean) {
     }
 
-    protected void postBatchUpdateBean(Object bean) {
-        updateTimestampIfNeed(bean);
-        updateVersionNoIfNeed(bean);
+    protected void postBatchUpdateBean(Object bean, int index) {
+        updateTimestampIfNeed(bean, index);
+        updateVersionNoIfNeed(bean, index);
     }
 
     // ===================================================================================
@@ -150,7 +179,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             if (_optimisticLockHandling) {
                 throw new BatchEntityAlreadyUpdatedException(list.get(0), 0, updateCount);
             } else {
-                String msg = "The entity have already deleted:";
+                String msg = "The entity was NOT found! it has already been deleted.";
                 msg = msg + " updateCount=" + updateCount;
                 msg = msg + " entityCount=" + entityCount;
                 msg = msg + " allEntities=" + list;
@@ -191,7 +220,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             if (_optimisticLockHandling) {
                 throw new BatchEntityAlreadyUpdatedException(list.get(index), 0, updateCount);
             } else {
-                String msg = "The entity have already deleted:";
+                String msg = "The entity was NOT found! it has already been deleted:";
                 msg = msg + " entity=" + list.get(index);
                 msg = msg + " updateCount=" + updateCount;
                 msg = msg + " allEntities=" + list;
