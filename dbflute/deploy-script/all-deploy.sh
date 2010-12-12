@@ -78,7 +78,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-flex-example/dbflute_exampledb
+cd ../../dbflute-flexserver-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
