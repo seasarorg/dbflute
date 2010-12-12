@@ -267,7 +267,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
                 }
             });
             CallbackContext.setCallbackContextOnThread(callbackContext);
-            InternalMapContext.setObject("df:DisplaySql", "select ...");
+            InternalMapContext.setResultInfoDisplaySql("select ...");
             actualResult = invoker.dispatchInvoking(new MockBehaviorCommand() {
                 @Override
                 public Object[] getSqlExecutionArgument() {
@@ -555,7 +555,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object ret = new Object();
         final HashSet<String> markSet = new HashSet<String>();
         try {
-            InternalMapContext.setObject("df:DisplaySql", "select ...");
+            InternalMapContext.setResultInfoDisplaySql("select ...");
 
             // ## Act & Assert ##
             invoker.callbackSqlResultHanler(new MockBehaviorCommand() {

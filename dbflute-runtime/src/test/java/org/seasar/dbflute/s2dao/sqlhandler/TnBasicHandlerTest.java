@@ -50,15 +50,15 @@ public class TnBasicHandlerTest extends PlainTestCase {
             }
 
             @Override
-            protected void log(String msg) {
-                assertEquals("select ...", msg);
+            protected void logDisplaySql(String displaySql) {
+                assertEquals("select ...", displaySql);
                 markList.add("log");
             }
 
             @Override
-            protected void putObjectToMapContext(String key, Object value) {
-                markList.add("putObjectToMapContext");
-                super.putObjectToMapContext(key, value);
+            protected void saveDisplaySqlForResultInfo(String displaySql) {
+                markList.add("saveDisplaySqlForResultInfo");
+                super.saveDisplaySqlForResultInfo(displaySql);
             }
 
             @Override
@@ -71,16 +71,16 @@ public class TnBasicHandlerTest extends PlainTestCase {
         try {
             handler.logSql(null, null);
 
-            assertEquals("select ...", InternalMapContext.getObject("df:DisplaySql"));
+            assertNull(InternalMapContext.getResultInfoDisplaySql());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
         }
 
         // ## Assert ##
+        assertEquals(2, markList.size());
         assertEquals("getDisplaySql", markList.get(0));
         assertEquals("log", markList.get(1));
-        assertEquals("putObjectToMapContext", markList.get(2));
     }
 
     public void test_logSql_whitebox_sqlLogHandlerOnly() {
@@ -96,14 +96,19 @@ public class TnBasicHandlerTest extends PlainTestCase {
             }
 
             @Override
+            protected void logDisplaySql(String displaySql) {
+                throw new IllegalStateException("log should not be called!");
+            }
+
+            @Override
             protected void log(String msg) {
                 throw new IllegalStateException("log should not be called!");
             }
 
             @Override
-            protected void putObjectToMapContext(String key, Object value) {
-                markList.add("putObjectToMapContext");
-                super.putObjectToMapContext(key, value);
+            protected void saveDisplaySqlForResultInfo(String displaySql) {
+                markList.add("saveDisplaySqlForResultInfo");
+                super.saveDisplaySqlForResultInfo(displaySql);
             }
 
             @Override
@@ -126,16 +131,16 @@ public class TnBasicHandlerTest extends PlainTestCase {
             CallbackContext.setCallbackContextOnThread(callbackContext);
             handler.logSql(args, argsTypes);
 
-            assertEquals("select ...", InternalMapContext.getObject("df:DisplaySql"));
+            assertNull(InternalMapContext.getResultInfoDisplaySql());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
         }
 
         // ## Assert ##
+        assertEquals(2, markList.size());
         assertEquals("getDisplaySql", markList.get(0));
         assertEquals("handle", markList.get(1));
-        assertEquals("putObjectToMapContext", markList.get(2));
     }
 
     public void test_logSql_whitebox_sqlResultHandlerOnly() {
@@ -149,14 +154,19 @@ public class TnBasicHandlerTest extends PlainTestCase {
             }
 
             @Override
+            protected void logDisplaySql(String displaySql) {
+                throw new IllegalStateException("log should not be called!");
+            }
+
+            @Override
             protected void log(String msg) {
                 throw new IllegalStateException("log should not be called!");
             }
 
             @Override
-            protected void putObjectToMapContext(String key, Object value) {
-                markList.add("putObjectToMapContext");
-                super.putObjectToMapContext(key, value);
+            protected void saveDisplaySqlForResultInfo(String displaySql) {
+                markList.add("saveDisplaySqlForResultInfo");
+                super.saveDisplaySqlForResultInfo(displaySql);
             }
 
             @Override
@@ -176,15 +186,16 @@ public class TnBasicHandlerTest extends PlainTestCase {
             CallbackContext.setCallbackContextOnThread(callbackContext);
             handler.logSql(null, null);
 
-            assertEquals("select ...", InternalMapContext.getObject("df:DisplaySql"));
+            assertEquals("select ...", InternalMapContext.getResultInfoDisplaySql());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
         }
 
         // ## Assert ##
+        assertEquals(2, markList.size());
         assertEquals("getDisplaySql", markList.get(0));
-        assertEquals("putObjectToMapContext", markList.get(1));
+        assertEquals("saveDisplaySqlForResultInfo", markList.get(1));
     }
 
     public void test_logSql_whitebox_bigThree() {
@@ -200,21 +211,22 @@ public class TnBasicHandlerTest extends PlainTestCase {
             }
 
             @Override
-            protected boolean isContainsLineSeparatorInSql() {
-                markList.add("isContainsLineSeparatorInSql");
-                return true;
+            protected void logDisplaySql(String displaySql) {
+                markList.add("logDisplaySql");
+                assertEquals("select ..." + ln() + "  from ...", displaySql);
+                super.logDisplaySql(displaySql);
             }
 
             @Override
             protected void log(String msg) {
-                assertEquals(ln() + "select ..." + ln() + "  from ...", msg);
                 markList.add("log");
+                assertEquals(ln() + "select ..." + ln() + "  from ...", msg);
             }
 
             @Override
-            protected void putObjectToMapContext(String key, Object value) {
-                markList.add("putObjectToMapContext");
-                super.putObjectToMapContext(key, value);
+            protected void saveDisplaySqlForResultInfo(String displaySql) {
+                markList.add("saveDisplaySqlForResultInfo");
+                super.saveDisplaySqlForResultInfo(displaySql);
             }
 
             @Override
@@ -242,18 +254,18 @@ public class TnBasicHandlerTest extends PlainTestCase {
             CallbackContext.setCallbackContextOnThread(callbackContext);
             handler.logSql(args, argsTypes);
 
-            assertEquals("select ..." + ln() + "  from ...", InternalMapContext.getObject("df:DisplaySql"));
+            assertEquals("select ..." + ln() + "  from ...", InternalMapContext.getResultInfoDisplaySql());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
         }
 
         // ## Assert ##
+        assertEquals(5, markList.size());
         assertEquals("getDisplaySql", markList.get(0));
-        assertEquals("isContainsLineSeparatorInSql", markList.get(1));
+        assertEquals("logDisplaySql", markList.get(1));
         assertEquals("log", markList.get(2));
         assertEquals("handle", markList.get(3));
-        assertEquals("putObjectToMapContext", markList.get(4));
-        assertEquals(5, markList.size());
+        assertEquals("saveDisplaySqlForResultInfo", markList.get(4));
     }
 }

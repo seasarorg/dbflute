@@ -224,7 +224,7 @@ public class BehaviorCommandInvoker {
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
             boolean existsSqlResultHandler, SqlResultHandler sqlResultHander, Object ret, long before, long after) {
         if (existsSqlResultHandler) {
-            final String displaySql = (String) InternalMapContext.getObject("df:DisplaySql");
+            final String displaySql = InternalMapContext.getResultInfoDisplaySql();
             final SqlResultInfo info = new SqlResultInfo();
             info.setResult(ret);
             info.setTableDbName(behaviorCommand.getTableDbName());
@@ -347,7 +347,7 @@ public class BehaviorCommandInvoker {
                 invokeMethodName);
 
         // Save behavior invoke name for error message.
-        putObjectToMapContext("df:BehaviorInvokeName", expWithoutKakko + "()");
+        InternalMapContext.setBehaviorInvokeName(expWithoutKakko + "()");
 
         final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
         final String callerExpression = expWithoutKakko + "()";
@@ -407,12 +407,12 @@ public class BehaviorCommandInvoker {
 
         // Save client invoke name for error message.
         if (clientInvokeName.trim().length() > 0) {
-            putObjectToMapContext("df:ClientInvokeName", clientInvokeName);
+            InternalMapContext.setClientInvokeName(clientInvokeName);
         }
 
         // Save by-pass invoke name for error message.
         if (byPassInvokeName.trim().length() > 0) {
-            putObjectToMapContext("df:ByPassInvokeName", byPassInvokeName);
+            InternalMapContext.setByPassInvokeName(byPassInvokeName);
         }
 
         final StringBuilder sb = new StringBuilder();
@@ -787,10 +787,6 @@ public class BehaviorCommandInvoker {
             return null;
         }
         return CallbackContext.getCallbackContextOnThread().getSqlResultHandler();
-    }
-
-    protected void putObjectToMapContext(String key, Object value) {
-        InternalMapContext.setObject(key, value);
     }
 
     // ===================================================================================

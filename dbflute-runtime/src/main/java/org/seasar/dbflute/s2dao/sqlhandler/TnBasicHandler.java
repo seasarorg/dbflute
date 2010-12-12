@@ -164,15 +164,8 @@ public class TnBasicHandler {
     //                                           SQL Logging
     //                                           -----------
     protected void logSql(Object[] args, Class<?>[] argTypes) {
-        // [SqlLogHandler]
-        final SqlLogHandler sqlLogHandler = getSqlLogHander();
-        final boolean existsSqlLogHandler = sqlLogHandler != null;
-
-        // [SqlResultHandler]
-        final SqlResultHandler sqlResultHander = getSqlResultHander();
-        final boolean existsSqlResultHandler = sqlResultHander != null;
-
-        // [SqlLogRegistry]
+        final boolean existsSqlLogHandler = hasSqlLogHandler();
+        final boolean existsSqlResultHandler = hasSqlResultHandler();
         final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
         final boolean existsSqlLogRegistry = sqlLogRegistry != null;
 
@@ -186,12 +179,14 @@ public class TnBasicHandler {
                 logDisplaySql(displaySql);
             }
             if (existsSqlLogHandler) { // DBFlute provides
-                sqlLogHandler.handle(getSql(), displaySql, args, argTypes);
+                getSqlLogHander().handle(getSql(), displaySql, args, argTypes);
             }
             if (existsSqlLogRegistry) { // S2Container provides
                 TnSqlLogRegistry.push(getSql(), displaySql, args, argTypes, sqlLogRegistry);
             }
-            saveDisplaySqlToContext(displaySql);
+            if (existsSqlResultHandler) {
+                saveDisplaySqlForResultInfo(displaySql);
+            }
         }
     }
 
@@ -208,6 +203,10 @@ public class TnBasicHandler {
         return CallbackContext.getCallbackContextOnThread().getSqlLogHandler();
     }
 
+    protected boolean hasSqlLogHandler() {
+        return getSqlLogHander() != null;
+    }
+
     protected SqlResultHandler getSqlResultHander() {
         if (!CallbackContext.isExistCallbackContextOnThread()) {
             return null;
@@ -215,20 +214,20 @@ public class TnBasicHandler {
         return CallbackContext.getCallbackContextOnThread().getSqlResultHandler();
     }
 
+    protected boolean hasSqlResultHandler() {
+        return getSqlResultHander() != null;
+    }
+
     protected void logDisplaySql(String displaySql) {
-        log((isContainsLineSeparatorInSql() ? ln() : "") + displaySql);
+        log((isContainsLineSeparatorInSql(displaySql) ? ln() : "") + displaySql);
     }
 
-    protected boolean isContainsLineSeparatorInSql() {
-        return _sql != null ? _sql.contains(ln()) : false;
+    protected boolean isContainsLineSeparatorInSql(String displaySql) {
+        return displaySql != null ? displaySql.contains(ln()) : false;
     }
 
-    protected void saveDisplaySqlToContext(String displaySql) {
-        putObjectToMapContext("df:DisplaySql", displaySql);
-    }
-
-    protected void putObjectToMapContext(String key, Object value) {
-        InternalMapContext.setObject(key, value);
+    protected void saveDisplaySqlForResultInfo(String displaySql) {
+        InternalMapContext.setResultInfoDisplaySql(displaySql);
     }
 
     // -----------------------------------------------------

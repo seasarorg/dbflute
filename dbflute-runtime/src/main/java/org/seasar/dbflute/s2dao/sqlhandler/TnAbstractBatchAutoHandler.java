@@ -120,7 +120,10 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         if (isLogEnabled()) {
             log(batchSql); // batch logging
         }
-        super.saveDisplaySqlToContext(batchSql.trim()); // remove first line separator
+        if (hasSqlResultHandler()) {
+            final String savedDisplaySql = batchSql.trim(); // remove first line separator
+            super.saveDisplaySqlForResultInfo(savedDisplaySql);
+        }
         _batchLoggingSb = null; // because it may be large strings
     }
 
@@ -133,7 +136,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     }
 
     @Override
-    protected void saveDisplaySqlToContext(String displaySql) {
+    protected void saveDisplaySqlForResultInfo(String displaySql) {
         // do nothing but it saves batch SQL in batch logging process
     }
 

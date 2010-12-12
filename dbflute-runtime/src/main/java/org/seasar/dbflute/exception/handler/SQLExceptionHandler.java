@@ -268,12 +268,12 @@ public class SQLExceptionHandler {
     }
 
     protected String extractBehaviorInvokeName() {
-        final Object behaviorInvokeName = InternalMapContext.getObject("df:BehaviorInvokeName");
+        final Object behaviorInvokeName = InternalMapContext.getBehaviorInvokeName();
         if (behaviorInvokeName == null) {
             return null;
         }
-        final Object clientInvokeName = InternalMapContext.getObject("df:ClientInvokeName");
-        final Object byPassInvokeName = InternalMapContext.getObject("df:ByPassInvokeName");
+        final Object clientInvokeName = InternalMapContext.getClientInvokeName();
+        final Object byPassInvokeName = InternalMapContext.getByPassInvokeName();
         final StringBuilder sb = new StringBuilder();
         boolean existsPath = false;
         if (clientInvokeName != null) {
