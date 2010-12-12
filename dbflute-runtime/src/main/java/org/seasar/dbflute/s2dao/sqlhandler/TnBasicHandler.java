@@ -40,6 +40,8 @@ import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
+ * The basic handler to execute SQL. <br />
+ * This handler is always created when executing so non thread safe. <br />
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */

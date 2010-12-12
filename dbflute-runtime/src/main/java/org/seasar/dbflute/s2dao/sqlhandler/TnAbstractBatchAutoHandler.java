@@ -48,7 +48,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final StringBuilder _logSqlSb = new StringBuilder();
+    protected StringBuilder _batchLoggingSb;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -113,19 +113,23 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     }
 
     protected void processBatchLogging() {
-        if (_logSqlSb.length() == 0) {
+        if (_batchLoggingSb == null || _batchLoggingSb.length() == 0) {
             return;
         }
-        final String batchSql = _logSqlSb.toString();
+        final String batchSql = _batchLoggingSb.toString();
         if (isLogEnabled()) {
             log(batchSql); // batch logging
         }
         super.saveDisplaySqlToContext(batchSql.trim()); // remove first line separator
+        _batchLoggingSb = null; // because it may be large strings
     }
 
     @Override
     protected void logDisplaySql(String displaySql) {
-        _logSqlSb.append(ln()).append(displaySql).append(";"); // for batch logging
+        if (_batchLoggingSb == null) {
+            _batchLoggingSb = new StringBuilder(400);
+        }
+        _batchLoggingSb.append(ln()).append(displaySql).append(";"); // for batch logging
     }
 
     @Override
