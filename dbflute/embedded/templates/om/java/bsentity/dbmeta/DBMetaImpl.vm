@@ -233,11 +233,11 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
 #if ($table.hasAllCommonColumn())
     public boolean hasCommonColumn() { return true; }
-    public List<ColumnInfo> getCommonColumnList()
+    public List<ColumnInfo> getCommonColumnInfoList()
     { return newArrayList(${table.commonColumnListSetupExpression}); }
-    public List<ColumnInfo> getCommonColumnBeforeInsertList()
+    public List<ColumnInfo> getCommonColumnInfoBeforeInsertList()
     { return newArrayList(${table.commonColumnBeforeInsertListSetupExpression}); }
-    public List<ColumnInfo> getCommonColumnBeforeUpdateList()
+    public List<ColumnInfo> getCommonColumnInfoBeforeUpdateList()
     { return newArrayList(${table.commonColumnBeforeUpdateListSetupExpression}); }
 #end
 

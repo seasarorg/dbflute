@@ -2047,6 +2047,10 @@ public class Table {
         return getProperties().getDatabaseProperties();
     }
 
+    protected DfCommonColumnProperties getCommonColumnProperties() {
+        return getProperties().getCommonColumnProperties();
+    }
+
     protected DfSequenceIdentityProperties getSequenceIdentityProperties() {
         return getProperties().getSequenceIdentityProperties();
     }
@@ -2556,15 +2560,14 @@ public class Table {
                 return false;
             }
         }
-        final List<String> commonColumnNameList = getDatabase().getCommonColumnNameList();
+        final List<String> commonColumnNameList = getCommonColumnProperties().getCommonColumnNameList();
         if (commonColumnNameList.isEmpty()) {
             return false;
         }
         for (String commonColumnName : commonColumnNameList) {
-            if (getProperties().getCommonColumnProperties().isCommonColumnConversion(commonColumnName)) {
-                try {
-                    findTargetColumnJavaNameByCommonColumnName(commonColumnName);
-                } catch (IllegalStateException e) {
+            if (getCommonColumnProperties().isCommonColumnConversion(commonColumnName)) {
+                final Column col = findMyCommonColumn(commonColumnName);
+                if (col == null) {
                     return false;
                 }
             } else {
@@ -2577,16 +2580,13 @@ public class Table {
     }
 
     public List<Column> getCommonColumnList() {
-        if (!isWritable()) {
-            return new ArrayList<Column>();
-        }
         final List<Column> ls = new ArrayList<Column>();
         if (!hasAllCommonColumn()) {
             return ls;
         }
-        final List<String> commonColumnNameList = getDatabase().getCommonColumnNameList();
+        final List<String> commonColumnNameList = getCommonColumnProperties().getCommonColumnNameList();
         for (String commonColumnName : commonColumnNameList) {
-            ls.add(getColumn(findTargetColumnNameByCommonColumnName(commonColumnName)));
+            ls.add(findMyCommonColumn(commonColumnName));
         }
         return ls;
     }
@@ -2596,15 +2596,17 @@ public class Table {
     }
 
     public List<Column> getCommonColumnBeforeInsertList() {
-        final List<Column> commonColumnList = getCommonColumnList();
-        final List<Column> commonColumnBeforeInsertList = DfCollectionUtil.newArrayList();
-        for (Column column : commonColumnList) {
-            final String name = column.getName();
-            if (getDatabase().containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(name)) {
-                commonColumnBeforeInsertList.add(column);
+        final List<Column> ls = new ArrayList<Column>();
+        if (!hasAllCommonColumn()) {
+            return ls;
+        }
+        final List<String> commonColumnNameList = getCommonColumnProperties().getCommonColumnNameList();
+        for (String commonColumnName : commonColumnNameList) {
+            if (getCommonColumnProperties().hasCommonColumnBeforeInsertLogic(commonColumnName)) {
+                ls.add(findMyCommonColumn(commonColumnName));
             }
         }
-        return commonColumnBeforeInsertList;
+        return ls;
     }
 
     public String getCommonColumnBeforeInsertListSetupExpression() {
@@ -2612,15 +2614,17 @@ public class Table {
     }
 
     public List<Column> getCommonColumnBeforeUpdateList() {
-        final List<Column> commonColumnList = getCommonColumnList();
-        final List<Column> commonColumnBeforeUpdateList = DfCollectionUtil.newArrayList();
-        for (Column column : commonColumnList) {
-            final String name = column.getName();
-            if (getDatabase().containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(name)) {
-                commonColumnBeforeUpdateList.add(column);
+        final List<Column> ls = new ArrayList<Column>();
+        if (!hasAllCommonColumn()) {
+            return ls;
+        }
+        final List<String> commonColumnNameList = getCommonColumnProperties().getCommonColumnNameList();
+        for (String commonColumnName : commonColumnNameList) {
+            if (getCommonColumnProperties().hasCommonColumnBeforeUpdateLogic(commonColumnName)) {
+                ls.add(findMyCommonColumn(commonColumnName));
             }
         }
-        return commonColumnBeforeUpdateList;
+        return ls;
     }
 
     public String getCommonColumnBeforeUpdateListSetupExpression() {
@@ -2649,51 +2653,32 @@ public class Table {
         return sb.toString();
     }
 
-    public String findTargetColumnJavaNameByCommonColumnName(String commonColumnName) {
-        final DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
-        if (prop.isCommonColumnConversion(commonColumnName)) {
-            final String filteredCommonColumn = convertCommonColumnName(commonColumnName, prop);
-            final Column column = getCommonColumnConversion(commonColumnName, filteredCommonColumn);
-            return column.getJavaName();
-        } else {
-            final Column column = getCommonColumnNormal(commonColumnName);
-            return column.getJavaName();
-        }
+    public String findTargetColumnJavaNameByCommonColumnName(String commonColumnName) { // called by templates
+        final Column column = findMyCommonColumn(commonColumnName);
+        return column != null ? column.getJavaName() : null;
     }
 
-    public String findTargetColumnNameByCommonColumnName(String commonColumnName) {
-        final DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
-        if (prop.isCommonColumnConversion(commonColumnName)) {
-            final String filteredCommonColumn = convertCommonColumnName(commonColumnName, prop);
-            final Column column = getCommonColumnConversion(commonColumnName, filteredCommonColumn);
-            return column.getName();
+    public String findTargetColumnNameByCommonColumnName(String commonColumnName) { // called by templates
+        final Column column = findMyCommonColumn(commonColumnName);
+        return column != null ? column.getName() : null;
+    }
+
+    protected Column findMyCommonColumn(String commonColumnName) {
+        final Column column;
+        if (getCommonColumnProperties().isCommonColumnConversion(commonColumnName)) {
+            column = getColumn(convertCommonColumnName(commonColumnName));
         } else {
-            final Column column = getCommonColumnNormal(commonColumnName);
-            return column.getName();
+            column = getColumn(commonColumnName);
         }
+        return column;
     }
 
     protected Column getCommonColumnNormal(String commonColumnName) {
-        final Column column = getColumn(commonColumnName);
-        if (column == null) {
-            String msg = "Not found column by '" + commonColumnName + "'.";
-            throw new IllegalStateException(msg);
-        }
-        return column;
+        return getColumn(commonColumnName);
     }
 
-    protected Column getCommonColumnConversion(String commonColumnName, String filteredCommonColumn) {
-        final Column column = getColumn(filteredCommonColumn);
-        if (column == null) {
-            String msg = "Not found column by '" + filteredCommonColumn + "': ";
-            msg = msg + "original=" + commonColumnName;
-            throw new IllegalStateException(msg);
-        }
-        return column;
-    }
-
-    protected String convertCommonColumnName(String commonColumnName, DfCommonColumnProperties prop) {
-        String filteredCommonColumn = prop.filterCommonColumn(commonColumnName);
+    protected String convertCommonColumnName(String commonColumnName) {
+        String filteredCommonColumn = getCommonColumnProperties().filterCommonColumn(commonColumnName);
         filteredCommonColumn = Srl.replace(filteredCommonColumn, "TABLE_NAME", getName());
         filteredCommonColumn = Srl.replace(filteredCommonColumn, "table_name", getName());
         filteredCommonColumn = Srl.replace(filteredCommonColumn, "TableName", getJavaName());

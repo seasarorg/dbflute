@@ -1275,35 +1275,23 @@ public class Database {
     // --------------------------------------
     //                                 insert
     //                                 ------
-    public Map<String, Object> getCommonColumnSetupBeforeInsertInterceptorLogicMap() {
-        return getProperties().getCommonColumnProperties().getBeforeInsertMap();
+    public boolean hasCommonColumnBeforeInsertLogic(String columnName) {
+        return getProperties().getCommonColumnProperties().hasCommonColumnBeforeInsertLogic(columnName);
     }
 
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
-        return getProperties().getCommonColumnProperties()
-                .containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(columnName);
-    }
-
-    public String getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(String columnName) {
-        return getProperties().getCommonColumnProperties()
-                .getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(columnName);
+    public String getCommonColumnBeforeInsertLogicByColumnName(String columnName) {
+        return getProperties().getCommonColumnProperties().getCommonColumnBeforeInsertLogicByColumnName(columnName);
     }
 
     // --------------------------------------
     //                                 update
     //                                 ------
-    public Map<String, Object> getCommonColumnSetupBeforeUpdateInterceptorLogicMap() {
-        return getProperties().getCommonColumnProperties().getBeforeUpdateMap();
+    public boolean hasCommonColumnBeforeUpdateLogic(String columnName) {
+        return getProperties().getCommonColumnProperties().hasCommonColumnBeforeUpdateLogic(columnName);
     }
 
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(String columnName) {
-        return getProperties().getCommonColumnProperties()
-                .containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(columnName);
-    }
-
-    public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
-        return getProperties().getCommonColumnProperties()
-                .getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(columnName);
+    public String getCommonColumnBeforeUpdateLogicByColumnName(String columnName) {
+        return getProperties().getCommonColumnProperties().getCommonColumnBeforeUpdateLogicByColumnName(columnName);
     }
 
     // --------------------------------------

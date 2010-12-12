@@ -224,8 +224,8 @@ namespace ${glPackageBaseCommonBhv} {
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
   #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
   #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
-  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(${columnName})})
-    #set ($logic = ${database.getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(${columnName})})
+  #if (${database.hasCommonColumnBeforeInsertLogic(${columnName})})
+    #set ($logic = ${database.getCommonColumnBeforeInsertLogicByColumnName(${columnName})})
     #if ($database.isCommonColumnSetupInvokingLogic($logic))
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
@@ -280,8 +280,8 @@ namespace ${glPackageBaseCommonBhv} {
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
   #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
   #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
-  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(${columnName})})
-    #set ($logic = ${database.getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(${columnName})})
+  #if (${database.hasCommonColumnBeforeUpdateLogic(${columnName})})
+    #set ($logic = ${database.getCommonColumnBeforeUpdateLogicByColumnName(${columnName})})
     #if ($database.isCommonColumnSetupInvokingLogic($logic))
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 

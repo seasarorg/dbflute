@@ -172,7 +172,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return _beforeInsertMap;
     }
 
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
+    public boolean hasCommonColumnBeforeInsertLogic(String columnName) {
         final Map<String, Object> map = getBeforeInsertMap();
         final String logic = (String) map.get(columnName);
         if (logic != null && logic.trim().length() != 0) {
@@ -182,7 +182,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public String getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(String columnName) {
+    public String getCommonColumnBeforeInsertLogicByColumnName(String columnName) {
         final Map<String, Object> map = getBeforeInsertMap();
         return (String) map.get(columnName);
     }
@@ -217,7 +217,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return _beforeUpdateMap;
     }
 
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(String columnName) {
+    public boolean hasCommonColumnBeforeUpdateLogic(String columnName) {
         final Map<String, Object> map = getBeforeUpdateMap();
         final String logic = (String) map.get(columnName);
         if (logic != null && logic.trim().length() != 0) {
@@ -227,7 +227,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
+    public String getCommonColumnBeforeUpdateLogicByColumnName(String columnName) {
         final Map<String, Object> map = getBeforeUpdateMap();
         return (String) map.get(columnName);
     }

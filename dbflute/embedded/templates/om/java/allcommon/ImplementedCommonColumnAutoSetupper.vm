@@ -62,8 +62,8 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
 #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
 #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
 #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-#if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(${columnName})})
-#set ($logic = ${database.getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(${columnName})})
+#if (${database.hasCommonColumnBeforeInsertLogic(${columnName})})
+#set ($logic = ${database.getCommonColumnBeforeInsertLogicByColumnName(${columnName})})
 #if ($database.isCommonColumnSetupInvokingLogic($logic))
 #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
@@ -95,8 +95,8 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
 #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
 #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
 #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
-#if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(${columnName})})
-#set ($logic = ${database.getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(${columnName})})
+#if (${database.hasCommonColumnBeforeUpdateLogic(${columnName})})
+#set ($logic = ${database.getCommonColumnBeforeUpdateLogicByColumnName(${columnName})})
 #if ($database.isCommonColumnSetupInvokingLogic($logic))
 #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
