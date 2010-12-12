@@ -330,19 +330,19 @@ public interface DBMeta {
      * Get the list of common column.
      * @return The list of column info. (NotNull)
      */
-    List<ColumnInfo> getCommonColumnList();
+    List<ColumnInfo> getCommonColumnInfoList();
 
     /**
      * Get the list of common column auto-setup before insert.
      * @return The list of column info. (NotNull)
      */
-    List<ColumnInfo> getCommonColumnBeforeInsertList();
+    List<ColumnInfo> getCommonColumnInfoBeforeInsertList();
 
     /**
      * Get the list of common column auto-setup before update.
      * @return The list of column info. (NotNull)
      */
-    List<ColumnInfo> getCommonColumnBeforeUpdateList();
+    List<ColumnInfo> getCommonColumnInfoBeforeUpdateList();
 
     // ===================================================================================
     //                                                                       Name Handling

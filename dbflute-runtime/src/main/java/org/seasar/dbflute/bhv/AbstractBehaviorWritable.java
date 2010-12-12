@@ -833,7 +833,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         final UpdateOption<CB> option = new UpdateOption<CB>();
         option.specify(updateColumnSpec);
         option.resolveUpdateColumnSpecification(cb);
-        option.xacceptForcedSpecifiedUpdateColumn(getDBMeta().getCommonColumnBeforeUpdateList());
+        option.xacceptForcedSpecifiedUpdateColumn(getDBMeta().getCommonColumnInfoBeforeUpdateList());
         return option;
     }
 

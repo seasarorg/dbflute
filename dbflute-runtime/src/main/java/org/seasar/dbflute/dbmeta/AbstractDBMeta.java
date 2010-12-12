@@ -588,15 +588,15 @@ public abstract class AbstractDBMeta implements DBMeta {
         return false;
     }
 
-    public List<ColumnInfo> getCommonColumnList() {
+    public List<ColumnInfo> getCommonColumnInfoList() {
         return DfCollectionUtil.emptyList();
     }
 
-    public List<ColumnInfo> getCommonColumnBeforeInsertList() {
+    public List<ColumnInfo> getCommonColumnInfoBeforeInsertList() {
         return DfCollectionUtil.emptyList();
     }
 
-    public List<ColumnInfo> getCommonColumnBeforeUpdateList() {
+    public List<ColumnInfo> getCommonColumnInfoBeforeUpdateList() {
         return DfCollectionUtil.emptyList();
     }
 
