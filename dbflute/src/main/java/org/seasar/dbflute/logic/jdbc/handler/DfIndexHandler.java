@@ -54,11 +54,13 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
         Map<String, Map<Integer, String>> map = doGetIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap, false);
-        if (map.isEmpty()) { // retry by lower case
-            map = doGetIndexMap(metaData, unifiedSchema, tableName.toLowerCase(), uniqueKeyMap, true);
-        }
-        if (map.isEmpty()) { // retry by upper case
-            map = doGetIndexMap(metaData, unifiedSchema, tableName.toUpperCase(), uniqueKeyMap, true);
+        if (canRetryCaseInsensitive()) {
+            if (map.isEmpty()) { // retry by lower case
+                map = doGetIndexMap(metaData, unifiedSchema, tableName.toLowerCase(), uniqueKeyMap, true);
+            }
+            if (map.isEmpty()) { // retry by upper case
+                map = doGetIndexMap(metaData, unifiedSchema, tableName.toUpperCase(), uniqueKeyMap, true);
+            }
         }
         return map;
     }

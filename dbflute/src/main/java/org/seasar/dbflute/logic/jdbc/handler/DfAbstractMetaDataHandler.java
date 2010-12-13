@@ -142,4 +142,18 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
     protected final DfAdditionalSchemaInfo getAdditionalSchemaInfo(UnifiedSchema unifiedSchema) {
         return getProperties().getDatabaseProperties().getAdditionalSchemaInfo(unifiedSchema);
     }
+
+    // ===================================================================================
+    //                                                                 Retry Determination
+    //                                                                 ===================
+    protected boolean canRetryCaseInsensitive() {
+        if (isDatabaseMySQL()) {
+            // MySQL causes a trouble by setting a name only differed in case as parameter
+            // when Windows and lower_case_table_names = 0
+            //  -> Can't create table '.\exampledb\Foo.frm' (errno: 121)
+            // and other modes do not need to retry, so it returns false 
+            return false;
+        }
+        return true;
+    }
 }

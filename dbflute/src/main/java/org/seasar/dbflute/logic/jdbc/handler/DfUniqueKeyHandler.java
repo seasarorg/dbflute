@@ -69,18 +69,20 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      */
     public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
-        DfPrimaryKeyMetaInfo info = doGetPrimaryKey(metaData, unifiedSchema, tableName);
-        if (!info.hasPrimaryKey()) { // retry by lower case
-            info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toLowerCase());
-        }
-        if (!info.hasPrimaryKey()) { // retry by upper case
-            info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toUpperCase());
+        DfPrimaryKeyMetaInfo info = doGetPrimaryKey(metaData, unifiedSchema, tableName, false);
+        if (canRetryCaseInsensitive()) {
+            if (!info.hasPrimaryKey()) { // retry by lower case
+                info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toLowerCase(), true);
+            }
+            if (!info.hasPrimaryKey()) { // retry by upper case
+                info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toUpperCase(), true);
+            }
         }
         return info;
     }
 
     protected DfPrimaryKeyMetaInfo doGetPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName) throws SQLException {
+            String tableName, boolean retry) throws SQLException {
         final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
         if (isPrimaryKeyExtractingUnsupported()) {
             if (isDatabaseMsAccess()) {
@@ -90,7 +92,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         }
         ResultSet rs = null;
         try {
-            rs = extractPrimaryKeyMetaData(metaData, unifiedSchema, tableName);
+            rs = extractPrimaryKeyMetaData(metaData, unifiedSchema, tableName, retry);
             if (rs == null) {
                 return info;
             }
@@ -111,18 +113,20 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return info;
     }
 
-    protected ResultSet extractPrimaryKeyMetaData(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema, String tableName) {
+    protected ResultSet extractPrimaryKeyMetaData(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema,
+            String tableName, boolean retry) throws SQLException {
         try {
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
             return dbMeta.getPrimaryKeys(catalogName, schemaName, tableName);
-        } catch (SQLException continued) {
-            // because the exception may be thrown when the table is not found
-            // (for example, MySQL)
-            // 
-            // even if it's not retry, it is continued only about primary key
-            // (for compatibility: implemented like this at old versions)
-            return null;
+        } catch (SQLException e) {
+            if (retry) {
+                // because the exception may be thrown when the table is not found
+                // (for example, Sybase)
+                return null;
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -195,11 +199,13 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
         Map<String, Map<Integer, String>> map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName, pkList, false);
-        if (map.isEmpty()) { // retry by lower case
-            map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), pkList, true);
-        }
-        if (map.isEmpty()) { // retry by upper case
-            map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), pkList, true);
+        if (canRetryCaseInsensitive()) {
+            if (map.isEmpty()) { // retry by lower case
+                map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), pkList, true);
+            }
+            if (map.isEmpty()) { // retry by upper case
+                map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), pkList, true);
+            }
         }
         return map;
     }

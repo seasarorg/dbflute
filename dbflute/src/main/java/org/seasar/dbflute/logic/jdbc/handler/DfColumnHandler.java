@@ -74,11 +74,13 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
         List<DfColumnMetaInfo> ls = doGetColumnList(metaData, unifiedSchema, tableName, false);
-        if (ls.isEmpty()) { // retry by lower case
-            ls = doGetColumnList(metaData, unifiedSchema, tableName.toLowerCase(), true);
-        }
-        if (ls.isEmpty()) { // retry by upper case
-            ls = doGetColumnList(metaData, unifiedSchema, tableName.toUpperCase(), true);
+        if (canRetryCaseInsensitive()) {
+            if (ls.isEmpty()) { // retry by lower case
+                ls = doGetColumnList(metaData, unifiedSchema, tableName.toLowerCase(), true);
+            }
+            if (ls.isEmpty()) { // retry by upper case
+                ls = doGetColumnList(metaData, unifiedSchema, tableName.toUpperCase(), true);
+            }
         }
         return ls;
     }
