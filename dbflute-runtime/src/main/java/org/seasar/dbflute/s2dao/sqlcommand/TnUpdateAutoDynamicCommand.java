@@ -86,7 +86,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     }
 
     protected UpdateOption<ConditionBean> extractUpdateOptionChecked(Object[] args) {
-        if (args.length < 2) {
+        if (args.length < 2 || args[1] == null) {
             return null;
         }
         @SuppressWarnings("unchecked")
