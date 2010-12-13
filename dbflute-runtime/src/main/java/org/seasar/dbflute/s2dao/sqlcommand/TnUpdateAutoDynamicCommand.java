@@ -17,10 +17,12 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -70,18 +72,27 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             throw new IllegalArgumentException(msg);
         }
         final Object bean = args[0];
-        @SuppressWarnings("unchecked")
-        final UpdateOption<ConditionBean> option = (args.length > 1 ? (UpdateOption<ConditionBean>) args[1] : null);
+        final UpdateOption<ConditionBean> option = extractUpdateOptionChecked(args);
 
         final TnPropertyType[] propertyTypes = createUpdatePropertyTypes(bean, option);
         if (propertyTypes.length == 0) {
             if (isLogEnabled()) {
                 log(createNonUpdateLogMessage(bean));
             }
-            return NON_UPDATE;
+            return getNonUpdateReturn();
         }
         final String sql = createUpdateSql(propertyTypes, option);
         return doExecute(bean, propertyTypes, sql, option);
+    }
+
+    protected UpdateOption<ConditionBean> extractUpdateOptionChecked(Object[] args) {
+        if (args.length < 2) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        final UpdateOption<ConditionBean> option = (UpdateOption<ConditionBean>) args[1];
+        option.xcheckSpecifiedUpdateColumnPrimaryKey();
+        return option;
     }
 
     protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
@@ -221,21 +232,16 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         final StringBuilder sb = new StringBuilder();
         final String tableDbName = _targetDBMeta.getTableDbName();
         sb.append("...Skipping update because of non-modification: table=").append(tableDbName);
-        final int size = _beanMetaData.getPrimaryKeySize();
-        for (int i = 0; i < size; i++) {
-            if (i == 0) {
-                sb.append(", primaryKey={");
-            } else {
-                sb.append(", ");
-            }
-            final String keyName = _beanMetaData.getPrimaryKeyDbName(i);
-            sb.append(keyName).append("=");
-            sb.append(_beanMetaData.getPropertyTypeByColumnName(keyName).getPropertyDesc().getValue(bean));
-            if (i == size - 1) {
-                sb.append("}");
-            }
+        if (_targetDBMeta.hasPrimaryKey() && (bean instanceof Entity)) {
+            final Entity entity = (Entity) bean;
+            final Map<String, Object> pkMap = _targetDBMeta.extractPrimaryKeyMap(entity);
+            sb.append(", primaryKey=").append(pkMap);
         }
         return sb.toString();
+    }
+
+    protected Object getNonUpdateReturn() {
+        return NON_UPDATE;
     }
 
     // ===================================================================================

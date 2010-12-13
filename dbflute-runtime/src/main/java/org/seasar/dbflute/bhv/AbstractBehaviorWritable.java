@@ -507,6 +507,14 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     /**
+     * Assert that the update column specification is not null.
+     * @param updateColumnSpec The SpecifyQuery implementation for update columns. (NotNull)
+     */
+    protected void assertUpdateColumnSpecificationNotNull(SpecifyQuery<? extends ConditionBean> updateColumnSpec) {
+        assertObjectNotNull("updateColumnSpec", updateColumnSpec);
+    }
+
+    /**
      * Assert that the update option is not null.
      * @param option The option of update. (NotNull)
      */

@@ -34,6 +34,12 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBatchUpdateAutoHandler;
 public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The result for no batch-update as normal execution. */
+    private static final int[] NON_BATCH_UPDATE = new int[] {};
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnBatchUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
@@ -90,6 +96,18 @@ public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand 
     //                                                                  ==================
     @Override
     protected String createNonUpdateLogMessage(final Object bean) {
-        throw new IllegalStateException("no way when BatchUpdate");
+        final StringBuilder sb = new StringBuilder();
+        final String tableDbName = _targetDBMeta.getTableDbName();
+        sb.append("...Skipping batch update because of non-specified: table=").append(tableDbName);
+        if (bean instanceof List<?>) {
+            final List<?> entityList = (List<?>) bean;
+            sb.append(", batchSize=").append(entityList.size());
+        }
+        return sb.toString();
+    }
+
+    @Override
+    protected Object getNonUpdateReturn() {
+        return NON_BATCH_UPDATE;
     }
 }

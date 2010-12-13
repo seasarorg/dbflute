@@ -24,7 +24,10 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.exception.SpecifyUpdateColumnInvalidException;
 import org.seasar.dbflute.exception.VaryingUpdateCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
 import org.seasar.dbflute.exception.VaryingUpdateInvalidColumnSpecificationException;
@@ -286,6 +289,26 @@ public class UpdateOption<CB extends ConditionBean> {
         if (_updateColumnSpecification != null) {
             _updateColumnSpecification.specify(cb);
             _updateColumnSpecifiedCB = cb;
+        }
+    }
+
+    public void xcheckSpecifiedUpdateColumnPrimaryKey() { // checked later by process if it needs
+        if (!hasSpecifiedUpdateColumn()) {
+            return;
+        }
+        final CB cb = _updateColumnSpecifiedCB;
+        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
+        final DBMeta dbmeta = cb.getDBMeta();
+        if (dbmeta.hasPrimaryKey()) {
+            final UniqueInfo pkInfo = dbmeta.getPrimaryUniqueInfo();
+            final List<ColumnInfo> pkList = pkInfo.getUniqueColumnList();
+            for (ColumnInfo pk : pkList) {
+                final String columnDbName = pk.getColumnDbName();
+                if (cb.getSqlClause().hasSpecifiedSelectColumn(basePointAliasName, columnDbName)) {
+                    String msg = "PK columns should not be allowed to specify as update columns: " + columnDbName;
+                    throw new SpecifyUpdateColumnInvalidException(msg);
+                }
+            }
         }
     }
 
