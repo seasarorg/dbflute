@@ -912,6 +912,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Batch-update the list. <br />
      * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
      * You can specify update columns used on set clause of update statement.
+     * However you do not need to specify common columns for update
+     * and an optimistick lock column because they are specified implicitly.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @param updateColumnSpec The specification of update columns. (NotNull)
      * @return The array of updated count.
@@ -945,6 +947,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Batch-update the list non-strictly. <br />
      * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
      * You can specify update columns used on set clause of update statement.
+     * However you do not need to specify common columns for update
+     * and an optimistick lock column because they are specified implicitly.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @param updateColumnSpec The specification of update columns. (NotNull)
      * @return The array of updated count.
