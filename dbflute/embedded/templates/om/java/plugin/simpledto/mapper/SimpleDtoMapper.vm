@@ -77,10 +77,13 @@ public class ${myClassName} {
     //                                                ------
     /**
      * Do mapping from an entity to a DTO with relation data.
-     * @param entity The entity as mapping resource. (NotNull)
+     * @param entity The entity as mapping resource. (Nullable: if null, returns null)
      * @return The mapped DTO. (NotNull)
      */
     public ${myExtendedObjectClassName} mappingToDto(${table.extendedEntityClassName} entity) {
+        if (entity == null) {
+            return null;
+        }
 #if ($table.hasRelation())
         Entity localKey = entity;
         Object cachedLocalDto = _relationDtoMap.get(localKey);
@@ -144,13 +147,23 @@ public class ${myClassName} {
     /**
      * Do mapping from an entity list to a DTO list with relation data. <br />
      * This calls this.mappingToDto() in a loop of the list.
-     * @param entityList The list of entity as mapping resource. (NotNull)
+     * @param entityList The list of entity as mapping resource. (NotNull: null elements are inherited)
      * @return The mapped DTO. (NotNull)
      */
     public List<${myExtendedObjectClassName}> mappingToDtoList(List<${table.extendedEntityClassName}> entityList) {
+        if (entityList == null) {
+            throw new IllegalArgumentException("The argument 'entityList' should not be null.");
+        }
         List<${myExtendedObjectClassName}> dtoList = new ArrayList<${myExtendedObjectClassName}>();
         for (${table.extendedEntityClassName} entity : entityList) {
-            dtoList.add(mappingToDto(entity));
+            ${myExtendedObjectClassName} dto = mappingToDto(entity);
+            if (dto != null) {
+                dtoList.add(dto);
+            } else {
+                if (isAcceptNullElementOnList()) {
+                    dtoList.add(null);
+                }
+            }
         }
         return dtoList;
     }
@@ -161,10 +174,13 @@ public class ${myClassName} {
     /**
      * Do mapping from a DTO to an entity with relation data. <br />
      * A setter of an entity is called under the rule of this.needsMapping().
-     * @param dto The DTO as mapping resource. (NotNull)
+     * @param dto The DTO as mapping resource. (Nullable: if null, returns null)
      * @return The mapped entity. (NotNull)
      */
     public ${table.extendedEntityClassName} mappingToEntity(${myExtendedObjectClassName} dto) {
+        if (dto == null) {
+            return null;
+        }
 #if ($table.hasRelation())
         Object localKey = dto;
         Entity cachedLocalEntity = _relationEntityMap.get(localKey);
@@ -255,14 +271,28 @@ public class ${myClassName} {
     /**
      * Do mapping from a DTO list to an entity list with relation data. <br />
      * This calls this.mappingToEntity() in loop of the list.
-     * @param dtoList The list of DTO as mapping resource. (NotNull)
+     * @param dtoList The list of DTO as mapping resource. (NotNull: null elements are inherited)
      * @return The mapped entity. (NotNull)
      */
     public List<${table.extendedEntityClassName}> mappingToEntityList(List<${myExtendedObjectClassName}> dtoList) {
+        if (dtoList == null) {
+            throw new IllegalArgumentException("The argument 'dtoList' should not be null.");
+        }
         List<${table.extendedEntityClassName}> entityList = new ArrayList<${table.extendedEntityClassName}>();
         for (${myExtendedObjectClassName} dto : dtoList) {
-            entityList.add(mappingToEntity(dto));
+            ${table.extendedEntityClassName} entity = mappingToEntity(dto);
+            if (entity != null) {
+                entityList.add(entity);
+            } else {
+                if (isAcceptNullElementOnList()) {
+                    entityList.add(null);
+                }
+            }
         }
         return entityList;
+    }
+
+    protected boolean isAcceptNullElementOnList() {
+        return true; // as default
     }
 }
