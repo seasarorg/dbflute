@@ -845,13 +845,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValSubCommand(Class<RESULT> resultType,
-            String columnDbName, Integer incrementSize, Integer cacheSize) {
+            String columnDbName, String sequenceName, Integer incrementSize, Integer cacheSize) {
         assertBehaviorCommandInvoker("createSelectNextValCommand");
         final SelectNextValSubCommand<RESULT> cmd = xsetupSelectCommand(new SelectNextValSubCommand<RESULT>());
         cmd.setResultType(resultType);
         cmd.setDBMeta(getDBMeta());
         cmd.setSequenceCacheHandler(_behaviorCommandInvoker.getSequenceCacheHandler());
         cmd.setColumnInfo(getDBMeta().findColumnInfo(columnDbName));
+        cmd.setSequenceName(sequenceName);
         cmd.setIncrementSize(incrementSize);
         cmd.setCacheSize(cacheSize);
         return cmd;

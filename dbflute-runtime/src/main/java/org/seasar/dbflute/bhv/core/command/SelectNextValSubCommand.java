@@ -18,8 +18,10 @@ package org.seasar.dbflute.bhv.core.command;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCache;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.resource.ResourceContext;
 
 /**
+ * The command to select next values of sequence for sub column.
  * @author jflute
  * @param <RESULT> The type of result.
  */
@@ -30,6 +32,9 @@ public class SelectNextValSubCommand<RESULT> extends SelectNextValCommand<RESULT
     //                                                                           =========
     /** The information of column. (NotNull) */
     protected ColumnInfo _columnInfo;
+
+    /** The name of sequence. (NotNull) */
+    protected String _sequenceName;
 
     /** The increment size for sequence. (Nullable) */
     protected Integer _incrementSize;
@@ -51,6 +56,11 @@ public class SelectNextValSubCommand<RESULT> extends SelectNextValCommand<RESULT
     }
 
     @Override
+    protected String getSequenceNextValSql() {
+        return ResourceContext.currentDBDef().dbway().buildSequenceNextValSql(_sequenceName);
+    }
+
+    @Override
     protected String prepareSequenceCache(String sql, SequenceCache sequenceCache) {
         return doPrepareSequenceCache(sql, sequenceCache, _incrementSize, _cacheSize);
     }
@@ -60,6 +70,10 @@ public class SelectNextValSubCommand<RESULT> extends SelectNextValCommand<RESULT
         final String tableName = buildSequenceKeyName();
         final String sequenceName = dbmeta.getSequenceName();
         return doFindSequenceCache(tableName, sequenceName, _cacheSize, _incrementSize);
+    }
+
+    @Override
+    protected void assertTableHasSequence() {
     }
 
     // ===================================================================================
@@ -78,6 +92,10 @@ public class SelectNextValSubCommand<RESULT> extends SelectNextValCommand<RESULT
     //                                                                            ========
     public void setColumnInfo(ColumnInfo columnInfo) {
         _columnInfo = columnInfo;
+    }
+
+    public void setSequenceName(String sequenceName) {
+        _sequenceName = sequenceName;
     }
 
     public void setIncrementSize(Integer incrementSize) {

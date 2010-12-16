@@ -29,6 +29,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
+ * The command to select next values of sequence for primary key.
  * @author jflute
  * @param <RESULT> The type of result.
  */
@@ -110,8 +111,8 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
     protected SqlExecution createSelectNextValExecution(TnResultSetHandler handler) {
         assertStatus("createSelectNextValExecution");
         final DBMeta dbmeta = _dbmeta;
-        assertTableHasSequence(dbmeta);
-        String sql = dbmeta.getSequenceNextValSql(); // filtered later
+        assertTableHasSequence();
+        String sql = getSequenceNextValSql(); // filtered later
         assertSequenceReturnsNotNull(sql, dbmeta);
 
         // handling for sequence cache
@@ -119,6 +120,10 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         sql = prepareSequenceCache(sql, sequenceCache);
 
         return createBasicSelectExecution(handler, new String[] {}, new Class<?>[] {}, sql, sequenceCache);
+    }
+
+    protected String getSequenceNextValSql() {
+        return _dbmeta.getSequenceNextValSql();
     }
 
     protected String prepareSequenceCache(String sql, SequenceCache sequenceCache) {
@@ -141,10 +146,10 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         return sql;
     }
 
-    protected void assertTableHasSequence(DBMeta dbmeta) {
-        if (!dbmeta.hasSequence()) {
+    protected void assertTableHasSequence() {
+        if (!_dbmeta.hasSequence()) {
             String msg = "If it uses sequence, the table should be related to a sequence:";
-            msg = msg + " table=" + dbmeta.getTableDbName() + " sequence=" + dbmeta.getSequenceName();
+            msg = msg + " table=" + _dbmeta.getTableDbName() + " sequence=" + _dbmeta.getSequenceName();
             throw new SequenceSelectIllegalStateException(msg);
         }
     }
