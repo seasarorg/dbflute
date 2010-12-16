@@ -22,7 +22,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityAutoHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteAutoHandler;
 
 /**
@@ -45,7 +45,7 @@ public class TnDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand {
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected TnAbstractAutoHandler createAutoHandler() {
+    protected TnAbstractEntityAutoHandler createAutoHandler() {
         return new TnDeleteAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 

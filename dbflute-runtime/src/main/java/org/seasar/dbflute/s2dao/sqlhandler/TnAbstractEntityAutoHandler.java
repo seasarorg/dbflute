@@ -17,6 +17,8 @@ package org.seasar.dbflute.s2dao.sqlhandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractAutoHandler extends TnBasicHandler {
+public abstract class TnAbstractEntityAutoHandler extends TnBasicHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -62,7 +64,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
+    public TnAbstractEntityAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory);
         _beanMetaData = beanMetaData;
@@ -255,26 +257,65 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     //                                                                            Identity
     //                                                                            ========
     protected void disableIdentityGeneration() {
-        if (ResourceContext.isCurrentDBDef(DBDef.SQLServer)) {
-            final WayOfSQLServer dbway = (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
-            final DBMeta dbmeta = ResourceContext.dbmetaProvider().provideDBMeta(_beanMetaData.getTableName());
-            final String disableSql = dbway.buildIdentityDisableSql(dbmeta.getTableSqlName().toString());
+        if (isDatabaseSQLServer()) {
+            final String tableName = findDBMeta().getTableSqlName().toString();
+            final String disableSql = getWayOfSQLServer().buildIdentityDisableSql(tableName);
             doExecuteIdentityAdjustment(disableSql);
         }
     }
 
     protected void enableIdentityGeneration() {
-        if (ResourceContext.isCurrentDBDef(DBDef.SQLServer)) {
-            final WayOfSQLServer dbway = (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
-            final DBMeta dbmeta = ResourceContext.dbmetaProvider().provideDBMeta(_beanMetaData.getTableName());
-            final String disableSql = dbway.buildIdentityEnableSql(dbmeta.getTableSqlName().toString());
+        if (isDatabaseSQLServer()) {
+            final String tableName = findDBMeta().getTableSqlName().toString();
+            final String disableSql = getWayOfSQLServer().buildIdentityEnableSql(tableName);
             doExecuteIdentityAdjustment(disableSql);
         }
     }
 
+    protected DBMeta findDBMeta() {
+        return ResourceContext.dbmetaProvider().provideDBMeta(_beanMetaData.getTableName());
+    }
+
+    protected boolean isDatabaseSQLServer() {
+        return ResourceContext.isCurrentDBDef(DBDef.SQLServer);
+    }
+
+    protected WayOfSQLServer getWayOfSQLServer() {
+        return (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
+    }
+
     protected void doExecuteIdentityAdjustment(String sql) {
-        final TnBasicUpdateHandler handler = new TnBasicUpdateHandler(getDataSource(), getStatementFactory(), sql);
-        handler.execute(new Object[] {});
+        final TnIdentityAdjustmentHandler handler = createIdentityAdjustmentHandler(sql);
+        handler.execute(new Object[] {}); // SQL for identity adjustment does not have a bind-variable
+    }
+
+    protected TnIdentityAdjustmentHandler createIdentityAdjustmentHandler(String sql) {
+        return new TnIdentityAdjustmentHandler(getDataSource(), getStatementFactory(), sql);
+    }
+
+    protected static class TnIdentityAdjustmentHandler extends TnBasicUpdateHandler {
+
+        public TnIdentityAdjustmentHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
+            super(dataSource, statementFactory, sql);
+        }
+
+        @Override
+        public int execute(Connection conn, Object[] args, Class<?>[] argTypes) {
+            logSql(args, argTypes);
+            Statement st = null;
+            try {
+                // PreparedStatement is not used here
+                // because SQLServer do not work by PreparedStatement
+                // but it do work well by Statement
+                st = conn.createStatement();
+                return st.executeUpdate(getSql());
+            } catch (SQLException e) {
+                handleSQLException(e, st);
+                return 0; // unreachable
+            } finally {
+                close(st);
+            }
+        };
     }
 
     protected boolean isPrimaryKeyIdentityDisabled() {

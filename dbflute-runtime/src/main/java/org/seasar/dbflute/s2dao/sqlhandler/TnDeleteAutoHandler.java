@@ -25,7 +25,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnDeleteAutoHandler extends TnAbstractAutoHandler {
+public class TnDeleteAutoHandler extends TnAbstractEntityAutoHandler {
 
     // ===================================================================================
     //                                                                         Constructor

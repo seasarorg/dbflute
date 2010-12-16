@@ -37,7 +37,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
+public abstract class TnAbstractBatchAutoHandler extends TnAbstractEntityAutoHandler {
 
     // ===================================================================================
     //                                                                          Definition

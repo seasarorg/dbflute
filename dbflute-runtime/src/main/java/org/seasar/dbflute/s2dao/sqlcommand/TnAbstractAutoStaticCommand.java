@@ -28,7 +28,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityAutoHandler;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
@@ -67,7 +67,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) { // NOT for batch (batch should override this)
-        final TnAbstractAutoHandler handler = createAutoHandler();
+        final TnAbstractEntityAutoHandler handler = createAutoHandler();
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
@@ -84,7 +84,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         this._propertyTypes = propertyTypes;
     }
 
-    protected abstract TnAbstractAutoHandler createAutoHandler();
+    protected abstract TnAbstractEntityAutoHandler createAutoHandler();
 
     protected abstract void setupPropertyTypes(String[] propertyNames); // called by constructor
 
