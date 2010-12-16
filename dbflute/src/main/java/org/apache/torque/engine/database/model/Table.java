@@ -2323,20 +2323,29 @@ public class Table {
         }
     }
 
+    protected List<Column> _subSequenceColumnList;
+
+    public boolean isUseSubSequence() {
+        return !getSubSequenceColumnList().isEmpty();
+    }
+
     public List<Column> getSubSequenceColumnList() {
+        if (_subSequenceColumnList != null) {
+            return _subSequenceColumnList;
+        }
+        _subSequenceColumnList = DfCollectionUtil.newArrayList();
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         if (!prop.hasSubSequence()) {
-            return DfCollectionUtil.emptyList();
+            return _subSequenceColumnList;
         }
         final List<Column> columnList = getColumnList();
-        final List<Column> subSequenceColumnList = DfCollectionUtil.newArrayList();
         for (Column column : columnList) {
             final String sequenceName = prop.getSubSequenceName(getName(), column.getName());
             if (sequenceName != null) {
-                subSequenceColumnList.add(column);
+                _subSequenceColumnList.add(column);
             }
         }
-        return subSequenceColumnList;
+        return _subSequenceColumnList;
     }
 
     // ===================================================================================

@@ -93,7 +93,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (sequenceProp == null || sequenceProp.trim().length() == 0) {
             return null;
         }
-        final String hintMark = ":";
+        final String hintMark = getSequenceHintMark();
         final int hintMarkIndex = sequenceProp.lastIndexOf(hintMark);
         if (hintMarkIndex < 0) {
             return sequenceProp;
@@ -103,6 +103,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return null;
         }
         return sequenceName;
+    }
+
+    protected String getSequenceHintMark() {
+        return ":";
     }
 
     protected String getSequenceProp(String tableName) {
@@ -129,8 +133,12 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getSubSequenceName(String tableName, String columnName) {
-        final String key = generateSubSequenceKey(tableName, columnName);
-        final String sequenceProp = getSequenceSubDefinitionMap().get(key);
+        final String sequenceProp = getSubSequenceProp(tableName, columnName);
+        final String hintMark = getSequenceHintMark();
+        if (sequenceProp.contains(hintMark)) { // unsupported
+            String msg = "Sequence hint for sub sequence is unsupported: " + sequenceProp;
+            throw new DfIllegalPropertySettingException(msg);
+        }
         return extractSequenceNameFromProp(sequenceProp);
     }
 
@@ -359,7 +367,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (sequenceProp == null) {
             return null;
         }
-        final String hintMark = ":";
+        final String hintMark = getSequenceHintMark();
         final int hintMarkIndex = sequenceProp.lastIndexOf(hintMark);
         if (hintMarkIndex < 0) {
             return null;

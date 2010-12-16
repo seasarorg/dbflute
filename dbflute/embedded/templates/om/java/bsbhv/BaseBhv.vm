@@ -403,8 +403,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 #foreach ($col in $table.subSequenceColumnList)
 
-    public ${col.javaNative} selectNextValFor${col.JavaName}() {
-        return delegateSelectNextVal(${col.javaNative}.class);
+    public ${col.javaNative} selectNextValFor${col.javaName}() {
+        return doSelectNextValFor${col.javaName}(null, null); // sequence cache is unsupported by default
+    }
+
+    protected ${col.javaNative} doSelectNextValFor${col.javaName}(Integer incrementSize, Integer cacheSize) {
+        return delegateSelectNextValSub(${col.javaNative}.class, "${col.name}", incrementSize, cacheSize);
     }
 #end
 
@@ -1514,6 +1518,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     { return invoke(createSelectListCBCommand(cb, entityType)); }
 #if ($table.isUseSequence())
     protected <RESULT> RESULT delegateSelectNextVal(Class<RESULT> resultType) { return invoke(createSelectNextValCommand(resultType)); }
+#end
+#if ($table.isUseSubSequence())
+    protected <RESULT> RESULT delegateSelectNextValSub(Class<RESULT> resultType, String columnDbName, Integer incrementSize, Integer cacheSize)
+    { return invoke(createSelectNextValSubCommand(resultType, columnDbName, incrementSize, cacheSize)); }
 #end
 #if ($table.isWritable())
 
