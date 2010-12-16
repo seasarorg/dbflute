@@ -104,7 +104,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
 
     protected boolean isInsertTarget(TnPropertyType propertyType) {
         if (propertyType.isPrimaryKey()) {
-            if (_insertOption == null || !_insertOption.isPrimaryIdentityInsertDisabled()) {
+            if (_insertOption == null || !_insertOption.isPrimaryKeyIdentityDisabled()) {
                 final String name = propertyType.getPropertyName();
                 final TnIdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator(name);
                 return generator.isSelfGenerate();

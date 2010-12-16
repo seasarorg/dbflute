@@ -43,4 +43,20 @@ public class TnBatchInsertAutoHandler extends TnAbstractBatchAutoHandler {
     protected void setupBindVariables(Object bean) {
         setupInsertBindVariables(bean);
     }
+
+    @Override
+    protected void preBatchUpdateBean(Object bean) {
+        super.preBatchUpdateBean(bean);
+        if (isPrimaryKeyIdentityDisabled()) {
+            disableIdentityGeneration();
+        }
+    }
+
+    @Override
+    protected void postBatchUpdateBean(Object bean, int index) {
+        super.postBatchUpdateBean(bean, index);
+        if (isPrimaryKeyIdentityDisabled()) {
+            enableIdentityGeneration();
+        }
+    }
 }

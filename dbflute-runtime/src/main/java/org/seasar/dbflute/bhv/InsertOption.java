@@ -30,7 +30,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _disableCommonColumnAutoSetup;
-    protected boolean _disablePrimaryIdentityInsert;
+    protected boolean _disablePrimaryKeyIdentity;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -86,7 +86,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                     Identity Insert
     //                                                                     ===============
     /**
-     * Disable identity-insert for primary key. <br />
+     * Disable identity for primary key. <br />
      * you can insert by your value for primary key.
      * <pre>
      * Member member = new Member();
@@ -98,13 +98,13 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * </pre>
      * @return The option of insert. (NotNull: returns this)
      */
-    public InsertOption<CB> disablePrimaryIdentityInsert() {
-        _disablePrimaryIdentityInsert = true;
+    public InsertOption<CB> disablePrimaryKeyIdentity() {
+        _disablePrimaryKeyIdentity = true;
         return this;
     }
 
-    public boolean isPrimaryIdentityInsertDisabled() {
-        return _disablePrimaryIdentityInsert;
+    public boolean isPrimaryKeyIdentityDisabled() {
+        return _disablePrimaryKeyIdentity;
     }
 
     // ===================================================================================
@@ -116,7 +116,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         if (_disableCommonColumnAutoSetup) {
             sb.append("CommonColumnDisabled");
         }
-        if (_disablePrimaryIdentityInsert) {
+        if (_disablePrimaryKeyIdentity) {
             if (sb.length() > 0) {
                 sb.append(", ");
             }

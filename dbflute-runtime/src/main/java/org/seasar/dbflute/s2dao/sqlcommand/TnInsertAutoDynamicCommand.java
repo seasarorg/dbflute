@@ -104,7 +104,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         for (int i = 0; i < propertyNames.length; ++i) {
             final TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
-                if (option == null || !option.isPrimaryIdentityInsertDisabled()) {
+                if (option == null || !option.isPrimaryKeyIdentityDisabled()) {
                     final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(pt.getPropertyName());
                     if (!generator.isSelfGenerate()) {
                         continue;

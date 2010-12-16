@@ -35,6 +35,18 @@ public class WayOfSQLServer implements DBWay {
         return "select @@identity";
     }
 
+    public String buildIdentityDisableSql(String tableName) {
+        return buildIdentityOnOffSql(tableName, true);
+    }
+
+    public String buildIdentityEnableSql(String tableName) {
+        return buildIdentityOnOffSql(tableName, false);
+    }
+
+    protected String buildIdentityOnOffSql(String tableName, boolean insertOn) {
+        return "set identity_insert " + tableName + " " + (insertOn ? "on" : "off");
+    }
+
     // ===================================================================================
     //                                                                         SQL Support
     //                                                                         ===========

@@ -47,7 +47,7 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
     @Override
     public String buildSqlExecutionKey() {
         final String baseKey = super.buildSqlExecutionKey();
-        if (_insertOption != null && _insertOption.isPrimaryIdentityInsertDisabled()) {
+        if (_insertOption != null && _insertOption.isPrimaryKeyIdentityDisabled()) {
             return baseKey + ":PKIdentityDisabled";
         } else {
             return baseKey;

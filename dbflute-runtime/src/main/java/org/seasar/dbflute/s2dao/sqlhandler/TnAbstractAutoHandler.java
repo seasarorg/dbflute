@@ -23,9 +23,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbway.WayOfSQLServer;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -246,6 +249,36 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         }
         final DfPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
         pd.setValue(bean, newVersionNoList.get(index));
+    }
+
+    // ===================================================================================
+    //                                                                            Identity
+    //                                                                            ========
+    protected void disableIdentityGeneration() {
+        if (ResourceContext.isCurrentDBDef(DBDef.SQLServer)) {
+            final WayOfSQLServer dbway = (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
+            final DBMeta dbmeta = ResourceContext.dbmetaProvider().provideDBMeta(_beanMetaData.getTableName());
+            final String disableSql = dbway.buildIdentityDisableSql(dbmeta.getTableSqlName().toString());
+            doExecuteIdentityAdjustment(disableSql);
+        }
+    }
+
+    protected void enableIdentityGeneration() {
+        if (ResourceContext.isCurrentDBDef(DBDef.SQLServer)) {
+            final WayOfSQLServer dbway = (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
+            final DBMeta dbmeta = ResourceContext.dbmetaProvider().provideDBMeta(_beanMetaData.getTableName());
+            final String disableSql = dbway.buildIdentityEnableSql(dbmeta.getTableSqlName().toString());
+            doExecuteIdentityAdjustment(disableSql);
+        }
+    }
+
+    protected void doExecuteIdentityAdjustment(String sql) {
+        final TnBasicUpdateHandler handler = new TnBasicUpdateHandler(getDataSource(), getStatementFactory(), sql);
+        handler.execute(new Object[] {});
+    }
+
+    protected boolean isPrimaryKeyIdentityDisabled() {
+        return _insertOption != null && _insertOption.isPrimaryKeyIdentityDisabled();
     }
 
     // ===================================================================================

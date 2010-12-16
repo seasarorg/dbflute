@@ -458,8 +458,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             msg = msg + " table=" + getTableDbName() + " option=" + option;
             throw new IllegalStateException(msg);
         }
-        if (option.isPrimaryIdentityInsertDisabled() && !getDBMeta().hasIdentity()) {
-            String msg = "The identity-insert disabling was set to the table not defined identity:";
+        if (option.isPrimaryKeyIdentityDisabled() && !getDBMeta().hasIdentity()) {
+            String msg = "The identity disabling was set to the table not defined identity:";
             msg = msg + " table=" + getTableDbName() + " option=" + option;
             throw new IllegalStateException(msg);
         }

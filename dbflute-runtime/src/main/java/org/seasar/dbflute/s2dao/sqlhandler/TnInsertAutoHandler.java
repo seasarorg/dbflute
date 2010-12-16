@@ -53,7 +53,8 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
             final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (generator.isSelfGenerate()) {
                 if (generator.isPrimaryKey()) {
-                    if (_insertOption != null && _insertOption.isPrimaryIdentityInsertDisabled()) {
+                    if (isPrimaryKeyIdentityDisabled()) {
+                        disableIdentityGeneration();
                         continue;
                     }
                 }
@@ -69,7 +70,8 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
             final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (!generator.isSelfGenerate()) {
                 if (generator.isPrimaryKey()) {
-                    if (_insertOption != null && _insertOption.isPrimaryIdentityInsertDisabled()) {
+                    if (isPrimaryKeyIdentityDisabled()) {
+                        enableIdentityGeneration();
                         continue;
                     }
                 }
