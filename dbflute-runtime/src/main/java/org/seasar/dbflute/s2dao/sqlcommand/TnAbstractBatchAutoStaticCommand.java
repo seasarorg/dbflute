@@ -19,6 +19,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.DeleteOption;
+import org.seasar.dbflute.bhv.InsertOption;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -35,9 +38,10 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
     //                                                                         ===========
     public TnAbstractBatchAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
             TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
-            boolean versionNoAutoIncrementOnMemory) {
+            boolean versionNoAutoIncrementOnMemory, InsertOption<? extends ConditionBean> insertOption,
+            DeleteOption<? extends ConditionBean> deleteOption) {
         super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling,
-                versionNoAutoIncrementOnMemory);
+                versionNoAutoIncrementOnMemory, insertOption, deleteOption);
     }
 
     // ===================================================================================

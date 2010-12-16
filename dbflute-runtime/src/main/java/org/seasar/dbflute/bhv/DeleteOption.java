@@ -13,34 +13,41 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.core.command;
+package org.seasar.dbflute.bhv;
 
-import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
+ * The option of delete for varying-delete.
  * @author jflute
+ * @since 0.9.7.8 (2010/12/16 Thursday)
+ * @param <CB> The type of condition-bean for specification.
  */
-public abstract class AbstractUpdateEntityCommand extends AbstractEntityCommand {
+public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB> {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The option of update. (NotRequired) */
-    protected UpdateOption<? extends ConditionBean> _updateOption;
+    // nothing now, this is for the future
 
     // ===================================================================================
-    //                                                               SqlExecution Handling
-    //                                                               =====================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     */
+    public DeleteOption() {
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
-    protected Object[] doGetSqlExecutionArgument() {
-        return new Object[] { _entity, _updateOption };
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("default");
+        return DfTypeUtil.toClassTitle(this) + ":{" + sb.toString() + "}";
     }
 
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setUpdateOption(UpdateOption<? extends ConditionBean> updateOption) {
-        _updateOption = updateOption;
-    }
 }

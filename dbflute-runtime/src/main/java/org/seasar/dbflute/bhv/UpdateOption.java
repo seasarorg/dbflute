@@ -37,6 +37,7 @@ import org.seasar.dbflute.exception.VaryingUpdatePrimaryKeySpecificationExceptio
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The option of update for varying-update.
@@ -44,7 +45,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @since 0.9.7.2 (2010/06/18 Friday)
  * @param <CB> The type of condition-bean for specification.
  */
-public class UpdateOption<CB extends ConditionBean> {
+public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -56,6 +57,8 @@ public class UpdateOption<CB extends ConditionBean> {
     protected CB _updateColumnSpecifiedCB;
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
 
+    protected boolean _disableCommonColumnAutoSetup;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -63,15 +66,21 @@ public class UpdateOption<CB extends ConditionBean> {
      * Constructor.
      * <pre>
      * Purchase purchase = new Purchase();
-     * purchase.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * purchase.setPurchaseId(value); <span style="color: #3F7E5E">// required</span>
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * 
+     * <span style="color: #3F7E5E">// ex) you can update by self calculation values</span>
      * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #FD4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
      * option.<span style="color: #FD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     public void specify(PurchaseCB cb) {
      *         cb.specify().<span style="color: #FD4747">columnPurchaseCount()</span>;
      *     }
      * }).<span style="color: #FD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
-     * purchaseBhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(purchase, option);
+     * 
+     * <span style="color: #3F7E5E">// ex) you can update by your values for common columns</span>
+     * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
+     * 
+     * purchaseBhv.<span style="color: #FD4747">varyingUpdate</span>(purchase, option);
      * </pre>
      */
     public UpdateOption() {
@@ -86,7 +95,7 @@ public class UpdateOption<CB extends ConditionBean> {
      * And you can specify only one column that is a number type.
      * <pre>
      * Purchase purchase = new Purchase();
-     * purchase.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * purchase.setPurchaseId(value); <span style="color: #3F7E5E">// required</span>
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * UpdateOption&lt;PurchaseCB&gt; option = new UpdateOption&lt;PurchaseCB&gt;();
      * option.<span style="color: #FD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
@@ -96,18 +105,18 @@ public class UpdateOption<CB extends ConditionBean> {
      * }).<span style="color: #FD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
      * purchaseBhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(purchase, option);
      * </pre>
-     * @param specifyQuery The query for specification that specifies only one column. (NotNull)
+     * @param selfCalculationSpecification The query for specification that specifies only one column. (NotNull)
      * @return The calculation of specification for the specified column. (NotNull)
      */
-    public HpCalculator self(SpecifyQuery<CB> specifyQuery) {
-        if (specifyQuery == null) {
-            String msg = "The argument 'specifyQuery' should not be null.";
+    public HpCalculator self(SpecifyQuery<CB> selfCalculationSpecification) {
+        if (selfCalculationSpecification == null) {
+            String msg = "The argument 'selfCalculationSpecification' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (_selfSpecificationList == null) {
             _selfSpecificationList = DfCollectionUtil.newArrayList();
         }
-        final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(specifyQuery);
+        final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(selfCalculationSpecification);
         _selfSpecificationList.add(specification);
         return specification;
     }
@@ -277,7 +286,31 @@ public class UpdateOption<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                       Update Column
     //                                                                       =============
+    /**
+     * Specify update columns manually. <br />
+     * You can update fixed columns instead of modified update columns.
+     * <pre>
+     * Member member = new Member();
+     * member.setMemberId(3);
+     * member.setOthers...(value);
+     * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
+     * option.<span style="color: #FD4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB cb) {
+     *         <span style="color: #3F7E5E">// only MemberName and Birthdate are updated</span>
+     *         <span style="color: #3F7E5E">// with common columns for update and an optimistic lock column</span>
+     *         cb.specify().columnMemberName();
+     *         cb.specify().columnBirthdate();
+     *     }
+     * });
+     * memberBhv.varyingUpdate(member, option);
+     * </pre>
+     * @param updateColumnSpecification The query for specifying update columns. (NotNull)
+     */
     public void specify(SpecifyQuery<CB> updateColumnSpecification) {
+        if (updateColumnSpecification == null) {
+            String msg = "The argument 'updateColumnSpecification' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         _updateColumnSpecification = updateColumnSpecification;
     }
 
@@ -333,5 +366,59 @@ public class UpdateOption<CB extends ConditionBean> {
         for (ColumnInfo columnInfo : columnInfoList) {
             _forcedSpecifiedUpdateColumnSet.add(columnInfo.getColumnDbName());
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Common Column
+    //                                                                       =============
+    /**
+     * Disable auto-setup for common columns. <br />
+     * You can update by your values for common columns.
+     * <pre>
+     * Member member = new Member();
+     * member.setMemberId(3);
+     * member.setOthers...(value);
+     * member.setUpdateDatetime(updateDatetime);
+     * member.setUpdateUser(updateUser);
+     * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
+     * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
+     * memberBhv.varyingUpdate(member, option);
+     * </pre>
+     * @return The option of insert. (NotNull: returns this)
+     */
+    public UpdateOption<CB> disableCommonColumnAutoSetup() {
+        _disableCommonColumnAutoSetup = true;
+        return this;
+    }
+
+    public boolean isCommonColumnAutoSetupDisabled() {
+        return _disableCommonColumnAutoSetup;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        if (_selfSpecificationList != null && !_selfSpecificationList.isEmpty()) {
+            sb.append("SelfCalculationSpecified");
+        }
+        if (_updateColumnSpecification != null) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("UpdateColumnSpecified");
+        }
+        if (_disableCommonColumnAutoSetup) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("CommonColumnDisabled");
+        }
+        if (sb.length() == 0) {
+            sb.append("default");
+        }
+        return DfTypeUtil.toClassTitle(this) + ":{" + sb.toString() + "}";
     }
 }

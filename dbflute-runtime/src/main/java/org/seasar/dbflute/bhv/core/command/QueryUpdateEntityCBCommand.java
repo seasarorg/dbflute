@@ -92,8 +92,7 @@ public class QueryUpdateEntityCBCommand extends AbstractUpdateEntityCommand {
     }
 
     @Override
-    public Object[] getSqlExecutionArgument() {
-        assertStatus("getSqlExecutionArgument");
+    protected Object[] doGetSqlExecutionArgument() {
         return new Object[] { _conditionBean, _entity, _updateOption };
     }
 

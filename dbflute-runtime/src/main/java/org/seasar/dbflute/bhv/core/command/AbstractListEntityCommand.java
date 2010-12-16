@@ -101,8 +101,10 @@ public abstract class AbstractListEntityCommand extends AbstractBehaviorCommand<
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _entityList };
+        return doGetSqlExecutionArgument();
     }
+
+    protected abstract Object[] doGetSqlExecutionArgument();
 
     // ===================================================================================
     //                                                                Argument Information

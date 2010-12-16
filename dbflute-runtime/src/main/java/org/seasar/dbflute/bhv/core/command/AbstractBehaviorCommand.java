@@ -34,6 +34,7 @@ import org.seasar.dbflute.s2dao.rshandler.TnScalarListResultSetHandler;
 import org.seasar.dbflute.s2dao.rshandler.TnScalarResultSetHandler;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -146,8 +147,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected String buildAssertMessage(String propertyName, String methodName) {
-        propertyName = propertyName.startsWith("_") ? propertyName.substring("_".length()) : propertyName;
-        String msg = "The property '" + propertyName + "' should not be null";
+        String msg = "The property '" + Srl.ltrim(propertyName, "_") + "' should not be null";
         msg = msg + " when you call " + methodName + "().";
         throw new IllegalStateException(msg);
     }

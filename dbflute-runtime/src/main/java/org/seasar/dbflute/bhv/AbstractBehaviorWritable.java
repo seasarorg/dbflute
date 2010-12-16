@@ -16,12 +16,10 @@
 package org.seasar.dbflute.bhv;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-import org.seasar.dbflute.bhv.core.command.AbstractEntityCommand;
 import org.seasar.dbflute.bhv.core.command.AbstractListEntityCommand;
 import org.seasar.dbflute.bhv.core.command.BatchDeleteEntityCommand;
 import org.seasar.dbflute.bhv.core.command.BatchDeleteNonstrictEntityCommand;
@@ -30,7 +28,6 @@ import org.seasar.dbflute.bhv.core.command.BatchUpdateEntityCommand;
 import org.seasar.dbflute.bhv.core.command.BatchUpdateNonstrictEntityCommand;
 import org.seasar.dbflute.bhv.core.command.DeleteEntityCommand;
 import org.seasar.dbflute.bhv.core.command.DeleteNonstrictEntityCommand;
-import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
 import org.seasar.dbflute.bhv.core.command.QueryDeleteCBCommand;
 import org.seasar.dbflute.bhv.core.command.QueryUpdateEntityCBCommand;
 import org.seasar.dbflute.bhv.core.command.UpdateEntityCommand;
@@ -355,42 +352,55 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Process before insert.
      * @param entity The entity for insert. (NotNull)
+     * @param option The option of insert. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeInsert(Entity entity) {
-        if (!determineExecuteInsert(entity)) {
+    protected boolean processBeforeInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
+        if (!determineExecuteInsert(entity, option)) {
             return false;
         }
-        assertEntityNotNull(entity); // If this table use identity, the entity does not have primary-key.
-        frameworkFilterEntityOfInsert(entity);
-        filterEntityOfInsert(entity);
-        assertEntityOfInsert(entity);
+        assertEntityNotNull(entity); // primary key is checked later
+        frameworkFilterEntityOfInsert(entity, option);
+        filterEntityOfInsert(entity, option);
+        assertEntityOfInsert(entity, option);
+        // check primary key after filtering at an insert process
+        // because a primary key value may be set in filtering process
+        // (for example, sequence)
+        if (!entity.getDBMeta().hasIdentity()) { // identity does not need primary key value here
+            assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        }
         return true;
     }
 
     /**
      * Determine execution of insert. (for extension)
      * @param entity The entity for insert. (NotNull)
+     * @param option The option of insert. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteInsert(Entity entity) {
+    protected boolean determineExecuteInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
         return true;
     }
 
     /**
      * {Framework Method} Filter the entity of insert.
      * @param entity The entity for insert. (NotNull)
+     * @param option The option of insert. (Nullable)
      */
-    protected void frameworkFilterEntityOfInsert(Entity entity) {
+    protected void frameworkFilterEntityOfInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
         injectSequenceToPrimaryKeyIfNeeds(entity);
-        setupCommonColumnOfInsertIfNeeds(entity);
+        setupCommonColumnOfInsertIfNeeds(entity, option);
     }
 
     /**
      * Set up common columns of insert if it needs.
      * @param entity The entity for insert. (NotNull)
+     * @param option The option of insert. (Nullable)
      */
-    protected void setupCommonColumnOfInsertIfNeeds(Entity entity) {
+    protected void setupCommonColumnOfInsertIfNeeds(Entity entity, InsertOption<? extends ConditionBean> option) {
+        if (option != null && option.isCommonColumnAutoSetupDisabled()) {
+            return;
+        }
         final CommonColumnAutoSetupper setupper = getCommonColumnAutoSetupper();
         assertCommonColumnAutoSetupperNotNull();
         setupper.handleCommonColumnOfInsertIfNeeds(entity);
@@ -417,15 +427,42 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Filter the entity of insert. (for extension)
      * @param entity The entity for insert. (NotNull)
+     * @param option The option of insert. (Nullable)
      */
-    protected void filterEntityOfInsert(Entity entity) {
+    protected void filterEntityOfInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
     }
 
     /**
      * Assert the entity of insert. (for extension)
      * @param entity The entity for insert. (NotNull)
+     * @param option The option of insert. (Nullable)
      */
-    protected void assertEntityOfInsert(Entity entity) {
+    protected void assertEntityOfInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
+    }
+
+    /**
+     * Assert that the insert option is not null.
+     * @param option The option of insert. (NotNull)
+     */
+    protected void assertInsertOptionNotNull(InsertOption<? extends ConditionBean> option) {
+        assertObjectNotNull("option (for insert)", option);
+    }
+
+    /**
+     * Assert that the insert option is legal status.
+     * @param option The option of insert. (NotNull)
+     */
+    protected void assertInsertOptionStatus(InsertOption<? extends ConditionBean> option) {
+        if (option.isCommonColumnAutoSetupDisabled() && !getDBMeta().hasCommonColumn()) {
+            String msg = "The common column auto-setup disabling was set to the table not defined common columns:";
+            msg = msg + " table=" + getTableDbName() + " option=" + option;
+            throw new IllegalStateException(msg);
+        }
+        if (option.isPrimaryIdentityInsertDisabled() && !getDBMeta().hasIdentity()) {
+            String msg = "The identity-insert disabling was set to the table not defined identity:";
+            msg = msg + " table=" + getTableDbName() + " option=" + option;
+            throw new IllegalStateException(msg);
+        }
     }
 
     // -----------------------------------------------------
@@ -434,59 +471,68 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Process before update.
      * @param entity The entity for update that has primary key. (NotNull)
+     * @param option The option of update. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeUpdate(Entity entity) {
-        if (!determineExecuteUpdate(entity)) {
+    protected boolean processBeforeUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        if (!determineExecuteUpdate(entity, option)) {
             return false;
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        frameworkFilterEntityOfUpdate(entity);
-        filterEntityOfUpdate(entity);
-        assertEntityOfUpdate(entity);
+        frameworkFilterEntityOfUpdate(entity, option);
+        filterEntityOfUpdate(entity, option);
+        assertEntityOfUpdate(entity, option);
         return true;
     }
 
     /**
      * Process before query-update.
      * @param entity The entity for update that is not needed primary key. (NotNull)
-     * @param cb The condition-bean for query. (NotNull) 
+     * @param cb The condition-bean for query. (NotNull)
+     * @param option The option of update. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeQueryUpdate(Entity entity, ConditionBean cb) {
-        if (!determineExecuteUpdate(entity)) {
+    protected boolean processBeforeQueryUpdate(Entity entity, ConditionBean cb,
+            UpdateOption<? extends ConditionBean> option) {
+        if (!determineExecuteUpdate(entity, option)) {
             return false;
         }
-        assertEntityNotNull(entity); // query-update doesn't need primary key
+        assertEntityNotNull(entity); // query-update doesn't need to check primary key
         assertCBNotNull(cb);
-        frameworkFilterEntityOfUpdate(entity);
-        filterEntityOfUpdate(entity);
-        assertEntityOfUpdate(entity);
+        frameworkFilterEntityOfUpdate(entity, option);
+        filterEntityOfUpdate(entity, option);
+        assertEntityOfUpdate(entity, option);
         return true;
     }
 
     /**
      * Determine execution of update. (for extension)
      * @param entity The entity for update. (NotNull)
+     * @param option The option of update. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteUpdate(Entity entity) {
+    protected boolean determineExecuteUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
         return true;
     }
 
     /**
      * {Framework Method} Filter the entity of update.
      * @param entity The entity for update. (NotNull)
+     * @param option The option of update. (Nullable)
      */
-    protected void frameworkFilterEntityOfUpdate(Entity entity) {
-        setupCommonColumnOfUpdateIfNeeds(entity);
+    protected void frameworkFilterEntityOfUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        setupCommonColumnOfUpdateIfNeeds(entity, option);
     }
 
     /**
      * Set up common columns of update if it needs.
      * @param entity The entity for update. (NotNull)
+     * @param option The option of update. (Nullable)
      */
-    protected void setupCommonColumnOfUpdateIfNeeds(Entity entity) {
+    protected void setupCommonColumnOfUpdateIfNeeds(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        if (option != null && option.isCommonColumnAutoSetupDisabled()) {
+            return;
+        }
         final CommonColumnAutoSetupper setupper = getCommonColumnAutoSetupper();
         assertCommonColumnAutoSetupperNotNull();
         setupper.handleCommonColumnOfUpdateIfNeeds(entity);
@@ -495,15 +541,17 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Filter the entity of update. (for extension)
      * @param entity The entity for update. (NotNull)
+     * @param option The option of update. (Nullable)
      */
-    protected void filterEntityOfUpdate(Entity entity) {
+    protected void filterEntityOfUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
     }
 
     /**
      * Assert the entity of update. (for extension)
      * @param entity The entity for update. (NotNull)
+     * @param option The option of update. (Nullable)
      */
-    protected void assertEntityOfUpdate(Entity entity) {
+    protected void assertEntityOfUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
     }
 
     /**
@@ -519,7 +567,19 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @param option The option of update. (NotNull)
      */
     protected void assertUpdateOptionNotNull(UpdateOption<? extends ConditionBean> option) {
-        assertObjectNotNull("option", option);
+        assertObjectNotNull("option (for update)", option);
+    }
+
+    /**
+     * Assert that the update option is legal status.
+     * @param option The option of update. (NotNull)
+     */
+    protected void assertUpdateOptionStatus(UpdateOption<? extends ConditionBean> option) {
+        if (option.isCommonColumnAutoSetupDisabled() && !getDBMeta().hasCommonColumn()) {
+            String msg = "The common column auto-setup disabling was set to the table not defined common columns:";
+            msg = msg + " table=" + getTableDbName() + " option=" + option;
+            throw new IllegalStateException(msg);
+        }
     }
 
     // -----------------------------------------------------
@@ -528,25 +588,27 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Process before delete.
      * @param entity The entity for delete that has primary key. (NotNull)
+     * @param option The option of delete. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeDelete(Entity entity) {
-        if (!determineExecuteDelete(entity)) {
+    protected boolean processBeforeDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
+        if (!determineExecuteDelete(entity, option)) {
             return false;
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        frameworkFilterEntityOfDelete(entity);
-        filterEntityOfDelete(entity);
-        assertEntityOfDelete(entity);
+        frameworkFilterEntityOfDelete(entity, option);
+        filterEntityOfDelete(entity, option);
+        assertEntityOfDelete(entity, option);
         return true;
     }
 
     /**
      * Process before query-delete.
      * @param cb The condition-bean for query. (NotNull)
+     * @param option The option of delete. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeQueryDelete(ConditionBean cb) {
+    protected boolean processBeforeQueryDelete(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
         assertCBNotNull(cb);
         return true;
     }
@@ -554,31 +616,50 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Determine execution of delete. (for extension) {not called if query-delete}
      * @param entity The entity for delete that has primary key. (NotNull)
+     * @param option The option of delete. (Nullable)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteDelete(Entity entity) {
+    protected boolean determineExecuteDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
         return true;
     }
 
     /**
      * {Framework Method} Filter the entity of delete. {not called if query-delete}
      * @param entity The entity for delete that has primary key. (NotNull)
+     * @param option The option of delete. (Nullable)
      */
-    protected void frameworkFilterEntityOfDelete(Entity entity) {
+    protected void frameworkFilterEntityOfDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
     }
 
     /**
      * Filter the entity of delete. (for extension) {not called if query-delete}
      * @param entity The entity for delete that has primary key. (NotNull)
+     * @param option The option of delete. (Nullable)
      */
-    protected void filterEntityOfDelete(Entity entity) {
+    protected void filterEntityOfDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
     }
 
     /**
      * Assert the entity of delete. (for extension) {not called if query-delete}
      * @param entity The entity for delete that has primary key. (NotNull)
+     * @param option The option of delete. (Nullable)
      */
-    protected void assertEntityOfDelete(Entity entity) {
+    protected void assertEntityOfDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
+    }
+
+    /**
+     * Assert that the delete option is not null.
+     * @param option The option of delete. (NotNull)
+     */
+    protected void assertDeleteOptionNotNull(DeleteOption<? extends ConditionBean> option) {
+        assertObjectNotNull("option (for delete)", option);
+    }
+
+    /**
+     * Assert that the delete option is legal status.
+     * @param option The option of delete. (NotNull)
+     */
+    protected void assertDeleteOptionStatus(DeleteOption<? extends ConditionBean> option) {
     }
 
     // -----------------------------------------------------
@@ -589,8 +670,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Inserted count.
      */
     protected int[] callCreateList(List<Entity> entityList) {
-        assertObjectNotNull("entityList", entityList);
-        helpFilterBeforeInsertInternally(entityList);
+        helpFilterBeforeInsertInternally(entityList, null);
         return doCreateList(entityList);
     }
 
@@ -601,8 +681,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Updated count.
      */
     protected int[] callModifyList(List<Entity> entityList) {
-        assertObjectNotNull("entityList", entityList);
-        helpFilterBeforeUpdateInternally(entityList);
+        helpFilterBeforeUpdateInternally(entityList, null);
         return doModifyList(entityList);
     }
 
@@ -613,8 +692,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Deleted count.
      */
     protected int[] callRemoveList(List<Entity> entityList) {
-        assertObjectNotNull("entityList", entityList);
-        helpFilterBeforeDeleteInternally(entityList);
+        helpFilterBeforeDeleteInternally(entityList, null);
         return doRemoveList(entityList);
     }
 
@@ -651,11 +729,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // ===================================================================================
     //                                                     Delegate Method Internal Helper
     //                                                     ===============================
-    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList) {
+    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList,
+            InsertOption<? extends ConditionBean> option) {
+        assertObjectNotNull("entityList", entityList);
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
-        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext();) {
-            final ENTITY entity = ite.next();
-            if (!processBeforeInsert(entity)) {
+        for (ENTITY entity : entityList) {
+            if (!processBeforeInsert(entity, option)) {
                 continue;
             }
             filteredList.add(entity);
@@ -663,11 +742,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return filteredList;
     }
 
-    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList) {
+    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList,
+            UpdateOption<? extends ConditionBean> option) {
+        assertObjectNotNull("entityList", entityList);
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
-        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext();) {
-            final ENTITY entity = ite.next();
-            if (!processBeforeUpdate(entity)) {
+        for (ENTITY entity : entityList) {
+            if (!processBeforeUpdate(entity, option)) {
                 continue;
             }
             filteredList.add(entity);
@@ -675,11 +755,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return filteredList;
     }
 
-    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList) {
+    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList,
+            DeleteOption<? extends ConditionBean> option) {
+        assertObjectNotNull("entityList", entityList);
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
-        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext();) {
-            final ENTITY entity = ite.next();
-            if (!processBeforeDelete(entity)) {
+        for (ENTITY entity : entityList) {
+            if (!processBeforeDelete(entity, option)) {
                 continue;
             }
             filteredList.add(entity);
@@ -693,45 +774,47 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    protected InsertEntityCommand createInsertEntityCommand(Entity entity) {
-        assertBehaviorCommandInvoker("createInsertEntityCommand");
-        return xsetupEntityCommand(new InsertEntityCommand(), entity);
-    }
+    // an insert command creation is defined on the readable interface for non-primary key value
 
-    protected UpdateEntityCommand createUpdateEntityCommand(Entity entity) {
+    protected UpdateEntityCommand createUpdateEntityCommand(Entity entity, UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createUpdateEntityCommand");
-        return xsetupEntityCommand(new UpdateEntityCommand(), entity);
+        final UpdateEntityCommand cmd = xsetupEntityCommand(new UpdateEntityCommand(), entity);
+        cmd.setUpdateOption(option);
+        return cmd;
     }
 
-    protected UpdateNonstrictEntityCommand createUpdateNonstrictEntityCommand(Entity entity) {
+    protected UpdateNonstrictEntityCommand createUpdateNonstrictEntityCommand(Entity entity,
+            UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createUpdateNonstrictEntityCommand");
-        return xsetupEntityCommand(new UpdateNonstrictEntityCommand(), entity);
+        final UpdateNonstrictEntityCommand cmd = xsetupEntityCommand(new UpdateNonstrictEntityCommand(), entity);
+        cmd.setUpdateOption(option);
+        return cmd;
     }
 
-    protected DeleteEntityCommand createDeleteEntityCommand(Entity entity) {
+    protected DeleteEntityCommand createDeleteEntityCommand(Entity entity, DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createDeleteEntityCommand");
-        return xsetupEntityCommand(new DeleteEntityCommand(), entity);
+        final DeleteEntityCommand cmd = xsetupEntityCommand(new DeleteEntityCommand(), entity);
+        cmd.setDeleteOption(option);
+        return cmd;
     }
 
-    protected DeleteNonstrictEntityCommand createDeleteNonstrictEntityCommand(Entity entity) {
+    protected DeleteNonstrictEntityCommand createDeleteNonstrictEntityCommand(Entity entity,
+            DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createDeleteNonstrictEntityCommand");
-        return xsetupEntityCommand(new DeleteNonstrictEntityCommand(), entity);
-    }
-
-    protected <COMMAND extends AbstractEntityCommand> COMMAND xsetupEntityCommand(COMMAND command, Entity entity) {
-        command.setTableDbName(getTableDbName());
-        _behaviorCommandInvoker.injectComponentProperty(command);
-        command.setEntityType(entity.getClass());
-        command.setEntity(entity);
-        return command;
+        final DeleteNonstrictEntityCommand cmd = xsetupEntityCommand(new DeleteNonstrictEntityCommand(), entity);
+        cmd.setDeleteOption(option);
+        return cmd;
     }
 
     // -----------------------------------------------------
     //                                                 Batch
     //                                                 -----
-    protected BatchInsertEntityCommand createBatchInsertEntityCommand(List<? extends Entity> entityList) {
+    protected BatchInsertEntityCommand createBatchInsertEntityCommand(List<? extends Entity> entityList,
+            InsertOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchInsertEntityCommand");
-        return xsetupListEntityCommand(new BatchInsertEntityCommand(), entityList);
+        final BatchInsertEntityCommand cmd = xsetupListEntityCommand(new BatchInsertEntityCommand(), entityList);
+        cmd.setInsertOption(option);
+        return cmd;
     }
 
     protected BatchUpdateEntityCommand createBatchUpdateEntityCommand(List<? extends Entity> entityList,
@@ -751,15 +834,21 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return cmd;
     }
 
-    protected BatchDeleteEntityCommand createBatchDeleteEntityCommand(List<? extends Entity> entityList) {
+    protected BatchDeleteEntityCommand createBatchDeleteEntityCommand(List<? extends Entity> entityList,
+            DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchDeleteEntityCommand");
-        return xsetupListEntityCommand(new BatchDeleteEntityCommand(), entityList);
+        final BatchDeleteEntityCommand cmd = xsetupListEntityCommand(new BatchDeleteEntityCommand(), entityList);
+        cmd.setDeleteOption(option);
+        return cmd;
     }
 
     protected BatchDeleteNonstrictEntityCommand createBatchDeleteNonstrictEntityCommand(
-            List<? extends Entity> entityList) {
+            List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchDeleteNonstrictEntityCommand");
-        return xsetupListEntityCommand(new BatchDeleteNonstrictEntityCommand(), entityList);
+        final BatchDeleteNonstrictEntityCommand cmd = xsetupListEntityCommand(new BatchDeleteNonstrictEntityCommand(),
+                entityList);
+        cmd.setDeleteOption(option);
+        return cmd;
     }
 
     /**
@@ -784,7 +873,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // -----------------------------------------------------
     //                                                 Query
     //                                                 -----
-    protected QueryUpdateEntityCBCommand createQueryUpdateEntityCBCommand(Entity entity, ConditionBean cb) {
+    protected QueryUpdateEntityCBCommand createQueryUpdateEntityCBCommand(Entity entity, ConditionBean cb,
+            UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryUpdateEntityCBCommand");
         final QueryUpdateEntityCBCommand cmd = new QueryUpdateEntityCBCommand();
         cmd.setTableDbName(getTableDbName());
@@ -793,43 +883,19 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         cmd.setConditionBean(cb);
         cmd.setEntityType(entity.getClass());
         cmd.setEntity(entity);
+        cmd.setUpdateOption(option);
         return cmd;
     }
 
-    protected QueryDeleteCBCommand createQueryDeleteCBCommand(ConditionBean cb) {
+    protected QueryDeleteCBCommand createQueryDeleteCBCommand(ConditionBean cb,
+            DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
         final QueryDeleteCBCommand cmd = new QueryDeleteCBCommand();
         cmd.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setConditionBeanType(cb.getClass());
         cmd.setConditionBean(cb);
-        return cmd;
-    }
-
-    // -----------------------------------------------------
-    //                                               Varying
-    //                                               -------
-    protected UpdateEntityCommand createVaryingUpdateEntityCommand(Entity entity,
-            UpdateOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createVaryingUpdateEntityCommand");
-        final UpdateEntityCommand cmd = createUpdateEntityCommand(entity);
-        cmd.setUpdateOption(option);
-        return cmd;
-    }
-
-    protected UpdateNonstrictEntityCommand createVaryingUpdateNonstrictEntityCommand(Entity entity,
-            UpdateOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createVaryingUpdateNonstrictEntityCommand");
-        final UpdateNonstrictEntityCommand cmd = createUpdateNonstrictEntityCommand(entity);
-        cmd.setUpdateOption(option);
-        return cmd;
-    }
-
-    protected QueryUpdateEntityCBCommand createVaryingQueryUpdateEntityCBCommand(Entity entity, ConditionBean cb,
-            UpdateOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createVaryingQueryUpdateEntityCBCommand");
-        final QueryUpdateEntityCBCommand cmd = createQueryUpdateEntityCBCommand(entity, cb);
-        cmd.setUpdateOption(option);
+        cmd.setDeleteOption(option);
         return cmd;
     }
 
@@ -838,6 +904,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                                       =============
     protected <CB extends ConditionBean> UpdateOption<CB> createSpecifiedUpdateOption(
             SpecifyQuery<CB> updateColumnSpec, CB cb) {
+        assertUpdateColumnSpecificationNotNull(updateColumnSpec);
+        assertCBNotNull(cb);
         final UpdateOption<CB> option = new UpdateOption<CB>();
         option.specify(updateColumnSpec);
         option.resolveUpdateColumnSpecification(cb);

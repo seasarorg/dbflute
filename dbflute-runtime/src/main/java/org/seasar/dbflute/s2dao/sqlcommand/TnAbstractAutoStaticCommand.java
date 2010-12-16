@@ -20,6 +20,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.DeleteOption;
+import org.seasar.dbflute.bhv.InsertOption;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
@@ -37,20 +40,25 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     //                                                                           Attribute
     //                                                                           =========
     protected final DBMeta _targetDBMeta;
+    protected final boolean _optimisticLockHandling;
+    protected final boolean _versionNoAutoIncrementOnMemory;
+    protected final InsertOption<? extends ConditionBean> _insertOption;
+    protected final DeleteOption<? extends ConditionBean> _deleteOption;
     protected TnPropertyType[] _propertyTypes;
-    protected boolean _optimisticLockHandling;
-    protected boolean _versionNoAutoIncrementOnMemory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
             TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
-            boolean versionNoAutoIncrementOnMemory) {
+            boolean versionNoAutoIncrementOnMemory, InsertOption<? extends ConditionBean> insertOption,
+            DeleteOption<? extends ConditionBean> deleteOption) {
         super(dataSource, statementFactory, beanMetaData);
-        this._targetDBMeta = targetDBMeta;
-        this._optimisticLockHandling = optimisticLockHandling;
-        this._versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
+        _targetDBMeta = targetDBMeta;
+        _optimisticLockHandling = optimisticLockHandling;
+        _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
+        _insertOption = insertOption;
+        _deleteOption = deleteOption;
         setupPropertyTypes(propertyNames);
         setupSql();
     }
@@ -78,7 +86,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
 
     protected abstract TnAbstractAutoHandler createAutoHandler();
 
-    protected abstract void setupPropertyTypes(String[] propertyNames);
+    protected abstract void setupPropertyTypes(String[] propertyNames); // called by constructor
 
     // ===================================================================================
     //                                                                              Insert
@@ -96,14 +104,13 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
 
     protected boolean isInsertTarget(TnPropertyType propertyType) {
         if (propertyType.isPrimaryKey()) {
-            final String name = propertyType.getPropertyName();
-            final TnIdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator(name);
-            return generator.isSelfGenerate();
+            if (_insertOption == null || !_insertOption.isPrimaryIdentityInsertDisabled()) {
+                final String name = propertyType.getPropertyName();
+                final TnIdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator(name);
+                return generator.isSelfGenerate();
+            }
         }
         return true;
-    }
-
-    protected void setupDeletePropertyTypes(String[] propertyNames) {
     }
 
     protected abstract void setupSql();
@@ -123,7 +130,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         sb.setLength(sb.length() - 2);
         sb.append(") values (");
         for (int i = 0; i < _propertyTypes.length; ++i) {
-            TnPropertyType pt = _propertyTypes[i];
+            final TnPropertyType pt = _propertyTypes[i];
             if (isInsertTarget(pt)) {
                 sb.append("?, ");
             }
@@ -146,7 +153,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         final StringBuilder sb = new StringBuilder(100);
         sb.append("delete from ");
         sb.append(_targetDBMeta.getTableSqlName());
-        setupUpdateWhere(sb);
+        setupDeleteWhere(sb);
         setSql(sb.toString());
     }
 
@@ -159,7 +166,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         }
     }
 
-    protected void setupUpdateWhere(StringBuilder sb) {
+    protected void setupDeleteWhere(StringBuilder sb) {
         final TnBeanMetaData bmd = getBeanMetaData();
         sb.append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {

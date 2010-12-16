@@ -20,7 +20,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -39,11 +41,11 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    private DataSource dataSource;
-    private StatementFactory statementFactory;
-    private TnBeanMetaData beanMetaData;
-    private DBMeta targetDBMeta;
-    private String[] propertyNames;
+    protected DataSource _dataSource;
+    protected StatementFactory _statementFactory;
+    protected TnBeanMetaData _beanMetaData;
+    protected DBMeta _targetDBMeta;
+    protected String[] _propertyNames;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -55,46 +57,42 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
+        if (args == null || args.length == 0) {
+            String msg = "The argument 'args' should not be null or empty.";
+            throw new IllegalArgumentException(msg);
+        }
         final Object bean = args[0];
+        final InsertOption<ConditionBean> option = extractInsertOptionChecked(args);
+
         final TnBeanMetaData bmd = getBeanMetaData();
-        final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames());
-        final String sql = createInsertSql(bmd, propertyTypes);
-        final TnInsertAutoHandler handler = createInsertAutoHandler(bmd, propertyTypes);
-        handler.setSql(sql);
-        handler.setExceptionMessageSqlArgs(args);
-        final int rows = handler.execute(args);
+        final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames(), option);
+        final String sql = createInsertSql(bmd, propertyTypes, option);
+        return doExecute(bean, propertyTypes, sql, option);
+    }
+
+    protected InsertOption<ConditionBean> extractInsertOptionChecked(Object[] args) {
+        if (args.length < 2 || args[1] == null) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        final InsertOption<ConditionBean> option = (InsertOption<ConditionBean>) args[1];
+        return option;
+    }
+
+    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
+            InsertOption<ConditionBean> option) {
+        final TnInsertAutoHandler handler = createInsertAutoHandler(propertyTypes, sql, option);
+        final Object[] realArgs = new Object[] { bean };
+        handler.setExceptionMessageSqlArgs(realArgs);
+        final int rows = handler.execute(realArgs);
         return Integer.valueOf(rows);
     }
 
-    protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append("insert into ");
-        sb.append(targetDBMeta.getTableSqlName());
-        sb.append(" (");
-        for (int i = 0; i < propertyTypes.length; ++i) {
-            TnPropertyType pt = propertyTypes[i];
-            final ColumnSqlName columnSqlName = pt.getColumnSqlName();
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append(columnSqlName);
-        }
-        sb.append(")").append(ln()).append(" values (");
-        for (int i = 0; i < propertyTypes.length; ++i) {
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append("?");
-        }
-        sb.append(")");
-        return sb.toString();
-    }
-
-    protected TnInsertAutoHandler createInsertAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
-        return new TnInsertAutoHandler(dataSource, statementFactory, bmd, propertyTypes);
-    }
-
-    protected TnPropertyType[] createInsertPropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames) {
+    // ===================================================================================
+    //                                                                       Insert Column
+    //                                                                       =============
+    protected TnPropertyType[] createInsertPropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames,
+            InsertOption<ConditionBean> option) {
         if (0 == propertyNames.length) {
             String msg = "The property name was not found in the bean: " + bean;
             throw new IllegalStateException(msg);
@@ -106,12 +104,14 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         for (int i = 0; i < propertyNames.length; ++i) {
             final TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
-                final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(pt.getPropertyName());
-                if (!generator.isSelfGenerate()) {
-                    continue;
+                if (option == null || !option.isPrimaryIdentityInsertDisabled()) {
+                    final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(pt.getPropertyName());
+                    if (!generator.isSelfGenerate()) {
+                        continue;
+                    }
                 }
             } else {
-                if (pt.getPropertyDesc().getValue(bean) == null) {
+                if (pt.getPropertyDesc().getValue(bean) == null) { // getting by reflection here
                     final String propertyName = pt.getPropertyName();
                     if (!propertyName.equalsIgnoreCase(timestampPropertyName)
                             && !propertyName.equalsIgnoreCase(versionNoPropertyName)) {
@@ -129,6 +129,46 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     }
 
     // ===================================================================================
+    //                                                                          Insert SQL
+    //                                                                          ==========
+    protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes,
+            InsertOption<ConditionBean> option) {
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append("insert into ");
+        sb.append(_targetDBMeta.getTableSqlName());
+        sb.append(" (");
+        for (int i = 0; i < propertyTypes.length; ++i) {
+            final TnPropertyType pt = propertyTypes[i];
+            final ColumnSqlName columnSqlName = pt.getColumnSqlName();
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(columnSqlName);
+        }
+        sb.append(")").append(ln()).append(" values (");
+        for (int i = 0; i < propertyTypes.length; ++i) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append("?");
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                             Handler
+    //                                                                             =======
+    protected TnInsertAutoHandler createInsertAutoHandler(TnPropertyType[] boundPropTypes, String sql,
+            InsertOption<ConditionBean> option) {
+        final TnInsertAutoHandler handler = new TnInsertAutoHandler(getDataSource(), getStatementFactory(),
+                _beanMetaData, boundPropTypes);
+        handler.setSql(sql);
+        handler.setInsertOption(option);
+        return handler;
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
@@ -139,42 +179,42 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     //                                                                            Accessor
     //                                                                            ========
     protected DataSource getDataSource() {
-        return dataSource;
+        return _dataSource;
     }
 
     public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+        this._dataSource = dataSource;
     }
 
     protected StatementFactory getStatementFactory() {
-        return statementFactory;
+        return _statementFactory;
     }
 
     public void setStatementFactory(StatementFactory statementFactory) {
-        this.statementFactory = statementFactory;
+        this._statementFactory = statementFactory;
     }
 
     protected TnBeanMetaData getBeanMetaData() {
-        return beanMetaData;
+        return _beanMetaData;
     }
 
     public void setBeanMetaData(TnBeanMetaData beanMetaData) {
-        this.beanMetaData = beanMetaData;
+        this._beanMetaData = beanMetaData;
     }
 
     public DBMeta getTargetDBMeta() {
-        return targetDBMeta;
+        return _targetDBMeta;
     }
 
     public void setTargetDBMeta(DBMeta targetDBMeta) {
-        this.targetDBMeta = targetDBMeta;
+        this._targetDBMeta = targetDBMeta;
     }
 
     protected String[] getPropertyNames() {
-        return propertyNames;
+        return _propertyNames;
     }
 
     public void setPropertyNames(String[] propertyNames) {
-        this.propertyNames = propertyNames;
+        this._propertyNames = propertyNames;
     }
 }

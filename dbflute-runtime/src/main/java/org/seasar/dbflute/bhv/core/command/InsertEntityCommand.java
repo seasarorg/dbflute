@@ -17,8 +17,10 @@ package org.seasar.dbflute.bhv.core.command;
 
 import java.util.List;
 
+import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -28,6 +30,12 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnInsertAutoDynamicCommand;
  * @author jflute
  */
 public class InsertEntityCommand extends AbstractEntityCommand {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The option of insert. (NotRequired) */
+    protected InsertOption<? extends ConditionBean> _insertOption;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -90,5 +98,17 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
         return createOutsideSqlExecuteExecution(new String[] { "pmb" }, new Class<?>[] { _entityType }, sql);
+    }
+
+    @Override
+    protected Object[] doGetSqlExecutionArgument() {
+        return new Object[] { _entity, _insertOption };
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setInsertOption(InsertOption<? extends ConditionBean> insertOption) {
+        _insertOption = insertOption;
     }
 }

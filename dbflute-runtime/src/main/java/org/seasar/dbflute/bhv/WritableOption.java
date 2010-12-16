@@ -13,21 +13,15 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.identity;
+package org.seasar.dbflute.bhv;
 
-import javax.sql.DataSource;
+import org.seasar.dbflute.cbean.ConditionBean;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
+ * The option for writable process. (marker interface)
  * @author jflute
+ * @since 0.9.7.8 (2010/12/16 Thursday)
+ * @param <CB> The type of condition-bean for specification.
  */
-public interface TnIdentifierGenerator {
-
-    boolean isPrimaryKey();
-
-    boolean isSelfGenerate();
-
-    void setIdentifier(Object bean, DataSource ds);
-
-    String getPropertyName();
+public interface WritableOption<CB extends ConditionBean> {
 }

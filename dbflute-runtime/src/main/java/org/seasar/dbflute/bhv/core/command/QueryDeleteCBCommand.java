@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -36,6 +37,9 @@ public class QueryDeleteCBCommand extends AbstractBehaviorCommand<Integer> {
 
     /** The instance of condition-bean. (Required) */
     protected ConditionBean _conditionBean;
+
+    /** The option of delete. (NotRequired) */
+    protected DeleteOption<? extends ConditionBean> _deleteOption;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -107,7 +111,7 @@ public class QueryDeleteCBCommand extends AbstractBehaviorCommand<Integer> {
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[] { _conditionBean };
+        return new Object[] { _conditionBean, _deleteOption };
     }
 
     // ===================================================================================
@@ -148,5 +152,12 @@ public class QueryDeleteCBCommand extends AbstractBehaviorCommand<Integer> {
 
     public void setConditionBean(ConditionBean conditionBean) {
         _conditionBean = conditionBean;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setDeleteOption(DeleteOption<? extends ConditionBean> deleteOption) {
+        _deleteOption = deleteOption;
     }
 }

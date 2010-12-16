@@ -15,8 +15,10 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnBatchDeleteAutoStaticCommand;
@@ -25,6 +27,12 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnBatchDeleteAutoStaticCommand;
  * @author jflute
  */
 public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The option of delete. (NotRequired) */
+    protected DeleteOption<? extends ConditionBean> _deleteOption;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -36,6 +44,12 @@ public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
+    @Override
+    public String buildSqlExecutionKey() {
+        // same as super now, for the future
+        return super.buildSqlExecutionKey();
+    }
+
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
@@ -55,10 +69,23 @@ public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
             String[] propertyNames) {
         final DBMeta dbmeta = findDBMeta();
         final boolean opt = isOptimisticLockHandling();
-        return new TnBatchDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
+        return new TnBatchDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt,
+                _deleteOption);
     }
 
     protected boolean isOptimisticLockHandling() {
         return true;
+    }
+
+    @Override
+    protected Object[] doGetSqlExecutionArgument() {
+        return new Object[] { _entityList }; // deleteOption is not specified because of static command
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setDeleteOption(DeleteOption<? extends ConditionBean> deleteOption) {
+        _deleteOption = deleteOption;
     }
 }

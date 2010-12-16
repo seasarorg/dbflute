@@ -15,8 +15,10 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnBatchInsertAutoStaticCommand;
@@ -25,6 +27,12 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnBatchInsertAutoStaticCommand;
  * @author jflute
  */
 public class BatchInsertEntityCommand extends AbstractListEntityCommand {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The option of insert. (NotRequired) */
+    protected InsertOption<? extends ConditionBean> _insertOption;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -36,6 +44,16 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
+    @Override
+    public String buildSqlExecutionKey() {
+        final String baseKey = super.buildSqlExecutionKey();
+        if (_insertOption != null && _insertOption.isPrimaryIdentityInsertDisabled()) {
+            return baseKey + ":PKIdentityDisabled";
+        } else {
+            return baseKey;
+        }
+    }
+
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
@@ -54,6 +72,20 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
     protected TnBatchInsertAutoStaticCommand createInsertBatchAutoStaticCommand(TnBeanMetaData bmd,
             String[] propertyNames) {
         final DBMeta dbmeta = findDBMeta();
-        return new TnBatchInsertAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames);
+        final TnBatchInsertAutoStaticCommand cmd = new TnBatchInsertAutoStaticCommand(_dataSource, _statementFactory,
+                bmd, dbmeta, propertyNames, _insertOption);
+        return cmd;
+    }
+
+    @Override
+    protected Object[] doGetSqlExecutionArgument() {
+        return new Object[] { _entityList }; // insertOption is not specified because of static command
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setInsertOption(InsertOption<? extends ConditionBean> insertOption) {
+        _insertOption = insertOption;
     }
 }

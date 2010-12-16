@@ -17,6 +17,8 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.InsertOption;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -34,8 +36,9 @@ public class TnBatchInsertAutoStaticCommand extends TnAbstractBatchAutoStaticCom
     //                                                                         Constructor
     //                                                                         ===========
     public TnBatchInsertAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames) {
-        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, false, false);
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames,
+            InsertOption<? extends ConditionBean> insertOption) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, false, false, insertOption, null);
     }
 
     // ===================================================================================
@@ -53,12 +56,12 @@ public class TnBatchInsertAutoStaticCommand extends TnAbstractBatchAutoStaticCom
     }
 
     @Override
-    protected void setupSql() {
-        setupInsertSql();
+    protected void setupPropertyTypes(String[] propertyNames) { // called by constructor
+        setupInsertPropertyTypes(propertyNames);
     }
 
     @Override
-    protected void setupPropertyTypes(String[] propertyNames) {
-        setupInsertPropertyTypes(propertyNames);
+    protected void setupSql() { // called by constructor
+        setupInsertSql();
     }
 }

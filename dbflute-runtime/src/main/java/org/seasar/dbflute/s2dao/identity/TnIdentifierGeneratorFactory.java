@@ -40,7 +40,7 @@ public class TnIdentifierGeneratorFactory {
     private static final Map<String, Class<?>> _generatorClasses = newConcurrentHashMap();
 
     static {
-        addIdentifierGeneratorClass("assigned", TnIdentifierAssignedGenerator.class);
+        addIdentifierGeneratorClass("assigned", TnIdentifierAssignedGenerator.class); // unused on DBFlute
         addIdentifierGeneratorClass("identity", TnIdentifierIdentityGenerator.class);
     }
 

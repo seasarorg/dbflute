@@ -29,6 +29,8 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.AbstractBehaviorCommand;
+import org.seasar.dbflute.bhv.core.command.AbstractEntityCommand;
+import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
 import org.seasar.dbflute.bhv.core.command.SelectCountCBCommand;
 import org.seasar.dbflute.bhv.core.command.SelectCursorCBCommand;
 import org.seasar.dbflute.bhv.core.command.SelectListCBCommand;
@@ -765,16 +767,21 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                      Process Method
     //                                                                      ==============
+    // defined here (on the readable interface) for non-primary key value
     /**
-     * Filter the entity of insert.
+     * Filter the entity of insert. (basically for non-primary-key insert)
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * @param option The option of insert. (Nullable)
      */
-    protected void filterEntityOfInsert(Entity targetEntity) { // for isAvailableNonPrimaryKeyWritable
+    protected void filterEntityOfInsert(Entity targetEntity, InsertOption<? extends ConditionBean> option) {
     }
 
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
+    // -----------------------------------------------------
+    //                                               Warm up
+    //                                               -------
     public void warmUpCommand() {
         {
             final SelectCountCBCommand cmd = createSelectCountCBCommand(newConditionBean(), true);
@@ -794,6 +801,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                  Read
+    //                                                  ----
     protected SelectCountCBCommand createSelectCountCBCommand(ConditionBean cb, boolean uniqueCount) {
         assertBehaviorCommandInvoker("createSelectCountCBCommand");
         final SelectCountCBCommand command = xsetupSelectCommand(new SelectCountCBCommand());
@@ -850,6 +860,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return command;
     }
 
+    // -----------------------------------------------------
+    //                                                 Write
+    //                                                 -----
+    // defined here (on the readable interface) for non-primary key value
+    protected InsertEntityCommand createInsertEntityCommand(Entity entity, InsertOption<? extends ConditionBean> option) {
+        assertBehaviorCommandInvoker("createInsertEntityCommand");
+        final InsertEntityCommand cmd = xsetupEntityCommand(new InsertEntityCommand(), entity);
+        cmd.setInsertOption(option);
+        return cmd;
+    }
+
+    protected <COMMAND extends AbstractEntityCommand> COMMAND xsetupEntityCommand(COMMAND command, Entity entity) {
+        command.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(command);
+        command.setEntityType(entity.getClass());
+        command.setEntity(entity);
+        return command;
+    }
+
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
     /**
      * Invoke the command of behavior.
      * @param <RESULT> The type of result.

@@ -17,6 +17,8 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.DeleteOption;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -33,8 +35,10 @@ public class TnDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand {
     //                                                                         Constructor
     //                                                                         ===========
     public TnDeleteAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling) {
-        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false);
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
+            DeleteOption<? extends ConditionBean> deleteOption) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false,
+                null, deleteOption);
     }
 
     // ===================================================================================
@@ -52,6 +56,5 @@ public class TnDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand {
 
     @Override
     protected void setupPropertyTypes(String[] propertyNames) {
-        setupDeletePropertyTypes(propertyNames);
     }
 }

@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
@@ -49,8 +50,9 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     protected Object[] _bindVariables;
     protected ValueType[] _bindVariableValueTypes;
     protected boolean _optimisticLockHandling;
-    protected boolean _versionNoAutoIncrementOnMemory; // for filtering
-    protected UpdateOption<ConditionBean> _updateOption; // for filtering
+    protected boolean _versionNoAutoIncrementOnMemory; // to adjust binding
+    protected InsertOption<ConditionBean> _insertOption;
+    protected UpdateOption<ConditionBean> _updateOption;
     protected List<Timestamp> _newTimestampList;
     protected List<Long> _newVersionNoList;
 
@@ -275,6 +277,10 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
 
     public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
         this._versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
+    }
+
+    public void setInsertOption(InsertOption<ConditionBean> insertOption) {
+        this._insertOption = insertOption;
     }
 
     public void setUpdateOption(UpdateOption<ConditionBean> updateOption) {

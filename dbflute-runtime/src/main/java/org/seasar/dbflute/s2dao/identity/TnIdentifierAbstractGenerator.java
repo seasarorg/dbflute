@@ -49,8 +49,19 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     //                                                                         Constructor
     //                                                                         ===========
     public TnIdentifierAbstractGenerator(TnPropertyType propertyType) {
+        if (propertyType == null) {
+            String msg = "The arguement 'propertyType' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         _propertyType = propertyType;
-        _resultSetHandler = new InternalIdentifierResultSetHandler(propertyType.getValueType());
+        _resultSetHandler = new TnIdentifierResultSetHandler(propertyType.getValueType());
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isPrimaryKey() {
+        return _propertyType.isPrimaryKey();
     }
 
     // ===================================================================================
@@ -70,31 +81,27 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     }
 
     protected StatementFactory createStatementFactory(DataSource ds, String sql) {
-        return new IdentifierGeneratorStatementFactory();
+        return new TnIdentifierGeneratorStatementFactory();
     }
 
     protected void reflectIdentifier(Object bean, Object value) {
-        if (_propertyType == null) {
-            String msg = "The arguement[propertyType] should not be null: value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
-        DfPropertyDesc pd = _propertyType.getPropertyDesc();
-        pd.setValue(bean, value);
+        final DfPropertyDesc pd = _propertyType.getPropertyDesc();
+        pd.setValue(bean, value); // setting by reflection here
     }
 
     // ===================================================================================
     //                                                                  Result Set Handler
     //                                                                  ==================
-    protected static class InternalIdentifierResultSetHandler implements TnResultSetHandler {
-        private ValueType valueType;
+    protected static class TnIdentifierResultSetHandler implements TnResultSetHandler {
+        private ValueType _valueType;
 
-        public InternalIdentifierResultSetHandler(ValueType valueType) {
-            this.valueType = valueType;
+        public TnIdentifierResultSetHandler(ValueType valueType) {
+            this._valueType = valueType;
         }
 
         public Object handle(ResultSet rs) throws SQLException {
             if (rs.next()) {
-                return valueType.getValue(rs, 1);
+                return _valueType.getValue(rs, 1);
             }
             return null;
         }
@@ -103,7 +110,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     // ===================================================================================
     //                                                                   Statement Factory
     //                                                                   =================
-    protected static class IdentifierGeneratorStatementFactory implements StatementFactory {
+    protected static class TnIdentifierGeneratorStatementFactory implements StatementFactory {
         public PreparedStatement createPreparedStatement(Connection conn, String sql) {
             try {
                 return conn.prepareStatement(sql);

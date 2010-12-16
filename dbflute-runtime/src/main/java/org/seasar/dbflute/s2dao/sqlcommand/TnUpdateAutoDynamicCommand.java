@@ -197,11 +197,11 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         }
         sb.setLength(sb.length() - 5); // for deleting extra ' and '
         if (_optimisticLockHandling && _beanMetaData.hasVersionNoPropertyType()) {
-            TnPropertyType pt = _beanMetaData.getVersionNoPropertyType();
+            final TnPropertyType pt = _beanMetaData.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
         if (_optimisticLockHandling && _beanMetaData.hasTimestampPropertyType()) {
-            TnPropertyType pt = _beanMetaData.getTimestampPropertyType();
+            final TnPropertyType pt = _beanMetaData.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
         return sb.toString();

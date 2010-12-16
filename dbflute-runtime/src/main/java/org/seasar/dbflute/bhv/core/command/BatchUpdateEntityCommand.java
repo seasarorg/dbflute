@@ -43,12 +43,6 @@ public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    @Override
-    public Object[] getSqlExecutionArgument() {
-        assertStatus("getSqlExecutionArgument");
-        return new Object[] { _entityList, _updateOption };
-    }
-
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
@@ -81,6 +75,11 @@ public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
 
     protected boolean isVersionNoAutoIncrementOnMemory() {
         return isOptimisticLockHandling();
+    }
+
+    @Override
+    protected Object[] doGetSqlExecutionArgument() {
+        return new Object[] { _entityList, _updateOption };
     }
 
     // ===================================================================================
