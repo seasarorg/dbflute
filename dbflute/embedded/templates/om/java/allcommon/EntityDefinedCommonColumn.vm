@@ -65,7 +65,9 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
     void enableCommonColumnAutoSetup();
 
     /**
-	 * Disable common column auto set up.
+	 * Disable common column auto set up. <br />
+	 * This is an old style. You can get the same process
+	 * by varyingInsert() and varyingUpdate() and so on.
 	 */
     void disableCommonColumnAutoSetup();
 

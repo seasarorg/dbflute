@@ -679,8 +679,18 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        delegateInsert(${myEntityVariableName});
+        doInsert(${myEntityVariableName}, null);
+    }
+
+    protected void doInsert(${myExtendedObjectClassName} ${myEntityVariableName}, InsertOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
+        prepareInsertOption(option);
+        delegateInsert(${myEntityVariableName}, option);
+    }
+
+    protected void prepareInsertOption(InsertOption<${myConditionBeanClassName}> option) {
+        if (option == null) { return; }
+        assertInsertOptionStatus(option);
     }
 
     @Override
@@ -712,8 +722,37 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        doUpdate(${myEntityVariableName}, null);
+    }
+
+    protected void doUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
+        prepareUpdateOption(option);
         helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateUpdate(entity); } });
+            public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateUpdate(entity, option); } });
+    }
+
+    protected void prepareUpdateOption(UpdateOption<${myConditionBeanClassName}> option) {
+        if (option == null) { return; }
+        assertUpdateOptionStatus(option);
+        if (option.hasSelfSpecification()) {
+            option.resolveSelfSpecification(createCBForVaryingUpdate());
+        }
+        if (option.hasSpecifiedUpdateColumn()) {
+            option.resolveUpdateColumnSpecification(createCBForSpecifiedUpdate());
+        }
+    }
+
+    protected ${myConditionBeanClassName} createCBForVaryingUpdate() {
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.xsetupForVaryingUpdate();
+        return cb;
+    }
+
+    protected ${myConditionBeanClassName} createCBForSpecifiedUpdate() {
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.xsetupForSpecifiedUpdate();
+        return cb;
     }
 
     @Override
@@ -739,8 +778,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void updateNonstrict(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        doUpdateNonstrict(${myEntityVariableName}, null);
+    }
+
+    protected void doUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
+        prepareUpdateOption(option);
         helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { return delegateUpdateNonstrict(entity); } });
+            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { return delegateUpdateNonstrict(entity, option); } });
     }
 #end
 
@@ -764,10 +809,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+    public void insertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        doInesrtOrUpdate(${myEntityVariableName}, null, null);
+    }
+
+    protected void doInesrtOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final InsertOption<${myConditionBeanClassName}> insertOption, final UpdateOption<${myConditionBeanClassName}> updateOption) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
-            public void callbackInsert(${myExtendedObjectClassName} entity) { insert(entity); }
-            public void callbackUpdate(${myExtendedObjectClassName} entity) { update(entity); }
+            public void callbackInsert(${myExtendedObjectClassName} entity) { doInsert(entity, insertOption); }
+            public void callbackUpdate(${myExtendedObjectClassName} entity) { doUpdate(entity, updateOption); }
             public ${myConditionBeanClassName} callbackNewMyConditionBean() { return newMyConditionBean(); }
             public int callbackSelectCount(${myConditionBeanClassName} cb) { return selectCount(cb); }
         });
@@ -787,16 +836,20 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        doInesrtOrUpdateNonstrict(${myEntityVariableName}, null, null);
+    }
+
+    protected void doInesrtOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final InsertOption<${myConditionBeanClassName}> insertOption, final UpdateOption<${myConditionBeanClassName}> updateOption) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
-            public void callbackInsert(${myExtendedObjectClassName} entity) { insert(entity); }
-            public void callbackUpdateNonstrict(${myExtendedObjectClassName} entity) { updateNonstrict(entity); }
+            public void callbackInsert(${myExtendedObjectClassName} entity) { doInsert(entity, insertOption); }
+            public void callbackUpdateNonstrict(${myExtendedObjectClassName} entity) { doUpdateNonstrict(entity, updateOption); }
         });
     }
 #end
 
     @Override
     protected void doCreateOrUpdateNonstrict(Entity entity) {
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($table.hasOptimisticLock())
         insertOrUpdateNonstrict(downcast(entity));
 #else
         insertOrUpdate(downcast(entity));
@@ -825,8 +878,19 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        doDelete(${myEntityVariableName}, null);
+    }
+
+    protected void doDelete(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
+        prepareDeleteOption(option);
         helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateDelete(${myExtendedObjectClassName} entity) { return delegateDelete(entity); } });
+            public int callbackDelegateDelete(${myExtendedObjectClassName} entity) { return delegateDelete(entity, option); } });
+    }
+
+    protected void prepareDeleteOption(DeleteOption<${myConditionBeanClassName}> option) {
+        if (option == null) { return; }
+        assertDeleteOptionStatus(option);
     }
 
     @Override
@@ -850,8 +914,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        doDeleteNonstrict(${myEntityVariableName}, null);
+    }
+
+    protected void doDeleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
+        prepareDeleteOption(option);
         helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity); } });
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity, option); } });
     }
 
     /**
@@ -869,8 +939,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        doDeleteNonstrictIgnoreDeleted(${myEntityVariableName}, null);
+    }
+
+    protected void doDeleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
+        prepareDeleteOption(option);
         helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity); } });
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity, option); } });
     }
 #end
 
@@ -887,8 +963,18 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The array of inserted count.
      */
     public int[] batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return doBatchInsert(${myEntityListVariableName}, null);
+    }
+
+    protected int[] doBatchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return delegateInsertList(${myEntityListVariableName});
+        prepareInsertOption(option);
+        return delegateBatchInsert(${myEntityListVariableName}, option);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected int[] doCreateList(List<Entity> ls) {
+        return delegateBatchInsert((List)ls, null);
     }
 
     /**
@@ -904,8 +990,13 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return doBatchUpdate(${myEntityListVariableName}, null);
+    }
+
+    protected int[] doBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return delegateUpdateList(${myEntityListVariableName}, null);
+        prepareUpdateOption(option);
+        return delegateBatchUpdate(${myEntityListVariableName}, option);
     }
 
     /**
@@ -924,10 +1015,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        assertUpdateColumnSpecificationNotNull(updateColumnSpec);
-        return delegateUpdateList(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec, createCBForSpecifiedUpdate()));
+        return doBatchUpdate(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec, createCBForSpecifiedUpdate()));
     }
+
+    @SuppressWarnings("unchecked")
+    protected int[] doModifyList(List<Entity> ls) {
+        return delegateBatchUpdate((List)ls, null);
+    }
+
 #if ($table.hasOptimisticLock())
 
     /**
@@ -939,8 +1034,13 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return doBatchUpdateNonstrict(${myEntityListVariableName}, null);
+    }
+
+    protected int[] doBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return delegateUpdateListNonstrict(${myEntityListVariableName}, null);
+        prepareUpdateOption(option);
+        return delegateBatchUpdateNonstrict(${myEntityListVariableName}, option);
     }
 
     /**
@@ -955,9 +1055,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        assertUpdateColumnSpecificationNotNull(updateColumnSpec);
-        return delegateUpdateListNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec, createCBForSpecifiedUpdate()));
+        return doBatchUpdateNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec, createCBForSpecifiedUpdate()));
     }
 #end
 
@@ -973,9 +1071,20 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
      */
     public int[] batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return delegateDeleteList(${myEntityListVariableName});
+        return doBatchDelete(${myEntityListVariableName}, null);
     }
+
+    protected int[] doBatchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        prepareDeleteOption(option);
+        return delegateBatchDelete(${myEntityListVariableName}, option);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected int[] doRemoveList(List<Entity> ls) {
+        return delegateBatchDelete((List)ls, null);
+    }
+
 #if ($table.hasOptimisticLock())
 
     /**
@@ -986,8 +1095,13 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     public int[] batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return doBatchDeleteNonstrict(${myEntityListVariableName}, null);
+    }
+
+    protected int[] doBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return delegateDeleteListNonstrict(${myEntityListVariableName});
+        prepareDeleteOption(option);
+        return delegateBatchDeleteNonstrict(${myEntityListVariableName}, option);
     }
 #end
 
@@ -995,7 +1109,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Query Update
     //                                                                        ============
     /**
-     * Query-update the several entities non-strictly modified-only. {NonExclusiveControl}
+     * Update the several entities by query non-strictly modified-only. {NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * <span style="color: #3F7E5E">// you don't need to set PK value</span>
@@ -1013,11 +1127,17 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The updated count.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
-        return delegateQueryUpdate(${myEntityVariableName}, cb);
+        return doQueryUpdate(${myEntityVariableName}, cb, null);
+    }
+
+    protected int doQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBNotNull(cb);
+        prepareUpdateOption(option);
+        return delegateQueryUpdate(${myEntityVariableName}, cb, option);
     }
 
     /**
-     * Query-delete the several entities. {NonExclusiveControl}
+     * Delete the several entities by query. {NonExclusiveControl}
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
@@ -1027,11 +1147,46 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The deleted count.
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
-        return delegateQueryDelete(cb);
+        return doQueryDelete(cb, null);
+    }
+
+    protected int doQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> option) {
+        assertCBNotNull(cb);
+        prepareDeleteOption(option);
+        return delegateQueryDelete(cb, option);
+    }
+
+    // ===================================================================================
+    //                                                                      Varying Update
+    //                                                                      ==============
+    /**
+     * Insert the entity with varying requests. <br />
+     * For example, disableCommonColumnAutoSetup(), disablePrimaryIdentityInsert(). <br />
+     * Other specifications are same as insert(entity).
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * <span style="color: #3F7E5E">// if auto-increment, you don't need to set the PK value</span>
+     * ${myEntityVariableName}.setFoo...(value);
+     * ${myEntityVariableName}.setBar...(value);
+     * InsertOption<${myConditionBeanClassName}> option = new InsertOption<${myConditionBeanClassName}>();
+     * <span style="color: #3F7E5E">// you can insert by your values for common columns</span>
+     * option.disableCommonColumnAutoSetup();
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">insert</span>(${myEntityVariableName});
+     * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
+     * </pre>
+     * @param ${myEntityVariableName} The entity of insert target. (NotNull)
+     * @param option The option of insert for varying requests. (NotNull)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void varyingInsert(${myExtendedObjectClassName} ${myEntityVariableName}, InsertOption<${myConditionBeanClassName}> option) {
+        assertInsertOptionNotNull(option);
+        doInsert(${myEntityVariableName}, option);
     }
 
     /**
-     * Varying-update the entity modified-only. {UpdateCountZeroException, ExclusiveControl}
+     * Update the entity with varying requests modified-only. {UpdateCountZeroException, ExclusiveControl} <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * Other specifications are same as update(entity).
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -1039,6 +1194,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <span style="color: #3F7E5E">// if exclusive control, the value of exclusive control column is required</span>
      * ${myEntityVariableName}.<span style="color: #FD4747">setVersionNo</span>(value);
      * try {
+     *     <span style="color: #3F7E5E">// you can update by self calculation values</span>
      *     UpdateOption&lt;${myConditionBeanClassName}&gt; option = new UpdateOption&lt;${myConditionBeanClassName}&gt;();
      *     option.self(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
      *         public void specify(${myConditionBeanClassName} cb) {
@@ -1051,7 +1207,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * }
      * </pre>
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
-     * @param option The option of update for varying values. (NotNull)
+     * @param option The option of update for varying requests. (NotNull)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
 #else
@@ -1060,16 +1216,18 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void varyingUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
-        processVaryingUpdate(option);
-        helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateVaryingUpdate(entity, option); } });
+    public void varyingUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
+        assertUpdateOptionNotNull(option);
+        doUpdate(${myEntityVariableName}, option);
     }
 #if ($table.hasOptimisticLock())
 
     /**
-     * Varying-update the entity non-strictly modified-only. {UpdateCountZeroException, NonExclusiveControl}
+     * Update the entity with varying requests non-strictly modified-only. {UpdateCountZeroException, NonExclusiveControl} <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * Other specifications are same as updateNonstrict(entity).
      * <pre>
+     * <span style="color: #3F7E5E">// ex) you can update by self calculation values</span>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
      * ${myEntityVariableName}.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
@@ -1085,21 +1243,100 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(${myEntityVariableName}, option);
      * </pre>
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
-     * @param option The option of update for varying values. (NotNull)
+     * @param option The option of update for varying requests. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void varyingUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
-        processVaryingUpdate(option);
-        helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { return delegateVaryingUpdateNonstrict(entity, option); } });
+    public void varyingUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
+        assertUpdateOptionNotNull(option);
+        doUpdateNonstrict(${myEntityVariableName}, option);
     }
 #end
 
     /**
-     * Varying-query-update the several entities non-strictly modified-only. {NonExclusiveControl}
+     * Insert or update the entity with varying requests. {ExclusiveControl(when update)}<br />
+     * Other specifications are same as insertOrUpdate(entity).
+     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
+     * @param insertOption The option of insert for varying requests. (NotNull)
+     * @param updateOption The option of update for varying requests. (NotNull)
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void varyingInsertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, InsertOption<${myConditionBeanClassName}> insertOption, UpdateOption<${myConditionBeanClassName}> updateOption) {
+        assertInsertOptionNotNull(insertOption); assertUpdateOptionNotNull(updateOption);
+        doInesrtOrUpdate(${myEntityVariableName}, insertOption, updateOption);
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Insert or update the entity with varying requests non-strictly. {NonExclusiveControl(when update)}<br />
+     * Other specifications are same as insertOrUpdateNonstrict(entity).
+     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
+     * @param insertOption The option of insert for varying requests. (NotNull)
+     * @param updateOption The option of update for varying requests. (NotNull)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void varyingInsertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, InsertOption<${myConditionBeanClassName}> insertOption, UpdateOption<${myConditionBeanClassName}> updateOption) {
+        assertInsertOptionNotNull(insertOption); assertUpdateOptionNotNull(updateOption);
+        doInesrtOrUpdateNonstrict(${myEntityVariableName}, insertOption, updateOption);
+    }
+#end
+
+    /**
+     * Batch-insert the list with varying requests. <br />
+     * For example, disableCommonColumnAutoSetup(), disablePrimaryIdentityInsert(). <br />
+     * Other specifications are same as batchInsert(entityList).
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param option The option of insert for varying requests. (NotNull)
+     * @return The array of inserted count.
+     */
+    public int[] varyingBatchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> option) {
+        assertInsertOptionNotNull(option);
+        return doBatchInsert(${myEntityListVariableName}, option);
+    }
+
+    /**
+     * Batch-update the list with varying requests. <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * Other specifications are same as batchUpdate(entityList).
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param option The option of update for varying requests. (NotNull)
+     * @return The array of inserted count.
+     */
+    public int[] varyingBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
+        assertUpdateOptionNotNull(option);
+        return doBatchUpdate(${myEntityListVariableName}, option);
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Batch-update the list with varying requests non-strictly. <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * Other specifications are same as batchUpdateNonstrict(entityList).
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param option The option of update for varying requests. (NotNull)
+     * @return The array of inserted count.
+     */
+    public int[] varyingBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
+        assertUpdateOptionNotNull(option);
+        return doBatchUpdateNonstrict(${myEntityListVariableName}, option);
+    }
+#end
+
+    /**
+     * update the several entities by query with varying requests non-strictly modified-only. {NonExclusiveControl} <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * Other specifications are same as queryUpdate(entity, cb). 
      * <pre>
+     * <span style="color: #3F7E5E">// ex) you can update by self calculation values</span>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * <span style="color: #3F7E5E">// you don't need to set PK value</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
@@ -1119,34 +1356,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * </pre>
      * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @param option The option of update for varying values. (NotNull)
+     * @param option The option of update for varying requests. (NotNull)
      * @return The updated count.
      */
-    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, final UpdateOption<${myConditionBeanClassName}> option) {
-        processVaryingUpdate(option);
-        return delegateVaryingQueryUpdate(${myEntityVariableName}, cb, option);
-    }
-
-    protected void processVaryingUpdate(UpdateOption<${myConditionBeanClassName}> option) {
+    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
-        if (option.hasSelfSpecification()) {
-            option.resolveSelfSpecification(createCBForVaryingUpdate());
-        }
-        if (option.hasSpecifiedUpdateColumn()) {
-            option.resolveUpdateColumnSpecification(createCBForSpecifiedUpdate());
-        }
-    }
-
-    protected ${myConditionBeanClassName} createCBForVaryingUpdate() {
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.xsetupForVaryingUpdate();
-        return cb;
-    }
-
-    protected ${myConditionBeanClassName} createCBForSpecifiedUpdate() {
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.xsetupForSpecifiedUpdate();
-        return cb;
+        return doQueryUpdate(${myEntityVariableName}, cb, option);
     }
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
@@ -1155,10 +1370,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                       Entity Update
     //                                                                       =============
     /**
-     * Insert the entity.
+     * Insert the entity for a table not defined primary key. <br />
+     * The auto-setup for common columns is unsupported.
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * ${myEntityVariableName}.setPK...(value);
      * ${myEntityVariableName}.setFoo...(value);
      * ${myEntityVariableName}.setBar...(value);
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">insert</span>(${myEntityVariableName});
@@ -1167,7 +1382,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
-        delegateInsert(${myEntityVariableName});
+        doInsert(${myEntityVariableName}, null);
     }
 #end
 #end
@@ -1299,90 +1514,62 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected int delegateInsert(${myExtendedObjectClassName} e)
-    { if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e)); }
-    protected int delegateUpdate(${myExtendedObjectClassName} e)
+    protected int delegateInsert(${myExtendedObjectClassName} e, InsertOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeInsert(e, op)) { return 0; } return invoke(createInsertEntityCommand(e, op)); }
+    protected int delegateUpdate(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
 #if ($table.hasOptimisticLock())
-    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e)); }
+    { if (!processBeforeUpdate(e, op)) { return 0; } return invoke(createUpdateEntityCommand(e, op)); }
 #else
-    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
+    { if (!processBeforeUpdate(e, op)) { return 0; } return invoke(createUpdateNonstrictEntityCommand(e, op)); }
 #end
 #if ($table.hasOptimisticLock())
-    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e)
-    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeUpdate(e, op)) { return 0; } return invoke(createUpdateNonstrictEntityCommand(e, op)); }
 #end
-    protected int delegateDelete(${myExtendedObjectClassName} e)
+    protected int delegateDelete(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
 #if ($table.hasOptimisticLock())
-    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e)); }
+    { if (!processBeforeDelete(e, op)) { return 0; } return invoke(createDeleteEntityCommand(e, op)); }
 #else
-    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
+    { if (!processBeforeDelete(e, op)) { return 0; } return invoke(createDeleteNonstrictEntityCommand(e, op)); }
 #end
 #if ($table.hasOptimisticLock())
-    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e)
-    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeDelete(e, op)) { return 0; } return invoke(createDeleteNonstrictEntityCommand(e, op)); }
 #end
 
-    protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls))); }
-    @SuppressWarnings("unchecked")
-    protected int[] doCreateList(List<Entity> ls) { return delegateInsertList((List)ls); }
-    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
+    protected int[] delegateBatchInsert(List<${myExtendedObjectClassName}> ls, InsertOption<${myConditionBeanClassName}> op)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls, op), op)); }
+    protected int[] delegateBatchUpdate(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
 #if ($table.hasOptimisticLock())
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls), op)); }
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls, op), op)); }
 #else
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls), op)); }
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls, op), op)); }
 #end
-    @SuppressWarnings("unchecked")
-    protected int[] doModifyList(List<Entity> ls) { return delegateUpdateList((List)ls, null); }
 #if ($table.hasOptimisticLock())
-    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls), op)); }
+    protected int[] delegateBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls, op), op)); }
 #end
-    protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls)
+    protected int[] delegateBatchDelete(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
 #if ($table.hasOptimisticLock())
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls, op), op)); }
 #else
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls, op), op)); }
 #end
-    @SuppressWarnings("unchecked")
-    protected int[] doRemoveList(List<Entity> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
-    protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+    protected int[] delegateBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls, op), op)); }
 #end
 
-    protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb)
-    { if (!processBeforeQueryUpdate(e, cb)) { return 0; } return invoke(createQueryUpdateEntityCBCommand(e, cb));  }
-    protected int delegateQueryDelete(${myConditionBeanClassName} cb)
-    { if (!processBeforeQueryDelete(cb)) { return 0; } return invoke(createQueryDeleteCBCommand(cb));  }
+    protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateEntityCBCommand(e, cb, op));  }
+    protected int delegateQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeQueryDelete(cb, op)) { return 0; } return invoke(createQueryDeleteCBCommand(cb, op));  }
 
-    protected int delegateVaryingUpdate(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
-#if ($table.hasOptimisticLock())
-    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createVaryingUpdateEntityCommand(e, op)); }
-#else
-    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createVaryingUpdateNonstrictEntityCommand(e, op)); }
-#end
-#if ($table.hasOptimisticLock())
-    protected int delegateVaryingUpdateNonstrict(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createVaryingUpdateNonstrictEntityCommand(e, op)); }
-#end
-    protected int delegateVaryingQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeQueryUpdate(e, cb)) { return 0; } return invoke(createVaryingQueryUpdateEntityCBCommand(e, cb, op));  }
-#else
 #if ($table.isAvailableNonPrimaryKeyWritable())
-    protected int delegateInsert(${myExtendedObjectClassName} e) {
-        assertEntityNotNull(e); // If this table use identity, the entity does not have primary-key.
-        filterEntityOfInsert(e);
-        return invoke(createInsertEntityCommand(e));
-    }
-    protected InsertEntityCommand createInsertEntityCommand(Entity entity) {
-        assertBehaviorCommandInvoker("createInsertEntityCommand");
-        final InsertEntityCommand cmd = new InsertEntityCommand();
-        cmd.setTableDbName(getTableDbName());
-        _behaviorCommandInvoker.injectComponentProperty(cmd);
-        cmd.setEntityType(entity.getClass());
-        cmd.setEntity(entity);
-        return cmd;
+    protected int delegateInsert(${myExtendedObjectClassName} e, InsertOption<${myConditionBeanClassName}> op) {
+        // only filtering for extension is supported (filtering for common columns is unsupported)
+        assertEntityNotNull(e); filterEntityOfInsert(e, op);
+        return invoke(createInsertEntityCommand(e, op));
     }
 #end
 #end
