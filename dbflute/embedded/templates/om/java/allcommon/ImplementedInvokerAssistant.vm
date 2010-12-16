@@ -227,6 +227,16 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     // -----------------------------------------------------
+    //                                   SQLException Digger
+    //                                   -------------------
+    /**
+     * {@inheritDoc}
+     */
+    public SQLExceptionDigger assistSQLExceptionDigger() {
+        return ${glDBFluteConfig}.getInstance().getSQLExceptionDigger();
+    }
+
+    // -----------------------------------------------------
     //                          SQLException Handler Factory
     //                          ----------------------------
     /**

@@ -19,6 +19,7 @@ import org.seasar.dbflute.exception.IllegalDBFluteConfigAccessException;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
 import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
+import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
@@ -30,6 +31,7 @@ import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
 import org.seasar.dbflute.util.DfReflectionUtil;
 #if ($database.isTargetContainerSeasar())
 import org.seasar.extension.dbcp.ConnectionWrapper;
+import org.seasar.framework.exception.SQLRuntimeException;
 #end
 #if ($database.isTargetContainerSpring())
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -78,6 +80,7 @@ public class ${glDBFluteConfig} {
     protected String _logTimestampFormat;
     protected DataSourceHandler _dataSourceHandler;
     protected PhysicalConnectionDigger _physicalConnectionDigger;
+    protected SQLExceptionDigger _sqlExceptionDigger;
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected SqlClauseCreator _sqlClauseCreator;
     protected SqlNameFilter _tableSqlNameFilter;
@@ -110,6 +113,7 @@ public class ${glDBFluteConfig} {
      */
     private ${glDBFluteConfig}() { // adjusts default settings
         _physicalConnectionDigger = new ImplementedPhysicalConnectionDigger();
+        _sqlExceptionDigger = new ImplementedSQLExceptionDigger();
 
         if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
@@ -249,6 +253,31 @@ public class ${glDBFluteConfig} {
             throw new IllegalArgumentException("The argument 'physicalConnectionDigger' should not be null.");
         }
         _physicalConnectionDigger = physicalConnectionDigger;
+    }
+
+    // [DBFlute-0.9.7.8]
+    // ===================================================================================
+    //                                                                 SQLException Digger
+    //                                                                 ===================
+    /**
+     * @return The digger of SQLException. (NotNull: has a default instance)
+     */
+    public SQLExceptionDigger getSQLExceptionDigger() {
+        return _sqlExceptionDigger;
+    }
+
+    /**
+     * @param sqlExceptionDigger The digger of SQLException. (NotNull)
+     */
+    public void setSQLExceptionDigger(SQLExceptionDigger sqlExceptionDigger) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting sqlExceptionDigger: " + sqlExceptionDigger);
+        }
+        if (sqlExceptionDigger == null) {
+            throw new IllegalArgumentException("The argument 'sqlExceptionDigger' should not be null.");
+        }
+        _sqlExceptionDigger = sqlExceptionDigger;
     }
 
     // [DBFlute-0.9.6.4]
@@ -709,5 +738,31 @@ public class ${glDBFluteConfig} {
             Field field = DfReflectionUtil.getWholeField(conn.getClass(), fieldName);
             return (Connection) DfReflectionUtil.getValueForcedly(field, conn);
         }
-    } 
+    }
+
+    // -----------------------------------------------------
+    //                                          SQLException
+    //                                          ------------
+    public static class ImplementedSQLExceptionDigger implements SQLExceptionDigger {
+
+        public SQLException digUp(Throwable cause) {
+            SQLException found = resolveS2DBCP(cause);
+            if (found != null) {
+                return found;
+            }
+            return null;
+        }
+
+        protected SQLException resolveS2DBCP(Throwable cause) {
+#if ($database.isTargetContainerSeasar())
+            if (cause instanceof SQLRuntimeException) {
+                Throwable nestedCause = ((SQLRuntimeException)cause).getCause();
+                if (nestedCause instanceof SQLException) {
+                    return (SQLException)nestedCause;
+                }
+            }
+#end
+            return null;
+        }
+    }    
 }
