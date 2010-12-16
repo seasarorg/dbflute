@@ -24,6 +24,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
+import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
@@ -81,6 +82,11 @@ public interface InvokerAssistant {
      * @return The instance of factory. (NotNull)
      */
     OutsideSqlExecutorFactory assistOutsideSqlExecutorFactory();
+    
+    /**
+     * @return The digger of SQLException. (NotNull)
+     */
+    SQLExceptionDigger assistSQLExceptionDigger();
 
     /**
      * Assist the factory of SQLException handler.

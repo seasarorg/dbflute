@@ -13,25 +13,20 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.jdbc;
 
 import java.sql.SQLException;
 
 /**
- * The exception of when the entity already exists on the database.
+ * The digger of SQL exception.
  * @author jflute
  */
-public class EntityAlreadyExistsException extends SQLFailureException {
-
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public interface SQLExceptionDigger {
 
     /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause SQLException. (NotNull)
+     * Dig up the physical connection from logical one.
+     * @param cause The cause of exception wrapping SQLException. (NotNull)
+     * @return The instance of SQLException. (Nullable: if null, means not found)
      */
-    public EntityAlreadyExistsException(String msg, SQLException cause) {
-        super(msg, cause);
-    }
+    SQLException digUp(Throwable cause);
 }

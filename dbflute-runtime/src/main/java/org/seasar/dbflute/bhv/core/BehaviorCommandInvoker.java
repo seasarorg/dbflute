@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.bhv.core;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +31,12 @@ import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
+import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -164,6 +167,8 @@ public class BehaviorCommandInvoker {
         try {
             final Object[] args = behaviorCommand.getSqlExecutionArgument();
             ret = executeSql(execution, args);
+        } catch (RuntimeException cause) {
+            handleExecutionException(cause);
         } finally {
             behaviorCommand.afterExecuting();
         }
@@ -219,6 +224,23 @@ public class BehaviorCommandInvoker {
 
     protected long systemTime() {
         return DfSystemUtil.currentTimeMillis(); // for calculating performance
+    }
+
+    protected void handleExecutionException(RuntimeException cause) {
+        if (cause instanceof SQLFailureException) {
+            throw cause;
+        }
+        final SQLExceptionDigger digger = getSQLExceptionDigger();
+        final SQLException sqlEx = digger.digUp(cause);
+        if (sqlEx != null) {
+            handleSQLException(sqlEx);
+        } else {
+            throw cause;
+        }
+    }
+
+    protected void handleSQLException(SQLException e) {
+        ResourceContext.createSQLExceptionHandler().handleSQLException(e);
     }
 
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
@@ -823,13 +845,13 @@ public class BehaviorCommandInvoker {
     }
 
     // ===================================================================================
-    //                                                                   Exception Thrower
-    //                                                                   =================
+    //                                                                 SQLException Digger
+    //                                                                 ===================
     /**
-     * @return The thrower of behavior exception. (NotNull)
+     * @return The digger of SQLException. (NotNull)
      */
-    public BehaviorExceptionThrower createBehaviorExceptionThrower() {
-        return _invokerAssistant.assistBehaviorExceptionThrower();
+    public SQLExceptionDigger getSQLExceptionDigger() {
+        return _invokerAssistant.assistSQLExceptionDigger();
     }
 
     // ===================================================================================
@@ -841,6 +863,16 @@ public class BehaviorCommandInvoker {
      */
     public SequenceCacheHandler getSequenceCacheHandler() {
         return _invokerAssistant.assistSequenceCacheHandler();
+    }
+
+    // ===================================================================================
+    //                                                                   Exception Thrower
+    //                                                                   =================
+    /**
+     * @return The thrower of behavior exception. (NotNull)
+     */
+    public BehaviorExceptionThrower createBehaviorExceptionThrower() {
+        return _invokerAssistant.assistBehaviorExceptionThrower();
     }
 
     // ===================================================================================
