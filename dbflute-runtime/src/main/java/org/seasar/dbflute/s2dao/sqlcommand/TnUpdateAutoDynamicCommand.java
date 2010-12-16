@@ -32,7 +32,7 @@ import org.seasar.dbflute.dbmeta.name.TableSqlName;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateEntityHandler;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -97,7 +97,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnUpdateAutoHandler handler = createUpdateAutoHandler(propertyTypes, sql, option);
+        final TnUpdateEntityHandler handler = createUpdateEntityHandler(propertyTypes, sql, option);
         final Object[] realArgs = new Object[] { bean };
         handler.setExceptionMessageSqlArgs(realArgs);
         final int result = handler.execute(realArgs);
@@ -214,9 +214,9 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnUpdateAutoHandler createUpdateAutoHandler(TnPropertyType[] boundPropTypes, String sql,
+    protected TnUpdateEntityHandler createUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnUpdateAutoHandler handler = new TnUpdateAutoHandler(getDataSource(), getStatementFactory(),
+        final TnUpdateEntityHandler handler = new TnUpdateEntityHandler(getDataSource(), getStatementFactory(),
                 _beanMetaData, boundPropTypes);
         handler.setSql(sql);
         handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]

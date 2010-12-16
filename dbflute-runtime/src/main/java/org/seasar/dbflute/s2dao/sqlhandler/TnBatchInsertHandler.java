@@ -25,13 +25,13 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBatchInsertAutoHandler extends TnAbstractBatchAutoHandler {
+public class TnBatchInsertHandler extends TnAbstractBatchHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBatchInsertAutoHandler(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+    public TnBatchInsertHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
+            TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, beanMetaData, boundPropTypes);
         setOptimisticLockHandling(false);
     }
@@ -45,18 +45,24 @@ public class TnBatchInsertAutoHandler extends TnAbstractBatchAutoHandler {
     }
 
     @Override
-    protected void preBatchUpdateBean(Object bean) {
-        super.preBatchUpdateBean(bean);
+    protected void processBefore(Object beanList) {
         if (isPrimaryKeyIdentityDisabled()) {
             disableIdentityGeneration();
         }
     }
 
     @Override
-    protected void postBatchUpdateBean(Object bean, int index) {
-        super.postBatchUpdateBean(bean, index);
+    protected void processFinally(Object beanList, RuntimeException sqlEx) {
         if (isPrimaryKeyIdentityDisabled()) {
-            enableIdentityGeneration();
+            try {
+                enableIdentityGeneration();
+            } catch (RuntimeException e) {
+                if (sqlEx == null) {
+                    throw e;
+                }
+                // ignore the exception when main SQL fails
+                // not to close the main exception
+            }
         }
     }
 }

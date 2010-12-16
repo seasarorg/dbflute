@@ -37,13 +37,13 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractBatchAutoHandler extends TnAbstractEntityAutoHandler {
+public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(TnAbstractBatchAutoHandler.class);
+    private static final Log _log = LogFactory.getLog(TnAbstractBatchHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -53,7 +53,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractEntityAutoHan
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
+    public TnAbstractBatchHandler(DataSource dataSource, StatementFactory statementFactory,
             TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, beanMetaData, boundPropTypes);
     }
@@ -78,28 +78,38 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractEntityAutoHan
             }
             return new int[0];
         }
+        processBefore(beanList);
         final Connection conn = getConnection();
         try {
+            RuntimeException sqlEx = null;
             final PreparedStatement ps = prepareStatement(conn);
+            int[] result = null;
             try {
                 for (Object bean : beanList) {
-                    preBatchUpdateBean(bean);
+                    processBatchBefore(bean);
                     prepareBatchElement(conn, ps, bean);
                 }
-                processBatchLogging();
-                final int[] result = executeBatch(ps, beanList);
-                handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
-                // a value of optimistic lock column should be synchronized
-                // after handling optimistic lock
-                int index = 0;
-                for (Object bean : beanList) {
-                    postBatchUpdateBean(bean, index);
-                    ++index;
-                }
-                return result;
+                handleBatchLogging();
+                result = executeBatch(ps, beanList);
+            } catch (RuntimeException e) {
+                // not SQLFailureException because
+                // a wrapper of JDBC may throw an other exception
+                sqlEx = e;
+                throw e;
             } finally {
                 close(ps);
+                processFinally(beanList, sqlEx);
             }
+            handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
+            // a value of optimistic lock column should be synchronized
+            // after handling optimistic lock
+            int index = 0;
+            for (Object bean : beanList) {
+                processBatchSuccess(bean, index);
+                ++index;
+            }
+            processSuccess(beanList, result.length);
+            return result;
         } finally {
             close(conn);
         }
@@ -112,7 +122,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractEntityAutoHan
         addBatch(ps);
     }
 
-    protected void processBatchLogging() {
+    protected void handleBatchLogging() {
         if (_batchLoggingSb == null || _batchLoggingSb.length() == 0) {
             return;
         }
@@ -141,13 +151,25 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractEntityAutoHan
     }
 
     // ===================================================================================
-    //                                                                       Pre/Post Bean
-    //                                                                       =============
-    // *after case about identity is unsupported at Batch Update   
-    protected void preBatchUpdateBean(Object bean) {
+    //                                                                   Extension Process
+    //                                                                   =================
+    @Override
+    protected void processBefore(Object beanList) {
     }
 
-    protected void postBatchUpdateBean(Object bean, int index) {
+    @Override
+    protected void processFinally(Object beanList, RuntimeException sqlEx) {
+    }
+
+    @Override
+    protected void processSuccess(Object beanList, int ret) {
+    }
+
+    protected void processBatchBefore(Object bean) {
+    }
+
+    // *after case about identity is unsupported at Batch Update   
+    protected void processBatchSuccess(Object bean, int index) {
         updateTimestampIfNeed(bean, index);
         updateVersionNoIfNeed(bean, index);
     }

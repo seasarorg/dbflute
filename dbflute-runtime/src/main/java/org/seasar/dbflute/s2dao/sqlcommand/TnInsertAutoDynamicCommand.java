@@ -29,7 +29,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.sqlhandler.TnInsertAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnInsertEntityHandler;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -81,7 +81,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
             InsertOption<ConditionBean> option) {
-        final TnInsertAutoHandler handler = createInsertAutoHandler(propertyTypes, sql, option);
+        final TnInsertEntityHandler handler = createInsertEntityHandler(propertyTypes, sql, option);
         final Object[] realArgs = new Object[] { bean };
         handler.setExceptionMessageSqlArgs(realArgs);
         final int rows = handler.execute(realArgs);
@@ -159,9 +159,9 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnInsertAutoHandler createInsertAutoHandler(TnPropertyType[] boundPropTypes, String sql,
+    protected TnInsertEntityHandler createInsertEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             InsertOption<ConditionBean> option) {
-        final TnInsertAutoHandler handler = new TnInsertAutoHandler(getDataSource(), getStatementFactory(),
+        final TnInsertEntityHandler handler = new TnInsertEntityHandler(getDataSource(), getStatementFactory(),
                 _beanMetaData, boundPropTypes);
         handler.setSql(sql);
         handler.setInsertOption(option);

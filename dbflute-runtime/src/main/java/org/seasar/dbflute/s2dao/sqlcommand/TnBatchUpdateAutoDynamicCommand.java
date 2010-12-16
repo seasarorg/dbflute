@@ -25,7 +25,7 @@ import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.sqlhandler.TnBatchUpdateAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnBatchUpdateHandler;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
@@ -59,7 +59,7 @@ public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand 
             String msg = "The argument 'args[0]' should be list: " + bean;
             throw new IllegalArgumentException(msg);
         }
-        final TnBatchUpdateAutoHandler handler = createUpdateBatchAutoHandler(propertyTypes, sql, option);
+        final TnBatchUpdateHandler handler = createBatchUpdateHandler(propertyTypes, sql, option);
         handler.setExceptionMessageSqlArgs(new Object[] { beanList });
         return handler.executeBatch(beanList);
     }
@@ -81,9 +81,9 @@ public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand 
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBatchUpdateAutoHandler createUpdateBatchAutoHandler(TnPropertyType[] boundPropTypes, String sql,
+    protected TnBatchUpdateHandler createBatchUpdateHandler(TnPropertyType[] boundPropTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnBatchUpdateAutoHandler handler = new TnBatchUpdateAutoHandler(getDataSource(), getStatementFactory(),
+        final TnBatchUpdateHandler handler = new TnBatchUpdateHandler(getDataSource(), getStatementFactory(),
                 _beanMetaData, boundPropTypes);
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);

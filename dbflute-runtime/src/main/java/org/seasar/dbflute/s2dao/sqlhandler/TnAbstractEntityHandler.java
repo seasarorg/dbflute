@@ -45,7 +45,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractEntityAutoHandler extends TnBasicHandler {
+public abstract class TnAbstractEntityHandler extends TnBasicHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -64,8 +64,8 @@ public abstract class TnAbstractEntityAutoHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractEntityAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            TnPropertyType[] boundPropTypes) {
+    public TnAbstractEntityHandler(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory);
         _beanMetaData = beanMetaData;
         _boundPropTypes = boundPropTypes;
@@ -84,23 +84,30 @@ public abstract class TnAbstractEntityAutoHandler extends TnBasicHandler {
     }
 
     protected int execute(Connection conn, Object bean) {
-        preUpdateBean(bean);
+        processBefore(bean);
         setupBindVariables(bean);
         logSql(_bindVariables, getArgTypes(_bindVariables));
         final PreparedStatement ps = prepareStatement(conn);
+        RuntimeException sqlEx = null;
         final int ret;
         try {
             bindArgs(conn, ps, _bindVariables, _bindVariableValueTypes);
             ret = executeUpdate(ps);
+        } catch (RuntimeException e) {
+            // not SQLFailureException because
+            // a wrapper of JDBC may throw an other exception
+            sqlEx = e;
+            throw e;
         } finally {
             close(ps);
+            processFinally(bean, sqlEx);
         }
         if (_optimisticLockHandling && ret < 1) { // means no update (contains minus just in case)
             throw createEntityAlreadyUpdatedException(bean, ret);
         }
         // a value of optimistic lock column should be synchronized
         // after handling optimistic lock
-        postUpdateBean(bean, ret);
+        processSuccess(bean, ret);
         return ret;
     }
 
@@ -109,12 +116,15 @@ public abstract class TnAbstractEntityAutoHandler extends TnBasicHandler {
     }
 
     // ===================================================================================
-    //                                                                       Pre/Post Bean
-    //                                                                       =============
-    protected void preUpdateBean(Object bean) {
+    //                                                                   Extension Process
+    //                                                                   =================
+    protected void processBefore(Object bean) {
     }
 
-    protected void postUpdateBean(Object bean, int ret) {
+    protected void processFinally(Object bean, RuntimeException sqlEx) {
+    }
+
+    protected void processSuccess(Object bean, int ret) {
     }
 
     // ===================================================================================

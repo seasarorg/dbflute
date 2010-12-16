@@ -18,7 +18,6 @@ package org.seasar.dbflute.s2dao.sqlhandler;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
@@ -26,15 +25,14 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnInsertAutoHandler extends TnAbstractEntityAutoHandler {
+public class TnDeleteEntityHandler extends TnAbstractEntityHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnInsertAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
+    public TnDeleteEntityHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, beanMetaData, boundPropTypes);
-        setOptimisticLockHandling(false);
     }
 
     // ===================================================================================
@@ -42,38 +40,7 @@ public class TnInsertAutoHandler extends TnAbstractEntityAutoHandler {
     //                                                                            ========
     @Override
     protected void setupBindVariables(Object bean) {
-        setupInsertBindVariables(bean);
+        setupDeleteBindVariables(bean);
         setExceptionMessageSqlArgs(_bindVariables);
-    }
-
-    @Override
-    protected void preUpdateBean(Object bean) {
-        final TnBeanMetaData bmd = getBeanMetaData();
-        for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
-            final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
-            if (generator.isSelfGenerate()) {
-                generator.setIdentifier(bean, getDataSource());
-            } else { // identity
-                if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
-                    disableIdentityGeneration();
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void postUpdateBean(Object bean, int ret) {
-        final TnBeanMetaData bmd = getBeanMetaData();
-        for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
-            final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
-            if (!generator.isSelfGenerate()) { // identity
-                if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
-                    enableIdentityGeneration();
-                }
-                generator.setIdentifier(bean, getDataSource());
-            }
-        }
-        updateVersionNoIfNeed(bean);
-        updateTimestampIfNeed(bean);
     }
 }

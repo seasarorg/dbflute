@@ -25,7 +25,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchHandler;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
@@ -60,7 +60,7 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
             String msg = "The argument 'args[0]' should be list: " + args[0];
             throw new IllegalArgumentException(msg);
         }
-        final TnAbstractBatchAutoHandler handler = createBatchAutoHandler();
+        final TnAbstractBatchHandler handler = createBatchHandler();
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
@@ -69,5 +69,5 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
         return handler.executeBatch(beanList);
     }
 
-    protected abstract TnAbstractBatchAutoHandler createBatchAutoHandler();
+    protected abstract TnAbstractBatchHandler createBatchHandler();
 }

@@ -22,8 +22,8 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityAutoHandler;
-import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteAutoHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteEntityHandler;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
@@ -45,8 +45,8 @@ public class TnDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand {
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected TnAbstractEntityAutoHandler createAutoHandler() {
-        return new TnDeleteAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+    protected TnAbstractEntityHandler createEntityHandler() {
+        return new TnDeleteEntityHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 
     @Override
