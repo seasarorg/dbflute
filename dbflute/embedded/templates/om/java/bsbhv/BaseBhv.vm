@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.seasar.dbflute.*;
 import org.seasar.dbflute.bhv.*;
-#if ($table.isAvailableNonPrimaryKeyWritable())
-import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
-#end
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
