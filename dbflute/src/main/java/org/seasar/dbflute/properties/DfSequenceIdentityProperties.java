@@ -45,7 +45,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                                             =======================
     protected static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
     protected Map<String, String> _sequenceDefinitionMap;
-    protected Map<String, String> _sequenceSubDefinitionMap;
+    protected Map<String, String> _subColumnSequenceDefinitionMap;
 
     protected Map<String, String> getSequenceDefinitionMap() {
         if (_sequenceDefinitionMap != null) {
@@ -70,7 +70,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             }
         }
         _sequenceDefinitionMap = flexibleMap;
-        _sequenceSubDefinitionMap = flexibleSubMap;
+        _subColumnSequenceDefinitionMap = flexibleSubMap;
         return _sequenceDefinitionMap;
     }
 
@@ -120,38 +120,37 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                          Sub Sequence
     //                                          ------------
-    protected Map<String, String> getSequenceSubDefinitionMap() {
-        if (_sequenceSubDefinitionMap != null) {
-            return _sequenceSubDefinitionMap;
+    protected Map<String, String> getSubColumnSequenceDefinitionMap() {
+        if (_subColumnSequenceDefinitionMap != null) {
+            return _subColumnSequenceDefinitionMap;
         }
         getSequenceDefinitionMap(); // initialize
-        return _sequenceDefinitionMap;
+        return _subColumnSequenceDefinitionMap;
     }
 
-    public boolean hasSubSequence() {
-        return !getSequenceSubDefinitionMap().isEmpty();
+    public boolean hasSubColumnSequence() {
+        return !getSubColumnSequenceDefinitionMap().isEmpty();
     }
 
-    public String getSubSequenceName(String tableName, String columnName) {
-        final String sequenceProp = getSubSequenceProp(tableName, columnName);
+    public String getSubColumnSequenceName(String tableName, String columnName) {
+        final String sequenceProp = getSubColumnSequenceProp(tableName, columnName);
+        if (Srl.is_Null_or_TrimmedEmpty(sequenceProp)) {
+            return null;
+        }
         final String hintMark = getSequenceHintMark();
         if (sequenceProp.contains(hintMark)) { // unsupported
-            String msg = "Sequence hint for sub sequence is unsupported: " + sequenceProp;
+            String msg = "Sequence hint for sub-column sequence is unsupported: " + sequenceProp;
             throw new DfIllegalPropertySettingException(msg);
         }
         return extractSequenceNameFromProp(sequenceProp);
     }
 
-    protected String getSubSequenceProp(String tableName, String columnName) {
-        final String key = generateSubSequenceKey(tableName, columnName);
-        final String sequenceProp = getSequenceDefinitionMap().get(key);
-        if (sequenceProp == null || sequenceProp.trim().length() == 0) {
-            return null;
-        }
-        return sequenceProp;
+    protected String getSubColumnSequenceProp(String tableName, String columnName) {
+        final String key = generateSubColumnSequenceKey(tableName, columnName);
+        return getSubColumnSequenceDefinitionMap().get(key);
     }
 
-    protected String generateSubSequenceKey(String tableName, String columnName) {
+    protected String generateSubColumnSequenceKey(String tableName, String columnName) {
         return tableName + "." + columnName;
     }
 
@@ -162,12 +161,27 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
      * @param checker The checker for call-back. (NotNull)
      */
     public void checkSequenceDefinitionMap(SequenceDefinitionMapChecker checker) {
-        final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
-        final Set<String> keySet = sequenceDefinitionMap.keySet();
         final List<String> notFoundTableNameList = new ArrayList<String>();
-        for (String tableName : keySet) {
-            if (!checker.hasTable(tableName)) {
-                notFoundTableNameList.add(tableName);
+        {
+            final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
+            final Set<Entry<String, String>> entrySet = sequenceDefinitionMap.entrySet();
+            for (Entry<String, String> entry : entrySet) {
+                final String tableName = entry.getKey();
+                if (!checker.hasTable(tableName)) {
+                    notFoundTableNameList.add(tableName);
+                }
+            }
+        }
+        {
+            final Map<String, String> sequenceSubDefinitionMap = getSubColumnSequenceDefinitionMap();
+            final Set<Entry<String, String>> entrySet = sequenceSubDefinitionMap.entrySet();
+            for (Entry<String, String> entry : entrySet) {
+                final String key = entry.getKey();
+                final String tableName = Srl.substringFirstFront(key, ".");
+                final String columnName = Srl.substringFirstRear(key, ".");
+                if (!checker.hasTableColumn(tableName, columnName)) {
+                    notFoundTableNameList.add(key);
+                }
             }
         }
         if (!notFoundTableNameList.isEmpty()) {
@@ -180,7 +194,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The table name on the sequence definition was NOT FOUND!" + ln();
         msg = msg + ln();
-        msg = msg + "[Not Found Table]" + ln();
+        msg = msg + "[Not Found Table (or Column)]" + ln();
         for (String tableName : notFoundTableNameList) {
             msg = msg + tableName + ln();
         }
@@ -192,6 +206,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     public static interface SequenceDefinitionMapChecker {
         public boolean hasTable(String tableName);
+
+        public boolean hasTableColumn(String tableName, String columnName);
     }
 
     public static class SequenceDefinitionMapTableNotFoundException extends RuntimeException {

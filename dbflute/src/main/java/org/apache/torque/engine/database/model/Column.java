@@ -73,6 +73,7 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -1683,6 +1684,10 @@ public class Column {
         return getProperties().getBasicProperties();
     }
 
+    protected DfSequenceIdentityProperties getSequenceIdentityProperties() {
+        return getProperties().getSequenceIdentityProperties();
+    }
+
     protected DfTypeMappingProperties getTypeMappingProperties() {
         return getProperties().getTypeMappingProperties();
     }
@@ -2149,6 +2154,11 @@ public class Column {
             return true;
         }
         return false;
+    }
+
+    public String getSubColumnSequenceName() {
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        return prop.getSubColumnSequenceName(getTableName(), getName());
     }
 
     // ===================================================================================

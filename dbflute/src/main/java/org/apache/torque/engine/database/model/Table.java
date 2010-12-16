@@ -2323,29 +2323,29 @@ public class Table {
         }
     }
 
-    protected List<Column> _subSequenceColumnList;
+    protected List<Column> _subColumnSequenceColumnList;
 
-    public boolean isUseSubSequence() {
-        return !getSubSequenceColumnList().isEmpty();
+    public boolean isUseSubColumnSequence() {
+        return !getSubColumnSequenceColumnList().isEmpty();
     }
 
-    public List<Column> getSubSequenceColumnList() {
-        if (_subSequenceColumnList != null) {
-            return _subSequenceColumnList;
+    public List<Column> getSubColumnSequenceColumnList() {
+        if (_subColumnSequenceColumnList != null) {
+            return _subColumnSequenceColumnList;
         }
-        _subSequenceColumnList = DfCollectionUtil.newArrayList();
+        _subColumnSequenceColumnList = DfCollectionUtil.newArrayList();
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        if (!prop.hasSubSequence()) {
-            return _subSequenceColumnList;
+        if (!prop.hasSubColumnSequence()) {
+            return _subColumnSequenceColumnList;
         }
         final List<Column> columnList = getColumnList();
         for (Column column : columnList) {
-            final String sequenceName = prop.getSubSequenceName(getName(), column.getName());
+            final String sequenceName = prop.getSubColumnSequenceName(getName(), column.getName());
             if (sequenceName != null) {
-                _subSequenceColumnList.add(column);
+                _subColumnSequenceColumnList.add(column);
             }
         }
-        return _subSequenceColumnList;
+        return _subColumnSequenceColumnList;
     }
 
     // ===================================================================================

@@ -663,6 +663,13 @@ public class Database {
             public boolean hasTable(String tableName) {
                 return getTable(tableName) != null;
             }
+
+            public boolean hasTableColumn(String tableName, String columnName) {
+                if (!hasTable(tableName)) {
+                    return false;
+                }
+                return getTable(tableName).getColumn(columnName) != null;
+            }
         });
         getProperties().getBasicProperties().checkDirectoryPackage();
     }
