@@ -401,6 +401,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         throw new UnsupportedOperationException(msg);
 #end
     }
+#foreach ($col in $table.subSequenceColumnList)
+
+    public ${col.javaNative} selectNextValFor${col.JavaName}() {
+        return delegateSelectNextVal(${col.javaNative}.class);
+    }
+#end
 
 #if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
     // ===================================================================================
@@ -1580,8 +1586,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                     ===============
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
     @Override
-    protected void filterEntityOfInsert(Entity targetEntity) {
-        super.filterEntityOfInsert(targetEntity);
+    protected void filterEntityOfInsert(Entity targetEntity, InsertOption<? extends ConditionBean> option) {
+        super.filterEntityOfInsert(targetEntity, option);
         ${myExtendedObjectClassName} entity = downcast(targetEntity);
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
         entity.set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
@@ -1591,8 +1597,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.isWritable())
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
-    protected void filterEntityOfUpdate(Entity targetEntity) {
-        super.filterEntityOfUpdate(targetEntity);
+    protected void filterEntityOfUpdate(Entity targetEntity, UpdateOption<? extends ConditionBean> option) {
+        super.filterEntityOfUpdate(targetEntity, option);
         ${myExtendedObjectClassName} entity = downcast(targetEntity);
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
         entity.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});

@@ -45,25 +45,32 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                                             =======================
     protected static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
     protected Map<String, String> _sequenceDefinitionMap;
+    protected Map<String, String> _sequenceSubDefinitionMap;
 
     protected Map<String, String> getSequenceDefinitionMap() {
         if (_sequenceDefinitionMap != null) {
             return _sequenceDefinitionMap;
         }
         final Map<String, String> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, String> flexibleSubMap = StringKeyMap.createAsFlexibleOrdered();
         final Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
         final Set<Entry<String, Object>> entrySet = originalMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
-            String tableName = entry.getKey();
-            Object sequenceName = entry.getValue();
+            final String tableName = entry.getKey();
+            final Object sequenceName = entry.getValue();
             if (!(sequenceName instanceof String)) {
                 String msg = "The value of sequence map should be string:";
                 msg = msg + " sequenceName=" + sequenceName + " map=" + originalMap;
                 throw new DfIllegalPropertyTypeException(msg);
             }
-            flexibleMap.put(tableName, (String) sequenceName);
+            if (!tableName.contains(".")) { // tableName only means primary sequence
+                flexibleMap.put(tableName, (String) sequenceName);
+            } else { // means sub sequence for normal columns
+                flexibleSubMap.put(tableName, (String) sequenceName);
+            }
         }
         _sequenceDefinitionMap = flexibleMap;
+        _sequenceSubDefinitionMap = flexibleSubMap;
         return _sequenceDefinitionMap;
     }
 
@@ -79,6 +86,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     public String getSequenceName(String tableName) {
         final String sequenceProp = getSequenceDefinitionMap().get(tableName);
+        return extractSequenceNameFromProp(sequenceProp);
+    }
+
+    protected String extractSequenceNameFromProp(String sequenceProp) {
         if (sequenceProp == null || sequenceProp.trim().length() == 0) {
             return null;
         }
@@ -100,6 +111,40 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return null;
         }
         return sequenceProp;
+    }
+
+    // -----------------------------------------------------
+    //                                          Sub Sequence
+    //                                          ------------
+    protected Map<String, String> getSequenceSubDefinitionMap() {
+        if (_sequenceSubDefinitionMap != null) {
+            return _sequenceSubDefinitionMap;
+        }
+        getSequenceDefinitionMap(); // initialize
+        return _sequenceDefinitionMap;
+    }
+
+    public boolean hasSubSequence() {
+        return !getSequenceSubDefinitionMap().isEmpty();
+    }
+
+    public String getSubSequenceName(String tableName, String columnName) {
+        final String key = generateSubSequenceKey(tableName, columnName);
+        final String sequenceProp = getSequenceSubDefinitionMap().get(key);
+        return extractSequenceNameFromProp(sequenceProp);
+    }
+
+    protected String getSubSequenceProp(String tableName, String columnName) {
+        final String key = generateSubSequenceKey(tableName, columnName);
+        final String sequenceProp = getSequenceDefinitionMap().get(key);
+        if (sequenceProp == null || sequenceProp.trim().length() == 0) {
+            return null;
+        }
+        return sequenceProp;
+    }
+
+    protected String generateSubSequenceKey(String tableName, String columnName) {
+        return tableName + "." + columnName;
     }
 
     // -----------------------------------------------------

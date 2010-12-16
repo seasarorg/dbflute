@@ -2323,6 +2323,22 @@ public class Table {
         }
     }
 
+    public List<Column> getSubSequenceColumnList() {
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        if (!prop.hasSubSequence()) {
+            return DfCollectionUtil.emptyList();
+        }
+        final List<Column> columnList = getColumnList();
+        final List<Column> subSequenceColumnList = DfCollectionUtil.newArrayList();
+        for (Column column : columnList) {
+            final String sequenceName = prop.getSubSequenceName(getName(), column.getName());
+            if (sequenceName != null) {
+                subSequenceColumnList.add(column);
+            }
+        }
+        return subSequenceColumnList;
+    }
+
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
