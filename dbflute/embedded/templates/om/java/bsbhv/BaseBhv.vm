@@ -909,7 +909,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrict</span>(${myEntityVariableName});
      * </pre>
-     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired}
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
@@ -935,7 +935,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrictIgnoreDeleted</span>(${myEntityVariableName});
      * <span style="color: #3F7E5E">// if the target entity doesn't exist, no exception</span>
      * </pre>
-     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired}
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -974,7 +974,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     @SuppressWarnings("unchecked")
     protected int[] doCreateList(List<Entity> ls) {
-        return delegateBatchInsert((List)ls, null);
+        return batchInsert((List)ls);
     }
 
     /**
@@ -1020,7 +1020,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     @SuppressWarnings("unchecked")
     protected int[] doModifyList(List<Entity> ls) {
-        return delegateBatchUpdate((List)ls, null);
+        return batchUpdate((List)ls);
     }
 
 #if ($table.hasOptimisticLock())
@@ -1082,7 +1082,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     @SuppressWarnings("unchecked")
     protected int[] doRemoveList(List<Entity> ls) {
-        return delegateBatchDelete((List)ls, null);
+        return batchDelete((List)ls);
     }
 
 #if ($table.hasOptimisticLock())
@@ -1382,7 +1382,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
-        doInsert(${myEntityVariableName}, null);
+        delegateInsert(${myEntityVariableName}, null);
     }
 #end
 #end
@@ -1564,7 +1564,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateEntityCBCommand(e, cb, op));  }
     protected int delegateQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> op)
     { if (!processBeforeQueryDelete(cb, op)) { return 0; } return invoke(createQueryDeleteCBCommand(cb, op));  }
-
+#else
 #if ($table.isAvailableNonPrimaryKeyWritable())
     protected int delegateInsert(${myExtendedObjectClassName} e, InsertOption<${myConditionBeanClassName}> op) {
         // only filtering for extension is supported (filtering for common columns is unsupported)
