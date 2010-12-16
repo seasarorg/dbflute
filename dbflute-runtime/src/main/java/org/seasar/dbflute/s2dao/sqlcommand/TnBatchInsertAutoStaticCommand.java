@@ -51,7 +51,10 @@ public class TnBatchInsertAutoStaticCommand extends TnAbstractBatchAutoStaticCom
 
     @Override
     protected TnAbstractBatchHandler createBatchHandler() {
-        return new TnBatchInsertHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+        final TnBatchInsertHandler handler = new TnBatchInsertHandler(getDataSource(), getStatementFactory(),
+                getBeanMetaData(), getPropertyTypes());
+        handler.setInsertOption(_insertOption);
+        return handler;
     }
 
     @Override

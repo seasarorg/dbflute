@@ -56,8 +56,8 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
     protected ValueType[] _bindVariableValueTypes;
     protected boolean _optimisticLockHandling;
     protected boolean _versionNoAutoIncrementOnMemory; // to adjust binding
-    protected InsertOption<ConditionBean> _insertOption;
-    protected UpdateOption<ConditionBean> _updateOption;
+    protected InsertOption<? extends ConditionBean> _insertOption;
+    protected UpdateOption<? extends ConditionBean> _updateOption;
     protected List<Timestamp> _newTimestampList;
     protected List<Long> _newVersionNoList;
 
@@ -363,11 +363,11 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
         this._versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
     }
 
-    public void setInsertOption(InsertOption<ConditionBean> insertOption) {
+    public void setInsertOption(InsertOption<? extends ConditionBean> insertOption) {
         this._insertOption = insertOption;
     }
 
-    public void setUpdateOption(UpdateOption<ConditionBean> updateOption) {
+    public void setUpdateOption(UpdateOption<? extends ConditionBean> updateOption) {
         this._updateOption = updateOption;
     }
 }
