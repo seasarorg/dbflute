@@ -46,7 +46,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
      * 
      * <span style="color: #3F7E5E">// ex) you can insert by your values for primary key</span>
-     * option.<span style="color: #FD4747">disablePrimaryIdentityInsert</span>();
+     * option.<span style="color: #FD4747">disablePrimaryKeyIdentity</span>();
      * 
      * memberBhv.<span style="color: #FD4747">varyingInsert</span>(member, option);
      * </pre>
@@ -93,7 +93,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setMemberId(123); <span style="color: #3F7E5E">// instead of identity</span>
      * member.setOthers...(value);
      * InsertOption&lt;MemberCB&gt; option = new InsertOption&lt;MemberCB&gt;();
-     * option.<span style="color: #FD4747">disablePrimaryIdentityInsert</span>();
+     * option.<span style="color: #FD4747">disablePrimaryKeyIdentity</span>();
      * memberBhv.varyingInsert(member, option);
      * </pre>
      * @return The option of insert. (NotNull: returns this)
