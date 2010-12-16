@@ -750,6 +750,10 @@ public class ${glDBFluteConfig} {
             if (found != null) {
                 return found;
             }
+            found = resolveDefault(cause);
+            if (found != null) {
+                return found;
+            }
             return null;
         }
 
@@ -762,6 +766,14 @@ public class ${glDBFluteConfig} {
                 }
             }
 #end
+            return null;
+        }
+
+        protected SQLException resolveDefault(Throwable cause) {
+            Throwable nestedCause = cause.getCause();
+            if (nestedCause instanceof SQLException) {
+                return (SQLException)nestedCause;
+            }
             return null;
         }
     }    
