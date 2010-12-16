@@ -52,13 +52,11 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
             final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (generator.isSelfGenerate()) {
-                if (generator.isPrimaryKey()) {
-                    if (isPrimaryKeyIdentityDisabled()) {
-                        disableIdentityGeneration();
-                        continue;
-                    }
-                }
                 generator.setIdentifier(bean, getDataSource());
+            } else { // identity
+                if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
+                    disableIdentityGeneration();
+                }
             }
         }
     }
@@ -68,12 +66,9 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
         final TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
             final TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
-            if (!generator.isSelfGenerate()) {
-                if (generator.isPrimaryKey()) {
-                    if (isPrimaryKeyIdentityDisabled()) {
-                        enableIdentityGeneration();
-                        continue;
-                    }
+            if (!generator.isSelfGenerate()) { // identity
+                if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
+                    enableIdentityGeneration();
                 }
                 generator.setIdentifier(bean, getDataSource());
             }
