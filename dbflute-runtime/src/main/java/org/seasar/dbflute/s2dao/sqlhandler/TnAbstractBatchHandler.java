@@ -91,6 +91,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
                 }
                 handleBatchLogging();
                 result = executeBatch(ps, beanList);
+                handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
             } catch (RuntimeException e) {
                 // not SQLFailureException because
                 // a wrapper of JDBC may throw an other exception
@@ -100,7 +101,6 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
                 close(ps);
                 processFinally(beanList, sqlEx);
             }
-            handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
             // a value of optimistic lock column should be synchronized
             // after handling optimistic lock
             int index = 0;

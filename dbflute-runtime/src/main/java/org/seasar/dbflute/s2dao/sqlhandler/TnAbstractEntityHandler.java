@@ -93,6 +93,7 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
         try {
             bindArgs(conn, ps, _bindVariables, _bindVariableValueTypes);
             ret = executeUpdate(ps);
+            handleUpdateResultWithOptimisticLock(bean, ret);
         } catch (RuntimeException e) {
             // not SQLFailureException because
             // a wrapper of JDBC may throw an other exception
@@ -102,17 +103,10 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
             close(ps);
             processFinally(bean, sqlEx);
         }
-        if (_optimisticLockHandling && ret < 1) { // means no update (contains minus just in case)
-            throw createEntityAlreadyUpdatedException(bean, ret);
-        }
         // a value of optimistic lock column should be synchronized
         // after handling optimistic lock
         processSuccess(bean, ret);
         return ret;
-    }
-
-    protected EntityAlreadyUpdatedException createEntityAlreadyUpdatedException(Object bean, int rows) {
-        return new EntityAlreadyUpdatedException(bean, rows);
     }
 
     // ===================================================================================
@@ -125,6 +119,19 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
     }
 
     protected void processSuccess(Object bean, int ret) {
+    }
+
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
+    protected void handleUpdateResultWithOptimisticLock(Object bean, int ret) {
+        if (_optimisticLockHandling && ret < 1) { // means no update (contains minus just in case)
+            throw createEntityAlreadyUpdatedException(bean, ret);
+        }
+    }
+
+    protected EntityAlreadyUpdatedException createEntityAlreadyUpdatedException(Object bean, int rows) {
+        return new EntityAlreadyUpdatedException(bean, rows);
     }
 
     // ===================================================================================
