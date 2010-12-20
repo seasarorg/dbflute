@@ -126,6 +126,12 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
         if (isDisableSelectIndex()) {
             sqlClause.disableSelectIndex();
         }
+        if (isEmptyStringQueryAllowed()) {
+            sqlClause.allowEmptyStringQuery();
+        }
+        if (isInvalidQueryChecked()) {
+            sqlClause.checkInvalidQuery();
+        }
     }
 
     // ===================================================================================
@@ -137,5 +143,13 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected boolean isDisableSelectIndex() {
 	    return ${glDBFluteConfig}.getInstance().isDisableSelectIndex();
+    }
+
+    protected boolean isEmptyStringQueryAllowed() {
+	    return ${glDBFluteConfig}.getInstance().isEmptyStringQueryAllowed();
+    }
+
+    protected boolean isInvalidQueryChecked() {
+	    return ${glDBFluteConfig}.getInstance().isInvalidQueryChecked();
     }
 }

@@ -20,6 +20,7 @@ import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 #end
 import org.seasar.dbflute.util.DfTypeUtil;
+import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}.*;
 #end
@@ -167,8 +168,19 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected String filterStringParameter(String value) {
+        if (isEmptyStringParameterAllowed()) {
+            return value;
+        }
+        return convertEmptyToNull(value);
+    }
+
+    protected boolean isEmptyStringParameterAllowed() {
+	    return ${glDBFluteConfig}.getInstance().isEmptyStringParameterAllowed();
+    }
+
     protected String convertEmptyToNull(String value) {
-        return ParameterUtil.convertEmptyToNull(value);
+	    return ParameterUtil.convertEmptyToNull(value);
     }
 
     protected String handleShortChar(String propertyName, String value, Integer size) {
@@ -266,11 +278,11 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     public ${propertyType} get${database.initCap($propertyName)}() {
 #if ($propertyType.endsWith("String"))
 #if ($database.isShortCharHandlingValid() && $database.isPmbMetaDataPropertyRefColumnChar($pmbClassName, $propertyName))
-        String filtered = convertEmptyToNull(${variableName});
+        String filtered = filterStringParameter(${variableName});
         filtered = handleShortChar("${propertyName}", filtered, ${database.getPmbMetaDataPropertyRefSize($pmbClassName, $propertyName)});
         return filtered;
 #else
-        return convertEmptyToNull(${variableName});
+        return filterStringParameter(${variableName});
 #end
 #else
 #if ($propertyType.equals("Date"))

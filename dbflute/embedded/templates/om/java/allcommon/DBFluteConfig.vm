@@ -73,21 +73,33 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                                         Configuration
     //                                         -------------
-    protected StatementConfig _defaultStatementConfig;
+    // condition-bean or parameter-bean
+    protected boolean _disableSelectIndex;
+    protected boolean _emptyStringQueryAllowed;
+    protected boolean _emptyStringParameterAllowed;
+    protected boolean _invalidQueryChecked;
+
+    // logging
     protected boolean _queryLogLevelInfo;
     protected boolean _executeStatusLogLevelInfo;
     protected String _logDateFormat;
     protected String _logTimestampFormat;
+
+    // environment
+    protected StatementConfig _defaultStatementConfig;
     protected DataSourceHandler _dataSourceHandler;
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SQLExceptionDigger _sqlExceptionDigger;
+    protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
+    protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
+
+    // extension
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected SqlClauseCreator _sqlClauseCreator;
     protected SqlNameFilter _tableSqlNameFilter;
-    protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
     protected OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
-    protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
-    protected boolean _disableSelectIndex;
+
+    // internal
     protected boolean _internalDebug;
 
     // -----------------------------------------------------
@@ -141,18 +153,72 @@ public class ${glDBFluteConfig} {
     }
 
     // ===================================================================================
-    //                                                            Default Statement Config
-    //                                                            ========================
-    public StatementConfig getDefaultStatementConfig() {
-        return _defaultStatementConfig;
+    //                                                                        Select Index
+    //                                                                        ============
+    public boolean isDisableSelectIndex() {
+        return _disableSelectIndex;
     }
 
-    public void setDefaultStatementConfig(StatementConfig defaultStatementConfig) {
+    public void setDisableSelectIndex(boolean disableSelectIndex) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting defaultStatementConfig: " + defaultStatementConfig);
+            _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
         }
-        _defaultStatementConfig = defaultStatementConfig;
+        _disableSelectIndex = disableSelectIndex;
+    }
+
+    // ===================================================================================
+    //                                                                       Invalid Query
+    //                                                                       =============
+    public boolean isEmptyStringQueryAllowed() {
+        return _emptyStringQueryAllowed;
+    }
+
+    /**
+     * Set whether an empty string for query is allowed or not. {default: false}<br />
+     * This configuration is only for ConditionBean.
+     * @param emptyStringQueryAllowed Determination.
+     */
+    public void setEmptyStringQueryAllowed(boolean emptyStringQueryAllowed) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting emptyStringQueryAllowed: " + emptyStringQueryAllowed);
+        }
+        _emptyStringQueryAllowed = emptyStringQueryAllowed;
+    }
+
+    public boolean isEmptyStringParameterAllowed() {
+        return _emptyStringParameterAllowed;
+    }
+
+    /**
+     * Set whether an empty string for parameter is allowed or not. {default: false}<br />
+     * This configuration is only for ParameterBean.
+     * @param emptyStringParameterAllowed Determination.
+     */
+    public void setEmptyStringParameterAllowed(boolean emptyStringParameterAllowed) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting emptyStringParameterAllowed: " + emptyStringParameterAllowed);
+        }
+        _emptyStringParameterAllowed = emptyStringParameterAllowed;
+    }
+
+    public boolean isInvalidQueryChecked() {
+        return _invalidQueryChecked;
+    }
+
+    /**
+     * Set whether an invalid query is checked or not. {default: false}<br />
+     * This configuration is only for ConditionBean.
+     * @param invalidQueryChecked Determination.
+     */
+    public void setInvalidQueryChecked(boolean invalidQueryChecked) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting invalidQueryChecked: " + invalidQueryChecked);
+        }
+        _invalidQueryChecked = invalidQueryChecked;
     }
 
     // ===================================================================================
@@ -206,6 +272,21 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting logTimestampFormat: " + logTimestampFormat);
         }
         _logTimestampFormat = logTimestampFormat;
+    }
+
+    // ===================================================================================
+    //                                                            Default Statement Config
+    //                                                            ========================
+    public StatementConfig getDefaultStatementConfig() {
+        return _defaultStatementConfig;
+    }
+
+    public void setDefaultStatementConfig(StatementConfig defaultStatementConfig) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting defaultStatementConfig: " + defaultStatementConfig);
+        }
+        _defaultStatementConfig = defaultStatementConfig;
     }
 
     // [DBFlute-0.9.0]
@@ -280,6 +361,43 @@ public class ${glDBFluteConfig} {
         _sqlExceptionDigger = sqlExceptionDigger;
     }
 
+    // ===================================================================================
+    //                                                                  OutsideSql Package
+    //                                                                  ==================
+    /**
+     * @return The package of outside SQL. (Nullable)
+     */
+    public String getOutsideSqlPackage() {
+        return _outsideSqlPackage;
+    }
+
+    /**
+     * @param outsideSqlPackage The package of outside SQL. (Nullable)
+     */
+    public void setOutsideSqlPackage(String outsideSqlPackage) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting outsideSqlPackage: " + outsideSqlPackage);
+        }
+        _outsideSqlPackage = outsideSqlPackage;
+    }
+
+    // [DBFlute-0.8.2]
+    // ===================================================================================
+    //                                                                    SQL Log Registry
+    //                                                                    ================
+    public boolean isUseSqlLogRegistry() {
+        return _useSqlLogRegistry;
+    }
+
+    public void setUseSqlLogRegistry(boolean useSqlLogRegistry) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting useSqlLogRegistry: " + useSqlLogRegistry);
+        }
+        _useSqlLogRegistry = useSqlLogRegistry;
+    }
+
     // [DBFlute-0.9.6.4]
     // ===================================================================================
     //                                                                      Sequence Cache
@@ -349,27 +467,6 @@ public class ${glDBFluteConfig} {
         _tableSqlNameFilter = tableSqlNameFilter;
     }
 
-    // ===================================================================================
-    //                                                                  OutsideSql Package
-    //                                                                  ==================
-    /**
-     * @return The package of outside SQL. (Nullable)
-     */
-    public String getOutsideSqlPackage() {
-        return _outsideSqlPackage;
-    }
-
-    /**
-     * @param outsideSqlPackage The package of outside SQL. (Nullable)
-     */
-    public void setOutsideSqlPackage(String outsideSqlPackage) {
-        assertNotLocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Setting outsideSqlPackage: " + outsideSqlPackage);
-        }
-        _outsideSqlPackage = outsideSqlPackage;
-    }
-
     // [DBFlute-0.9.7.0]
     // ===================================================================================
     //                                                                 OutsideSql Executor
@@ -384,38 +481,6 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting outsideSqlExecutorFactory: " + outsideSqlExecutorFactory);
         }
         _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
-    }
-
-    // [DBFlute-0.8.2]
-    // ===================================================================================
-    //                                                                    SQL Log Registry
-    //                                                                    ================
-    public boolean isUseSqlLogRegistry() {
-        return _useSqlLogRegistry;
-    }
-
-    public void setUseSqlLogRegistry(boolean useSqlLogRegistry) {
-        assertNotLocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Setting useSqlLogRegistry: " + useSqlLogRegistry);
-        }
-        _useSqlLogRegistry = useSqlLogRegistry;
-    }
-
-    // [DBFlute-0.9.0]
-    // ===================================================================================
-    //                                                                        Select Index
-    //                                                                        ============
-    public boolean isDisableSelectIndex() {
-        return _disableSelectIndex;
-    }
-
-    public void setDisableSelectIndex(boolean disableSelectIndex) {
-        assertNotLocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
-        }
-        _disableSelectIndex = disableSelectIndex;
     }
     
     // ===================================================================================
