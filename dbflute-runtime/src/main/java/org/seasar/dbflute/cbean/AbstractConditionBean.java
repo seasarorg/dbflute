@@ -352,8 +352,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
-    //                                                                        InvalidQuery
-    //                                                                        ============
+    //                                                                       Invalid Query
+    //                                                                       =============
+    /**
+     * {@inheritDoc}
+     */
+    public void allowEmptyStringQuery() {
+        getSqlClause().allowEmptyStringQuery();
+    }
+
     /**
      * {@inheritDoc}
      */

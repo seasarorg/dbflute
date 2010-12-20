@@ -470,7 +470,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, columnRealName)) {
             return true;
         } else {
-            if (xgetSqlClause().isCheckInvalidQuery()) {
+            if (xgetSqlClause().isInvalidQueryChecked()) {
                 throwInvalidQueryRegisteredException(key, value, columnRealName);
                 return false; // unreachable
             } else {
@@ -1389,26 +1389,50 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                        Filter Value
     //                                                                        ============
     /**
-     * @param value Query-value-string. (Nullable)
+     * Delegate to filterRemoveEmptyString(). {Internal}
+     * @param value The string value for query. (Nullable)
      * @return Filtered value. (Nullable)
      */
     protected String fRES(String value) {
         return filterRemoveEmptyString(value);
     }
 
-    private String filterRemoveEmptyString(String value) {
+    /**
+     * Filter removing an empty string as null. <br />
+     * You can extend this to use an empty string value as condition.
+     * @param value The string value for query. (Nullable)
+     * @return Filtered value. (Nullable)
+     */
+    protected String filterRemoveEmptyString(String value) {
+        if (isEmptyStringQueryAllowed()) {
+            return value;
+        }
         return ((value != null && !"".equals(value)) ? value : null);
     }
 
     /**
-     * @param date The date instance. (Nullable)
+     * Does it allowed an empty string to set for query?
+     * @return Determination.
+     */
+    protected boolean isEmptyStringQueryAllowed() {
+        return xgetSqlClause().isEmptyStringQueryAllowed();
+    }
+
+    /**
+     * Delegate to filterConvertToPureDate().
+     * @param date The instance of date for query. (Nullable)
      * @return Filtered date. (Nullable)
      */
     protected java.util.Date fCTPD(java.util.Date date) {
         return filterConvertToPureDate(date);
     }
 
-    private java.util.Date filterConvertToPureDate(java.util.Date date) {
+    /**
+     * Filter converting the date to a pure date.
+     * @param date The instance of date for query. (Nullable)
+     * @return Filtered value. (Nullable)
+     */
+    protected java.util.Date filterConvertToPureDate(java.util.Date date) {
         return DfTypeUtil.toDate(date);
     }
 

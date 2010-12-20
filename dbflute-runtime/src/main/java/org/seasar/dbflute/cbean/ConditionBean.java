@@ -123,8 +123,20 @@ public interface ConditionBean extends PagingBean {
     boolean isSelectCountIgnoreFetchScope();
 
     // ===================================================================================
-    //                                                                        InvalidQuery
-    //                                                                        ============
+    //                                                                       Invalid Query
+    //                                                                       =============
+    /**
+     * Allow an empty string for query. <br />
+     * (you can use an empty string as condition) <br />
+     * If it has already been set as allowed, this calling is ignored.
+     */
+    void allowEmptyStringQuery();
+
+    /**
+     * Check an invalid query when a query is set. <br />
+     * (it throws an exception if a set query is invalid) <br />
+     * If it has already been set as checked, this calling is ignored.
+     */
     void checkInvalidQuery();
 
     // ===================================================================================

@@ -643,7 +643,11 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
-    boolean isCheckInvalidQuery();
+    boolean isEmptyStringQueryAllowed();
+
+    void allowEmptyStringQuery();
+
+    boolean isInvalidQueryChecked();
 
     void checkInvalidQuery();
 

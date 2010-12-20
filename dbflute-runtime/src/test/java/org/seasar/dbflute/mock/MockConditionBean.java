@@ -215,6 +215,9 @@ public class MockConditionBean implements ConditionBean {
     public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
     }
 
+    public void allowEmptyStringQuery() {
+    }
+
     public void checkInvalidQuery() {
     }
 

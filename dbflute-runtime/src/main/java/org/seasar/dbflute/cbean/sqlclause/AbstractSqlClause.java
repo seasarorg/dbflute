@@ -197,8 +197,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                    Invalid Query Info
     //                                    ------------------
+    /** Does it accept an empty string for query? */
+    protected boolean _emptyStringQueryAllowed;
+
     /** Does it check an invalid query? */
-    protected boolean _checkInvalidQuery;
+    protected boolean _invalidQueryChecked;
 
     /** The map of invalid query column. */
     protected Map<ColumnRealName, ConditionKey> _invalidQueryColumnMap;
@@ -2013,12 +2016,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                  Invalid Query Info
     //                                                                  ==================
-    public boolean isCheckInvalidQuery() {
-        return _checkInvalidQuery;
+    public boolean isEmptyStringQueryAllowed() {
+        return _emptyStringQueryAllowed;
+    }
+
+    public void allowEmptyStringQuery() {
+        _emptyStringQueryAllowed = true;
+    }
+
+    public boolean isInvalidQueryChecked() {
+        return _invalidQueryChecked;
     }
 
     public void checkInvalidQuery() {
-        _checkInvalidQuery = true;
+        _invalidQueryChecked = true;
     }
 
     public Map<ColumnRealName, ConditionKey> getInvalidQueryColumnMap() {
