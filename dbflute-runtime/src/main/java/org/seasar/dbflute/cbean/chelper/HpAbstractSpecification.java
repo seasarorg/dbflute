@@ -3,7 +3,9 @@ package org.seasar.dbflute.cbean.chelper;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -45,7 +47,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    protected void doColumn(String columnName) {
+    protected HpSpecifiedInfo doColumn(String columnName) {
         ++_specifyColumnCount;
         assertColumn(columnName);
         if (_query == null) {
@@ -63,7 +65,11 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         } else {
             tableAliasName = sqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel());
         }
-        sqlClause.specifySelectColumn(tableAliasName, columnName, _query.getTableDbName());
+        final DBMeta correspondingDBMeta = _dbmetaProvider.provideDBMetaChecked(_query.getTableDbName());
+        final ColumnInfo specifiedColumn = correspondingDBMeta.findColumnInfo(columnName);
+        final HpSpecifiedInfo specifiedInfo = new HpSpecifiedInfo(tableAliasName, specifiedColumn);
+        sqlClause.specifySelectColumn(specifiedInfo);
+        return specifiedInfo;
     }
 
     /**

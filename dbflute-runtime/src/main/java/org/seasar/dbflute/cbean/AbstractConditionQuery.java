@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
@@ -811,7 +812,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 subQueryDBMeta, mainSubQueryIdentity, aliasName);
         registerParameterOption(option);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
-        xgetSqlClause().specifyDerivingSubQuery(aliasName, clause, derivedReferrer);
+        final HpDerivingSubQueryInfo subQueryInfo = new HpDerivingSubQueryInfo(aliasName, clause, derivedReferrer);
+        xgetSqlClause().specifyDerivingSubQuery(subQueryInfo);
     }
 
     // [DBFlute-0.8.8.1]

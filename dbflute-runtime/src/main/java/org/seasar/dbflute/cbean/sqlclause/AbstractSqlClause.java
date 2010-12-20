@@ -29,6 +29,8 @@ import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedInfo;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -45,7 +47,6 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.cbean.sqlclause.select.SelectedSelectColumnInfo;
-import org.seasar.dbflute.cbean.sqlclause.subquery.DerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -105,14 +106,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}} */
     protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap;
 
-    /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
-    protected Map<String, Map<String, String>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
+    /** Specified select column map. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (Nullable: This is lazy-loaded) */
+    protected Map<String, Map<String, HpSpecifiedInfo>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
-    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
-    protected Map<String, Map<String, String>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
+    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (Nullable: This is lazy-loaded) */
+    protected Map<String, Map<String, HpSpecifiedInfo>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
     /** Specified derive sub-query map. A null key is acceptable. (Nullable: This is lazy-loaded) */
-    protected Map<String, DerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
+    protected Map<String, HpDerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
     protected Map<String, String> _selectClauseRealColumnAliasMap;
@@ -440,7 +441,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final StringBuilder sb = new StringBuilder();
         final DBMeta dbmeta = getDBMeta();
 
-        Map<String, String> localSpecifiedMap = null;
+        Map<String, HpSpecifiedInfo> localSpecifiedMap = null;
         if (_specifiedSelectColumnMap != null) {
             localSpecifiedMap = _specifiedSelectColumnMap.get(basePointAliasName);
         }
@@ -514,7 +515,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String tableAliasName = entry.getKey();
             final Map<String, SelectedSelectColumnInfo> map = entry.getValue();
             final Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
-            Map<String, String> foreginSpecifiedMap = null;
+            Map<String, HpSpecifiedInfo> foreginSpecifiedMap = null;
             if (_specifiedSelectColumnMap != null) {
                 foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
             }
@@ -546,7 +547,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         // columns of DerivedReferrer
         if (_specifiedDerivingSubQueryMap != null && !_specifiedDerivingSubQueryMap.isEmpty()) {
-            for (Entry<String, DerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
+            for (Entry<String, HpDerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
                 final String subQueryAlias = entry.getKey();
                 final String derivingSubQuery = entry.getValue().getDerivingSubQuery();
                 sb.append(ln()).append("     ");
@@ -1836,16 +1837,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                        Specify Column
     //                                        --------------
-    public void specifySelectColumn(String tableAliasName, String columnDbName, String tableDbName) {
+    public void specifySelectColumn(HpSpecifiedInfo specifiedInfo) {
         if (_specifiedSelectColumnMap == null) {
             _specifiedSelectColumnMap = StringKeyMap.createAsFlexible(); // not needs order
         }
+        final String tableAliasName = specifiedInfo.getTableAliasName();
         if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
-            final Map<String, String> elementMap = StringKeyMap.createAsFlexibleOrdered();
+            final Map<String, HpSpecifiedInfo> elementMap = StringKeyMap.createAsFlexibleOrdered();
             _specifiedSelectColumnMap.put(tableAliasName, elementMap);
         }
-        final Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
-        elementMap.put(columnDbName, tableDbName); // this tableDbName is unused actually, this is for future
+        final String columnDbName = specifiedInfo.getSpecifiedColumn().getColumnDbName();
+        final Map<String, HpSpecifiedInfo> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        elementMap.put(columnDbName, specifiedInfo);
     }
 
     public boolean hasSpecifiedSelectColumn(String tableAliasName) {
@@ -1856,7 +1859,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_specifiedSelectColumnMap == null) {
             return false;
         }
-        final Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        final Map<String, HpSpecifiedInfo> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
         if (elementMap == null) {
             return false;
         }
@@ -1888,13 +1891,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public ColumnInfo getSpecifiedColumnInfoAsOne() {
-        final Map<String, String> elementMap = getSpecifiedColumnElementMapAsOne();
+        final Map<String, HpSpecifiedInfo> elementMap = getSpecifiedColumnElementMapAsOne();
         if (elementMap == null) {
             return null;
         }
-        final String columnDbName = elementMap.keySet().iterator().next();
-        final String tableDbName = elementMap.values().iterator().next();
-        return toColumnInfo(tableDbName, columnDbName);
+        final HpSpecifiedInfo specifiedInfo = elementMap.values().iterator().next();
+        return specifiedInfo.getSpecifiedColumn();
     }
 
     public ColumnRealName getSpecifiedColumnRealNameAsOne() {
@@ -1918,7 +1920,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return null;
     }
 
-    protected Map<String, String> getSpecifiedColumnElementMapAsOne() {
+    protected Map<String, HpSpecifiedInfo> getSpecifiedColumnElementMapAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
             return _specifiedSelectColumnMap.values().iterator().next();
         }
@@ -1928,12 +1930,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                      Specify Deriving
     //                                      ----------------
-    public void specifyDerivingSubQuery(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
+    public void specifyDerivingSubQuery(HpDerivingSubQueryInfo subQueryInfo) {
         if (_specifiedDerivingSubQueryMap == null) {
             _specifiedDerivingSubQueryMap = StringKeyMap.createAsFlexibleOrdered();
         }
-        final DerivingSubQueryInfo info = new DerivingSubQueryInfo(aliasName, derivingSubQuery, derivedReferrer);
-        _specifiedDerivingSubQueryMap.put(aliasName, info);
+        final String aliasName = subQueryInfo.getAliasName(); // nullable (treated as null key)
+        _specifiedDerivingSubQueryMap.put(aliasName, subQueryInfo);
     }
 
     public boolean hasSpecifiedDerivingSubQuery(String aliasName) {
@@ -1953,7 +1955,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       Deriving as One
     //                                       ---------------
     public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
-        final DerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
         if (derivingInfo == null) {
             return null;
         }
@@ -1966,16 +1968,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public String getSpecifiedDerivingAliasNameAsOne() {
-        final DerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
         return derivingInfo != null ? derivingInfo.getAliasName() : null;
     }
 
     public String getSpecifiedDerivingSubQueryAsOne() {
-        final DerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
         return derivingInfo != null ? derivingInfo.getDerivingSubQuery() : null;
     }
 
-    protected DerivingSubQueryInfo getSpecifiedDerivingInfoAsOne() {
+    protected HpDerivingSubQueryInfo getSpecifiedDerivingInfoAsOne() {
         if (_specifiedDerivingSubQueryMap != null && _specifiedDerivingSubQueryMap.size() == 1) {
             return _specifiedDerivingSubQueryMap.values().iterator().next();
         }
@@ -1986,30 +1988,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_specifiedDerivingSubQueryMap != null) {
             _specifiedDerivingSubQueryMap.clear();
             _specifiedDerivingSubQueryMap = null;
-        }
-    }
-
-    protected static class DerivingSubQueryInfo {
-        protected String _aliasName;
-        protected String _derivingSubQuery;
-        protected DerivedReferrer _derivedReferrer;
-
-        public DerivingSubQueryInfo(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
-            this._aliasName = aliasName;
-            this._derivingSubQuery = derivingSubQuery;
-            this._derivedReferrer = derivedReferrer;
-        }
-
-        public String getAliasName() {
-            return _aliasName;
-        }
-
-        public String getDerivingSubQuery() {
-            return _derivingSubQuery;
-        }
-
-        public DerivedReferrer getDerivedReferrer() {
-            return _derivedReferrer;
         }
     }
 

@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedInfo;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -27,7 +29,6 @@ import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
-import org.seasar.dbflute.cbean.sqlclause.subquery.DerivedReferrer;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -554,11 +555,9 @@ public interface SqlClause {
     //                                        --------------
     /**
      * Specify select columns.
-     * @param tableAliasName The alias name of table. (NotNull)
-     * @param columnDbName The DB name of column. (NotNull)
-     * @param tableDbName The DB name of table. (NotNull)
+     * @param specifiedInfo The info about column specification. (NotNull)
      */
-    void specifySelectColumn(String tableAliasName, String columnDbName, String tableDbName);
+    void specifySelectColumn(HpSpecifiedInfo specifiedInfo);
 
     /**
      * Does it have specified select columns?
@@ -621,17 +620,19 @@ public interface SqlClause {
     //                                      Specify Deriving
     //                                      ----------------
     /**
-     * Specify deriving sub-query for DerivedReferrer.
-     * @param aliasName The alias name for sub-query. (Nullable: if null, means as-one use in other functions)
-     * @param derivingSubQuery The sub-query for deriving. (NotNull)
-     * @param derivedReferrer The handler of DerivedReferrer. (NotNull)  
+     * Specify deriving sub-query for DerivedReferrer. <br />
+     * aliasName is nullable if (Specify)DerivedReferrer is used in other functions.
+     * @param subQueryInfo The info about deriving sub-query. (NotNull: aliasName is nullable)
      */
-    void specifyDerivingSubQuery(String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer);
+    void specifyDerivingSubQuery(HpDerivingSubQueryInfo subQueryInfo);
 
     boolean hasSpecifiedDerivingSubQuery(String aliasName);
 
     List<String> getSpecifiedDerivingAliasList();
 
+    // -----------------------------------------------------
+    //                                       Deriving as One
+    //                                       ---------------
     ColumnInfo getSpecifiedDerivingColumnInfoAsOne();
 
     String getSpecifiedDerivingAliasNameAsOne();
