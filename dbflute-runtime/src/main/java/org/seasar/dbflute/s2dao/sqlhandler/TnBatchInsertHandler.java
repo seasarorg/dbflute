@@ -46,6 +46,7 @@ public class TnBatchInsertHandler extends TnAbstractBatchHandler {
 
     @Override
     protected void processBefore(Object beanList) {
+        super.processBefore(beanList);
         if (isPrimaryKeyIdentityDisabled()) {
             disableIdentityGeneration();
         }
@@ -53,6 +54,7 @@ public class TnBatchInsertHandler extends TnAbstractBatchHandler {
 
     @Override
     protected void processFinally(Object beanList, RuntimeException sqlEx) {
+        super.processFinally(beanList, sqlEx);
         if (isPrimaryKeyIdentityDisabled()) {
             try {
                 enableIdentityGeneration();

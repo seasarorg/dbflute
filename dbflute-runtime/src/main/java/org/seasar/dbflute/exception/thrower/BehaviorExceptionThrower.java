@@ -20,6 +20,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.DeleteOption;
+import org.seasar.dbflute.bhv.UpdateOption;
+import org.seasar.dbflute.bhv.WritableOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
@@ -27,6 +30,8 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.exception.NonQueryDeleteNotAllowedException;
+import org.seasar.dbflute.exception.NonQueryUpdateNotAllowedException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.PagingCountSelectNotCountException;
 import org.seasar.dbflute.exception.SelectEntityConditionNotFoundException;
@@ -235,9 +240,39 @@ public class BehaviorExceptionThrower {
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
+    public <ENTITY extends Entity> void throwNonQueryUpdateNotAllowedException(ENTITY entity, ConditionBean cb,
+            UpdateOption<? extends ConditionBean> option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The query-update without a query condition is not allowed.");
+        br.addItem("Advice");
+        br.addElement("Confirm your condition values for queryUpdate().");
+        br.addElement("If you want to update all records, use varyingQueryUpdate().");
+        setupEntityElement(br, entity);
+        setupOptionElement(br, option);
+        final String msg = br.buildExceptionMessage();
+        throw new NonQueryUpdateNotAllowedException(msg);
+    }
+
+    public <ENTITY extends Entity> void throwNonQueryDeleteNotAllowedException(ConditionBean cb,
+            DeleteOption<? extends ConditionBean> option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The query-delete without a query condition is not allowed.");
+        br.addItem("Advice");
+        br.addElement("Confirm your condition values for queryDelete().");
+        br.addElement("If you want to delete all records, use varyingQueryDelete().");
+        setupOptionElement(br, option);
+        final String msg = br.buildExceptionMessage();
+        throw new NonQueryDeleteNotAllowedException(msg);
+    }
+
     protected void setupEntityElement(ExceptionMessageBuilder br, Entity entity) {
         br.addItem("Entity");
-        br.addElement(entity.toString());
+        br.addElement(entity);
+    }
+
+    protected void setupOptionElement(ExceptionMessageBuilder br, WritableOption<? extends ConditionBean> option) {
+        br.addItem("Option");
+        br.addElement(option);
     }
 
     // ===================================================================================

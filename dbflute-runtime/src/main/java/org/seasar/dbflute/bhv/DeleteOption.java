@@ -63,8 +63,15 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("default");
+        if (_allowNonQueryDelete) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("NonQueryDeleteAllowed");
+        }
+        if (sb.length() == 0) {
+            sb.append("default");
+        }
         return DfTypeUtil.toClassTitle(this) + ":{" + sb.toString() + "}";
     }
-
 }

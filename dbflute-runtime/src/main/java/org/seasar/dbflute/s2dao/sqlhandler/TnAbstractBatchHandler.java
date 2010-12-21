@@ -177,14 +177,18 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     //                                                                   =================
     @Override
     protected void processBefore(Object beanList) {
+        super.processBefore(beanList);
     }
 
     @Override
     protected void processFinally(Object beanList, RuntimeException sqlEx) {
+        super.processFinally(beanList, sqlEx);
+        _alreadySavedToResultInfo = false; // clear just in case
     }
 
     @Override
     protected void processSuccess(Object beanList, int ret) {
+        super.processSuccess(beanList, ret);
     }
 
     protected void processBatchBefore(Object bean) {

@@ -38,7 +38,6 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 
@@ -503,6 +502,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         frameworkFilterEntityOfUpdate(entity, option);
         filterEntityOfUpdate(entity, option);
         assertEntityOfUpdate(entity, option);
+        assertQueryUpdateStatus(entity, cb, option);
         return true;
     }
 
@@ -585,23 +585,16 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     /**
      * Assert that the query-update is legal status.
+     * @param entity The entity for query-update. (NotNull)
      * @param cb The condition-bean for query-update. (NotNull)
      * @param option The option of update. (Nullable)
      */
-    protected void assertQueryUpdateStatus(ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
+    protected void assertQueryUpdateStatus(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
         if (option != null && option.isNonQueryUpdateAllowed()) {
             return;
         }
         if (!cb.hasWhereClause()) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("The query-update without a query condition is not allowed.");
-            br.addItem("Advice");
-            br.addElement("Confirm your condition values for queryUpdate().");
-            br.addElement("If you want to update all records, use varyingQueryUpdate().");
-            br.addItem("Table");
-            br.addElement(getTableDbName());
-            final String msg = br.buildExceptionMessage();
-            throw new IllegalConditionBeanOperationException(msg);
+            createBhvExThrower().throwNonQueryUpdateNotAllowedException(entity, cb, option);
         }
     }
 
@@ -633,6 +626,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      */
     protected boolean processBeforeQueryDelete(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
         assertCBNotNull(cb);
+        assertQueryDeleteStatus(cb, option);
         return true;
     }
 
@@ -695,15 +689,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             return;
         }
         if (!cb.hasWhereClause()) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("The query-delete without a query condition is not allowed.");
-            br.addItem("Advice");
-            br.addElement("Confirm your condition values for queryDelete().");
-            br.addElement("If you want to update all records, use varyingQueryDelete().");
-            br.addItem("Table");
-            br.addElement(getTableDbName());
-            final String msg = br.buildExceptionMessage();
-            throw new IllegalConditionBeanOperationException(msg);
+            createBhvExThrower().throwNonQueryDeleteNotAllowedException(cb, option);
         }
     }
 

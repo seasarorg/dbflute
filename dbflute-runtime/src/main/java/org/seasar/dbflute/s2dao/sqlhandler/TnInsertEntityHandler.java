@@ -48,6 +48,7 @@ public class TnInsertEntityHandler extends TnAbstractEntityHandler {
 
     @Override
     protected void processBefore(Object bean) {
+        super.processBefore(bean);
         doProcessIdentity(new IdentityProcessCallback() {
             public void callback(TnIdentifierGenerator generator) {
                 if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
@@ -59,6 +60,7 @@ public class TnInsertEntityHandler extends TnAbstractEntityHandler {
 
     @Override
     protected void processFinally(Object bean, RuntimeException sqlEx) {
+        super.processFinally(bean, sqlEx);
         try {
             doProcessIdentity(new IdentityProcessCallback() {
                 public void callback(TnIdentifierGenerator generator) {
@@ -79,8 +81,12 @@ public class TnInsertEntityHandler extends TnAbstractEntityHandler {
 
     @Override
     protected void processSuccess(final Object bean, int ret) {
+        super.processSuccess(bean, ret);
         doProcessIdentity(new IdentityProcessCallback() {
             public void callback(TnIdentifierGenerator generator) {
+                if (generator.isPrimaryKey() && isPrimaryKeyIdentityDisabled()) {
+                    return;
+                }
                 generator.setIdentifier(bean, getDataSource());
             }
         });
