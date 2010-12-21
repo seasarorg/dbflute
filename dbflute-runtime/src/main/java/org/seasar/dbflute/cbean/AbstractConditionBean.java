@@ -824,20 +824,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public boolean hasWhereClause() {
-        if (getSqlClause().hasWhereClause()) {
-            if (_unionCBeanList != null) {
-                for (ConditionBean unionCB : _unionCBeanList) {
-                    if (unionCB.hasWhereClause()) {
-                        return false;
-                    }
-                }
-                return true; // means all unions have clauses
-            } else {
-                return true;
-            }
-        } else {
+        if (!getSqlClause().hasWhereClause()) {
             return false;
         }
+        // mainCB has clauses here
+        if (_unionCBeanList == null || _unionCBeanList.isEmpty()) {
+            return true; // no union
+        }
+        // mainCB has unions
+        for (ConditionBean unionCB : _unionCBeanList) {
+            if (!unionCB.hasWhereClause()) {
+                return false;
+            }
+        }
+        return true; // means all unions have clauses
     }
 
     /**
