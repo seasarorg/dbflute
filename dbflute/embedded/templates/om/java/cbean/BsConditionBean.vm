@@ -220,7 +220,7 @@ public class ${myClassName} extends AbstractConditionBean {
      */
     public void union(UnionQuery<${myConditionBeanClassName}> unionQuery) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.query(cb);
+        cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.query(cb); xsaveUCB(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionQuery(cq);
     }
 
@@ -239,7 +239,7 @@ public class ${myClassName} extends AbstractConditionBean {
      */
     public void unionAll(UnionQuery<${myConditionBeanClassName}> unionQuery) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.query(cb);
+        cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.query(cb); xsaveUCB(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
 #if ($database.isAvailableDatabaseDependency())
