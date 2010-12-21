@@ -1339,8 +1339,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     /**
-     * update the several entities by query with varying requests non-strictly modified-only. {NonExclusiveControl} <br />
-     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * Update the several entities by query with varying requests non-strictly modified-only. {NonExclusiveControl} <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
+     * , disableCommonColumnAutoSetup(), allowNonQueryUpdate(). <br />
      * Other specifications are same as queryUpdate(entity, cb). 
      * <pre>
      * <span style="color: #3F7E5E">// ex) you can update by self calculation values</span>
@@ -1369,6 +1370,19 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
         return doQueryUpdate(${myEntityVariableName}, cb, option);
+    }
+
+    /**
+     * Delete the several entities by query with varying requests non-strictly. <br />
+     * For example, allowNonQueryDelete(). <br />
+     * Other specifications are same as batchUpdateNonstrict(entityList).
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param option The option of delete for varying requests. (NotNull)
+     * @return The deleted count.
+     */
+    public int varyingQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> option) {
+        assertDeleteOptionNotNull(option);
+        return doQueryDelete(cb, option);
     }
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
