@@ -16,7 +16,9 @@
 package org.seasar.dbflute.cbean;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -77,6 +79,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** The map for free parameters. {Internal} (Nullable) */
     private Map<String, Object> _freeParameterMap;
+
+    /** The list of condition-bean for union. {Internal} (Nullable) */
+    private List<ConditionBean> _unionCBeanList;
 
     /** The synchronizer of union query. {Internal} (Nullable) */
     private UnionQuery<ConditionBean> _unionQuerySynchronizer;
@@ -819,7 +824,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public boolean hasWhereClause() {
-        return getSqlClause().hasWhereClause();
+        if (getSqlClause().hasWhereClause()) {
+            if (_unionCBeanList != null) {
+                for (ConditionBean unionCB : _unionCBeanList) {
+                    if (unionCB.hasWhereClause()) {
+                        return false;
+                    }
+                }
+                return true; // means all unions have clauses
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -899,10 +917,17 @@ public abstract class AbstractConditionBean implements ConditionBean {
         _freeParameterMap.put(key, value);
     }
 
-    // [DBFlute-0.9.5.2]
     // ===================================================================================
-    //                                                                  Query Synchronizer
-    //                                                                  ==================
+    //                                                                         Union Query
+    //                                                                         ===========
+    protected void xsaveUCB(ConditionBean unionCB) {
+        if (_unionCBeanList == null) {
+            _unionCBeanList = new ArrayList<ConditionBean>();
+        }
+        // save for various checks, for example, hasWhereClause()
+        _unionCBeanList.add(unionCB);
+    }
+
     /**
      * Synchronize union-query. {Internal}
      * @param unionCB The condition-bean for union. (NotNull)

@@ -168,14 +168,16 @@ public interface ConditionBean extends PagingBean {
     //                                                          ==========================
     /**
      * Does it have where clauses? <br />
-     * In-line where clause is NOT contained.
+     * If this condition-bean has union queries,
+     * all unions must have each where clauses for true. <br />
+     * However, where clauses in in-line views is NOT contained.
      * @return Determination.
      */
     boolean hasWhereClause();
 
     /**
      * Does it have order-by clauses? <br />
-     * Whether effective or not has no influence.
+     * Whether that order-by is effective or not has no influence.
      * @return Determination.
      */
     boolean hasOrderByClause();
