@@ -15,7 +15,7 @@
 #end
 
     <!-- The components of DBFlute Runtime. -->
-    <component class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
+    <component name="introduction" class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
 #if ($database.hasExtendedImplementedInvokerAssistantClass())
     <component name="invokerAssistant" class="${database.extendedImplementedInvokerAssistantClass}"/>
 #else

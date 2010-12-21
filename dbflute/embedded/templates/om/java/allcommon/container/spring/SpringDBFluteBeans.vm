@@ -5,7 +5,7 @@
 >
 <beans>
     <!-- The components of DBFlute Runtime. -->
-    <bean class="${glPackageBaseCommon}.${glDBFluteInitializer}">
+    <bean id="${database.DBFluteInitializerComponentName}" class="${glPackageBaseCommon}.${glDBFluteInitializer}">
         <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
     </bean>
 #if ($database.hasExtendedImplementedInvokerAssistantClass())

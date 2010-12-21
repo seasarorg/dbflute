@@ -1835,10 +1835,9 @@ public class Database {
     // because S2Container has name-space in the DI architecture.
     // = = = = = = = = = =/
 
-    // Comment out because the dbfluteInitializer does not need ID or Name basically.
-    //public String getDBFluteInitializerComponentName() {
-    //    return filterComponentNameWithProjectPrefix("dbfluteInitializer");
-    //}
+    public String getDBFluteInitializerComponentName() {
+        return filterComponentNameWithProjectPrefix("introduction");
+    }
 
     public String getInvokerAssistantComponentName() {
         return filterComponentNameWithProjectPrefix("invokerAssistant");

@@ -23,37 +23,47 @@ public class ${glDBFluteInitializer} {
     private static final Log _log = LogFactory.getLog(${glDBFluteInitializer}.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#if ($database.isTargetContainerSpring())
+    protected final String _dataSourceFqcn;
+#end
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-#if ($database.isTargetContainerSeasar())
     /**
-     * Constructor. And initialize various components.
-     */
-    public ${glDBFluteInitializer}() {
-        _log.info("...Initializing DBFlute components");
-        handleSqlLogRegistry();
-        loadCoolClasses();
-        lockConfig();
-    }
-#elseif ($database.isTargetContainerSpring())
-    /**
-     * Constructor. And initialize various components.
+     * Constructor, which initializes various components.
+#if ($database.isTargetContainerSpring())
      * @param dataSource The instance of data source. (NotNull)
      */
     public ${glDBFluteInitializer}(DataSource dataSource) {
-        _log.info("...Initializing DBFlute components");
-        setupDataSourceHandler(dataSource);
-        lockConfig();
-    }
+        if (dataSource == null) {
+            String msg = "The argument 'dataSource' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        _dataSourceFqcn = dataSource.getClass().getName();
 #else
-    /**
-     * Constructor. And initialize various components.
      */
     public ${glDBFluteInitializer}() {
-        _log.info("...Initializing DBFlute components");
-        lockConfig();
-    }
 #end
+        announce();
+        prologue();
+        standBy();
+    }
+
+    protected void prologue() {
+#if ($database.isTargetContainerSeasar())
+        handleSqlLogRegistry();
+        loadCoolClasses();
+#elseif ($database.isTargetContainerSpring())
+        setupDataSourceHandler();
+#end
+    }
+
+    protected void announce() {
+        _log.info("...Initializing DBFlute components");
+    }
 
     protected void handleSqlLogRegistry() { // for S2Container
         if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
@@ -89,26 +99,20 @@ public class ${glDBFluteInitializer} {
      * If you use a transaction library which has a data source which supports transaction,
      * It doesn't need these arrangement. (For example, the framework 'Atomikos') <br />
      * This method should be executed when application is initialized.
-     * @param dataSource The instance of data source. (NotNull)
      */
-    protected void setupDataSourceHandler(DataSource dataSource) { // for Spring
-        if (dataSource == null) {
-            String msg = "The argument 'dataSource' should not be null!";
-            throw new IllegalArgumentException(msg);
-        }
+    protected void setupDataSourceHandler() { // for Spring
         final ${glDBFluteConfig} config = ${glDBFluteConfig}.getInstance();
         final DataSourceHandler dataSourceHandler = config.getDataSourceHandler();
         if (dataSourceHandler != null) {
             return;
         }
-        final String dataSourceFqcn = dataSource.getClass().getName();
-        if (dataSourceFqcn.startsWith("org.apache.commons.dbcp.")) {
+        if (_dataSourceFqcn.startsWith("org.apache.commons.dbcp.")) {
             config.unlock();
             config.setDataSourceHandler(new ${glDBFluteConfig}.SpringDBCPDataSourceHandler());
         }
     }
 
-    protected void lockConfig() {
+    protected void standBy() {
         if (!${glDBFluteConfig}.getInstance().isLocked()) {
             ${glDBFluteConfig}.getInstance().lock();
         }

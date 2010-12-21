@@ -48,7 +48,10 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // non-thread-safe because handler is created per execution
     protected StringBuilder _batchLoggingSb;
+    protected int _loggingCurrentSize;
+    protected boolean _alreadySavedToResultInfo;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -122,32 +125,51 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         addBatch(ps);
     }
 
-    protected void handleBatchLogging() {
-        if (_batchLoggingSb == null || _batchLoggingSb.length() == 0) {
-            return;
-        }
-        final String batchSql = _batchLoggingSb.toString();
-        if (isLogEnabled()) {
-            log(batchSql); // batch logging
-        }
-        if (hasSqlResultHandler()) {
-            final String savedDisplaySql = batchSql.trim(); // remove first line separator
-            super.saveDisplaySqlForResultInfo(savedDisplaySql);
-        }
-        _batchLoggingSb = null; // because it may be large strings
-    }
-
     @Override
     protected void logDisplaySql(String displaySql) {
         if (_batchLoggingSb == null) {
-            _batchLoggingSb = new StringBuilder(400);
+            _batchLoggingSb = new StringBuilder(1000);
         }
-        _batchLoggingSb.append(ln()).append(displaySql).append(";"); // for batch logging
+        saveBatchLoggingSql(displaySql);
+        if (needsBatchLoggingHandling()) {
+            handleBatchLogging(); // and also cleared
+        }
+    }
+
+    protected void saveBatchLoggingSql(String displaySql) {
+        ++_loggingCurrentSize;
+        _batchLoggingSb.append(ln()).append(displaySql).append(";");
+    }
+
+    protected boolean needsBatchLoggingHandling() {
+        return _loggingCurrentSize >= 100; // per 100 statements
     }
 
     @Override
     protected void saveDisplaySqlForResultInfo(String displaySql) {
         // do nothing but it saves batch SQL in batch logging process
+    }
+
+    protected String handleBatchLogging() {
+        if (_batchLoggingSb == null) {
+            return null;
+        }
+        final String batchSql = _batchLoggingSb.toString();
+        if (isLogEnabled()) {
+            log(batchSql); // batch logging (always starts with a line separator)
+        }
+        clearBatchLogging();
+        if (!_alreadySavedToResultInfo && hasSqlResultHandler()) {
+            final String savedDisplaySql = batchSql.trim(); // remove first line separator
+            super.saveDisplaySqlForResultInfo(savedDisplaySql); // only first scope is saved)
+            _alreadySavedToResultInfo = true;
+        }
+        return batchSql;
+    }
+
+    protected void clearBatchLogging() {
+        _batchLoggingSb = null;
+        _loggingCurrentSize = 0;
     }
 
     // ===================================================================================

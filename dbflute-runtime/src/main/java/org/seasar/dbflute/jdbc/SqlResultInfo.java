@@ -58,6 +58,12 @@ public class SqlResultInfo {
         this._commandName = commandName;
     }
 
+    /**
+     * Get the SQL for display. <br />
+     * If the statement is batch-update, this value
+     * contains only a part of batch statements.
+     * @return The string of SQL. (NotNull)
+     */
     public String getDisplaySql() {
         return _displaySql;
     }

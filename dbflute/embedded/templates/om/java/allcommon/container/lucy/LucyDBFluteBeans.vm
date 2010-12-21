@@ -2,7 +2,7 @@
 <!DOCTYPE lucy-config PUBLIC "-//LUCY//DTD LUCY//EN" "http://www.lucy.org/dtd/lucy-config.dtd">
 <lucy-config>
     <!-- The components of DBFlute Runtime. -->
-    <component class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
+    <component name="${database.DBFluteInitializerComponentName}" class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
 #if ($database.hasExtendedImplementedInvokerAssistantClass())
     <component name="${database.invokerAssistantComponentName}" class="${database.extendedImplementedInvokerAssistantClass}">
 #else
