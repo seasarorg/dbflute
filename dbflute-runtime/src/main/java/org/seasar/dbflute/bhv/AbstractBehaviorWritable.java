@@ -38,6 +38,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 
@@ -582,6 +583,28 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         }
     }
 
+    /**
+     * Assert that the query-update is legal status.
+     * @param cb The condition-bean for query-update. (NotNull)
+     * @param option The option of update. (Nullable)
+     */
+    protected void assertQueryUpdateStatus(ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
+        if (option != null && option.isNonQueryUpdateAllowed()) {
+            return;
+        }
+        if (!cb.hasWhereClause()) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The query-update without a query condition is not allowed.");
+            br.addItem("Advice");
+            br.addElement("Confirm your condition values for queryUpdate().");
+            br.addElement("If you want to update all records, use varyingQueryUpdate().");
+            br.addItem("Table");
+            br.addElement(getTableDbName());
+            final String msg = br.buildExceptionMessage();
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
     // -----------------------------------------------------
     //                                                Delete
     //                                                ------
@@ -660,6 +683,28 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @param option The option of delete. (NotNull)
      */
     protected void assertDeleteOptionStatus(DeleteOption<? extends ConditionBean> option) {
+    }
+
+    /**
+     * Assert that the query-delete is legal status.
+     * @param cb The condition-bean for query-delete. (NotNull)
+     * @param option The option of delete. (Nullable)
+     */
+    protected void assertQueryDeleteStatus(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
+        if (option != null && option.isNonQueryDeleteAllowed()) {
+            return;
+        }
+        if (!cb.hasWhereClause()) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The query-delete without a query condition is not allowed.");
+            br.addItem("Advice");
+            br.addElement("Confirm your condition values for queryDelete().");
+            br.addElement("If you want to update all records, use varyingQueryDelete().");
+            br.addItem("Table");
+            br.addElement(getTableDbName());
+            final String msg = br.buildExceptionMessage();
+            throw new IllegalConditionBeanOperationException(msg);
+        }
     }
 
     // -----------------------------------------------------

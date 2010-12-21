@@ -82,7 +82,7 @@ public interface InvokerAssistant {
      * @return The instance of factory. (NotNull)
      */
     OutsideSqlExecutorFactory assistOutsideSqlExecutorFactory();
-    
+
     /**
      * @return The digger of SQLException. (NotNull)
      */

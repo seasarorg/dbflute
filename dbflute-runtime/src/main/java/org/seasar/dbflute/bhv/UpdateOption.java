@@ -58,6 +58,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
 
     protected boolean _disableCommonColumnAutoSetup;
+    protected boolean _allowNonQueryUpdate;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -384,7 +385,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
      * memberBhv.varyingUpdate(member, option);
      * </pre>
-     * @return The option of insert. (NotNull: returns this)
+     * @return The option of update. (NotNull: returns this)
      */
     public UpdateOption<CB> disableCommonColumnAutoSetup() {
         _disableCommonColumnAutoSetup = true;
@@ -393,6 +394,23 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
 
     public boolean isCommonColumnAutoSetupDisabled() {
         return _disableCommonColumnAutoSetup;
+    }
+
+    // ===================================================================================
+    //                                                                    Non Query Update
+    //                                                                    ================
+    /**
+     * Allow you to non-query-update (means query-update without a query condition). <br />
+     * Normally it is not allowed, so you can do it by this option if you want.
+     * @return The option of update. (NotNull: returns this)
+     */
+    public UpdateOption<CB> allowNonQueryUpdate() {
+        _allowNonQueryUpdate = true;
+        return this;
+    }
+
+    public boolean isNonQueryUpdateAllowed() {
+        return _allowNonQueryUpdate;
     }
 
     // ===================================================================================

@@ -29,7 +29,7 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    // nothing now, this is for the future
+    protected boolean _allowNonQueryDelete;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -38,6 +38,23 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
      * Constructor.
      */
     public DeleteOption() {
+    }
+
+    // ===================================================================================
+    //                                                                    Non Query Delete
+    //                                                                    ================
+    /**
+     * Allow you to non-query-delete (means query-delete without a query condition). <br />
+     * Normally it is not allowed, so you can do it by this option if you want.
+     * @return The option of delete. (NotNull: returns this)
+     */
+    public DeleteOption<CB> allowNonQueryDelete() {
+        _allowNonQueryDelete = true;
+        return this;
+    }
+
+    public boolean isNonQueryDeleteAllowed() {
+        return _allowNonQueryDelete;
     }
 
     // ===================================================================================
