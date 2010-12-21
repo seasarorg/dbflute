@@ -924,7 +924,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         if (_unionCBeanList == null) {
             _unionCBeanList = new ArrayList<ConditionBean>();
         }
-        // save for various checks, for example, hasWhereClause()
+        // save for, for example, hasWhereClause()
         _unionCBeanList.add(unionCB);
     }
 
