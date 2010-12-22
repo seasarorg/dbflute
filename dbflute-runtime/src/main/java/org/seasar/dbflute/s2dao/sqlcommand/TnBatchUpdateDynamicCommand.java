@@ -60,7 +60,8 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateDynamicCommand {
             throw new IllegalArgumentException(msg);
         }
         final TnBatchUpdateHandler handler = createBatchUpdateHandler(propertyTypes, sql, option);
-        handler.setExceptionMessageSqlArgs(new Object[] { beanList });
+        // because the variable is set when exception occurs if batch
+        //handler.setExceptionMessageSqlArgs(new Object[] { beanList });
         return handler.executeBatch(beanList);
     }
 

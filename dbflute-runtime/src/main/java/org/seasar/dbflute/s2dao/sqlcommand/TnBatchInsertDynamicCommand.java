@@ -51,7 +51,8 @@ public class TnBatchInsertDynamicCommand extends TnInsertDynamicCommand {
             throw new IllegalArgumentException(msg);
         }
         final TnBatchInsertHandler handler = createBatchInsertHandler(propertyTypes, sql, option);
-        handler.setExceptionMessageSqlArgs(new Object[] { beanList });
+        // because the variable is set when exception occurs if batch 
+        //handler.setExceptionMessageSqlArgs(new Object[] { ... });
         return handler.executeBatch(beanList);
     }
 

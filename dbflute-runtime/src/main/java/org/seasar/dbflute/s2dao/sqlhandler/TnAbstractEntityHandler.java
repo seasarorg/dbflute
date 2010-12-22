@@ -53,13 +53,14 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
     //                                                                           =========
     protected final TnBeanMetaData _beanMetaData;
     protected final TnPropertyType[] _boundPropTypes; // not only completely bounds (needs to filter)
-    protected Object[] _bindVariables;
-    protected ValueType[] _bindVariableValueTypes;
     protected boolean _optimisticLockHandling;
     protected boolean _versionNoAutoIncrementOnMemory; // to adjust binding
     protected InsertOption<? extends ConditionBean> _insertOption;
     protected UpdateOption<? extends ConditionBean> _updateOption;
     protected DeleteOption<? extends ConditionBean> _deleteOption;
+
+    protected Object[] _bindVariables;
+    protected ValueType[] _bindVariableValueTypes;
     protected List<Timestamp> _newTimestampList;
     protected List<Long> _newVersionNoList;
 
@@ -162,8 +163,8 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
             }
             varValueTypeList.add(pt.getValueType());
         }
-        setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        _bindVariables = varList.toArray();
+        _bindVariableValueTypes = (ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]);
     }
 
     protected void setupUpdateBindVariables(Object bean) {
@@ -195,16 +196,16 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
             varValueTypeList.add(pt.getValueType());
         }
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
-        setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        _bindVariables = varList.toArray();
+        _bindVariableValueTypes = (ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]);
     }
 
     protected void setupDeleteBindVariables(Object bean) {
         final List<Object> varList = new ArrayList<Object>();
         final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
-        setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        _bindVariables = varList.toArray();
+        _bindVariableValueTypes = (ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]);
     }
 
     protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {
@@ -346,22 +347,6 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
     //                                                                            ========
     public TnBeanMetaData getBeanMetaData() {
         return _beanMetaData;
-    }
-
-    protected Object[] getBindVariables() {
-        return _bindVariables;
-    }
-
-    protected void setBindVariables(Object[] bindVariables) {
-        this._bindVariables = bindVariables;
-    }
-
-    protected ValueType[] getBindVariableValueTypes() {
-        return _bindVariableValueTypes;
-    }
-
-    protected void setBindVariableValueTypes(ValueType[] bindVariableValueTypes) {
-        this._bindVariableValueTypes = bindVariableValueTypes;
     }
 
     public void setOptimisticLockHandling(boolean optimisticLockHandling) {

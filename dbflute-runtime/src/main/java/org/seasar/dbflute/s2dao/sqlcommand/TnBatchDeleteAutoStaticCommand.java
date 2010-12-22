@@ -55,7 +55,8 @@ public class TnBatchDeleteAutoStaticCommand extends TnDeleteAutoStaticCommand {
             String msg = "The argument 'args[0]' should be list: " + args[0];
             throw new IllegalArgumentException(msg);
         }
-        handler.setExceptionMessageSqlArgs(new Object[] { beanList });
+        // because the variable is set when exception occurs if batch 
+        //handler.setExceptionMessageSqlArgs(new Object[] { ... });
         return ((TnBatchDeleteHandler) handler).executeBatch(beanList);
     };
 

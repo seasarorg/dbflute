@@ -261,7 +261,10 @@ public class TnBasicHandler {
         if (_sql != null && _exceptionMessageSqlArgs != null) {
             try {
                 displaySql = buildDisplaySql(_exceptionMessageSqlArgs);
-            } catch (RuntimeException ignored) {
+            } catch (RuntimeException continued) { // because of when exception occurs
+                if (_log.isDebugEnabled()) {
+                    _log.debug("*Failed to build SQL for an exception message: " + continued.getMessage());
+                }
             }
         }
         return displaySql;
