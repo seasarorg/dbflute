@@ -147,8 +147,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                ------
     protected <ENTITY extends Entity> void helpUpdateInternally(ENTITY entity, InternalUpdateCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
-        assertEntityHasVersionNoValue(entity);
-        assertEntityHasUpdateDateValue(entity);
+        assertEntityHasOptimisticLockValue(entity);
         final int updatedCount = callback.callbackDelegateUpdate(entity);
         if (updatedCount == 0) {
             throwUpdateEntityAlreadyDeletedException(entity);
@@ -250,8 +249,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                ------
     protected <ENTITY extends Entity> void helpDeleteInternally(ENTITY entity, InternalDeleteCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
-        assertEntityHasVersionNoValue(entity);
-        assertEntityHasUpdateDateValue(entity);
+        assertEntityHasOptimisticLockValue(entity);
         final int deletedCount = callback.callbackDelegateDelete(entity);
         if (deletedCount == 0) {
             throwUpdateEntityAlreadyDeletedException(entity);
@@ -701,7 +699,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Inserted count.
      */
     protected int[] callCreateList(List<Entity> entityList) {
-        helpFilterBeforeInsertInternally(entityList, null);
         return doCreateList(entityList);
     }
 
@@ -712,7 +709,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Updated count.
      */
     protected int[] callModifyList(List<Entity> entityList) {
-        helpFilterBeforeUpdateInternally(entityList, null);
         return doModifyList(entityList);
     }
 
@@ -723,11 +719,15 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Deleted count.
      */
     protected int[] callRemoveList(List<Entity> entityList) {
-        helpFilterBeforeDeleteInternally(entityList, null);
         return doRemoveList(entityList);
     }
 
     protected abstract int[] doRemoveList(List<Entity> entityList);
+
+    protected void assertEntityHasOptimisticLockValue(Entity entity) {
+        assertEntityHasVersionNoValue(entity);
+        assertEntityHasUpdateDateValue(entity);
+    }
 
     protected void assertEntityHasVersionNoValue(Entity entity) {
         if (!getDBMeta().hasVersionNo()) {
@@ -760,7 +760,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // ===================================================================================
     //                                                     Delegate Method Internal Helper
     //                                                     ===============================
-    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList,
+    protected <ENTITY extends Entity> List<ENTITY> processBatchInternally(List<ENTITY> entityList,
             InsertOption<? extends ConditionBean> option) {
         assertObjectNotNull("entityList", entityList);
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
@@ -773,26 +773,32 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return filteredList;
     }
 
-    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList,
-            UpdateOption<? extends ConditionBean> option) {
+    protected <ENTITY extends Entity> List<ENTITY> processBatchInternally(List<ENTITY> entityList,
+            UpdateOption<? extends ConditionBean> option, boolean nonstrict) {
         assertObjectNotNull("entityList", entityList);
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (ENTITY entity : entityList) {
             if (!processBeforeUpdate(entity, option)) {
                 continue;
             }
+            if (!nonstrict) {
+                assertEntityHasOptimisticLockValue(entity);
+            }
             filteredList.add(entity);
         }
         return filteredList;
     }
 
-    protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList,
-            DeleteOption<? extends ConditionBean> option) {
+    protected <ENTITY extends Entity> List<ENTITY> processBatchInternally(List<ENTITY> entityList,
+            DeleteOption<? extends ConditionBean> option, boolean nonstrict) {
         assertObjectNotNull("entityList", entityList);
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
         for (ENTITY entity : entityList) {
             if (!processBeforeDelete(entity, option)) {
                 continue;
+            }
+            if (!nonstrict) {
+                assertEntityHasOptimisticLockValue(entity);
             }
             filteredList.add(entity);
         }
