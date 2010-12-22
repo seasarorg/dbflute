@@ -17,8 +17,11 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBatchInsertHandler;
 
@@ -26,7 +29,14 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBatchInsertHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBatchInsertAutoDynamicCommand extends TnInsertAutoDynamicCommand {
+public class TnBatchInsertDynamicCommand extends TnInsertDynamicCommand {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public TnBatchInsertDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+        super(dataSource, statementFactory);
+    }
 
     // ===================================================================================
     //                                                                             Execute
@@ -59,8 +69,8 @@ public class TnBatchInsertAutoDynamicCommand extends TnInsertAutoDynamicCommand 
     //                                                                             =======
     protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql,
             InsertOption<ConditionBean> option) {
-        final TnBatchInsertHandler handler = new TnBatchInsertHandler(getDataSource(), getStatementFactory(),
-                _beanMetaData, boundPropTypes);
+        final TnBatchInsertHandler handler = new TnBatchInsertHandler(_dataSource, _statementFactory, _beanMetaData,
+                boundPropTypes);
         handler.setSql(sql);
         handler.setInsertOption(option);
         return handler;

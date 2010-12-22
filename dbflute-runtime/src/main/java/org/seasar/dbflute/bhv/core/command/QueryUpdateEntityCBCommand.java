@@ -20,7 +20,7 @@ import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.dbflute.s2dao.sqlcommand.TnQueryUpdateAutoDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnQueryUpdateDynamicCommand;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -85,8 +85,7 @@ public class QueryUpdateEntityCBCommand extends AbstractUpdateEntityCommand {
     }
 
     protected SqlExecution createQueryUpdateEntityCBExecution(Class<? extends ConditionBean> cbType) {
-        final TnQueryUpdateAutoDynamicCommand sqlCommand = new TnQueryUpdateAutoDynamicCommand(_dataSource,
-                _statementFactory);
+        final TnQueryUpdateDynamicCommand sqlCommand = new TnQueryUpdateDynamicCommand(_dataSource, _statementFactory);
         sqlCommand.setBeanMetaData(createBeanMetaData());
         return sqlCommand;
     }

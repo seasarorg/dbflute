@@ -17,48 +17,39 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
-import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
-import org.seasar.dbflute.twowaysql.node.Node;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnQueryDeleteAutoDynamicCommand implements TnSqlCommand, SqlExecution {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected DataSource dataSource;
-    protected StatementFactory statementFactory;
+public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnQueryDeleteAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
-        this.dataSource = dataSource;
-        this.statementFactory = statementFactory;
+    public TnQueryDeleteDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+        super(dataSource, statementFactory);
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
-        ConditionBean cb = extractConditionBeanWithCheck(args);
-        String[] argNames = new String[] { "pmb" };
-        Class<?>[] argTypes = new Class<?>[] { cb.getClass() };
-        String twoWaySql = buildQueryDeleteTwoWaySql(cb);
-        CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
-        TnCommandContextHandler handler = createCommandContextHandler(context);
+        final CommandContext context;
+        {
+            final ConditionBean cb = extractConditionBeanWithCheck(args);
+            final String[] argNames = new String[] { "pmb" };
+            final Class<?>[] argTypes = new Class<?>[] { cb.getClass() };
+            final String twoWaySql = buildQueryDeleteTwoWaySql(cb);
+            context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        }
+        final TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setExceptionMessageSqlArgs(context.getBindVariables());
-        int rows = handler.execute(args);
+        final int rows = handler.execute(args);
         return Integer.valueOf(rows);
     }
 
@@ -77,28 +68,7 @@ public class TnQueryDeleteAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         return (ConditionBean) fisrtArg;
     }
 
-    protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
-        return new TnCommandContextHandler(dataSource, statementFactory, context);
-    }
-
     protected String buildQueryDeleteTwoWaySql(ConditionBean cb) {
         return cb.getSqlClause().getClauseQueryDelete();
-    }
-
-    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
-            Object[] args) {
-        CommandContext context;
-        {
-            SqlAnalyzer analyzer = createSqlAnalyzer(twoWaySql);
-            Node node = analyzer.analyze();
-            CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
-            context = creator.createCommandContext(args);
-            node.accept(context);
-        }
-        return context;
-    }
-
-    protected SqlAnalyzer createSqlAnalyzer(String sql) {
-        return ResourceContext.createSqlAnalyzer(sql, true);
     }
 }

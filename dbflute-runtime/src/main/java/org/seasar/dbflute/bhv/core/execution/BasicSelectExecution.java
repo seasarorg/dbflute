@@ -19,20 +19,20 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractNodeStaticCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
 /**
  * @author jflute
  */
-public class BasicSelectExecution extends TnAbstractDynamicCommand {
+public class BasicSelectExecution extends TnAbstractNodeStaticCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The handler of resultSet. */
-    protected TnResultSetHandler resultSetHandler;
+    protected TnResultSetHandler _resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -46,7 +46,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
     public BasicSelectExecution(DataSource dataSource, StatementFactory statementFactory,
             TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
-        this.resultSetHandler = resultSetHandler;
+        this._resultSetHandler = resultSetHandler;
     }
 
     // ===================================================================================
@@ -58,7 +58,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
      */
     public Object execute(Object[] args) {
         final CommandContext ctx = apply(args);
-        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
+        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this._resultSetHandler);
         final Object[] bindVariableArray = ctx.getBindVariables();
         selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
@@ -68,7 +68,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
     //                                                                      Select Handler
     //                                                                      ==============
     protected TnBasicSelectHandler createBasicSelectHandler(String realSql, TnResultSetHandler rsh) {
-        return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
+        return new TnBasicSelectHandler(_dataSource, realSql, rsh, _statementFactory);
     }
 
     // ===================================================================================

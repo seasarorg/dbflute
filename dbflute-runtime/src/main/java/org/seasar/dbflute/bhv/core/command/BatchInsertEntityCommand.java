@@ -20,8 +20,8 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnBatchInsertAutoDynamicCommand;
-import org.seasar.dbflute.s2dao.sqlcommand.TnInsertAutoDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnBatchInsertDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnInsertDynamicCommand;
 
 /**
  * @author jflute
@@ -59,10 +59,8 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
         return createBatchInsertAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnInsertAutoDynamicCommand createBatchInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnBatchInsertAutoDynamicCommand cmd = new TnBatchInsertAutoDynamicCommand();
-        cmd.setDataSource(_dataSource);
-        cmd.setStatementFactory(_statementFactory);
+    protected TnInsertDynamicCommand createBatchInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnBatchInsertDynamicCommand cmd = new TnBatchInsertDynamicCommand(_dataSource, _statementFactory);
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);

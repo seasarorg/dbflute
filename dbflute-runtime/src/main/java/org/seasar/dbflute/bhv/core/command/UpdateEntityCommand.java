@@ -18,7 +18,7 @@ package org.seasar.dbflute.bhv.core.command;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateAutoDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateDynamicCommand;
 
 /**
  * @author jflute
@@ -50,8 +50,8 @@ public class UpdateEntityCommand extends AbstractUpdateEntityCommand {
         return createUpdateAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnUpdateAutoDynamicCommand createUpdateAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnUpdateAutoDynamicCommand cmd = new TnUpdateAutoDynamicCommand(_dataSource, _statementFactory);
+    protected TnUpdateDynamicCommand createUpdateAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnUpdateDynamicCommand cmd = new TnUpdateDynamicCommand(_dataSource, _statementFactory);
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);

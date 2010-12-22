@@ -24,7 +24,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnInsertAutoDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnInsertDynamicCommand;
 
 /**
  * @author jflute
@@ -66,10 +66,8 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         return createInsertAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnInsertAutoDynamicCommand createInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnInsertAutoDynamicCommand cmd = new TnInsertAutoDynamicCommand();
-        cmd.setDataSource(_dataSource);
-        cmd.setStatementFactory(_statementFactory);
+    protected TnInsertDynamicCommand createInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnInsertDynamicCommand cmd = new TnInsertDynamicCommand(_dataSource, _statementFactory);
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);

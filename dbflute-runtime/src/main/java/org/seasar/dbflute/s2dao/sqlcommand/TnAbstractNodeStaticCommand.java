@@ -28,19 +28,19 @@ import org.seasar.dbflute.twowaysql.node.Node;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
+public abstract class TnAbstractNodeStaticCommand extends TnAbstractBasicSqlCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected Node _rootNode;
-    protected String[] _argNames = new String[0];
-    protected Class<?>[] _argTypes = new Class[0];
+    protected String[] _argNames = new String[0]; // as default
+    protected Class<?>[] _argTypes = new Class[0]; // as default
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnAbstractNodeStaticCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 
@@ -59,6 +59,9 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
         return false;
     }
 
+    // ===================================================================================
+    //                                                                   Argument Handling
+    //                                                                   =================
     public CommandContext apply(Object[] args) { // It is necessary to be public!
         final CommandContext ctx = createCommandContext(args);
         _rootNode.accept(ctx);

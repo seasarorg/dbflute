@@ -21,7 +21,7 @@ import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.dbflute.s2dao.sqlcommand.TnQueryDeleteAutoDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnQueryDeleteDynamicCommand;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -106,7 +106,7 @@ public class QueryDeleteCBCommand extends AbstractBehaviorCommand<Integer> {
     }
 
     protected SqlExecution createQueryDeleteCBExecution(Class<? extends ConditionBean> cbType) {
-        return new TnQueryDeleteAutoDynamicCommand(_dataSource, _statementFactory);
+        return new TnQueryDeleteDynamicCommand(_dataSource, _statementFactory);
     }
 
     public Object[] getSqlExecutionArgument() {

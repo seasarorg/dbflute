@@ -17,37 +17,50 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.core.SqlExecution;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution {
+public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DataSource _dataSource;
-    private StatementFactory _statementFactory;
+    protected TnBeanMetaData _beanMetaData;
+    protected DBMeta _targetDBMeta;
+    protected String[] _propertyNames;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractSqlCommand(DataSource dataSource, StatementFactory statementFactory) {
-        this._dataSource = dataSource;
-        this._statementFactory = statementFactory;
+    public TnAbstractEntityDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+        super(dataSource, statementFactory);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public DataSource getDataSource() {
-        return _dataSource;
+    public void setBeanMetaData(TnBeanMetaData beanMetaData) {
+        this._beanMetaData = beanMetaData;
     }
 
-    public StatementFactory getStatementFactory() {
-        return _statementFactory;
+    public void setTargetDBMeta(DBMeta targetDBMeta) {
+        this._targetDBMeta = targetDBMeta;
+    }
+
+    public void setPropertyNames(String[] propertyNames) {
+        this._propertyNames = propertyNames;
     }
 }

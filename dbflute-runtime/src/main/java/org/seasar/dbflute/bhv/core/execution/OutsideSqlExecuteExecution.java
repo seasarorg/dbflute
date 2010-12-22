@@ -47,7 +47,7 @@ public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
 
     protected TnBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
         final String realSql = filterSql(ctx.getSql());
-        return new TnBasicUpdateHandler(getDataSource(), getStatementFactory(), realSql);
+        return new TnBasicUpdateHandler(_dataSource, _statementFactory, realSql);
     }
 
     // ===================================================================================

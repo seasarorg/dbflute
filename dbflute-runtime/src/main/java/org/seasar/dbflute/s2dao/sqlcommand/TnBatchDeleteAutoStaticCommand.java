@@ -64,6 +64,6 @@ public class TnBatchDeleteAutoStaticCommand extends TnDeleteAutoStaticCommand {
     //                                                                            ========
     @Override
     protected TnAbstractEntityHandler newEntityHandler() {
-        return new TnBatchDeleteHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+        return new TnBatchDeleteHandler(_dataSource, _statementFactory, _beanMetaData, _propertyTypes);
     }
 }

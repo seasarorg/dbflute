@@ -24,7 +24,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractNodeStaticCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -33,13 +33,13 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class SelectCBExecution extends TnAbstractDynamicCommand {
+public class SelectCBExecution extends TnAbstractNodeStaticCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The handler of resultSet. */
-    protected TnResultSetHandler resultSetHandler;
+    protected TnResultSetHandler _resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -53,7 +53,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
     public SelectCBExecution(DataSource dataSource, StatementFactory statementFactory,
             TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
-        this.resultSetHandler = resultSetHandler;
+        this._resultSetHandler = resultSetHandler;
     }
 
     // ===================================================================================
@@ -68,7 +68,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
         final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>();
 
         final String finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
-        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
+        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this._resultSetHandler);
         final Object[] bindVariableArray = bindVariableList.toArray();
         selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
@@ -96,14 +96,14 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
     //                                                                 Dynamic SQL Factory
     //                                                                 ===================
     protected SelectCBExecution createDynamicSqlFactory() {
-        return new SelectCBExecution(getDataSource(), getStatementFactory(), resultSetHandler);
+        return new SelectCBExecution(_dataSource, _statementFactory, _resultSetHandler);
     }
 
     // ===================================================================================
     //                                                                      Select Handler
     //                                                                      ==============
     protected TnBasicSelectHandler createBasicSelectHandler(String realSql, TnResultSetHandler rsh) {
-        return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
+        return new TnBasicSelectHandler(_dataSource, realSql, rsh, _statementFactory);
     }
 
     // ===================================================================================

@@ -21,36 +21,25 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.InsertOption;
-import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnInsertEntityHandler;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
+public class TnInsertDynamicCommand extends TnAbstractEntityDynamicCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DataSource _dataSource;
-    protected StatementFactory _statementFactory;
-    protected TnBeanMetaData _beanMetaData;
-    protected DBMeta _targetDBMeta;
-    protected String[] _propertyNames;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public TnInsertAutoDynamicCommand() {
+    public TnInsertDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+        super(dataSource, statementFactory);
     }
 
     // ===================================================================================
@@ -64,8 +53,8 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         final Object bean = args[0];
         final InsertOption<ConditionBean> option = extractInsertOptionChecked(args);
 
-        final TnBeanMetaData bmd = getBeanMetaData();
-        final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames(), option);
+        final TnBeanMetaData bmd = _beanMetaData;
+        final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, _propertyNames, option);
         final String sql = createInsertSql(bmd, propertyTypes, option);
         return doExecute(bean, propertyTypes, sql, option);
     }
@@ -176,60 +165,10 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     //                                                                             =======
     protected TnInsertEntityHandler createInsertEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             InsertOption<ConditionBean> option) {
-        final TnInsertEntityHandler handler = new TnInsertEntityHandler(getDataSource(), getStatementFactory(),
-                _beanMetaData, boundPropTypes);
+        final TnInsertEntityHandler handler = new TnInsertEntityHandler(_dataSource, _statementFactory, _beanMetaData,
+                boundPropTypes);
         handler.setSql(sql);
         handler.setInsertOption(option);
         return handler;
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return DfSystemUtil.getLineSeparator();
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    protected DataSource getDataSource() {
-        return _dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this._dataSource = dataSource;
-    }
-
-    protected StatementFactory getStatementFactory() {
-        return _statementFactory;
-    }
-
-    public void setStatementFactory(StatementFactory statementFactory) {
-        this._statementFactory = statementFactory;
-    }
-
-    protected TnBeanMetaData getBeanMetaData() {
-        return _beanMetaData;
-    }
-
-    public void setBeanMetaData(TnBeanMetaData beanMetaData) {
-        this._beanMetaData = beanMetaData;
-    }
-
-    public DBMeta getTargetDBMeta() {
-        return _targetDBMeta;
-    }
-
-    public void setTargetDBMeta(DBMeta targetDBMeta) {
-        this._targetDBMeta = targetDBMeta;
-    }
-
-    protected String[] getPropertyNames() {
-        return _propertyNames;
-    }
-
-    public void setPropertyNames(String[] propertyNames) {
-        this._propertyNames = propertyNames;
     }
 }

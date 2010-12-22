@@ -20,7 +20,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
@@ -35,15 +34,13 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnProcedureHandler.TnProcedureResultS
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
+public class TnProcedureCommand extends TnAbstractBasicSqlCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource _dataSource;
-    protected StatementFactory _statementFactory;
-    protected TnProcedureMetaData _procedureMetaData;
-    protected TnProcedureResultSetHandlerFactory _procedureResultSetHandlerFactory;
+    protected final TnProcedureMetaData _procedureMetaData;
+    protected final TnProcedureResultSetHandlerFactory _procedureResultSetHandlerFactory;
 
     /** The filter of outside-SQL. (Nullable) */
     protected OutsideSqlFilter _outsideSqlFilter;
@@ -53,8 +50,7 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
     //                                                                         ===========
     public TnProcedureCommand(DataSource dataSource, StatementFactory statementFactory,
             TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerFactory procedureResultSetHandlerFactory) {
-        _dataSource = dataSource;
-        _statementFactory = statementFactory;
+        super(dataSource, statementFactory);
         _procedureMetaData = procedureMetaData;
         _procedureResultSetHandlerFactory = procedureResultSetHandlerFactory;
     }

@@ -31,7 +31,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBatchUpdateHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand {
+public class TnBatchUpdateDynamicCommand extends TnUpdateDynamicCommand {
 
     // ===================================================================================
     //                                                                          Definition
@@ -42,7 +42,7 @@ public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBatchUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnBatchUpdateDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 
@@ -83,8 +83,8 @@ public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand 
     //                                                                             =======
     protected TnBatchUpdateHandler createBatchUpdateHandler(TnPropertyType[] boundPropTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnBatchUpdateHandler handler = new TnBatchUpdateHandler(getDataSource(), getStatementFactory(),
-                _beanMetaData, boundPropTypes);
+        final TnBatchUpdateHandler handler = new TnBatchUpdateHandler(_dataSource, _statementFactory, _beanMetaData,
+                boundPropTypes);
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(sql);

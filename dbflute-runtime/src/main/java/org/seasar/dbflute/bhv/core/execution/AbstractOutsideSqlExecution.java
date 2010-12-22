@@ -19,13 +19,13 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
-import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractNodeStaticCommand;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public abstract class AbstractOutsideSqlExecution extends TnAbstractDynamicCommand {
+public abstract class AbstractOutsideSqlExecution extends TnAbstractNodeStaticCommand {
 
     // ===================================================================================
     //                                                                           Attribute

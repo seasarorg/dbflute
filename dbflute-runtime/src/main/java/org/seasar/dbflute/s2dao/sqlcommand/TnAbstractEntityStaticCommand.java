@@ -29,7 +29,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractAutoStaticCommand extends TnAbstractSqlCommand {
+public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCommand {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -46,7 +46,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractSqlCommand {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+    public TnAbstractEntityStaticCommand(DataSource dataSource, StatementFactory statementFactory,
             TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
             boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory);

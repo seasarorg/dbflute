@@ -91,7 +91,7 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
     }
 
     protected TnBasicSelectHandler createBasicSelectHandler(String realSql, TnResultSetHandler rsh) {
-        return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
+        return new TnBasicSelectHandler(_dataSource, realSql, rsh, _statementFactory);
     }
 
     // ===================================================================================

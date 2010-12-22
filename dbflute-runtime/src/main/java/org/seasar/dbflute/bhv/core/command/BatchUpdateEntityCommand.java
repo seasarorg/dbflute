@@ -20,7 +20,7 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnBatchUpdateAutoDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnBatchUpdateDynamicCommand;
 
 /**
  * @author jflute
@@ -58,9 +58,8 @@ public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
         return createBatchUpdateAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnBatchUpdateAutoDynamicCommand createBatchUpdateAutoDynamicCommand(TnBeanMetaData bmd,
-            String[] propertyNames) {
-        final TnBatchUpdateAutoDynamicCommand cmd = new TnBatchUpdateAutoDynamicCommand(_dataSource, _statementFactory);
+    protected TnBatchUpdateDynamicCommand createBatchUpdateAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnBatchUpdateDynamicCommand cmd = new TnBatchUpdateDynamicCommand(_dataSource, _statementFactory);
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);

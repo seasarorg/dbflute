@@ -25,7 +25,6 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.UpdateOption;
-import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -34,10 +33,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
-import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
-import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -45,21 +41,18 @@ import org.seasar.dbflute.util.Srl;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnQueryUpdateAutoDynamicCommand implements TnSqlCommand, SqlExecution {
+public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DataSource _dataSource;
-    protected final StatementFactory _statementFactory;
     protected TnBeanMetaData _beanMetaData;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnQueryUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
-        this._dataSource = dataSource;
-        this._statementFactory = statementFactory;
+    public TnQueryUpdateDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+        super(dataSource, statementFactory);
     }
 
     // ===================================================================================
@@ -206,30 +199,6 @@ public class TnQueryUpdateAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     }
 
     // ===================================================================================
-    //                                                                     Command Context
-    //                                                                     ===============
-    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
-            Object[] args) {
-        CommandContext context;
-        {
-            SqlAnalyzer analyzer = createSqlAnalyzer(twoWaySql);
-            Node node = analyzer.analyze();
-            CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
-            context = creator.createCommandContext(args);
-            node.accept(context);
-        }
-        return context;
-    }
-
-    protected SqlAnalyzer createSqlAnalyzer(String sql) {
-        return ResourceContext.createSqlAnalyzer(sql, true);
-    }
-
-    protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
-        return new TnCommandContextHandler(_dataSource, _statementFactory, context);
-    }
-
-    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {
@@ -243,10 +212,6 @@ public class TnQueryUpdateAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public TnBeanMetaData getBeanMetaData() {
-        return _beanMetaData;
-    }
-
     public void setBeanMetaData(TnBeanMetaData beanMetaData) {
         this._beanMetaData = beanMetaData;
     }

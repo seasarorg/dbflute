@@ -26,20 +26,17 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.TableSqlName;
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateEntityHandler;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
+public class TnUpdateDynamicCommand extends TnAbstractEntityDynamicCommand {
 
     // ===================================================================================
     //                                                                          Definition
@@ -50,16 +47,13 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected TnBeanMetaData _beanMetaData;
-    protected DBMeta _targetDBMeta;
-    protected String[] _propertyNames;
     protected boolean _optimisticLockHandling;
     protected boolean _versionNoAutoIncrementOnMemory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnUpdateDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 
@@ -112,7 +106,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         final List<TnPropertyType> typeList = new ArrayList<TnPropertyType>();
         final String timestampProp = _beanMetaData.getTimestampPropertyName();
         final String versionNoProp = _beanMetaData.getVersionNoPropertyName();
-        final String[] propertyNames = getPropertyNames();
+        final String[] propertyNames = _propertyNames;
         for (int i = 0; i < propertyNames.length; ++i) {
             final TnPropertyType pt = _beanMetaData.getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
@@ -128,7 +122,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     }
 
     protected Set<?> getModifiedPropertyNames(Object bean) {
-        return getBeanMetaData().getModifiedPropertyNames(bean);
+        return _beanMetaData.getModifiedPropertyNames(bean);
     }
 
     protected boolean isOptimisticLockProperty(String timestampProp, String versionNoProp, TnPropertyType pt) {
@@ -216,8 +210,8 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     //                                                                             =======
     protected TnUpdateEntityHandler createUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnUpdateEntityHandler handler = new TnUpdateEntityHandler(getDataSource(), getStatementFactory(),
-                _beanMetaData, boundPropTypes);
+        final TnUpdateEntityHandler handler = new TnUpdateEntityHandler(_dataSource, _statementFactory, _beanMetaData,
+                boundPropTypes);
         handler.setSql(sql);
         handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
@@ -253,40 +247,6 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     protected boolean isLogEnabled() {
         return XLog.isLogEnabled();
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return DfSystemUtil.getLineSeparator();
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public TnBeanMetaData getBeanMetaData() {
-        return _beanMetaData;
-    }
-
-    public void setBeanMetaData(TnBeanMetaData beanMetaData) {
-        this._beanMetaData = beanMetaData;
-    }
-
-    public DBMeta getTargetDBMeta() {
-        return _targetDBMeta;
-    }
-
-    public void setTargetDBMeta(DBMeta targetDBMeta) {
-        this._targetDBMeta = targetDBMeta;
-    }
-
-    public String[] getPropertyNames() {
-        return _propertyNames;
-    }
-
-    public void setPropertyNames(String[] propertyNames) {
-        this._propertyNames = propertyNames;
     }
 
     public void setOptimisticLockHandling(boolean optimisticLockHandling) {
