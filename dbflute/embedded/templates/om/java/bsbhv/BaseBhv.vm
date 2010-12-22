@@ -1575,7 +1575,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                Update
     //                                                ------
     protected int delegateInsert(${myExtendedObjectClassName} e, InsertOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeInsert(e, op)) { return 0; } return invoke(createInsertEntityCommand(e, op)); }
+    { if (!processBeforeInsert(e, op)) { return 0; }
+      return invoke(createInsertEntityCommand(e, op)); }
     protected int delegateUpdate(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
     { if (!processBeforeUpdate(e, op)) { return 0; }
 #if ($table.hasOptimisticLock())
@@ -1584,7 +1585,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
       return delegateUpdateNonstrict(e, op); }
 #end
     protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeUpdate(e, op)) { return 0; } return invoke(createUpdateNonstrictEntityCommand(e, op)); }
+    { if (!processBeforeUpdate(e, op)) { return 0; }
+      return invoke(createUpdateNonstrictEntityCommand(e, op)); }
     protected int delegateDelete(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
     { if (!processBeforeDelete(e, op)) { return 0; }
 #if ($table.hasOptimisticLock())
@@ -1593,7 +1595,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
       return delegateDeleteNonstrict(e, op); }
 #end
     protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeDelete(e, op)) { return 0; } return invoke(createDeleteNonstrictEntityCommand(e, op)); }
+    { if (!processBeforeDelete(e, op)) { return 0; }
+      return invoke(createDeleteNonstrictEntityCommand(e, op)); }
 
     protected int[] delegateBatchInsert(List<${myExtendedObjectClassName}> ls, InsertOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
@@ -1606,7 +1609,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
       return delegateBatchUpdateNonstrict(ls, op); }
 #end
     protected int[] delegateBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
+    { if (ls.isEmpty()) { return new int[]{}; }
+      return invoke(createBatchUpdateNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
     protected int[] delegateBatchDelete(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
 #if ($table.hasOptimisticLock())
@@ -1615,7 +1619,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
       return delegateBatchDeleteNonstrict(ls, op); }
 #end
     protected int[] delegateBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
+    { if (ls.isEmpty()) { return new int[]{}; }
+      return invoke(createBatchDeleteNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
 
     protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
     { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateEntityCBCommand(e, cb, op));  }
