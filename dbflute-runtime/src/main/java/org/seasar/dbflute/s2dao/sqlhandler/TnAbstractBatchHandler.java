@@ -159,7 +159,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         if (_existsSkippedLogging) {
             if (XLog.isLogEnabled()) {
                 final Integer batchLoggingLimit = getBatchLoggingLimit();
-                XLog.log("...Skipping several loggings by limit option: " + batchLoggingLimit);
+                XLog.log("...Skipping several loggings by the limit option: " + batchLoggingLimit);
             }
         }
     }
