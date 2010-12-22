@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedInfo;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -204,8 +205,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it check an invalid query? */
     protected boolean _invalidQueryChecked;
 
-    /** The map of invalid query column. */
-    protected Map<ColumnRealName, ConditionKey> _invalidQueryColumnMap;
+    /** The list of invalid query info. */
+    protected List<HpInvalidQueryInfo> _invalidQueryList;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -2010,18 +2011,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _invalidQueryChecked = true;
     }
 
-    public Map<ColumnRealName, ConditionKey> getInvalidQueryColumnMap() {
-        if (_invalidQueryColumnMap != null) {
-            return _invalidQueryColumnMap;
-        }
-        return new HashMap<ColumnRealName, ConditionKey>();
+    /**
+     * {@inheritDoc}
+     */
+    public List<HpInvalidQueryInfo> getInvalidQueryList() {
+        return new ArrayList<HpInvalidQueryInfo>(doGetInvalidQueryList());
     }
 
-    public void registerInvalidQueryColumn(ColumnRealName columnRealName, ConditionKey key) {
-        if (_invalidQueryColumnMap == null) {
-            _invalidQueryColumnMap = new LinkedHashMap<ColumnRealName, ConditionKey>();
+    public void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo) {
+        doGetInvalidQueryList().add(invalidQueryInfo);
+    }
+
+    protected List<HpInvalidQueryInfo> doGetInvalidQueryList() {
+        if (_invalidQueryList == null) {
+            _invalidQueryList = new ArrayList<HpInvalidQueryInfo>();
         }
-        _invalidQueryColumnMap.put(columnRealName, key);
+        return _invalidQueryList;
     }
 
     // ===================================================================================

@@ -47,7 +47,9 @@ public class TnBatchDeleteAutoStaticCommand extends TnAbstractBatchAutoStaticCom
     //                                                                            ========
     @Override
     protected TnAbstractEntityHandler createEntityHandler() {
-        return createBatchHandler();
+        final TnAbstractBatchHandler handler = createBatchHandler();
+        handler.setDeleteOption(_deleteOption);
+        return handler;
     }
 
     @Override

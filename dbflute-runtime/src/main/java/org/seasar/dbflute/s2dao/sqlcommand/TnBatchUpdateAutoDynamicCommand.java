@@ -88,6 +88,7 @@ public class TnBatchUpdateAutoDynamicCommand extends TnUpdateAutoDynamicCommand 
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(sql);
+        handler.setUpdateOption(option);
         return handler;
     }
 

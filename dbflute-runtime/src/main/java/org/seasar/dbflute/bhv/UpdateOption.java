@@ -59,6 +59,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
 
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _allowNonQueryUpdate;
+    protected Integer _batchLoggingUpdateLimit;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -414,6 +415,23 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     // ===================================================================================
+    //                                                                       Batch Logging
+    //                                                                       =============
+    /**
+     * Limit batch-update logging by logging size. <br />
+     * For example, if you set 3, only 3 records are logged. <br />
+     * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
+     * @param batchLoggingUpdateLimit The limit size of batch-update logging. (Nullable: if null and minus, means no limit)
+     */
+    public void limitBatchUpdateLogging(Integer batchLoggingUpdateLimit) {
+        this._batchLoggingUpdateLimit = batchLoggingUpdateLimit;
+    }
+
+    public Integer getBatchUpdateLoggingLimit() {
+        return _batchLoggingUpdateLimit;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -439,6 +457,12 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
                 sb.append(", ");
             }
             sb.append("NonQueryUpdateAllowed");
+        }
+        if (_batchLoggingUpdateLimit != null) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("batchLogging(" + _batchLoggingUpdateLimit + ")");
         }
         if (sb.length() == 0) {
             sb.append("default");

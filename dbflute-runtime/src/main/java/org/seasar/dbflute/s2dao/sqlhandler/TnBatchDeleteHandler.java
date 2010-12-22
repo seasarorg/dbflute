@@ -42,4 +42,9 @@ public class TnBatchDeleteHandler extends TnAbstractBatchHandler {
     protected void setupBindVariables(Object bean) {
         setupDeleteBindVariables(bean);
     }
+
+    @Override
+    protected Integer getBatchLoggingLimit() {
+        return _deleteOption != null ? _deleteOption.getBatchLoggingDeleteLimit() : null;
+    }
 }

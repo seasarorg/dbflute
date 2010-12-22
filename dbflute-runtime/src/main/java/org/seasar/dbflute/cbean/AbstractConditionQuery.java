@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
+import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -464,21 +465,32 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
     }
 
-    protected boolean isValidQuery(final ConditionKey key, final Object value, final ConditionValue cvalue,
-            final String columnDbName) {
-        // not uses SQL name because of only logging used
-        final ColumnRealName columnRealName = toColumnRealName(columnDbName);
-        if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, columnRealName)) {
+    protected boolean isValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        final ColumnRealName callerName = toColumnRealName(columnDbName); // logging only
+        if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, callerName)) {
             return true;
         } else {
+            final HpInvalidQueryInfo invalidQueryInfo = xcreateInvalidQueryInfo(key, value, columnDbName);
             if (xgetSqlClause().isInvalidQueryChecked()) {
-                throwInvalidQueryRegisteredException(key, value, columnRealName);
+                throwInvalidQueryRegisteredException(invalidQueryInfo);
                 return false; // unreachable
             } else {
-                xgetSqlClause().registerInvalidQueryColumn(columnRealName, key);
+                xgetSqlClause().saveInvalidQuery(invalidQueryInfo);
                 return false;
             }
         }
+    }
+
+    protected HpInvalidQueryInfo xcreateInvalidQueryInfo(ConditionKey key, Object value, String columnDbName) {
+        final String locationBase = xgetLocationBase();
+        final ColumnInfo targetColumn = findDBMeta(getTableDbName()).findColumnInfo(columnDbName);
+        final HpInvalidQueryInfo invalidQueryInfo = new HpInvalidQueryInfo(locationBase, targetColumn, key, value);
+        if (_inline) {
+            invalidQueryInfo.inlineView();
+        } else if (_onClause) {
+            invalidQueryInfo.onClause();
+        }
+        return invalidQueryInfo;
     }
 
     protected QueryModeProvider xcreateQueryModeProvider() {
@@ -497,8 +509,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
     }
 
-    protected void throwInvalidQueryRegisteredException(ConditionKey key, Object value, ColumnRealName columnRealName) {
-        createCBExThrower().throwInvalidQueryRegisteredException(key, value, columnRealName);
+    protected void throwInvalidQueryRegisteredException(HpInvalidQueryInfo invalidQueryInfo) {
+        createCBExThrower().throwInvalidQueryRegisteredException(invalidQueryInfo);
     }
 
     // -----------------------------------------------------

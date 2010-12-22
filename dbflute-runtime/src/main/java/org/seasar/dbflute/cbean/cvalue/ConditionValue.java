@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The value of condition.
@@ -761,6 +762,20 @@ public class ConditionValue implements Serializable {
             _inline = false;
             _onClause = false;
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final String title = DfTypeUtil.toClassTitle(this);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(title).append(":{");
+        sb.append("fixed=").append(_fixedValueMap);
+        sb.append(", varying=").append(_varyingValueMap);
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================

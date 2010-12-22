@@ -62,7 +62,7 @@ public class SqlResultInfo {
      * Get the SQL for display. <br />
      * If the statement is batch-update, this value
      * contains only a part of batch statements.
-     * @return The string of SQL. (NotNull)
+     * @return The string of SQL. (Nullable: for example, when batch logging is limited by option)
      */
     public String getDisplaySql() {
         return _displaySql;

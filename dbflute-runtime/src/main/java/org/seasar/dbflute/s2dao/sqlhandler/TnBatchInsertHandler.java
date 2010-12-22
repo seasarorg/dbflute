@@ -45,6 +45,11 @@ public class TnBatchInsertHandler extends TnAbstractBatchHandler {
     }
 
     @Override
+    protected Integer getBatchLoggingLimit() {
+        return _insertOption != null ? _insertOption.getBatchInsertLoggingLimit() : null;
+    }
+
+    @Override
     protected void processBefore(Object beanList) {
         super.processBefore(beanList);
         if (isPrimaryKeyIdentityDisabled()) {

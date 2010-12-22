@@ -30,6 +30,7 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _allowNonQueryDelete;
+    protected Integer _batchLoggingDeleteLimit;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -55,6 +56,23 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
 
     public boolean isNonQueryDeleteAllowed() {
         return _allowNonQueryDelete;
+    }
+
+    // ===================================================================================
+    //                                                                       Batch Logging
+    //                                                                       =============
+    /**
+     * Limit batch-delete logging by logging size. <br />
+     * For example, if you set 3, only 3 records are logged. <br />
+     * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
+     * @param batchDeleteLoggingLimit The limit size of batch-delete logging. (Nullable: if null and minus, means no limit)
+     */
+    public void limitBatchDeleteLogging(Integer batchDeleteLoggingLimit) {
+        this._batchLoggingDeleteLimit = batchDeleteLoggingLimit;
+    }
+
+    public Integer getBatchLoggingDeleteLimit() {
+        return _batchLoggingDeleteLimit;
     }
 
     // ===================================================================================

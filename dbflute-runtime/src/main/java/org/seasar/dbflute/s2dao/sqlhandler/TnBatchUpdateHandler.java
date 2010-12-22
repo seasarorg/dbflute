@@ -42,4 +42,9 @@ public class TnBatchUpdateHandler extends TnAbstractBatchHandler {
     protected void setupBindVariables(Object bean) {
         setupUpdateBindVariables(bean);
     }
+
+    @Override
+    protected Integer getBatchLoggingLimit() {
+        return _updateOption != null ? _updateOption.getBatchUpdateLoggingLimit() : null;
+    }
 }

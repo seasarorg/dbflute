@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedInfo;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -653,12 +654,12 @@ public interface SqlClause {
     void checkInvalidQuery();
 
     /**
-     * Get the map of invalid query column. (basically for logging)
-     * @return The map of invalid query column. (NotNull)
+     * Get the list of invalid query. (basically for logging)
+     * @return The list of invalid query. (NotNull, ReadOnly)
      */
-    Map<ColumnRealName, ConditionKey> getInvalidQueryColumnMap();
+    List<HpInvalidQueryInfo> getInvalidQueryList();
 
-    void registerInvalidQueryColumn(ColumnRealName columnRealName, ConditionKey key);
+    void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
 
     // [DBFlute-0.7.5]
     // ===================================================================================

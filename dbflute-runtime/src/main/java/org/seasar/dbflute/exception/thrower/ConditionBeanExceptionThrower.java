@@ -18,9 +18,8 @@ package org.seasar.dbflute.exception.thrower;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
-import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartAlreadySetupException;
@@ -657,7 +656,7 @@ public class ConditionBeanExceptionThrower {
         throw new QueryIllegalPurposeException(msg);
     }
 
-    public void throwInvalidQueryRegisteredException(ConditionKey key, Object value, ColumnRealName columnRealName) {
+    public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo invalidQueryInfo) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("An invalid query was registered. (check is working)");
         br.addItem("Advice");
@@ -674,12 +673,8 @@ public class ConditionBeanExceptionThrower {
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(null);");
-        br.addItem("Column");
-        br.addElement(columnRealName);
-        br.addItem("Condition Key");
-        br.addElement(key.getConditionKey());
-        br.addItem("Registered Value");
-        br.addElement(value);
+        br.addItem("Invalid Query");
+        br.addElement(invalidQueryInfo.buildDisplay());
         final String msg = br.buildExceptionMessage();
         throw new InvalidQueryRegisteredException(msg);
     }

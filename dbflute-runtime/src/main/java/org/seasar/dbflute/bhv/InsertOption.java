@@ -31,6 +31,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                           =========
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _disablePrimaryKeyIdentity;
+    protected Integer _batchInsertLoggingLimit;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -105,6 +106,23 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
 
     public boolean isPrimaryKeyIdentityDisabled() {
         return _disablePrimaryKeyIdentity;
+    }
+
+    // ===================================================================================
+    //                                                                       Batch Logging
+    //                                                                       =============
+    /**
+     * Limit batch-insert logging by logging size. <br />
+     * For example, if you set 3, only 3 records are logged. <br />
+     * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
+     * @param batchInsertLoggingLimit The limit size of batch-insert logging. (Nullable: if null and minus, means no limit)
+     */
+    public void limitBatchInsertLogging(Integer batchInsertLoggingLimit) {
+        this._batchInsertLoggingLimit = batchInsertLoggingLimit;
+    }
+
+    public Integer getBatchInsertLoggingLimit() {
+        return _batchInsertLoggingLimit;
     }
 
     // ===================================================================================

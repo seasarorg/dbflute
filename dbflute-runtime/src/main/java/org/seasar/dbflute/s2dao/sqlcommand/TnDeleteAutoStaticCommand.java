@@ -46,7 +46,10 @@ public class TnDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand {
     //                                                                            ========
     @Override
     protected TnAbstractEntityHandler createEntityHandler() {
-        return new TnDeleteEntityHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+        final TnDeleteEntityHandler handler = new TnDeleteEntityHandler(getDataSource(), getStatementFactory(),
+                getBeanMetaData(), getPropertyTypes());
+        handler.setDeleteOption(_deleteOption);
+        return handler;
     }
 
     @Override

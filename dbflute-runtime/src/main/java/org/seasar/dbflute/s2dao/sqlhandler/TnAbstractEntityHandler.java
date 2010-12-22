@@ -26,6 +26,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -58,6 +59,7 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
     protected boolean _versionNoAutoIncrementOnMemory; // to adjust binding
     protected InsertOption<? extends ConditionBean> _insertOption;
     protected UpdateOption<? extends ConditionBean> _updateOption;
+    protected DeleteOption<? extends ConditionBean> _deleteOption;
     protected List<Timestamp> _newTimestampList;
     protected List<Long> _newVersionNoList;
 
@@ -376,5 +378,9 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
 
     public void setUpdateOption(UpdateOption<? extends ConditionBean> updateOption) {
         this._updateOption = updateOption;
+    }
+
+    public void setDeleteOption(DeleteOption<? extends ConditionBean> deleteOption) {
+        this._deleteOption = deleteOption;
     }
 }

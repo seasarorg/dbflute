@@ -15,9 +15,7 @@
  */
 package org.seasar.dbflute.exception.thrower;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
+import java.util.List;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.DeleteOption;
@@ -25,8 +23,7 @@ import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.bhv.WritableOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.PagingBean;
-import org.seasar.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
@@ -142,11 +139,10 @@ public class BehaviorExceptionThrower {
 
     protected void setupInvalidQueryElement(ExceptionMessageBuilder br, ConditionBean cb) {
         br.addItem("Invalid Query");
-        final Map<ColumnRealName, ConditionKey> invalidQueryColumnMap = cb.getSqlClause().getInvalidQueryColumnMap();
-        if (invalidQueryColumnMap != null && !invalidQueryColumnMap.isEmpty()) {
-            final Set<Entry<ColumnRealName, ConditionKey>> entrySet = invalidQueryColumnMap.entrySet();
-            for (Entry<ColumnRealName, ConditionKey> entry : entrySet) {
-                br.addElement(entry.getKey() + " : " + entry.getValue().getConditionKey());
+        final List<HpInvalidQueryInfo> invalidQueryList = cb.getSqlClause().getInvalidQueryList();
+        if (invalidQueryList != null && !invalidQueryList.isEmpty()) {
+            for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryList) {
+                br.addElement(invalidQueryInfo.buildDisplay());
             }
         } else {
             br.addElement("*no invalid");
@@ -249,6 +245,7 @@ public class BehaviorExceptionThrower {
         br.addElement("If you want to update all records, use varyingQueryUpdate().");
         setupEntityElement(br, entity);
         setupOptionElement(br, option);
+        setupInvalidQueryElement(br, cb);
         final String msg = br.buildExceptionMessage();
         throw new NonQueryUpdateNotAllowedException(msg);
     }
@@ -261,6 +258,7 @@ public class BehaviorExceptionThrower {
         br.addElement("Confirm your condition values for queryDelete().");
         br.addElement("If you want to delete all records, use varyingQueryDelete().");
         setupOptionElement(br, option);
+        setupInvalidQueryElement(br, cb);
         final String msg = br.buildExceptionMessage();
         throw new NonQueryDeleteNotAllowedException(msg);
     }
