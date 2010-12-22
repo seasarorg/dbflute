@@ -735,7 +735,11 @@ public class BehaviorCommandInvoker {
                             ++loopCount;
                         }
                         sb.insert(0, "{").append("}");
-                        log(prefix + "all-updated=(" + resultCount + ") result=" + sb + "]");
+                        if (resultCount >= 0) {
+                            log(prefix + "all-updated=(" + resultCount + ") result=" + sb + "]");
+                        } else { // minus
+                            log(prefix + "result=" + sb + "]"); // for example, Oracle
+                        }
                     }
                 }
             } else {
