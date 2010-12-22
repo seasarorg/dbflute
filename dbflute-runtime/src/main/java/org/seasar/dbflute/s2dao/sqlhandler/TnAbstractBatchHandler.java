@@ -320,6 +320,38 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     }
 
     // ===================================================================================
+    //                                                                         SQL Logging
+    //                                                                         ===========
+    @Override
+    protected String buildDisplaySql(Object[] args) { // override for exception message's SQL
+        if (args == null || args.length == 0) {
+            return executeSuperDisplaySql(args);
+        }
+        final List<?> beanList;
+        if (args[0] instanceof List<?>) {
+            beanList = (List<?>) args[0];
+        } else {
+            return executeSuperDisplaySql(args);
+        }
+        // basically exception message's SQL here
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (Object bean : beanList) {
+            if (index > 0) {
+                sb.append(";").append(ln());
+            }
+            final String displaySql = executeSuperDisplaySql(new Object[] { bean });
+            sb.append(displaySql);
+            ++index;
+        }
+        return sb.toString();
+    }
+
+    protected String executeSuperDisplaySql(Object[] args) {
+        return super.buildDisplaySql(args);
+    }
+
+    // ===================================================================================
     //                                                                      JDBC Delegator
     //                                                                      ==============
     protected int[] executeBatch(PreparedStatement ps, List<?> list) {

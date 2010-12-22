@@ -109,7 +109,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     //                                                                       =============
     protected TnPropertyType[] createUpdatePropertyTypes(Object bean, UpdateOption<ConditionBean> option) {
         final Set<?> modifiedSet = getModifiedPropertyNames(bean);
-        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
+        final List<TnPropertyType> typeList = new ArrayList<TnPropertyType>();
         final String timestampProp = _beanMetaData.getTimestampPropertyName();
         final String versionNoProp = _beanMetaData.getVersionNoPropertyName();
         final String[] propertyNames = getPropertyNames();
@@ -121,10 +121,10 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             if (isOptimisticLockProperty(timestampProp, versionNoProp, pt) // OptimisticLock
                     || isSpecifiedProperty(option, modifiedSet, pt) // Specified
                     || isStatementProperty(option, pt)) { // Statement
-                types.add(pt);
+                typeList.add(pt);
             }
         }
-        return types.toArray(new TnPropertyType[types.size()]);
+        return typeList.toArray(new TnPropertyType[typeList.size()]);
     }
 
     protected Set<?> getModifiedPropertyNames(Object bean) {

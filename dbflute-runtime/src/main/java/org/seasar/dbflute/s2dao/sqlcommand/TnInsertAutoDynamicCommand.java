@@ -97,7 +97,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
             String msg = "The property name was not found in the bean: " + bean;
             throw new IllegalStateException(msg);
         }
-        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
+        final List<TnPropertyType> typeList = new ArrayList<TnPropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
 
@@ -111,21 +111,36 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
                     }
                 }
             } else {
-                if (pt.getPropertyDesc().getValue(bean) == null) { // getting by reflection here
-                    final String propertyName = pt.getPropertyName();
-                    if (!propertyName.equalsIgnoreCase(timestampPropertyName)
-                            && !propertyName.equalsIgnoreCase(versionNoPropertyName)) {
-                        continue;
-                    }
+                if (isExceptProperty(bean, pt, timestampPropertyName, versionNoPropertyName)) {
+                    continue;
                 }
             }
-            types.add(pt);
+            typeList.add(pt);
         }
-        if (types.isEmpty()) {
+        if (typeList.isEmpty()) {
             String msg = "The target property type was not found in the bean: " + bean;
             throw new IllegalStateException(msg);
         }
-        return (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
+        return (TnPropertyType[]) typeList.toArray(new TnPropertyType[typeList.size()]);
+    }
+
+    protected boolean isExceptProperty(Object bean, TnPropertyType pt, String timestampPropertyName,
+            String versionNoPropertyName) {
+        if (isOptimisticLockProperty(pt, timestampPropertyName, versionNoPropertyName)) {
+            return false;
+        }
+        return isNullProperty(bean, pt); // as default (only not null columns are target)
+    }
+
+    protected boolean isOptimisticLockProperty(TnPropertyType pt, String timestampPropertyName,
+            String versionNoPropertyName) {
+        final String propertyName = pt.getPropertyName();
+        return propertyName.equalsIgnoreCase(timestampPropertyName)
+                || propertyName.equalsIgnoreCase(versionNoPropertyName);
+    }
+
+    protected boolean isNullProperty(Object bean, TnPropertyType pt) {
+        return pt.getPropertyDesc().getValue(bean) == null; // getting by reflection here
     }
 
     // ===================================================================================

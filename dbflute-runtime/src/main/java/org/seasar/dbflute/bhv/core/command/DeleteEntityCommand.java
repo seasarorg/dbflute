@@ -46,7 +46,7 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
     //                                                               =====================
     @Override
     public String buildSqlExecutionKey() {
-        // same as super now, for the future
+        // no special unique key for options
         return super.buildSqlExecutionKey();
     }
 
@@ -68,8 +68,7 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
     protected TnDeleteAutoStaticCommand createDeleteAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
         final DBMeta dbmata = findDBMeta();
         final boolean opt = isOptimisticLockHandling();
-        return new TnDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmata, propertyNames, opt,
-                _deleteOption);
+        return new TnDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmata, propertyNames, opt);
     }
 
     protected boolean isOptimisticLockHandling() {
@@ -78,7 +77,7 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
 
     @Override
     protected Object[] doGetSqlExecutionArgument() {
-        return new Object[] { _entity }; // deleteOption is not specified because of static command
+        return new Object[] { _entity, _deleteOption };
     }
 
     // ===================================================================================

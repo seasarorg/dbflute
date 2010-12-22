@@ -74,7 +74,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
         if (sql != null) {
-            cmd.setSql(sql);
+            cmd.acceptSql(sql);
         }
         return cmd;
     }

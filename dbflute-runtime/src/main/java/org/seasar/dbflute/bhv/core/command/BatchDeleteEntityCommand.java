@@ -46,7 +46,7 @@ public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
     //                                                               =====================
     @Override
     public String buildSqlExecutionKey() {
-        // same as super now, for the future
+        // no special unique key for options
         return super.buildSqlExecutionKey();
     }
 
@@ -69,8 +69,7 @@ public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
             String[] propertyNames) {
         final DBMeta dbmeta = findDBMeta();
         final boolean opt = isOptimisticLockHandling();
-        return new TnBatchDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt,
-                _deleteOption);
+        return new TnBatchDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
     }
 
     protected boolean isOptimisticLockHandling() {
@@ -79,7 +78,7 @@ public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
 
     @Override
     protected Object[] doGetSqlExecutionArgument() {
-        return new Object[] { _entityList }; // deleteOption is not specified because of static command
+        return new Object[] { _entityList, _deleteOption };
     }
 
     // ===================================================================================

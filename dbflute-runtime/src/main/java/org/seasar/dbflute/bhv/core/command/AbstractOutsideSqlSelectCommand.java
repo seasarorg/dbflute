@@ -142,7 +142,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         final OutsideSqlSelectExecution cmd = new OutsideSqlSelectExecution(_dataSource, _statementFactory, handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
-        cmd.setSql(sql);
+        cmd.acceptSql(sql);
         return cmd;
     }
 

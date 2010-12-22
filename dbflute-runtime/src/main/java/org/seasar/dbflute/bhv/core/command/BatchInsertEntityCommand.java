@@ -19,9 +19,9 @@ import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnBatchInsertAutoStaticCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnBatchInsertAutoDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnInsertAutoDynamicCommand;
 
 /**
  * @author jflute
@@ -44,16 +44,6 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    @Override
-    public String buildSqlExecutionKey() {
-        final String baseKey = super.buildSqlExecutionKey();
-        if (_insertOption != null && _insertOption.isPrimaryKeyIdentityDisabled()) {
-            return baseKey + ":PKIdentityDisabled";
-        } else {
-            return baseKey;
-        }
-    }
-
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
@@ -66,20 +56,22 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
 
     protected SqlExecution createBatchInsertEntitySqlExecution(TnBeanMetaData bmd) {
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        return createInsertBatchAutoStaticCommand(bmd, propertyNames);
+        return createBatchInsertAutoDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnBatchInsertAutoStaticCommand createInsertBatchAutoStaticCommand(TnBeanMetaData bmd,
-            String[] propertyNames) {
-        final DBMeta dbmeta = findDBMeta();
-        final TnBatchInsertAutoStaticCommand cmd = new TnBatchInsertAutoStaticCommand(_dataSource, _statementFactory,
-                bmd, dbmeta, propertyNames, _insertOption);
+    protected TnInsertAutoDynamicCommand createBatchInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnBatchInsertAutoDynamicCommand cmd = new TnBatchInsertAutoDynamicCommand();
+        cmd.setDataSource(_dataSource);
+        cmd.setStatementFactory(_statementFactory);
+        cmd.setBeanMetaData(bmd);
+        cmd.setTargetDBMeta(findDBMeta());
+        cmd.setPropertyNames(propertyNames);
         return cmd;
     }
 
     @Override
     protected Object[] doGetSqlExecutionArgument() {
-        return new Object[] { _entityList }; // insertOption is not specified because of static command
+        return new Object[] { _entityList, _insertOption };
     }
 
     // ===================================================================================

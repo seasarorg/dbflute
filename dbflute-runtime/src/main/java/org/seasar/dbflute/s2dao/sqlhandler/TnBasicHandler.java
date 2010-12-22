@@ -174,7 +174,7 @@ public class TnBasicHandler {
                 _log.debug("...Building displaySql because of " + isLogEnabled() + ", " + existsSqlLogHandler + ", "
                         + existsSqlResultHandler + ", " + existsSqlLogRegistry);
             }
-            final String displaySql = getDisplaySql(args);
+            final String displaySql = buildDisplaySql(args);
             if (isLogEnabled()) {
                 logDisplaySql(displaySql);
             }
@@ -190,7 +190,7 @@ public class TnBasicHandler {
         }
     }
 
-    protected String getDisplaySql(Object[] args) {
+    protected String buildDisplaySql(Object[] args) {
         final String logDateFormat = ResourceContext.getLogDateFormat();
         final String logTimestampFormat = ResourceContext.getLogTimestampFormat();
         return DisplaySqlBuilder.buildDisplaySql(_sql, args, logDateFormat, logTimestampFormat);
@@ -260,7 +260,7 @@ public class TnBasicHandler {
         String displaySql = null;
         if (_sql != null && _exceptionMessageSqlArgs != null) {
             try {
-                displaySql = getDisplaySql(_exceptionMessageSqlArgs);
+                displaySql = buildDisplaySql(_exceptionMessageSqlArgs);
             } catch (RuntimeException ignored) {
             }
         }

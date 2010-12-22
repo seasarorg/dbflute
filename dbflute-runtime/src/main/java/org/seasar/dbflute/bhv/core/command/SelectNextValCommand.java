@@ -209,7 +209,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         }
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
-        cmd.setSql(sql);
+        cmd.acceptSql(sql);
         return cmd;
     }
 

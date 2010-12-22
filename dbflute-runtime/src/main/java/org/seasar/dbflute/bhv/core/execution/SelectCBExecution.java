@@ -84,7 +84,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
             final SelectCBExecution dynamicSqlFactory = createDynamicSqlFactory();
             dynamicSqlFactory.setArgNames(getArgNames());
             dynamicSqlFactory.setArgTypes(getArgTypes());
-            dynamicSqlFactory.setSql(cb.getSqlClause().getClause());
+            dynamicSqlFactory.acceptSql(cb.getSqlClause().getClause());
             final CommandContext ctx = dynamicSqlFactory.apply(args);
             realClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);

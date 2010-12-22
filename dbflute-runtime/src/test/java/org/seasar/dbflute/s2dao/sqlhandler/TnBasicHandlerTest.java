@@ -20,7 +20,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         // ## Arrange ##
         TnBasicHandler handler = new TnBasicHandler(null, null) {
             @Override
-            protected String getDisplaySql(Object[] args) {
+            protected String buildDisplaySql(Object[] args) {
                 throw new IllegalStateException("log should not be called!");
             }
 
@@ -44,7 +44,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         TnBasicHandler handler = new TnBasicHandler(null, null) {
             @Override
-            protected String getDisplaySql(Object[] args) {
+            protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");
                 return "select ...";
             }
@@ -90,7 +90,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         final Class<?>[] argsTypes = new Class<?>[] {};
         TnBasicHandler handler = new TnBasicHandler(null, null) {
             @Override
-            protected String getDisplaySql(Object[] args) {
+            protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");
                 return "select ...";
             }
@@ -148,7 +148,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         TnBasicHandler handler = new TnBasicHandler(null, null) {
             @Override
-            protected String getDisplaySql(Object[] args) {
+            protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");
                 return "select ...";
             }
@@ -205,7 +205,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         final Class<?>[] argsTypes = new Class<?>[] {};
         TnBasicHandler handler = new TnBasicHandler(null, null) {
             @Override
-            protected String getDisplaySql(Object[] args) {
+            protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");
                 return "select ..." + ln() + "  from ...";
             }

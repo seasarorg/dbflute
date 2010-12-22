@@ -15,17 +15,12 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.DeleteOption;
-import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
@@ -34,31 +29,31 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticCommand {
+public abstract class TnAbstractAutoStaticCommand extends TnAbstractSqlCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final TnBeanMetaData _beanMetaData;
     protected final DBMeta _targetDBMeta;
     protected final boolean _optimisticLockHandling;
     protected final boolean _versionNoAutoIncrementOnMemory;
-    protected final InsertOption<? extends ConditionBean> _insertOption;
-    protected final DeleteOption<? extends ConditionBean> _deleteOption;
+
+    // initialized in a process called by constructor
     protected TnPropertyType[] _propertyTypes;
+    protected String _sql;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
             TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
-            boolean versionNoAutoIncrementOnMemory, InsertOption<? extends ConditionBean> insertOption,
-            DeleteOption<? extends ConditionBean> deleteOption) {
-        super(dataSource, statementFactory, beanMetaData);
+            boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory);
         _targetDBMeta = targetDBMeta;
         _optimisticLockHandling = optimisticLockHandling;
         _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
-        _insertOption = insertOption;
-        _deleteOption = deleteOption;
+        this._beanMetaData = beanMetaData;
         setupPropertyTypes(propertyNames);
         setupSql();
     }
@@ -66,79 +61,36 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public Object execute(Object[] args) { // NOT for batch (batch should override this)
-        final TnAbstractEntityHandler handler = createEntityHandler();
+    public Object execute(Object[] args) {
+        final TnAbstractEntityHandler handler = createEntityHandler(args);
+        return doExecute(args, handler);
+    }
+
+    protected Object doExecute(Object[] args, TnAbstractEntityHandler handler) {
+        handler.setExceptionMessageSqlArgs(args);
+        final int rows = handler.execute(args);
+        return Integer.valueOf(rows);
+    }
+
+    protected TnAbstractEntityHandler createEntityHandler(Object[] args) {
+        final TnAbstractEntityHandler handler = newEntityHandler();
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
         handler.setExceptionMessageSqlArgs(args);
-        int rows = handler.execute(args);
-        return Integer.valueOf(rows);
+        return handler;
     }
 
-    protected TnPropertyType[] getPropertyTypes() {
-        return _propertyTypes;
-    }
-
-    protected void setPropertyTypes(TnPropertyType[] propertyTypes) {
-        this._propertyTypes = propertyTypes;
-    }
-
-    protected abstract TnAbstractEntityHandler createEntityHandler();
+    protected abstract TnAbstractEntityHandler newEntityHandler();
 
     protected abstract void setupPropertyTypes(String[] propertyNames); // called by constructor
+
+    protected abstract void setupSql();
 
     // ===================================================================================
     //                                                                              Insert
     //                                                                              ======
-    protected void setupInsertPropertyTypes(String[] propertyNames) {
-        final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
-        for (int i = 0; i < propertyNames.length; ++i) {
-            final TnPropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
-            if (isInsertTarget(pt)) {
-                types.add(pt);
-            }
-        }
-        _propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
-    }
-
-    protected boolean isInsertTarget(TnPropertyType propertyType) {
-        if (propertyType.isPrimaryKey()) {
-            if (_insertOption == null || !_insertOption.isPrimaryKeyIdentityDisabled()) {
-                final String name = propertyType.getPropertyName();
-                final TnIdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator(name);
-                return generator.isSelfGenerate();
-            }
-        }
-        return true;
-    }
-
-    protected abstract void setupSql();
-
-    protected void setupInsertSql() {
-        final StringBuilder sb = new StringBuilder(100);
-        sb.append("insert into ");
-        sb.append(_targetDBMeta.getTableSqlName());
-        sb.append(" (");
-        for (int i = 0; i < _propertyTypes.length; ++i) {
-            final TnPropertyType pt = _propertyTypes[i];
-            if (isInsertTarget(pt)) {
-                sb.append(pt.getColumnSqlName());
-                sb.append(", ");
-            }
-        }
-        sb.setLength(sb.length() - 2);
-        sb.append(") values (");
-        for (int i = 0; i < _propertyTypes.length; ++i) {
-            final TnPropertyType pt = _propertyTypes[i];
-            if (isInsertTarget(pt)) {
-                sb.append("?, ");
-            }
-        }
-        sb.setLength(sb.length() - 2);
-        sb.append(")");
-        setSql(sb.toString());
-    }
+    // *static insert is unused on DBFlute
 
     // ===================================================================================
     //                                                                              Update
@@ -154,7 +106,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         sb.append("delete from ");
         sb.append(_targetDBMeta.getTableSqlName());
         setupDeleteWhere(sb);
-        setSql(sb.toString());
+        _sql = sb.toString();
     }
 
     protected void checkPrimaryKey() {
@@ -181,5 +133,31 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
             TnPropertyType pt = bmd.getTimestampPropertyType();
             sb.append(" and ").append(pt.getColumnSqlName()).append(" = ?");
         }
+    }
+
+    protected DeleteOption<ConditionBean> extractDeleteOption(Object[] args) {
+        if (args.length < 2 || args[1] == null) {
+            return null;
+        }
+        // should be same as fixed option about static options,
+        // for example, PrimaryKeyIdentityDisabled
+        @SuppressWarnings("unchecked")
+        final DeleteOption<ConditionBean> option = (DeleteOption<ConditionBean>) args[1];
+        return option;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getSql() {
+        return _sql;
+    }
+
+    public TnBeanMetaData getBeanMetaData() {
+        return _beanMetaData;
+    }
+
+    protected TnPropertyType[] getPropertyTypes() {
+        return _propertyTypes;
     }
 }

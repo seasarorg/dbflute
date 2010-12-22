@@ -15,14 +15,13 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.DeleteOption;
-import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBatchDeleteHandler;
 
@@ -30,39 +29,41 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBatchDeleteHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBatchDeleteAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
+public class TnBatchDeleteAutoStaticCommand extends TnDeleteAutoStaticCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnBatchDeleteAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
-            DeleteOption<? extends ConditionBean> deleteOption) {
-        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false,
-                null, deleteOption);
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling);
     }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    @Override
+    protected Object doExecute(Object[] args, TnAbstractEntityHandler handler) {
+        if (args == null || args.length == 0) {
+            String msg = "The argument 'args' should not be null or empty.";
+            throw new IllegalArgumentException(msg);
+        }
+        final List<?> beanList;
+        if (args[0] instanceof List<?>) {
+            beanList = (List<?>) args[0];
+        } else {
+            String msg = "The argument 'args[0]' should be list: " + args[0];
+            throw new IllegalArgumentException(msg);
+        }
+        handler.setExceptionMessageSqlArgs(new Object[] { beanList });
+        return ((TnBatchDeleteHandler) handler).executeBatch(beanList);
+    };
 
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected TnAbstractEntityHandler createEntityHandler() {
-        final TnAbstractBatchHandler handler = createBatchHandler();
-        handler.setDeleteOption(_deleteOption);
-        return handler;
-    }
-
-    @Override
-    protected TnAbstractBatchHandler createBatchHandler() {
+    protected TnAbstractEntityHandler newEntityHandler() {
         return new TnBatchDeleteHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
-    }
-
-    @Override
-    protected void setupPropertyTypes(String[] propertyNames) { // called by constructor
-    }
-
-    @Override
-    protected void setupSql() { // called by constructor
-        setupDeleteSql();
     }
 }

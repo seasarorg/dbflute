@@ -17,8 +17,6 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.DeleteOption;
-import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -35,21 +33,23 @@ public class TnDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand {
     //                                                                         Constructor
     //                                                                         ===========
     public TnDeleteAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
-            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
-            DeleteOption<? extends ConditionBean> deleteOption) {
-        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false,
-                null, deleteOption);
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false);
     }
 
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected TnAbstractEntityHandler createEntityHandler() {
-        final TnDeleteEntityHandler handler = new TnDeleteEntityHandler(getDataSource(), getStatementFactory(),
-                getBeanMetaData(), getPropertyTypes());
-        handler.setDeleteOption(_deleteOption);
+    protected TnAbstractEntityHandler createEntityHandler(Object[] args) {
+        final TnAbstractEntityHandler handler = super.createEntityHandler(args);
+        handler.setDeleteOption(extractDeleteOption(args));
         return handler;
+    }
+
+    @Override
+    protected TnAbstractEntityHandler newEntityHandler() {
+        return new TnDeleteEntityHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 
     @Override

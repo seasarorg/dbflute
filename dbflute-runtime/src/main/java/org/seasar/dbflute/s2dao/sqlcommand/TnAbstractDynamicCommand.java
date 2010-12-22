@@ -33,9 +33,9 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Node rootNode;
-    protected String[] argNames = new String[0];
-    protected Class<?>[] argTypes = new Class[0];
+    protected Node _rootNode;
+    protected String[] _argNames = new String[0];
+    protected Class<?>[] _argTypes = new Class[0];
 
     // ===================================================================================
     //                                                                         Constructor
@@ -45,11 +45,10 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
     }
 
     // ===================================================================================
-    //                                                                        Sql Handling
+    //                                                                        SQL Handling
     //                                                                        ============
-    public void setSql(String sql) {
-        super.setSql(sql);
-        this.rootNode = createSqlAnalyzer(sql).analyze();
+    public void acceptSql(String sql) {
+        this._rootNode = createSqlAnalyzer(sql).analyze();
     }
 
     protected SqlAnalyzer createSqlAnalyzer(String sql) {
@@ -62,7 +61,7 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
 
     public CommandContext apply(Object[] args) { // It is necessary to be public!
         final CommandContext ctx = createCommandContext(args);
-        rootNode.accept(ctx);
+        _rootNode.accept(ctx);
         return ctx;
     }
 
@@ -71,25 +70,25 @@ public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {
     }
 
     protected CommandContextCreator createCommandContextCreator() {
-        return new CommandContextCreator(argNames, argTypes);
+        return new CommandContextCreator(_argNames, _argTypes);
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String[] getArgNames() {
-        return argNames;
+        return _argNames;
     }
 
     public void setArgNames(String[] argNames) {
-        this.argNames = argNames;
+        this._argNames = argNames;
     }
 
     public Class<?>[] getArgTypes() {
-        return argTypes;
+        return _argTypes;
     }
 
     public void setArgTypes(Class<?>[] argTypes) {
-        this.argTypes = argTypes;
+        this._argTypes = argTypes;
     }
 }

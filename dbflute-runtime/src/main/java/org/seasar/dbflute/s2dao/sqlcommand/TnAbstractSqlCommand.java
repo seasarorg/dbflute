@@ -31,7 +31,6 @@ public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution
     //                                                                           =========
     private DataSource _dataSource;
     private StatementFactory _statementFactory;
-    private String _sql; // is not always used
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,13 +49,5 @@ public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution
 
     public StatementFactory getStatementFactory() {
         return _statementFactory;
-    }
-
-    public String getSql() {
-        return _sql;
-    }
-
-    public void setSql(String sql) {
-        this._sql = sql;
     }
 }
