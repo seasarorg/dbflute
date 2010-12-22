@@ -1180,7 +1180,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * InsertOption<${myConditionBeanClassName}> option = new InsertOption<${myConditionBeanClassName}>();
      * <span style="color: #3F7E5E">// you can insert by your values for common columns</span>
      * option.disableCommonColumnAutoSetup();
-     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">insert</span>(${myEntityVariableName});
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">varyingInsert</span>(${myEntityVariableName}, option);
      * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
      * </pre>
      * @param ${myEntityVariableName} The entity of insert target. (NotNull)
