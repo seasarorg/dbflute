@@ -1132,6 +1132,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The updated count.
+     * @exception org.seasar.dbflute.exception.NonQueryUpdateNotAllowedException When the query has no condition.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
         return doQueryUpdate(${myEntityVariableName}, cb, null);
@@ -1152,6 +1153,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The deleted count.
+     * @exception org.seasar.dbflute.exception.NonQueryDeleteNotAllowedException When the query has no condition.
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
         return doQueryDelete(cb, null);
@@ -1299,7 +1301,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     /**
      * Batch-insert the list with varying requests. <br />
-     * For example, disableCommonColumnAutoSetup(), disablePrimaryKeyIdentity(). <br />
+     * For example, disableCommonColumnAutoSetup()
+     * , disablePrimaryKeyIdentity(), limitBatchInsertLogging(). <br />
      * Other specifications are same as batchInsert(entityList).
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @param option The option of insert for varying requests. (NotNull)
@@ -1312,11 +1315,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     /**
      * Batch-update the list with varying requests. <br />
-     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
+     * , disableCommonColumnAutoSetup(), limitBatchUpdateLogging(). <br />
      * Other specifications are same as batchUpdate(entityList).
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @param option The option of update for varying requests. (NotNull)
-     * @return The array of inserted count.
+     * @return The array of updated count.
      */
     public int[] varyingBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
@@ -1326,15 +1330,44 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     /**
      * Batch-update the list with varying requests non-strictly. <br />
-     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
+     * , disableCommonColumnAutoSetup(), limitBatchUpdateLogging(). <br />
      * Other specifications are same as batchUpdateNonstrict(entityList).
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @param option The option of update for varying requests. (NotNull)
-     * @return The array of inserted count.
+     * @return The array of updated count.
      */
     public int[] varyingBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
         return doBatchUpdateNonstrict(${myEntityListVariableName}, option);
+    }
+#end
+
+    /**
+     * Batch-delete the list with varying requests. <br />
+     * For example, limitBatchDeleteLogging(). <br />
+     * Other specifications are same as batchDelete(entityList).
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param option The option of delete for varying requests. (NotNull)
+     * @return The array of deleted count.
+     */
+    public int[] varyingBatchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
+        assertDeleteOptionNotNull(option);
+        return doBatchDelete(${myEntityListVariableName}, option);
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Batch-delete the list with varying requests non-strictly. <br />
+     * For example, limitBatchDeleteLogging(). <br />
+     * Other specifications are same as batchDeleteNonstrict(entityList).
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param option The option of delete for varying requests. (NotNull)
+     * @return The array of deleted count.
+     */
+    public int[] varyingBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
+        assertDeleteOptionNotNull(option);
+        return doBatchDeleteNonstrict(${myEntityListVariableName}, option);
     }
 #end
 
@@ -1366,6 +1399,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param option The option of update for varying requests. (NotNull)
      * @return The updated count.
+     * @exception org.seasar.dbflute.exception.NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
      */
     public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
@@ -1379,6 +1413,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param option The option of delete for varying requests. (NotNull)
      * @return The deleted count.
+     * @exception org.seasar.dbflute.exception.NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
      */
     public int varyingQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> option) {
         assertDeleteOptionNotNull(option);
@@ -1542,48 +1577,45 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     protected int delegateInsert(${myExtendedObjectClassName} e, InsertOption<${myConditionBeanClassName}> op)
     { if (!processBeforeInsert(e, op)) { return 0; } return invoke(createInsertEntityCommand(e, op)); }
     protected int delegateUpdate(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeUpdate(e, op)) { return 0; }
 #if ($table.hasOptimisticLock())
-    { if (!processBeforeUpdate(e, op)) { return 0; } return invoke(createUpdateEntityCommand(e, op)); }
+      return invoke(createUpdateEntityCommand(e, op)); }
 #else
-    { if (!processBeforeUpdate(e, op)) { return 0; } return invoke(createUpdateNonstrictEntityCommand(e, op)); }
+      return delegateUpdateNonstrict(e, op); }
 #end
-#if ($table.hasOptimisticLock())
     protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
     { if (!processBeforeUpdate(e, op)) { return 0; } return invoke(createUpdateNonstrictEntityCommand(e, op)); }
-#end
     protected int delegateDelete(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeDelete(e, op)) { return 0; }
 #if ($table.hasOptimisticLock())
-    { if (!processBeforeDelete(e, op)) { return 0; } return invoke(createDeleteEntityCommand(e, op)); }
+      return invoke(createDeleteEntityCommand(e, op)); }
 #else
-    { if (!processBeforeDelete(e, op)) { return 0; } return invoke(createDeleteNonstrictEntityCommand(e, op)); }
+      return delegateDeleteNonstrict(e, op); }
 #end
-#if ($table.hasOptimisticLock())
     protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
     { if (!processBeforeDelete(e, op)) { return 0; } return invoke(createDeleteNonstrictEntityCommand(e, op)); }
-#end
 
     protected int[] delegateBatchInsert(List<${myExtendedObjectClassName}> ls, InsertOption<${myConditionBeanClassName}> op)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls, op), op)); }
+    { if (ls.isEmpty()) { return new int[]{}; }
+      return invoke(createBatchInsertEntityCommand(processBatchInternally(ls, op), op)); }
     protected int[] delegateBatchUpdate(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
+    { if (ls.isEmpty()) { return new int[]{}; }
 #if ($table.hasOptimisticLock())
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls, op), op)); }
+      return invoke(createBatchUpdateEntityCommand(processBatchInternally(ls, op, false), op)); }
 #else
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls, op), op)); }
+      return delegateBatchUpdateNonstrict(ls, op); }
 #end
-#if ($table.hasOptimisticLock())
     protected int[] delegateBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls, op), op)); }
-#end
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
     protected int[] delegateBatchDelete(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
+    { if (ls.isEmpty()) { return new int[]{}; }
 #if ($table.hasOptimisticLock())
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls, op), op)); }
+      return invoke(createBatchDeleteEntityCommand(processBatchInternally(ls, op, false), op)); }
 #else
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls, op), op)); }
+      return delegateBatchDeleteNonstrict(ls, op); }
 #end
-#if ($table.hasOptimisticLock())
     protected int[] delegateBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
-    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls, op), op)); }
-#end
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
 
     protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
     { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateEntityCBCommand(e, cb, op));  }
