@@ -77,11 +77,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected Map<String, Class<?>> createBeanArgNameTypeMapByInstance(Object pmb) {
-        final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
-        if (pmb != null) {
-            argNameTypeMap.put("pmb", pmb.getClass());
-        }
-        return argNameTypeMap;
+        return createBeanArgNameTypeMapByType(pmb != null ? pmb.getClass() : null);
     }
 
     protected Map<String, Class<?>> createBeanArgNameTypeMapByType(Class<?> pmbType) {

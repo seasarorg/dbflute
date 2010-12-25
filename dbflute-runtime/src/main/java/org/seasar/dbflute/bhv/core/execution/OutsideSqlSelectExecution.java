@@ -22,8 +22,8 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 
 /**
  * @author jflute

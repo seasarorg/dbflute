@@ -26,7 +26,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class QueryUpdateEntityCBCommand extends AbstractUpdateEntityCommand {
+public class QueryUpdateCBCommand extends AbstractUpdateEntityCommand {
 
     // ===================================================================================
     //                                                                           Attribute

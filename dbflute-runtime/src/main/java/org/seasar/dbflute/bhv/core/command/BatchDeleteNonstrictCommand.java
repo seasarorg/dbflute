@@ -18,7 +18,7 @@ package org.seasar.dbflute.bhv.core.command;
 /**
  * @author jflute
  */
-public class BatchDeleteNonstrictEntityCommand extends BatchDeleteEntityCommand {
+public class BatchDeleteNonstrictCommand extends BatchDeleteCommand {
 
     // ===================================================================================
     //                                                                   Basic Information

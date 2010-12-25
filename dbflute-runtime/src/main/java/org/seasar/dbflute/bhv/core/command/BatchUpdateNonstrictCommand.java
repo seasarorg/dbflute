@@ -18,7 +18,7 @@ package org.seasar.dbflute.bhv.core.command;
 /**
  * @author jflute
  */
-public class BatchUpdateNonstrictEntityCommand extends BatchUpdateEntityCommand {
+public class BatchUpdateNonstrictCommand extends BatchUpdateCommand {
 
     // ===================================================================================
     //                                                                   Basic Information

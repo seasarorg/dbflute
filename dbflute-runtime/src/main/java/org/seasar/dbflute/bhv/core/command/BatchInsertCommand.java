@@ -15,75 +15,67 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
-import org.seasar.dbflute.bhv.DeleteOption;
+import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnBatchDeleteStaticCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnBatchInsertDynamicCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnInsertEntityDynamicCommand;
 
 /**
  * @author jflute
  */
-public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
+public class BatchInsertCommand extends AbstractListEntityCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The option of delete. (NotRequired) */
-    protected DeleteOption<? extends ConditionBean> _deleteOption;
+    /** The option of insert. (NotRequired) */
+    protected InsertOption<? extends ConditionBean> _insertOption;
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
     public String getCommandName() {
-        return "batchDelete";
+        return "batchInsert";
     }
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
-    @Override
-    public String buildSqlExecutionKey() {
-        // no special unique key for options
-        return super.buildSqlExecutionKey();
-    }
-
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
                 final TnBeanMetaData bmd = createBeanMetaData();
-                return createBatchDeleteSqlExecution(bmd);
+                return createBatchInsertSqlExecution(bmd);
             }
         };
     }
 
-    protected SqlExecution createBatchDeleteSqlExecution(TnBeanMetaData bmd) {
+    protected SqlExecution createBatchInsertSqlExecution(TnBeanMetaData bmd) {
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        return createBatchDeleteStaticCommand(bmd, propertyNames);
+        return createBatchInsertDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnBatchDeleteStaticCommand createBatchDeleteStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final DBMeta dbmeta = findDBMeta();
-        final boolean opt = isOptimisticLockHandling();
-        return new TnBatchDeleteStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
-    }
-
-    protected boolean isOptimisticLockHandling() {
-        return true;
+    protected TnInsertEntityDynamicCommand createBatchInsertDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnBatchInsertDynamicCommand cmd = new TnBatchInsertDynamicCommand(_dataSource, _statementFactory);
+        cmd.setBeanMetaData(bmd);
+        cmd.setTargetDBMeta(findDBMeta());
+        cmd.setPropertyNames(propertyNames);
+        return cmd;
     }
 
     @Override
     protected Object[] doGetSqlExecutionArgument() {
-        return new Object[] { _entityList, _deleteOption };
+        return new Object[] { _entityList, _insertOption };
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setDeleteOption(DeleteOption<? extends ConditionBean> deleteOption) {
-        _deleteOption = deleteOption;
+    public void setInsertOption(InsertOption<? extends ConditionBean> insertOption) {
+        _insertOption = insertOption;
     }
 }

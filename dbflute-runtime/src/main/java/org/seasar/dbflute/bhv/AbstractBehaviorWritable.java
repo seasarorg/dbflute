@@ -21,15 +21,15 @@ import java.util.List;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.command.AbstractListEntityCommand;
-import org.seasar.dbflute.bhv.core.command.BatchDeleteEntityCommand;
-import org.seasar.dbflute.bhv.core.command.BatchDeleteNonstrictEntityCommand;
-import org.seasar.dbflute.bhv.core.command.BatchInsertEntityCommand;
-import org.seasar.dbflute.bhv.core.command.BatchUpdateEntityCommand;
-import org.seasar.dbflute.bhv.core.command.BatchUpdateNonstrictEntityCommand;
+import org.seasar.dbflute.bhv.core.command.BatchDeleteCommand;
+import org.seasar.dbflute.bhv.core.command.BatchDeleteNonstrictCommand;
+import org.seasar.dbflute.bhv.core.command.BatchInsertCommand;
+import org.seasar.dbflute.bhv.core.command.BatchUpdateCommand;
+import org.seasar.dbflute.bhv.core.command.BatchUpdateNonstrictCommand;
 import org.seasar.dbflute.bhv.core.command.DeleteEntityCommand;
 import org.seasar.dbflute.bhv.core.command.DeleteNonstrictEntityCommand;
 import org.seasar.dbflute.bhv.core.command.QueryDeleteCBCommand;
-import org.seasar.dbflute.bhv.core.command.QueryUpdateEntityCBCommand;
+import org.seasar.dbflute.bhv.core.command.QueryUpdateCBCommand;
 import org.seasar.dbflute.bhv.core.command.UpdateEntityCommand;
 import org.seasar.dbflute.bhv.core.command.UpdateNonstrictEntityCommand;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -846,44 +846,42 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // -----------------------------------------------------
     //                                                 Batch
     //                                                 -----
-    protected BatchInsertEntityCommand createBatchInsertEntityCommand(List<? extends Entity> entityList,
+    protected BatchInsertCommand createBatchInsertCommand(List<? extends Entity> entityList,
             InsertOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createBatchInsertEntityCommand");
-        final BatchInsertEntityCommand cmd = xsetupListEntityCommand(new BatchInsertEntityCommand(), entityList);
+        assertBehaviorCommandInvoker("createBatchInsertCommand");
+        final BatchInsertCommand cmd = xsetupListEntityCommand(new BatchInsertCommand(), entityList);
         cmd.setInsertOption(option);
         return cmd;
     }
 
-    protected BatchUpdateEntityCommand createBatchUpdateEntityCommand(List<? extends Entity> entityList,
+    protected BatchUpdateCommand createBatchUpdateCommand(List<? extends Entity> entityList,
             UpdateOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createBatchUpdateEntityCommand");
-        final BatchUpdateEntityCommand cmd = xsetupListEntityCommand(new BatchUpdateEntityCommand(), entityList);
+        assertBehaviorCommandInvoker("createBatchUpdateCommand");
+        final BatchUpdateCommand cmd = xsetupListEntityCommand(new BatchUpdateCommand(), entityList);
         cmd.setUpdateOption(option);
         return cmd;
     }
 
-    protected BatchUpdateNonstrictEntityCommand createBatchUpdateNonstrictEntityCommand(
-            List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createBatchUpdateNonstrictEntityCommand");
-        final BatchUpdateNonstrictEntityCommand cmd = xsetupListEntityCommand(new BatchUpdateNonstrictEntityCommand(),
-                entityList);
+    protected BatchUpdateNonstrictCommand createBatchUpdateNonstrictCommand(List<? extends Entity> entityList,
+            UpdateOption<? extends ConditionBean> option) {
+        assertBehaviorCommandInvoker("createBatchUpdateNonstrictCommand");
+        final BatchUpdateNonstrictCommand cmd = xsetupListEntityCommand(new BatchUpdateNonstrictCommand(), entityList);
         cmd.setUpdateOption(option);
         return cmd;
     }
 
-    protected BatchDeleteEntityCommand createBatchDeleteEntityCommand(List<? extends Entity> entityList,
+    protected BatchDeleteCommand createBatchDeleteCommand(List<? extends Entity> entityList,
             DeleteOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createBatchDeleteEntityCommand");
-        final BatchDeleteEntityCommand cmd = xsetupListEntityCommand(new BatchDeleteEntityCommand(), entityList);
+        assertBehaviorCommandInvoker("createBatchDeleteCommand");
+        final BatchDeleteCommand cmd = xsetupListEntityCommand(new BatchDeleteCommand(), entityList);
         cmd.setDeleteOption(option);
         return cmd;
     }
 
-    protected BatchDeleteNonstrictEntityCommand createBatchDeleteNonstrictEntityCommand(
-            List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createBatchDeleteNonstrictEntityCommand");
-        final BatchDeleteNonstrictEntityCommand cmd = xsetupListEntityCommand(new BatchDeleteNonstrictEntityCommand(),
-                entityList);
+    protected BatchDeleteNonstrictCommand createBatchDeleteNonstrictCommand(List<? extends Entity> entityList,
+            DeleteOption<? extends ConditionBean> option) {
+        assertBehaviorCommandInvoker("createBatchDeleteNonstrictCommand");
+        final BatchDeleteNonstrictCommand cmd = xsetupListEntityCommand(new BatchDeleteNonstrictCommand(), entityList);
         cmd.setDeleteOption(option);
         return cmd;
     }
@@ -910,10 +908,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // -----------------------------------------------------
     //                                                 Query
     //                                                 -----
-    protected QueryUpdateEntityCBCommand createQueryUpdateEntityCBCommand(Entity entity, ConditionBean cb,
+    protected QueryUpdateCBCommand createQueryUpdateCBCommand(Entity entity, ConditionBean cb,
             UpdateOption<? extends ConditionBean> option) {
-        assertBehaviorCommandInvoker("createQueryUpdateEntityCBCommand");
-        final QueryUpdateEntityCBCommand cmd = new QueryUpdateEntityCBCommand();
+        assertBehaviorCommandInvoker("createQueryUpdateCBCommand");
+        final QueryUpdateCBCommand cmd = new QueryUpdateCBCommand();
         cmd.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setConditionBeanType(cb.getClass());

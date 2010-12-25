@@ -25,7 +25,7 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnBatchUpdateDynamicCommand;
 /**
  * @author jflute
  */
-public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
+public class BatchUpdateCommand extends AbstractListEntityCommand {
 
     // ===================================================================================
     //                                                                           Attribute
