@@ -84,11 +84,10 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateDynamicCommand {
     //                                                                             =======
     protected TnBatchUpdateHandler createBatchUpdateHandler(TnPropertyType[] boundPropTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnBatchUpdateHandler handler = new TnBatchUpdateHandler(_dataSource, _statementFactory, _beanMetaData,
-                boundPropTypes);
+        final TnBatchUpdateHandler handler = new TnBatchUpdateHandler(_dataSource, _statementFactory, sql,
+                _beanMetaData, boundPropTypes);
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
-        handler.setSql(sql);
         handler.setUpdateOption(option);
         return handler;
     }

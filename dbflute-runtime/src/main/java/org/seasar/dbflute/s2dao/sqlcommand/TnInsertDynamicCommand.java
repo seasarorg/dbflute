@@ -165,9 +165,8 @@ public class TnInsertDynamicCommand extends TnAbstractEntityDynamicCommand {
     //                                                                             =======
     protected TnInsertEntityHandler createInsertEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             InsertOption<ConditionBean> option) {
-        final TnInsertEntityHandler handler = new TnInsertEntityHandler(_dataSource, _statementFactory, _beanMetaData,
-                boundPropTypes);
-        handler.setSql(sql);
+        final TnInsertEntityHandler handler = new TnInsertEntityHandler(_dataSource, _statementFactory, sql,
+                _beanMetaData, boundPropTypes);
         handler.setInsertOption(option);
         return handler;
     }

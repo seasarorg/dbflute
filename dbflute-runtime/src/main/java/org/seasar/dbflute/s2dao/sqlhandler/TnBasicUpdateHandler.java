@@ -26,7 +26,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBasicUpdateHandler extends TnBasicHandler {
+public class TnBasicUpdateHandler extends TnBasicParameterHandler {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -38,20 +38,8 @@ public class TnBasicUpdateHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public int execute(Object[] args) {
-        return execute(args, getArgTypes(args));
-    }
-
-    public int execute(Object[] args, Class<?>[] argTypes) {
-        final Connection conn = getConnection();
-        try {
-            return execute(conn, args, argTypes);
-        } finally {
-            close(conn);
-        }
-    }
-
-    public int execute(Connection conn, Object[] args, Class<?>[] argTypes) {
+    @Override
+    protected Object doExecute(Connection conn, Object[] args, Class<?>[] argTypes) {
         logSql(args, argTypes);
         final PreparedStatement ps = prepareStatement(conn);
         try {

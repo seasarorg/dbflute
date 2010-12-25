@@ -20,7 +20,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
@@ -28,37 +27,28 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
 /**
  * @author jflute
  */
-public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
+public class SelectSimpleExecution extends AbstractFixedSqlExecution {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The handler of resultSet. */
     protected final TnResultSetHandler _resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlSelectExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
+    public SelectSimpleExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
             Map<String, Class<?>> argNameTypeMap, TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory, twoWaySql, argNameTypeMap);
-        _resultSetHandler = resultSetHandler;
+        this._resultSetHandler = resultSetHandler;
     }
 
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
     @Override
-    protected TnBasicParameterHandler newBasicParameterHandler(String executedSql) {
-        return new TnBasicSelectHandler(_dataSource, executedSql, _resultSetHandler, _statementFactory);
-    }
-
-    // ===================================================================================
-    //                                                                              Filter
-    //                                                                              ======
-    @Override
-    protected OutsideSqlFilter.ExecutionFilterType getOutsideSqlExecutionFilterType() {
-        return OutsideSqlFilter.ExecutionFilterType.SELECT;
+    protected TnBasicParameterHandler newBasicParameterHandler(String sql) {
+        return new TnBasicSelectHandler(_dataSource, sql, _resultSetHandler, _statementFactory);
     }
 
     // ===================================================================================

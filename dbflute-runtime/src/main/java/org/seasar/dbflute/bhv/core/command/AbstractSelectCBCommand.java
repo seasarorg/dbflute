@@ -15,7 +15,8 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
-import org.seasar.dbflute.bhv.core.SqlExecution;
+import java.util.Map;
+
 import org.seasar.dbflute.bhv.core.execution.SelectCBExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
@@ -65,16 +66,13 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
         return _tableDbName + ":" + getCommandName() + "(" + cbName + ")";
     }
 
-    protected SqlExecution createSelectCBExecution(Class<? extends ConditionBean> cbType, TnResultSetHandler handler) {
-        return createSelectCBExecution(handler, new String[] { "pmb" }, new Class<?>[] { cbType });
+    protected SelectCBExecution createSelectCBExecution(Class<? extends ConditionBean> cbType,
+            TnResultSetHandler handler) {
+        return createSelectCBExecution(createBeanArgNameTypeMapByType(cbType), handler);
     }
 
-    protected SelectCBExecution createSelectCBExecution(TnResultSetHandler handler, String[] argNames,
-            Class<?>[] argTypes) {
-        final SelectCBExecution cmd = new SelectCBExecution(_dataSource, _statementFactory, handler);
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(argTypes);
-        return cmd;
+    protected SelectCBExecution createSelectCBExecution(Map<String, Class<?>> argNameTypeMap, TnResultSetHandler handler) {
+        return new SelectCBExecution(_dataSource, _statementFactory, argNameTypeMap, handler);
     }
 
     public Object[] getSqlExecutionArgument() {

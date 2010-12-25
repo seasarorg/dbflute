@@ -210,9 +210,8 @@ public class TnUpdateDynamicCommand extends TnAbstractEntityDynamicCommand {
     //                                                                             =======
     protected TnUpdateEntityHandler createUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             UpdateOption<ConditionBean> option) {
-        final TnUpdateEntityHandler handler = new TnUpdateEntityHandler(_dataSource, _statementFactory, _beanMetaData,
-                boundPropTypes);
-        handler.setSql(sql);
+        final TnUpdateEntityHandler handler = new TnUpdateEntityHandler(_dataSource, _statementFactory, sql,
+                _beanMetaData, boundPropTypes);
         handler.setOptimisticLockHandling(_optimisticLockHandling); // [DBFlute-0.8.0]
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setUpdateOption(option);

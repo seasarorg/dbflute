@@ -46,7 +46,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractEntityHandler extends TnBasicHandler {
+public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -67,9 +67,9 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractEntityHandler(DataSource dataSource, StatementFactory statementFactory,
+    public TnAbstractEntityHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
             TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
-        super(dataSource, statementFactory);
+        super(dataSource, statementFactory, sql);
         _beanMetaData = beanMetaData;
         _boundPropTypes = boundPropTypes;
     }
@@ -310,7 +310,7 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
     }
 
     protected TnIdentityAdjustmentHandler createIdentityAdjustmentHandler(String sql) {
-        return new TnIdentityAdjustmentHandler(getDataSource(), getStatementFactory(), sql);
+        return new TnIdentityAdjustmentHandler(_dataSource, _statementFactory, sql);
     }
 
     protected static class TnIdentityAdjustmentHandler extends TnBasicUpdateHandler {
@@ -320,7 +320,7 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
         }
 
         @Override
-        public int execute(Connection conn, Object[] args, Class<?>[] argTypes) {
+        protected Object doExecute(Connection conn, Object[] args, Class<?>[] argTypes) {
             logSql(args, argTypes);
             Statement st = null;
             try {
@@ -328,7 +328,7 @@ public abstract class TnAbstractEntityHandler extends TnBasicHandler {
                 // because SQLServer do not work by PreparedStatement
                 // but it do work well by Statement
                 st = conn.createStatement();
-                return st.executeUpdate(getSql());
+                return st.executeUpdate(_sql);
             } catch (SQLException e) {
                 handleSQLException(e, st);
                 return 0; // unreachable

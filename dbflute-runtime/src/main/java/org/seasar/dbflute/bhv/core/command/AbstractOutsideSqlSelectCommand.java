@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import java.util.Map;
+
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.bhv.core.execution.OutsideSqlSelectExecution;
@@ -115,11 +117,10 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         final String sql = outsideSqlContext.readFilteredOutsideSql(_sqlFileEncoding, suffix);
         final Object pmb = outsideSqlContext.getParameterBean();
 
-        // - - - - - - - - - - - - - - -
-        // The attribute of SqlCommand.
-        // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] { "pmb" } : new String[] {});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] { pmb.getClass() } : new Class<?>[] {});
+        // - - - - - - - - - - - - - - - -
+        // The attribute of SqlExecution.
+        // - - - - - - - - - - - - - - - -
+        final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMapByInstance(pmb);
 
         // - - - - - - - - - - - - -
         // Create ResultSetHandler.
@@ -129,21 +130,17 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // - - - - - - - - - - -
         // Create SqlExecution.
         // - - - - - - - - - - -
-        final OutsideSqlSelectExecution execution = createOutsideSqlSelectExecution(handler, argNames, argTypes, sql);
-        execution.setOutsideSqlFilter(_outsideSqlFilter);
+        final OutsideSqlSelectExecution execution = createOutsideSqlSelectExecution(sql, argNameTypeMap, handler);
         execution.setRemoveBlockComment(isRemoveBlockComment(outsideSqlContext));
         execution.setRemoveLineComment(isRemoveLineComment(outsideSqlContext));
         execution.setFormatSql(outsideSqlContext.isFormatSql());
+        execution.setOutsideSqlFilter(_outsideSqlFilter);
         return execution;
     }
 
-    protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(TnResultSetHandler handler, String[] argNames,
-            Class<?>[] argTypes, String sql) {
-        final OutsideSqlSelectExecution cmd = new OutsideSqlSelectExecution(_dataSource, _statementFactory, handler);
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(argTypes);
-        cmd.acceptSql(sql);
-        return cmd;
+    protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(String sql,
+            Map<String, Class<?>> argNameTypeMap, TnResultSetHandler handler) {
+        return new OutsideSqlSelectExecution(_dataSource, _statementFactory, sql, argNameTypeMap, handler);
     }
 
     public Object[] getSqlExecutionArgument() {

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import java.util.Map;
+
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.bhv.core.execution.OutsideSqlExecuteExecution;
@@ -97,10 +99,9 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         // - - - - - - - - - - - - - - -
         // The attribute of SqlCommand.
         // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] { "pmb" } : new String[] {});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] { pmb.getClass() } : new Class<?>[] {});
+        final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMapByInstance(pmb);
 
-        final OutsideSqlExecuteExecution execution = createOutsideSqlExecuteExecution(argNames, argTypes, sql);
+        final OutsideSqlExecuteExecution execution = createOutsideSqlExecuteExecution(sql, argNameTypeMap);
         execution.setOutsideSqlFilter(_outsideSqlFilter);
         execution.setRemoveBlockComment(isRemoveBlockComment(outsideSqlContext));
         execution.setRemoveLineComment(isRemoveLineComment(outsideSqlContext));

@@ -37,7 +37,7 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBasicSelectHandler extends TnBasicHandler {
+public class TnBasicSelectHandler extends TnBasicParameterHandler {
 
     // ===================================================================================
     //                                                                          Definition
@@ -48,41 +48,28 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private TnResultSetHandler resultSetHandler;
+    protected final TnResultSetHandler _resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnBasicSelectHandler(DataSource dataSource, String sql, TnResultSetHandler resultSetHandler,
             StatementFactory statementFactory) {
-        super(dataSource, statementFactory);
-        setSql(sql);
-        setResultSetHandler(resultSetHandler);
+        super(dataSource, statementFactory, sql);
+        _resultSetHandler = resultSetHandler;
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public Object execute(Object[] args) {
-        return execute(args, getArgTypes(args));
-    }
-
-    public Object execute(Object[] args, Class<?>[] argTypes) {
-        final Connection conn = getConnection();
-        try {
-            return execute(conn, args, argTypes);
-        } finally {
-            close(conn);
-        }
-    }
-
-    public Object execute(Connection conn, Object[] args, Class<?>[] argTypes) {
+    @Override
+    protected Object doExecute(Connection conn, Object[] args, Class<?>[] argTypes) {
         logSql(args, argTypes);
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(conn);
             bindArgs(conn, ps, args, argTypes);
-            return execute(ps);
+            return queryResult(ps);
         } catch (SQLException e) {
             handleSQLException(e, ps);
             return null; // unreachable
@@ -91,20 +78,17 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         }
     }
 
-    protected Object execute(PreparedStatement ps) throws SQLException {
-        if (resultSetHandler == null) {
-            throw new IllegalStateException("The resultSetHandler should not be null!");
-        }
+    protected Object queryResult(PreparedStatement ps) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = createResultSet(ps);
-            return resultSetHandler.handle(rs);
+            rs = executeQuery(ps);
+            return _resultSetHandler.handle(rs);
         } finally {
             close(rs);
         }
     }
 
-    protected ResultSet createResultSet(PreparedStatement ps) throws SQLException {
+    protected ResultSet executeQuery(PreparedStatement ps) throws SQLException {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
         // All select statements on DBFlute use this result set. 
         // - - - - - - - - - -/
@@ -164,16 +148,5 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     //                                                                      ==============
     private boolean isInternalDebugEnabled() { // because log instance is private
         return ResourceContext.isInternalDebug() && _log.isDebugEnabled();
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public TnResultSetHandler getResultSetHandler() {
-        return resultSetHandler;
-    }
-
-    public void setResultSetHandler(TnResultSetHandler resultSetHandler) {
-        this.resultSetHandler = resultSetHandler;
     }
 }

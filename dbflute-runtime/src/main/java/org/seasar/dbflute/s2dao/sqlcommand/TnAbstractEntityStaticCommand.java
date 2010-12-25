@@ -76,7 +76,6 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
         final TnAbstractEntityHandler handler = newEntityHandler();
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
-        handler.setSql(getSql());
         handler.setExceptionMessageSqlArgs(args);
         return handler;
     }

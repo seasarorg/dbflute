@@ -13,32 +13,42 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.sqlcommand;
+package org.seasar.dbflute.s2dao.sqlhandler;
+
+import java.sql.Connection;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
- * The basic command to execute SQL. <br />
- * This command is basically reused when executing so thread safe. <br />
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractBasicSqlCommand implements TnSqlCommand, SqlExecution {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final DataSource _dataSource;
-    protected final StatementFactory _statementFactory;
+public abstract class TnBasicParameterHandler extends TnAbstractBasicSqlHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBasicSqlCommand(DataSource dataSource, StatementFactory statementFactory) {
-        _dataSource = dataSource;
-        _statementFactory = statementFactory;
+    public TnBasicParameterHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
+        super(dataSource, statementFactory, sql);
     }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object execute(Object[] args) {
+        return execute(args, getArgTypes(args));
+    }
+
+    public Object execute(Object[] args, Class<?>[] argTypes) {
+        final Connection conn = getConnection();
+        try {
+            return doExecute(conn, args, argTypes);
+        } finally {
+            close(conn);
+        }
+    }
+
+    protected abstract Object doExecute(Connection conn, Object[] args, Class<?>[] argTypes);
 }

@@ -15,9 +15,11 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import java.util.Map;
+
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
-import org.seasar.dbflute.bhv.core.execution.BasicSelectExecution;
+import org.seasar.dbflute.bhv.core.execution.SelectSimpleExecution;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCache;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCache.SequenceRealExecutor;
@@ -119,7 +121,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         final SequenceCache sequenceCache = findSequenceCache(dbmeta);
         sql = prepareSequenceCache(sql, sequenceCache);
 
-        return createBasicSelectExecution(handler, new String[] {}, new Class<?>[] {}, sql, sequenceCache);
+        return createSequenceExecution(handler, sql, sequenceCache);
     }
 
     protected String getSequenceNextValSql() {
@@ -186,11 +188,12 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         }
     }
 
-    protected BasicSelectExecution createBasicSelectExecution(TnResultSetHandler handler, String[] argNames,
-            Class<?>[] argTypes, String sql, final SequenceCache sequenceCache) {
-        final BasicSelectExecution cmd;
+    protected SelectSimpleExecution createSequenceExecution(TnResultSetHandler handler, String sql,
+            final SequenceCache sequenceCache) {
+        final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
+        final SelectSimpleExecution cmd;
         if (sequenceCache != null) {
-            cmd = new BasicSelectExecution(_dataSource, _statementFactory, handler) {
+            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, sql, argNameTypeMap, handler) {
                 @Override
                 public Object execute(final Object[] args) {
                     return sequenceCache.nextval(new SequenceRealExecutor() {
@@ -205,11 +208,8 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
                 }
             };
         } else {
-            cmd = new BasicSelectExecution(_dataSource, _statementFactory, handler);
+            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, sql, argNameTypeMap, handler);
         }
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(argTypes);
-        cmd.acceptSql(sql);
         return cmd;
     }
 

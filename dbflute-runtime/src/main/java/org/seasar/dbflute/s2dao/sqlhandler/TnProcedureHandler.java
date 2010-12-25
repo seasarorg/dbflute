@@ -35,7 +35,7 @@ import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnProcedureHandler extends TnBasicHandler {
+public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -101,10 +101,10 @@ public class TnProcedureHandler extends TnBasicHandler {
     }
 
     protected CallableStatement prepareCallableStatement(final Connection connection) {
-        if (getSql() == null) {
+        if (_sql == null) {
             throw new IllegalStateException("The SQL should not be null!");
         }
-        return getStatementFactory().createCallableStatement(connection, getSql());
+        return _statementFactory.createCallableStatement(connection, _sql);
     }
 
     protected void bindArgs(Connection conn, CallableStatement cs, Object dto) throws SQLException {
@@ -212,7 +212,7 @@ public class TnProcedureHandler extends TnBasicHandler {
     //                                                                          ==========
     @Override
     protected String buildDisplaySql(final Object[] args) { // for procedure call
-        final String sql = getSql();
+        final String sql = _sql;
         final Object dto = getParameterBean(args);
         if (args == null || dto == null) {
             return sql;

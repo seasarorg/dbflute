@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
@@ -68,15 +71,29 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                            OutsideSqlExecuteExecution
     //                            --------------------------
-    protected OutsideSqlExecuteExecution createOutsideSqlExecuteExecution(String[] argNames, Class<?>[] argTypes,
-            String sql) {
-        final OutsideSqlExecuteExecution cmd = new OutsideSqlExecuteExecution(_dataSource, _statementFactory);
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(argTypes);
-        if (sql != null) {
-            cmd.acceptSql(sql);
+    protected OutsideSqlExecuteExecution createOutsideSqlExecuteExecution(String sql,
+            Map<String, Class<?>> argNameTypeMap) {
+        return new OutsideSqlExecuteExecution(_dataSource, _statementFactory, sql, argNameTypeMap);
+    }
+
+    protected Map<String, Class<?>> createBeanArgNameTypeMapByInstance(Object pmb) {
+        final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
+        if (pmb != null) {
+            argNameTypeMap.put("pmb", pmb.getClass());
         }
-        return cmd;
+        return argNameTypeMap;
+    }
+
+    protected Map<String, Class<?>> createBeanArgNameTypeMapByType(Class<?> pmbType) {
+        final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
+        if (pmbType != null) {
+            argNameTypeMap.put("pmb", pmbType);
+        }
+        return argNameTypeMap;
+    }
+
+    protected Map<String, Class<?>> newArgNameTypeMap() {
+        return new LinkedHashMap<String, Class<?>>();
     }
 
     // -----------------------------------------------------

@@ -13,32 +13,47 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.sqlcommand;
+package org.seasar.dbflute.bhv.core.execution;
+
+import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractTwoWaySqlCommand;
+import org.seasar.dbflute.twowaysql.node.Node;
 
 /**
- * The basic command to execute SQL. <br />
- * This command is basically reused when executing so thread safe. <br />
- * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public abstract class TnAbstractBasicSqlCommand implements TnSqlCommand, SqlExecution {
+public abstract class AbstractFixedSqlExecution extends TnAbstractTwoWaySqlCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DataSource _dataSource;
-    protected final StatementFactory _statementFactory;
+    protected final Node _rootNode;
+    protected final Map<String, Class<?>> _argNameTypeMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBasicSqlCommand(DataSource dataSource, StatementFactory statementFactory) {
-        _dataSource = dataSource;
-        _statementFactory = statementFactory;
+    public AbstractFixedSqlExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
+            Map<String, Class<?>> argNameTypeMap) {
+        super(dataSource, statementFactory);
+        _rootNode = analyzeTwoWaySql(twoWaySql);
+        _argNameTypeMap = argNameTypeMap;
+    }
+
+    // ===================================================================================
+    //                                                                            Resource
+    //                                                                            ========
+    @Override
+    protected Node getRootNode(Object[] args) {
+        return _rootNode;
+    }
+
+    @Override
+    protected Map<String, Class<?>> getArgNameTypeMap(Object[] args) {
+        return _argNameTypeMap;
     }
 }

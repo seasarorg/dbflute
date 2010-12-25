@@ -15,12 +15,15 @@
  */
 package org.seasar.dbflute.bhv.core.execution;
 
+import java.util.Map;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
+import org.seasar.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
-import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -30,29 +33,27 @@ public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory) {
-        super(dataSource, statementFactory);
+    public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
+            Map<String, Class<?>> argNameTypeMap) {
+        super(dataSource, statementFactory, twoWaySql, argNameTypeMap);
     }
 
     // ===================================================================================
-    //                                                                             Execute
+    //                                                                             Handler
     //                                                                             =======
-    public Object execute(Object args[]) {
-        final CommandContext ctx = apply(args);
-        final TnBasicUpdateHandler updateHandler = createBasicUpdateHandler(ctx);
-        final Object[] bindVariables = ctx.getBindVariables();
-        updateHandler.setExceptionMessageSqlArgs(bindVariables);
-        return Integer.valueOf(updateHandler.execute(bindVariables, ctx.getBindVariableTypes()));
-    }
-
-    protected TnBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
-        final String realSql = filterSql(ctx.getSql());
-        return new TnBasicUpdateHandler(_dataSource, _statementFactory, realSql);
+    @Override
+    protected TnBasicParameterHandler newBasicParameterHandler(String executedSql) {
+        return new TnBasicUpdateHandler(_dataSource, _statementFactory, executedSql);
     }
 
     // ===================================================================================
     //                                                                              Filter
     //                                                                              ======
+    @Override
+    protected Object filterReturnValue(Object returnValue) {
+        return DfTypeUtil.toInteger(returnValue); // just in case
+    }
+
     @Override
     protected OutsideSqlFilter.ExecutionFilterType getOutsideSqlExecutionFilterType() {
         return OutsideSqlFilter.ExecutionFilterType.EXECUTE;

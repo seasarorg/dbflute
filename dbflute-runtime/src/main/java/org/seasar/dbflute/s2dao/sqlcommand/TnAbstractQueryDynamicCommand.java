@@ -42,23 +42,23 @@ public abstract class TnAbstractQueryDynamicCommand extends TnAbstractBasicSqlCo
     //                                                                      CommandContext
     //                                                                      ==============
     protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
-        return new TnCommandContextHandler(_dataSource, _statementFactory, context);
+        return new TnCommandContextHandler(_dataSource, _statementFactory, context.getSql(), context);
     }
 
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
             Object[] args) {
-        final CommandContext context;
+        final CommandContext ctx;
         {
             final SqlAnalyzer analyzer = createSqlAnalyzer(twoWaySql);
             final Node node = analyzer.analyze();
             final CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
-            context = creator.createCommandContext(args);
-            node.accept(context);
+            ctx = creator.createCommandContext(args);
+            node.accept(ctx);
         }
-        return context;
+        return ctx;
     }
 
-    protected SqlAnalyzer createSqlAnalyzer(String sql) {
-        return ResourceContext.createSqlAnalyzer(sql, true);
+    protected SqlAnalyzer createSqlAnalyzer(String twoWaySql) {
+        return ResourceContext.createSqlAnalyzer(twoWaySql, true);
     }
 }

@@ -59,9 +59,9 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBatchHandler(DataSource dataSource, StatementFactory statementFactory,
+    public TnAbstractBatchHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
             TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
-        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
+        super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
     }
 
     // ===================================================================================

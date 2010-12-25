@@ -30,9 +30,9 @@ public class TnUpdateEntityHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateEntityHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            TnPropertyType[] boundPropTypes) {
-        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
+    public TnUpdateEntityHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
+            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+        super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
     }
 
     // ===================================================================================

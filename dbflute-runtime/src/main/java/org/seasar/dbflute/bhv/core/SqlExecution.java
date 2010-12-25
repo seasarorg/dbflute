@@ -20,5 +20,5 @@ package org.seasar.dbflute.bhv.core;
  */
 public interface SqlExecution {
 
-    public Object execute(Object[] args);
+    Object execute(Object[] args);
 }

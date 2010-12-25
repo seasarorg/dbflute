@@ -16,6 +16,7 @@
 package org.seasar.dbflute.bhv.core.command;
 
 import java.util.List;
+import java.util.Map;
 
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
@@ -95,7 +96,8 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         }
         columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
-        return createOutsideSqlExecuteExecution(new String[] { "pmb" }, new Class<?>[] { _entityType }, sql);
+        final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMapByType(_entityType);
+        return createOutsideSqlExecuteExecution(sql, argNameTypeMap);
     }
 
     @Override

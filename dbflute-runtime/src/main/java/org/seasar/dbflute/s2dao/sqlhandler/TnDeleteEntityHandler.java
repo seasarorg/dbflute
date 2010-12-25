@@ -30,9 +30,9 @@ public class TnDeleteEntityHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnDeleteEntityHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            TnPropertyType[] boundPropTypes) {
-        super(dataSource, statementFactory, beanMetaData, boundPropTypes);
+    public TnDeleteEntityHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
+            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+        super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
     }
 
     // ===================================================================================

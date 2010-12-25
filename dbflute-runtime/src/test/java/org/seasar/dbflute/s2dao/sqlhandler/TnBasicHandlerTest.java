@@ -18,7 +18,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
 
     public void test_logSql_whitebox_nothing() {
         // ## Arrange ##
-        TnBasicHandler handler = new TnBasicHandler(null, null) {
+        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
             protected String buildDisplaySql(Object[] args) {
                 throw new IllegalStateException("log should not be called!");
@@ -42,7 +42,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
     public void test_logSql_whitebox_logEnabledOnly() {
         // ## Arrange ##
         final List<String> markList = new ArrayList<String>();
-        TnBasicHandler handler = new TnBasicHandler(null, null) {
+        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
             protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");
@@ -88,7 +88,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         final Object[] args = new Object[] {};
         final Class<?>[] argsTypes = new Class<?>[] {};
-        TnBasicHandler handler = new TnBasicHandler(null, null) {
+        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
             protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");
@@ -146,7 +146,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
     public void test_logSql_whitebox_sqlResultHandlerOnly() {
         // ## Arrange ##
         final List<String> markList = new ArrayList<String>();
-        TnBasicHandler handler = new TnBasicHandler(null, null) {
+        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
             protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");
@@ -203,7 +203,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         final Object[] args = new Object[] {};
         final Class<?>[] argsTypes = new Class<?>[] {};
-        TnBasicHandler handler = new TnBasicHandler(null, null) {
+        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
             protected String buildDisplaySql(Object[] args) {
                 markList.add("getDisplaySql");

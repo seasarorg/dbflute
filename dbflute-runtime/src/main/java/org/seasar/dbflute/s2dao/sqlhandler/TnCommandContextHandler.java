@@ -31,43 +31,42 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnCommandContextHandler extends TnBasicHandler {
+public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected CommandContext _commandContext;
+    protected final CommandContext _commandContext;
     protected List<TnPropertyType> _boundPropTypeList;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory,
+    public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
             CommandContext commandContext) {
-        super(dataSource, statementFactory);
-        this._commandContext = commandContext;
-        setSql(commandContext.getSql());
+        super(dataSource, statementFactory, sql);
+        _commandContext = commandContext;
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     public int execute(Object[] args) {
-        final Connection connection = getConnection();
+        final Connection conn = getConnection();
         try {
-            return execute(connection, _commandContext);
+            return doExecute(conn, _commandContext);
         } finally {
-            close(connection);
+            close(conn);
         }
     }
 
-    protected int execute(Connection conn, CommandContext context) {
-        logSql(context.getBindVariables(), getArgTypes(context.getBindVariables()));
+    protected int doExecute(Connection conn, CommandContext ctx) {
+        logSql(ctx.getBindVariables(), getArgTypes(ctx.getBindVariables()));
         final PreparedStatement ps = prepareStatement(conn);
         int ret = -1;
         try {
-            final Object[] bindVariables = context.getBindVariables();
-            final Class<?>[] bindVariableTypes = context.getBindVariableTypes();
+            final Object[] bindVariables = ctx.getBindVariables();
+            final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
             if (hasPropertyTypeList()) {
                 final int index = bindFirstScope(conn, ps, bindVariables, bindVariableTypes);
                 bindSecondScope(conn, ps, bindVariables, bindVariableTypes, index);

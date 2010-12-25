@@ -45,44 +45,35 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBasicHandler {
+public abstract class TnAbstractBasicSqlHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for internal debug. (QLog should be used instead for query log) */
-    private static final Log _log = LogFactory.getLog(TnBasicHandler.class);
+    private static final Log _log = LogFactory.getLog(TnAbstractBasicSqlHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final DataSource _dataSource;
     protected final StatementFactory _statementFactory;
-    protected String _sql;
-    protected Object[] _exceptionMessageSqlArgs;
+    protected final String _sql;
+    protected Object[] _exceptionMessageSqlArgs; // not required
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor. You need to set SQL later.
-     * @param dataSource The data source. (NotNull)
-     * @param statementFactory The factory of statement. (NotNull)
-     */
-    public TnBasicHandler(DataSource dataSource, StatementFactory statementFactory) {
-        this(dataSource, statementFactory, null);
-    }
-
-    /**
-     * Constructor. (full property parameter)
+     * Constructor.
      * @param dataSource The data source. (NotNull)
      * @param statementFactory The factory of statement. (NotNull)
      * @param sql The SQL string. (NotNull)
      */
-    public TnBasicHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
+    public TnAbstractBasicSqlHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
         _dataSource = dataSource;
         _statementFactory = statementFactory;
-        setSql(sql);
+        _sql = sql;
     }
 
     // ===================================================================================
@@ -179,10 +170,10 @@ public class TnBasicHandler {
                 logDisplaySql(displaySql);
             }
             if (existsSqlLogHandler) { // DBFlute provides
-                getSqlLogHander().handle(getSql(), displaySql, args, argTypes);
+                getSqlLogHander().handle(_sql, displaySql, args, argTypes);
             }
             if (existsSqlLogRegistry) { // S2Container provides
-                TnSqlLogRegistry.push(getSql(), displaySql, args, argTypes, sqlLogRegistry);
+                TnSqlLogRegistry.push(_sql, displaySql, args, argTypes, sqlLogRegistry);
             }
             if (existsSqlResultHandler) {
                 saveDisplaySqlForResultInfo(displaySql);
@@ -384,22 +375,6 @@ public class TnBasicHandler {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public DataSource getDataSource() {
-        return _dataSource;
-    }
-
-    public StatementFactory getStatementFactory() {
-        return _statementFactory;
-    }
-
-    public String getSql() {
-        return _sql;
-    }
-
-    public void setSql(String sql) {
-        this._sql = sql;
-    }
-
     public void setExceptionMessageSqlArgs(Object[] exceptionMessageSqlArgs) {
         this._exceptionMessageSqlArgs = exceptionMessageSqlArgs;
     }
