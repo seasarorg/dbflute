@@ -27,12 +27,12 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteEntityHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnDeleteAutoStaticCommand extends TnAbstractEntityStaticCommand {
+public class TnDeleteStaticCommand extends TnAbstractEntityStaticCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnDeleteAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+    public TnDeleteStaticCommand(DataSource dataSource, StatementFactory statementFactory,
             TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling) {
         super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false);
     }
