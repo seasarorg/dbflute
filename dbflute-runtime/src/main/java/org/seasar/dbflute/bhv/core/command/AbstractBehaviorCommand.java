@@ -71,20 +71,23 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                            OutsideSqlExecuteExecution
     //                            --------------------------
-    protected OutsideSqlExecuteExecution createOutsideSqlExecuteExecution(String sql,
-            Map<String, Class<?>> argNameTypeMap) {
-        return new OutsideSqlExecuteExecution(_dataSource, _statementFactory, sql, argNameTypeMap);
+    protected OutsideSqlExecuteExecution createOutsideSqlExecuteExecution(Object pmbTypeObj, String sql) {
+        final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMap(pmbTypeObj);
+        return new OutsideSqlExecuteExecution(_dataSource, _statementFactory, argNameTypeMap, sql);
     }
 
-    protected Map<String, Class<?>> createBeanArgNameTypeMapByInstance(Object pmb) {
-        return createBeanArgNameTypeMapByType(pmb != null ? pmb.getClass() : null);
-    }
-
-    protected Map<String, Class<?>> createBeanArgNameTypeMapByType(Class<?> pmbType) {
+    protected Map<String, Class<?>> createBeanArgNameTypeMap(Object pmbTypeObj) {
         final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
-        if (pmbType != null) {
-            argNameTypeMap.put("pmb", pmbType);
+        if (pmbTypeObj == null) {
+            return argNameTypeMap;
         }
+        final Class<?> pmbType;
+        if (pmbTypeObj instanceof Class<?>) {
+            pmbType = (Class<?>) pmbTypeObj;
+        } else {
+            pmbType = pmbTypeObj.getClass();
+        }
+        argNameTypeMap.put("pmb", pmbType);
         return argNameTypeMap;
     }
 

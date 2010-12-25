@@ -39,9 +39,9 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlSelectExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
-            Map<String, Class<?>> argNameTypeMap, TnResultSetHandler resultSetHandler) {
-        super(dataSource, statementFactory, twoWaySql, argNameTypeMap);
+    public OutsideSqlSelectExecution(DataSource dataSource, StatementFactory statementFactory,
+            Map<String, Class<?>> argNameTypeMap, String twoWaySql, TnResultSetHandler resultSetHandler) {
+        super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
         _resultSetHandler = resultSetHandler;
     }
 

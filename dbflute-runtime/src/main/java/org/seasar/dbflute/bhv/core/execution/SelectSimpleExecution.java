@@ -37,9 +37,9 @@ public class SelectSimpleExecution extends AbstractFixedSqlExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SelectSimpleExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
-            Map<String, Class<?>> argNameTypeMap, TnResultSetHandler resultSetHandler) {
-        super(dataSource, statementFactory, twoWaySql, argNameTypeMap);
+    public SelectSimpleExecution(DataSource dataSource, StatementFactory statementFactory,
+            Map<String, Class<?>> argNameTypeMap, String twoWaySql, TnResultSetHandler resultSetHandler) {
+        super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
         this._resultSetHandler = resultSetHandler;
     }
 

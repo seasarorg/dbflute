@@ -39,9 +39,9 @@ public abstract class AbstractOutsideSqlExecution extends AbstractFixedSqlExecut
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public AbstractOutsideSqlExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
-            Map<String, Class<?>> argNameTypeMap) {
-        super(dataSource, statementFactory, twoWaySql, argNameTypeMap);
+    public AbstractOutsideSqlExecution(DataSource dataSource, StatementFactory statementFactory,
+            Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
+        super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
     }
 
     // ===================================================================================

@@ -193,7 +193,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
         final SelectSimpleExecution cmd;
         if (sequenceCache != null) {
-            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, sql, argNameTypeMap, handler) {
+            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler) {
                 @Override
                 public Object execute(final Object[] args) {
                     return sequenceCache.nextval(new SequenceRealExecutor() {
@@ -208,7 +208,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
                 }
             };
         } else {
-            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, sql, argNameTypeMap, handler);
+            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler);
         }
         return cmd;
     }

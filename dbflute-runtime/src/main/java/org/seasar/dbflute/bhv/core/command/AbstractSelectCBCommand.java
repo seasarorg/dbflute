@@ -68,7 +68,7 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
 
     protected SelectCBExecution createSelectCBExecution(Class<? extends ConditionBean> cbType,
             TnResultSetHandler handler) {
-        return createSelectCBExecution(createBeanArgNameTypeMapByType(cbType), handler);
+        return createSelectCBExecution(createBeanArgNameTypeMap(cbType), handler);
     }
 
     protected SelectCBExecution createSelectCBExecution(Map<String, Class<?>> argNameTypeMap, TnResultSetHandler handler) {

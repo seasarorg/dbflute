@@ -35,7 +35,6 @@ public class SelectCBExecution extends TnAbstractTwoWaySqlCommand {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Class<?>> _argNameTypeMap;
     protected final TnResultSetHandler _resultSetHandler;
 
     // ===================================================================================
@@ -43,8 +42,7 @@ public class SelectCBExecution extends TnAbstractTwoWaySqlCommand {
     //                                                                         ===========
     public SelectCBExecution(DataSource dataSource, StatementFactory statementFactory,
             Map<String, Class<?>> argNameTypeMap, TnResultSetHandler resultSetHandler) {
-        super(dataSource, statementFactory);
-        _argNameTypeMap = argNameTypeMap;
+        super(dataSource, statementFactory, argNameTypeMap);
         _resultSetHandler = resultSetHandler;
     }
 
@@ -68,11 +66,6 @@ public class SelectCBExecution extends TnAbstractTwoWaySqlCommand {
             String msg = "The argument 'args' should not be empty.";
             throw new IllegalArgumentException(msg);
         }
-    }
-
-    @Override
-    protected Map<String, Class<?>> getArgNameTypeMap(Object[] args) {
-        return _argNameTypeMap;
     }
 
     // ===================================================================================

@@ -33,9 +33,9 @@ public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
-            Map<String, Class<?>> argNameTypeMap) {
-        super(dataSource, statementFactory, twoWaySql, argNameTypeMap);
+    public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory,
+            Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
+        super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
     }
 
     // ===================================================================================

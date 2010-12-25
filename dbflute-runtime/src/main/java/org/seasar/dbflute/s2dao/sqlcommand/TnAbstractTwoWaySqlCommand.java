@@ -16,8 +16,6 @@
 package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -36,10 +34,19 @@ import org.seasar.dbflute.twowaysql.node.Node;
 public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlCommand {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final String[] _argNames;
+    protected final Class<?>[] _argTypes;
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractTwoWaySqlCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnAbstractTwoWaySqlCommand(DataSource dataSource, StatementFactory statementFactory,
+            Map<String, Class<?>> argNameTypeMap) {
         super(dataSource, statementFactory);
+        _argNames = argNameTypeMap.keySet().toArray(new String[] {});
+        _argTypes = argNameTypeMap.values().toArray(new Class<?>[] {});
     }
 
     // ===================================================================================
@@ -47,7 +54,7 @@ public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlComma
     //                                                                             =======
     public Object execute(Object[] args) {
         final Node rootNode = getRootNode(args);
-        final CommandContext ctx = apply(rootNode, args, getArgNameTypeMap(args));
+        final CommandContext ctx = apply(rootNode, args, getArgNames(args), getArgTypes(args));
         final String executedSql = filterExecutedSql(ctx.getSql());
         final TnBasicParameterHandler handler = createFreeParameterHandler(ctx, executedSql);
         final Object[] bindVariables = ctx.getBindVariables();
@@ -60,7 +67,13 @@ public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlComma
     //                                                                            ========
     protected abstract Node getRootNode(Object[] args);
 
-    protected abstract Map<String, Class<?>> getArgNameTypeMap(Object[] args);
+    protected String[] getArgNames(Object[] args) {
+        return _argNames;
+    }
+
+    protected Class<?>[] getArgTypes(Object[] args) {
+        return _argTypes;
+    }
 
     // ===================================================================================
     //                                                                             Handler
@@ -103,26 +116,17 @@ public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlComma
     // ===================================================================================
     //                                                                   Argument Handling
     //                                                                   =================
-    protected CommandContext apply(Node rootNode, Object[] args, Map<String, Class<?>> argNameTypeMap) {
-        final CommandContext ctx = createCommandContext(args, argNameTypeMap);
+    protected CommandContext apply(Node rootNode, Object[] args, String[] argNames, Class<?>[] argTypes) {
+        final CommandContext ctx = createCommandContext(args, argNames, argTypes);
         rootNode.accept(ctx);
         return ctx;
     }
 
-    protected CommandContext createCommandContext(Object[] args, Map<String, Class<?>> argNameTypeMap) {
-        return createCommandContextCreator(argNameTypeMap).createCommandContext(args);
+    protected CommandContext createCommandContext(Object[] args, String[] argNames, Class<?>[] argTypes) {
+        return createCommandContextCreator(argNames, argTypes).createCommandContext(args);
     }
 
-    protected CommandContextCreator createCommandContextCreator(Map<String, Class<?>> argNameTypeMap) {
-        final Set<Entry<String, Class<?>>> entrySet = argNameTypeMap.entrySet();
-        final String[] argNames = new String[argNameTypeMap.size()];
-        final Class<?>[] argTypes = new Class[argNameTypeMap.size()];
-        int index = 0;
-        for (Entry<String, Class<?>> entry : entrySet) {
-            argNames[index] = entry.getKey();
-            argTypes[index] = entry.getValue();
-            ++index;
-        }
+    protected CommandContextCreator createCommandContextCreator(String[] argNames, Class<?>[] argTypes) {
         return new CommandContextCreator(argNames, argTypes);
     }
 }

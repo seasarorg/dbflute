@@ -113,14 +113,9 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -
+        final Object pmb = outsideSqlContext.getParameterBean();
         final String suffix = buildDbmsSuffix();
         final String sql = outsideSqlContext.readFilteredOutsideSql(_sqlFileEncoding, suffix);
-        final Object pmb = outsideSqlContext.getParameterBean();
-
-        // - - - - - - - - - - - - - - - -
-        // The attribute of SqlExecution.
-        // - - - - - - - - - - - - - - - -
-        final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMapByInstance(pmb);
 
         // - - - - - - - - - - - - -
         // Create ResultSetHandler.
@@ -130,7 +125,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // - - - - - - - - - - -
         // Create SqlExecution.
         // - - - - - - - - - - -
-        final OutsideSqlSelectExecution execution = createOutsideSqlSelectExecution(sql, argNameTypeMap, handler);
+        final OutsideSqlSelectExecution execution = createOutsideSqlSelectExecution(pmb, sql, handler);
         execution.setRemoveBlockComment(isRemoveBlockComment(outsideSqlContext));
         execution.setRemoveLineComment(isRemoveLineComment(outsideSqlContext));
         execution.setFormatSql(outsideSqlContext.isFormatSql());
@@ -138,9 +133,10 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         return execution;
     }
 
-    protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(String sql,
-            Map<String, Class<?>> argNameTypeMap, TnResultSetHandler handler) {
-        return new OutsideSqlSelectExecution(_dataSource, _statementFactory, sql, argNameTypeMap, handler);
+    protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(Object pmbTypeObj, String sql,
+            TnResultSetHandler handler) {
+        final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMap(pmbTypeObj);
+        return new OutsideSqlSelectExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler);
     }
 
     public Object[] getSqlExecutionArgument() {

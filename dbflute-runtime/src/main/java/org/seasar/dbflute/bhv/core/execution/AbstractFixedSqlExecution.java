@@ -32,16 +32,14 @@ public abstract class AbstractFixedSqlExecution extends TnAbstractTwoWaySqlComma
     //                                                                           Attribute
     //                                                                           =========
     protected final Node _rootNode;
-    protected final Map<String, Class<?>> _argNameTypeMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public AbstractFixedSqlExecution(DataSource dataSource, StatementFactory statementFactory, String twoWaySql,
-            Map<String, Class<?>> argNameTypeMap) {
-        super(dataSource, statementFactory);
+    public AbstractFixedSqlExecution(DataSource dataSource, StatementFactory statementFactory,
+            Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
+        super(dataSource, statementFactory, argNameTypeMap);
         _rootNode = analyzeTwoWaySql(twoWaySql);
-        _argNameTypeMap = argNameTypeMap;
     }
 
     // ===================================================================================
@@ -50,10 +48,5 @@ public abstract class AbstractFixedSqlExecution extends TnAbstractTwoWaySqlComma
     @Override
     protected Node getRootNode(Object[] args) {
         return _rootNode;
-    }
-
-    @Override
-    protected Map<String, Class<?>> getArgNameTypeMap(Object[] args) {
-        return _argNameTypeMap;
     }
 }
