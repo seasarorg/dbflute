@@ -21,7 +21,7 @@ import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.sqlcommand.TnBatchDeleteAutoStaticCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnBatchDeleteStaticCommand;
 
 /**
  * @author jflute
@@ -55,21 +55,20 @@ public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
                 final TnBeanMetaData bmd = createBeanMetaData();
-                return createBatchDeleteEntitySqlExecution(bmd);
+                return createBatchDeleteSqlExecution(bmd);
             }
         };
     }
 
-    protected SqlExecution createBatchDeleteEntitySqlExecution(TnBeanMetaData bmd) {
+    protected SqlExecution createBatchDeleteSqlExecution(TnBeanMetaData bmd) {
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        return createDeleteBatchAutoStaticCommand(bmd, propertyNames);
+        return createBatchDeleteStaticCommand(bmd, propertyNames);
     }
 
-    protected TnBatchDeleteAutoStaticCommand createDeleteBatchAutoStaticCommand(TnBeanMetaData bmd,
-            String[] propertyNames) {
+    protected TnBatchDeleteStaticCommand createBatchDeleteStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
         final DBMeta dbmeta = findDBMeta();
         final boolean opt = isOptimisticLockHandling();
-        return new TnBatchDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
+        return new TnBatchDeleteStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
     }
 
     protected boolean isOptimisticLockHandling() {

@@ -36,7 +36,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateEntityHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnUpdateDynamicCommand extends TnAbstractEntityDynamicCommand {
+public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand {
 
     // ===================================================================================
     //                                                                          Definition
@@ -53,7 +53,7 @@ public class TnUpdateDynamicCommand extends TnAbstractEntityDynamicCommand {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnUpdateEntityDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 

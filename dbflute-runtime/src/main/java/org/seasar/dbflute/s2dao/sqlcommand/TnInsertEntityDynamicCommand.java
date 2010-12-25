@@ -33,12 +33,12 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnInsertEntityHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnInsertDynamicCommand extends TnAbstractEntityDynamicCommand {
+public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnInsertDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
+    public TnInsertEntityDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 

@@ -29,7 +29,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBatchInsertHandler;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-public class TnBatchInsertDynamicCommand extends TnInsertDynamicCommand {
+public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
 
     // ===================================================================================
     //                                                                         Constructor
