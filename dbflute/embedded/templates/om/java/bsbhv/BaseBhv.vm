@@ -1600,30 +1600,30 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     protected int[] delegateBatchInsert(List<${myExtendedObjectClassName}> ls, InsertOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
-      return invoke(createBatchInsertEntityCommand(processBatchInternally(ls, op), op)); }
+      return invoke(createBatchInsertCommand(processBatchInternally(ls, op), op)); }
     protected int[] delegateBatchUpdate(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
 #if ($table.hasOptimisticLock())
-      return invoke(createBatchUpdateEntityCommand(processBatchInternally(ls, op, false), op)); }
+      return invoke(createBatchUpdateCommand(processBatchInternally(ls, op, false), op)); }
 #else
       return delegateBatchUpdateNonstrict(ls, op); }
 #end
     protected int[] delegateBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ls, UpdateOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
-      return invoke(createBatchUpdateNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
+      return invoke(createBatchUpdateNonstrictCommand(processBatchInternally(ls, op, true), op)); }
     protected int[] delegateBatchDelete(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
 #if ($table.hasOptimisticLock())
-      return invoke(createBatchDeleteEntityCommand(processBatchInternally(ls, op, false), op)); }
+      return invoke(createBatchDeleteCommand(processBatchInternally(ls, op, false), op)); }
 #else
       return delegateBatchDeleteNonstrict(ls, op); }
 #end
     protected int[] delegateBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ls, DeleteOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
-      return invoke(createBatchDeleteNonstrictEntityCommand(processBatchInternally(ls, op, true), op)); }
+      return invoke(createBatchDeleteNonstrictCommand(processBatchInternally(ls, op, true), op)); }
 
     protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateEntityCBCommand(e, cb, op));  }
+    { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateCBCommand(e, cb, op));  }
     protected int delegateQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> op)
     { if (!processBeforeQueryDelete(cb, op)) { return 0; } return invoke(createQueryDeleteCBCommand(cb, op));  }
 #else
