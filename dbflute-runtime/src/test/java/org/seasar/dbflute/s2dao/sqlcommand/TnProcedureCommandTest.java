@@ -44,6 +44,11 @@ public class TnProcedureCommandTest extends PlainTestCase {
     }
 
     protected TnProcedureCommand createTarget() {
-        return new TnProcedureCommand(null, null, null, null);
+        return new TnProcedureCommand(null, null, null, null) {
+            @Override
+            protected void assertObjectNotNull(String variableName, Object value) {
+                // for no check of constructor
+            }
+        };
     }
 }
