@@ -49,7 +49,7 @@ public class SequenceCacheHandler {
     /**
      * @param tableName The name of table. (NotNull)
      * @param sequenceName The name of sequence. (NotNull)
-     * @param dataSource The data source. (NotNull)
+     * @param dataSource The data source for a database connection. (NotNull)
      * @param resultType The type of sequence result. (NotNull)
      * @param cacheSize The size of sequence cache. (Nullable: If null, returns null)
      * @param incrementSize The size of increment of sequence. (Nullable, If null, batch way is invalid) 

@@ -15,8 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
-import java.util.Map;
-
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -28,25 +26,23 @@ import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.Node;
 
 /**
+ * The SQL execution of 2Way-SQL. <br />
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
+ * @since 0.9.7.9 (2010/12/26 Sunday)
  */
 public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlCommand {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final String[] _argNames;
-    protected final Class<?>[] _argTypes;
-
-    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractTwoWaySqlCommand(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap) {
+    /**
+     * Constructor.
+     * @param dataSource The data source for a database connection. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     */
+    public TnAbstractTwoWaySqlCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
-        _argNames = argNameTypeMap.keySet().toArray(new String[] {});
-        _argTypes = argNameTypeMap.values().toArray(new Class<?>[] {});
     }
 
     // ===================================================================================
@@ -56,7 +52,7 @@ public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlComma
         final Node rootNode = getRootNode(args);
         final CommandContext ctx = apply(rootNode, args, getArgNames(args), getArgTypes(args));
         final String executedSql = filterExecutedSql(ctx.getSql());
-        final TnBasicParameterHandler handler = createFreeParameterHandler(ctx, executedSql);
+        final TnBasicParameterHandler handler = createBasicParameterHandler(ctx, executedSql);
         final Object[] bindVariables = ctx.getBindVariables();
         final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
         return filterReturnValue(handler.execute(bindVariables, bindVariableTypes));
@@ -67,18 +63,14 @@ public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlComma
     //                                                                            ========
     protected abstract Node getRootNode(Object[] args);
 
-    protected String[] getArgNames(Object[] args) {
-        return _argNames;
-    }
+    protected abstract String[] getArgNames(Object[] args);
 
-    protected Class<?>[] getArgTypes(Object[] args) {
-        return _argTypes;
-    }
+    protected abstract Class<?>[] getArgTypes(Object[] args);
 
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBasicParameterHandler createFreeParameterHandler(CommandContext context, String executedSql) {
+    protected TnBasicParameterHandler createBasicParameterHandler(CommandContext context, String executedSql) {
         final TnBasicParameterHandler handler = newBasicParameterHandler(executedSql);
         final Object[] bindVariables = context.getBindVariables();
         handler.setExceptionMessageSqlArgs(bindVariables);

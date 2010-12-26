@@ -26,6 +26,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 
 /**
+ * The SQL execution of select by outside-SQL.
  * @author jflute
  */
 public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
@@ -33,15 +34,23 @@ public class OutsideSqlSelectExecution extends AbstractOutsideSqlExecution {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The handler of resultSet. */
     protected final TnResultSetHandler _resultSetHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor.
+     * @param dataSource The data source for a database connection. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     * @param argNameTypeMap The map of names and types for arguments. (NotNull)
+     * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
+     * @param resultSetHandler The handler of result set. (NotNull)
+     */
     public OutsideSqlSelectExecution(DataSource dataSource, StatementFactory statementFactory,
             Map<String, Class<?>> argNameTypeMap, String twoWaySql, TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
+        assertObjectNotNull("resultSetHandler", resultSetHandler);
         _resultSetHandler = resultSetHandler;
     }
 

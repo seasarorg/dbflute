@@ -24,6 +24,8 @@ import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.util.Srl;
 
 /**
+ * The SQL execution by outside-SQL. <br />
+ * This has filter options.
  * @author jflute
  */
 public abstract class AbstractOutsideSqlExecution extends AbstractFixedSqlExecution {
@@ -39,6 +41,13 @@ public abstract class AbstractOutsideSqlExecution extends AbstractFixedSqlExecut
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor.
+     * @param dataSource The data source for a database connection. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     * @param argNameTypeMap The map of names and types for arguments. (NotNull)
+     * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
+     */
     public AbstractOutsideSqlExecution(DataSource dataSource, StatementFactory statementFactory,
             Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
         super(dataSource, statementFactory, argNameTypeMap, twoWaySql);

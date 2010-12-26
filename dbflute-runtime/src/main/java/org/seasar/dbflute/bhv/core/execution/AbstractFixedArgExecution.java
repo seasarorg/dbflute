@@ -20,20 +20,20 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-import org.seasar.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
-import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
+import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractTwoWaySqlCommand;
 
 /**
- * The SQL execution of simple select by fixed SQL.
+ * The SQL execution of 2Way-SQL as fixed arguments.
  * @author jflute
+ * @since 0.9.7.9 (2010/12/26 Sunday)
  */
-public class SelectSimpleExecution extends AbstractFixedSqlExecution {
+public abstract class AbstractFixedArgExecution extends TnAbstractTwoWaySqlCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final TnResultSetHandler _resultSetHandler;
+    protected final String[] _argNames;
+    protected final Class<?>[] _argTypes;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -43,29 +43,25 @@ public class SelectSimpleExecution extends AbstractFixedSqlExecution {
      * @param dataSource The data source for a database connection. (NotNull)
      * @param statementFactory The factory of statement. (NotNull)
      * @param argNameTypeMap The map of names and types for arguments. (NotNull)
-     * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
-     * @param resultSetHandler The handler of result set. (NotNull)
      */
-    public SelectSimpleExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap, String twoWaySql, TnResultSetHandler resultSetHandler) {
-        super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
-        assertObjectNotNull("resultSetHandler", resultSetHandler);
-        _resultSetHandler = resultSetHandler;
+    public AbstractFixedArgExecution(DataSource dataSource, StatementFactory statementFactory,
+            Map<String, Class<?>> argNameTypeMap) {
+        super(dataSource, statementFactory);
+        assertObjectNotNull("argNameTypeMap", argNameTypeMap);
+        _argNames = argNameTypeMap.keySet().toArray(new String[] {});
+        _argTypes = argNameTypeMap.values().toArray(new Class<?>[] {});
     }
 
     // ===================================================================================
-    //                                                                             Handler
-    //                                                                             =======
+    //                                                                            Resource
+    //                                                                            ========
     @Override
-    protected TnBasicParameterHandler newBasicParameterHandler(String sql) {
-        return new TnBasicSelectHandler(_dataSource, sql, _resultSetHandler, _statementFactory);
+    protected String[] getArgNames(Object[] args) {
+        return _argNames;
     }
 
-    // ===================================================================================
-    //                                                                        SQL Handling
-    //                                                                        ============
     @Override
-    protected boolean isBlockNullParameter() {
-        return true; // because the SQL is select
+    protected Class<?>[] getArgTypes(Object[] args) {
+        return _argTypes;
     }
 }

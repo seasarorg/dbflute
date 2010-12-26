@@ -28,7 +28,7 @@ public interface SequenceCacheKeyGenerator {
      * Generate the key for sequence cache.
      * @param tableName The name of table. The one of elements for default key. (NotNull)
      * @param sequenceName The name of sequence. The one of elements for default key. (NotNull)
-     * @param dataSource The data source. (NotNull)
+     * @param dataSource The data source for a database connection. (NotNull)
      * @return The generated key for sequence cache. (NotNull)
      */
     String generateKey(String tableName, String sequenceName, DataSource dataSource);

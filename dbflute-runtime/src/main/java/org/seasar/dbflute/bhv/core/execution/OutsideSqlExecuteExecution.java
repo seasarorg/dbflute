@@ -26,6 +26,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
+ * The SQL execution of execution (for example, update) by outside-SQL.
  * @author jflute
  */
 public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
@@ -33,6 +34,13 @@ public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor.
+     * @param dataSource The data source for a database connection. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     * @param argNameTypeMap The map of names and types for arguments. (NotNull)
+     * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
+     */
     public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory,
             Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
         super(dataSource, statementFactory, argNameTypeMap, twoWaySql);

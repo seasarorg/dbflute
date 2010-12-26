@@ -16,6 +16,8 @@
 package org.seasar.dbflute.s2dao.sqlcommand;
 
 /**
+ * The command of SQL. <br />
+ * This interface is unused on DBFlute. <br />
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */

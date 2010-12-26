@@ -16,9 +16,16 @@
 package org.seasar.dbflute.bhv.core;
 
 /**
+ * The interface of SQL execution. <br />
+ * This is basically reused on executing so it's thread safe.
  * @author jflute
  */
 public interface SqlExecution {
 
+    /**
+     * Execute SQL.
+     * @param args The arguments for SQL.
+     * @return The execution result. (Nullable: depends on an execution)
+     */
     Object execute(Object[] args);
 }

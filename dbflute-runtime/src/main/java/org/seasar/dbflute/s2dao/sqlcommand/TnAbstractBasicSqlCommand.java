@@ -22,7 +22,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
  * The basic command to execute SQL. <br />
- * This command is basically reused when executing so thread safe. <br />
+ * This is basically reused on executing so it's thread safe. <br />
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
@@ -37,8 +37,29 @@ public abstract class TnAbstractBasicSqlCommand implements TnSqlCommand, SqlExec
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor.
+     * @param dataSource The data source for a database connection. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     */
     public TnAbstractBasicSqlCommand(DataSource dataSource, StatementFactory statementFactory) {
+        assertObjectNotNull("dataSource", dataSource);
+        assertObjectNotNull("statementFactory", statementFactory);
         _dataSource = dataSource;
         _statementFactory = statementFactory;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

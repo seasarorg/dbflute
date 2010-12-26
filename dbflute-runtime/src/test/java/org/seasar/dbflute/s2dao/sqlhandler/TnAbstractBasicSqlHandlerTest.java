@@ -14,7 +14,7 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @author jflute
  * @since 0.9.5.1 (2009/06/19 Friday)
  */
-public class TnBasicHandlerTest extends PlainTestCase {
+public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
 
     public void test_logSql_whitebox_nothing() {
         // ## Arrange ##
@@ -32,6 +32,11 @@ public class TnBasicHandlerTest extends PlainTestCase {
             @Override
             protected boolean isLogEnabled() {
                 return false;
+            }
+
+            @Override
+            protected void assertObjectNotNull(String variableName, Object value) {
+                // for no check of constructor
             }
         };
 
@@ -64,6 +69,11 @@ public class TnBasicHandlerTest extends PlainTestCase {
             @Override
             protected boolean isLogEnabled() {
                 return true;
+            }
+
+            @Override
+            protected void assertObjectNotNull(String variableName, Object value) {
+                // for no check of constructor
             }
         };
 
@@ -114,6 +124,11 @@ public class TnBasicHandlerTest extends PlainTestCase {
             @Override
             protected boolean isLogEnabled() {
                 return false;
+            }
+
+            @Override
+            protected void assertObjectNotNull(String variableName, Object value) {
+                // for no check of constructor
             }
         };
 
@@ -172,6 +187,11 @@ public class TnBasicHandlerTest extends PlainTestCase {
             @Override
             protected boolean isLogEnabled() {
                 return false;
+            }
+
+            @Override
+            protected void assertObjectNotNull(String variableName, Object value) {
+                // for no check of constructor
             }
         };
 
@@ -232,6 +252,11 @@ public class TnBasicHandlerTest extends PlainTestCase {
             @Override
             protected boolean isLogEnabled() {
                 return true;
+            }
+
+            @Override
+            protected void assertObjectNotNull(String variableName, Object value) {
+                // for no check of constructor
             }
         };
 

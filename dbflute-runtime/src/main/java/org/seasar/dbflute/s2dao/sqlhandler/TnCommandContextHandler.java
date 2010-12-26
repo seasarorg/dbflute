@@ -37,7 +37,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected final CommandContext _commandContext;
-    protected List<TnPropertyType> _boundPropTypeList;
+    protected List<TnPropertyType> _boundPropTypeList; // not required
 
     // ===================================================================================
     //                                                                         Constructor
@@ -45,6 +45,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
             CommandContext commandContext) {
         super(dataSource, statementFactory, sql);
+        assertObjectNotNull("commandContext", commandContext);
         _commandContext = commandContext;
     }
 
@@ -84,6 +85,9 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
         return _boundPropTypeList != null && !_boundPropTypeList.isEmpty();
     }
 
+    // ===================================================================================
+    //                                                                          Bind Scope
+    //                                                                          ==========
     protected int bindFirstScope(Connection conn, PreparedStatement ps, Object[] bindVariables,
             Class<?>[] bindVariableTypes) {
         final List<Object> firstVariableList = new ArrayList<Object>();

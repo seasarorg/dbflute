@@ -41,7 +41,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The basic handler to execute SQL. <br />
- * This handler is always created when executing so non thread safe. <br />
+ * This is always created when executing so it's non thread safe. <br />
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
@@ -66,11 +66,14 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param dataSource The data source. (NotNull)
+     * @param dataSource The data source for a database connection. (NotNull)
      * @param statementFactory The factory of statement. (NotNull)
-     * @param sql The SQL string. (NotNull)
+     * @param sql The executed SQL. (NotNull)
      */
     public TnAbstractBasicSqlHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
+        assertObjectNotNull("dataSource", dataSource);
+        assertObjectNotNull("statementFactory", statementFactory);
+        assertObjectNotNull("sql", sql);
         _dataSource = dataSource;
         _statementFactory = statementFactory;
         _sql = sql;
@@ -106,7 +109,7 @@ public abstract class TnAbstractBasicSqlHandler {
      * @param conn The connection for the database. (NotNull)
      * @param ps The prepared statement for the SQL. (NotNull)
      * @param args The arguments for binding. (Nullable)
-     * @param argTypes The types of arguments. (NotNull)
+     * @param argTypes The types of arguments. (Nullable: if args is null, this is also null)
      */
     protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
         bindArgs(conn, ps, args, argTypes, 0);
@@ -116,7 +119,7 @@ public abstract class TnAbstractBasicSqlHandler {
      * @param conn The connection for the database. (NotNull)
      * @param ps The prepared statement for the SQL. (NotNull)
      * @param args The arguments for binding. (Nullable)
-     * @param argTypes The types of arguments. (NotNull)
+     * @param argTypes The types of arguments. (Nullable: if args is null, this is also null)
      * @param beginIndex The index for beginning of binding.
      */
     protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, Class<?>[] argTypes, int beginIndex) {
@@ -265,9 +268,6 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                      JDBC Delegator
     //                                                                      ==============
     protected Connection getConnection() {
-        if (_dataSource == null) {
-            throw new IllegalStateException("The dataSource should not be null!");
-        }
         try {
             return _dataSource.getConnection();
         } catch (SQLException e) {
@@ -277,9 +277,6 @@ public abstract class TnAbstractBasicSqlHandler {
     }
 
     protected PreparedStatement prepareStatement(Connection conn) {
-        if (_sql == null) {
-            throw new IllegalStateException("The sql should not be null!");
-        }
         return _statementFactory.createPreparedStatement(conn, _sql);
     }
 
@@ -363,6 +360,20 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                      ==============
     private boolean isInternalDebugEnabled() { // because log instance is private
         return ResourceContext.isInternalDebug() && _log.isDebugEnabled();
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     // ===================================================================================

@@ -49,8 +49,10 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
     public TnProcedureHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
             TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerProvider resultSetHandlerProvider) {
         super(dataSource, statementFactory, sql);
-        this._procedureMetaData = procedureMetaData;
-        this._resultSetHandlerProvider = resultSetHandlerProvider;
+        assertObjectNotNull("procedureMetaData", procedureMetaData);
+        assertObjectNotNull("resultSetHandlerProvider", resultSetHandlerProvider);
+        _procedureMetaData = procedureMetaData;
+        _resultSetHandlerProvider = resultSetHandlerProvider;
     }
 
     public static interface TnProcedureResultSetHandlerProvider { // is needed to construct an instance

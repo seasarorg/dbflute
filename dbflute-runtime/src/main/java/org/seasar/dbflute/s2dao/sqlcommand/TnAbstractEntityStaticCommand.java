@@ -50,6 +50,8 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
             TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
             boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory);
+        assertObjectNotNull("targetDBMeta", targetDBMeta);
+        assertObjectNotNull("propertyNames", propertyNames);
         _targetDBMeta = targetDBMeta;
         _optimisticLockHandling = optimisticLockHandling;
         _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;

@@ -35,7 +35,9 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 
 /**
- * The interface of SQL clause.
+ * The interface of SQL clause. <br />
+ * And this also has a role of a container for common info
+ * between the top level condition-bean and related condition-queries.
  * @author jflute
  */
 public interface SqlClause {

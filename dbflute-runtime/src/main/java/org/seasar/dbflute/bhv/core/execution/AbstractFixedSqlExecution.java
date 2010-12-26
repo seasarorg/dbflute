@@ -20,13 +20,13 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractTwoWaySqlCommand;
 import org.seasar.dbflute.twowaysql.node.Node;
 
 /**
  * @author jflute
+ * @since 0.9.7.9 (2010/12/26 Sunday)
  */
-public abstract class AbstractFixedSqlExecution extends TnAbstractTwoWaySqlCommand {
+public abstract class AbstractFixedSqlExecution extends AbstractFixedArgExecution {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,9 +36,17 @@ public abstract class AbstractFixedSqlExecution extends TnAbstractTwoWaySqlComma
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor.
+     * @param dataSource The data source for a database connection. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     * @param argNameTypeMap The map of names and types for arguments. (NotNull)
+     * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
+     */
     public AbstractFixedSqlExecution(DataSource dataSource, StatementFactory statementFactory,
             Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
         super(dataSource, statementFactory, argNameTypeMap);
+        assertObjectNotNull("twoWaySql", twoWaySql);
         _rootNode = analyzeTwoWaySql(twoWaySql);
     }
 

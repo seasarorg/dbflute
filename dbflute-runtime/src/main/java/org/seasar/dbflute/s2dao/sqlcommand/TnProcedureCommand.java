@@ -51,6 +51,8 @@ public class TnProcedureCommand extends TnAbstractBasicSqlCommand {
     public TnProcedureCommand(DataSource dataSource, StatementFactory statementFactory,
             TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerFactory procedureResultSetHandlerFactory) {
         super(dataSource, statementFactory);
+        assertObjectNotNull("procedureMetaData", procedureMetaData);
+        assertObjectNotNull("procedureResultSetHandlerFactory", procedureResultSetHandlerFactory);
         _procedureMetaData = procedureMetaData;
         _procedureResultSetHandlerFactory = procedureResultSetHandlerFactory;
     }
