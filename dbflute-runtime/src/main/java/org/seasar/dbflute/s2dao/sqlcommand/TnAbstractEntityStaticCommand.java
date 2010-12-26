@@ -39,7 +39,7 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
     protected final boolean _optimisticLockHandling;
     protected final boolean _versionNoAutoIncrementOnMemory;
 
-    // initialized in a process called by constructor
+    // initialized (required) in a process called by constructor
     protected TnPropertyType[] _propertyTypes;
     protected String _sql;
 
@@ -51,11 +51,11 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
             boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory);
         assertObjectNotNull("targetDBMeta", targetDBMeta);
-        assertObjectNotNull("propertyNames", propertyNames);
+        assertObjectNotNull("propertyNames", propertyNames); // not null but empty allowed
         _targetDBMeta = targetDBMeta;
         _optimisticLockHandling = optimisticLockHandling;
         _versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
-        this._beanMetaData = beanMetaData;
+        _beanMetaData = beanMetaData;
         setupPropertyTypes(propertyNames);
         setupSql();
     }
@@ -84,9 +84,11 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
 
     protected abstract TnAbstractEntityHandler newEntityHandler();
 
-    protected abstract void setupPropertyTypes(String[] propertyNames); // called by constructor
+    protected void setupPropertyTypes(String[] propertyNames) { // called by constructor
+        _propertyTypes = new TnPropertyType[] {}; // as default
+    }
 
-    protected abstract void setupSql();
+    protected abstract void setupSql(); // called by constructor
 
     // ===================================================================================
     //                                                                              Insert
@@ -111,7 +113,7 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
     }
 
     protected void checkPrimaryKey() {
-        final TnBeanMetaData bmd = getBeanMetaData();
+        final TnBeanMetaData bmd = _beanMetaData;
         if (bmd.getPrimaryKeySize() == 0) {
             String msg = "The primary key was not found:";
             msg = msg + " bean=" + bmd.getBeanClass();
@@ -120,7 +122,7 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
     }
 
     protected void setupDeleteWhere(StringBuilder sb) {
-        final TnBeanMetaData bmd = getBeanMetaData();
+        final TnBeanMetaData bmd = _beanMetaData;
         sb.append(" where ");
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
             sb.append(bmd.getPrimaryKeySqlName(i)).append(" = ? and ");
@@ -145,20 +147,5 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
         @SuppressWarnings("unchecked")
         final DeleteOption<ConditionBean> option = (DeleteOption<ConditionBean>) args[1];
         return option;
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public String getSql() {
-        return _sql;
-    }
-
-    public TnBeanMetaData getBeanMetaData() {
-        return _beanMetaData;
-    }
-
-    protected TnPropertyType[] getPropertyTypes() {
-        return _propertyTypes;
     }
 }

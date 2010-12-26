@@ -71,7 +71,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
             TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, sql);
         assertObjectNotNull("beanMetaData", beanMetaData);
-        assertObjectNotNull("boundPropTypes", boundPropTypes);
+        assertObjectNotNull("boundPropTypes", boundPropTypes); // not null but empty allowed
         _beanMetaData = beanMetaData;
         _boundPropTypes = boundPropTypes;
     }
