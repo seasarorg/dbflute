@@ -56,8 +56,4 @@ public class TnDeleteEntityStaticCommand extends TnAbstractEntityStaticCommand {
     protected void setupSql() {
         setupDeleteSql();
     }
-
-    @Override
-    protected void setupPropertyTypes(String[] propertyNames) {
-    }
 }
