@@ -586,7 +586,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         });
         if (pkList.size() > 1) {
             callback.qyOdFKAsc(cb);
-            cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
+            cb.getOrderByComponent().exchangeFirstOrderByElementForLastOne();
         }
         loadReferrerOption.delegateConditionBeanSettingUp(cb);
         if (cb.getSqlClause().hasSpecifiedSelectColumn(cb.getSqlClause().getBasePointAliasName())) {

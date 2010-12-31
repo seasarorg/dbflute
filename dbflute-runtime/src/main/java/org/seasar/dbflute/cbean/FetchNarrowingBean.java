@@ -18,7 +18,7 @@ package org.seasar.dbflute.cbean;
 import org.seasar.dbflute.jdbc.FetchBean;
 
 /**
- * The bean of fetch narrowing.
+ * The bean for fetch narrowing.
  * @author jflute
  */
 public interface FetchNarrowingBean extends FetchBean {

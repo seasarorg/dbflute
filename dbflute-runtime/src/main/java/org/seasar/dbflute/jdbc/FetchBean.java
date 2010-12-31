@@ -16,7 +16,7 @@
 package org.seasar.dbflute.jdbc;
 
 /**
- * The fetch-bean.
+ * The bean for fetch.
  * @author jflute
  */
 public interface FetchBean {

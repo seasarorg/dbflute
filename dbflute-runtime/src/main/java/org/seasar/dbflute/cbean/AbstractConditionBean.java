@@ -654,15 +654,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public OrderByClause getSqlComponentOfOrderByClause() {
-        return getSqlClause().getSqlComponentOfOrderByClause();
+    public String getOrderByClause() {
+        return _sqlClause.getOrderByClause();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getOrderByClause() {
-        return _sqlClause.getOrderByClause();
+    public OrderByClause getOrderByComponent() {
+        return getSqlClause().getOrderByComponent();
     }
 
     /**

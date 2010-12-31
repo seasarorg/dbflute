@@ -18,22 +18,22 @@ package org.seasar.dbflute.cbean;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 
 /**
- * The order-by-bean.
+ * The bean for order-by.
  * @author jflute
  */
 public interface OrderByBean {
-
-    /**
-     * Get sql component of order-by clause.
-     * @return Sql component of order-by clause. (NotNull)
-     */
-    OrderByClause getSqlComponentOfOrderByClause();
 
     /**
      * Get order-by clause.
      * @return Order-by clause. (NotNull)
      */
     String getOrderByClause();
+
+    /**
+     * Get the component of order-by clause.
+     * @return The component of order-by clause. (NotNull)
+     */
+    OrderByClause getOrderByComponent();
 
     /**
      * Clear order-by.

@@ -1301,7 +1301,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    public OrderByClause getSqlComponentOfOrderByClause() {
+    public OrderByClause getOrderByComponent() {
         return getOrderBy();
     }
 

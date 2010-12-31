@@ -306,7 +306,7 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    OrderByClause getSqlComponentOfOrderByClause();
+    OrderByClause getOrderByComponent();
 
     SqlClause clearOrderBy();
 

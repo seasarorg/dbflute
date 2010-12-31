@@ -16,7 +16,7 @@
 package org.seasar.dbflute.cbean;
 
 /**
- * The bean of paging.
+ * The bean for paging.
  * @author jflute
  */
 public interface PagingBean extends FetchNarrowingBean, OrderByBean {

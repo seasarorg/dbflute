@@ -303,19 +303,19 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, S
     //                                                       Implementation of OrderByBean
     //                                                       =============================
     // basically unused because this class does not have order-by registration I/F
-    // (you can use these methods if you implements the I/F methods at sub-class of this class)
-    /**
-     * {@inheritDoc}
-     */
-    public OrderByClause getSqlComponentOfOrderByClause() {
-        return getSqlClause().getSqlComponentOfOrderByClause();
-    }
-
+    // (you can use these methods if you implements original methods at your sub-class of this class)
     /**
      * {@inheritDoc}
      */
     public String getOrderByClause() {
         return getSqlClause().getOrderByClause();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OrderByClause getOrderByComponent() {
+        return getSqlClause().getOrderByComponent();
     }
 
     /**

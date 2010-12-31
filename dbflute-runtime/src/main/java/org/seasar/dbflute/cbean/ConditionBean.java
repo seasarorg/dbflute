@@ -24,7 +24,7 @@ import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
- * The interface of condition-bean.
+ * The bean for condition.
  * @author jflute
  */
 public interface ConditionBean extends PagingBean {

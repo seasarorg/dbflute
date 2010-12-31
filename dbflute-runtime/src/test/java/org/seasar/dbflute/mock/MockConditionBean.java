@@ -183,7 +183,7 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public OrderByClause getSqlComponentOfOrderByClause() {
+    public OrderByClause getOrderByComponent() {
         return null;
     }
 
