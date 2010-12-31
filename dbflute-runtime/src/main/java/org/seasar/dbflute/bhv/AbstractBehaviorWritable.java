@@ -47,9 +47,10 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
  */
 public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable implements BehaviorWritable {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The auto-setup-per of common column. (NotNull) */
     protected CommonColumnAutoSetupper _commonColumnAutoSetupper;
 
     // ===================================================================================
@@ -59,85 +60,77 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                Create
     //                                                ------
     /**
-     * Create.
-     * @param entity Entity. (NotNull)
-     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     * {@inheritDoc}
      */
-    public void create(Entity entity) {
-        doCreate(entity);
+    public void create(Entity entity, InsertOption<? extends ConditionBean> option) {
+        doCreate(entity, option);
     }
 
-    protected abstract void doCreate(Entity entity);
+    protected abstract void doCreate(Entity entity, InsertOption<? extends ConditionBean> option);
 
     // -----------------------------------------------------
     //                                                Modify
     //                                                ------
     /**
-     * Modify.
-     * @param entity Entity. (NotNull)
-     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
-     */
-    public void modify(Entity entity) {
-        doModify(entity);
-    }
-
-    protected abstract void doModify(Entity entity);
-
-    /**
-     * Modify non strict.
-     * @param entity Entity. (NotNull)
-     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
-     */
-    public void modifyNonstrict(Entity entity) {
-        doModifyNonstrict(entity);
-    }
-
-    protected abstract void doModifyNonstrict(Entity entity);
-
-    // -----------------------------------------------------
-    //                                      Create or Modify
-    //                                      ----------------
-    /**
      * {@inheritDoc}
      */
-    public void createOrModify(org.seasar.dbflute.Entity entity) {
-        assertEntityNotNull(entity);
-        doCreateOrUpdate(entity);
+    public void modify(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        doModify(entity, option);
     }
 
-    protected abstract void doCreateOrUpdate(Entity entity);
+    protected abstract void doModify(Entity entity, UpdateOption<? extends ConditionBean> option);
 
     /**
      * {@inheritDoc}
      */
-    public void createOrModifyNonstrict(org.seasar.dbflute.Entity entity) {
-        assertEntityNotNull(entity);
-        doCreateOrUpdateNonstrict(entity);
+    public void modifyNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        doModifyNonstrict(entity, option);
     }
 
-    protected abstract void doCreateOrUpdateNonstrict(Entity entity);
+    protected abstract void doModifyNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option);
+
+    /**
+     * {@inheritDoc}
+     */
+    public void createOrModify(Entity entity, InsertOption<? extends ConditionBean> insertOption,
+            UpdateOption<? extends ConditionBean> updateOption) {
+        doCreateOrModify(entity, insertOption, updateOption);
+    }
+
+    protected abstract void doCreateOrModify(Entity entity, InsertOption<? extends ConditionBean> insertOption,
+            UpdateOption<? extends ConditionBean> updateOption);
+
+    /**
+     * {@inheritDoc}
+     */
+    public void createOrModifyNonstrict(Entity entity, InsertOption<? extends ConditionBean> insertOption,
+            UpdateOption<? extends ConditionBean> updateOption) {
+        doCreateOrModifyNonstrict(entity, insertOption, updateOption);
+    }
+
+    protected abstract void doCreateOrModifyNonstrict(Entity entity,
+            InsertOption<? extends ConditionBean> insertOption, UpdateOption<? extends ConditionBean> updateOption);
 
     // -----------------------------------------------------
     //                                                Remove
     //                                                ------
     /**
-     * Remove.
-     * @param entity Entity. (NotNull)
-     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * {@inheritDoc}
      */
-    public void remove(org.seasar.dbflute.Entity entity) {
-        assertEntityNotNull(entity);
-        doRemove(entity);
+    public void remove(Entity entity, DeleteOption<? extends ConditionBean> option) {
+        doRemove(entity, option);
     }
 
-    protected abstract void doRemove(Entity entity);
+    protected abstract void doRemove(Entity entity, DeleteOption<? extends ConditionBean> option);
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option) {
+        doRemoveNonstrict(entity, option);
+    }
+
+    protected abstract void doRemoveNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option);
 
     // ===================================================================================
     //                                                       Entity Update Internal Helper
@@ -293,53 +286,73 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     // ===================================================================================
-    //                                                                         Lump Update
-    //                                                                         ===========
+    //                                                                        Batch Update
+    //                                                                        ============
     /**
-     * Lump create the list.
-     * @param entityList Entity list. (NotNull and NotEmpty)
-     * @return The array of created count.
+     * {@inheritDoc}
      */
-    public int[] lumpCreate(List<Entity> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        return callCreateList(entityList);
+    public int[] lumpCreate(List<Entity> entityList, InsertOption<? extends ConditionBean> option) {
+        return doLumpCreate(entityList, option);
     }
 
-    /**
-     * Lump Modify the list.
-     * @param entityList Entity list. (NotNull and NotEmpty)
-     * @return Modified count.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException If s2dao's version is over 1.0.47 (contains 1.0.47).
-     */
-    public int[] lumpModify(List<Entity> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        return callModifyList(entityList);
-    }
+    protected abstract int[] doLumpCreate(List<Entity> entityList, InsertOption<? extends ConditionBean> option);
 
     /**
-     * Lump remove the list.
-     * @param entityList Entity list. (NotNull and NotEmpty)
-     * @return Removed count.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException If s2dao's version is over 1.0.47 (contains 1.0.47).
+     * {@inheritDoc}
      */
-    public int[] lumpRemove(List<Entity> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        return callRemoveList(entityList);
+    public int[] lumpModify(List<Entity> entityList, UpdateOption<? extends ConditionBean> option) {
+        return doLumpModify(entityList, option);
     }
 
+    protected abstract int[] doLumpModify(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
+
     /**
-     * Inject sequence to primary key if it needs.
-     * @param entity Entity. (NotNull)
+     * {@inheritDoc}
      */
-    protected void injectSequenceToPrimaryKeyIfNeeds(Entity entity) {
-        final DBMeta dbmeta = entity.getDBMeta();
-        if (!dbmeta.hasSequence() || dbmeta.hasCompoundPrimaryKey() || entity.hasPrimaryKeyValue()) {
-            return;
-        }
-        // basically property(column) type is same as next value type
-        // so there is NOT type conversion cost when writing to the entity
-        dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
+    public int[] lumpModifyNonstrict(List<Entity> entityList, UpdateOption<? extends ConditionBean> option) {
+        return doLumpModifyNonstrict(entityList, option);
     }
+
+    protected abstract int[] doLumpModifyNonstrict(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
+
+    /**
+     * {@inheritDoc}
+     */
+    public int[] lumpRemove(List<Entity> entityList, DeleteOption<? extends ConditionBean> option) {
+        return doLumpRemove(entityList, option);
+    }
+
+    protected abstract int[] doLumpRemove(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);
+
+    /**
+     * {@inheritDoc}
+     */
+    public int[] lumpRemoveNonstrict(List<Entity> entityList, DeleteOption<? extends ConditionBean> option) {
+        return doLumpRemoveNonstrict(entityList, option);
+    }
+
+    protected abstract int[] doLumpRemoveNonstrict(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);
+
+    // =====================================================================================
+    //                                                                          Query Update
+    //                                                                          ============
+    /**
+     * {@inheritDoc}
+     */
+    public int rangeModify(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
+        return doRangeModify(entity, cb, option);
+    }
+
+    protected abstract int doRangeModify(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option);
+
+    /**
+     * {@inheritDoc}
+     */
+    public int rangeRemove(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
+        return doRangeRemove(cb, option);
+    }
+
+    protected abstract int doRangeRemove(ConditionBean cb, DeleteOption<? extends ConditionBean> option);
 
     // =====================================================================================
     //                                                                        Process Method
@@ -692,37 +705,24 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     // -----------------------------------------------------
-    //                                                 Batch
-    //                                                 -----
-    /**
-     * @param entityList Entity list that the type is entity interface. (NotNull)
-     * @return Inserted count.
-     */
-    protected int[] callCreateList(List<Entity> entityList) {
-        return doCreateList(entityList);
+    //                                                Common
+    //                                                ------
+    protected void injectSequenceToPrimaryKeyIfNeeds(Entity entity) {
+        final DBMeta dbmeta = entity.getDBMeta();
+        if (!dbmeta.hasSequence() || dbmeta.hasCompoundPrimaryKey() || entity.hasPrimaryKeyValue()) {
+            return;
+        }
+        // basically property(column) type is same as next value type
+        // so there is NOT type conversion cost when writing to the entity
+        dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
     }
 
-    protected abstract int[] doCreateList(List<Entity> entityList);
-
-    /**
-     * @param entityList Entity list that the type is entity interface. (NotNull)
-     * @return Updated count.
-     */
-    protected int[] callModifyList(List<Entity> entityList) {
-        return doModifyList(entityList);
+    protected <CB extends ConditionBean> UpdateOption<CB> createSpecifiedUpdateOption(SpecifyQuery<CB> updateColumnSpec) {
+        assertUpdateColumnSpecificationNotNull(updateColumnSpec);
+        final UpdateOption<CB> option = new UpdateOption<CB>();
+        option.specify(updateColumnSpec);
+        return option;
     }
-
-    protected abstract int[] doModifyList(List<Entity> entityList);
-
-    /**
-     * @param entityList Entity list that the type is entity interface. (NotNull)
-     * @return Deleted count.
-     */
-    protected int[] callRemoveList(List<Entity> entityList) {
-        return doRemoveList(entityList);
-    }
-
-    protected abstract int[] doRemoveList(List<Entity> entityList);
 
     protected void assertEntityHasOptimisticLockValue(Entity entity) {
         assertEntityHasVersionNoValue(entity);
@@ -932,20 +932,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         cmd.setConditionBean(cb);
         cmd.setDeleteOption(option);
         return cmd;
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected <CB extends ConditionBean> UpdateOption<CB> createSpecifiedUpdateOption(
-            SpecifyQuery<CB> updateColumnSpec, CB cb) {
-        assertUpdateColumnSpecificationNotNull(updateColumnSpec);
-        assertCBNotNull(cb);
-        final UpdateOption<CB> option = new UpdateOption<CB>();
-        option.specify(updateColumnSpec);
-        option.resolveUpdateColumnSpecification(cb);
-        option.xacceptForcedSpecifiedUpdateColumn(getDBMeta().getCommonColumnInfoBeforeUpdateList());
-        return option;
     }
 
     // ===================================================================================

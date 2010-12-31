@@ -56,6 +56,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected SpecifyQuery<CB> _updateColumnSpecification;
     protected CB _updateColumnSpecifiedCB;
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
+    protected boolean _exceptCommonColumnForcedSpecified;
 
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _allowNonQueryUpdate;
@@ -317,20 +318,27 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     public boolean hasSpecifiedUpdateColumn() {
-        return _updateColumnSpecifiedCB != null;
+        return _updateColumnSpecification != null;
     }
 
     public void resolveUpdateColumnSpecification(CB cb) {
-        if (_updateColumnSpecification != null) {
-            _updateColumnSpecification.specify(cb);
-            _updateColumnSpecifiedCB = cb;
+        if (!hasSpecifiedUpdateColumn()) {
+            return;
         }
+        _updateColumnSpecification.specify(cb);
+        _updateColumnSpecifiedCB = cb;
+        if (!_exceptCommonColumnForcedSpecified) {
+            final List<ColumnInfo> beforeUpdateList = cb.getDBMeta().getCommonColumnInfoBeforeUpdateList();
+            xacceptForcedSpecifiedUpdateColumn(beforeUpdateList);
+        }
+        // an optimistic lock column is specified forcedly by behavior's logic
     }
 
     public void xcheckSpecifiedUpdateColumnPrimaryKey() { // checked later by process if it needs
         if (!hasSpecifiedUpdateColumn()) {
             return;
         }
+        assertUpdateColumnSpecifiedCB();
         final CB cb = _updateColumnSpecifiedCB;
         final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
         final DBMeta dbmeta = cb.getDBMeta();
@@ -351,14 +359,28 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (_forcedSpecifiedUpdateColumnSet != null && _forcedSpecifiedUpdateColumnSet.contains(columnDbName)) {
             return true; // basically common column
         }
-        if (_updateColumnSpecifiedCB == null) {
-            return false;
-        }
+        assertUpdateColumnSpecifiedCB();
         final SqlClause sqlClause = _updateColumnSpecifiedCB.getSqlClause();
         return sqlClause.hasSpecifiedSelectColumn(sqlClause.getBasePointAliasName(), columnDbName);
     }
 
-    public void xacceptForcedSpecifiedUpdateColumn(List<ColumnInfo> columnInfoList) { // internal
+    protected void assertUpdateColumnSpecifiedCB() {
+        if (_updateColumnSpecifiedCB == null) {
+            String msg = "The CB for specification of update columns should be required here.";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    /**
+     * Except common columns from forced specified update columns.
+     * @return The option of update. (NotNull: returns this)
+     */
+    public UpdateOption<CB> exceptCommonColumnForcedSpecified() {
+        _exceptCommonColumnForcedSpecified = true;
+        return this;
+    }
+
+    protected void xacceptForcedSpecifiedUpdateColumn(List<ColumnInfo> columnInfoList) { // internal
         if (columnInfoList == null || columnInfoList.isEmpty()) {
             return;
         }

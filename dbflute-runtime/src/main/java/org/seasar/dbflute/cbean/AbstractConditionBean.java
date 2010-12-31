@@ -1007,7 +1007,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected void xchangePurposeSqlClause(HpCBPurpose purpose, ConditionQuery mainCQ) {
         _purpose = purpose;
         getSqlClause().setPurpose(purpose); // synchronize
-        // mainCQ is not needed but just in case
+        if (mainCQ != null) {
+            // all sub condition-query are target
+            // (purposes not allowed to use query() also may have nested query())
+            xinheritInvalidQueryInfo(mainCQ);
+        }
+    }
+
+    protected void xinheritInvalidQueryInfo(ConditionQuery mainCQ) {
+        if (mainCQ.xgetSqlClause().isEmptyStringQueryAllowed()) {
+            allowEmptyStringQuery(); // inherited
+        }
+        if (mainCQ.xgetSqlClause().isInvalidQueryChecked()) {
+            checkInvalidQuery(); // inherited
+        }
     }
 
     // ===================================================================================

@@ -25,11 +25,14 @@ import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
+import org.seasar.dbflute.bhv.BehaviorReadable;
+import org.seasar.dbflute.bhv.BehaviorWritable;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
+import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
@@ -582,10 +585,12 @@ public class BehaviorCommandInvoker {
     }
 
     protected List<InvokeNameResult> extractBehaviorInvoke(StackTraceElement[] stackTrace) {
-        final String[] names = new String[] { "Bhv", "BhvAp", "BehaviorReadable", "BehaviorWritable", "PagingInvoker" };
+        final String readableName = DfTypeUtil.toClassTitle(BehaviorReadable.class);
+        final String writableName = DfTypeUtil.toClassTitle(BehaviorWritable.class);
+        final String pagingInvokerName = DfTypeUtil.toClassTitle(PagingInvoker.class);
+        final String[] names = new String[] { "Bhv", "BhvAp", readableName, writableName, pagingInvokerName };
         final List<String> suffixList = Arrays.asList(names);
-        final List<String> keywordList = Arrays
-                .asList(new String[] { "Bhv$", "BehaviorReadable$", "BehaviorWritable$" });
+        final List<String> keywordList = Arrays.asList(new String[] { "Bhv$", readableName + "$", writableName + "$" });
         final List<String> ousideSql1List = Arrays.asList(new String[] { "OutsideSql" });
         final List<String> ousideSql2List = Arrays.asList(new String[] { "Executor" });
         final List<String> ousideSql3List = Arrays.asList(new String[] { "Executor$" });
@@ -606,7 +611,13 @@ public class BehaviorCommandInvoker {
             }
 
             public String filterSimpleClassName(String simpleClassName) {
-                return removeBasePrefixFromSimpleClassName(simpleClassName);
+                if (simpleClassName.endsWith(readableName)) {
+                    return readableName;
+                } else if (simpleClassName.endsWith(writableName)) {
+                    return writableName;
+                } else {
+                    return removeBasePrefixFromSimpleClassName(simpleClassName);
+                }
             }
 
             public boolean isUseAdditionalInfo() {
