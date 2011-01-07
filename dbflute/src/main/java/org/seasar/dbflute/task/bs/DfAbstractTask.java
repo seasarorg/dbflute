@@ -191,7 +191,7 @@ public abstract class DfAbstractTask extends Task {
 
         final String finalInformation = getFinalInformation();
         if (finalInformation != null) {
-            sb.append(ln);
+            sb.append(ln).append(ln);
             sb.append(finalInformation);
         }
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");

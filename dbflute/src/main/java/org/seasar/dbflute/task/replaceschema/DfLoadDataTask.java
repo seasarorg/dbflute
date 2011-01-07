@@ -218,50 +218,6 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     // ===================================================================================
-    //                                                                         Dump Result
-    //                                                                         ===========
-    // *not used because loading data is not continued if it causes an error
-    //protected void dumpContinuedErrorResult() {
-    //    final File file = new File(LOG_PATH);
-    //    if (file.exists()) {
-    //        boolean deleted = file.delete();
-    //        if (!deleted) {
-    //            return; // skip to dump!
-    //        }
-    //    }
-    //    if (_continuedErrorFileList.isEmpty()) {
-    //        return;
-    //    }
-    //    BufferedWriter bw = null;
-    //    try {
-    //        final StringBuilder contentsSb = new StringBuilder();
-    //        contentsSb.append("{Load Data}: warning files=" + _continuedErrorFileList.size());
-    //        List<String> continuedErrorFileList = _continuedErrorFileList;
-    //        for (String continuedErrorFile : continuedErrorFileList) {
-    //            // remove path because only file names are enough to see the files 
-    //            final String fileName = Srl.substringLastRear(continuedErrorFile, "/");
-    //            contentsSb.append(ln()).append("x " + fileName);
-    //        }
-    //        final FileOutputStream fos = new FileOutputStream(file);
-    //        bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-    //        bw.write(contentsSb.toString());
-    //    } catch (UnsupportedEncodingException e) {
-    //        throw new IllegalStateException(e);
-    //    } catch (FileNotFoundException e) {
-    //        throw new IllegalStateException(e);
-    //    } catch (IOException e) {
-    //        throw new IllegalStateException(e);
-    //    } finally {
-    //        if (bw != null) {
-    //            try {
-    //                bw.close();
-    //            } catch (IOException ignored) {
-    //            }
-    //        }
-    //    }
-    //}
-
-    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setValidTaskEndInformation(String validTaskEndInformation) {

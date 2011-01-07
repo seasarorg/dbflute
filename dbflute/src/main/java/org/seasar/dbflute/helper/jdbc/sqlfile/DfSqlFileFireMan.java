@@ -17,7 +17,6 @@ package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -50,8 +49,8 @@ public class DfSqlFileFireMan {
      * Load the SQL files and then execute them.
      * @return The result about firing SQL. (NotNull)
      */
-    public FireResult execute(DfSqlFileRunner runner, List<File> fileList) {
-        final FireResult fireResult = new FireResult();
+    public DfSqlFileFireResult execute(DfSqlFileRunner runner, List<File> fileList) {
+        final DfSqlFileFireResult fireResult = new DfSqlFileFireResult();
         int goodSqlCount = 0;
         int totalSqlCount = 0;
         for (final File file : fileList) {
@@ -121,45 +120,6 @@ public class DfSqlFileFireMan {
         }
         fireResult.setDetailMessage(detailSb.toString());
         return fireResult;
-    }
-
-    public static class FireResult {
-        protected String resultMessage;
-        protected String detailMessage;
-        protected boolean existsError;
-        protected List<DfSqlFileRunnerResult> runnerResultList = new ArrayList<DfSqlFileRunnerResult>();
-
-        public String getResultMessage() {
-            return resultMessage;
-        }
-
-        public void setResultMessage(String resultMessage) {
-            this.resultMessage = resultMessage;
-        }
-
-        public String getDetailMessage() {
-            return detailMessage;
-        }
-
-        public void setDetailMessage(String detailMessage) {
-            this.detailMessage = detailMessage;
-        }
-
-        public boolean isExistsError() {
-            return existsError;
-        }
-
-        public void setExistsError(boolean existsError) {
-            this.existsError = existsError;
-        }
-
-        public List<DfSqlFileRunnerResult> getRunnerResultList() {
-            return runnerResultList;
-        }
-
-        public void addRunnerResult(DfSqlFileRunnerResult runnerResult) {
-            this.runnerResultList.add(runnerResult);
-        }
     }
 
     // ===================================================================================

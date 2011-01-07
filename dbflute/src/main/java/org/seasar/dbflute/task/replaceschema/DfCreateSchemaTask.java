@@ -29,10 +29,10 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory.InitializeType;
@@ -48,7 +48,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfCreateSchemaTask.class);
-    protected static final String LOG_PATH = "./log/create-schema.log";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -222,7 +221,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* * * * * * * * *");
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Create Schema");
-        final FireResult result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
+        final DfSqlFileFireResult result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
         try {
             dumpFireResult(result);
         } catch (Throwable ignored) {
@@ -232,8 +231,8 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         destroyChangeUserConnection();
     }
 
-    protected void dumpFireResult(FireResult result) {
-        final File file = new File(LOG_PATH);
+    protected void dumpFireResult(DfSqlFileFireResult result) {
+        final File file = new File(CREATE_SCHEMA_LOG_PATH);
         if (file.exists()) {
             boolean deleted = file.delete();
             if (!deleted) {
@@ -247,7 +246,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         BufferedWriter bw = null;
         try {
             final StringBuilder contentsSb = new StringBuilder();
-            contentsSb.append(resultMessage).append(ln()).append(result.isExistsError());
+            contentsSb.append(resultMessage).append(ln()).append(result.existsError());
             final String detailMessage = result.getDetailMessage();
             if (detailMessage != null && detailMessage.trim().length() > 0) {
                 contentsSb.append(ln()).append(detailMessage);

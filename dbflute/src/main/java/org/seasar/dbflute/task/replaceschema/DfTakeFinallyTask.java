@@ -2,13 +2,10 @@ package org.seasar.dbflute.task.replaceschema;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -21,17 +18,18 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
+import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
-import org.seasar.dbflute.helper.token.line.LineToken;
-import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
-import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.logic.generate.dataassert.DfDataAssertHandler;
 import org.seasar.dbflute.logic.generate.dataassert.DfDataAssertProvider;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.factory.DfSequenceHandlerFactory;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -50,10 +48,8 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Timestamp beforeTimestamp;
-
-    /** The result of take-finally for final information. */
-    protected FireResult takeFinallyResult;
+    protected Timestamp _beforeTimestamp; // is set through its property
+    protected DfSqlFileFireResult _takeFinallyFireResult;
 
     // ===================================================================================
     //                                                                             Execute
@@ -63,14 +59,15 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         final DfRunnerInformation runInfo = createRunnerInformation();
 
         beforeTakeFinally();
-        takeFinallyResult = takeFinally(runInfo);
+        _takeFinallyFireResult = takeFinally(runInfo);
         incrementSequenceToDataMax();
+        handleSchemaFailure();
     }
 
     @Override
     protected long getTaskBeforeTimeMillis() {
-        if (beforeTimestamp != null) {
-            return beforeTimestamp.getTime();
+        if (_beforeTimestamp != null) {
+            return _beforeTimestamp.getTime();
         } else {
             return super.getTaskBeforeTimeMillis();
         }
@@ -118,7 +115,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     // --------------------------------------------
     //                                 Take Finally
     //                                 ------------
-    protected FireResult takeFinally(DfRunnerInformation runInfo) {
+    protected DfSqlFileFireResult takeFinally(DfRunnerInformation runInfo) {
         _log.info("");
         _log.info("* * * * * * * **");
         _log.info("*              *");
@@ -268,6 +265,21 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
 
     // --------------------------------------------
+    //                               Schema Failure
+    //                               --------------
+    protected void handleSchemaFailure() { // means continued errors
+        final DfReplaceSchemaFinalInfo finalInfo = getReplaceSchemaFinalInfo();
+        if (finalInfo.isCreateSchemaFailure()) {
+            String msg = "Failed to create schema (Look the final info)";
+            throw new DfCreateSchemaFailureException(msg);
+        }
+        if (finalInfo.isTakeFinallyFailure()) {
+            String msg = "Failed to take finally (Look the final info)";
+            throw new DfTakeFinallyFailureException(msg);
+        }
+    }
+
+    // --------------------------------------------
     //                              Callback Helper
     //                              ---------------
     protected void callbackProcess(String timing, String processCommand) {
@@ -340,241 +352,20 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
-    // --------------------------------------------
-    //                            Final Information
-    //                            -----------------
+    // ===================================================================================
+    //                                                                          Final Info
+    //                                                                          ==========
     @Override
-    protected String getFinalInformation() {
-        return buildFinalInformation(takeFinallyResult); // The argument cannot be null!
+    protected DfTakeFinallyFinalInfo getTakeFinallyFireResult() {
+        return extractTakeFinallyFinalInfo(_takeFinallyFireResult);
     }
-
-    /**
-     * @param result The fire result for take-finally. (NotNull)
-     * @return The final information. (Nullable)
-     */
-    protected String buildFinalInformation(FireResult result) {
-        final File file = new File(DfCreateSchemaTask.LOG_PATH);
-        if (!file.exists()) {
-            return null;
-        }
-        final StringBuilder sb = new StringBuilder();
-        boolean firstDone = false;
-        boolean failure = false;
-
-        // Create Schema
-        final CreateSchemaFinalInfo createSchemaFinalInfo = buildCreateSchemaFinalInfo();
-        if (createSchemaFinalInfo != null) {
-            if (firstDone) {
-                sb.append(ln()).append(ln());
-            } else {
-                firstDone = true;
-            }
-            sb.append(createSchemaFinalInfo.getMessage());
-            if (createSchemaFinalInfo.isFailure()) {
-                failure = true;
-            }
-        }
-
-        // Take Finally
-        if (result != null) {
-            if (firstDone) {
-                sb.append(ln()).append(ln());
-            } else {
-                firstDone = true;
-            }
-            sb.append(" ").append(result.getResultMessage());
-            final String detailMessage = result.getDetailMessage();
-            if (detailMessage != null && detailMessage.trim().length() > 0) {
-                final LineToken lineToken = new LineTokenImpl();
-                final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-                lineTokenizingOption.setDelimiter(ln());
-                final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
-                for (String tokenizedElement : tokenizedList) {
-                    sb.append(ln()).append("  ").append(tokenizedElement);
-                }
-            }
-            if (result.isExistsError()) {
-                failure = true;
-            }
-        } else {
-            failure = true; // means take-finally was not finished
-        }
-
-        if (failure) { // exists error anywhere
-            sb.append(ln()).append("    * * * * * *");
-            sb.append(ln()).append("    * Failure *");
-            sb.append(ln()).append("    * * * * * *");
-        }
-        return sb.toString();
-    }
-
-    protected CreateSchemaFinalInfo buildCreateSchemaFinalInfo() {
-        final File file = new File(DfCreateSchemaTask.LOG_PATH);
-        if (!file.exists()) {
-            return null;
-        }
-        BufferedReader br = null;
-        try {
-            final FileInputStream fis = new FileInputStream(file);
-            br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-
-            // - - - - - - - - - - - -
-            // line1: resultMessage
-            // line2: existsError
-            // line3-x: detailMessage
-            // - - - - - - - - - - - -
-            final String line = br.readLine();
-            if (line == null) {
-                return null;
-            }
-            final String line2 = br.readLine();
-            final List<String> detailList = new ArrayList<String>();
-            if (line2 != null) {
-                while (true) {
-                    String line3 = br.readLine();
-                    if (line3 == null) {
-                        break;
-                    }
-                    detailList.add(line3);
-                }
-            }
-
-            final StringBuilder sb = new StringBuilder();
-            sb.append(ln()).append(" ").append(line);
-            for (String detail : detailList) {
-                sb.append(ln()).append("  ").append(detail);
-            }
-
-            final CreateSchemaFinalInfo info = new CreateSchemaFinalInfo();
-            info.setMessage(sb.toString());
-            info.setFailure(isLine2True(line2));
-            return info;
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if (file.exists()) {
-                boolean deleted = file.delete();
-                if (!deleted) {
-                    // ignored
-                }
-            }
-        }
-    }
-
-    protected boolean isLine2True(String line2) {
-        return line2 != null && line2.trim().equalsIgnoreCase("true");
-    }
-
-    protected static class CreateSchemaFinalInfo {
-        protected String _message;
-        protected boolean _failure;
-
-        public String getMessage() {
-            return _message;
-        }
-
-        public void setMessage(String message) {
-            this._message = message;
-        }
-
-        public boolean isFailure() {
-            return _failure;
-        }
-
-        public void setFailure(boolean failure) {
-            this._failure = failure;
-        }
-    }
-
-    // *not used because loading data is not continued if it causes an error
-    //protected LoadDataFinalInfo buildLoadDataFinalInfo() {
-    //    final File file = new File(DfLoadDataTask.LOG_PATH);
-    //    if (!file.exists()) {
-    //        return null;
-    //    }
-    //    BufferedReader br = null;
-    //    try {
-    //        final FileInputStream fis = new FileInputStream(file);
-    //        br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-    //
-    //        final StringBuilder sb = new StringBuilder();
-    //        int index = 0;
-    //        while (true) {
-    //            final String line = br.readLine();
-    //            if (line == null) {
-    //                break;
-    //            }
-    //            if (index == 0) { // title
-    //                sb.append(" ");
-    //            } else { // warning file
-    //                sb.append(ln()).append("  ");
-    //            }
-    //            sb.append(line);
-    //            ++index;
-    //        }
-    //        final LoadDataFinalInfo loadDataFinalInfo = new LoadDataFinalInfo();
-    //        loadDataFinalInfo.setMessage(sb.toString());
-    //        loadDataFinalInfo.setFailure(true); // loadDataFinalInfo has only error info
-    //        return loadDataFinalInfo;
-    //    } catch (UnsupportedEncodingException e) {
-    //        throw new IllegalStateException(e);
-    //    } catch (FileNotFoundException e) {
-    //        throw new IllegalStateException(e);
-    //    } catch (IOException e) {
-    //        throw new IllegalStateException(e);
-    //    } finally {
-    //        if (br != null) {
-    //            try {
-    //                br.close();
-    //            } catch (IOException ignored) {
-    //            }
-    //        }
-    //        if (file.exists()) {
-    //            boolean deleted = file.delete();
-    //            if (!deleted) {
-    //                // ignored
-    //            }
-    //        }
-    //    }
-    //}
-    //
-    //protected static class LoadDataFinalInfo {
-    //    protected String _message;
-    //    protected boolean _failure;
-    //
-    //    public String getMessage() {
-    //        return _message;
-    //    }
-    //
-    //    public void setMessage(String message) {
-    //        this._message = message;
-    //    }
-    //
-    //    public boolean isFailure() {
-    //        return _failure;
-    //    }
-    //
-    //    public void setFailure(boolean failure) {
-    //        this._failure = failure;
-    //    }
-    //}
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setBeforeTimestamp(String beforeTimestamp) {
         try {
-            this.beforeTimestamp = Timestamp.valueOf(beforeTimestamp);
+            _beforeTimestamp = Timestamp.valueOf(beforeTimestamp);
         } catch (RuntimeException ignored) {
             _log.warn("Wrong beforeTimestampExpression: " + beforeTimestamp, ignored);
         }

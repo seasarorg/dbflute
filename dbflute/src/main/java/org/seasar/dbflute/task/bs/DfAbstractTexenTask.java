@@ -215,7 +215,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
         final String finalInformation = getFinalInformation();
         if (finalInformation != null) {
-            sb.append(ln);
+            sb.append(ln).append(ln);
             sb.append(finalInformation);
         }
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
