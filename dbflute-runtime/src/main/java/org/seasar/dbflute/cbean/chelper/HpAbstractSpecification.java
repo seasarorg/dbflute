@@ -1,5 +1,8 @@
 package org.seasar.dbflute.cbean.chelper;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -25,7 +28,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected final DBMetaProvider _dbmetaProvider;
     protected CQ _query; // lazy-loaded
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
-    protected int _specifiedColumnCount; // incremented per specify() called
+    protected Map<String, HpSpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
 
     // ===================================================================================
     //                                                                         Constructor
@@ -48,7 +51,10 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                Column Specification
     //                                                                ====================
     protected HpSpecifiedColumn doColumn(String columnName) {
-        ++_specifiedColumnCount;
+        if (isSpecifiedColumn(columnName)) {
+            // returns the same instance as the specified before
+            return getSpecifiedColumn(columnName);
+        }
         assertColumn(columnName);
         if (_query == null) {
             _query = qyCall().qy();
@@ -67,6 +73,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         }
         final HpSpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
         sqlClause.specifySelectColumn(specifiedColumn);
+        saveSpecifiedColumn(columnName, specifiedColumn);
         return specifiedColumn;
     }
 
@@ -97,12 +104,27 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         return new HpSpecifiedColumn(tableAliasName, columnInfo);
     }
 
+    protected HpSpecifiedColumn getSpecifiedColumn(String columnName) {
+        return isSpecifiedColumn(columnName) ? _specifiedColumnMap.get(columnName) : null;
+    }
+
+    protected boolean isSpecifiedColumn(String columnName) {
+        return _specifiedColumnMap != null && _specifiedColumnMap.containsKey(columnName);
+    }
+
+    protected void saveSpecifiedColumn(String columnName, HpSpecifiedColumn specifiedColumn) {
+        if (_specifiedColumnMap == null) {
+            _specifiedColumnMap = new LinkedHashMap<String, HpSpecifiedColumn>();
+        }
+        _specifiedColumnMap.put(columnName, specifiedColumn);
+    }
+
     // ===================================================================================
     //                                                                      Purpose Assert
     //                                                                      ==============
     protected void assertColumn(String columnName) {
         if (_purpose.isNoSpecifyColumnTwoOrMore()) {
-            if (_specifiedColumnCount > 1) {
+            if (_specifiedColumnMap != null && _specifiedColumnMap.size() > 1) {
                 throwSpecifyColumnTwoOrMoreColumnException(columnName);
             }
             // no specification is checked at an other timing
@@ -135,7 +157,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             }
         }
         if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
-            if (_specifiedColumnCount > 0) {
+            if (_specifiedColumnMap != null && _specifiedColumnMap.size() > 0) {
                 throwSpecifyColumnWithDerivedReferrerException(null, referrerName);
             }
         }

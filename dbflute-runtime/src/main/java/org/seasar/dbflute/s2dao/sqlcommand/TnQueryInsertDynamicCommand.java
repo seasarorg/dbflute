@@ -17,7 +17,6 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -60,9 +59,9 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
         final InsertOption<ConditionBean> option = extractInsertOptionWithCheck(args);
 
         // arguments for execution (not contains an option)
-        final String[] argNames = new String[] { "pmb" };
-        final Class<?>[] argTypes = new Class<?>[] { resourceCB.getClass() };
-        final Object[] realArgs = new Object[] { resourceCB };
+        final String[] argNames = new String[] { "entity", "pmb" };
+        final Class<?>[] argTypes = new Class<?>[] { entity.getClass(), resourceCB.getClass() };
+        final Object[] realArgs = new Object[] { entity, resourceCB };
 
         // prepare context
         final List<TnPropertyType> boundPropTypeList = new ArrayList<TnPropertyType>();
@@ -160,18 +159,19 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
         final DBMeta dbmeta = entity.getDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
-            if (!modifiedProperties.contains(columnInfo.getPropertyName())) {
+            final String propertyName = columnInfo.getPropertyName();
+            if (!modifiedProperties.contains(propertyName)) {
                 continue;
             }
             final Object value = columnInfo.read(entity);
-            final Map<String, Object> freeParameterMap = resourceCB.getFreeParameterMap();
             final String fixedValueQueryExp;
             if (value != null) {
-                final String key = "fixedValue" + (freeParameterMap != null ? freeParameterMap.size() : 0);
-                resourceCB.xregisterFreeParameter(key, value);
-                fixedValueQueryExp = "/*pmb.freeParameterMap." + key + "*/null";
+                fixedValueQueryExp = "/*entity." + propertyName + "*/null";
             } else {
-                fixedValueQueryExp = "null"; // null literal on query
+                // it uses null literal on query
+                // because the SQL analyzer blocks null parameters
+                // (the analyzer should do it for condition-bean)
+                fixedValueQueryExp = "null";
             }
             fixedValueQueryExpMap.put(columnInfo.getColumnDbName(), fixedValueQueryExp);
         }

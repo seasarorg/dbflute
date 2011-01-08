@@ -158,7 +158,7 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             if (columnInfo.isOptimisticLock()) {
-                continue; // optimistic lock columns are processed after here
+                continue; // exclusive control columns are processed after here
             }
             final String columnDbName = columnInfo.getColumnDbName();
             if (option != null && option.hasStatement(columnDbName)) {
@@ -176,7 +176,10 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
                     final TnPropertyType propertyType = _beanMetaData.getPropertyType(propertyName);
                     boundPropTypeList.add(propertyType);
                 } else {
-                    columnParameterMap.put(columnDbName, "null"); // null literal on query
+                    // it uses null literal on query
+                    // because the SQL analyzer blocks null parameters
+                    // (the analyzer should do it for condition-bean)
+                    columnParameterMap.put(columnDbName, "null");
                 }
                 continue;
             }

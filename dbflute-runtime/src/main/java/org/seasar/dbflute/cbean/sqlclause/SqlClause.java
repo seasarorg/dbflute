@@ -549,10 +549,11 @@ public interface SqlClause {
     //                                        Specify Column
     //                                        --------------
     /**
-     * Specify select columns.
-     * @param specifiedInfo The info about column specification. (NotNull)
+     * Specify select columns. <br />
+     * It is overridden when the specified column has already been specified.
+     * @param specifiedColumn The info about column specification. (NotNull)
      */
-    void specifySelectColumn(HpSpecifiedColumn specifiedInfo);
+    void specifySelectColumn(HpSpecifiedColumn specifiedColumn);
 
     /**
      * Does it have specified select columns?
@@ -616,8 +617,9 @@ public interface SqlClause {
     //                                      ----------------
     /**
      * Specify deriving sub-query for DerivedReferrer. <br />
-     * aliasName is nullable if (Specify)DerivedReferrer is used in other functions.
-     * @param subQueryInfo The info about deriving sub-query. (NotNull: aliasName is nullable)
+     * It is overridden when the specified column has already been specified. <br />
+     * The aliasName is allowed to be null for (Specify)DerivedReferrer to be used in other functions.
+     * @param subQueryInfo The info about deriving sub-query. (NotNull: aliasName is allowed to be null)
      */
     void specifyDerivingSubQuery(HpDerivingSubQueryInfo subQueryInfo);
 

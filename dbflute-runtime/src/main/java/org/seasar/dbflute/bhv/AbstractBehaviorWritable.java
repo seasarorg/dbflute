@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.bhv;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +43,7 @@ import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.resource.ResourceContext;
 
 /**
  * The abstract class of writable behavior.
@@ -415,28 +415,24 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             throw new IllegalConditionBeanOperationException(msg);
         }
         frameworkFilterEntityOfInsert(entity, option);
+        setupExclusiveControlColumnOfQueryInsert(entity);
+        filterEntityOfInsert(entity, option);
+        assertEntityOfInsert(entity, option);
+        return true;
+    }
 
-        // set the default value for optimistic lock columns
+    protected void setupExclusiveControlColumnOfQueryInsert(Entity entity) {
         final DBMeta dbmeta = getDBMeta();
         if (dbmeta.hasVersionNo()) {
             final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
             final String propertyName = columnInfo.getPropertyName();
-            if (!entity.modifiedProperties().contains(propertyName)) {
-                dbmeta.setupEntityProperty(propertyName, entity, 0);
-            }
+            dbmeta.setupEntityProperty(propertyName, entity, InsertOption.VERSION_NO_FIRST_VALUE);
         }
         if (dbmeta.hasUpdateDate()) {
             final ColumnInfo columnInfo = dbmeta.getUpdateDateColumnInfo();
             final String propertyName = columnInfo.getPropertyName();
-            if (!entity.modifiedProperties().contains(propertyName)) {
-                final Timestamp current = new Timestamp(System.currentTimeMillis());
-                dbmeta.setupEntityProperty(columnInfo.getPropertyName(), entity, current);
-            }
+            dbmeta.setupEntityProperty(propertyName, entity, ResourceContext.getAccessTimestamp());
         }
-
-        filterEntityOfInsert(entity, option);
-        assertEntityOfInsert(entity, option);
-        return true;
     }
 
     /**

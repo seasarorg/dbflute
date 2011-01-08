@@ -112,7 +112,7 @@ public class SubQueryIndentProcessor implements Serializable {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(preRemainder)) {
             mainSb.append(preRemainder);
         }
-        final String filteredSql = mainSb.toString();
+        final String filteredSql = Srl.rtrim(mainSb.toString()); // removed latest line separator
 
         if (throughBegin) {
             throwSubQueryNotFoundEndMarkException(subQueryIdentity, sql, filteredSql, originalSql);

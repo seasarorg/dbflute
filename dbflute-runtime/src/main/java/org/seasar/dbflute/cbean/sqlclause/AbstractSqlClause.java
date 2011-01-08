@@ -431,14 +431,26 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         Select Clause
     //                                         -------------
     public String getSelectClause() {
-        final String basePointAliasName = getBasePointAliasName();
         if (isSelectClauseTypeScalar() && !hasUnionQuery()) {
-            return buildSelectClauseScalar(basePointAliasName);
+            return buildSelectClauseScalar(getBasePointAliasName());
         }
         // if it's a scalar-select, it always has union-query since here
         final StringBuilder sb = new StringBuilder();
-        final DBMeta dbmeta = getDBMeta();
 
+        if (_useSelectIndex) {
+            _selectIndexMap = createSelectIndexMap(); // should be initialized before process
+        }
+
+        final Integer selectIndex = processSelectClauseLocal(sb);
+        processSelectClauseRelation(sb, selectIndex);
+        processSelectClauseDerivedReferrer(sb);
+
+        return sb.toString();
+    }
+
+    protected Integer processSelectClauseLocal(StringBuilder sb) {
+        final String basePointAliasName = getBasePointAliasName();
+        final DBMeta dbmeta = getDBMeta();
         final Map<String, HpSpecifiedColumn> localSpecifiedMap;
         if (_specifiedSelectColumnMap != null) {
             localSpecifiedMap = _specifiedSelectColumnMap.get(basePointAliasName);
@@ -446,7 +458,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             localSpecifiedMap = null;
         }
         final List<ColumnInfo> columnInfoList;
-        final boolean needsSpecifiedColumnFilter;
+        final boolean validSpecifiedLocal;
         if (isSelectClauseTypeUniqueScalar()) {
             // it always has union-query because it's handled before this process
             if (dbmeta.hasPrimaryKey()) {
@@ -463,26 +475,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 // all columns are target if no-PK and unique-scalar and union-query
                 columnInfoList = dbmeta.getColumnInfoList();
             }
-            needsSpecifiedColumnFilter = false;
+            validSpecifiedLocal = false; // because specified columns are fixed here
         } else {
             columnInfoList = dbmeta.getColumnInfoList();
-            needsSpecifiedColumnFilter = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
+            validSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
         }
 
         Integer selectIndex = 0; // because 1 origin in JDBC
-        if (_useSelectIndex) {
-            _selectIndexMap = createSelectIndexMap();
-        }
-
-        final Map<String, String> selectClauseRealColumnAliasMap = getSelectClauseRealColumnAliasMap();
-
-        // columns of local table.
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
 
-            if (needsSpecifiedColumnFilter && !localSpecifiedMap.containsKey(columnDbName)) {
+            if (validSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
                 // a case for scalar-select has been already resolved here
                 continue;
             }
@@ -505,15 +510,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 onQueryName = columnSqlName.toString();
             }
             sb.append(realColumnName).append(" as ").append(onQueryName);
-            selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
+            getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
-            if (needsSpecifiedColumnFilter && localSpecifiedMap.containsKey(columnDbName)) {
+            if (validSpecifiedLocal && localSpecifiedMap.containsKey(columnDbName)) {
                 final HpSpecifiedColumn specifiedColumn = localSpecifiedMap.get(columnDbName);
                 specifiedColumn.setOnQueryName(onQueryName); // basically for queryInsert()
             }
         }
+        return selectIndex;
+    }
 
-        // columns of foreign tables.
+    protected Integer processSelectClauseRelation(StringBuilder sb, Integer selectIndex) {
         for (Entry<String, Map<String, SelectedRelationColumn>> entry : getSelectedRelationColumnMap().entrySet()) {
             final String tableAliasName = entry.getKey();
             final Map<String, SelectedRelationColumn> map = entry.getValue();
@@ -522,11 +529,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             if (_specifiedSelectColumnMap != null) {
                 foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
             }
-            final boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
+            final boolean validSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
             boolean finishedForeignIndent = false;
             for (SelectedRelationColumn selectColumnInfo : selectColumnInfoList) {
                 final String columnDbName = selectColumnInfo.getColumnDbName();
-                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(columnDbName)) {
+                if (validSpecifiedForeign && !foreginSpecifiedMap.containsKey(columnDbName)) {
                     continue;
                 }
 
@@ -545,31 +552,32 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     finishedForeignIndent = true;
                 }
                 sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
-                selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
+                getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
-                if (needsSpecifiedColumnFilter && foreginSpecifiedMap.containsKey(columnDbName)) {
+                if (validSpecifiedForeign && foreginSpecifiedMap.containsKey(columnDbName)) {
                     final HpSpecifiedColumn specifiedColumn = foreginSpecifiedMap.get(columnDbName);
                     specifiedColumn.setOnQueryName(onQueryName); // basically for queryInsert()
                 }
             }
         }
+        return selectIndex;
+    }
 
-        // columns of DerivedReferrer
-        if (_specifiedDerivingSubQueryMap != null && !_specifiedDerivingSubQueryMap.isEmpty()) {
-            for (Entry<String, HpDerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
-                final String subQueryAlias = entry.getKey();
-                final String derivingSubQuery = entry.getValue().getDerivingSubQuery();
-                sb.append(ln()).append("     ");
-                sb.append(", ").append(derivingSubQuery);
+    protected void processSelectClauseDerivedReferrer(StringBuilder sb) {
+        if (_specifiedDerivingSubQueryMap == null || _specifiedDerivingSubQueryMap.isEmpty()) {
+            return;
+        }
+        for (Entry<String, HpDerivingSubQueryInfo> entry : _specifiedDerivingSubQueryMap.entrySet()) {
+            final String subQueryAlias = entry.getKey();
+            final String derivingSubQuery = entry.getValue().getDerivingSubQuery();
+            sb.append(ln()).append("     ");
+            sb.append(", ").append(derivingSubQuery);
 
-                if (subQueryAlias != null) {
-                    // for SpecifiedDerivedOrderBy
-                    selectClauseRealColumnAliasMap.put(subQueryAlias, subQueryAlias);
-                }
+            // for SpecifiedDerivedOrderBy
+            if (subQueryAlias != null) {
+                getSelectClauseRealColumnAliasMap().put(subQueryAlias, subQueryAlias);
             }
         }
-
-        return sb.toString();
     }
 
     protected Map<String, String> getSelectClauseRealColumnAliasMap() {
@@ -1942,7 +1950,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_specifiedDerivingSubQueryMap == null) {
             _specifiedDerivingSubQueryMap = StringKeyMap.createAsFlexibleOrdered();
         }
-        final String aliasName = subQueryInfo.getAliasName(); // nullable (treated as null key)
+        final String aliasName = subQueryInfo.getAliasName(); // null allowed (treated as null key)
         _specifiedDerivingSubQueryMap.put(aliasName, subQueryInfo);
     }
 

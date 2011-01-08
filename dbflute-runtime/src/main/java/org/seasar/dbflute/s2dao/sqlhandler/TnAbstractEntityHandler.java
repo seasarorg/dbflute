@@ -108,7 +108,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
             close(ps);
             processFinally(bean, sqlEx);
         }
-        // a value of optimistic lock column should be synchronized
+        // a value of exclusive control column should be synchronized
         // after handling optimistic lock
         processSuccess(bean, ret);
         return ret;
@@ -157,7 +157,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
                 addNewTimestamp(timestamp);
                 varList.add(timestamp);
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
-                final Long firstNo = Long.valueOf(0);
+                final Long firstNo = InsertOption.VERSION_NO_FIRST_VALUE;
                 addNewVersionNo(firstNo);
                 varList.add(firstNo);
             } else {

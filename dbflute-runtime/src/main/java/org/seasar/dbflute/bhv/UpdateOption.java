@@ -300,7 +300,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * option.<span style="color: #FD4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     public void query(MemberCB cb) {
      *         <span style="color: #3F7E5E">// only MemberName and Birthdate are updated</span>
-     *         <span style="color: #3F7E5E">// with common columns for update and an optimistic lock column</span>
+     *         <span style="color: #3F7E5E">// with common columns for update and an exclusive control column</span>
      *         cb.specify().columnMemberName();
      *         cb.specify().columnBirthdate();
      *     }
@@ -331,7 +331,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
             final List<ColumnInfo> beforeUpdateList = cb.getDBMeta().getCommonColumnInfoBeforeUpdateList();
             xacceptForcedSpecifiedUpdateColumn(beforeUpdateList);
         }
-        // an optimistic lock column is specified forcedly by behavior's logic
+        // an exclusive control column is specified forcedly by behavior's logic
     }
 
     public void xcheckSpecifiedUpdateColumnPrimaryKey() { // checked later by process if it needs

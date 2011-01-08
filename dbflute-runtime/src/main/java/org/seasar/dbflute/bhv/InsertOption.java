@@ -29,6 +29,11 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    public static final Long VERSION_NO_FIRST_VALUE = 0L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _disablePrimaryKeyIdentity;
     protected Integer _batchInsertLoggingLimit;

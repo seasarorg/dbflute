@@ -107,7 +107,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
                 close(ps);
                 processFinally(beanList, sqlEx);
             }
-            // a value of optimistic lock column should be synchronized
+            // a value of exclusive control column should be synchronized
             // after handling optimistic lock
             int index = 0;
             for (Object bean : beanList) {
