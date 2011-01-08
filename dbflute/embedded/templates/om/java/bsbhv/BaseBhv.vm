@@ -1194,17 +1194,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Query Update
     //                                                                        ============
     /**
-     * Insert the several entities by query.
+     * Insert the several entities by query (modified-only for fixed value).
      * <pre>
-     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
-     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you can set fixed values</span>
-     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
-     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
-     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
-     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
-     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
-     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryInsert</span>(${myEntityVariableName}, new QueryInsertSetupper&lt;${myConditionBeanClassName}&gt;() {
-     *     public ConditionBean setup(${myConditionBeanClassName} intoCB) {
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryInsert</span>(new QueryInsertSetupper&lt;${myEntityVariableName}, ${myConditionBeanClassName}&gt;() {
+     *     public ConditionBean setup(${myEntityVariableName} entity, ${myConditionBeanClassName} intoCB) {
      *         FooCB cb = FooCB();
      *         cb.setupSelect_Bar();
      * 
@@ -1212,25 +1205,31 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *         intoCB.specify().columnMyName().mappedFrom(cb.specify().columnFooName());
      *         intoCB.specify().columnMyCount().mappedFrom(cb.specify().columnFooCount());
      *         intoCB.specify().columnMyDate().mappedFrom(cb.specify().specifyBar().columnBarDate());
+     *         entity.setMyFixedValue("foo"); <span style="color: #3F7E5E">// fixed value</span>
+     *         <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     *         <span style="color: #3F7E5E">//entity.setRegisterUser(value);</span>
+     *         <span style="color: #3F7E5E">//entity.set...;</span>
+     *         <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
+     *         <span style="color: #3F7E5E">//entity.setVersionNo(value);</span>
      * 
      *         return cb;
      *     }
      * });
      * </pre>
-     * @param ${myEntityVariableName} The entity for fixed values. (NotNull, PrimaryKeyNullAllowed)
      * @param setupper The setup-per of query-insert. (NotNull)
      * @return The inserted count.
      */
-    public int queryInsert(${myExtendedObjectClassName} ${myEntityVariableName}, QueryInsertSetupper<${myConditionBeanClassName}> setupper) {
-        return doQueryInsert(${myEntityVariableName}, setupper, null);
+    public int queryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> setupper) {
+        return doQueryInsert(setupper, null);
     }
 
-    protected int doQueryInsert(${myExtendedObjectClassName} ${myEntityVariableName}, QueryInsertSetupper<${myConditionBeanClassName}> setupper, InsertOption<${myConditionBeanClassName}> option) {
+    protected int doQueryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> setupper, InsertOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("setupper", setupper);
         prepareInsertOption(option);
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${myConditionBeanClassName} intoCB = createCBForQueryInsert();
-        ConditionBean resourceCB = setupper.setup(intoCB);
-        return delegateQueryInsert(${myEntityVariableName}, intoCB, resourceCB, option);
+        ConditionBean resourceCB = setupper.setup(entity, intoCB);
+        return delegateQueryInsert(entity, intoCB, resourceCB, option);
     }
 
     protected ${myConditionBeanClassName} createCBForQueryInsert() {
@@ -1241,9 +1240,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected int doRangeCreate(Entity entity, QueryInsertSetupper<? extends ConditionBean> setupper, InsertOption<? extends ConditionBean> option) {
-        if (option == null) { return queryInsert(downcast(entity), (QueryInsertSetupper)setupper); }
-        else { return varyingQueryInsert(downcast(entity), (QueryInsertSetupper)setupper, (InsertOption)option); }
+    protected int doRangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper, InsertOption<? extends ConditionBean> option) {
+        if (option == null) { return queryInsert((QueryInsertSetupper)setupper); }
+        else { return varyingQueryInsert((QueryInsertSetupper)setupper, (InsertOption)option); }
     }
 
     /**
@@ -1563,17 +1562,16 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                          Query Update
     //                                          ------------
     /**
-     * Insert the several entities by query with varying requests. <br />
+     * Insert the several entities by query with varying requests (modified-only for fixed value). <br />
      * For example, disableCommonColumnAutoSetup(), allowNonQueryUpdate(). <br />
      * Other specifications are same as queryInsert(entity, setupper). 
-     * @param ${myEntityVariableName} The entity for fixed values. (NotNull, PrimaryKeyNullAllowed)
      * @param setupper The setup-per of query-insert. (NotNull)
      * @param option The option of insert for varying requests. (NotNull)
      * @return The inserted count.
      */
-    public int varyingQueryInsert(${myExtendedObjectClassName} ${myEntityVariableName}, QueryInsertSetupper<${myConditionBeanClassName}> setupper, InsertOption<${myConditionBeanClassName}> option) {
+    public int varyingQueryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> setupper, InsertOption<${myConditionBeanClassName}> option) {
         assertInsertOptionNotNull(option);
-        return doQueryInsert(${myEntityVariableName}, setupper, option);
+        return doQueryInsert(setupper, option);
     }
 
     /**
