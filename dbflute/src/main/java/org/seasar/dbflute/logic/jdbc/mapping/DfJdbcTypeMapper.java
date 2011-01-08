@@ -64,7 +64,7 @@ public class DfJdbcTypeMapper {
      * 5. String finally
      * </pre>
      * @param jdbcDefType The definition type of JDBC.
-     * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
+     * @param dbTypeName The name of DB data type. (NullAllowed: If null, the mapping using this is invalid)
      * @return The JDBC type of the column. (NotNull)
      */
     public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
@@ -81,7 +81,7 @@ public class DfJdbcTypeMapper {
     /**
      * Does it have a mapping about the type?
      * @param jdbcDefType The definition type of JDBC.
-     * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
+     * @param dbTypeName The name of DB data type. (NullAllowed: If null, the mapping using this is invalid)
      * @return The JDBC type of the column. (NotNull)
      */
     public boolean hasMappingJdbcType(int jdbcDefType, String dbTypeName) {

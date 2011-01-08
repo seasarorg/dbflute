@@ -376,7 +376,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             /**
              * Extract the meta data of parameter bean.
              * @param sql Target SQL. (NotNull and NotEmpty)
-             * @return the meta data of parameter bean. (Nullable: If it returns null, it means 'not found'.)
+             * @return the meta data of parameter bean. (NullAllowed: If it returns null, it means 'not found'.)
              */
             protected DfPmbMetaData extractParameterBeanMetaData(String sql) {
                 final String parameterBeanName = getParameterBeanName(sql);

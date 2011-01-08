@@ -124,7 +124,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
      */
     public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
 #if ($col.isForeignKey())
@@ -175,7 +175,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
      */
     public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
 #if ($col.isForeignKey())
@@ -212,7 +212,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if (${col.hasClassificationName()})
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
-     * @return The value of the column '${col.uncapitalisedJavaName}' as classification name. (Nullable)
+     * @return The value of the column '${col.uncapitalisedJavaName}' as classification name. (NullAllowed)
      */
     public String get${col.JavaName}Name() {
         ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
@@ -223,7 +223,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if (${col.hasClassificationAlias()})
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification alias.
-     * @return The value of the column '${col.uncapitalisedJavaName}' as classification alias. (Nullable)
+     * @return The value of the column '${col.uncapitalisedJavaName}' as classification alias. (NullAllowed)
      */
     public String get${col.JavaName}Alias() {
         ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
@@ -255,7 +255,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
     /**
      * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'.
-     * @return The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
+     * @return The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
@@ -263,7 +263,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
     /**
      * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'.
-     * @param ${foreignKey.foreignPropertyName} The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable)
+     * @param ${foreignKey.foreignPropertyName} The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (NullAllowed)
      */
     public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
         this.${foreignVariableName} = ${foreignKey.foreignPropertyName};
@@ -282,7 +282,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
     /**
      * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. <br />
-     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
+     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
         return ${referrerVariableName};
@@ -290,7 +290,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
     /**
      * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
-     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable)
+     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
         this.${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
@@ -322,7 +322,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
     /**
      * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
-     * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (Nullable)
+     * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NullAllowed)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         this.${referrerVariableName} = ${referrer.referrerPropertyName};
@@ -414,7 +414,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #else
     /**
      * If the all-column value of the other is same as this one, returns true.
-     * @param other Other entity. (Nullable)
+     * @param other Other entity. (NullAllowed)
      * @return Comparing result. If other is null, returns false.
      */
     public boolean equals(Object other) {
@@ -493,7 +493,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
 
     /**
-     * @param name The name for display. (Nullable: If it's null, it does not have a name)
+     * @param name The name for display. (NullAllowed: If it's null, it does not have a name)
      * @param column Does it contains column values or not?
      * @param relation Does it contains relation existences or not?
      * @return The display string for this entity. (NotNull)
@@ -561,7 +561,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
-     * @return The value of the column '${col.name}'. (Nullable)
+     * @return The value of the column '${col.name}'. (NullAllowed)
      */
     public ${col.JavaNative} get${col.javaName}() {
         return ${col.uncapitalisedJavaName};
@@ -572,7 +572,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
-     * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
+     * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (NullAllowed)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
         this.${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
@@ -592,7 +592,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
     /**
      * Get the value of the column '${uncapitalisedJavaName}'. <br />
-     * @return The value of the column '${uncapitalisedJavaName}'. (Nullable)
+     * @return The value of the column '${uncapitalisedJavaName}'. (NullAllowed)
      */
     public ${javaNative} get${javaName}() {
         return get${targetJavaName}();
@@ -600,7 +600,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
     /**
      * Set the value of the column '${uncapitalisedJavaName}'. <br />
-     * @param ${uncapitalisedJavaName} The value of the column '${uncapitalisedJavaName}'. (Nullable)
+     * @param ${uncapitalisedJavaName} The value of the column '${uncapitalisedJavaName}'. (NullAllowed)
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});

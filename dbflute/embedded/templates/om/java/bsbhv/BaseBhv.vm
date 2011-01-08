@@ -180,7 +180,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * }
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The selected entity. (Nullable: If the condition has no data, it returns null)
+     * @return The selected entity. (NullAllowed: If the condition has no data, it returns null)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
@@ -230,7 +230,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Select the entity by the primary-key value.
      * ${table.primaryKeyArgsJavaDocString}
-     * @return The selected entity. (Nullable: If the primary-key value has no data, it returns null)
+     * @return The selected entity. (NullAllowed: If the primary-key value has no data, it returns null)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
@@ -358,7 +358,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * </pre>
      * @param <RESULT> The type of result.
      * @param resultType The type of result. (NotNull)
-     * @return The scalar value derived by a function. (Nullable)
+     * @return The scalar value derived by a function. (NullAllowed)
      */
     public <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
         return doScalarSelect(resultType, newMyConditionBean());

@@ -283,7 +283,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
 
     /**
      * Get the meta information of connected database.
-     * @return The instance of meta information. (Nullable)
+     * @return The instance of meta information. (NullAllowed)
      */
     public DfConnectionMetaInfo getConnectionMetaInfo() {
         return _connectionMetaInfo;

@@ -27,7 +27,7 @@ public class DfDataSourceContext {
 
     /**
      * Get DataSource on thread.
-     * @return DataSource. (Nullable)
+     * @return DataSource. (NullAllowed)
      */
     public static DataSource getDataSource() {
         return (DataSource) _threadLocal.get();

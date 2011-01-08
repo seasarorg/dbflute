@@ -67,7 +67,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
@@ -208,7 +208,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     /**
      * Get the JDBC type of the column. 
      * @param jdbcDefType The JDBC definition value.
-     * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
+     * @param dbTypeName The name of DB data type. (NullAllowed: If null, the mapping using this is invalid)
      * @return The JDBC type of the column. (NotNull)
      */
     public String getColumnJdbcType(int jdbcDefType, String dbTypeName) {
@@ -227,7 +227,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     /**
      * Does it have a mapping about the type?
      * @param jdbcDefType The definition type of JDBC.
-     * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
+     * @param dbTypeName The name of DB data type. (NullAllowed: If null, the mapping using this is invalid)
      * @return The JDBC type of the column. (NotNull)
      */
     public boolean hasMappingJdbcType(int jdbcDefType, String dbTypeName) {

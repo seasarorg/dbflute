@@ -563,7 +563,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     /**
      * Get the package for flat directory. Normally, this property is only for C#.
-     * @return The package for flat directory. (Nullable)
+     * @return The package for flat directory. (NullAllowed)
      */
     public String getFlatDirectoryPackage() {
         final String key = "flatDirectoryPackage";
@@ -579,7 +579,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     /**
      * Get the package for omit directory. Normally, this property is only for C#.
-     * @return The package for omit directory. (Nullable)
+     * @return The package for omit directory. (NullAllowed)
      */
     public String getOmitDirectoryPackage() {
         final String key = "omitDirectoryPackage";

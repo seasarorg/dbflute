@@ -49,7 +49,7 @@ public interface DfProcedureSupplementExtractor {
     public StringKeyMap<DfTypeStructInfo> extractStructInfoMap();
 
     /**
-     * @param catalog The catalog for procedure. (Nullable)
+     * @param catalog The catalog for procedure. (NullAllowed)
      * @param procedureName The name of procedure. (NotNull)
      * @param parameterName The name of parameter. (NotNull)
      * @return The map key for parameter info. (NotNull)

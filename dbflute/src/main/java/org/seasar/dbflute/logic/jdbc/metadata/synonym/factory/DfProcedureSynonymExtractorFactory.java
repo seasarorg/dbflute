@@ -33,7 +33,7 @@ public class DfProcedureSynonymExtractorFactory {
     }
 
     /**
-     * @return The extractor of DB comments. (Nullable)
+     * @return The extractor of DB comments. (NullAllowed)
      */
     public DfProcedureSynonymExtractor createSynonymExtractor() {
         if (_basicProperties.isDatabaseOracle()) {

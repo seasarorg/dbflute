@@ -215,7 +215,7 @@ public abstract class $myClassName implements Serializable {
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
-     * @return The value of the column '${col.name}'. (Nullable)
+     * @return The value of the column '${col.name}'. (NullAllowed)
      */
     public ${col.javaNative} get${col.javaName}() {
         return ${col.simpleDtoVariableName};
@@ -226,7 +226,7 @@ public abstract class $myClassName implements Serializable {
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
-     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (NullAllowed)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
         __modifiedProperties.add("${col.javaBeansRulePropertyName}");

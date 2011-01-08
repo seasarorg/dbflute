@@ -61,7 +61,7 @@ public abstract class DfAbsractDataWriter {
     /** The data source. (NotNull) */
     protected DataSource _dataSource;
 
-    /** The unified schema (for getting database meta data). (Nullable) */
+    /** The unified schema (for getting database meta data). (NullAllowed) */
     protected UnifiedSchema _unifiedSchema;
 
     /** Does it output the insert SQLs as logging? */
@@ -70,7 +70,7 @@ public abstract class DfAbsractDataWriter {
     /** Does it suppress batch updates? */
     protected boolean _suppressBatchUpdate;
 
-    /** The interceptor of data writing. (Nullable) */
+    /** The interceptor of data writing. (NullAllowed) */
     protected DfDataWritingInterceptor _dataWritingInterceptor;
 
     /** The handler of columns for getting column meta information(as helper). */
@@ -666,7 +666,7 @@ public abstract class DfAbsractDataWriter {
     /**
      * Get the bind type to find a value type.
      * @param columnMetaInfo The meta information of column. (NotNull)
-     * @return The type of column. (Nullable: However Basically NotNull)
+     * @return The type of column. (NullAllowed: However Basically NotNull)
      */
     protected Class<?> getBindType(String tableName, DfColumnMetaInfo columnMetaInfo) {
         Map<String, Class<?>> cacheMap = _bindTypeCacheMap.get(tableName);

@@ -694,7 +694,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //              -------------------------
     /**
      * Get the map of all column classification.
-     * @return The map of all column classification. (Nullable: If the mark would be not found)
+     * @return The map of all column classification. (NullAllowed: If the mark would be not found)
      */
     public Map<String, String> getAllColumnClassificationMap() {
         return (Map<String, String>) getClassificationDeploymentMap().get(MARK_allColumnClassification);
@@ -712,7 +712,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     /**
      * Get the name of classification for all column.
      * @param columnName The name of column. (NotNull)
-     * @return The name of classification for all column. (Nullable: If NotFound)
+     * @return The name of classification for all column. (NullAllowed: If NotFound)
      */
     public String getAllClassificationName(String columnName) {
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();

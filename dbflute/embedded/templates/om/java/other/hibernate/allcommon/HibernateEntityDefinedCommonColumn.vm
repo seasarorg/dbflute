@@ -16,13 +16,13 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
 
     /**
      * Get the value of ${uncapitalisedJavaName}.
-     * @return The value of ${uncapitalisedJavaName}. (Nullable)
+     * @return The value of ${uncapitalisedJavaName}. (NullAllowed)
      */
     public ${javaNative} get${javaName}();
 
     /**
      * Set the value of ${uncapitalisedJavaName}.
-     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}. (Nullable)
+     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}. (NullAllowed)
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName});
 #if (${database.isAllClassificationColumn($filteredColumnName)})

@@ -77,7 +77,7 @@ public class ${myClassName} {
     //                                                ------
     /**
      * Do mapping from an entity to a DTO with relation data.
-     * @param entity The entity as mapping resource. (Nullable: if null, returns null)
+     * @param entity The entity as mapping resource. (NullAllowed: if null, returns null)
      * @return The mapped DTO. (NotNull)
      */
     public ${myExtendedObjectClassName} mappingToDto(${table.extendedEntityClassName} entity) {
@@ -174,7 +174,7 @@ public class ${myClassName} {
     /**
      * Do mapping from a DTO to an entity with relation data. <br />
      * A setter of an entity is called under the rule of this.needsMapping().
-     * @param dto The DTO as mapping resource. (Nullable: if null, returns null)
+     * @param dto The DTO as mapping resource. (NullAllowed: if null, returns null)
      * @return The mapped entity. (NotNull)
      */
     public ${table.extendedEntityClassName} mappingToEntity(${myExtendedObjectClassName} dto) {

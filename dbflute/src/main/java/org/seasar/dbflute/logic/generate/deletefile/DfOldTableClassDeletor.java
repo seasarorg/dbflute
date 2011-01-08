@@ -73,7 +73,7 @@ public class DfOldTableClassDeletor {
     /**
      * @param packagePath The path of package. (NotNull)
      * @param classPrefix The prefix of classes. (NotNull)
-     * @param classSuffix The suffix of classes. (Nullable)
+     * @param classSuffix The suffix of classes. (NullAllowed)
      * @return The list of package files. (NotNull)
      */
     protected List<File> findPackageFileList(String packagePath, final String classPrefix, final String classSuffix) {

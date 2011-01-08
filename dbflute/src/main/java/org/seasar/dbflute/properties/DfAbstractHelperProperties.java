@@ -223,8 +223,8 @@ public abstract class DfAbstractHelperProperties {
     /**
      * Get property as string. {Delegate method}
      * @param key Property-key. (NotNull)
-     * @param defaultValue Default value. (Nullable)
-     * @return Property as string. (Nullable: If the default-value is null)
+     * @param defaultValue Default value. (NullAllowed)
+     * @return Property as string. (NullAllowed: If the default-value is null)
      */
     final protected String stringProp(String key, String defaultValue) {
         try {
@@ -244,8 +244,8 @@ public abstract class DfAbstractHelperProperties {
     /**
      * Get property as string. {Delegate method}
      * @param key Property-key. (NotNull)
-     * @param defaultValue Default value. (Nullable)
-     * @return Property as string. (Nullable: If the default-value is null)
+     * @param defaultValue Default value. (NullAllowed)
+     * @return Property as string. (NullAllowed: If the default-value is null)
      */
     final protected String stringPropNoEmpty(String key, String defaultValue) {
         try {
@@ -362,8 +362,8 @@ public abstract class DfAbstractHelperProperties {
     /**
      * Get property as list. {Delegate method}
      * @param key Property-key. (NotNull)
-     * @param defaultValue Default value. (Nullable)
-     * @return Property as list. (Nullable: If the default-value is null)
+     * @param defaultValue Default value. (NullAllowed)
+     * @return Property as list. (NullAllowed: If the default-value is null)
      */
     final protected List<Object> listProp(String key, List<Object> defaultValue) {
         try {
@@ -409,8 +409,8 @@ public abstract class DfAbstractHelperProperties {
     /**
      * Get property as map. {Delegate method}
      * @param key Property-key. (NotNull)
-     * @param defaultValue Default value. (Nullable)
-     * @return Property as map. (Nullable: If the default-value is null)
+     * @param defaultValue Default value. (NullAllowed)
+     * @return Property as map. (NullAllowed: If the default-value is null)
      */
     final protected Map<String, Object> mapProp(String key, Map<String, Object> defaultValue) {
         try {

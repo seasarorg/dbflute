@@ -171,7 +171,7 @@ public class ${myClassName} extends AbstractDBMeta {
 
         /**
          * Constructor for first step.
-         * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
+         * @param relationTraceFixHandler The handler of fixed relation trace. (NullAllowed)
          */
         public ${table.relationTraceClassName}RelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
             super(relationTraceFixHandler);

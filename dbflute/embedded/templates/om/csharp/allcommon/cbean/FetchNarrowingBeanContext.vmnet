@@ -20,7 +20,7 @@ namespace ${glPackageBaseCommonCBean} {
         /**
          * Get fetch-narrowing-bean context on thread.
          * 
-         * @return FetchNarrowing-bean. (Nullable)
+         * @return FetchNarrowing-bean. (NullAllowed)
          */
         public static ${glFetchNarrowingBean} GetFetchNarrowingBeanOnThread() {
             return (${glFetchNarrowingBean})Thread.GetData(_fetchNarrowingBeanSlot);

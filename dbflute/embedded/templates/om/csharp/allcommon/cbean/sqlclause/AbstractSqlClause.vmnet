@@ -46,10 +46,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
     /** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}} */
     protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
 
-    /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
+    /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (NullAllowed: This is lazy-loaded) */
     protected Map<String, Map<String, String>> _specifiedSelectColumnMap;
 
-    /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
+    /** Specified derive sub-query map. (NullAllowed: This is lazy-loaded) */
     protected Map<String, String> _specifiedDeriveSubQueryMap;
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
@@ -58,13 +58,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
     /** The type of select clause. (NotNull) */
     protected SelectClauseType _selectClauseType = DEFAULT_SELECT_CLAUSE_TYPE;
 
-    /** The previous type of select clause. (Nullable: The default is null) */
+    /** The previous type of select clause. (NullAllowed: The default is null) */
     protected SelectClauseType _previousSelectClauseType;
 
-    /** The map of select index. {key:columnName, value:selectIndex} (Nullable) */
+    /** The map of select index. {key:columnName, value:selectIndex} (NullAllowed) */
     protected Map<String, int?> _selectIndexMap;
 
-    /** The reverse map of select index. {key:selectIndex, value:columnName} (Nullable) */
+    /** The reverse map of select index. {key:selectIndex, value:columnName} (NullAllowed) */
     protected Map<String, String> _selectIndexReverseMap;
 
     /** Is use select index? Default value is true. */
@@ -85,7 +85,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     /** The clause of order-by. (NotNull) */
     protected ${glOrderByClause} _orderByClause = new ${glOrderByClause}();
 
-    /** The list of union clause. (Nullable: This is lazy-loaded) */
+    /** The list of union clause. (NullAllowed: This is lazy-loaded) */
     protected List<UnionQueryInfo> _unionQueryInfoList;
 
     /** Is order-by effective? Default value is false. */

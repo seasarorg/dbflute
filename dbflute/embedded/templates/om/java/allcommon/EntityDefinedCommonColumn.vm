@@ -18,14 +18,14 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 
     /**
      * Get the value of ${uncapitalisedJavaName}.
-     * @return The instance of the property type. (Nullable)
+     * @return The instance of the property type. (NullAllowed)
      */
     ${javaNative} get${javaName}();
 
 #if (!$database.isForcedClassificationHandling() || !$database.isAllClassificationColumn($filteredColumnName))
     /**
      * Set the value of ${uncapitalisedJavaName}.
-     * @param ${uncapitalisedJavaName} The instance of the property type. (Nullable)
+     * @param ${uncapitalisedJavaName} The instance of the property type. (NullAllowed)
      */
     void set${javaName}(${javaNative} ${uncapitalisedJavaName});
 #end

@@ -26,7 +26,7 @@ public class DfOutsideSqlMarkAnalyzer {
     //                                                                           =========
     /**
      * @param sql The string of SQL. (NotNull)
-     * @return The name of entity. (Nullable: If it's not found, this returns null)
+     * @return The name of entity. (NullAllowed: If it's not found, this returns null)
      */
     public String getCustomizeEntityName(String sql) {
         return getTargetString(sql, "#");
@@ -43,7 +43,7 @@ public class DfOutsideSqlMarkAnalyzer {
 
     /**
      * @param sql The string of SQL. (NotNull)
-     * @return The name of parameter-bean. (Nullable: If it's not found, this returns null)
+     * @return The name of parameter-bean. (NullAllowed: If it's not found, this returns null)
      */
     public String getParameterBeanName(final String sql) {
         return getTargetString(sql, "!");

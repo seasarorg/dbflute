@@ -14,7 +14,7 @@ namespace ${glPackageBaseCommonJdbc} {
         /// Handle dataReader.
         /// </summary>
         /// <param name="reader">The dataReader of handling target. (NotNull)</param>
-        /// <returns>The result of handling. (Nullable)</returns>
+        /// <returns>The result of handling. (NullAllowed)</returns>
         Object Handle(IDataReader reader);
     }
 
@@ -23,6 +23,6 @@ namespace ${glPackageBaseCommonJdbc} {
     /// </summary>
     /// <typeparam name="CURSOR">The type of cursor.</typeparam>
     /// <param name="cursor">The cursor of fetch target. (NotNull)</param>
-    /// <returns>the result of fetching. (Nullable)</returns>
+    /// <returns>the result of fetching. (NullAllowed)</returns>
     public delegate Object ${glCursorFetcher}<CURSOR>(CURSOR cursor);
 }

@@ -68,7 +68,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The pattern of skip sheet. (Nullable) */
+    /** The pattern of skip sheet. (NullAllowed) */
     protected Pattern _skipSheetPattern;
 
     // ===================================================================================

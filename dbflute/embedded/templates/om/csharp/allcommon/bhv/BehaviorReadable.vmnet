@@ -45,7 +45,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// Read entity.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read entity. (Nullable)</returns>
+        /// <returns>Read entity. (NullAllowed)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         ${glEntity} ReadEntity(${glConditionBean} cb);
 

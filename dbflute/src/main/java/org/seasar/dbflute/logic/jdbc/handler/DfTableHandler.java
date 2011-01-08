@@ -50,7 +50,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * Get all the table names in the current database that are not system tables. <br />
      * This does not contain additional schema. only specified schema is considered.
      * @param metaData JDBC database meta data. (NotNull)
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */

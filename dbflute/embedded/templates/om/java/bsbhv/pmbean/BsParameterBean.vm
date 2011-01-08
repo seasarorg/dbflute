@@ -296,7 +296,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${argumentName}) {
         ${variableName} = ${argumentName};
@@ -306,7 +306,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      * @param ${argumentName}Option The option of likeSearch for ${propertyName} which is NOT split mode. (NotNull)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${argumentName}, LikeSearchOption ${argumentName}Option) {
@@ -319,7 +319,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${argumentName}) {
         ${variableName} = ${argumentName};
@@ -330,7 +330,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${argumentName}) {
         ${variableName} = ${argumentName};
@@ -341,7 +341,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${argumentName}) {
         ${variableName} = ${argumentName};
@@ -352,7 +352,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't Invoke This!}
-     * @return The internal option of likeSearch for ${propertyName}. (Nullable)
+     * @return The internal option of likeSearch for ${propertyName}. (NullAllowed)
      */
     public LikeSearchOption get${database.initCap($propertyName)}InternalLikeSearchOption() {
         return ${variableName}InternalLikeSearchOption;
@@ -362,7 +362,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
         ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
@@ -372,7 +372,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
         ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});

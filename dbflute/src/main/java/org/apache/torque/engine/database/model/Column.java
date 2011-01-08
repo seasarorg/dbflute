@@ -803,7 +803,7 @@ public class Column {
     /**
      * get the foreign key object for this column
      * if it is a foreign key or part of a foreign key
-     * @return Foreign key. (Nullable)
+     * @return Foreign key. (NullAllowed)
      */
     public ForeignKey getForeignKey() {
         return _table.getForeignKey(this._name);
@@ -1522,7 +1522,7 @@ public class Column {
     /**
      * Set the related table for Sql2Entity. <br />
      * This is used at supplementary information and LoadReferrer for customize entity.
-     * @param sql2EntityRelatedTable The related table for Sql2Entity. (Nullable)
+     * @param sql2EntityRelatedTable The related table for Sql2Entity. (NullAllowed)
      */
     public void setSql2EntityRelatedTable(Table sql2EntityRelatedTable) {
         _sql2EntityRelatedTable = sql2EntityRelatedTable;
@@ -1539,7 +1539,7 @@ public class Column {
     /**
      * Set the related column for Sql2Entity. <br />
      * This is used at supplementary information and LoadReferrer for customize entity.
-     * @param sql2EntityRelatedColumn The related column for Sql2Entity. (Nullable)
+     * @param sql2EntityRelatedColumn The related column for Sql2Entity. (NullAllowed)
      */
     public void setSql2EntityRelatedColumn(Column sql2EntityRelatedColumn) {
         _sql2EntityRelatedColumn = sql2EntityRelatedColumn;
@@ -1552,7 +1552,7 @@ public class Column {
     /**
      * Set the forced java native type for Sql2Entity. <br />
      * This is used at getting java native type as high priority.
-     * @param sql2EntityForcedJavaNative The forced java native type for Sql2Entity. (Nullable)
+     * @param sql2EntityForcedJavaNative The forced java native type for Sql2Entity. (NullAllowed)
      */
     public void setSql2EntityForcedJavaNative(String sql2EntityForcedJavaNative) {
         _sql2EntityForcedJavaNative = sql2EntityForcedJavaNative;

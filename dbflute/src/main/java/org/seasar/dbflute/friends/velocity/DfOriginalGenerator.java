@@ -142,7 +142,7 @@ public class DfOriginalGenerator extends DfGenerator {
      * output file parameter is null or an empty string the result is
      * returned as a string object.  Otherwise an empty string is returned.
      * @param inputTemplate input template
-     * @param outputFile output file (Nullable: If you use as nested parsing, you should set null about this.)
+     * @param outputFile output file (NullAllowed: If you use as nested parsing, you should set null about this.)
      */
     public String parse(String inputTemplate, String outputFile) throws Exception {
         return parse(inputTemplate, outputFile, null, null);
@@ -154,7 +154,7 @@ public class DfOriginalGenerator extends DfGenerator {
      * returned as a string object.  Otherwise an empty string is returned.
      * You can add objects to the context with the objs Hashtable.
      * @param inputTemplate input template
-     * @param outputFile output file. (Nullable: If you use as nested parsing, you should set null about this.)
+     * @param outputFile output file. (NullAllowed: If you use as nested parsing, you should set null about this.)
      * @param objectID id for object to be placed in the control context
      * @param object object to be placed in the context
      * @return String generated output from velocity
@@ -170,7 +170,7 @@ public class DfOriginalGenerator extends DfGenerator {
      * You can add objects to the context with the objs Hashtable.
      * @param inputTemplate input template
      * @param specifiedInputEncoding inputEncoding template encoding
-     * @param outputFile output file (Nullable: If you use as nested parsing, you should set null about this.)
+     * @param outputFile output file (NullAllowed: If you use as nested parsing, you should set null about this.)
      * @param specifiedOutputEncoding outputEncoding encoding of output file
      * @param objectID id for object to be placed in the control context
      * @param object object to be placed in the context

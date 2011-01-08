@@ -778,7 +778,7 @@ public class Table {
 
     /**
      * Returns primaryKeyArgsSetupString. [beanName.setRcvlcqNo(rcvlcqNo);beanName.setSprlptTp(sprlptTp);]
-     * @param beanName The name of bean. (Nullable)
+     * @param beanName The name of bean. (NullAllowed)
      * @return The value of primaryKeyArgsSetupString. (NotNull)
      */
     public String getPrimaryKeyArgsSetupString(String beanName) {
@@ -795,7 +795,7 @@ public class Table {
 
     /**
      * Returns primaryKeyArgsSetupStringCSharp. [beanName.RcvlcqNo = rcvlcqNo;beanName.SprlptTp = sprlptTp;]
-     * @param beanName The name of bean. (Nullable)
+     * @param beanName The name of bean. (NullAllowed)
      * @return The value of primaryKeyArgsSetupStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsSetupStringCSharp(String beanName) {
@@ -2273,7 +2273,7 @@ public class Table {
 
     /**
      * Extract sequence name of postgreSQL serial type column.
-     * @return Sequence name of postgreSQL serial type column. (Nullable: If null, not found)
+     * @return Sequence name of postgreSQL serial type column. (NullAllowed: If null, not found)
      */
     protected String extractPostgreSQLSerialSequenceName() {
         final DfBasicProperties basicProperties = getBasicProperties();

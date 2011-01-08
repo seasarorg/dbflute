@@ -72,7 +72,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
     //                                                                ====================
     /**
      * Is the table name out of sight?
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name schema. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name schema. (NullAllowed)
      * @param tableName The name of table. (NotNull)
      * @return Determination.
      */
@@ -107,7 +107,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     /**
      * Is the column of the table out of sight?
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull)
      * @param columnName The name of column. (NotNull)
      * @return Determination.

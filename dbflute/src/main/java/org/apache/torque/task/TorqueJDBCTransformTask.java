@@ -743,7 +743,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @param tableInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnInfo The meta information of primary-key column.
      * @param conn Connection.
-     * @return Auto-increment column name. (Nullable)
+     * @return Auto-increment column name. (NullAllowed)
      * @throws SQLException
      */
     protected boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo,

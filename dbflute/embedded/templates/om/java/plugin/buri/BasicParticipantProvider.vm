@@ -16,16 +16,16 @@ public class ${glBasicParticipantProvider} implements ParticipantProvider {
     //                                                                User Data Conversion
     //                                                                ====================
     /**
-     * @param appUserId The user identity information of application. (Nullable)
-     * @return The user data. (Nullable)
+     * @param appUserId The user identity information of application. (NullAllowed)
+     * @return The user data. (NullAllowed)
      */
     public Object getUserData(IdentityInfo identityInfo) {
         return identityInfo;
     }
 
     /**
-     * @param userData The user data. (Nullable)
-     * @return The user identity information of application. (Nullable)
+     * @param userData The user data. (NullAllowed)
+     * @return The user identity information of application. (NullAllowed)
      */
     public IdentityInfo getUserId(Object userData) {
         return (IdentityInfo) userData;

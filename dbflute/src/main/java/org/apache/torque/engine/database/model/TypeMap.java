@@ -373,7 +373,7 @@ public class TypeMap {
     //                                                                           =========
     /**
      * @param jdbcDefValue The JDBC definition value. (NotNull)
-     * @return The type as JDBC. (Nullable: when not found)
+     * @return The type as JDBC. (NullAllowed: when not found)
      */
     public static String findJdbcTypeByJdbcDefValue(Integer jdbcDefValue) {
         initializeIfNeeds();
@@ -427,8 +427,8 @@ public class TypeMap {
     /**
      * Find java native type by JDBC type.
      * @param jdbcType The type of JDBC. (NotNull)
-     * @param columnSize The size of column. (Nullable: if null, returns numeric or decimal)
-     * @param decimalDigits The decimal digits. (Nullable: if null, returns numeric or decimal)
+     * @param columnSize The size of column. (NullAllowed: if null, returns numeric or decimal)
+     * @param decimalDigits The decimal digits. (NullAllowed: if null, returns numeric or decimal)
      * @return The string expression of java native type. (NotNull)
      */
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {

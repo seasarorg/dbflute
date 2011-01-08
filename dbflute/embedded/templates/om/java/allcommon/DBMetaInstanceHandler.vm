@@ -90,7 +90,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
 
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
-     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
+     * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
      */
     public DBMeta provideDBMeta(String tableFlexibleName) {
         return byTableFlexibleName(tableFlexibleName);
@@ -129,7 +129,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     //                                                                       =============
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
-     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
+     * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
      */
     protected static DBMeta byTableFlexibleName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
@@ -163,7 +163,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
 
     /**
      * @param tableDbName The DB name of table. (NotNull)
-     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
+     * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
      */
     protected static DBMeta byTableDbName(String tableDbName) {
         assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);

@@ -454,7 +454,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     /**
-     * @return The process command of call-back for before-take-finally. (Nullable)
+     * @return The process command of call-back for before-take-finally. (NullAllowed)
      */
     public String getBeforeTakeFinally() { // It's closet!
         return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");

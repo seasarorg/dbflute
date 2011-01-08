@@ -86,7 +86,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     /**
      * @param cb Condition-bean. (NotNull)
      * @param entity Entity. (NotNull)
-     * @return The two-way SQL of query update. (Nullable: If the set of modified properties is empty, return null.)
+     * @return The two-way SQL of query update. (NullAllowed: If the set of modified properties is empty, return null.)
      */
     protected String buildQueryUpdateTwoWaySql(${glConditionBean} cb, ${glEntity} entity) {
         Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();

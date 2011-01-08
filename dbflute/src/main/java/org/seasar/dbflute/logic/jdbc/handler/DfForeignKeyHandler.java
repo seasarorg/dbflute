@@ -66,7 +66,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     /**
      * Retrieves a map of foreign key columns for a given table. (the key is FK name)
      * @param metaData JDBC meta data. (NotNull)
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException

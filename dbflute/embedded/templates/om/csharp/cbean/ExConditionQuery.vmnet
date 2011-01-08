@@ -20,7 +20,7 @@ namespace ${glPackageCQ} {
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="childQuery">Child query as interface. (Nullable: If null, this is base instance.)</param>
+        /// <param name="childQuery">Child query as interface. (NullAllowed: If null, this is base instance.)</param>
         /// <param name="sqlClause">SQL clause instance. (NotNull)</param>
         /// <param name="aliasName">My alias name. (NotNull)</param>
         /// <param name="nestLevel">Nest level.</param>

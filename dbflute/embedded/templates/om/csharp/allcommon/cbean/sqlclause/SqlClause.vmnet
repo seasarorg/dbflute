@@ -95,14 +95,14 @@ public interface ${myClassName} {
     
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
+     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (NullAllowed)
      * @param ascOrDesc Is it ascend or descend?
      */
     void registerOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);
     
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
+     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (NullAllowed)
      * @param ascOrDesc Is it ascend or descend?
      */
     void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);

@@ -9,9 +9,9 @@ namespace ${glPackageBaseCommonJdbc} {
      * (before you get the result)
      * <pre>
      * [SqlResultInfo]
-     * o result : The result(mapped object) of executed SQL. (Nullable)
+     * o result : The result(mapped object) of executed SQL. (NullAllowed)
      * o commandName : The name of executed command. (for display only) (NotNull)
-     * o displaySql : The latest executed SQL for display. (for display only) (Nullable: if the SQL would be not executed)
+     * o displaySql : The latest executed SQL for display. (for display only) (NullAllowed: if the SQL would be not executed)
      * o beforeDateTime : The date time before executing command(after initializing executions).
      * o afterDateTime : The date time after executing command(after mapping entities).
      * </pre>

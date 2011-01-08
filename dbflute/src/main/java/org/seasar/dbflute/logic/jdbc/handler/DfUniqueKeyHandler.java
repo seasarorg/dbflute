@@ -62,7 +62,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     /**
      * Retrieves an info of the columns composing the primary key for a given table.
      * @param metaData JDBC meta data. (NotNull)
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull)
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException
@@ -191,7 +191,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     /**
      * Retrieves an map of the columns composing the unique key for a given table.
      * @param metaData JDBC meta data. (NotNull)
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull)
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException

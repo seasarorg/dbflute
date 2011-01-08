@@ -25,7 +25,7 @@ public class DfIdentityExtractorFactory {
     }
 
     /**
-     * @return The extractor of DB comments. (Nullable)
+     * @return The extractor of DB comments. (NullAllowed)
      */
     public DfIdentityExtractor createIdentityExtractor() {
         if (_basicProperties.isDatabaseDB2()) {

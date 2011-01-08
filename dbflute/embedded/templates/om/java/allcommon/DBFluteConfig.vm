@@ -294,14 +294,14 @@ public class ${glDBFluteConfig} {
     //                                                                  DataSource Handler
     //                                                                  ==================
     /**
-     * @return The handler of data source. (Nullable)
+     * @return The handler of data source. (NullAllowed)
      */
     public DataSourceHandler getDataSourceHandler() {
         return _dataSourceHandler;
     }
 
     /**
-     * @param dataSourceHandler The handler of data source. (Nullable)
+     * @param dataSourceHandler The handler of data source. (NullAllowed)
      */
     public void setDataSourceHandler(DataSourceHandler dataSourceHandler) {
         assertNotLocked();
@@ -365,14 +365,14 @@ public class ${glDBFluteConfig} {
     //                                                                  OutsideSql Package
     //                                                                  ==================
     /**
-     * @return The package of outside SQL. (Nullable)
+     * @return The package of outside SQL. (NullAllowed)
      */
     public String getOutsideSqlPackage() {
         return _outsideSqlPackage;
     }
 
     /**
-     * @param outsideSqlPackage The package of outside SQL. (Nullable)
+     * @param outsideSqlPackage The package of outside SQL. (NullAllowed)
      */
     public void setOutsideSqlPackage(String outsideSqlPackage) {
         assertNotLocked();
@@ -403,14 +403,14 @@ public class ${glDBFluteConfig} {
     //                                                                      Sequence Cache
     //                                                                      ==============
     /**
-     * @return The key generator of sequence cache. (Nullable)
+     * @return The key generator of sequence cache. (NullAllowed)
      */
     public SequenceCacheKeyGenerator getSequenceCacheKeyGenerator() {
         return _sequenceCacheKeyGenerator;
     }
 
     /**
-     * @param sequenceCacheKeyGenerator The key generator of sequence cache. (Nullable)
+     * @param sequenceCacheKeyGenerator The key generator of sequence cache. (NullAllowed)
      */
     public void setSequenceCacheKeyGenerator(SequenceCacheKeyGenerator sequenceCacheKeyGenerator) {
         assertNotLocked();
@@ -425,14 +425,14 @@ public class ${glDBFluteConfig} {
     //                                                                   SqlClause Creator
     //                                                                   =================
     /**
-     * @return The creator of SQL clause. (Nullable)
+     * @return The creator of SQL clause. (NullAllowed)
      */
     public SqlClauseCreator getSqlClauseCreator() {
         return _sqlClauseCreator;
     }
 
     /**
-     * @param sqlClauseCreator The creator of SQL clause. (Nullable)
+     * @param sqlClauseCreator The creator of SQL clause. (NullAllowed)
      */
     public void setSqlClauseCreator(SqlClauseCreator sqlClauseCreator) {
         assertNotLocked();
@@ -447,7 +447,7 @@ public class ${glDBFluteConfig} {
     //                                                                 TableSqlName Filter
     //                                                                 ===================
     /**
-     * @return The SQL name filter for table. (Nullable)
+     * @return The SQL name filter for table. (NullAllowed)
      */
     public SqlNameFilter getTableSqlNameFilter() {
         return _tableSqlNameFilter;
@@ -457,7 +457,7 @@ public class ${glDBFluteConfig} {
      * Set the SQL name filter for table. <br />
      * This setting should be called before container's initialization.
      * (its exact meaning is: before class loading of DBMeta for table)
-     * @param tableSqlNameFilter The SQL name filter for table. (Nullable)
+     * @param tableSqlNameFilter The SQL name filter for table. (NullAllowed)
      */
     public void setTableSqlNameFilter(SqlNameFilter tableSqlNameFilter) {
         assertNotLocked();

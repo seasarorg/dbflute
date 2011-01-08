@@ -28,7 +28,7 @@ public class DfDbCommentExtractorFactory {
     /**
      * @param basicProperties The basic properties. (NotNull)
      * @param dataSource The data source. (NotNull)
-     * @param unifiedSchema The unified schema to extract. (Nullable)
+     * @param unifiedSchema The unified schema to extract. (NullAllowed)
      */
     public DfDbCommentExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource,
             UnifiedSchema unifiedSchema) {
@@ -41,7 +41,7 @@ public class DfDbCommentExtractorFactory {
     //                                                                              Create
     //                                                                              ======
     /**
-     * @return The extractor of DB comments. (Nullable)
+     * @return The extractor of DB comments. (NullAllowed)
      */
     public DfDbCommentExtractor createDbCommentExtractor() {
         if (_basicProperties.isDatabaseMySQL()) {

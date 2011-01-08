@@ -220,7 +220,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     }
 
     /**
-     * @return The extractor of procedure synonym. (Nullable)
+     * @return The extractor of procedure synonym. (NullAllowed)
      */
     protected DfProcedureSynonymExtractor createProcedureSynonymExtractor() {
         final DfProcedureSynonymExtractorFactory factory = new DfProcedureSynonymExtractorFactory(
@@ -328,7 +328,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
      * It selects procedures of specified schema only.
      * @param dataSource Data source. (NotNull)
      * @param metaData The meta data of database. (NotNull)
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (Nullable)
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @return The list of procedure meta information. (NotNull)
      */
     public List<DfProcedureMetaInfo> getPlainProcedureList(DataSource dataSource, DatabaseMetaData metaData,
