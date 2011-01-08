@@ -2116,7 +2116,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final String subQueryEndMark = resolveSubQueryEndMark(subQueryIdentity);
         final StringBuilder mainSb = new StringBuilder();
         mainSb.append("insert into ").append(dbmeta.getTableSqlName());
-        mainSb.append("(").append(intoSb).append(")").append(ln());
+        mainSb.append(" (").append(intoSb).append(")").append(ln());
         mainSb.append("select ").append(selectSb).append(ln());
         mainSb.append("  from (").append(subQueryBeginMark).append(ln());
         mainSb.append(resourceViewClause).append(ln());
