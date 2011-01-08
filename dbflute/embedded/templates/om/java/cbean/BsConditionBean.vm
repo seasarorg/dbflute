@@ -433,8 +433,11 @@ public class ${myClassName} extends AbstractConditionBean {
                              , HpCBPurpose purpose, DBMetaProvider dbmetaProvider)
         { super(baseCB, qyCall, purpose, dbmetaProvider); }
 #foreach ($col in $table.columns)
-        /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
-        public void column${col.javaName}() { doColumn("${col.name}"); }
+        /**
+         * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+         * @return The information object of specified column. (NotNull)
+         */
+        public HpSpecifiedColumn column${col.javaName}() { return doColumn("${col.name}"); }
 #end
         @Override
         protected void doSpecifyRequiredColumn() {
@@ -650,26 +653,14 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
-    public void xsetupForColumnQuery(final ${myConditionBeanClassName} mainCB) {
-        xinheritSubQueryInfo(mainCB.localCQ());
-        xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY, mainCB.localCQ());
-
-        // inherits a parent query to synchronize real name
-        // (and also for suppressing query check) 
-        xprepareSyncQyCall(mainCB);
-    }
-
-    public void xsetupForVaryingUpdate() {
-        xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE, null);
-        xprepareSyncQyCall(new ${myConditionBeanClassName}()); // for suppressing query check
-    }
-
-    public void xsetupForSpecifiedUpdate() {
-        xchangePurposeSqlClause(HpCBPurpose.SPECIFIED_UPDATE, null);
-        xprepareSyncQyCall(new ${myConditionBeanClassName}()); // for suppressing query check
-    }
-
-    protected void xprepareSyncQyCall(final ${myConditionBeanClassName} cb) {
+    @Override
+    protected void xprepareSyncQyCall(ConditionBean mainCB) {
+        final ${myConditionBeanClassName} cb;
+        if (mainCB != null) {
+            cb = (${myConditionBeanClassName})mainCB;
+        } else {
+            cb = new ${myConditionBeanClassName}();
+        }
         specify().xsetSyncQyCall(new HpSpQyCall<${myConditionQueryClassName}>() {
             public boolean has() { return true; }
             public ${myConditionQueryClassName} qy() { return cb.query(); }

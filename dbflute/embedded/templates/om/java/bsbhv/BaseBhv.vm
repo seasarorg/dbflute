@@ -679,6 +679,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <span style="color: #3F7E5E">// if auto-increment, you don't need to set the PK value</span>
      * ${myEntityVariableName}.setFoo...(value);
      * ${myEntityVariableName}.setBar...(value);
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">insert</span>(${myEntityVariableName});
      * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
      * </pre>
@@ -713,6 +716,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
      * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
      * <span style="color: #3F7E5E">// if exclusive control, the value of exclusive control column is required</span>
      * ${myEntityVariableName}.<span style="color: #FD4747">setVersionNo</span>(value);
      * try {
@@ -778,7 +784,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
      * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
-     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
      * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">updateNonstrict</span>(${myEntityVariableName});
@@ -937,7 +946,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
-     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
      * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrict</span>(${myEntityVariableName});
@@ -962,7 +971,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
-     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
      * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrictIgnoreDeleted</span>(${myEntityVariableName});
@@ -1185,20 +1194,76 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Query Update
     //                                                                        ============
     /**
+     * Insert the several entities by query.
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you can set fixed values</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryInsert</span>(${myEntityVariableName}, new QueryInsertSetupper&lt;${myConditionBeanClassName}&gt;() {
+     *     public ConditionBean setup(${myConditionBeanClassName} intoCB) {
+     *         FooCB cb = FooCB();
+     *         cb.setupSelect_Bar();
+     * 
+     *         <span style="color: #3F7E5E">// mapping</span>
+     *         intoCB.specify().columnMyName().mappedFrom(cb.specify().columnFooName());
+     *         intoCB.specify().columnMyCount().mappedFrom(cb.specify().columnFooCount());
+     *         intoCB.specify().columnMyDate().mappedFrom(cb.specify().specifyBar().columnBarDate());
+     * 
+     *         return cb;
+     *     }
+     * });
+     * </pre>
+     * @param ${myEntityVariableName} The entity for fixed values. (NotNull, PrimaryKeyNullAllowed)
+     * @param setupper The setup-per of query-insert. (NotNull)
+     * @return The inserted count.
+     */
+    public int queryInsert(${myExtendedObjectClassName} ${myEntityVariableName}, QueryInsertSetupper<${myConditionBeanClassName}> setupper) {
+        return doQueryInsert(${myEntityVariableName}, setupper, null);
+    }
+
+    protected int doQueryInsert(${myExtendedObjectClassName} ${myEntityVariableName}, QueryInsertSetupper<${myConditionBeanClassName}> setupper, InsertOption<${myConditionBeanClassName}> option) {
+        assertObjectNotNull("setupper", setupper);
+        prepareInsertOption(option);
+        ${myConditionBeanClassName} intoCB = createCBForQueryInsert();
+        ConditionBean resourceCB = setupper.setup(intoCB);
+        return delegateQueryInsert(${myEntityVariableName}, intoCB, resourceCB, option);
+    }
+
+    protected ${myConditionBeanClassName} createCBForQueryInsert() {
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.xsetupForQueryInsert();
+        return cb;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected int doRangeCreate(Entity entity, QueryInsertSetupper<? extends ConditionBean> setupper, InsertOption<? extends ConditionBean> option) {
+        if (option == null) { return queryInsert(downcast(entity), (QueryInsertSetupper)setupper); }
+        else { return varyingQueryInsert(downcast(entity), (QueryInsertSetupper)setupper, (InsertOption)option); }
+    }
+
+    /**
      * Update the several entities by query non-strictly modified-only. {NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * <span style="color: #3F7E5E">// you don't need to set PK value</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
      * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
-     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
      * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryUpdate</span>(${myEntityVariableName}, cb);
      * </pre>
-     * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
+     * @param ${myEntityVariableName} The entity that contains update values. (NotNull, PrimaryKeyNullAllowed)
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The updated count.
      * @exception org.seasar.dbflute.exception.NonQueryUpdateNotAllowedException When the query has no condition.
@@ -1326,7 +1391,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
      * ${myEntityVariableName}.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
-     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
      * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * UpdateOption&lt;${myConditionBeanClassName}&gt; option = new UpdateOption&lt;${myConditionBeanClassName}&gt;();
@@ -1498,6 +1563,20 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                          Query Update
     //                                          ------------
     /**
+     * Insert the several entities by query with varying requests. <br />
+     * For example, disableCommonColumnAutoSetup(), allowNonQueryUpdate(). <br />
+     * Other specifications are same as queryInsert(entity, setupper). 
+     * @param ${myEntityVariableName} The entity for fixed values. (NotNull, PrimaryKeyNullAllowed)
+     * @param setupper The setup-per of query-insert. (NotNull)
+     * @param option The option of insert for varying requests. (NotNull)
+     * @return The inserted count.
+     */
+    public int varyingQueryInsert(${myExtendedObjectClassName} ${myEntityVariableName}, QueryInsertSetupper<${myConditionBeanClassName}> setupper, InsertOption<${myConditionBeanClassName}> option) {
+        assertInsertOptionNotNull(option);
+        return doQueryInsert(${myEntityVariableName}, setupper, option);
+    }
+
+    /**
      * Update the several entities by query with varying requests non-strictly modified-only. {NonExclusiveControl} <br />
      * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
      * , disableCommonColumnAutoSetup(), allowNonQueryUpdate(). <br />
@@ -1508,7 +1587,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <span style="color: #3F7E5E">// you don't need to set PK value</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
      * ${myEntityVariableName}.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
-     * <span style="color: #3F7E5E">// you don't need to set the value of exclusive control column</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
      * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
@@ -1748,6 +1827,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     { if (ls.isEmpty()) { return new int[]{}; }
       return invoke(createBatchDeleteNonstrictCommand(processBatchInternally(ls, op, true), op)); }
 
+    protected int delegateQueryInsert(${myExtendedObjectClassName} e, ${myConditionBeanClassName} inCB, ConditionBean resCB, InsertOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeQueryInsert(e, inCB, resCB, op)) { return 0; } return invoke(createQueryInsertCBCommand(e, inCB, resCB, op));  }
     protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
     { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateCBCommand(e, cb, op));  }
     protected int delegateQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> op)
