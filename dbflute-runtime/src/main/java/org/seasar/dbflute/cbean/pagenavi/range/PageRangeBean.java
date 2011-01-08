@@ -48,7 +48,7 @@ public class PageRangeBean implements Serializable {
     /**
      * Build the list of page number link.
      * @param <LINK> The type of link.
-     * @param pageNumberLinkSetupper Page number link setupper. (NotNull and Required LINK)
+     * @param pageNumberLinkSetupper Page number link set-upper. (NotNull and Required LINK)
      * @return The list of Page number link. (NotNull)
      */
     public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(

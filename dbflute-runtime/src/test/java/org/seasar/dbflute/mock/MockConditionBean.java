@@ -209,6 +209,10 @@ public class MockConditionBean implements ConditionBean {
     public void invokeSetupSelect(String foreignPropertyNamePath) {
     }
 
+    public Map<String, Object> getFreeParameterMap() {
+        return null;
+    }
+
     public void xregisterFreeParameter(String key, Object value) {
     }
 

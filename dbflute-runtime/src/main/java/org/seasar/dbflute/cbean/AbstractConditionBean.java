@@ -136,9 +136,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
         assertSetupSelectBeforeUnion(foreignPropertyName);
         final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = localCQ().xgetRelationPath();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
-                localRelationPath);
-        getSqlClause().registerSelectedForeignInfo(callback.qf().xgetRelationPath(), foreignPropertyName);
+        final String foreignRelationPath = callback.qf().xgetRelationPath();
+        getSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName,
+                localRelationPath, foreignRelationPath);
     }
 
     protected static interface SsCall {
@@ -900,8 +900,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                      Free Parameter
     //                                                                      ==============
     /**
-     * Get the map for free parameters for parameter comment. {Internal}
-     * @return The map for free parameters. (Nullable)
+     * {@inheritDoc}
      */
     public Map<String, Object> getFreeParameterMap() {
         return _freeParameterMap;
@@ -988,10 +987,28 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION, mainCQ);
     }
 
-    // *defined at base condition-bean per table
-    //  o xsetupForColumnQuery()
-    //  o xsetupForVaryingUpdate()
-    //  o xsetupForSpecifiedUpdate()
+    public void xsetupForQueryInsert() { // not sub-query (used independently)
+        xchangePurposeSqlClause(HpCBPurpose.QUERY_INSERT, null);
+    }
+
+    public void xsetupForColumnQuery(ConditionBean mainCB) {
+        xinheritSubQueryInfo(mainCB.localCQ());
+        xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY, mainCB.localCQ());
+
+        // inherits a parent query to synchronize real name
+        // (and also for suppressing query check) 
+        xprepareSyncQyCall(mainCB);
+    }
+
+    public void xsetupForVaryingUpdate() {
+        xchangePurposeSqlClause(HpCBPurpose.VARYING_UPDATE, null);
+        xprepareSyncQyCall(null); // for suppressing query check
+    }
+
+    public void xsetupForSpecifiedUpdate() {
+        xchangePurposeSqlClause(HpCBPurpose.SPECIFIED_UPDATE, null);
+        xprepareSyncQyCall(null); // for suppressing query check
+    }
 
     protected void xinheritSubQueryInfo(ConditionQuery mainCQ) {
         if (mainCQ.xgetSqlClause().isForSubQuery()) {
@@ -1022,6 +1039,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
             checkInvalidQuery(); // inherited
         }
     }
+
+    protected abstract void xprepareSyncQyCall(ConditionBean mainCB);
 
     // ===================================================================================
     //                                                                    Exception Helper

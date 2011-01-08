@@ -39,35 +39,53 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
+        // analyze arguments
+        final ConditionBean cb = extractConditionBeanWithCheck(args);
+
+        // arguments for execution (not contains an option)
+        final String[] argNames = new String[] { "pmb" };
+        final Class<?>[] argTypes = new Class<?>[] { cb.getClass() };
+        final Object[] realArgs = new Object[] { cb };
+
+        // prepare context
         final CommandContext context;
         {
-            final ConditionBean cb = extractConditionBeanWithCheck(args);
-            final String[] argNames = new String[] { "pmb" };
-            final Class<?>[] argTypes = new Class<?>[] { cb.getClass() };
             final String twoWaySql = buildQueryDeleteTwoWaySql(cb);
-            context = createCommandContext(twoWaySql, argNames, argTypes, args);
+            context = createCommandContext(twoWaySql, argNames, argTypes, realArgs);
         }
+
+        // execute
         final TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setExceptionMessageSqlArgs(context.getBindVariables());
-        final int rows = handler.execute(args);
+        final int rows = handler.execute(realArgs);
         return Integer.valueOf(rows);
     }
 
+    // ===================================================================================
+    //                                                                    Analyze Argument
+    //                                                                    ================
     protected ConditionBean extractConditionBeanWithCheck(Object[] args) {
-        if (args == null || args.length == 0) {
-            String msg = "The arguments should have one argument! But:";
-            msg = msg + " args=" + (args != null ? args.length : null);
-            throw new IllegalArgumentException(msg);
-        }
-        Object fisrtArg = args[0];
+        assertArgument(args);
+        final Object fisrtArg = args[0];
         if (!(fisrtArg instanceof ConditionBean)) {
-            String msg = "The type of argument should be " + ConditionBean.class + "! But:";
+            String msg = "The type of first argument should be " + ConditionBean.class + ":";
             msg = msg + " type=" + fisrtArg.getClass();
             throw new IllegalArgumentException(msg);
         }
         return (ConditionBean) fisrtArg;
     }
 
+    protected void assertArgument(Object[] args) {
+        if (args == null || args.length <= 1) {
+            String msg = "The arguments should have two argument at least! But:";
+            msg = msg + " args=" + (args != null ? args.length : null);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                           Build SQL
+    //                                                                           =========
     protected String buildQueryDeleteTwoWaySql(ConditionBean cb) {
         return cb.getSqlClause().getClauseQueryDelete();
     }

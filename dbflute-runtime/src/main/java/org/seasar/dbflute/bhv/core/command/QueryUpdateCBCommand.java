@@ -15,27 +15,21 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
-import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.sqlcommand.TnQueryUpdateDynamicCommand;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class QueryUpdateCBCommand extends AbstractUpdateEntityCommand {
+public class QueryUpdateCBCommand extends AbstractQueryEntityCBCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of condition-bean. (Derived from conditionBean) */
-    protected Class<? extends ConditionBean> _conditionBeanType;
-
-    /** The instance of condition-bean. (Required) */
-    protected ConditionBean _conditionBean;
+    /** The option of update. (NotRequired) */
+    protected UpdateOption<? extends ConditionBean> _updateOption;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -45,46 +39,11 @@ public class QueryUpdateCBCommand extends AbstractUpdateEntityCommand {
     }
 
     // ===================================================================================
-    //                                                                  Detail Information
-    //                                                                  ==================
-    @Override
-    public boolean isConditionBean() {
-        return true;
-    }
-
-    // ===================================================================================
-    //                                                                    Process Callback
-    //                                                                    ================
-    @Override
-    public void beforeGettingSqlExecution() {
-        assertStatus("beforeGettingSqlExecution");
-        final ConditionBean cb = _conditionBean;
-        ConditionBeanContext.setConditionBeanOnThread(cb);
-    }
-
-    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
+
     @Override
-    public String buildSqlExecutionKey() {
-        assertStatus("buildSqlExecutionKey");
-        final String main = _tableDbName + ":" + getCommandName();
-        final String entityName = DfTypeUtil.toClassTitle(_entityType);
-        final String cbName = DfTypeUtil.toClassTitle(_conditionBeanType);
-        final String type = "(" + entityName + ", " + cbName + ")";
-        return main + type;
-    }
-
-    public SqlExecutionCreator createSqlExecutionCreator() {
-        assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                return createQueryUpdateEntityCBExecution(_conditionBeanType);
-            }
-        };
-    }
-
-    protected SqlExecution createQueryUpdateEntityCBExecution(Class<? extends ConditionBean> cbType) {
+    protected SqlExecution createQueryEntityCBExecution() {
         final TnQueryUpdateDynamicCommand sqlCommand = new TnQueryUpdateDynamicCommand(_dataSource, _statementFactory);
         sqlCommand.setBeanMetaData(createBeanMetaData());
         return sqlCommand;
@@ -92,25 +51,7 @@ public class QueryUpdateCBCommand extends AbstractUpdateEntityCommand {
 
     @Override
     protected Object[] doGetSqlExecutionArgument() {
-        return new Object[] { _conditionBean, _entity, _updateOption };
-    }
-
-    // ===================================================================================
-    //                                                                Argument Information
-    //                                                                ====================
-    @Override
-    public ConditionBean getConditionBean() {
-        return _conditionBean;
-    }
-
-    @Override
-    public String getOutsideSqlPath() {
-        return null;
-    }
-
-    @Override
-    public OutsideSqlOption getOutsideSqlOption() {
-        return null;
+        return new Object[] { _entity, _conditionBean, _updateOption };
     }
 
     // ===================================================================================
@@ -118,17 +59,7 @@ public class QueryUpdateCBCommand extends AbstractUpdateEntityCommand {
     //                                                                       =============
     @Override
     protected void assertStatus(String methodName) {
-        assertBasicProperty(methodName);
-        assertComponentProperty(methodName);
-        if (_entityType == null) {
-            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
-        }
-        if (_entity == null) {
-            throw new IllegalStateException(buildAssertMessage("_entity", methodName));
-        }
-        if (_conditionBeanType == null) {
-            throw new IllegalStateException(buildAssertMessage("_conditionBeanType", methodName));
-        }
+        super.assertStatus(methodName);
         if (_conditionBean == null) {
             throw new IllegalStateException(buildAssertMessage("_conditionBean", methodName));
         }
@@ -137,11 +68,11 @@ public class QueryUpdateCBCommand extends AbstractUpdateEntityCommand {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setConditionBeanType(Class<? extends ConditionBean> conditionBeanType) {
-        _conditionBeanType = conditionBeanType;
-    }
-
     public void setConditionBean(ConditionBean conditionBean) {
         _conditionBean = conditionBean;
+    }
+
+    public void setUpdateOption(UpdateOption<? extends ConditionBean> updateOption) {
+        _updateOption = updateOption;
     }
 }

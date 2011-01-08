@@ -5,13 +5,19 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 /**
  * @author jflute
  */
-public class SelectedSelectColumnInfo {
+public class SelectedRelationColumn {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _tableAliasName;
     protected String _columnDbName;
     protected ColumnSqlName _columnSqlName;
     protected String _columnAliasName;
 
+    // ===================================================================================
+    //                                                                              Naming
+    //                                                                              ======
     public String buildRealColumnSqlName() {
         if (_tableAliasName != null) {
             return _tableAliasName + "." + _columnSqlName.toString();
@@ -20,6 +26,9 @@ public class SelectedSelectColumnInfo {
         }
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getTableAliasName() {
         return _tableAliasName;
     }

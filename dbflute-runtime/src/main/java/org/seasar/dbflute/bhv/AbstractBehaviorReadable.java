@@ -808,7 +808,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected SelectCountCBCommand createSelectCountCBCommand(ConditionBean cb, boolean uniqueCount) {
         assertBehaviorCommandInvoker("createSelectCountCBCommand");
         final SelectCountCBCommand cmd = xsetupSelectCommand(new SelectCountCBCommand());
-        cmd.setConditionBeanType(cb.getClass());
         cmd.setConditionBean(cb);
         cmd.setUniqueCount(uniqueCount);
         return cmd;
@@ -818,7 +817,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
         final SelectCursorCBCommand<ENTITY> cmd = xsetupSelectCommand(new SelectCursorCBCommand<ENTITY>());
-        cmd.setConditionBeanType(cb.getClass());
         cmd.setConditionBean(cb);
         cmd.setEntityType(entityType);
         cmd.setEntityRowHandler(entityRowHandler);
@@ -829,7 +827,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
         final SelectListCBCommand<ENTITY> cmd = xsetupSelectCommand(new SelectListCBCommand<ENTITY>());
-        cmd.setConditionBeanType(cb.getClass());
         cmd.setConditionBean(cb);
         cmd.setEntityType(entityType);
         return cmd;
@@ -862,7 +859,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             Class<RESULT> resultType, SqlClause.SelectClauseType selectClauseType) {
         assertBehaviorCommandInvoker("createSelectScalarCBCommand");
         final SelectScalarCBCommand<RESULT> cmd = xsetupSelectCommand(new SelectScalarCBCommand<RESULT>());
-        cmd.setConditionBeanType(cb.getClass());
         cmd.setConditionBean(cb);
         cmd.setResultType(resultType);
         cmd.setSelectClauseType(selectClauseType);
@@ -889,7 +885,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <COMMAND extends AbstractEntityCommand> COMMAND xsetupEntityCommand(COMMAND cmd, Entity entity) {
         cmd.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
-        cmd.setEntityType(entity.getClass());
         cmd.setEntity(entity);
         return cmd;
     }

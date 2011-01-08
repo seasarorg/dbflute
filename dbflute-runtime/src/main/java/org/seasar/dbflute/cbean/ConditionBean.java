@@ -208,6 +208,12 @@ public interface ConditionBean extends PagingBean {
     //                                                                      Free Parameter
     //                                                                      ==============
     /**
+     * Get the map for free parameters for parameter comment. {Internal}
+     * @return The map for free parameters. (Nullable: if null, means no parameter)
+     */
+    Map<String, Object> getFreeParameterMap();
+
+    /**
      * Register free parameters. {Internal}
      * @param key The key for the parameter. (NotNull)
      * @param value The value for the parameter. (Nullable)

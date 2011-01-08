@@ -16,7 +16,7 @@
 package org.seasar.dbflute.cbean.pagenavi;
 
 /**
- * The setupper of page number link.
+ * The set-upper of page number link.
  * @param <LINK> The type of link.
  * @author jflute
  */

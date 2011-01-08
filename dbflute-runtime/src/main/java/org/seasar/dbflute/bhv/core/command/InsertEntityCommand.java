@@ -95,7 +95,7 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         }
         columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
-        return createOutsideSqlExecuteExecution(_entityType, sql);
+        return createOutsideSqlExecuteExecution(_entity.getClass(), sql);
     }
 
     @Override

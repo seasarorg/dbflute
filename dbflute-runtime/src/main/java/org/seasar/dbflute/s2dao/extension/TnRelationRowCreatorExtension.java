@@ -256,7 +256,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     protected boolean isConditionBeanSelectedRelation(TnRelationRowCreationResource res) {
         if (hasConditionBean(res)) {
             final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-            if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
+            if (cb.getSqlClause().hasSelectedRelation(res.getRelationNoSuffix())) {
                 return true;
             }
         }
@@ -269,7 +269,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     protected boolean hasSelectedForeignInfo(TnRelationRowCreationResource res) {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
+        if (cb.getSqlClause().hasSelectedRelation(res.getRelationNoSuffix())) {
             return true;
         }
         return false;

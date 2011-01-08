@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.seasar.dbflute.cbean.chelper.HpSpecifiedInfo;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -47,7 +47,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryReflector;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
-import org.seasar.dbflute.cbean.sqlclause.select.SelectedSelectColumnInfo;
+import org.seasar.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -104,14 +104,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // The resources that are not frequently used to are lazy-loaded for performance.
     // - - - - - - - - - -/
-    /** Selected select column map. map:{tableAliasName : map:{columnName : selectColumnInfo}} */
-    protected Map<String, Map<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap;
+    /** The basic map of selected relation. map:{foreignRelationPath : foreignPropertyName} (Nullable: This is lazy-loaded) */
+    protected Map<String, String> _selectedRelationBasicMap;
+
+    /** The column map of selected relation. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (Nullable: This is lazy-loaded) */
+    protected Map<String, Map<String, SelectedRelationColumn>> _selectedRelationColumnMap;
 
     /** Specified select column map. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (Nullable: This is lazy-loaded) */
-    protected Map<String, Map<String, HpSpecifiedInfo>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
+    protected Map<String, Map<String, HpSpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
     /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (Nullable: This is lazy-loaded) */
-    protected Map<String, Map<String, HpSpecifiedInfo>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
+    protected Map<String, Map<String, HpSpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
     /** Specified derive sub-query map. A null key is acceptable. (Nullable: This is lazy-loaded) */
     protected Map<String, HpDerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
@@ -189,12 +192,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       SubQuery Indent
     //                                       ---------------
     protected SubQueryIndentProcessor _subQueryIndentProcessor;
-
-    // -----------------------------------------------------
-    //                                 Selected Foreign Info
-    //                                 ---------------------
-    /** The information of selected foreign table. */
-    protected Map<String, String> _selectedForeignInfo;
 
     // -----------------------------------------------------
     //                                    Invalid Query Info
@@ -442,9 +439,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final StringBuilder sb = new StringBuilder();
         final DBMeta dbmeta = getDBMeta();
 
-        Map<String, HpSpecifiedInfo> localSpecifiedMap = null;
+        final Map<String, HpSpecifiedColumn> localSpecifiedMap;
         if (_specifiedSelectColumnMap != null) {
             localSpecifiedMap = _specifiedSelectColumnMap.get(basePointAliasName);
+        } else {
+            localSpecifiedMap = null;
         }
         final List<ColumnInfo> columnInfoList;
         final boolean needsSpecifiedColumnFilter;
@@ -507,23 +506,27 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
             sb.append(realColumnName).append(" as ").append(onQueryName);
             selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
+
+            if (needsSpecifiedColumnFilter && localSpecifiedMap.containsKey(columnDbName)) {
+                final HpSpecifiedColumn specifiedColumn = localSpecifiedMap.get(columnDbName);
+                specifiedColumn.setOnQueryName(onQueryName); // basically for queryInsert()
+            }
         }
 
         // columns of foreign tables.
-        final Set<Entry<String, Map<String, SelectedSelectColumnInfo>>> entrySet = getSelectedSelectColumnMap()
-                .entrySet();
-        for (Entry<String, Map<String, SelectedSelectColumnInfo>> entry : entrySet) {
+        for (Entry<String, Map<String, SelectedRelationColumn>> entry : getSelectedRelationColumnMap().entrySet()) {
             final String tableAliasName = entry.getKey();
-            final Map<String, SelectedSelectColumnInfo> map = entry.getValue();
-            final Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
-            Map<String, HpSpecifiedInfo> foreginSpecifiedMap = null;
+            final Map<String, SelectedRelationColumn> map = entry.getValue();
+            final Collection<SelectedRelationColumn> selectColumnInfoList = map.values();
+            Map<String, HpSpecifiedColumn> foreginSpecifiedMap = null;
             if (_specifiedSelectColumnMap != null) {
                 foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
             }
             final boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
             boolean finishedForeignIndent = false;
-            for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
-                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnDbName())) {
+            for (SelectedRelationColumn selectColumnInfo : selectColumnInfoList) {
+                final String columnDbName = selectColumnInfo.getColumnDbName();
+                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(columnDbName)) {
                     continue;
                 }
 
@@ -543,6 +546,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 }
                 sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
                 selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
+
+                if (needsSpecifiedColumnFilter && foreginSpecifiedMap.containsKey(columnDbName)) {
+                    final HpSpecifiedColumn specifiedColumn = foreginSpecifiedMap.get(columnDbName);
+                    specifiedColumn.setOnQueryName(onQueryName); // basically for queryInsert()
+                }
             }
         }
 
@@ -562,13 +570,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
 
         return sb.toString();
-    }
-
-    protected Map<String, Map<String, SelectedSelectColumnInfo>> getSelectedSelectColumnMap() {
-        if (_selectedSelectColumnMap == null) {
-            _selectedSelectColumnMap = new LinkedHashMap<String, Map<String, SelectedSelectColumnInfo>>();
-        }
-        return _selectedSelectColumnMap;
     }
 
     protected Map<String, String> getSelectClauseRealColumnAliasMap() {
@@ -913,24 +914,34 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
-    //                                                                SelectedSelectColumn
-    //                                                                ====================
+    //                                                                   Selected Relation
+    //                                                                   =================
     /**
-     * Register selected select column.
-     * 
-     * @param foreignTableAliasName The alias name of foreign table. (NotNull)
-     * @param localTableDbName The table DB name of local. (NotNull)
-     * @param foreignPropertyName The property name of foreign table. (NotNull)
-     * @param localRelationPath The path of local relation. (Nullable)
+     * {@inheritDoc}
      */
-    public void registerSelectedSelectColumn(String foreignTableAliasName, String localTableDbName,
-            String foreignPropertyName, String localRelationPath) {
-        final Map<String, SelectedSelectColumnInfo> columnInfoMap = createSelectedSelectColumnInfo(
-                foreignTableAliasName, localTableDbName, foreignPropertyName, localRelationPath);
-        getSelectedSelectColumnMap().put(foreignTableAliasName, columnInfoMap);
+    public void registerSelectedRelation(String foreignTableAliasName, String localTableDbName,
+            String foreignPropertyName, String localRelationPath, String foreignRelationPath) {
+        getSelectedRelationBasicMap().put(foreignRelationPath, foreignPropertyName);
+        final Map<String, SelectedRelationColumn> columnMap = createSelectedSelectColumnInfo(foreignTableAliasName,
+                localTableDbName, foreignPropertyName, localRelationPath);
+        getSelectedRelationColumnMap().put(foreignTableAliasName, columnMap);
     }
 
-    protected Map<String, SelectedSelectColumnInfo> createSelectedSelectColumnInfo(String foreignTableAliasName,
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isSelectedRelationEmpty() {
+        return _selectedRelationBasicMap == null || _selectedRelationBasicMap.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasSelectedRelation(String relationPath) {
+        return _selectedRelationBasicMap != null && _selectedRelationBasicMap.containsKey(relationPath);
+    }
+
+    protected Map<String, SelectedRelationColumn> createSelectedSelectColumnInfo(String foreignTableAliasName,
             String localTableDbName, String foreignPropertyName, String localRelationPath) {
         final DBMeta dbmeta = findDBMeta(localTableDbName);
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
@@ -939,13 +950,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (localRelationPath != null) {
             nextRelationPath = localRelationPath + nextRelationPath;
         }
-        final Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
+        final Map<String, SelectedRelationColumn> resultMap = new LinkedHashMap<String, SelectedRelationColumn>();
         final DBMeta foreignDBMeta = foreignInfo.getForeignDBMeta();
         final List<ColumnInfo> columnInfoList = foreignDBMeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
-            final SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
+            final SelectedRelationColumn selectColumnInfo = new SelectedRelationColumn();
             selectColumnInfo.setTableAliasName(foreignTableAliasName);
             selectColumnInfo.setColumnDbName(columnDbName);
             selectColumnInfo.setColumnSqlName(columnSqlName);
@@ -953,6 +964,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             resultMap.put(columnDbName, selectColumnInfo);
         }
         return resultMap;
+    }
+
+    protected Map<String, String> getSelectedRelationBasicMap() {
+        if (_selectedRelationBasicMap == null) {
+            _selectedRelationBasicMap = new LinkedHashMap<String, String>();
+        }
+        return _selectedRelationBasicMap;
+    }
+
+    protected Map<String, Map<String, SelectedRelationColumn>> getSelectedRelationColumnMap() {
+        if (_selectedRelationColumnMap == null) {
+            _selectedRelationColumnMap = new LinkedHashMap<String, Map<String, SelectedRelationColumn>>();
+        }
+        return _selectedRelationColumnMap;
     }
 
     // ===================================================================================
@@ -1761,7 +1786,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public String getDerivedReferrerNestedAlias() {
-        return "dfnestedreferrer";
+        return "dfrefview";
     }
 
     // ===================================================================================
@@ -1813,24 +1838,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _subQueryIndentProcessor;
     }
 
-    // ===================================================================================
-    //                                                               Selected Foreign Info
-    //                                                               =====================
-    public boolean isSelectedForeignInfoEmpty() {
-        return _selectedForeignInfo == null || _selectedForeignInfo.isEmpty();
-    }
-
-    public boolean hasSelectedForeignInfo(String relationPath) {
-        return _selectedForeignInfo != null && _selectedForeignInfo.containsKey(relationPath);
-    }
-
-    public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName) {
-        if (_selectedForeignInfo == null) {
-            _selectedForeignInfo = new HashMap<String, String>();
-        }
-        _selectedForeignInfo.put(relationPath, foreignPropertyName);
-    }
-
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                       Specification
@@ -1838,18 +1845,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                        Specify Column
     //                                        --------------
-    public void specifySelectColumn(HpSpecifiedInfo specifiedInfo) {
+    public void specifySelectColumn(HpSpecifiedColumn specifiedColumn) {
         if (_specifiedSelectColumnMap == null) {
             _specifiedSelectColumnMap = StringKeyMap.createAsFlexible(); // not needs order
         }
-        final String tableAliasName = specifiedInfo.getTableAliasName();
+        final String tableAliasName = specifiedColumn.getTableAliasName();
         if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
-            final Map<String, HpSpecifiedInfo> elementMap = StringKeyMap.createAsFlexibleOrdered();
+            final Map<String, HpSpecifiedColumn> elementMap = StringKeyMap.createAsFlexibleOrdered();
             _specifiedSelectColumnMap.put(tableAliasName, elementMap);
         }
-        final String columnDbName = specifiedInfo.getSpecifiedColumn().getColumnDbName();
-        final Map<String, HpSpecifiedInfo> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
-        elementMap.put(columnDbName, specifiedInfo);
+        final String columnDbName = specifiedColumn.getColumnInfo().getColumnDbName();
+        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        elementMap.put(columnDbName, specifiedColumn);
     }
 
     public boolean hasSpecifiedSelectColumn(String tableAliasName) {
@@ -1860,7 +1867,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_specifiedSelectColumnMap == null) {
             return false;
         }
-        final Map<String, HpSpecifiedInfo> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
         if (elementMap == null) {
             return false;
         }
@@ -1892,12 +1899,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public ColumnInfo getSpecifiedColumnInfoAsOne() {
-        final Map<String, HpSpecifiedInfo> elementMap = getSpecifiedColumnElementMapAsOne();
+        final Map<String, HpSpecifiedColumn> elementMap = getSpecifiedColumnElementMapAsOne();
         if (elementMap == null) {
             return null;
         }
-        final HpSpecifiedInfo specifiedInfo = elementMap.values().iterator().next();
-        return specifiedInfo.getSpecifiedColumn();
+        final HpSpecifiedColumn specifiedColumn = elementMap.values().iterator().next();
+        return specifiedColumn.getColumnInfo();
     }
 
     public ColumnRealName getSpecifiedColumnRealNameAsOne() {
@@ -1921,7 +1928,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return null;
     }
 
-    protected Map<String, HpSpecifiedInfo> getSpecifiedColumnElementMapAsOne() {
+    protected Map<String, HpSpecifiedColumn> getSpecifiedColumnElementMapAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
             return _specifiedSelectColumnMap.values().iterator().next();
         }
@@ -2055,10 +2062,69 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return clauseElement;
     }
 
-    // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
+    public String getClauseQueryInsert(Map<String, String> fixedValueQueryExpMap, SqlClause resourceSqlClause) {
+        // at first, this should be called (before on-query name handling)
+        // because an on-query name of mapped info are set in this process
+        final String resourceViewClause = resourceSqlClause.getClause();
+        if (_specifiedSelectColumnMap == null) {
+            String msg = "The specified columns for query-insert are required.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(getBasePointAliasName());
+        if (elementMap == null || elementMap.isEmpty()) {
+            String msg = "The specified columns of inserted table for query-insert are required.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        final DBMeta dbmeta = getDBMeta();
+        final StringBuilder intoSb = new StringBuilder();
+        final StringBuilder selectSb = new StringBuilder();
+        final String resourceAlias = "dfres";
+        int index = 0;
+        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            final String columnDbName = columnInfo.getColumnDbName();
+            final HpSpecifiedColumn specifiedColumn = elementMap.get(columnDbName);
+            final String onQueryName;
+            if (specifiedColumn != null) {
+                onQueryName = specifiedColumn.getValidMappedOnQueryName();
+            } else if (fixedValueQueryExpMap.containsKey(columnDbName)) {
+                onQueryName = fixedValueQueryExpMap.get(columnDbName);
+            } else {
+                continue;
+            }
+            if (onQueryName == null || onQueryName.trim().length() == 0) { // no way
+                String msg = "The on-query name for query-insert is required: " + specifiedColumn;
+                throw new IllegalConditionBeanOperationException(msg);
+            }
+            final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
+            if (index > 0) {
+                intoSb.append(", ");
+                selectSb.append(", ");
+            }
+            intoSb.append(columnSqlName);
+            if (specifiedColumn != null) {
+                selectSb.append(resourceAlias).append(".");
+            }
+            selectSb.append(onQueryName);
+            ++index;
+        }
+        final String subQueryIdentity = "queryInsertResource";
+        final String subQueryBeginMark = resolveSubQueryBeginMark(subQueryIdentity);
+        final String subQueryEndMark = resolveSubQueryEndMark(subQueryIdentity);
+        final StringBuilder mainSb = new StringBuilder();
+        mainSb.append("insert into ").append(dbmeta.getTableSqlName());
+        mainSb.append("(").append(intoSb).append(")").append(ln());
+        mainSb.append("select ").append(selectSb).append(ln());
+        mainSb.append("  from (").append(subQueryBeginMark).append(ln());
+        mainSb.append(resourceViewClause).append(ln());
+        mainSb.append("       ) ").append(resourceAlias).append(subQueryEndMark);
+        final String sql = mainSb.toString();
+        return processSubQueryIndent(sql);
+    }
+
     public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
         if (columnParameterMap.isEmpty()) {
             return null;

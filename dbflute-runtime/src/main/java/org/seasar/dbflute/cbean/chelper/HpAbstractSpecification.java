@@ -23,9 +23,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected HpSpQyCall<CQ> _syncQyCall;
     protected final HpCBPurpose _purpose;
     protected final DBMetaProvider _dbmetaProvider;
-    protected CQ _query;
+    protected CQ _query; // lazy-loaded
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
-    protected int _specifyColumnCount;
+    protected int _specifiedColumnCount; // incremented per specify() called
 
     // ===================================================================================
     //                                                                         Constructor
@@ -47,8 +47,8 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    protected HpSpecifiedInfo doColumn(String columnName) {
-        ++_specifyColumnCount;
+    protected HpSpecifiedColumn doColumn(String columnName) {
+        ++_specifiedColumnCount;
         assertColumn(columnName);
         if (_query == null) {
             _query = qyCall().qy();
@@ -65,11 +65,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         } else {
             tableAliasName = sqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel());
         }
-        final DBMeta correspondingDBMeta = _dbmetaProvider.provideDBMetaChecked(_query.getTableDbName());
-        final ColumnInfo specifiedColumn = correspondingDBMeta.findColumnInfo(columnName);
-        final HpSpecifiedInfo specifiedInfo = new HpSpecifiedInfo(tableAliasName, specifiedColumn);
-        sqlClause.specifySelectColumn(specifiedInfo);
-        return specifiedInfo;
+        final HpSpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
+        sqlClause.specifySelectColumn(specifiedColumn);
+        return specifiedColumn;
     }
 
     /**
@@ -93,12 +91,18 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
 
     protected abstract String getTableDbName();
 
+    protected HpSpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
+        final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_query.getTableDbName());
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
+        return new HpSpecifiedColumn(tableAliasName, columnInfo);
+    }
+
     // ===================================================================================
     //                                                                      Purpose Assert
     //                                                                      ==============
     protected void assertColumn(String columnName) {
         if (_purpose.isNoSpecifyColumnTwoOrMore()) {
-            if (_specifyColumnCount > 1) {
+            if (_specifiedColumnCount > 1) {
                 throwSpecifyColumnTwoOrMoreColumnException(columnName);
             }
             // no specification is checked at an other timing
@@ -131,7 +135,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             }
         }
         if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
-            if (_specifyColumnCount > 0) {
+            if (_specifiedColumnCount > 0) {
                 throwSpecifyColumnWithDerivedReferrerException(null, referrerName);
             }
         }

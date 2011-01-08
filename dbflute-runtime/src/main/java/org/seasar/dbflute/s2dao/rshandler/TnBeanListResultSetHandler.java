@@ -85,7 +85,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         final boolean hasCB = hasConditionBean();
         final boolean skipRelationLoop;
         {
-            final boolean emptyRelation = isSelectedForeignInfoEmpty();
+            final boolean emptyRelation = isSelectedRelationEmpty();
             final boolean hasOSC = hasOutsideSqlContext();
             final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
 
@@ -129,7 +129,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 }
 
                 // Do only selected foreign property for performance if condition-bean exists.
-                if (hasCB && !hasSelectedForeignInfo(buildRelationNoSuffix(rpt))) {
+                if (hasCB && !hasSelectedRelation(buildRelationNoSuffix(rpt))) {
                     continue;
                 }
 
@@ -221,23 +221,23 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         return ConditionBeanContext.isExistConditionBeanOnThread();
     }
 
-    protected boolean isSelectedForeignInfoEmpty() {
+    protected boolean isSelectedRelationEmpty() {
         if (!hasConditionBean()) {
             return true;
         }
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        return cb.getSqlClause().isSelectedForeignInfoEmpty();
+        return cb.getSqlClause().isSelectedRelationEmpty();
     }
 
     /**
-     * Has it selected foreign information?
+     * Does it have the relation as selected?
      * You should call hasConditionBean() before calling this!
      * @param relationNoSuffix The suffix of relation NO. (NotNull)
      * @return Determination.
      */
-    protected boolean hasSelectedForeignInfo(String relationNoSuffix) {
+    protected boolean hasSelectedRelation(String relationNoSuffix) {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        return cb.getSqlClause().hasSelectedForeignInfo(relationNoSuffix);
+        return cb.getSqlClause().hasSelectedRelation(relationNoSuffix);
     }
 
     /**

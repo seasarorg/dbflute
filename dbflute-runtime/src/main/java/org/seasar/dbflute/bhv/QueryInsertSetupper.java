@@ -15,20 +15,19 @@
  */
 package org.seasar.dbflute.bhv;
 
-import java.util.List;
-
-import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.cbean.ConditionBean;
 
 /**
- * The set-upper of entity list.
- * @param <ENTITY> The type of entity.
+ * The set-upper for query-insert.
  * @author jflute
+ * @param <CB> The type of condition-bean.
  */
-public interface EntityListSetupper<ENTITY extends Entity> {
+public interface QueryInsertSetupper<CB extends ConditionBean> {
 
     /**
-     * Set up the list of entity.
-     * @param entityList The list of entity. (NotNull)
+     * Set up your query condition for insert. <br />
+     * @param intoCB The condition-bean for inserted table. (NotNull)
+     * @return The condition-bean for resource table. (NotNull)
      */
-    public void setup(List<ENTITY> entityList);
+    ConditionBean setup(CB intoCB);
 }

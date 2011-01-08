@@ -19,51 +19,36 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
+public abstract class AbstractQueryEntityCBCommand extends AbstractEntityCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Is it unique-count select? (NotNull) */
-    protected Boolean _uniqueCount;
+    /** The instance of condition-bean for query. (NotNull) */
+    protected ConditionBean _conditionBean;
 
     // ===================================================================================
-    //                                                                   Basic Information
-    //                                                                   =================
-    public String getCommandName() {
-        return "selectCount";
-    }
-
-    public Class<?> getCommandReturnType() {
-        return Integer.class;
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isConditionBean() {
+        return true;
     }
 
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================
+    @Override
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ConditionBean cb = _conditionBean;
-        cb.xsetupSelectCountIgnoreFetchScope(_uniqueCount); // *Point!
         ConditionBeanContext.setConditionBeanOnThread(cb);
-    }
-
-    public void afterExecuting() {
-        assertStatus("afterExecuting");
-        final ConditionBean cb = _conditionBean;
-        cb.xafterCareSelectCountIgnoreFetchScope();
-    }
-
-    // ===================================================================================
-    //                                                                  Detail Information
-    //                                                                  ==================
-    public boolean isSelectCount() {
-        return true;
     }
 
     // ===================================================================================
@@ -71,33 +56,62 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
     //                                                               =====================
     @Override
     public String buildSqlExecutionKey() {
-        return super.buildSqlExecutionKey() + ":" + (_uniqueCount ? "unique" : "plain");
+        assertStatus("buildSqlExecutionKey");
+        final String main = _tableDbName + ":" + getCommandName();
+        final String entityName = DfTypeUtil.toClassTitle(_entity);
+        final String cbName = DfTypeUtil.toClassTitle(_conditionBean);
+        final String type = "(" + (entityName != null ? entityName + ", " : "") + cbName + ")";
+        return main + type;
     }
 
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
-                TnResultSetHandler handler = createScalarResultSetHandler(getCommandReturnType());
-                return createSelectCBExecution(_conditionBean.getClass(), handler);
+                return createQueryEntityCBExecution();
             }
         };
+    }
+
+    protected abstract SqlExecution createQueryEntityCBExecution();
+
+    // ===================================================================================
+    //                                                                Argument Information
+    //                                                                ====================
+    @Override
+    public ConditionBean getConditionBean() {
+        return _conditionBean;
+    }
+
+    @Override
+    public String getOutsideSqlPath() {
+        return null;
+    }
+
+    @Override
+    public OutsideSqlOption getOutsideSqlOption() {
+        return null;
     }
 
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    @Override
     protected void assertStatus(String methodName) {
         super.assertStatus(methodName);
-        if (_uniqueCount == null) {
-            throw new IllegalStateException(buildAssertMessage("_uniqueCount", methodName));
+        assertConditionBeanProperty(methodName);
+    }
+
+    protected void assertConditionBeanProperty(String methodName) {
+        if (_conditionBean == null) {
+            throw new IllegalStateException(buildAssertMessage("_conditionBean", methodName));
         }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setUniqueCount(boolean uniqueCount) {
-        _uniqueCount = uniqueCount;
+    public void setConditionBean(ConditionBean conditionBean) {
+        _conditionBean = conditionBean;
     }
 }

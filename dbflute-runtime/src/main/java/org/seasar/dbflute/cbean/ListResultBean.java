@@ -99,7 +99,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * }, groupingOption);
      * </pre>
      * @param <ROW> The type of row.
-     * @param groupingRowSetupper The setupper of grouping row. (NotNull)
+     * @param groupingRowSetupper The set-upper of grouping row. (NotNull)
      * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)
      * @return The grouped list. (NotNull)
      */

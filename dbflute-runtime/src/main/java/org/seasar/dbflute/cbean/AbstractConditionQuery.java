@@ -313,11 +313,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                  Nested SetupSelect
     //                                                                  ==================
     public void doNss(NssCall callback) { // very internal
-        String foreignPropertyName = callback.qf().xgetForeignPropertyName();
-        String foreignTableAliasName = callback.qf().xgetAliasName();
-        xgetSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
-                xgetRelationPath());
-        xgetSqlClause().registerSelectedForeignInfo(callback.qf().xgetRelationPath(), foreignPropertyName);
+        final String foreignPropertyName = callback.qf().xgetForeignPropertyName();
+        final String foreignTableAliasName = callback.qf().xgetAliasName();
+        final String localRelationPath = xgetRelationPath();
+        final String foreignRelationPath = callback.qf().xgetRelationPath();
+        xgetSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName,
+                localRelationPath, foreignRelationPath);
     }
 
     public static interface NssCall { // very internal

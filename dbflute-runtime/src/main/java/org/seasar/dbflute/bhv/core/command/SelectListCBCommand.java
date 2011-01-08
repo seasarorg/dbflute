@@ -86,7 +86,7 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
             public SqlExecution createSqlExecution() {
                 TnBeanMetaData bmd = createBeanMetaData();
                 TnResultSetHandler handler = createBeanListResultSetHandler(bmd);
-                return createSelectCBExecution(_conditionBeanType, handler);
+                return createSelectCBExecution(_conditionBean.getClass(), handler);
             }
         };
     }

@@ -103,7 +103,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     }
 
     /**
-     * Set the setupper of condition-bean for a first level referrer. <br />
+     * Set the set-upper of condition-bean for a first level referrer. <br />
      * <pre>
      * LoadReferrerOption loadReferrerOption = new LoadReferrerOption();
      * 
@@ -115,7 +115,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * });
      * ...
      * </pre>
-     * @param conditionBeanSetupper The setupper of condition-bean. (Nullable: if null, means no condition for a first level referrer)
+     * @param conditionBeanSetupper The set-upper of condition-bean. (Nullable: if null, means no condition for a first level referrer)
      */
     public void setConditionBeanSetupper(ConditionBeanSetupper<REFERRER_CB> conditionBeanSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
@@ -126,7 +126,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     }
 
     /**
-     * Set the setupper of entity list for second or more level referrer. <br />
+     * Set the set-upper of entity list for second or more level referrer. <br />
      * <pre>
      * LoadReferrerOption loadReferrerOption = new LoadReferrerOption();
      * ...
@@ -142,7 +142,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      *     }
      * });
      * </pre>
-     * @param entityListSetupper The setupper of entity list. (Nullable: if null, means no loading for second level referrer)
+     * @param entityListSetupper The set-upper of entity list. (Nullable: if null, means no loading for second level referrer)
      */
     public void setEntityListSetupper(EntityListSetupper<REFERRER_ENTITY> entityListSetupper) {
         this._entityListSetupper = entityListSetupper;

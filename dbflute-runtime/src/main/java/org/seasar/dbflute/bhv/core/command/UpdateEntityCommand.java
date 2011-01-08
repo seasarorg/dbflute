@@ -15,15 +15,23 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateEntityDynamicCommand;
 
 /**
  * @author jflute
  */
-public class UpdateEntityCommand extends AbstractUpdateEntityCommand {
+public class UpdateEntityCommand extends AbstractEntityCommand {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The option of update. (NotRequired) */
+    protected UpdateOption<? extends ConditionBean> _updateOption;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -66,5 +74,17 @@ public class UpdateEntityCommand extends AbstractUpdateEntityCommand {
 
     protected boolean isVersionNoAutoIncrementOnMemory() {
         return isOptimisticLockHandling();
+    }
+
+    @Override
+    protected Object[] doGetSqlExecutionArgument() {
+        return new Object[] { _entity, _updateOption };
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setUpdateOption(UpdateOption<? extends ConditionBean> updateOption) {
+        _updateOption = updateOption;
     }
 }

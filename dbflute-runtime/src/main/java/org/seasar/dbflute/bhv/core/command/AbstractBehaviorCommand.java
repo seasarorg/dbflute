@@ -51,10 +51,10 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                     Basic Information
     //                                     -----------------
-    /** The table DB name. (Required) */
+    /** The table DB name. (NotNull) */
     protected String _tableDbName;
 
-    /** Is it initialize only? (Choice) */
+    /** Is it initialize only? */
     protected boolean _initializeOnly;
 
     // -----------------------------------------------------

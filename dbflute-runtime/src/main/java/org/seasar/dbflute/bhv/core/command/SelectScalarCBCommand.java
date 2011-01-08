@@ -84,7 +84,7 @@ public class SelectScalarCBCommand<RESULT> extends AbstractSelectCBCommand<RESUL
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
                 TnResultSetHandler handler = createScalarResultSetHandler(getCommandReturnType());
-                return createSelectCBExecution(_conditionBeanType, handler);
+                return createSelectCBExecution(_conditionBean.getClass(), handler);
             }
         };
     }

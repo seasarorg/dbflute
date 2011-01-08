@@ -37,10 +37,10 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of entity. (Required) */
+    /** The type of entity. (NotNull) */
     protected Class<ENTITY> _entityType;
 
-    /** The handler of entity row. (Required) */
+    /** The handler of entity row. (NotNull) */
     protected EntityRowHandler<ENTITY> _entityRowHandler;
 
     // ===================================================================================
@@ -93,7 +93,7 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
             public SqlExecution createSqlExecution() {
                 TnBeanMetaData bmd = createBeanMetaData();
                 TnResultSetHandler handler = createBeanCursorResultSetHandler(bmd);
-                return createSelectCBExecution(_conditionBeanType, handler);
+                return createSelectCBExecution(_conditionBean.getClass(), handler);
             }
         };
     }

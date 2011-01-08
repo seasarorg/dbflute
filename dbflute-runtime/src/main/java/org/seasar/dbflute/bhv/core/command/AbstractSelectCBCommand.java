@@ -32,10 +32,7 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of condition-bean. (Derived from conditionBean) */
-    protected Class<? extends ConditionBean> _conditionBeanType;
-
-    /** The instance of condition-bean. (Required) */
+    /** The instance of condition-bean. (NotNull) */
     protected ConditionBean _conditionBean;
 
     // ===================================================================================
@@ -62,7 +59,7 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        final String cbName = DfTypeUtil.toClassTitle(_conditionBeanType);
+        final String cbName = DfTypeUtil.toClassTitle(_conditionBean);
         return _tableDbName + ":" + getCommandName() + "(" + cbName + ")";
     }
 
@@ -101,9 +98,10 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
     protected void assertStatus(String methodName) {
         assertBasicProperty(methodName);
         assertComponentProperty(methodName);
-        if (_conditionBeanType == null) {
-            throw new IllegalStateException(buildAssertMessage("_conditionBeanType", methodName));
-        }
+        assertConditionBeanProperty(methodName);
+    }
+
+    protected void assertConditionBeanProperty(String methodName) {
         if (_conditionBean == null) {
             throw new IllegalStateException(buildAssertMessage("_conditionBean", methodName));
         }
@@ -112,10 +110,6 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setConditionBeanType(Class<? extends ConditionBean> conditionBeanType) {
-        _conditionBeanType = conditionBeanType;
-    }
-
     public void setConditionBean(ConditionBean conditionBean) {
         _conditionBean = conditionBean;
     }

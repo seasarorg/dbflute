@@ -35,10 +35,7 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The type of entity. (Required) */
-    protected Class<? extends Entity> _entityType;
-
-    /** The instance of condition-bean. (Required) */
+    /** The instance of condition-bean. (NotNull: but null allowed only when queryDelete() specially) */
     protected Entity _entity;
 
     // ===================================================================================
@@ -78,7 +75,7 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     //                                          BeanMetaData
     //                                          ------------
     protected TnBeanMetaData createBeanMetaData() {
-        return _beanMetaDataFactory.createBeanMetaData(_entityType);
+        return _beanMetaDataFactory.createBeanMetaData(_entity.getClass());
     }
 
     // ===================================================================================
@@ -95,7 +92,7 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        final String entityName = DfTypeUtil.toClassTitle(_entityType);
+        final String entityName = DfTypeUtil.toClassTitle(_entity);
         return _tableDbName + ":" + getCommandName() + "(" + entityName + ")";
     }
 
@@ -130,13 +127,11 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
      * @return DB meta. (Nullable: If the entity does not its DB meta)
      */
     protected DBMeta findDBMeta() {
-        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Cannot use the handler of DBMeta instance
-        // because the customize-entity is contained to find here.
+        // /- - - - - - - - - - - - - - - - - - - - - - - - 
+        // get from the entity instance 
+        // because the customize-entity is contained here.
         // - - - - - - - - - -/
-        //DBMetaInstanceHandler.findDBMeta(_tableDbName);
-
-        final Class<?> beanType = _entityType;
+        final Class<?> beanType = _entity.getClass();
         if (beanType == null) {
             return null;
         }
@@ -192,9 +187,10 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     protected void assertStatus(String methodName) {
         assertBasicProperty(methodName);
         assertComponentProperty(methodName);
-        if (_entityType == null) {
-            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
-        }
+        assertEntityProperty(methodName);
+    }
+
+    protected void assertEntityProperty(String methodName) {
         if (_entity == null) {
             throw new IllegalStateException(buildAssertMessage("_entity", methodName));
         }
@@ -203,10 +199,6 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setEntityType(Class<? extends Entity> entityType) {
-        _entityType = entityType;
-    }
-
     public void setEntity(Entity entity) {
         _entity = entity;
     }

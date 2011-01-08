@@ -28,6 +28,9 @@ public enum HpCBPurpose {
             .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
     , SPECIFIED_UPDATE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyDerivedReferrer().noQuery()) // SpecifiedUpdate
 
+    // for intoCB (not for resourceCB)
+    , QUERY_INSERT(new HpSpec().noSetupSelect().noSpecifyDerivedReferrer().noSpecifyRelation().noQuery().noOrderBy()) // QueryInsert
+
     // QueryUpdate and QueryDelete are not defined here
     // because their condition-beans are created by an application
     // (not call-back style)

@@ -15,89 +15,64 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
+import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.bhv.core.SqlExecution;
-import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.seasar.dbflute.s2dao.sqlcommand.TnQueryInsertDynamicCommand;
 
 /**
  * @author jflute
  */
-public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
+public class QueryInsertCBCommand extends AbstractQueryEntityCBCommand {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Is it unique-count select? (NotNull) */
-    protected Boolean _uniqueCount;
+    /** The instance of condition-bean for insert into. (NotNull) */
+    protected ConditionBean _intoConditionBean;
+
+    /** The option of insert. (NullAllowed) */
+    protected InsertOption<? extends ConditionBean> _insertOption;
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
     public String getCommandName() {
-        return "selectCount";
-    }
-
-    public Class<?> getCommandReturnType() {
-        return Integer.class;
-    }
-
-    // ===================================================================================
-    //                                                                    Process Callback
-    //                                                                    ================
-    public void beforeGettingSqlExecution() {
-        assertStatus("beforeGettingSqlExecution");
-        final ConditionBean cb = _conditionBean;
-        cb.xsetupSelectCountIgnoreFetchScope(_uniqueCount); // *Point!
-        ConditionBeanContext.setConditionBeanOnThread(cb);
-    }
-
-    public void afterExecuting() {
-        assertStatus("afterExecuting");
-        final ConditionBean cb = _conditionBean;
-        cb.xafterCareSelectCountIgnoreFetchScope();
-    }
-
-    // ===================================================================================
-    //                                                                  Detail Information
-    //                                                                  ==================
-    public boolean isSelectCount() {
-        return true;
+        return "queryInsert";
     }
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     @Override
-    public String buildSqlExecutionKey() {
-        return super.buildSqlExecutionKey() + ":" + (_uniqueCount ? "unique" : "plain");
+    protected SqlExecution createQueryEntityCBExecution() {
+        return new TnQueryInsertDynamicCommand(_dataSource, _statementFactory);
     }
 
-    public SqlExecutionCreator createSqlExecutionCreator() {
-        assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                TnResultSetHandler handler = createScalarResultSetHandler(getCommandReturnType());
-                return createSelectCBExecution(_conditionBean.getClass(), handler);
-            }
-        };
+    @Override
+    protected Object[] doGetSqlExecutionArgument() {
+        return new Object[] { _entity, _intoConditionBean, _conditionBean, _insertOption };
     }
 
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    @Override
     protected void assertStatus(String methodName) {
         super.assertStatus(methodName);
-        if (_uniqueCount == null) {
-            throw new IllegalStateException(buildAssertMessage("_uniqueCount", methodName));
+        if (_intoConditionBean == null) {
+            throw new IllegalStateException(buildAssertMessage("_intoConditionBean", methodName));
         }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setUniqueCount(boolean uniqueCount) {
-        _uniqueCount = uniqueCount;
+    public void setIntoConditionBean(ConditionBean intoConditionBean) {
+        _intoConditionBean = intoConditionBean;
+    }
+
+    public void setInsertOption(InsertOption<? extends ConditionBean> insertOption) {
+        _insertOption = insertOption;
     }
 }

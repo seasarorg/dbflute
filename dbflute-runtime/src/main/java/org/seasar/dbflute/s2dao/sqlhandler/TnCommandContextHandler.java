@@ -36,8 +36,11 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The context of command. (NotNull) */
     protected final CommandContext _commandContext;
-    protected List<TnPropertyType> _boundPropTypeList; // not required
+
+    /** The list of bound property type in first scope. (NullAllowed) */
+    protected List<TnPropertyType> _firstBoundPropTypeList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -68,7 +71,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
         try {
             final Object[] bindVariables = ctx.getBindVariables();
             final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
-            if (hasPropertyTypeList()) {
+            if (hasBoundPropertyTypeList()) { // basically for queryUpdate()
                 final int index = bindFirstScope(conn, ps, bindVariables, bindVariableTypes);
                 bindSecondScope(conn, ps, bindVariables, bindVariableTypes, index);
             } else {
@@ -81,8 +84,8 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
         return ret;
     }
 
-    protected boolean hasPropertyTypeList() {
-        return _boundPropTypeList != null && !_boundPropTypeList.isEmpty();
+    protected boolean hasBoundPropertyTypeList() {
+        return _firstBoundPropTypeList != null && !_firstBoundPropTypeList.isEmpty();
     }
 
     // ===================================================================================
@@ -93,7 +96,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
         final List<Object> firstVariableList = new ArrayList<Object>();
         final List<ValueType> firstValueTypeList = new ArrayList<ValueType>();
         int index = 0;
-        for (TnPropertyType propertyType : _boundPropTypeList) {
+        for (TnPropertyType propertyType : _firstBoundPropTypeList) {
             firstVariableList.add(bindVariables[index]);
             firstValueTypeList.add(propertyType.getValueType());
             ++index;
@@ -110,11 +113,12 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public List<TnPropertyType> getBoundPropTypeList() {
-        return _boundPropTypeList;
-    }
-
-    public void setBoundPropTypeList(List<TnPropertyType> boundPropTypeList) {
-        this._boundPropTypeList = boundPropTypeList;
+    /**
+     * Set the list of bound property type in first scope. <br />
+     * You can specify original value types for properties in first scope.
+     * @param firstBoundPropTypeList The list of bound property type. (NullAllowed)
+     */
+    public void setFirstBoundPropTypeList(List<TnPropertyType> firstBoundPropTypeList) {
+        _firstBoundPropTypeList = firstBoundPropTypeList;
     }
 }

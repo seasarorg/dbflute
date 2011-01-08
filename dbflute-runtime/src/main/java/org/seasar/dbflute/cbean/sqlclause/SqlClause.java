@@ -21,7 +21,7 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.seasar.dbflute.cbean.chelper.HpSpecifiedInfo;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -72,11 +72,11 @@ public interface SqlClause {
     /**
      * Get the clause of all parts.
      * <pre>
-     * # select [base-table-columns], [join-table-columns]
-     * #   from [base-table] left outer join [join-table] [join-alias] on [join-condition]
-     * #  where [base-table].[column] = [value] and [join-alias].[column] is null
-     * #  order by [base-table].[column] asc, [join-alias].[column] desc
-     * #  for update
+     * select [base-table-columns], [join-table-columns]
+     *   from [base-table] left outer join [join-table] [join-alias] on [join-condition]
+     *  where [base-table].[column] = [value] and [join-alias].[column] is null
+     *  order by [base-table].[column] asc, [join-alias].[column] desc
+     *  for update
      * </pre>
      * @return The clause of all parts. (NotNull)
      */
@@ -86,22 +86,18 @@ public interface SqlClause {
     //                                       Fragment Clause
     //                                       ---------------
     /**
-     * Get from-where clause without select and orderBy and sqlSuffix. 
-     * For subQuery and selectCount.
-     * <p>
+     * Get from-where clause without select and orderBy and sqlSuffix. <br />
+     * Basically for subQuery and selectCount. <br />
      * You should handle UnionSelectClauseMark and UnionWhereClauseMark and UnionWhereFirstConditionMark in clause.
-     * </p>
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
     String getClauseFromWhereWithUnionTemplate();
 
     /**
-     * Get from-where clause without select and orderBy and sqlSuffix as template. 
-     * For subQuery and selectCount.
-     * <p>
+     * Get from-where clause without select and orderBy and sqlSuffix as template. <br />
+     * Basically for subQuery and selectCount. <br />
      * You should handle UnionSelectClauseMark and UnionWhereClauseMark and UnionWhereFirstConditionMark
      * and WhereClauseMark and WhereFirstConditionMark in clause.
-     * </p>
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
     String getClauseFromWhereWithWhereUnionTemplate();
@@ -175,17 +171,22 @@ public interface SqlClause {
     String getSqlSuffix();
 
     // ===================================================================================
-    //                                                                SelectedSelectColumn
-    //                                                                ====================
+    //                                                                   Selected Relation
+    //                                                                   =================
     /**
-     * Register selected-select-column.
+     * Register selected relation.
      * @param foreignTableAliasName The alias name of foreign table. (NotNull)
      * @param localTableDbName The table DB name of local. (NotNull)
      * @param foreignPropertyName The property name of foreign table. (NotNull)
      * @param localRelationPath The path of local relation. (Nullable)
+     * @param foreignRelationPath The path of foreign relation. (Nullable)
      */
-    void registerSelectedSelectColumn(String foreignTableAliasName, String localTableDbName,
-            String foreignPropertyName, String localRelationPath);
+    void registerSelectedRelation(String foreignTableAliasName, String localTableDbName, String foreignPropertyName,
+            String localRelationPath, String foreignRelationPath);
+
+    boolean isSelectedRelationEmpty();
+
+    boolean hasSelectedRelation(String relationPath);
 
     // ===================================================================================
     //                                                                           OuterJoin
@@ -532,15 +533,6 @@ public interface SqlClause {
     void addWhereClauseSimpleFilter(QueryClauseFilter whereClauseSimpleFilter);
 
     // ===================================================================================
-    //                                                               Selected Foreign Info
-    //                                                               =====================
-    boolean isSelectedForeignInfoEmpty();
-
-    boolean hasSelectedForeignInfo(String relationPath);
-
-    void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
-
-    // ===================================================================================
     //                                                                    Sub Query Indent
     //                                                                    ================
     String resolveSubQueryBeginMark(String subQueryIdentity);
@@ -560,7 +552,7 @@ public interface SqlClause {
      * Specify select columns.
      * @param specifiedInfo The info about column specification. (NotNull)
      */
-    void specifySelectColumn(HpSpecifiedInfo specifiedInfo);
+    void specifySelectColumn(HpSpecifiedColumn specifiedInfo);
 
     /**
      * Does it have specified select columns?
@@ -668,11 +660,21 @@ public interface SqlClause {
     //                                                                        Query Update
     //                                                                        ============
     /**
+     * @param fixedValueQueryExpMap The map of query expression for fixed values. (NotNull)
+     * @param resourceSqlClause The SQL clause for resource. (NotNull)
+     * @return The clause of query-insert. (NotNull)
+     */
+    String getClauseQueryInsert(Map<String, String> fixedValueQueryExpMap, SqlClause resourceSqlClause);
+
+    /**
      * @param columnParameterMap The map of column parameters. (NotNull)
-     * @return The clause of query update. (Nullable: If columnParameterMap is empty, return null)
+     * @return The clause of query-update. (Nullable: If columnParameterMap is empty, return null)
      */
     String getClauseQueryUpdate(Map<String, String> columnParameterMap);
 
+    /**
+     * @return The clause of query-delete. (NotNull)
+     */
     String getClauseQueryDelete();
 
     // [DBFlute-0.8.6]
