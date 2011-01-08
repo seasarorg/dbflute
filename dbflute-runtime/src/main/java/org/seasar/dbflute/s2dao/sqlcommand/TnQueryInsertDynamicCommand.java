@@ -30,6 +30,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -74,7 +75,29 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
         // execute
         final TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setExceptionMessageSqlArgs(context.getBindVariables());
-        final int rows = handler.execute(realArgs);
+        if (option.isPrimaryKeyIdentityDisabled()) {
+            disableIdentityGeneration(entity);
+        }
+        final int rows;
+        RuntimeException sqlEx = null;
+        try {
+            rows = handler.execute(realArgs);
+        } catch (RuntimeException e) {
+            sqlEx = e;
+            throw e;
+        } finally {
+            if (option.isPrimaryKeyIdentityDisabled()) {
+                try {
+                    enableIdentityGeneration(entity);
+                } catch (RuntimeException e) {
+                    if (sqlEx == null) {
+                        throw e;
+                    }
+                    // ignore the exception when main SQL fails
+                    // not to close the main exception
+                }
+            }
+        }
         return Integer.valueOf(rows);
     }
 
@@ -176,6 +199,19 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
             fixedValueQueryExpMap.put(columnInfo.getColumnDbName(), fixedValueQueryExp);
         }
         return intoCB.getSqlClause().getClauseQueryInsert(fixedValueQueryExpMap, resourceCB.getSqlClause());
+    }
+
+    // ===================================================================================
+    //                                                                            Identity
+    //                                                                            ========
+    protected void disableIdentityGeneration(Entity entity) {
+        final String tableDbName = entity.getTableDbName();
+        TnAbstractEntityHandler.delegateDisableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
+    }
+
+    protected void enableIdentityGeneration(Entity entity) {
+        final String tableDbName = entity.getTableDbName();
+        TnAbstractEntityHandler.delegateEnableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
     }
 
     // ===================================================================================

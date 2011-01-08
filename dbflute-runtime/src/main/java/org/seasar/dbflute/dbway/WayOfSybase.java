@@ -35,6 +35,19 @@ public class WayOfSybase implements DBWay {
         return "select @@identity";
     }
 
+    public String buildIdentityDisableSql(String tableName) {
+        return buildIdentityOnOffSql(tableName, true);
+    }
+
+    public String buildIdentityEnableSql(String tableName) {
+        return buildIdentityOnOffSql(tableName, false);
+    }
+
+    protected String buildIdentityOnOffSql(String tableName, boolean insertOn) {
+        final String settingValue = (insertOn ? tableName : "");
+        return "set temporary option identity_insert = '" + settingValue + "'";
+    }
+
     // ===================================================================================
     //                                                                         SQL Support
     //                                                                         ===========

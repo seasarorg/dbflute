@@ -32,6 +32,7 @@ import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbway.WayOfSQLServer;
+import org.seasar.dbflute.dbway.WayOfSybase;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -279,45 +280,95 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     //                                                                            Identity
     //                                                                            ========
     protected void disableIdentityGeneration() {
-        if (isDatabaseSQLServer()) {
-            final String tableName = findDBMeta().getTableSqlName().toString();
-            final String disableSql = getWayOfSQLServer().buildIdentityDisableSql(tableName);
-            doExecuteIdentityAdjustment(disableSql);
-        }
+        final String tableDbName = _beanMetaData.getTableName();
+        delegateDisableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
     }
 
     protected void enableIdentityGeneration() {
-        if (isDatabaseSQLServer()) {
-            final String tableName = findDBMeta().getTableSqlName().toString();
-            final String disableSql = getWayOfSQLServer().buildIdentityEnableSql(tableName);
-            doExecuteIdentityAdjustment(disableSql);
+        final String tableDbName = _beanMetaData.getTableName();
+        delegateEnableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
+    }
+
+    protected boolean isPrimaryKeyIdentityDisabled() {
+        return _insertOption != null && _insertOption.isPrimaryKeyIdentityDisabled();
+    }
+
+    // "public static" for recycle
+    public static void delegateDisableIdentityGeneration(String tableDbName, DataSource dataSource,
+            StatementFactory statementFactory) {
+        final TnIdentityGenerationHandler handler = new TnIdentityGenerationHandler();
+        handler.disableIdentityGeneration(tableDbName, dataSource, statementFactory);
+    }
+
+    public static void delegateEnableIdentityGeneration(String tableDbName, DataSource dataSource,
+            StatementFactory statementFactory) {
+        final TnIdentityGenerationHandler handler = new TnIdentityGenerationHandler();
+        handler.enableIdentityGeneration(tableDbName, dataSource, statementFactory);
+    }
+
+    protected static class TnIdentityGenerationHandler {
+
+        public void disableIdentityGeneration(String tableDbName, DataSource dataSource,
+                StatementFactory statementFactory) {
+            if (isDatabaseSQLServer()) {
+                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
+                final String disableSql = getWayOfSQLServer().buildIdentityDisableSql(tableSqlName);
+                doExecuteIdentityAdjustment(disableSql, dataSource, statementFactory);
+            } else if (isDatabaseSybase()) {
+                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
+                final String disableSql = getWayOfSybase().buildIdentityDisableSql(tableSqlName);
+                doExecuteIdentityAdjustment(disableSql, dataSource, statementFactory);
+            }
+        }
+
+        public void enableIdentityGeneration(String tableDbName, DataSource dataSource,
+                StatementFactory statementFactory) {
+            if (isDatabaseSQLServer()) {
+                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
+                final String enableSql = getWayOfSQLServer().buildIdentityEnableSql(tableSqlName);
+                doExecuteIdentityAdjustment(enableSql, dataSource, statementFactory);
+            } else if (isDatabaseSybase()) {
+                final String tableSqlName = findDBMeta(tableDbName).getTableSqlName().toString();
+                final String enableSql = getWayOfSybase().buildIdentityEnableSql(tableSqlName);
+                doExecuteIdentityAdjustment(enableSql, dataSource, statementFactory);
+            }
+        }
+
+        protected DBMeta findDBMeta(String tableDbName) {
+            return ResourceContext.dbmetaProvider().provideDBMeta(tableDbName);
+        }
+
+        protected boolean isDatabaseSQLServer() {
+            return ResourceContext.isCurrentDBDef(DBDef.SQLServer);
+        }
+
+        protected boolean isDatabaseSybase() {
+            return ResourceContext.isCurrentDBDef(DBDef.Sybase);
+        }
+
+        protected WayOfSQLServer getWayOfSQLServer() {
+            return (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
+        }
+
+        protected WayOfSybase getWayOfSybase() {
+            return (WayOfSybase) ResourceContext.currentDBDef().dbway();
+        }
+
+        protected void doExecuteIdentityAdjustment(String sql, DataSource dataSource, StatementFactory statementFactory) {
+            final TnIdentityAdjustmentSqlHandler handler = createIdentityAdjustmentSqlHandler(sql, dataSource,
+                    statementFactory);
+            handler.execute(new Object[] {}); // SQL for identity adjustment does not have a bind-variable
+        }
+
+        protected TnIdentityAdjustmentSqlHandler createIdentityAdjustmentSqlHandler(String sql, DataSource dataSource,
+                StatementFactory statementFactory) {
+            return new TnIdentityAdjustmentSqlHandler(dataSource, statementFactory, sql);
         }
     }
 
-    protected DBMeta findDBMeta() {
-        return ResourceContext.dbmetaProvider().provideDBMeta(_beanMetaData.getTableName());
-    }
+    protected static class TnIdentityAdjustmentSqlHandler extends TnBasicUpdateHandler {
 
-    protected boolean isDatabaseSQLServer() {
-        return ResourceContext.isCurrentDBDef(DBDef.SQLServer);
-    }
-
-    protected WayOfSQLServer getWayOfSQLServer() {
-        return (WayOfSQLServer) ResourceContext.currentDBDef().dbway();
-    }
-
-    protected void doExecuteIdentityAdjustment(String sql) {
-        final TnIdentityAdjustmentHandler handler = createIdentityAdjustmentHandler(sql);
-        handler.execute(new Object[] {}); // SQL for identity adjustment does not have a bind-variable
-    }
-
-    protected TnIdentityAdjustmentHandler createIdentityAdjustmentHandler(String sql) {
-        return new TnIdentityAdjustmentHandler(_dataSource, _statementFactory, sql);
-    }
-
-    protected static class TnIdentityAdjustmentHandler extends TnBasicUpdateHandler {
-
-        public TnIdentityAdjustmentHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
+        public TnIdentityAdjustmentSqlHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
             super(dataSource, statementFactory, sql);
         }
 
@@ -338,10 +389,6 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
                 close(st);
             }
         };
-    }
-
-    protected boolean isPrimaryKeyIdentityDisabled() {
-        return _insertOption != null && _insertOption.isPrimaryKeyIdentityDisabled();
     }
 
     // ===================================================================================
