@@ -145,12 +145,11 @@ public interface BehaviorWritable extends BehaviorReadable {
     /**
      * Range-create entities. <br />
      * An interface dispatch for queryInsert() or varyingQueryInsert().
-     * @param entity The instance of corresponding entity. (NotNull)
      * @param setupper The set-upper for query-insert. (NotNull)
      * @param option The option of update. (NullAllowed: if null, same as queryUpdate())
      * @return Modified count.
      */
-    int rangeCreate(Entity entity, QueryInsertSetupper<? extends ConditionBean> setupper,
+    int rangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper,
             InsertOption<? extends ConditionBean> option);
 
     /**

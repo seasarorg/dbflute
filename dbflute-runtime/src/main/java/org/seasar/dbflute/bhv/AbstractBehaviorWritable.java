@@ -343,12 +343,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {@inheritDoc}
      */
-    public int rangeCreate(Entity entity, QueryInsertSetupper<? extends ConditionBean> setupper,
+    public int rangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper,
             InsertOption<? extends ConditionBean> option) {
-        return doRangeCreate(entity, setupper, option);
+        return doRangeCreate(setupper, option);
     }
 
-    protected abstract int doRangeCreate(Entity entity, QueryInsertSetupper<? extends ConditionBean> setupper,
+    protected abstract int doRangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper,
             InsertOption<? extends ConditionBean> option);
 
     /**

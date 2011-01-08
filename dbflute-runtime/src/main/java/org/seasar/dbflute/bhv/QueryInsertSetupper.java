@@ -15,19 +15,22 @@
  */
 package org.seasar.dbflute.bhv;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 
 /**
  * The set-upper for query-insert.
  * @author jflute
+ * @param <ENTITY> The type of entity.
  * @param <CB> The type of condition-bean.
  */
-public interface QueryInsertSetupper<CB extends ConditionBean> {
+public interface QueryInsertSetupper<ENTITY extends Entity, CB extends ConditionBean> {
 
     /**
      * Set up your query condition for insert. <br />
-     * @param intoCB The condition-bean for inserted table. (NotNull)
-     * @return The condition-bean for resource table. (NotNull)
+     * @param entity The entity of inserted table, to be set fixed values. (NotNull, EmptyEntity)
+     * @param intoCB The condition-bean of inserted table, to be specified columns. (NotNull, EmptyCB)
+     * @return The condition-bean of resource table, that has queries. (NotNull)
      */
-    ConditionBean setup(CB intoCB);
+    ConditionBean setup(ENTITY entity, CB intoCB);
 }

@@ -105,7 +105,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     }
 
     protected HpSpecifiedColumn getSpecifiedColumn(String columnName) {
-        return isSpecifiedColumn(columnName) ? _specifiedColumnMap.get(columnName) : null;
+        return _specifiedColumnMap != null ? _specifiedColumnMap.get(columnName) : null;
     }
 
     protected boolean isSpecifiedColumn(String columnName) {
@@ -124,7 +124,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                      ==============
     protected void assertColumn(String columnName) {
         if (_purpose.isNoSpecifyColumnTwoOrMore()) {
-            if (_specifiedColumnMap != null && _specifiedColumnMap.size() > 1) {
+            if (_specifiedColumnMap != null && _specifiedColumnMap.size() > 0) {
                 throwSpecifyColumnTwoOrMoreColumnException(columnName);
             }
             // no specification is checked at an other timing
