@@ -39,5 +39,10 @@ public interface TnBeanAnnotationReader {
 
     String getRelationKey(DfPropertyDesc pd);
 
+    /**
+     * Get the name of plug-in value type.
+     * @param pd The description of property. (NotNull)
+     * @return The name of plug-in value type. (Nullable)
+     */
     String getValueType(DfPropertyDesc pd);
 }
