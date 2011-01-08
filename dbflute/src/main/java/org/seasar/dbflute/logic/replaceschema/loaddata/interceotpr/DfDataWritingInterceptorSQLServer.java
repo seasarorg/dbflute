@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.dbway.WayOfSQLServer;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 
@@ -146,7 +147,12 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     }
 
     protected String buildIdentityInsertSettingSql(String tableName, boolean insertOn) {
-        return "set identity_insert " + tableName + " " + (insertOn ? "on" : "off");
+        final WayOfSQLServer wayOfSQLServer = new WayOfSQLServer();
+        if (insertOn) {
+            return wayOfSQLServer.buildIdentityDisableSql(tableName);
+        } else {
+            return wayOfSQLServer.buildIdentityEnableSql(tableName);
+        }
     }
 
     protected static Connection getConnection(DataSource dataSource) {

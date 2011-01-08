@@ -1563,7 +1563,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                          ------------
     /**
      * Insert the several entities by query with varying requests (modified-only for fixed value). <br />
-     * For example, disableCommonColumnAutoSetup(), allowNonQueryUpdate(). <br />
+     * For example, disableCommonColumnAutoSetup(), disablePrimaryKeyIdentity(). <br />
      * Other specifications are same as queryInsert(entity, setupper). 
      * @param setupper The setup-per of query-insert. (NotNull)
      * @param option The option of insert for varying requests. (NotNull)

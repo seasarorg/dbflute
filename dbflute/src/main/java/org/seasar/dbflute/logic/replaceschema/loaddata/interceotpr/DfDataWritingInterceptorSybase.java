@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.dbway.WayOfSybase;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 
 /**
@@ -42,7 +43,11 @@ public class DfDataWritingInterceptorSybase extends DfDataWritingInterceptorSQLS
 
     @Override
     protected String buildIdentityInsertSettingSql(String tableName, boolean insertOn) {
-        final String settingValue = (insertOn ? tableName : "");
-        return "set temporary option identity_insert = '" + settingValue + "'";
+        final WayOfSybase wayOfSybase = new WayOfSybase();
+        if (insertOn) {
+            return wayOfSybase.buildIdentityDisableSql(tableName);
+        } else {
+            return wayOfSybase.buildIdentityEnableSql(tableName);
+        }
     }
 }
