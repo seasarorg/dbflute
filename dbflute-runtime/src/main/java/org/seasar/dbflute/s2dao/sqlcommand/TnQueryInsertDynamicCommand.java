@@ -75,7 +75,8 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
         // execute
         final TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setExceptionMessageSqlArgs(context.getBindVariables());
-        if (option.isPrimaryKeyIdentityDisabled()) {
+        final boolean identityDisabled = option != null && option.isPrimaryKeyIdentityDisabled();
+        if (identityDisabled) {
             disableIdentityGeneration(entity);
         }
         final int rows;
@@ -86,7 +87,7 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
             sqlEx = e;
             throw e;
         } finally {
-            if (option.isPrimaryKeyIdentityDisabled()) {
+            if (identityDisabled) {
                 try {
                     enableIdentityGeneration(entity);
                 } catch (RuntimeException e) {
