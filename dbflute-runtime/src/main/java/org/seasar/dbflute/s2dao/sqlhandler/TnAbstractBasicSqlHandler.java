@@ -88,7 +88,7 @@ public abstract class TnAbstractBasicSqlHandler {
     /**
      * @param conn The connection for the database. (NotNull)
      * @param ps The prepared statement for the SQL. (NotNull)
-     * @param args The arguments for binding. (Nullable)
+     * @param args The arguments for binding. (NullAllowed)
      * @param valueTypes The types of binding value. (NotNull)
      */
     protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, ValueType[] valueTypes) {
@@ -108,8 +108,8 @@ public abstract class TnAbstractBasicSqlHandler {
     /**
      * @param conn The connection for the database. (NotNull)
      * @param ps The prepared statement for the SQL. (NotNull)
-     * @param args The arguments for binding. (Nullable)
-     * @param argTypes The types of arguments. (Nullable: if args is null, this is also null)
+     * @param args The arguments for binding. (NullAllowed)
+     * @param argTypes The types of arguments. (NullAllowed: if args is null, this is also null)
      */
     protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
         bindArgs(conn, ps, args, argTypes, 0);
@@ -118,8 +118,8 @@ public abstract class TnAbstractBasicSqlHandler {
     /**
      * @param conn The connection for the database. (NotNull)
      * @param ps The prepared statement for the SQL. (NotNull)
-     * @param args The arguments for binding. (Nullable)
-     * @param argTypes The types of arguments. (Nullable: if args is null, this is also null)
+     * @param args The arguments for binding. (NullAllowed)
+     * @param argTypes The types of arguments. (NullAllowed: if args is null, this is also null)
      * @param beginIndex The index for beginning of binding.
      */
     protected void bindArgs(Connection conn, PreparedStatement ps, Object[] args, Class<?>[] argTypes, int beginIndex) {

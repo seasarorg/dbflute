@@ -45,7 +45,7 @@ public class InternalMapContext {
     /**
      * Get the value of the object by the key.
      * @param key The key of the object. (NotNull)
-     * @return The value of the object. (Nullable)
+     * @return The value of the object. (NullAllowed)
      */
     public static Object getObject(String key) {
         initialize();
@@ -55,7 +55,7 @@ public class InternalMapContext {
     /**
      * Set the value of the object.
      * @param key The key of the object. (NotNull)
-     * @param value The value of the object. (Nullable)
+     * @param value The value of the object. (NullAllowed)
      */
     public static void setObject(String key, Object value) {
         initialize();

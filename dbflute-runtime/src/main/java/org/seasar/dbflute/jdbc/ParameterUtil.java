@@ -27,8 +27,8 @@ import org.seasar.dbflute.util.Srl;
 public class ParameterUtil {
 
     /**
-     * @param value Query value. (Nullable)
-     * @return Converted value. (Nullable)
+     * @param value Query value. (NullAllowed)
+     * @return Converted value. (NullAllowed)
      */
     public static String convertEmptyToNull(String value) {
         return Srl.isEmpty(value) ? null : value;
@@ -36,10 +36,10 @@ public class ParameterUtil {
 
     /**
      * @param parameterName The name of the parameter. (NotNull)
-     * @param value The value of the parameter. (Nullable)
-     * @param size The size of parameter type. (Nullable)
+     * @param value The value of the parameter. (NullAllowed)
+     * @param size The size of parameter type. (NullAllowed)
      * @param mode The handling mode. (NotNull)
-     * @return The filtered value. (Nullable)
+     * @return The filtered value. (NullAllowed)
      */
     public static String handleShortChar(String parameterName, String value, Integer size, ShortCharHandlingMode mode) {
         if (parameterName == null || parameterName.trim().length() == 0) {

@@ -33,7 +33,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Create the entity. <br />
      * An interface dispatch for insert() or varyingInsert().
      * @param entity The instance of corresponding entity. (NotNull)
-     * @param option The option of insert. (Nullable: if null, same as insert())
+     * @param option The option of insert. (NullAllowed: if null, same as insert())
      */
     void create(Entity entity, InsertOption<? extends ConditionBean> option);
 
@@ -41,7 +41,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Modify the entity. <br />
      * An interface dispatch for update() or varyingUpdate().
      * @param entity The instance of corresponding entity. (NotNull)
-     * @param option The option of update. (Nullable: if null, same as update())
+     * @param option The option of update. (NullAllowed: if null, same as update())
      */
     void modify(Entity entity, UpdateOption<? extends ConditionBean> option);
 
@@ -50,7 +50,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * An interface dispatch for updateNonstrict() or varyingUpdateNonstrict(). <br />
      * However if it's non optimistic lock table, this is same as modify().
      * @param entity The instance of corresponding entity. (NotNull)
-     * @param option The option of update. (Nullable: if null, same as updateNonstrict())
+     * @param option The option of update. (NullAllowed: if null, same as updateNonstrict())
      */
     void modifyNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option);
 
@@ -58,8 +58,8 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Create or modify the entity. <br />
      * An interface dispatch for insertOrUpdate() or varyingInsertOrUpdate().
      * @param entity The instance of corresponding entity. (NotNull)
-     * @param insertOption The option of insert. (Nullable)
-     * @param updateOption The option of update. (Nullable)
+     * @param insertOption The option of insert. (NullAllowed)
+     * @param updateOption The option of update. (NullAllowed)
      */
     void createOrModify(Entity entity, InsertOption<? extends ConditionBean> insertOption,
             UpdateOption<? extends ConditionBean> updateOption);
@@ -69,8 +69,8 @@ public interface BehaviorWritable extends BehaviorReadable {
      * An interface dispatch for insertOrUpdateNonstrict() or varyingInsertOrUpdateNonstrict(). <br />
      * However if it's non optimistic lock table, this is same as createOrModify().
      * @param entity The instance of corresponding entity. (NotNull)
-     * @param insertOption The option of insert. (Nullable)
-     * @param updateOption The option of update. (Nullable)
+     * @param insertOption The option of insert. (NullAllowed)
+     * @param updateOption The option of update. (NullAllowed)
      */
     void createOrModifyNonstrict(Entity entity, InsertOption<? extends ConditionBean> insertOption,
             UpdateOption<? extends ConditionBean> updateOption);
@@ -79,7 +79,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Remove the entity. <br />
      * An interface dispatch for delete() or varyingDelete().
      * @param entity The instance of corresponding entity. (NotNull)
-     * @param option The option of delete. (Nullable: if null, same as delete())
+     * @param option The option of delete. (NullAllowed: if null, same as delete())
      */
     void remove(Entity entity, DeleteOption<? extends ConditionBean> option);
 
@@ -87,7 +87,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Remove the entity non-strictly. <br />
      * An interface dispatch for deleteNonstrict() or varyingDeleteNonstrict().
      * @param entity The instance of corresponding entity. (NotNull)
-     * @param option The option of delete. (Nullable: if null, same as deleteNonstrict())
+     * @param option The option of delete. (NullAllowed: if null, same as deleteNonstrict())
      */
     void removeNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option);
 
@@ -98,7 +98,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Lump-create the list. <br />
      * An interface dispatch for batchInsert() or varyingBatchInsert().
      * @param entityList The list of corresponding entity. (NotNull and NotEmpty)
-     * @param option The option of insert. (Nullable: if null, same as batchInsert())
+     * @param option The option of insert. (NullAllowed: if null, same as batchInsert())
      * @return The array of created count.
      */
     int[] lumpCreate(List<Entity> entityList, InsertOption<? extends ConditionBean> option);
@@ -107,7 +107,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Lump-modify the list. <br />
      * An interface dispatch for batchUpdate() or varyingBatchUpdate().
      * @param entityList The list of corresponding entity. (NotNull and NotEmpty)
-     * @param option The option of update. (Nullable: if null, same as batchUpdate())
+     * @param option The option of update. (NullAllowed: if null, same as batchUpdate())
      * @return Modified count.
      */
     int[] lumpModify(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
@@ -116,7 +116,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Lump-modify the list non-strictly. <br />
      * An interface dispatch for batchUpdateNonstrict() or varyingBatchUpdateNonstrict().
      * @param entityList The list of corresponding entity. (NotNull and NotEmpty)
-     * @param option The option of update. (Nullable: if null, same as batchUpdateNonstrict())
+     * @param option The option of update. (NullAllowed: if null, same as batchUpdateNonstrict())
      * @return Modified count.
      */
     int[] lumpModifyNonstrict(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
@@ -125,7 +125,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Lump-remove the list. <br />
      * An interface dispatch for batchDelete() or varyingBatchDelete().
      * @param entityList The list of entity. (NotNull and NotEmpty)
-     * @param option The option of delete. (Nullable: if null, same as batchDelete())
+     * @param option The option of delete. (NullAllowed: if null, same as batchDelete())
      * @return Removed count.
      */
     int[] lumpRemove(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);
@@ -134,7 +134,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Lump-remove the list non-strictly. <br />
      * An interface dispatch for batchDeleteNonstrict() or varyingBatchDeleteNonstrict().
      * @param entityList The list of corresponding entity. (NotNull and NotEmpty)
-     * @param option The option of delete. (Nullable: if null, same as batchDeleteNonstrict())
+     * @param option The option of delete. (NullAllowed: if null, same as batchDeleteNonstrict())
      * @return Removed count.
      */
     int[] lumpRemoveNonstrict(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);
@@ -147,7 +147,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * An interface dispatch for queryInsert() or varyingQueryInsert().
      * @param entity The instance of corresponding entity. (NotNull)
      * @param setupper The set-upper for query-insert. (NotNull)
-     * @param option The option of update. (Nullable: if null, same as queryUpdate())
+     * @param option The option of update. (NullAllowed: if null, same as queryUpdate())
      * @return Modified count.
      */
     int rangeCreate(Entity entity, QueryInsertSetupper<? extends ConditionBean> setupper,
@@ -158,7 +158,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * An interface dispatch for queryUpdate() or varyingQueryUpdate().
      * @param entity The instance of corresponding entity. (NotNull)
      * @param cb The corresponding condition-bean for query. (NotNull)
-     * @param option The option of update. (Nullable: if null, same as queryUpdate())
+     * @param option The option of update. (NullAllowed: if null, same as queryUpdate())
      * @return Modified count.
      */
     int rangeModify(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option);
@@ -167,7 +167,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * Range-modify entities. <br />
      * An interface dispatch for queryDelete() or varyingQueryDelete().
      * @param cb The corresponding condition-bean for query. (NotNull)
-     * @param option The option of delete. (Nullable: if null, same as queryDelete())
+     * @param option The option of delete. (NullAllowed: if null, same as queryDelete())
      * @return Removed count.
      */
     int rangeRemove(ConditionBean cb, DeleteOption<? extends ConditionBean> option);

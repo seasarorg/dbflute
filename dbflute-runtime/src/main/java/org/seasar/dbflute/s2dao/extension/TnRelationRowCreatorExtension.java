@@ -156,7 +156,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     /**
      * @param row The instance of row. (NotNull)
-     * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
+     * @return The interface of DBMeta. (NullAllowed: If it's null, it means NotFound.)
      */
     protected DBMeta findDBMeta(Object row) {
         return TnRowCreatorExtension.findCachedDBMeta(row);

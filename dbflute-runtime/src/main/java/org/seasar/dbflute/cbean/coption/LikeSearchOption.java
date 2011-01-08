@@ -285,7 +285,7 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                                   =================
     /**
      * Get the operand for extension.
-     * @return The operand for extension. (Nullable: If the value is null, it means no extension)
+     * @return The operand for extension. (NullAllowed: If the value is null, it means no extension)
      */
     public ExtensionOperand getExtensionOperand() { // for application extension
         return null; // as default
@@ -296,7 +296,7 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                               =====================
     /**
      * Get the arranger of where clause.
-     * @return The arranger of where clause. (Nullable: If the value is null, it means no arrangement)
+     * @return The arranger of where clause. (NullAllowed: If the value is null, it means no arrangement)
      */
     public QueryClauseArranger getWhereClauseArranger() { // for application extension
         return null; // as default

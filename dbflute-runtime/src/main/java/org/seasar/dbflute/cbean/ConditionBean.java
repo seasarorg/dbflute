@@ -144,13 +144,13 @@ public interface ConditionBean extends PagingBean {
     //                                                                    ================
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (Nullable)
+     * @param statementConfig The configuration of statement. (NullAllowed)
      */
     void configure(StatementConfig statementConfig);
 
     /**
      * Get the configuration of statement that is set through configure().
-     * @return The configuration of statement. (Nullable)
+     * @return The configuration of statement. (NullAllowed)
      */
     StatementConfig getStatementConfig();
 
@@ -209,14 +209,14 @@ public interface ConditionBean extends PagingBean {
     //                                                                      ==============
     /**
      * Get the map for free parameters for parameter comment. {Internal}
-     * @return The map for free parameters. (Nullable: if null, means no parameter)
+     * @return The map for free parameters. (NullAllowed: if null, means no parameter)
      */
     Map<String, Object> getFreeParameterMap();
 
     /**
      * Register free parameters. {Internal}
      * @param key The key for the parameter. (NotNull)
-     * @param value The value for the parameter. (Nullable)
+     * @param value The value for the parameter. (NullAllowed)
      */
     void xregisterFreeParameter(String key, Object value);
 
@@ -225,7 +225,7 @@ public interface ConditionBean extends PagingBean {
     //                                                                  ==================
     /**
      * Register union-query synchronizer. {Internal}
-     * @param unionQuerySynchronizer The synchronizer of union query. (Nullable)
+     * @param unionQuerySynchronizer The synchronizer of union query. (NullAllowed)
      */
     void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer);
 

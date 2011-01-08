@@ -113,13 +113,13 @@ public interface SqlClause {
 
     /**
      * Get the map of select index. map:{columnAliasName = selectIndex(AliasName)}
-     * @return The map of select index. (Nullable: null means select index is disabled)
+     * @return The map of select index. (NullAllowed: null means select index is disabled)
      */
     Map<String, Integer> getSelectIndexMap();
 
     /**
      * Get the reverse map of select index. map:{selectIndex(AliasName) = columnAliasName}
-     * @return The reverse map of select index. (Nullable: null means select index is disabled)
+     * @return The reverse map of select index. (NullAllowed: null means select index is disabled)
      */
     Map<String, String> getSelectIndexReverseMap();
 
@@ -178,8 +178,8 @@ public interface SqlClause {
      * @param foreignTableAliasName The alias name of foreign table. (NotNull)
      * @param localTableDbName The table DB name of local. (NotNull)
      * @param foreignPropertyName The property name of foreign table. (NotNull)
-     * @param localRelationPath The path of local relation. (Nullable)
-     * @param foreignRelationPath The path of foreign relation. (Nullable)
+     * @param localRelationPath The path of local relation. (NullAllowed)
+     * @param foreignRelationPath The path of foreign relation. (NullAllowed)
      */
     void registerSelectedRelation(String foreignTableAliasName, String localTableDbName, String foreignPropertyName,
             String localRelationPath, String foreignRelationPath);
@@ -197,8 +197,8 @@ public interface SqlClause {
      * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName]} (NotNull)
      * @param foreignAliasName The alias name of foreign table. {left outer join joinTableName [foreignAliasName]} (NotNull and Unique per invoking method)
      * @param joinOnMap The map of join condition on on-clause. (NotNull)
-     * @param fixedCondition The fixed condition on on-clause. (Nullable: if null, means no fixed condition)
-     * @param fixedConditionResolver The resolver for variables on fixed-condition. (Nullable) 
+     * @param fixedCondition The fixed condition on on-clause. (NullAllowed: if null, means no fixed condition)
+     * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
     void registerOuterJoin(String localTableDbName, String foreignTableDbName, String foreignAliasName,
             Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
@@ -222,7 +222,7 @@ public interface SqlClause {
      * @param columnRealName The real name of column. {[alias-name].[column-name]}. (NotNull)
      * @param key Condition-key. (NotNull)
      * @param value Condition-value. (NotNull)
-     * @param option Condition-option. (Nullable)
+     * @param option Condition-option. (NullAllowed)
      */
     void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
             ConditionOption option);
@@ -589,25 +589,25 @@ public interface SqlClause {
     //                                      ----------------
     /**
      * Get the DB name of only one specified column.
-     * @return The instance as string. (Nullable: if not found or duplicated, returns null)
+     * @return The instance as string. (NullAllowed: if not found or duplicated, returns null)
      */
     String getSpecifiedColumnDbNameAsOne();
 
     /**
      * Get the information of only one specified column.
-     * @return An instance as a type for information of column. (Nullable: if not found or duplicated, returns null)
+     * @return An instance as a type for information of column. (NullAllowed: if not found or duplicated, returns null)
      */
     ColumnInfo getSpecifiedColumnInfoAsOne();
 
     /**
      * Get the real name of only one specified column.
-     * @return An instance as a type for real name of column. (Nullable: if not found or duplicated, returns null)
+     * @return An instance as a type for real name of column. (NullAllowed: if not found or duplicated, returns null)
      */
     ColumnRealName getSpecifiedColumnRealNameAsOne();
 
     /**
      * Get the SQL name of only one specified column.
-     * @return An instance as a type for SQL name of column. (Nullable: if not found or duplicated, returns null)
+     * @return An instance as a type for SQL name of column. (NullAllowed: if not found or duplicated, returns null)
      */
     ColumnSqlName getSpecifiedColumnSqlNameAsOne();
 
@@ -668,7 +668,7 @@ public interface SqlClause {
 
     /**
      * @param columnParameterMap The map of column parameters. (NotNull)
-     * @return The clause of query-update. (Nullable: If columnParameterMap is empty, return null)
+     * @return The clause of query-update. (NullAllowed: If columnParameterMap is empty, return null)
      */
     String getClauseQueryUpdate(Map<String, String> columnParameterMap);
 

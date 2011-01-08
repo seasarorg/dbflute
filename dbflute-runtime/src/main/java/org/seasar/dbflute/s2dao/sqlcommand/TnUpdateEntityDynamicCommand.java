@@ -152,7 +152,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     /**
      * Create update SQL. The update is by the primary keys.
      * @param propertyTypes The types of property for update. (NotNull)
-     * @param option An option of update. (Nullable)
+     * @param option An option of update. (NullAllowed)
      * @return The update SQL. (NotNull)
      */
     protected String createUpdateSql(TnPropertyType[] propertyTypes, UpdateOption<ConditionBean> option) {

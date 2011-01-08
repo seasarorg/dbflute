@@ -149,7 +149,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param referrerQuery The instance of referrer query. (Nullable: If null, this is base query)
+     * @param referrerQuery The instance of referrer query. (NullAllowed: If null, this is base query)
      * @param sqlClause The instance of SQL clause. (NotNull)
      * @param aliasName The alias name for this query. (NotNull)
      * @param nestLevel The nest level of this query. (If zero, this is base query)
@@ -341,7 +341,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Register outer-join.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
-     * @param fixedCondition The plain fixed condition. (Nullable)
+     * @param fixedCondition The plain fixed condition. (NullAllowed)
      */
     protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
             String fixedCondition) {
@@ -1405,8 +1405,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                        ============
     /**
      * Delegate to filterRemoveEmptyString(). {Internal}
-     * @param value The string value for query. (Nullable)
-     * @return Filtered value. (Nullable)
+     * @param value The string value for query. (NullAllowed)
+     * @return Filtered value. (NullAllowed)
      */
     protected String fRES(String value) {
         return filterRemoveEmptyString(value);
@@ -1415,8 +1415,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * Filter removing an empty string as null. <br />
      * You can extend this to use an empty string value as condition.
-     * @param value The string value for query. (Nullable)
-     * @return Filtered value. (Nullable)
+     * @param value The string value for query. (NullAllowed)
+     * @return Filtered value. (NullAllowed)
      */
     protected String filterRemoveEmptyString(String value) {
         if (isEmptyStringQueryAllowed()) {
@@ -1435,8 +1435,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * Delegate to filterConvertToPureDate().
-     * @param date The instance of date for query. (Nullable)
-     * @return Filtered date. (Nullable)
+     * @param date The instance of date for query. (NullAllowed)
+     * @return Filtered date. (NullAllowed)
      */
     protected java.util.Date fCTPD(java.util.Date date) {
         return filterConvertToPureDate(date);
@@ -1444,8 +1444,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * Filter converting the date to a pure date.
-     * @param date The instance of date for query. (Nullable)
-     * @return Filtered value. (Nullable)
+     * @param date The instance of date for query. (NullAllowed)
+     * @return Filtered value. (NullAllowed)
      */
     protected java.util.Date filterConvertToPureDate(java.util.Date date) {
         return DfTypeUtil.toDate(date);
@@ -1471,9 +1471,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * @param col Target collection. (Nullable)
+     * @param col Target collection. (NullAllowed)
      * @param <PROPERTY> The type of property.
-     * @return List. (Nullable: If the argument is null, returns null.)
+     * @return List. (NullAllowed: If the argument is null, returns null.)
      */
     protected <PROPERTY> List<PROPERTY> cTL(Collection<PROPERTY> col) { // convert to list
         return convertToList(col);
@@ -1499,9 +1499,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * @param col Target collection. (Nullable)
+     * @param col Target collection. (NullAllowed)
      * @param <PROPERTY> The type of property.
-     * @return List. (Nullable: If the argument is null, returns null.)
+     * @return List. (NullAllowed: If the argument is null, returns null.)
      */
     private <PROPERTY> List<PROPERTY> convertToList(Collection<PROPERTY> col) {
         if (col == null) {

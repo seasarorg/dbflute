@@ -26,7 +26,7 @@ public interface SQLExceptionDigger {
     /**
      * Dig up the physical connection from logical one.
      * @param cause The cause of exception wrapping SQLException. (NotNull)
-     * @return The instance of SQLException. (Nullable: if null, means not found)
+     * @return The instance of SQLException. (NullAllowed: if null, means not found)
      */
     SQLException digUp(Throwable cause);
 }

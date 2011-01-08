@@ -130,7 +130,7 @@ public class BehaviorCommandInvoker {
      * This method is an entry point!
      * @param <RESULT> The type of result.
      * @param behaviorCommand The command of behavior. (NotNull)
-     * @return The result object. (Nullable)
+     * @return The result object. (NullAllowed)
      */
     public <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
         initializeContext();
@@ -144,7 +144,7 @@ public class BehaviorCommandInvoker {
     /**
      * @param <RESULT> The type of result.
      * @param behaviorCommand The command of behavior. (NotNull)
-     * @return The result object. (Nullable)
+     * @return The result object. (NullAllowed)
      */
     protected <RESULT> RESULT dispatchInvoking(BehaviorCommand<RESULT> behaviorCommand) {
         setupResourceContext(behaviorCommand);

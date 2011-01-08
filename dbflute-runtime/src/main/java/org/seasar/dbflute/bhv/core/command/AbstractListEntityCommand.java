@@ -127,7 +127,7 @@ public abstract class AbstractListEntityCommand extends AbstractBehaviorCommand<
     /**
      * Find DB meta. <br />
      * Basically this method should be called when initializing only.
-     * @return DB meta. (Nullable: If the entity does not its DB meta)
+     * @return DB meta. (NullAllowed: If the entity does not its DB meta)
      */
     protected DBMeta findDBMeta() {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - 

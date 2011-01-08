@@ -33,7 +33,7 @@ public class ExistsReferrer extends AbstractSubQuery {
      * Build the clause of sub-query by single primary key.
      * @param correlatedColumnDbName The DB name of correlated column that is main-query table's column. (NotNull)
      * @param relatedColumnDbName The DB name of related column that is sub-query table's column. (NotNull)
-     * @param existsOption The option of ExistsReferrer. (basically for NotExistsReferrer) (Nullable)
+     * @param existsOption The option of ExistsReferrer. (basically for NotExistsReferrer) (NullAllowed)
      * @return The clause of sub-query. (NotNull)
      */
     public String buildExistsReferrer(String correlatedColumnDbName, String relatedColumnDbName, String existsOption) {

@@ -34,8 +34,8 @@ public interface OutsideSqlExecutorFactory {
      * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
      * @param currentDBDef The definition of current DBMS. (NotNull)
-     * @param defaultStatementConfig The default configuration of statement. (Nullable)
-     * @param outsideSqlOption The option of outsideSql. (Nullable: if null, means for an entry instance)
+     * @param defaultStatementConfig The default configuration of statement. (NullAllowed)
+     * @param outsideSqlOption The option of outsideSql. (NullAllowed: if null, means for an entry instance)
      * @return The instance of executor. (NotNull)
      */
     OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
@@ -60,7 +60,7 @@ public interface OutsideSqlExecutorFactory {
      * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
      * @param currentDBDef The definition of DBMS. (NotNull)
-     * @param defaultStatementConfig The default configuration of statement. (Nullable)
+     * @param defaultStatementConfig The default configuration of statement. (NullAllowed)
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
@@ -73,7 +73,7 @@ public interface OutsideSqlExecutorFactory {
      * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
      * @param currentDBDef The definition of current DBMS. (NotNull)
-     * @param defaultStatementConfig The default configuration of statement. (Nullable)
+     * @param defaultStatementConfig The default configuration of statement. (NullAllowed)
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */

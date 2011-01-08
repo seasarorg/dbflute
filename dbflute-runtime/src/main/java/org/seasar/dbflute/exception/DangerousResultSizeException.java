@@ -40,7 +40,7 @@ public class DangerousResultSizeException extends RuntimeException {
     /**
      * Constructor.
      * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (Nullable)
+     * @param cause Throwable. (NullAllowed)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
     public DangerousResultSizeException(String msg, Throwable cause, int safetyMaxResultSize) {

@@ -223,7 +223,7 @@ public class OrderByClause implements Serializable {
     }
 
     /**
-     * @param expectedColumnName Expected column-name. (Nullable)
+     * @param expectedColumnName Expected column-name. (NullAllowed)
      * @return Determination.
      */
     public boolean isSameAsFirstElementColumnName(String expectedColumnName) {

@@ -36,7 +36,7 @@ public class TnProcedureValueTypeProvider {
      * @param pmbType The type of ProcdurePmb for the parameter. (NotNull)
      * @param paramName The name of parameter. (NotNull)
      * @param paramType The type of parameter. (NotNull)
-     * @param keyName The key name for plug-in value type. (Nullable) 
+     * @param keyName The key name for plug-in value type. (NullAllowed) 
      * @param dbdef The current DB definition. (NotNull)
      * @return The instance of value type. (NotNull: if not found by (not-null) valueTypeName, exception)
      */

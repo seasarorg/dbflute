@@ -23,8 +23,8 @@ package org.seasar.dbflute.jdbc;
 public interface ClassificationMeta {
 
     /**
-     * @param code The code of the classification. (Nullable)
-     * @return The instance of the classification. (Nullable: when not found and code is null)
+     * @param code The code of the classification. (NullAllowed)
+     * @return The instance of the classification. (NullAllowed: when not found and code is null)
      */
     Classification codeOf(Object code);
 

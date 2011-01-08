@@ -51,7 +51,7 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     /** The factory of outside-SQL context. (NotNull) */
     protected OutsideSqlContextFactory _outsideSqlContextFactory;
 
-    /** The filter of outside-SQL. (Nullable) */
+    /** The filter of outside-SQL. (NullAllowed) */
     protected OutsideSqlFilter _outsideSqlFilter;
 
     // ===================================================================================

@@ -144,7 +144,7 @@ public abstract class ConditionKey implements Serializable {
      * @param conditionList Condition list. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
      * @param cvalue Condition value. (NotNull)
-     * @param option Condition option. (Nullable)
+     * @param option Condition option. (NullAllowed)
      */
     public void addWhereClause(final QueryModeProvider provider, final List<QueryClause> conditionList,
             final ColumnRealName columnRealName, final ConditionValue cvalue, final ConditionOption option) {
@@ -190,8 +190,8 @@ public abstract class ConditionKey implements Serializable {
      * Setup condition value.
      * @param provider The provider of query mode. (NotNull)
      * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (Nullable)
-     * @param location Location. (Nullable)
+     * @param value Value. (NullAllowed)
+     * @param location Location. (NullAllowed)
      */
     public void setupConditionValue(QueryModeProvider provider, ConditionValue conditionValue, Object value,
             String location) {
@@ -202,9 +202,9 @@ public abstract class ConditionKey implements Serializable {
      * Setup condition value.
      * @param provider The provider of query mode. (NotNull)
      * @param cvalue Condition value. (NotNull)
-     * @param value Value. (Nullable)
-     * @param location Location. (Nullable)
-     * @param option Condition option. (Nullable)
+     * @param value Value. (NullAllowed)
+     * @param location Location. (NullAllowed)
+     * @param option Condition option. (NullAllowed)
      */
     public void setupConditionValue(final QueryModeProvider provider, final ConditionValue cvalue, final Object value,
             final String location, final ConditionOption option) {
@@ -333,7 +333,7 @@ public abstract class ConditionKey implements Serializable {
     /**
      * The override.
      * If the condition-key of the other is same as this one, returns true.
-     * @param other Other entity. (Nullable)
+     * @param other Other entity. (NullAllowed)
      * @return Comparing result. If other is null, returns false.
      */
     @Override

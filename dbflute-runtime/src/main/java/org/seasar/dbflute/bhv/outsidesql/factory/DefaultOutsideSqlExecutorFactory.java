@@ -65,7 +65,7 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     /**
      * Create the filter of outside-SQL. <br />
      * This is the very point for an extension of the outside-SQL filtering. 
-     * @return The instance of the filter. (Nullable)
+     * @return The instance of the filter. (NullAllowed)
      */
     protected OutsideSqlFilter createOutsideSqlExecutionFilter() { // extension point
         return null; // as default (no filter)

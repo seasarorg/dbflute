@@ -76,8 +76,8 @@ public enum DBDef {
     }
 
     /**
-     * @param code The code of the DB. (Nullable: If the code is null, it returns null)
-     * @return The instance that has the code. (Nullable)
+     * @param code The code of the DB. (NullAllowed: If the code is null, it returns null)
+     * @return The instance that has the code. (NullAllowed)
      */
     public static DBDef codeOf(String code) {
         if (code == null) {
@@ -97,7 +97,7 @@ public enum DBDef {
     /** The code of the DB. (NotNull) */
     private String _code;
 
-    /** The code alias of the DB. (Nullable) */
+    /** The code alias of the DB. (NullAllowed) */
     private String _codeAlias;
 
     /** The way of the DB. (NotNull) */
@@ -108,7 +108,7 @@ public enum DBDef {
     //                                                                         ===========
     /**
      * @param code The code of the DB. (NotNull)
-     * @param codeAlias The code alias of the DB. (Nullable)
+     * @param codeAlias The code alias of the DB. (NullAllowed)
      */
     private DBDef(String code, String codeAlias, DBWay dbway) {
         _code = code;
@@ -127,7 +127,7 @@ public enum DBDef {
     }
 
     /**
-     * @return The code alias of the DB. (Nullable)
+     * @return The code alias of the DB. (NullAllowed)
      */
     private String codeAlias() {
         return _codeAlias;

@@ -39,7 +39,7 @@ public class ConditionBeanContext {
 
     /**
      * Get condition-bean on thread.
-     * @return Condition-bean. (Nullable)
+     * @return Condition-bean. (NullAllowed)
      */
     public static ConditionBean getConditionBeanOnThread() {
         return (ConditionBean) _conditionBeanLocal.get();
@@ -80,7 +80,7 @@ public class ConditionBeanContext {
 
     /**
      * Get the handler of entity row. on thread.
-     * @return The handler of entity row. (Nullable)
+     * @return The handler of entity row. (NullAllowed)
      */
     public static EntityRowHandler<? extends Entity> getEntityRowHandlerOnThread() {
         return (EntityRowHandler<? extends Entity>) _entityRowHandlerLocal.get();

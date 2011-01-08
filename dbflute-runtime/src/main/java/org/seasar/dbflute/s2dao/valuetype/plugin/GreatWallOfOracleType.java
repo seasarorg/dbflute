@@ -318,9 +318,9 @@ public abstract class GreatWallOfOracleType implements ValueType {
     /**
      * @param conn The connection for the database. (NotNull)
      * @param paramExp The expression of bind parameter (index or name). (NotNull)
-     * @param value The property value as scalar. (Nullable: if null, returns null)
-     * @param columnInfo The information of column. (Nullable: if null, several filter does not work)
-     * @return The mapped value for SQL. (Nullable)
+     * @param value The property value as scalar. (NullAllowed: if null, returns null)
+     * @param columnInfo The information of column. (NullAllowed: if null, several filter does not work)
+     * @return The mapped value for SQL. (NullAllowed)
      * @throws SQLException 
      */
     protected Object mappingScalarToSqlValue(Connection conn, Object paramExp, Object value, ColumnInfo columnInfo)

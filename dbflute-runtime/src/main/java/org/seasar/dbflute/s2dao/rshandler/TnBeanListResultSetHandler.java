@@ -171,7 +171,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param rpt The property type of relation. (NotNull)
      * @param selectColumnMap The name map of select column. {flexible-name = column-DB-name} (NotNull)
      * @param relKeyValues The values of relation keys. The key is relation column name. (NotNull)
-     * @param selectIndexMap The map of select index. (Nullable: If it's null, it doesn't use select index.)
+     * @param selectIndexMap The map of select index. (NullAllowed: If it's null, it doesn't use select index.)
      * @return The key of relation. (NotNull)
      * @throws SQLException
      */

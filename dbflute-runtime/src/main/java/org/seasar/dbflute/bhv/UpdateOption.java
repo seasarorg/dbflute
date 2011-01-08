@@ -443,7 +443,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * Limit batch-update logging by logging size. <br />
      * For example, if you set 3, only 3 records are logged. <br />
      * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
-     * @param batchLoggingUpdateLimit The limit size of batch-update logging. (Nullable: if null and minus, means no limit)
+     * @param batchLoggingUpdateLimit The limit size of batch-update logging. (NullAllowed: if null and minus, means no limit)
      */
     public void limitBatchUpdateLogging(Integer batchLoggingUpdateLimit) {
         this._batchLoggingUpdateLimit = batchLoggingUpdateLimit;

@@ -45,7 +45,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The value of table db-name. (Nullable: If it's null, it means 'Not Selected Yet'.) */
+    /** The value of table db-name. (NullAllowed: If it's null, it means 'Not Selected Yet'.) */
     protected String _tableDbName;
 
     /** The value of all record count. */
@@ -215,7 +215,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     }
 
     /**
-     * @param other Other entity. (Nullable)
+     * @param other Other entity. (NullAllowed)
      * @return Comparing result. If other is null, returns false.
      */
     public boolean equals(Object other) {
@@ -349,7 +349,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                            ========
     /**
      * Get the value of tableDbName.
-     * @return The value of tableDbName. (Nullable: If it's null, it means 'Not Selected Yet'.)
+     * @return The value of tableDbName. (NullAllowed: If it's null, it means 'Not Selected Yet'.)
      */
     public String getTableDbName() {
         return _tableDbName;

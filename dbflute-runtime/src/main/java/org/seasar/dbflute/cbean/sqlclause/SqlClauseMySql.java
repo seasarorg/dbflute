@@ -146,7 +146,7 @@ public class SqlClauseMySql extends AbstractSqlClause {
      * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NotNull)
-     * @param modifier The modifier of full-text search. (Nullable: If the value is null, No modifier specified)
+     * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
      * @param tableDbName The DB name of the target table. (NotNull)
      * @param aliasName The alias name of the target table. (NotNull)
      * @return The condition string of match statement. (NotNull)

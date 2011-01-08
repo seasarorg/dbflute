@@ -115,7 +115,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * });
      * ...
      * </pre>
-     * @param conditionBeanSetupper The set-upper of condition-bean. (Nullable: if null, means no condition for a first level referrer)
+     * @param conditionBeanSetupper The set-upper of condition-bean. (NullAllowed: if null, means no condition for a first level referrer)
      */
     public void setConditionBeanSetupper(ConditionBeanSetupper<REFERRER_CB> conditionBeanSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
@@ -142,7 +142,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      *     }
      * });
      * </pre>
-     * @param entityListSetupper The set-upper of entity list. (Nullable: if null, means no loading for second level referrer)
+     * @param entityListSetupper The set-upper of entity list. (NullAllowed: if null, means no loading for second level referrer)
      */
     public void setEntityListSetupper(EntityListSetupper<REFERRER_ENTITY> entityListSetupper) {
         this._entityListSetupper = entityListSetupper;
@@ -155,7 +155,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     /**
      * Set the original instance of condition-bean for first level referrer. <br />
      * use this, if you want to set the original instance.
-     * @param referrerConditionBean The original instance of condition-bean. (Nullable: if null, means normal)
+     * @param referrerConditionBean The original instance of condition-bean. (NullAllowed: if null, means normal)
      */
     public void setReferrerConditionBean(REFERRER_CB referrerConditionBean) {
         this._referrerConditionBean = referrerConditionBean;

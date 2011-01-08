@@ -27,7 +27,7 @@ public interface DBWay {
     /**
      * Build the SQL for next value of sequence with a sequence name.
      * @param sequenceName The sequence name. (NotNull)
-     * @return The SQL for next value of sequence. (Nullable: if sequence is unsupported)
+     * @return The SQL for next value of sequence. (NullAllowed: if sequence is unsupported)
      */
     String buildSequenceNextValSql(String sequenceName);
 
@@ -36,7 +36,7 @@ public interface DBWay {
     //                                                                        ============
     /**
      * Get the SQL for getting inserted value of identity.
-     * @return The SQL for getting inserted value of sequence. (Nullable: If it does not have identity, returns null.)
+     * @return The SQL for getting inserted value of sequence. (NullAllowed: If it does not have identity, returns null.)
      */
     String getIdentitySelectSql();
 
@@ -57,8 +57,8 @@ public interface DBWay {
     //                                                                   =================
     /**
      * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
-     * @param sqlState SQLState of the SQLException. (Nullable)
-     * @param errorCode ErrorCode of the SQLException. (Nullable)
+     * @param sqlState SQLState of the SQLException. (NullAllowed)
+     * @param errorCode ErrorCode of the SQLException. (NullAllowed)
      * @return Is the SQLException from unique constraint?
      */
     boolean isUniqueConstraintException(String sqlState, Integer errorCode);

@@ -247,7 +247,7 @@ public class TnProcedureMetaDataFactory {
         /**
          * Get the specification of parameter.
          * @param propertyDesc The description of property. (NotNull)
-         * @return The specification of parameter. (Nullable)
+         * @return The specification of parameter. (NullAllowed)
          */
         public String getParameterSpecification(DfPropertyDesc propertyDesc) {
             final String propertyName = propertyDesc.getPropertyName();
@@ -264,7 +264,7 @@ public class TnProcedureMetaDataFactory {
         /**
          * Get the name or instance of value type for parameter.
          * @param propertyDesc The description of property. (NotNull)
-         * @return The string or instance of value type. (Nullable)
+         * @return The string or instance of value type. (NullAllowed)
          */
         public Object getValueType(DfPropertyDesc propertyDesc) {
             final String propertyName = propertyDesc.getPropertyName();

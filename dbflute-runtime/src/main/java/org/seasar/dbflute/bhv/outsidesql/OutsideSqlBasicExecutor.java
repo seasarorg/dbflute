@@ -79,7 +79,7 @@ public class OutsideSqlBasicExecutor {
     /** The current database definition. (NotNull) */
     protected final DBDef _currentDBDef;
 
-    /** The default configuration of statement. (Nullable) */
+    /** The default configuration of statement. (NullAllowed) */
     protected final StatementConfig _defaultStatementConfig;
 
     /** The option of outside-SQL. (NotNull) */
@@ -88,7 +88,7 @@ public class OutsideSqlBasicExecutor {
     /** The factory of outside-SQL context. (NotNull) */
     protected final OutsideSqlContextFactory _outsideSqlContextFactory;
 
-    /** The filter of outside-SQL. (Nullable) */
+    /** The filter of outside-SQL. (NullAllowed) */
     protected final OutsideSqlFilter _outsideSqlFilter;
 
     /** The factory of outside-SQL executor. (NotNull) */
@@ -103,7 +103,7 @@ public class OutsideSqlBasicExecutor {
     /** Does it format the SQL? */
     protected boolean _formatSql;
 
-    /** The configuration of statement. (Nullable) */
+    /** The configuration of statement. (NullAllowed) */
     protected StatementConfig _statementConfig;
 
     // ===================================================================================
@@ -155,7 +155,7 @@ public class OutsideSqlBasicExecutor {
      * </pre>
      * @param <ENTITY> The type of entity for element.
      * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
@@ -200,7 +200,7 @@ public class OutsideSqlBasicExecutor {
      * int count = memberBhv.outsideSql().<span style="color: #FD4747">execute</span>(path, pmb);
      * </pre>
      * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
@@ -286,7 +286,7 @@ public class OutsideSqlBasicExecutor {
      * Invoke the command of behavior.
      * @param <RESULT> The type of result.
      * @param behaviorCommand The command of behavior. (NotNull)
-     * @return The instance of result. (Nullable)
+     * @return The instance of result. (NullAllowed)
      */
     protected <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
         return _behaviorCommandInvoker.invoke(behaviorCommand);
@@ -419,7 +419,7 @@ public class OutsideSqlBasicExecutor {
     //                                      ----------------
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (Nullable)
+     * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor configure(StatementConfig statementConfig) {

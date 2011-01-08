@@ -85,8 +85,8 @@ public final class DfTypeUtil {
     /**
      * Convert the object to the instance that is string. <br />
      * If the object is a byte array, encode as base64.
-     * @param obj The parsed object. (Nullable)
-     * @return The instance of string. (Nullable)
+     * @param obj The parsed object. (NullAllowed)
+     * @return The instance of string. (NullAllowed)
      */
     public static String toString(Object obj) {
         return toString(obj, null);
@@ -95,9 +95,9 @@ public final class DfTypeUtil {
     /**
      * Convert the object to the instance that is string. <br />
      * If the object is a byte array, encode as base64.
-     * @param obj The parsed object. (Nullable)
-     * @param pattern The pattern format to parse. (Nullable)
-     * @return The instance of string. (Nullable)
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse. (NullAllowed)
+     * @return The instance of string. (NullAllowed)
      */
     public static String toString(Object obj, String pattern) {
         if (obj == null) {
@@ -161,8 +161,8 @@ public final class DfTypeUtil {
      * If the object is Class, it uses Class.getName() as convert target string. <br />
      * If the object is String, it uses it directly as convert target string. <br />
      * If the object is the other object, it uses obj.getClass().getName() as convert target string.
-     * @param obj The target object. String or Class are treated as special. (Nullable: if null, returns null)
-     * @return The string as class title. (Nullable: when the argument is null)
+     * @param obj The target object. String or Class are treated as special. (NullAllowed: if null, returns null)
+     * @return The string as class title. (NullAllowed: when the argument is null)
      */
     public static String toClassTitle(Object obj) {
         if (obj == null) {
@@ -296,9 +296,9 @@ public final class DfTypeUtil {
     //                                                                              ======
     /**
      * Convert to number object.
-     * @param obj The resource of number. (Nullable: if null, returns null)
+     * @param obj The resource of number. (NullAllowed: if null, returns null)
      * @param type The type of number. (NotNull)
-     * @return The number object from resource. (Nullable: if type is not number, returns null)
+     * @return The number object from resource. (NullAllowed: if type is not number, returns null)
      */
     public static Number toNumber(Object obj, Class<?> type) {
         if (obj == null) {
@@ -363,8 +363,8 @@ public final class DfTypeUtil {
     //                                                                             Integer
     //                                                                             =======
     /**
-     * @param obj The resource value to integer. (Nullable)
-     * @return The value as integer. (Nullable)
+     * @param obj The resource value to integer. (NullAllowed)
+     * @return The value as integer. (NullAllowed)
      * @throws NumberFormatException
      */
     public static Integer toInteger(Object obj) {
@@ -704,9 +704,9 @@ public final class DfTypeUtil {
     //                                                                          ==========
     /**
      * Convert to point date object.
-     * @param obj The resource of number. (Nullable: if null, returns null)
+     * @param obj The resource of number. (NullAllowed: if null, returns null)
      * @param type The type of number. (NotNull)
-     * @return The point date object from resource. (Nullable: if type is not date, returns null)
+     * @return The point date object from resource. (NullAllowed: if type is not date, returns null)
      */
     public static Date toPointDate(Object obj, Class<?> type) {
         if (obj == null) {
@@ -732,8 +732,8 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
-     * @param obj The parsed object. (Nullable)
-     * @return The instance of date. (Nullable)
+     * @param obj The parsed object. (NullAllowed)
+     * @return The instance of date. (NullAllowed)
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
@@ -748,9 +748,9 @@ public final class DfTypeUtil {
      * This method uses specified date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default date pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
-     * @param obj The parsed object. (Nullable)
-     * @param pattern The pattern format to parse. (Nullable)
-     * @return The instance of date. (Nullable)
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse. (NullAllowed)
+     * @return The instance of date. (NullAllowed)
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
@@ -1105,8 +1105,8 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
-     * @param obj The parsed object. (Nullable)
-     * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
+     * @param obj The parsed object. (NullAllowed)
+     * @return The instance of time-stamp. (NullAllowed: If the value is null or empty, it returns null.)
      * @throws ParseTimestampException When it failed to parse the string to time-stamp.
      * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
@@ -1121,9 +1121,9 @@ public final class DfTypeUtil {
      * This method uses specified timestamp pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default timestamp pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
-     * @param obj The parsed object. (Nullable)
-     * @param pattern The pattern format to parse. (Nullable)
-     * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse. (NullAllowed)
+     * @return The instance of time-stamp. (NullAllowed: If the value is null or empty, it returns null.)
      * @throws ParseTimestampException When it failed to parse the string to time-stamp.
      * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
@@ -1229,8 +1229,8 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default time pattern based on 'HH:mm:ss'
      * with flexible-parsing if the object is string type.
-     * @param obj The parsed object. (Nullable)
-     * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
+     * @param obj The parsed object. (NullAllowed)
+     * @return The instance of time. (NullAllowed: If the value is null or empty, it returns null.)
      * @throws ParseTimeException When it failed to parse the string to time.
      * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
@@ -1245,9 +1245,9 @@ public final class DfTypeUtil {
      * This method uses specified time pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default time pattern
      * with flexible-parsing based on 'HH:mm:ss'.
-     * @param obj The parsed object. (Nullable)
-     * @param pattern The pattern format to parse. (Nullable)
-     * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse. (NullAllowed)
+     * @return The instance of time. (NullAllowed: If the value is null or empty, it returns null.)
      * @throws ParseTimeException When it failed to parse the string to time.
      * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
@@ -1365,8 +1365,8 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default date pattern based on 'yyyy-MM-dd'
      * with flexible-parsing if the object is string type.
-     * @param obj The parsed object. (Nullable)
-     * @return The instance of SQL date. (Nullable)
+     * @param obj The parsed object. (NullAllowed)
+     * @return The instance of SQL date. (NullAllowed)
      * @throws ParseSqlDateException When it failed to parse the string to SQL date.
      * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
@@ -1381,9 +1381,9 @@ public final class DfTypeUtil {
      * This method uses specified SQL-date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default SQL-date pattern
      * with flexible-parsing based on 'yyyy-MM-dd'.
-     * @param obj The parsed object. (Nullable)
-     * @param pattern The pattern format to parse. (Nullable)
-     * @return The instance of SQL date. (Nullable)
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse. (NullAllowed)
+     * @return The instance of SQL date. (NullAllowed)
      * @throws ParseSqlDateException When it failed to parse the string to SQL date.
      * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.

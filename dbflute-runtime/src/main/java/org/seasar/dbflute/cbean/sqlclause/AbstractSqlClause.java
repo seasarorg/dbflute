@@ -104,19 +104,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // The resources that are not frequently used to are lazy-loaded for performance.
     // - - - - - - - - - -/
-    /** The basic map of selected relation. map:{foreignRelationPath : foreignPropertyName} (Nullable: This is lazy-loaded) */
+    /** The basic map of selected relation. map:{foreignRelationPath : foreignPropertyName} (NullAllowed: This is lazy-loaded) */
     protected Map<String, String> _selectedRelationBasicMap;
 
-    /** The column map of selected relation. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (Nullable: This is lazy-loaded) */
+    /** The column map of selected relation. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (NullAllowed: This is lazy-loaded) */
     protected Map<String, Map<String, SelectedRelationColumn>> _selectedRelationColumnMap;
 
-    /** Specified select column map. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (Nullable: This is lazy-loaded) */
+    /** Specified select column map. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: This is lazy-loaded) */
     protected Map<String, Map<String, HpSpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
-    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (Nullable: This is lazy-loaded) */
+    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: This is lazy-loaded) */
     protected Map<String, Map<String, HpSpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
-    /** Specified derive sub-query map. A null key is acceptable. (Nullable: This is lazy-loaded) */
+    /** Specified derive sub-query map. A null key is acceptable. (NullAllowed: This is lazy-loaded) */
     protected Map<String, HpDerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
@@ -125,13 +125,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The type of select clause. (NotNull) */
     protected SelectClauseType _selectClauseType = DEFAULT_SELECT_CLAUSE_TYPE;
 
-    /** The previous type of select clause. (Nullable: The default is null) */
+    /** The previous type of select clause. (NullAllowed: The default is null) */
     protected SelectClauseType _previousSelectClauseType;
 
-    /** The map of select index. {key:columnAliasName, value:selectIndex} (Nullable) */
+    /** The map of select index. {key:columnAliasName, value:selectIndex} (NullAllowed) */
     protected Map<String, Integer> _selectIndexMap;
 
-    /** The reverse map of select index. {key:selectIndex, value:columnAliasName} (Nullable) */
+    /** The reverse map of select index. {key:selectIndex, value:columnAliasName} (NullAllowed) */
     protected Map<String, String> _selectIndexReverseMap;
 
     /** Is use select index? Default value is true. */
@@ -152,7 +152,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The clause of order-by. (NotNull) */
     protected OrderByClause _orderByClause;
 
-    /** The list of union clause. (Nullable: This is lazy-loaded) */
+    /** The list of union clause. (NullAllowed: This is lazy-loaded) */
     protected List<UnionQueryInfo> _unionQueryInfoList;
 
     /** Is order-by effective? Default value is false. */

@@ -16,7 +16,7 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The alias name for derived column. (Nullable: if null, means no alias expression) */
+    /** The alias name for derived column. (NullAllowed: if null, means no alias expression) */
     protected final String _aliasName;
 
     // ===================================================================================

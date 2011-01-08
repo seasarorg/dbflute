@@ -41,7 +41,7 @@ public class CommandContextCreator {
     //                                                                              ======
     /**
      * Create the command context as root context.
-     * @param args The array of arguments. (Nullable)
+     * @param args The array of arguments. (NullAllowed)
      * @return The command context as root context. (NotNull)
      */
     public CommandContext createCommandContext(Object[] args) {

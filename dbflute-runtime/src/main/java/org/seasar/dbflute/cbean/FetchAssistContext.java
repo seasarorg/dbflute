@@ -33,7 +33,7 @@ public class FetchAssistContext {
     //                                                                          ==========
     /**
      * Get fetch-bean on thread.
-     * @return The instance of fetch-bean. (Nullable)
+     * @return The instance of fetch-bean. (NullAllowed)
      */
     public static FetchBean getFetchBeanOnThread() {
         return _threadLocal.get();
@@ -71,7 +71,7 @@ public class FetchAssistContext {
     //                                                                ====================
     /**
      * Get fetch-narrowing-bean on thread.
-     * @return The instance of fetch-narrowing-bean. (Nullable)
+     * @return The instance of fetch-narrowing-bean. (NullAllowed)
      */
     public static FetchNarrowingBean getFetchNarrowingBeanOnThread() {
         if (isExistFetchBeanOnThread()) {

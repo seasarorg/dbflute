@@ -52,7 +52,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -86,7 +86,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -120,7 +120,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -154,7 +154,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -188,7 +188,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -222,7 +222,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * }).greaterEqual(123, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (Nullable)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
      * @return The parameter for comparing with scalar. (NotNull)
      */
     public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery, DerivedReferrerOption option) {

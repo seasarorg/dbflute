@@ -481,8 +481,8 @@ public class MapListStringImpl implements MapListString {
      * # If the value is 'null', this returns null.
      * # If the trimmed value is empty string, this returns null.
      * </pre>
-     * @param value value. (Nullable)
-     * @return Filtered value. (Nullable)
+     * @param value value. (NullAllowed)
+     * @return Filtered value. (NullAllowed)
      */
     protected String filterMapListValue(String value) {
         if (value == null) {

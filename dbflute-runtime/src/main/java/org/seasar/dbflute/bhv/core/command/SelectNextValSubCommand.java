@@ -36,10 +36,10 @@ public class SelectNextValSubCommand<RESULT> extends SelectNextValCommand<RESULT
     /** The name of sequence. (NotNull) */
     protected String _sequenceName;
 
-    /** The increment size for sequence. (Nullable) */
+    /** The increment size for sequence. (NullAllowed) */
     protected Integer _incrementSize;
 
-    /** The cache size for sequence. (Nullable) */
+    /** The cache size for sequence. (NullAllowed) */
     protected Integer _cacheSize;
 
     // ===================================================================================

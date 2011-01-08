@@ -56,16 +56,16 @@ public class SequenceCache {
     /** The cache size of sequence that is used by increment way only. (NotNull) */
     protected final BigDecimal _cacheSize;
 
-    /** The increment size of sequence that is used by batch way only. (Nullable: If null, it cannot use batch way) */
+    /** The increment size of sequence that is used by batch way only. (NullAllowed: If null, it cannot use batch way) */
     protected final Integer _incrementSize;
 
     /** The added count. If cached list is valid, this value is unused. (NotNull) */
     protected volatile BigDecimal _addedCount = INITIAL_ADDED_COUNT;
 
-    /** The sequence value as base point. (Nullable: only at first null) */
+    /** The sequence value as base point. (NullAllowed: only at first null) */
     protected volatile BigDecimal _sequenceValue;
 
-    /** The sequence value as first value for batch way only. (Nullable: at first or not batch way) */
+    /** The sequence value as first value for batch way only. (NullAllowed: at first or not batch way) */
     protected volatile BigDecimal _batchFirstValue;
 
     // should be used in a process synchronized
@@ -88,7 +88,7 @@ public class SequenceCache {
     /**
      * @param resultType The result type of sequence next value.
      * @param cacheSize The cache size of sequence that is used by increment way only. (NotNull) 
-     * @param incrementSize The increment size of sequence that is used by batch way only. (Nullable: If null, it cannot use batch way)
+     * @param incrementSize The increment size of sequence that is used by batch way only. (NullAllowed: If null, it cannot use batch way)
      */
     public SequenceCache(Class<?> resultType, BigDecimal cacheSize, Integer incrementSize) {
         _resultType = resultType;

@@ -47,7 +47,7 @@ public class ContextStack {
     //                                                                       =============
     /**
      * Get context-stack on thread.
-     * @return The instance of context-stack. (Nullable)
+     * @return The instance of context-stack. (NullAllowed)
      */
     public static Stack<ContextStack> getContextStackOnThread() {
         return _threadLocal.get();

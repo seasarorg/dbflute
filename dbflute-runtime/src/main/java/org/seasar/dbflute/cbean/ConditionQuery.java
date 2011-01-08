@@ -56,7 +56,7 @@ public interface ConditionQuery {
 
     /**
      * Get the referrer query.
-     * @return The condition-query of referrer table. (Nullable: If null, this is base query)
+     * @return The condition-query of referrer table. (NullAllowed: If null, this is base query)
      */
     ConditionQuery xgetReferrerQuery();
 
@@ -100,7 +100,7 @@ public interface ConditionQuery {
 
     /**
      * Get the path of foreign relation. ex) _0_1
-     * @return The path of foreign relation. (Nullable)
+     * @return The path of foreign relation. (NullAllowed)
      */
     String xgetRelationPath();
 

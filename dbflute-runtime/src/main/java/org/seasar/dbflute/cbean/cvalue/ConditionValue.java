@@ -77,7 +77,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does the value equal the value of equal?
-     * @param value The value of equal. (Nullable)
+     * @param value The value of equal. (NullAllowed)
      * @return Determination. (NotNull)
      */
     public boolean equalEqual(Object value) {
@@ -86,7 +86,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Override the value of equal.
-     * @param value The value of equal. (Nullable)
+     * @param value The value of equal. (NullAllowed)
      */
     public void overrideEqual(Object value) {
         getEqualValueHandler().overrideValue(value);
@@ -94,7 +94,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of equal.
-     * @param value The value of equal. (Nullable)
+     * @param value The value of equal. (NullAllowed)
      * @param location The base location of equal. (NotNull)
      */
     public void setupEqual(Object value, String location) {
@@ -103,7 +103,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of equal.
-     * @return The latest location of equal. (Nullable)
+     * @return The latest location of equal. (NullAllowed)
      */
     public String getEqualLatestLocation() {
         return _equalLatestLocation;
@@ -132,7 +132,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does the value equal the value of notEqual?
-     * @param value The value of notEqual. (Nullable)
+     * @param value The value of notEqual. (NullAllowed)
      * @return Determination. (NotNull)
      */
     public boolean equalNotEqual(Object value) {
@@ -141,7 +141,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Override the value of notEqual.
-     * @param value The value of notEqual. (Nullable)
+     * @param value The value of notEqual. (NullAllowed)
      */
     public void overrideNotEqual(Object value) {
         getNotEqualValueHandler().overrideValue(value);
@@ -149,7 +149,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of notEqual.
-     * @param value The value of notEqual. (Nullable)
+     * @param value The value of notEqual. (NullAllowed)
      * @param location The base location of notEqual. (NotNull)
      */
     public void setupNotEqual(Object value, String location) {
@@ -158,7 +158,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of notEqual.
-     * @return The latest location of notEqual. (Nullable)
+     * @return The latest location of notEqual. (NullAllowed)
      */
     public String getNotEqualLatestLocation() {
         return _notEqualLatestLocation;
@@ -187,7 +187,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does the value equal the value of greaterThan?
-     * @param value The value of greaterThan. (Nullable)
+     * @param value The value of greaterThan. (NullAllowed)
      * @return Determination. (NotNull)
      */
     public boolean equalGreaterThan(Object value) {
@@ -196,7 +196,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Override the value of greaterThan.
-     * @param value The value of greaterThan. (Nullable)
+     * @param value The value of greaterThan. (NullAllowed)
      */
     public void overrideGreaterThan(Object value) {
         getGreaterThanValueHandler().overrideValue(value);
@@ -204,7 +204,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of greaterThan.
-     * @param value The value of greaterThan. (Nullable)
+     * @param value The value of greaterThan. (NullAllowed)
      * @param location The base location of greaterThan. (NotNull)
      */
     public void setupGreaterThan(Object value, String location) {
@@ -213,7 +213,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of greaterThan.
-     * @return The latest location of greaterThan. (Nullable)
+     * @return The latest location of greaterThan. (NullAllowed)
      */
     public String getGreaterThanLatestLocation() {
         return _greaterThanLatestLocation;
@@ -242,7 +242,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does the value equal the value of lessThan?
-     * @param value The value of lessThan. (Nullable)
+     * @param value The value of lessThan. (NullAllowed)
      * @return Determination. (NotNull)
      */
     public boolean equalLessThan(Object value) {
@@ -251,7 +251,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Override the value of lessThan.
-     * @param value The value of lessThan. (Nullable)
+     * @param value The value of lessThan. (NullAllowed)
      */
     public void overrideLessThan(Object value) {
         getLessThanValueHandler().overrideValue(value);
@@ -259,7 +259,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of lessThan.
-     * @param value The value of lessThan. (Nullable)
+     * @param value The value of lessThan. (NullAllowed)
      * @param location The base location of lessThan. (NotNull)
      */
     public void setupLessThan(Object value, String location) {
@@ -268,7 +268,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of lessThan.
-     * @return The latest location of lessThan. (Nullable)
+     * @return The latest location of lessThan. (NullAllowed)
      */
     public String getLessThanLatestLocation() {
         return _lessThanLatestLocation;
@@ -297,7 +297,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does the value equal the value of greaterEqual?
-     * @param value The value of greaterEqual. (Nullable)
+     * @param value The value of greaterEqual. (NullAllowed)
      * @return Determination. (NotNull)
      */
     public boolean equalGreaterEqual(Object value) {
@@ -306,7 +306,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Override the value of greaterEqual.
-     * @param value The value of greaterEqual. (Nullable)
+     * @param value The value of greaterEqual. (NullAllowed)
      */
     public void overrideGreaterEqual(Object value) {
         getGreaterEqualValueHandler().overrideValue(value);
@@ -314,7 +314,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of greaterEqual.
-     * @param value The value of greaterEqual. (Nullable)
+     * @param value The value of greaterEqual. (NullAllowed)
      * @param location The base location of greaterEqual. (NotNull)
      */
     public void setupGreaterEqual(Object value, String location) {
@@ -323,7 +323,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of greaterEqual.
-     * @return The latest location of greaterEqual. (Nullable)
+     * @return The latest location of greaterEqual. (NullAllowed)
      */
     public String getGreaterEqualLatestLocation() {
         return _greaterEqualLatestLocation;
@@ -352,7 +352,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does the value equal the value of lessEqual?
-     * @param value The value of lessEqual. (Nullable)
+     * @param value The value of lessEqual. (NullAllowed)
      * @return Determination. (NotNull)
      */
     public boolean equalLessEqual(Object value) {
@@ -361,7 +361,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Override the value of lessEqual.
-     * @param value The value of lessEqual. (Nullable)
+     * @param value The value of lessEqual. (NullAllowed)
      */
     public void overrideLessEqual(Object value) {
         getLessEqualValueHandler().overrideValue(value);
@@ -369,7 +369,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of lessEqual.
-     * @param value The value of lessEqual. (Nullable)
+     * @param value The value of lessEqual. (NullAllowed)
      * @param location The base location of lessEqual. (NotNull)
      */
     public void setupLessEqual(Object value, String location) {
@@ -378,7 +378,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of lessEqual.
-     * @return The latest location of lessEqual. (Nullable)
+     * @return The latest location of lessEqual. (NullAllowed)
      */
     public String getLessEqualLatestLocation() {
         return _lessEqualLatestLocation;
@@ -399,7 +399,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of inScope.
-     * @param value The value of inScope. (Nullable)
+     * @param value The value of inScope. (NullAllowed)
      * @param location The base location of inScope. (NotNull)
      */
     public void setupInScope(Object value, String location) {
@@ -409,7 +409,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of inScope.
-     * @return The latest location of inScope. (Nullable)
+     * @return The latest location of inScope. (NullAllowed)
      */
     public String getInScopeLatestLocation() {
         return _inScopeLatestLocation;
@@ -430,7 +430,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of notInScope.
-     * @param value The value of notInScope. (Nullable)
+     * @param value The value of notInScope. (NullAllowed)
      * @param location The base location of notInScope. (NotNull)
      */
     public void setupNotInScope(Object value, String location) {
@@ -440,7 +440,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of notInScope.
-     * @return The latest location of notInScope. (Nullable)
+     * @return The latest location of notInScope. (NullAllowed)
      */
     public String getNotInScopeLatestLocation() {
         return _notInScopeLatestLocation;
@@ -461,7 +461,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of likeSearch.
-     * @param value The value of likeSearch. (Nullable)
+     * @param value The value of likeSearch. (NullAllowed)
      * @param option The option of likeSearch. (NotNull)
      * @param location The base location of likeSearch. (NotNull)
      */
@@ -472,7 +472,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of likeSearch.
-     * @return The latest location of likeSearch. (Nullable)
+     * @return The latest location of likeSearch. (NullAllowed)
      */
     public String getLikeSearchLatestLocation() {
         return _likeSearchLatestLocation;
@@ -493,7 +493,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set up the value of notLikeSearch.
-     * @param value The value of notLikeSearch. (Nullable)
+     * @param value The value of notLikeSearch. (NullAllowed)
      * @param option The option of notLikeSearch. (NotNull)
      * @param location The base location of notLikeSearch. (NotNull)
      */
@@ -504,7 +504,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the latest location of notLikeSearch.
-     * @return The latest location of notLikeSearch. (Nullable)
+     * @return The latest location of notLikeSearch. (NullAllowed)
      */
     public String getNotLikeSearchLatestLocation() {
         return _notLikeSearchLatestLocation;
@@ -524,7 +524,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set the value of isNotNull.
-     * @param value The value of isNotNull. (Nullable)
+     * @param value The value of isNotNull. (NullAllowed)
      * @return The key of value. (NotNull)
      */
     public String setIsNotNull(Object value) {
@@ -553,7 +553,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Set the value of isNull.
-     * @param value The value of isNull. (Nullable)
+     * @param value The value of isNull. (NullAllowed)
      * @return The key of value. (NotNull)
      */
     public String setIsNull(Object value) {
@@ -788,7 +788,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of fixed values. {basically for parameter-comment} <br />
-     * @return The map of fixed values. map:{[query or inline or onClause] = map:{[condition-key] = [value]}} (Nullable)
+     * @return The map of fixed values. map:{[query or inline or onClause] = map:{[condition-key] = [value]}} (NullAllowed)
      */
     public Map<String, Map<String, Object>> getFixed() {
         return _fixedValueMap;
@@ -796,7 +796,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of fixed values for query. {basically for internal tests} <br />
-     * @return A map instance. map:{[condition-key] = [value]} (Nullable)
+     * @return A map instance. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedQuery() {
         return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_QUERY) : null;
@@ -804,7 +804,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of fixed values for in-line. {basically for internal tests} <br />
-     * @return A map instance. map:{[condition-key] = [value]} (Nullable)
+     * @return A map instance. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedInline() {
         return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_INLINE) : null;
@@ -812,7 +812,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of fixed values for on-clause. {basically for internal tests} <br />
-     * @return A map instance. map:{[condition-key] = [value]} (Nullable)
+     * @return A map instance. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedOnClause() {
         return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_ONCLAUSE) : null;
@@ -820,7 +820,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of varying values. {basically for parameter-comment} <br />
-     * @return The map of varying values. map:{[condition-key] = map:{[varying-key] = [value]}} (Nullable)
+     * @return The map of varying values. map:{[condition-key] = map:{[varying-key] = [value]}} (NullAllowed)
      */
     public Map<String, Map<String, Object>> getVarying() {
         return _varyingValueMap;

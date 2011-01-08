@@ -247,7 +247,7 @@ public class Srl {
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
-     * @return The information of index. (Nullable: if delimiter not found)
+     * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfFirst(final String str, final String... delimiters) {
         return doIndexOfFirst(false, str, delimiters);
@@ -261,7 +261,7 @@ public class Srl {
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
-     * @return The information of index. (Nullable: if delimiter not found)
+     * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfFirstIgnoreCase(final String str, final String... delimiters) {
         return doIndexOfFirst(true, str, delimiters);
@@ -279,7 +279,7 @@ public class Srl {
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
-     * @return The information of index. (Nullable: if delimiter not found)
+     * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfLast(final String str, final String... delimiters) {
         return doIndexOfLast(false, str, delimiters);
@@ -293,7 +293,7 @@ public class Srl {
      * </pre>
      * @param str The target string. (NotNull)
      * @param delimiters The array of delimiters. (NotNull) 
-     * @return The information of index. (Nullable: if delimiter not found)
+     * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfLastIgnoreCase(final String str, final String... delimiters) {
         return doIndexOfLast(true, str, delimiters);

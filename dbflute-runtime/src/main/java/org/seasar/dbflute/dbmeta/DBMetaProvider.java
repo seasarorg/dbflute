@@ -24,7 +24,7 @@ public interface DBMetaProvider {
     /**
      * Provide the DB meta.
      * @param tableFlexibleName The flexible name of table. (NotNull)
-     * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
+     * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
      */
     DBMeta provideDBMeta(String tableFlexibleName);
 

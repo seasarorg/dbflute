@@ -50,7 +50,7 @@ public class OutsideSqlPagingExecutor {
     /** The current database definition. (NotNull) */
     protected final DBDef _currentDBDef;
 
-    /** The default configuration of statement. (Nullable) */
+    /** The default configuration of statement. (NullAllowed) */
     protected final StatementConfig _defaultStatementConfig;
 
     /** The option of outside-SQL. (NotNull) */
@@ -317,7 +317,7 @@ public class OutsideSqlPagingExecutor {
 
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (Nullable)
+     * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
     public OutsideSqlPagingExecutor configure(StatementConfig statementConfig) {

@@ -33,7 +33,7 @@ public interface Classification {
     String name();
 
     /**
-     * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
+     * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
      */
     String alias();
 

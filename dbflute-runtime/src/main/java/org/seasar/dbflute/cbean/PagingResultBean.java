@@ -158,7 +158,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous 1 2 3 4 5 6 7 8 9 10 next</span>
      * </pre>
-     * @param pageGroupOption The value of pageGroupOption. (Nullable)
+     * @param pageGroupOption The value of pageGroupOption. (NullAllowed)
      */
     public void setPageGroupOption(PageGroupOption pageGroupOption) {
         initializePageGroup();
@@ -259,7 +259,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <span style="color: #3F7E5E">//  3 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">//</span> <span style="color: #FD4747">1 2 3 4 5 6 7 8 9 10 11</span> <span style="color: #3F7E5E">next</span>
      * </pre>
-     * @param pageRangeOption The value of pageRangeOption. (Nullable)
+     * @param pageRangeOption The value of pageRangeOption. (NullAllowed)
      */
     public void setPageRangeOption(PageRangeOption pageRangeOption) {
         initializePageRange();
@@ -364,7 +364,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     /**
-     * @param other Other entity. (Nullable)
+     * @param other Other entity. (NullAllowed)
      * @return Comparing result. If other is null, returns false.
      */
     public boolean equals(Object other) {

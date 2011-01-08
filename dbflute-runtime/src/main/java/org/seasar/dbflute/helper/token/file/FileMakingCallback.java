@@ -24,7 +24,7 @@ public interface FileMakingCallback {
      * Get file-making header information. <br />
      * You should return your row resource for file-making.
      * It continues invoking until this method returns null.
-     * @return File-making header information. (Nullable)
+     * @return File-making header information. (NullAllowed)
      */
     public FileMakingRowResource getRowResource();
 }

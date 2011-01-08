@@ -38,7 +38,7 @@ public class AccessContext {
 
     /**
      * Get access-context on thread.
-     * @return The context of DB access. (Nullable)
+     * @return The context of DB access. (NullAllowed)
      */
     public static AccessContext getAccessContextOnThread() {
         return (AccessContext) _threadLocal.get();
@@ -181,7 +181,7 @@ public class AccessContext {
     /**
      * Get access value on thread.
      * @param key Key. (NotNull)
-     * @return Access value. (Nullable: If the key has null value, it returns null)
+     * @return Access value. (NullAllowed: If the key has null value, it returns null)
      * @exception IllegalStateException When it couldn't get access value.
      */
     public static Object getAccessValueOnThread(String key) {

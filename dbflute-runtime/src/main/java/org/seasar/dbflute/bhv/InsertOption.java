@@ -115,7 +115,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * Limit batch-insert logging by logging size. <br />
      * For example, if you set 3, only 3 records are logged. <br />
      * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
-     * @param batchInsertLoggingLimit The limit size of batch-insert logging. (Nullable: if null and minus, means no limit)
+     * @param batchInsertLoggingLimit The limit size of batch-insert logging. (NullAllowed: if null and minus, means no limit)
      */
     public void limitBatchInsertLogging(Integer batchInsertLoggingLimit) {
         this._batchInsertLoggingLimit = batchInsertLoggingLimit;

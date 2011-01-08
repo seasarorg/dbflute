@@ -47,7 +47,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     /** The current database definition. (NotNull) */
     protected DBDef _currentDBDef;
 
-    /** The default configuration of statement. (Nullable) */
+    /** The default configuration of statement. (NullAllowed) */
     protected final StatementConfig _defaultStatementConfig;
 
     /** The option of outside-SQL. (NotNull) */
@@ -90,9 +90,9 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The type of entity. (NotNull)
-     * @return The selected entity. (Nullable)
+     * @return The selected entity. (NullAllowed)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
@@ -140,9 +140,9 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The type of entity. (NotNull)
-     * @return The selected entity. (Nullable)
+     * @return The selected entity. (NullAllowed)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted(not found).
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
@@ -220,7 +220,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
 
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (Nullable)
+     * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
     public OutsideSqlEntityExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {

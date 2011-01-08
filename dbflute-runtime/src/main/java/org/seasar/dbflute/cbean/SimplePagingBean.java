@@ -48,7 +48,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, S
         _sqlClause = new SqlClauseDefault("dummy");
     }
 
-    /** The map of parameter. (Nullable) */
+    /** The map of parameter. (NullAllowed) */
     protected Map<String, Object> _parameterMap;
 
     /** The max size of safety result. */
@@ -366,7 +366,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, S
     /**
      * Add the parameter to the map.
      * @param key The key of parameter. (NotNull)
-     * @param value The value of parameter. (Nullable)
+     * @param value The value of parameter. (NullAllowed)
      */
     public void addParameter(String key, Object value) {
         initializeParameterMapIfNeeds();

@@ -62,7 +62,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     }
 
     /**
-     * @param beanClass The class of target bean to find DB-meta. (Nullable)
+     * @param beanClass The class of target bean to find DB-meta. (NullAllowed)
      * @return The instance of internal row creator. (NotNull)
      */
     public static TnRowCreatorExtension createRowCreator(Class<?> beanClass) {
@@ -220,7 +220,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                       =============
     /**
      * @param row The instance of row. (NotNull)
-     * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
+     * @return The interface of DBMeta. (NullAllowed: If it's null, it means NotFound.)
      */
     public static DBMeta findCachedDBMeta(Object row) {
         return DBMetaCacheHandler.findDBMeta(row);
@@ -229,7 +229,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     /**
      * @param rowType The type of row. (NotNull)
      * @param tableName The name of table. (NotNull)
-     * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
+     * @return The interface of DBMeta. (NullAllowed: If it's null, it means NotFound.)
      */
     public static DBMeta findCachedDBMeta(Class<?> rowType, String tableName) {
         return DBMetaCacheHandler.findDBMeta(rowType, tableName);

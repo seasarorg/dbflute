@@ -57,7 +57,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     /**
      * @param res The resource of relation row creation. (NotNull)
-     * @return Created relation row. (Nullable)
+     * @return Created relation row. (NullAllowed)
      * @throws SQLException
      */
     protected Object createRelationRow(TnRelationRowCreationResource res) throws SQLException {

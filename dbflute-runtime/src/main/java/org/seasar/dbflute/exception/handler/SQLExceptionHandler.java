@@ -45,7 +45,7 @@ public class SQLExceptionHandler {
 
     /**
      * @param e The instance of SQLException. (NotNull)
-     * @param st The instance of statement. (Nullable)
+     * @param st The instance of statement. (NullAllowed)
      */
     public void handleSQLException(SQLException e, Statement st) {
         handleSQLException(e, st, false);
@@ -53,7 +53,7 @@ public class SQLExceptionHandler {
 
     /**
      * @param e The instance of SQLException. (NotNull)
-     * @param st The instance of statement. (Nullable)
+     * @param st The instance of statement. (NullAllowed)
      * @param uniqueConstraintValid Is unique constraint handling valid?
      */
     public void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid) {
@@ -62,10 +62,10 @@ public class SQLExceptionHandler {
 
     /**
      * @param e The instance of SQLException. (NotNull)
-     * @param st The instance of statement. (Nullable)
+     * @param st The instance of statement. (NullAllowed)
      * @param uniqueConstraintValid Is unique constraint handling valid?
-     * @param executedSql The executed SQL which does not have bind values. (Nullable)
-     * @param displaySql The SQL for display which has bind values (embedded on SQL). (Nullable)
+     * @param executedSql The executed SQL which does not have bind values. (NullAllowed)
+     * @param displaySql The SQL for display which has bind values (embedded on SQL). (NullAllowed)
      */
     public void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid, String executedSql,
             String displaySql) {
@@ -202,8 +202,8 @@ public class SQLExceptionHandler {
      * (If you hide JDBC driver's message too, you'll be at a loss when you debug)
      * </p>
      * @param br The builder of exception message. (NotNull)
-     * @param executedSql The executed SQL which does not have bind values. (Nullable)
-     * @param displaySql The SQL for display which has bind values (embedded on SQL). (Nullable)
+     * @param executedSql The executed SQL which does not have bind values. (NullAllowed)
+     * @param displaySql The SQL for display which has bind values (embedded on SQL). (NullAllowed)
      */
     protected void setupTargetSqlElement(ExceptionMessageBuilder br, String executedSql, String displaySql) {
         if (displaySql != null) {

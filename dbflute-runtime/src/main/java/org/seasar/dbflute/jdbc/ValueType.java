@@ -46,7 +46,7 @@ public interface ValueType {
      * @param conn The connection for the database. (NotNull)
      * @param ps The prepared statement. (NotNull)
      * @param index The parameter index.
-     * @param value The parameter value. (Nullable)
+     * @param value The parameter value. (NullAllowed)
      * @throws SQLException
      */
     void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException;

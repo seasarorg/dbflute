@@ -46,7 +46,7 @@ public class TnRelationRowCache {
     /**
      * @param relno The relation number.
      * @param key The key of relation. (NotNull)
-     * @return The relation row. (Nullable)
+     * @return The relation row. (NullAllowed)
      */
     public Object getRelationRow(int relno, TnRelationKey key) {
         return getRowMap(relno).get(key);
@@ -55,7 +55,7 @@ public class TnRelationRowCache {
     /**
      * @param relno The relation number.
      * @param key The key of relation. (NotNull)
-     * @param row The relation row. (Nullable)
+     * @param row The relation row. (NullAllowed)
      */
     public void addRelationRow(int relno, TnRelationKey key, Object row) {
         getRowMap(relno).put(key, row);

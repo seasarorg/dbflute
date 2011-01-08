@@ -25,7 +25,7 @@ public interface SqlExecution {
     /**
      * Execute SQL.
      * @param args The arguments for SQL.
-     * @return The execution result. (Nullable: depends on an execution)
+     * @return The execution result. (NullAllowed: depends on an execution)
      */
     Object execute(Object[] args);
 }

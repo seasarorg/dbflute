@@ -51,7 +51,7 @@ public class ResourceContext {
 
     /**
      * Get the context of resource by the key.
-     * @return The context of resource. (Nullable)
+     * @return The context of resource. (NullAllowed)
      */
     public static ResourceContext getResourceContextOnThread() {
         return threadLocal.get();
@@ -131,7 +131,7 @@ public class ResourceContext {
 
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
-     * @return The instance of DB meta. (Nullable)
+     * @return The instance of DB meta. (NullAllowed)
      */
     public static DBMeta provideDBMeta(String tableFlexibleName) {
         if (!isExistResourceContextOnThread()) {
@@ -193,8 +193,8 @@ public class ResourceContext {
 
     /**
      * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
-     * @param sqlState SQLState of the SQLException. (Nullable)
-     * @param errorCode ErrorCode of the SQLException. (Nullable)
+     * @param sqlState SQLState of the SQLException. (NullAllowed)
+     * @param errorCode ErrorCode of the SQLException. (NullAllowed)
      * @return Is the SQLException from unique constraint?
      */
     public static boolean isUniqueConstraintException(String sqlState, Integer errorCode) {

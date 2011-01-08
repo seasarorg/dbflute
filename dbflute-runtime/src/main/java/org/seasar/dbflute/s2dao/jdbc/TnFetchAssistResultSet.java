@@ -48,7 +48,7 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     /** Is the safety check valid? (derived from fetchBean) */
     protected final boolean _safetyCheckValid;
 
-    /** The bean of fetch narrowing. (Nullable) */
+    /** The bean of fetch narrowing. (NullAllowed) */
     protected final FetchNarrowingBean _fetchNarrowingBean;
 
     /** Does it offset by cursor forcedly? */

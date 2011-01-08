@@ -165,7 +165,7 @@ public class ColumnInfo {
 
     /**
      * Get the generic type of property type for list property.
-     * @return The type instance. (Nullable: when not list type)
+     * @return The type instance. (NullAllowed: when not list type)
      */
     public Class<?> getGenericType() {
         return DfReflectionUtil.getGenericType(reader().getGenericReturnType());
@@ -276,7 +276,7 @@ public class ColumnInfo {
 
     /**
      * Get the alias of the column.
-     * @return The alias of the column. (Nullable: when it cannot get an alias from meta)
+     * @return The alias of the column. (NullAllowed: when it cannot get an alias from meta)
      */
     public String getColumnAlias() {
         return this._columnAlias;
@@ -356,7 +356,7 @@ public class ColumnInfo {
 
     /**
      * Get the size of the column.
-     * @return The size of the column. (Nullable: If the type does not have size, it returns null.)
+     * @return The size of the column. (NullAllowed: If the type does not have size, it returns null.)
      */
     public Integer getColumnSize() {
         return this._columnSize;
@@ -364,7 +364,7 @@ public class ColumnInfo {
 
     /**
      * Get the decimal digits of the column.
-     * @return The decimal digits of the column. (Nullable: If the type does not have disits, it returns null.)
+     * @return The decimal digits of the column. (NullAllowed: If the type does not have disits, it returns null.)
      */
     public Integer getDecimalDigits() {
         return this._decimalDigits;
@@ -406,7 +406,7 @@ public class ColumnInfo {
      * Get the comment of the column. <br />
      * If the real comment contains the alias,
      * this result does NOT contain it and its delimiter.  
-     * @return The comment of the column. (Nullable: when it cannot get an alias from meta)
+     * @return The comment of the column. (NullAllowed: when it cannot get an alias from meta)
      */
     public String getColumnComment() {
         return this._columnComment;
@@ -441,7 +441,7 @@ public class ColumnInfo {
 
     /**
      * Get the meta of classification related to the column.
-     * @return The instance of classification meta. (Nullable)
+     * @return The instance of classification meta. (NullAllowed)
      */
     public ClassificationMeta getClassificationMeta() {
         return _classificationMeta;

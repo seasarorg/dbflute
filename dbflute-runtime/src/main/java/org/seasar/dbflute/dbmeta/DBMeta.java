@@ -86,7 +86,7 @@ public interface DBMeta {
 
     /**
      * Get the alias of the table.
-     * @return The alias of the table. (Nullable: when it cannot get an alias from meta)
+     * @return The alias of the table. (NullAllowed: when it cannot get an alias from meta)
      */
     String getTableAlias();
 
@@ -94,7 +94,7 @@ public interface DBMeta {
      * Get the comment of the table. <br />
      * If the real comment contains the alias,
      * this result does NOT contain it and its delimiter.  
-     * @return The comment of the table. (Nullable: when it cannot get a comment from meta)
+     * @return The comment of the table. (NullAllowed: when it cannot get a comment from meta)
      */
     String getTableComment();
 
@@ -239,7 +239,7 @@ public interface DBMeta {
 
         /**
          * Get the trace of column.
-         * @return The trace of column as column info. (Nullable)
+         * @return The trace of column as column info. (NullAllowed)
          */
         ColumnInfo getTraceColumn();
     }
@@ -268,25 +268,25 @@ public interface DBMeta {
 
     /**
      * Get the sequence name.
-     * @return The sequence name. (Nullable: If it does not have sequence, returns null.)
+     * @return The sequence name. (NullAllowed: If it does not have sequence, returns null.)
      */
     String getSequenceName();
 
     /**
      * Get the SQL for next value of sequence.
-     * @return The SQL for next value of sequence. (Nullable: If it does not have sequence, returns null.)
+     * @return The SQL for next value of sequence. (NullAllowed: If it does not have sequence, returns null.)
      */
     String getSequenceNextValSql();
 
     /**
      * Get the increment size of sequence.
-     * @return The increment size of sequence. (Nullable: If it is unknown, returns null.)
+     * @return The increment size of sequence. (NullAllowed: If it is unknown, returns null.)
      */
     Integer getSequenceIncrementSize();
 
     /**
      * Get the cache size of sequence. (The cache means sequence cache on DBFlute)
-     * @return The cache size of sequence. (Nullable: If it does not use cache, returns null.)
+     * @return The cache size of sequence. (NullAllowed: If it does not use cache, returns null.)
      */
     Integer getSequenceCacheSize();
 
@@ -301,7 +301,7 @@ public interface DBMeta {
 
     /**
      * Get the column information of version no.
-     * @return The column information of version no. (Nullable: If it doesn't have the column, return null.)
+     * @return The column information of version no. (NullAllowed: If it doesn't have the column, return null.)
      */
     ColumnInfo getVersionNoColumnInfo();
 
@@ -313,7 +313,7 @@ public interface DBMeta {
 
     /**
      * Get the column information of update date.
-     * @return The column information of update date. (Nullable: If it doesn't have the column, return null.)
+     * @return The column information of update date. (NullAllowed: If it doesn't have the column, return null.)
      */
     ColumnInfo getUpdateDateColumnInfo();
 
@@ -379,19 +379,19 @@ public interface DBMeta {
 
     /**
      * Get the type name of condition-bean.
-     * @return The type name of condition-bean. (Nullable: If the condition-bean does not exist)
+     * @return The type name of condition-bean. (NullAllowed: If the condition-bean does not exist)
      */
     String getConditionBeanTypeName();
 
     /**
      * Get the type name of DAO.
-     * @return The type name of DAO. (Nullable: If the DAO does not exist)
+     * @return The type name of DAO. (NullAllowed: If the DAO does not exist)
      */
     String getDaoTypeName();
 
     /**
      * Get the type name of behavior.
-     * @return The type name of behavior. (Nullable: If the behavior does not exist)
+     * @return The type name of behavior. (NullAllowed: If the behavior does not exist)
      */
     String getBehaviorTypeName();
 
@@ -459,7 +459,7 @@ public interface DBMeta {
      * Set up entity property. (for INTERNAL)
      * @param propertyName The name of the property. (NotNull)
      * @param entity The entity for the property. (NotNull)
-     * @param value The value of the property. (Nullable)
+     * @param value The value of the property. (NullAllowed)
      */
     void setupEntityProperty(String propertyName, Object entity, Object value);
 
@@ -472,7 +472,7 @@ public interface DBMeta {
 
         /**
          * @param entity Entity. (NotNull)
-         * @param value Value. (Nullable)
+         * @param value Value. (NullAllowed)
          */
         void setup(ENTITY_TYPE entity, Object value);
     }

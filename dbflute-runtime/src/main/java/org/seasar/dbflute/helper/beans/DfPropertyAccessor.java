@@ -27,15 +27,15 @@ public interface DfPropertyAccessor {
     Class<?> getPropertyType();
 
     /**
-     * @param target The target instance. (Nullable)
-     * @return The value of the property. (Nullable)
+     * @param target The target instance. (NullAllowed)
+     * @return The value of the property. (NullAllowed)
      * @throws DfBeanIllegalPropertyException When the property of bean is illegal. (basically has a cause)
      */
     Object getValue(Object target);
 
     /**
-     * @param target The target instance. (Nullable)
-     * @param value The value of the property. (Nullable)
+     * @param target The target instance. (NullAllowed)
+     * @param value The value of the property. (NullAllowed)
      * @throws DfBeanIllegalPropertyException When the property of bean is illegal. (basically has a cause)
      */
     void setValue(Object target, Object value);

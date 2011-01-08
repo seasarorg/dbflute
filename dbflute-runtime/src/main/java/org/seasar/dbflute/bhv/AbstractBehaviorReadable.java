@@ -287,7 +287,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                              ======================
     /**
      * Assert that the entity is not deleted.
-     * @param entity Selected entity. (Nullable)
+     * @param entity Selected entity. (NullAllowed)
      * @param searchKey Search-key for logging.
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
@@ -299,7 +299,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Assert that the entity is not deleted.
-     * @param ls Selected list. (Nullable)
+     * @param ls Selected list. (NullAllowed)
      * @param searchKey Search-key for logging. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException
      */
@@ -372,7 +372,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The maximum value. (Nullable)
+         * @return The maximum value. (NullAllowed)
          */
         public RESULT max(ScalarQuery<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
@@ -388,7 +388,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The minimum value. (Nullable)
+         * @return The minimum value. (NullAllowed)
          */
         public RESULT min(ScalarQuery<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
@@ -404,7 +404,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The summary value. (Nullable)
+         * @return The summary value. (NullAllowed)
          */
         public RESULT sum(ScalarQuery<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
@@ -420,7 +420,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The average value. (Nullable)
+         * @return The average value. (NullAllowed)
          */
         public RESULT avg(ScalarQuery<CB> scalarQuery) {
             assertObjectNotNull("scalarQuery", scalarQuery);
@@ -772,7 +772,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * Filter the entity of insert. (basically for non-primary-key insert)
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      */
     protected void filterEntityOfInsert(Entity targetEntity, InsertOption<? extends ConditionBean> option) {
     }
@@ -896,7 +896,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * Invoke the command of behavior.
      * @param <RESULT> The type of result.
      * @param behaviorCommand The command of behavior. (NotNull)
-     * @return The instance of result. (Nullable)
+     * @return The instance of result. (NullAllowed)
      */
     protected <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
         return _behaviorCommandInvoker.invoke(behaviorCommand);
@@ -1103,8 +1103,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                      ==============
     /**
      * To lower case if the type is String.
-     * @param obj Object. (Nullable)
-     * @return Lower object. (Nullable)
+     * @param obj Object. (NullAllowed)
+     * @return Lower object. (NullAllowed)
      */
     protected Object toLowerCaseIfString(Object obj) {
         if (obj != null && obj instanceof String) {
@@ -1126,7 +1126,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                            ========
     /**
      * Get the invoker of behavior command.
-     * @return The invoker of behavior command. (Nullable: But normally NotNull)
+     * @return The invoker of behavior command. (NullAllowed: But normally NotNull)
      */
     protected BehaviorCommandInvoker getBehaviorCommandInvoker() {
         return _behaviorCommandInvoker;
@@ -1142,7 +1142,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * Get the selector of behavior.
-     * @return The select of behavior. (Nullable: But normally NotNull)
+     * @return The select of behavior. (NullAllowed: But normally NotNull)
      */
     protected BehaviorSelector getBehaviorSelector() {
         return _behaviorSelector;

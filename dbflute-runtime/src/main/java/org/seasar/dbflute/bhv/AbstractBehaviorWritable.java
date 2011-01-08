@@ -379,7 +379,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * Process before insert. </br >
      * You can stop the process by your extension.
      * @param entity The entity for insert. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
@@ -402,7 +402,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @param entity The entity for query-insert. (NotNull)
      * @param intoCB The condition-bean for inserted table. (NotNull)
      * @param resourceCB The condition-bean for resource table. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeQueryInsert(Entity entity, ConditionBean intoCB, ConditionBean resourceCB,
@@ -442,7 +442,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {Framework Method} Filter the entity of insert.
      * @param entity The entity for insert. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      */
     protected void frameworkFilterEntityOfInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
         injectSequenceToPrimaryKeyIfNeeds(entity);
@@ -452,7 +452,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Set up common columns of insert if it needs.
      * @param entity The entity for insert. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      */
     protected void setupCommonColumnOfInsertIfNeeds(Entity entity, InsertOption<? extends ConditionBean> option) {
         if (option != null && option.isCommonColumnAutoSetupDisabled()) {
@@ -484,7 +484,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Filter the entity of insert. (for extension)
      * @param entity The entity for insert. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      */
     protected void filterEntityOfInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
     }
@@ -492,7 +492,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Assert the entity of insert. (for extension)
      * @param entity The entity for insert. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      */
     protected void assertEntityOfInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
     }
@@ -529,7 +529,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * Process before update. </br >
      * You can stop the process by your extension.
      * @param entity The entity for update that has primary key. (NotNull)
-     * @param option The option of update. (Nullable)
+     * @param option The option of update. (NullAllowed)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
@@ -545,7 +545,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * You can stop the process by your extension.
      * @param entity The entity for update that is not needed primary key. (NotNull)
      * @param cb The condition-bean for query. (NotNull)
-     * @param option The option of update. (Nullable)
+     * @param option The option of update. (NullAllowed)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeQueryUpdate(Entity entity, ConditionBean cb,
@@ -562,7 +562,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {Framework Method} Filter the entity of update.
      * @param entity The entity for update. (NotNull)
-     * @param option The option of update. (Nullable)
+     * @param option The option of update. (NullAllowed)
      */
     protected void frameworkFilterEntityOfUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
         setupCommonColumnOfUpdateIfNeeds(entity, option);
@@ -571,7 +571,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Set up common columns of update if it needs.
      * @param entity The entity for update. (NotNull)
-     * @param option The option of update. (Nullable)
+     * @param option The option of update. (NullAllowed)
      */
     protected void setupCommonColumnOfUpdateIfNeeds(Entity entity, UpdateOption<? extends ConditionBean> option) {
         if (option != null && option.isCommonColumnAutoSetupDisabled()) {
@@ -585,7 +585,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Filter the entity of update. (for extension)
      * @param entity The entity for update. (NotNull)
-     * @param option The option of update. (Nullable)
+     * @param option The option of update. (NullAllowed)
      */
     protected void filterEntityOfUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
     }
@@ -593,7 +593,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Assert the entity of update. (for extension)
      * @param entity The entity for update. (NotNull)
-     * @param option The option of update. (Nullable)
+     * @param option The option of update. (NullAllowed)
      */
     protected void assertEntityOfUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
     }
@@ -630,7 +630,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * Assert that the query-update is legal status.
      * @param entity The entity for query-update. (NotNull)
      * @param cb The condition-bean for query-update. (NotNull)
-     * @param option The option of update. (Nullable)
+     * @param option The option of update. (NullAllowed)
      */
     protected void assertQueryUpdateStatus(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
         if (option != null && option.isNonQueryUpdateAllowed()) {
@@ -648,7 +648,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * Process before delete. </br >
      * You can stop the process by your extension.
      * @param entity The entity for delete that has primary key. (NotNull)
-     * @param option The option of delete. (Nullable)
+     * @param option The option of delete. (NullAllowed)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
@@ -663,7 +663,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * Process before query-delete. </br >
      * You can stop the process by your extension.
      * @param cb The condition-bean for query. (NotNull)
-     * @param option The option of delete. (Nullable)
+     * @param option The option of delete. (NullAllowed)
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeQueryDelete(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
@@ -675,7 +675,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {Framework Method} Filter the entity of delete. {not called if query-delete}
      * @param entity The entity for delete that has primary key. (NotNull)
-     * @param option The option of delete. (Nullable)
+     * @param option The option of delete. (NullAllowed)
      */
     protected void frameworkFilterEntityOfDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
     }
@@ -683,7 +683,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Filter the entity of delete. (for extension) {not called if query-delete}
      * @param entity The entity for delete that has primary key. (NotNull)
-     * @param option The option of delete. (Nullable)
+     * @param option The option of delete. (NullAllowed)
      */
     protected void filterEntityOfDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
     }
@@ -691,7 +691,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Assert the entity of delete. (for extension) {not called if query-delete}
      * @param entity The entity for delete that has primary key. (NotNull)
-     * @param option The option of delete. (Nullable)
+     * @param option The option of delete. (NullAllowed)
      */
     protected void assertEntityOfDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
     }
@@ -714,7 +714,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * Assert that the query-delete is legal status.
      * @param cb The condition-bean for query-delete. (NotNull)
-     * @param option The option of delete. (Nullable)
+     * @param option The option of delete. (NullAllowed)
      */
     protected void assertQueryDeleteStatus(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
         if (option != null && option.isNonQueryDeleteAllowed()) {
@@ -970,7 +970,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                                            ========
     /**
      * Get the auto set-upper of common column.
-     * @return The auto set-upper of common column. (Nullable: But normally NotNull)
+     * @return The auto set-upper of common column. (NullAllowed: But normally NotNull)
      */
     protected CommonColumnAutoSetupper getCommonColumnAutoSetupper() {
         return _commonColumnAutoSetupper;

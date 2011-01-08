@@ -146,7 +146,7 @@ public interface Entity {
 
     /**
      * Build display string flexibly.
-     * @param name The name for display. (Nullable: If it's null, it does not have a name)
+     * @param name The name for display. (NullAllowed: If it's null, it does not have a name)
      * @param column Does it contains column values or not?
      * @param relation Does it contains relation existences or not?
      * @return The display string for this entity. (NotNull)

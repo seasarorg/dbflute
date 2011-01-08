@@ -149,7 +149,7 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
      * @param entity The entity for fixed values. (NotNull)
      * @param intoCB The condition-bean for insert into. (NotNull)
      * @param resourceCB The condition-bean for resource. (NotNull)
-     * @param option The option of insert. (Nullable)
+     * @param option The option of insert. (NullAllowed)
      * @param boundPropTypeList The type list of bound property. (NotNull, Empty)
      * @return The two-way SQL of query-insert. (NotNull)
      */

@@ -70,7 +70,7 @@ public class DerivedReferrerOption implements ParameterOption {
      * Set the value for coalesce function. <br />
      * If you set string value and the derived column is date type, it converts it to a date object internally.
      * For example, "2010-10-30 12:34:56.789", "2010/10/30" and so on ... are acceptable.
-     * @param coalesce An alternate value when group function returns null. (Nullable: if null, no coalesce)
+     * @param coalesce An alternate value when group function returns null. (NullAllowed: if null, no coalesce)
      * @return this. (NotNull)
      */
     public DerivedReferrerOption coalesce(Object coalesce) {
@@ -85,7 +85,7 @@ public class DerivedReferrerOption implements ParameterOption {
 
     /**
      * Set the value for round function.
-     * @param round Decimal digits or date format for round. (Nullable: if null, no round)
+     * @param round Decimal digits or date format for round. (NullAllowed: if null, no round)
      * @return this. (NotNull)
      */
     public DerivedReferrerOption round(Object round) {
@@ -100,7 +100,7 @@ public class DerivedReferrerOption implements ParameterOption {
 
     /**
      * Set the value for trunc function.
-     * @param trunc Decimal digits or date format for trunc. (Nullable: if null, no trunc)
+     * @param trunc Decimal digits or date format for trunc. (NullAllowed: if null, no trunc)
      * @return this. (NotNull)
      */
     public DerivedReferrerOption trunc(Object trunc) {

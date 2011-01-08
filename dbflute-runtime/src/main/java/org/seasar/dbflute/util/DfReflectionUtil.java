@@ -279,7 +279,7 @@ public class DfReflectionUtil {
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
      * @param argTypes The type of argument. (NotNull)
-     * @return The instance of method. (Nullable: if null, not found)
+     * @return The instance of method. (NullAllowed: if null, not found)
      */
     public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
@@ -292,7 +292,7 @@ public class DfReflectionUtil {
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
      * @param argTypes The type of argument. (NotNull)
-     * @return The instance of method. (Nullable: if null, not found)
+     * @return The instance of method. (NullAllowed: if null, not found)
      */
     public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
@@ -309,7 +309,7 @@ public class DfReflectionUtil {
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
      * @param argTypes The type of argument. (NotNull)
-     * @return The instance of method. (Nullable: if null, not found)
+     * @return The instance of method. (NullAllowed: if null, not found)
      */
     public static Method getWholeMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
@@ -356,9 +356,9 @@ public class DfReflectionUtil {
     /**
      * Invoke the method by reflection.
      * @param method The instance of method. (NotNull)
-     * @param target The invocation target instance. (Nullable: if null, it means static method)
-     * @param args The array of arguments. (Nullable)
-     * @return The return value of the method. (Nullable)
+     * @param target The invocation target instance. (NullAllowed: if null, it means static method)
+     * @param args The array of arguments. (NullAllowed)
+     * @return The return value of the method. (NullAllowed)
      * @throws ReflectionFailureException When invocation failure and illegal access
      */
     public static Object invoke(Method method, Object target, Object[] args) {

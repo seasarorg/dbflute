@@ -42,7 +42,7 @@ public interface TnBeanMetaData {
     /**
      * Get the property type by the key as case insensitive.
      * @param propertyName The name of property. (NotNull)
-     * @return The type of property. (Nullable)
+     * @return The type of property. (NullAllowed)
      */
     TnPropertyType getPropertyType(String propertyName);
 

@@ -309,8 +309,8 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                                                       =============
     /**
      * Filter the date as From. It requires this method is called before getFromDateConditionKey().
-     * @param fromDate The date as From. (Nullable: If the value is null, it returns null)
-     * @return The filtered date as From. (Nullable)
+     * @param fromDate The date as From. (NullAllowed: If the value is null, it returns null)
+     * @return The filtered date as From. (NullAllowed)
      */
     public Date filterFromDate(Date fromDate) {
         if (fromDate == null) {
@@ -341,8 +341,8 @@ public class FromToOption implements ConditionOption, Serializable {
 
     /**
      * Filter the date as To. It requires this method is called before getToDateConditionKey().
-     * @param toDate The date as To. (Nullable: If the value is null, it returns null)
-     * @return The filtered date as To. (Nullable)
+     * @param toDate The date as To. (NullAllowed: If the value is null, it returns null)
+     * @return The filtered date as To. (NullAllowed)
      */
     public Date filterToDate(Date toDate) {
         if (toDate == null) {

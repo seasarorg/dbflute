@@ -38,7 +38,7 @@ public class SimpleMapPmb<VALUE> implements MapParameterBean<VALUE>, Serializabl
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The map of parameter. (Nullable) */
+    /** The map of parameter. (NullAllowed) */
     protected Map<String, VALUE> _parameterMap;
 
     // ===================================================================================
@@ -55,7 +55,7 @@ public class SimpleMapPmb<VALUE> implements MapParameterBean<VALUE>, Serializabl
     /**
      * Add the parameter to the map.
      * @param key The key of parameter. (NotNull)
-     * @param value The value of parameter. (Nullable)
+     * @param value The value of parameter. (NullAllowed)
      */
     public void addParameter(String key, VALUE value) {
         initializeParameterMapIfNeeds();

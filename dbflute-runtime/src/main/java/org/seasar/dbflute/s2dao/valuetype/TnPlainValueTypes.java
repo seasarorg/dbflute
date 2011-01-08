@@ -143,8 +143,8 @@ public class TnPlainValueTypes {
     /**
      * Find a value type by a class type or an object instance. <br />
      * A class type is a prior searching key.
-     * @param type The type of class. (Nullable: if null, searching by instance)
-     * @param value The object value. (Nullable: if null, returns default object type)
+     * @param type The type of class. (NullAllowed: if null, searching by instance)
+     * @param value The object value. (NullAllowed: if null, returns default object type)
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public ValueType findByTypeOrValue(Class<?> type, Object value) {
@@ -158,8 +158,8 @@ public class TnPlainValueTypes {
     /**
      * Find a value type by an object instance or a definition type of JDBC. <br />
      * An object instance is a prior searching key.
-     * @param value The object value. (Nullable: if null, returns dynamic object type)
-     * @param jdbcDefType The definition type of JDBC. (Nullable: if null, searching by instance)
+     * @param value The object value. (NullAllowed: if null, returns dynamic object type)
+     * @param jdbcDefType The definition type of JDBC. (NullAllowed: if null, searching by instance)
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public ValueType findByValueOrJdbcDefType(Object value, int jdbcDefType) {
@@ -178,7 +178,7 @@ public class TnPlainValueTypes {
     //                                               -------
     /**
      * Get the value type by object instance.
-     * @param value The object value. (Nullable: if null, returns object type)
+     * @param value The object value. (NullAllowed: if null, returns object type)
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public ValueType getValueType(Object value) {
@@ -197,7 +197,7 @@ public class TnPlainValueTypes {
      * but only when the ENUM is assignable from the class type, interfaces are prior.
      * Because frequently the ENUM has application own interfaces.
      * Actually Classification of DBFlute matches the pattern.
-     * @param type The type of class. (Nullable: if null, returns object type)
+     * @param type The type of class. (NullAllowed: if null, returns object type)
      * @return The value type. (NotNull: if not found, returns object type)
      */
     public ValueType getValueType(Class<?> type) {
@@ -316,7 +316,7 @@ public class TnPlainValueTypes {
     //                                      ----------------
     /**
      * @param valueTypeName The name of value type. (NotNull)
-     * @return The value type. (Nullable)
+     * @return The value type. (NullAllowed)
      */
     public ValueType getPluginValueType(String valueTypeName) {
         assertObjectNotNull("valueTypeName", valueTypeName);

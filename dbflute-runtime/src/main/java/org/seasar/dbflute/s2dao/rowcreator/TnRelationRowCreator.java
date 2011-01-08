@@ -33,9 +33,9 @@ public interface TnRelationRowCreator {
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
      * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
-     * @param relKeyValues The map of relation key values. The key is relation column name. (Nullable)
+     * @param relKeyValues The map of relation key values. The key is relation column name. (NullAllowed)
      * @param relationPropertyCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
-     * @return Created relation row. (Nullable)
+     * @return Created relation row. (NullAllowed)
      * @throws SQLException
      */
     Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,

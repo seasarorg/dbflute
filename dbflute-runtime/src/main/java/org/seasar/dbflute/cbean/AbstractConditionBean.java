@@ -68,7 +68,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** Safety max result size. {Internal} */
     private int _safetyMaxResultSize;
 
-    /** The configuration of statement. {Internal} (Nullable) */
+    /** The configuration of statement. {Internal} (NullAllowed) */
     private StatementConfig _statementConfig;
 
     /** Is the count executed later? {Internal} */
@@ -77,13 +77,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** Can the paging re-select? {Internal} */
     private boolean _pagingReSelect = true;
 
-    /** The map for free parameters. {Internal} (Nullable) */
+    /** The map for free parameters. {Internal} (NullAllowed) */
     private Map<String, Object> _freeParameterMap;
 
-    /** The list of condition-bean for union. {Internal} (Nullable) */
+    /** The list of condition-bean for union. {Internal} (NullAllowed) */
     private List<ConditionBean> _unionCBeanList;
 
-    /** The synchronizer of union query. {Internal} (Nullable) */
+    /** The synchronizer of union query. {Internal} (NullAllowed) */
     private UnionQuery<ConditionBean> _unionQuerySynchronizer;
 
     // -----------------------------------------------------
@@ -206,7 +206,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * Get the condition-bean map for ColumnQuery. <br />
      * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery.
-     * @return The instance of the map. (Nullable)
+     * @return The instance of the map. (NullAllowed)
      */
     public Map<String, ConditionBean> getColQyCBMap() {
         return _colQyCBMap;

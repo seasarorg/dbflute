@@ -51,7 +51,7 @@ public class OutsideSqlContext {
 
     /**
      * Get outside-SQL context on thread.
-     * @return The context of outside-SQL. (Nullable)
+     * @return The context of outside-SQL. (NullAllowed)
      */
     public static OutsideSqlContext getOutsideSqlContextOnThread() {
         return (OutsideSqlContext) _threadLocal.get();
@@ -128,7 +128,7 @@ public class OutsideSqlContext {
     /** The provider of DB meta. (NotNull) */
     protected final DBMetaProvider _dbmetaProvider;
 
-    /** The package of outside-SQL. (Nullable: If null, use behavior package path) */
+    /** The package of outside-SQL. (NullAllowed: If null, use behavior package path) */
     protected final String _outsideSqlPackage;
 
     /** The path of outside-SQL. (The mark of specified outside-SQL) */
@@ -142,10 +142,10 @@ public class OutsideSqlContext {
 
     protected String _methodName;
 
-    /** The configuration of statement. (Nullable) */
+    /** The configuration of statement. (NullAllowed) */
     protected StatementConfig _statementConfig;
 
-    /** The DB name of table for using behavior-SQL-path. (Nullable) */
+    /** The DB name of table for using behavior-SQL-path. (NullAllowed) */
     protected String _tableDbName;
 
     // -----------------------------------------------------
@@ -172,7 +172,7 @@ public class OutsideSqlContext {
     //                                                                         ===========
     /**
      * @param dbmetaProvider The provider of DB meta. (NotNull)
-     * @param outsideSqlPackage The package of outside SQL. (Nullable: If null, use behavior package path)
+     * @param outsideSqlPackage The package of outside SQL. (NullAllowed: If null, use behavior package path)
      */
     public OutsideSqlContext(DBMetaProvider dbmetaProvider, String outsideSqlPackage) {
         if (dbmetaProvider == null) {

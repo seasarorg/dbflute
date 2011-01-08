@@ -51,7 +51,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     /** The factory of outside-SQL context. (NotNull) */
     protected final OutsideSqlContextFactory _outsideSqlContextFactory;
 
-    /** The filter of outside-SQL. (Nullable) */
+    /** The filter of outside-SQL. (NullAllowed) */
     protected final OutsideSqlFilter _outsideSqlFilter;
 
     /** The factory of outside-SQL executor. (NotNull) */
@@ -100,9 +100,9 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * <span style="color: #3F7E5E">-- +cursor+</span>
      * </pre>
      * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param handler The handler of cursor. (NotNull)
-     * @return The result object that the cursor handler returns. (Nullable)
+     * @return The result object that the cursor handler returns. (NullAllowed)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     public Object selectCursor(String path, PARAMETER_BEAN pmb, CursorHandler handler) {
@@ -138,7 +138,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * Invoke the command of behavior.
      * @param <RESULT> The type of result.
      * @param behaviorCommand The command of behavior. (NotNull)
-     * @return The instance of result. (Nullable)
+     * @return The instance of result. (NullAllowed)
      */
     protected <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
         return _behaviorCommandInvoker.invoke(behaviorCommand);
@@ -177,7 +177,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
 
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (Nullable)
+     * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
     public OutsideSqlCursorExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {

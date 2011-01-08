@@ -23,7 +23,7 @@ public interface ExtensionOperand {
 
     /**
      * Get the value of operand.
-     * @return The value of operand. (Nullable)
+     * @return The value of operand. (NullAllowed)
      */
     String operand();
 }

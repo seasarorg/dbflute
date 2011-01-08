@@ -42,7 +42,7 @@ public class TnProcedureCommand extends TnAbstractBasicSqlCommand {
     protected final TnProcedureMetaData _procedureMetaData;
     protected final TnProcedureResultSetHandlerFactory _procedureResultSetHandlerFactory;
 
-    /** The filter of outside-SQL. (Nullable) */
+    /** The filter of outside-SQL. (NullAllowed) */
     protected OutsideSqlFilter _outsideSqlFilter;
 
     // ===================================================================================

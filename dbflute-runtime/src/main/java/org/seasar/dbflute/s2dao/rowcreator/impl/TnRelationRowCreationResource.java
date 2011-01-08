@@ -81,7 +81,7 @@ public class TnRelationRowCreationResource {
     /** The backup of base suffix. The element type is String. */
     protected Stack<String> _relationSuffixBackup;
 
-    /** The map of select index. (Nullable) */
+    /** The map of select index. (NullAllowed) */
     protected Map<String, Integer> _selectIndexMap;
 
     // ===================================================================================

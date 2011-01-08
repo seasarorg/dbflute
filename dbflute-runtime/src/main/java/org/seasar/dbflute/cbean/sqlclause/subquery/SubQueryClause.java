@@ -27,7 +27,7 @@ public class SubQueryClause {
      * @param subQueryPath The property path of sub-query. (NotNull)
      * @param selectClause The select clause of sub-query. (NotNull)
      * @param subQuerySqlClause The SQL clause for sub-query. (NotNull)
-     * @param localAliasName The alias name of sub-query local table. (Nullable: if plain)
+     * @param localAliasName The alias name of sub-query local table. (NullAllowed: if plain)
      */
     public SubQueryClause(SubQueryPath subQueryPath, String selectClause, SqlClause subQuerySqlClause,
             String localAliasName) {

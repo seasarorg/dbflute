@@ -469,7 +469,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
         /**
          * Constructor for first step.
-         * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
+         * @param relationTraceFixHandler The handler of fixed relation trace. (NullAllowed)
          */
         public AbstractRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
             this(new ArrayList<RelationInfo>(), new ArrayList<AbstractRelationTrace>());
@@ -504,7 +504,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         /**
          * Fix trace.
          * @param traceRelationInfoList The trace of relation as the list of relation info. (NotNull)
-         * @param traceColumnInfo The trace of column as column info. (Nullable)
+         * @param traceColumnInfo The trace of column as column info. (NullAllowed)
          * @return Relation trace(result). (NotNull)
          */
         protected RelationTrace fixTrace(List<RelationInfo> traceRelationInfoList, ColumnInfo traceColumnInfo) {
