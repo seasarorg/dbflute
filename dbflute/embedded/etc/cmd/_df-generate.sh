@@ -1,5 +1,6 @@
 #!/bin/bash
 
+ANT_HOME=$DBFLUTE_HOME/ant
 NATIVE_PROPERTIES_PATH=$1
 
 sh $DBFLUTE_HOME/etc/cmd/_df-copy-properties.sh $NATIVE_PROPERTIES_PATH
