@@ -11,6 +11,7 @@ import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHandlingInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
@@ -35,7 +36,8 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     protected boolean _validTaskEndInformation = true;
     protected DfXlsDataHandlerImpl _xlsDataHandlerImpl;
     protected DfDelimiterDataHandlerImpl _delimiterDataHandlerImpl;
-    protected boolean _success = false;
+    protected boolean _success;
+    protected int _handledFileCount;
 
     // ===================================================================================
     //                                                                             Execute
@@ -57,7 +59,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         writeDbFromDelimiterFileAsLoadingTypeData("csv", ",");
         writeDbFromXlsAsLoadingTypeData();
         writeDbFromXlsAsLoadingTypeDataAdditional();
-        _success = true;
+        _success = true; // means no exception
     }
 
     @Override
@@ -106,6 +108,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         handlingInfo.setErrorContinue(true);
         final DfDelimiterDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
         showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
+        _handledFileCount = _handledFileCount + resultInfo.getHandledFileCount();
     }
 
     protected DfDelimiterDataHandlerImpl getDelimiterDataHandlerImpl() {
@@ -178,7 +181,8 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     protected void writeDbFromXls(String directoryPath) {
         final DfXlsDataHandler xlsDataHandler = getXlsDataHandlerImpl();
-        xlsDataHandler.writeSeveralData(directoryPath);
+        final DfXlsDataResultInfo resultInfo = xlsDataHandler.writeSeveralData(directoryPath);
+        _handledFileCount = _handledFileCount + resultInfo.getHandledFileCount();
     }
 
     protected DfXlsDataHandlerImpl getXlsDataHandlerImpl() {
@@ -227,7 +231,11 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
         final String detailMessage;
         if (_success) {
-            detailMessage = "o (all data was loaded)";
+            if (_handledFileCount > 0) {
+                detailMessage = "o (all data was loaded)";
+            } else {
+                detailMessage = "- (no data file)";
+            }
         } else {
             detailMessage = "x (failed: Look the exception message)";
             finalInfo.setFailure(true);

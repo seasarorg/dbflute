@@ -15,20 +15,15 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author jflute
  */
-public class DfDelimiterDataResultInfo {
+public class DfXlsDataResultInfo {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected int _handledFileCount;
-    protected final Map<String, Set<String>> _notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
 
     // ===================================================================================
     //                                                                            Accessor
@@ -39,9 +34,5 @@ public class DfDelimiterDataResultInfo {
 
     public void incrementHandledFileCount() {
         ++_handledFileCount;
-    }
-
-    public Map<String, Set<String>> getNotFoundColumnMap() {
-        return _notFoundColumnMap;
     }
 }

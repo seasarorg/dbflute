@@ -52,6 +52,7 @@ import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResultInfo;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**
@@ -94,7 +95,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
-    public void writeSeveralData(String dataDirectoryName) {
+    public DfXlsDataResultInfo writeSeveralData(String dataDirectoryName) {
+        final DfXlsDataResultInfo resultInfo = new DfXlsDataResultInfo();
         final List<File> xlsList = getXlsList(dataDirectoryName);
         for (File file : xlsList) {
             _log.info("");
@@ -108,7 +110,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             setupDefaultValue(dataDirectoryName, dataSet);
 
             doWriteDataSet(file, dataSet);
+            resultInfo.incrementHandledFileCount();
         }
+        return resultInfo;
     }
 
     protected void doWriteDataSet(File file, DfDataSet dataSet) {

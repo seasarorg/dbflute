@@ -27,7 +27,7 @@ public interface DfXlsDataHandler {
 
     List<DfDataSet> readSeveralData(String dataDirectoryName);
 
-    void writeSeveralData(String dataDirectoryName);
+    DfXlsDataResultInfo writeSeveralData(String dataDirectoryName);
 
     List<File> getXlsList(String dataDirectoryName);
 }

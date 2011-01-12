@@ -20,5 +20,5 @@ package org.seasar.dbflute.logic.replaceschema.loaddata;
  */
 public interface DfDelimiterDataHandler {
 
-    public DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataSeveralHandlingInfo info);
+    DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataSeveralHandlingInfo info);
 }

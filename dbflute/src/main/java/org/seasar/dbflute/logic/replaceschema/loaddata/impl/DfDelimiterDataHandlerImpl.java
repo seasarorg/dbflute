@@ -20,7 +20,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -64,8 +63,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     //                                                                                ====
     public DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataSeveralHandlingInfo info) {
         final DfDelimiterDataResultInfo resultInfo = new DfDelimiterDataResultInfo();
-        final Map<String, Set<String>> notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
-        resultInfo.setNotFoundColumnMap(notFoundColumnMap);
+        final Map<String, Set<String>> notFoundColumnMap = resultInfo.getNotFoundColumnMap();
         final File baseDir = new File(info.getBasePath());
         final String[] dataDirectoryElements = baseDir.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -112,6 +110,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setSuppressBatchUpdate(isSuppressBatchUpdate());
                     writer.setDataWritingInterceptor(_dataWritingInterceptor);
                     writer.writeData(notFoundColumnMap);
+                    resultInfo.incrementHandledFileCount();
                 }
             }
         } catch (IOException e) {
