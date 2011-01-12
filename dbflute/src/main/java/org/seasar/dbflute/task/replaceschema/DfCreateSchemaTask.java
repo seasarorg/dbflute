@@ -33,6 +33,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory.InitializeType;
@@ -545,6 +546,14 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 _log.info(msg);
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Final Info
+    //                                                                          ==========
+    @Override
+    protected DfLoadDataFinalInfo getLoadDataFinalInfo() {
+        return null; // means it does not executed yet
     }
 
     // ===================================================================================

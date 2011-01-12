@@ -6,20 +6,29 @@ package org.seasar.dbflute.logic.replaceschema.finalinfo;
 public class DfReplaceSchemaFinalInfo {
 
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
+    protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
 
     public DfReplaceSchemaFinalInfo(DfCreateSchemaFinalInfo createSchemaFinalInfo,
-            DfTakeFinallyFinalInfo takeFinallyFinalInfo) {
+            DfLoadDataFinalInfo loadDataFinalInfo, DfTakeFinallyFinalInfo takeFinallyFinalInfo) {
         _createSchemaFinalInfo = createSchemaFinalInfo;
+        _loadDataFinalInfo = loadDataFinalInfo;
         _takeFinallyFinalInfo = takeFinallyFinalInfo;
     }
 
     public boolean hasFailure() {
-        return isCreateSchemaFailure() || isTakeFinallyFailure();
+        return isCreateSchemaFailure() || isLoadDataFailure() || isTakeFinallyFailure();
     }
 
     public boolean isCreateSchemaFailure() {
         if (_createSchemaFinalInfo != null && _createSchemaFinalInfo.isFailure()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isLoadDataFailure() {
+        if (_loadDataFinalInfo != null && _loadDataFinalInfo.isFailure()) {
             return true;
         }
         return false;
@@ -34,6 +43,10 @@ public class DfReplaceSchemaFinalInfo {
 
     public DfCreateSchemaFinalInfo getCreateSchemaFinalInfo() {
         return _createSchemaFinalInfo;
+    }
+
+    public DfLoadDataFinalInfo getLoadDataFinalInfo() {
+        return _loadDataFinalInfo;
     }
 
     public DfTakeFinallyFinalInfo getTakeFinallyFinalInfo() {

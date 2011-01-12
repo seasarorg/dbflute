@@ -15,6 +15,7 @@ import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
@@ -84,11 +85,23 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
 
     protected DfReplaceSchemaFinalInfo createReplaceSchemaFinalInfo() {
         final DfCreateSchemaFinalInfo createSchemaFinalInfo = extractCreateSchemaFinalInfo();
-        final DfTakeFinallyFinalInfo takeFinallyFinalInfo = getTakeFinallyFireResult();
-        return new DfReplaceSchemaFinalInfo(createSchemaFinalInfo, takeFinallyFinalInfo);
+        final DfLoadDataFinalInfo loadDataFinalInfo = getLoadDataFinalInfo();
+        final DfTakeFinallyFinalInfo takeFinallyFinalInfo = getTakeFinallyFinalInfo();
+        return new DfReplaceSchemaFinalInfo(createSchemaFinalInfo, loadDataFinalInfo, takeFinallyFinalInfo);
     }
 
-    protected DfTakeFinallyFinalInfo getTakeFinallyFireResult() {
+    protected DfLoadDataFinalInfo getLoadDataFinalInfo() { // should be overridden as null if create-schema
+        final DfLoadDataFinalInfo finalInfo = new DfLoadDataFinalInfo();
+        finalInfo.setResultMessage("{LoadData}");
+        setupLoadDataFinalInfoDetail(finalInfo);
+        return finalInfo;
+    }
+
+    protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
+        // should be overridden if load-data and take-finally
+    }
+
+    protected DfTakeFinallyFinalInfo getTakeFinallyFinalInfo() {
         return null; // as default (should be overridden if take-finally)
     }
 
@@ -185,6 +198,14 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
         }
 
         // *Load Data does not exist because loading data is not continued if it causes an error
+        final DfLoadDataFinalInfo loadDataFinalInfo = replaceSchemaFinalInfo.getLoadDataFinalInfo();
+        if (loadDataFinalInfo != null) {
+            if (firstDone) {
+                sb.append(ln()).append(ln());
+            }
+            firstDone = true;
+            buildSchemaTaskContents(sb, loadDataFinalInfo);
+        }
 
         // Take Finally
         final DfTakeFinallyFinalInfo takeFinallyFinalInfo = replaceSchemaFinalInfo.getTakeFinallyFinalInfo();

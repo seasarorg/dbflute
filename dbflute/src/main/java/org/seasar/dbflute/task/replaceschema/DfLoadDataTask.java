@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHandlingInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
@@ -34,6 +35,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     protected boolean _validTaskEndInformation = true;
     protected DfXlsDataHandlerImpl _xlsDataHandlerImpl;
     protected DfDelimiterDataHandlerImpl _delimiterDataHandlerImpl;
+    protected boolean _success = false;
 
     // ===================================================================================
     //                                                                             Execute
@@ -55,6 +57,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         writeDbFromDelimiterFileAsLoadingTypeData("csv", ",");
         writeDbFromXlsAsLoadingTypeData();
         writeDbFromXlsAsLoadingTypeDataAdditional();
+        _success = true;
     }
 
     @Override
@@ -215,6 +218,21 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 
     protected String doGetLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
         return getMyProperties().getLoadingTypeDataDirectoryPath(dir, envType, typeName);
+    }
+
+    // ===================================================================================
+    //                                                                          Final Info
+    //                                                                          ==========
+    @Override
+    protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
+        final String detailMessage;
+        if (_success) {
+            detailMessage = "o (all data was loaded)";
+        } else {
+            detailMessage = "x (failed: Look the exception message)";
+            finalInfo.setFailure(true);
+        }
+        finalInfo.addDetailMessage(detailMessage);
     }
 
     // ===================================================================================
