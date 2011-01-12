@@ -360,7 +360,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
         // because load-data stops if it fails
         // (this task is going, means all data was loaded)
-        finalInfo.addDetailMessage("o (all data was loaded)");
+        finalInfo.addDetailMessage("o (succeeded)");
     }
 
     @Override

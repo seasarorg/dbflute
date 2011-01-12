@@ -231,8 +231,10 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
         final String detailMessage;
         if (_success) {
+            // only when validTaskEndInformation is true
+            // (means an independent execution)
             if (_handledFileCount > 0) {
-                detailMessage = "o (all data was loaded)";
+                detailMessage = "o (succeeded)";
             } else {
                 detailMessage = "- (no data file)";
             }
