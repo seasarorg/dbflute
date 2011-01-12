@@ -119,7 +119,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void doWriteDataTable(File file, DfDataTable dataTable) {
-        final String tableName = dataTable.getTableName();
+        final String tableName = dataTable.getTableDbName();
         if (dataTable.getRowSize() == 0) {
             _log.info("*Not found row at the table: " + tableName);
             return;
@@ -129,13 +129,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final Map<String, DfColumnMetaInfo> columnMap = getColumnInfoMap(tableName);
 
         // process before handling table
-        beforeHandlingTable(dataTable.getTableName(), columnMap);
+        beforeHandlingTable(dataTable.getTableDbName(), columnMap);
 
         // set up columnNameList
         final List<String> columnNameList = new ArrayList<String>();
         for (int j = 0; j < dataTable.getColumnSize(); j++) {
             final DfDataColumn dataColumn = dataTable.getColumn(j);
-            final String columnName = dataColumn.getColumnName();
+            final String columnName = dataColumn.getColumnDbName();
             columnNameList.add(columnName);
         }
 
@@ -180,7 +180,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 }
             }
             // process after (finally) handling table
-            finallyHandlingTable(dataTable.getTableName(), columnMap);
+            finallyHandlingTable(dataTable.getTableDbName(), columnMap);
         }
     }
 
@@ -227,7 +227,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
             Map<String, DfColumnMetaInfo> columnMetaInfoMap, List<String> columnNameList, Connection conn,
             PreparedStatement ps) throws SQLException {
-        final String tableName = dataTable.getTableName();
+        final String tableName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
         final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
@@ -322,12 +322,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     protected void filterValidColumn(final DfDataSet dataSet) {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable table = dataSet.getTable(i);
-            final String tableName = table.getTableName();
+            final String tableName = table.getTableDbName();
 
             final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnInfoMap(tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DfDataColumn dataColumn = table.getColumn(j);
-                if (!metaInfoMap.containsKey(dataColumn.getColumnName())) {
+                if (!metaInfoMap.containsKey(dataColumn.getColumnDbName())) {
                     dataColumn.setWritable(false);
                 }
             }
@@ -342,7 +342,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable table = dataSet.getTable(i);
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
-            final String tableName = table.getTableName();
+            final String tableName = table.getTableDbName();
 
             final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnInfoMap(tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
@@ -443,7 +443,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 continue;
             }
             final Object value = dataRow.getValue(i);
-            final String columnName = dataColumn.getColumnName();
+            final String columnName = dataColumn.getColumnDbName();
             container.addColumnValue(columnName, value);
             container.addColumnObject(columnName, dataColumn);
         }

@@ -16,13 +16,12 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public abstract class DfDtsAbstractRowState implements DfDtsRowState {
 
-    /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfDtsAbstractRowState.class);
 
     DfDtsAbstractRowState() {
@@ -34,7 +33,7 @@ public abstract class DfDtsAbstractRowState implements DfDtsRowState {
     }
 
     protected void execute(DataSource dataSource, String sql, Object[] args, Class<?>[] argTypes, DfDataRow row) {
-        final String tableName = row.getTable().getTableName();
+        final String tableName = row.getTable().getTableDbName();
         final Connection conn = getConnection(dataSource);
         try {
             final PreparedStatement ps = prepareStatement(conn, sql);
@@ -152,6 +151,10 @@ public abstract class DfDtsAbstractRowState implements DfDtsRowState {
     }
 
     protected abstract DfDtsSqlContext getSqlContext(DfDataRow row);
+
+    protected DfDtsSqlContext createDtsSqlContext(String sql, List<Object> argList, List<Class<?>> argTypeList) {
+        return new DfDtsSqlContext(sql, argList.toArray(), argTypeList.toArray(new Class[] {}));
+    }
 
     private static Connection getConnection(DataSource dataSource) {
         try {

@@ -47,7 +47,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class DfXlsReader {
@@ -219,7 +219,7 @@ public class DfXlsReader {
                 cell = row.getCell(i);
                 value = getValue(i, cell, table);
                 column = table.getColumn(i);
-                final String columnName = column.getColumnName();
+                final String columnName = column.getColumnDbName();
                 try {
                     dataRow.addValue(columnName, value);
                 } catch (NumberFormatException e) {
@@ -244,9 +244,9 @@ public class DfXlsReader {
         msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
         msg = msg + "Failed to handling the cell value!" + ln();
         msg = msg + ln();
-        msg = msg + "[Table]" + ln() + table.getTableName() + ln();
+        msg = msg + "[Table]" + ln() + table.getTableDbName() + ln();
         msg = msg + ln();
-        msg = msg + "[Column]" + ln() + (column != null ? column.getColumnName() : null) + ln();
+        msg = msg + "[Column]" + ln() + (column != null ? column.getColumnDbName() : null) + ln();
         msg = msg + ln();
         msg = msg + "[Row Number]" + ln() + row.getRowNum() + ln();
         msg = msg + ln();
@@ -345,13 +345,13 @@ public class DfXlsReader {
     }
 
     public boolean isNotTrimTarget(HSSFCell cell, DfDataTable table) {
-        final String tableName = table.getTableName();
+        final String tableName = table.getTableDbName();
         if (!_notTrimTableColumnMap.containsKey(tableName)) {
             return false;
         }
         final List<String> notTrimTargetColumnList = _notTrimTableColumnMap.get(tableName);
         final DfDataColumn column = table.getColumn(cell.getColumnIndex());
-        final String targetColumnName = column.getColumnName();
+        final String targetColumnName = column.getColumnDbName();
         for (String currentColumnName : notTrimTargetColumnList) {
             if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
                 return true;
@@ -361,13 +361,13 @@ public class DfXlsReader {
     }
 
     public boolean isEmptyStringTarget(int columnIndex, DfDataTable table) {
-        final String tableName = table.getTableName();
+        final String tableName = table.getTableDbName();
         if (!_emptyStringTableColumnMap.containsKey(tableName)) {
             return false;
         }
         final List<String> emptyStringTargetColumnList = _emptyStringTableColumnMap.get(tableName);
         final DfDataColumn column = table.getColumn(columnIndex);
-        final String targetColumnName = column.getColumnName();
+        final String targetColumnName = column.getColumnDbName();
         for (String currentColumnName : emptyStringTargetColumnList) {
             if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
                 return true;

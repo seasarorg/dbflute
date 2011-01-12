@@ -13,7 +13,7 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.states.DfDtsRowState;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */

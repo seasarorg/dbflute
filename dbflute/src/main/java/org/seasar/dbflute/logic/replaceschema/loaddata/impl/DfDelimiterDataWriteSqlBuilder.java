@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -39,11 +41,13 @@ public class DfDelimiterDataWriteSqlBuilder {
         final Map<String, String> columnValueMap = createBasicColumnValueMap();
         final StringBuilder sb = new StringBuilder();
         final StringBuilder sbValues = new StringBuilder();
-        for (String columnName : columnValueMap.keySet()) {
-            sb.append(", ").append(columnName);
+        for (String columnDbName : columnValueMap.keySet()) {
+            final String columnSqlName = quoteColumnNameIfNeeds(columnDbName);
+            sb.append(", ").append(columnSqlName);
             sbValues.append(", ?");
         }
-        sb.delete(0, ", ".length()).insert(0, "insert into " + _tableName + " (").append(")");
+        final String tableSqlName = quoteTableNameIfNeeds(_tableName);
+        sb.delete(0, ", ".length()).insert(0, "insert into " + tableSqlName + " (").append(")");
         sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
         sb.append(sbValues);
         return sb.toString();
@@ -51,6 +55,16 @@ public class DfDelimiterDataWriteSqlBuilder {
 
     public Map<String, Object> setupParameter() {
         return resolveColumnValueMap(createBasicColumnValueMap());
+    }
+
+    protected String quoteTableNameIfNeeds(String tableDbName) {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return prop.quoteTableNameIfNeeds(tableDbName, true);
+    }
+
+    protected String quoteColumnNameIfNeeds(String columnDbName) {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return prop.quoteColumnNameIfNeeds(columnDbName, true);
     }
 
     // ===================================================================================

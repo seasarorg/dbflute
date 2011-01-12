@@ -1,9 +1,11 @@
 package org.seasar.dbflute.helper.dataset;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
@@ -12,74 +14,79 @@ public class DfDataColumn {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String columnName;
-    private DfDtsColumnType columnType;
-    private int columnIndex;
-    private boolean primaryKey = false;
-    private boolean writable = true;
-    private String formatPattern;
+    private final String _columnDbName;
+    private DfDtsColumnType _columnType; // can be overridden
+    private int _columnIndex; // can be overridden
+    private boolean _primaryKey = false;
+    private boolean _writable = true;
+    private String _formatPattern;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataColumn(String columnName, DfDtsColumnType columnType, int columnIndex) {
-        setColumnName(columnName);
-        setColumnType(columnType);
-        setColumnIndex(columnIndex);
+    public DfDataColumn(String columnDbName, DfDtsColumnType columnType, int columnIndex) {
+        this._columnDbName = columnDbName;
+        this._columnType = columnType;
+        this._columnIndex = columnIndex;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getColumnName() {
-        return columnName;
+    public String getColumnDbName() {
+        return _columnDbName;
     }
 
-    private void setColumnName(String columnName) {
-        this.columnName = columnName;
+    public String getColumnSqlName() {
+        return quoteColumnNameIfNeeds(_columnDbName);
+    }
+
+    protected String quoteColumnNameIfNeeds(String columnDbName) {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return prop.quoteColumnNameIfNeeds(columnDbName, true);
     }
 
     public DfDtsColumnType getColumnType() {
-        return columnType;
+        return _columnType;
     }
 
     public void setColumnType(DfDtsColumnType columnType) {
-        this.columnType = columnType;
+        this._columnType = columnType;
     }
 
     public int getColumnIndex() {
-        return columnIndex;
+        return _columnIndex;
     }
 
-    private void setColumnIndex(int columnIndex) {
-        this.columnIndex = columnIndex;
+    public void setColumnIndex(int columnIndex) {
+        this._columnIndex = columnIndex;
     }
 
     public boolean isPrimaryKey() {
-        return primaryKey;
+        return _primaryKey;
     }
 
     public void setPrimaryKey(boolean primaryKey) {
-        this.primaryKey = primaryKey;
+        this._primaryKey = primaryKey;
     }
 
     public boolean isWritable() {
-        return writable;
+        return _writable;
     }
 
     public void setWritable(boolean writable) {
-        this.writable = writable;
+        this._writable = writable;
     }
 
     public String getFormatPattern() {
-        return formatPattern;
+        return _formatPattern;
     }
 
     public void setFormatPattern(String formatPattern) {
-        this.formatPattern = formatPattern;
+        this._formatPattern = formatPattern;
     }
 
     public Object convert(Object value) {
-        return columnType.convert(value, formatPattern);
+        return _columnType.convert(value, _formatPattern);
     }
 }

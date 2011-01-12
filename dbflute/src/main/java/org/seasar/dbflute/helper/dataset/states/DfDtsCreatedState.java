@@ -8,43 +8,43 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsCreatedState extends DfDtsAbstractRowState {
 
+    @Override
     public String toString() {
         return "CREATED";
     }
 
     protected DfDtsSqlContext getSqlContext(DfDataRow row) {
-        DfDataTable table = row.getTable();
-        StringBuffer buf = new StringBuffer(100);
-        List<Object> argList = new ArrayList<Object>();
-        List<Class<?>> argTypeList = new ArrayList<Class<?>>();
-        buf.append("insert into ");
-        buf.append(table.getTableName());
-        buf.append(" (");
+        final DfDataTable table = row.getTable();
+        final StringBuffer sb = new StringBuffer(100);
+        final List<Object> argList = new ArrayList<Object>();
+        final List<Class<?>> argTypeList = new ArrayList<Class<?>>();
+        sb.append("insert into ");
+        sb.append(table.getTableSqlName());
+        sb.append(" (");
         int writableColumnSize = 0;
         for (int i = 0; i < table.getColumnSize(); ++i) {
-            DfDataColumn column = table.getColumn(i);
+            final DfDataColumn column = table.getColumn(i);
             if (column.isWritable()) {
                 ++writableColumnSize;
-                buf.append(column.getColumnName());
-                buf.append(", ");
+                sb.append(column.getColumnSqlName());
+                sb.append(", ");
                 argList.add(row.getValue(i));
                 argTypeList.add(column.getColumnType().getType());
             }
         }
-        buf.setLength(buf.length() - 2);
-        buf.append(") values (");
+        sb.setLength(sb.length() - 2);
+        sb.append(") values (");
         for (int i = 0; i < writableColumnSize; ++i) {
-            buf.append("?, ");
+            sb.append("?, ");
         }
-        buf.setLength(buf.length() - 2);
-        buf.append(")");
-        return new DfDtsSqlContext(buf.toString(), argList.toArray(), argTypeList
-                .toArray(new Class[argTypeList.size()]));
+        sb.setLength(sb.length() - 2);
+        sb.append(")");
+        return createDtsSqlContext(sb.toString(), argList, argTypeList);
     }
 }

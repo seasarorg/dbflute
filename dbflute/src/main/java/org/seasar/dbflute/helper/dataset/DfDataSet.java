@@ -7,7 +7,7 @@ import java.util.Map;
 import org.seasar.dbflute.helper.StringKeyMap;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
@@ -33,7 +33,7 @@ public class DfDataSet {
     }
 
     public String getTableName(int index) {
-        return getTable(index).getTableName();
+        return getTable(index).getTableDbName();
     }
 
     public DfDataTable getTable(int index) {
@@ -58,7 +58,7 @@ public class DfDataSet {
     }
 
     public DfDataTable addTable(DfDataTable table) {
-        _tableMap.put(table.getTableName(), table);
+        _tableMap.put(table.getTableDbName(), table);
         _tableList.add(table);
         return table;
     }

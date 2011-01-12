@@ -8,35 +8,35 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsRemovedState extends DfDtsAbstractRowState {
 
+    @Override
     public String toString() {
         return "REMOVED";
     }
 
     protected DfDtsSqlContext getSqlContext(DfDataRow row) {
-        DfDataTable table = row.getTable();
-        StringBuffer buf = new StringBuffer(100);
-        List<Object> argList = new ArrayList<Object>();
-        List<Class<?>> argTypeList = new ArrayList<Class<?>>();
-        buf.append("delete from ");
-        buf.append(table.getTableName());
-        buf.append(" where ");
+        final DfDataTable table = row.getTable();
+        final StringBuffer sb = new StringBuffer(100);
+        final List<Object> argList = new ArrayList<Object>();
+        final List<Class<?>> argTypeList = new ArrayList<Class<?>>();
+        sb.append("delete from ");
+        sb.append(table.getTableSqlName());
+        sb.append(" where ");
         for (int i = 0; i < table.getColumnSize(); ++i) {
-            DfDataColumn column = table.getColumn(i);
+            final DfDataColumn column = table.getColumn(i);
             if (column.isPrimaryKey()) {
-                buf.append(column.getColumnName());
-                buf.append(" = ? and ");
+                sb.append(column.getColumnSqlName());
+                sb.append(" = ? and ");
                 argList.add(row.getValue(i));
                 argTypeList.add(column.getColumnType().getType());
             }
         }
-        buf.setLength(buf.length() - 5);
-        return new DfDtsSqlContext(buf.toString(), argList.toArray(), argTypeList
-                .toArray(new Class[argTypeList.size()]));
+        sb.setLength(sb.length() - 5);
+        return createDtsSqlContext(sb.toString(), argList, argTypeList);
     }
 }

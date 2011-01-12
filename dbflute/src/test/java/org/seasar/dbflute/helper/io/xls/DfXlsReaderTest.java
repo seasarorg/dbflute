@@ -60,17 +60,17 @@ public class DfXlsReaderTest extends PlainTestCase {
                 final DfDataRow dataRow = dataTable.getRow(j);
                 for (int k = 0; k < columnSize; k++) {
                     final DfDataColumn dataColumn = dataTable.getColumn(k);
-                    final Object value = dataRow.getValue(dataColumn.getColumnName());
-                    if (dataColumn.getColumnName().equals("AAA")) {
+                    final Object value = dataRow.getValue(dataColumn.getColumnDbName());
+                    if (dataColumn.getColumnDbName().equals("AAA")) {
                         assertNotNull(value);
-                    } else if (dataColumn.getColumnName().equals("BBB")) {
+                    } else if (dataColumn.getColumnDbName().equals("BBB")) {
                         existsNull = true;
-                    } else if (dataColumn.getColumnName().equals("CCC")) {
+                    } else if (dataColumn.getColumnDbName().equals("CCC")) {
                         assertNotNull(value);
-                    } else if (dataColumn.getColumnName().equals("DDD")) {
+                    } else if (dataColumn.getColumnDbName().equals("DDD")) {
                         assertNotNull(value);
                         assertEquals(((String) value).length(), ((String) value).trim().length());
-                    } else if (dataColumn.getColumnName().equals("EEE")) {
+                    } else if (dataColumn.getColumnDbName().equals("EEE")) {
                         assertNotNull(value);
                         String str = (String) value;
                         if (str.startsWith("\"") && str.endsWith("\"")) {

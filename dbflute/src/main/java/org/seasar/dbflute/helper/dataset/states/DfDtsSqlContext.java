@@ -1,48 +1,31 @@
 package org.seasar.dbflute.helper.dataset.states;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsSqlContext {
 
-    private String sql;
-
-    private Object[] args;
-
-    private Class<?>[] argTypes;
-
-    public DfDtsSqlContext() {
-    }
+    private String _sql;
+    private Object[] _args;
+    private Class<?>[] _argTypes;
 
     public DfDtsSqlContext(String sql, Object[] args, Class<?>[] argTypes) {
-        setSql(sql);
-        setArgs(args);
-        setArgTypes(argTypes);
+        _sql = sql;
+        _args = args;
+        _argTypes = argTypes;
     }
 
     public Object[] getArgs() {
-        return args;
-    }
-
-    public void setArgs(Object[] args) {
-        this.args = args;
+        return _args;
     }
 
     public Class<?>[] getArgTypes() {
-        return argTypes;
-    }
-
-    public void setArgTypes(Class<?>[] argTypes) {
-        this.argTypes = argTypes;
+        return _argTypes;
     }
 
     public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
+        return _sql;
     }
 }

@@ -13,7 +13,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
@@ -55,7 +55,7 @@ public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
     }
 
     private void setIdentityInsert(final DfDataTable dataTable, final String command) {
-        final String sql = "SET IDENTITY_INSERT " + dataTable.getTableName() + " " + command;
+        final String sql = "SET IDENTITY_INSERT " + dataTable.getTableDbName() + " " + command;
         if (_log.isDebugEnabled()) {
             _log.debug(sql);
         }
@@ -80,7 +80,7 @@ public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
     }
 
     private boolean hasIdentityColumn(final DfDataTable dataTable) {
-        final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableName() + "') AS IDENT_CURRENT";
+        final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableDbName() + "') AS IDENT_CURRENT";
         final Connection conn = getConnection(getDataSource());
         Statement stmt = null;
         ResultSet rs = null;

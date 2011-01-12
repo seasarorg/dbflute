@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.states.DfDtsRowStates;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
@@ -18,9 +19,10 @@ import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
- * {Refers to S2Container and Extends it}
+ * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
@@ -29,18 +31,18 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String _tableName;
-    private Map<String, DfDataColumn> _columnMap = StringKeyMap.createAsFlexibleOrdered();
-    private List<DfDataColumn> _columnList = new ArrayList<DfDataColumn>();
-    private List<DfDataRow> _rows = new ArrayList<DfDataRow>();
-    private List<DfDataRow> _removedRows = new ArrayList<DfDataRow>();
+    private final String _tableDbName;
+    private final Map<String, DfDataColumn> _columnMap = StringKeyMap.createAsFlexibleOrdered();
+    private final List<DfDataColumn> _columnList = new ArrayList<DfDataColumn>();
+    private final List<DfDataRow> _rows = new ArrayList<DfDataRow>();
+    private final List<DfDataRow> _removedRows = new ArrayList<DfDataRow>();
     private boolean _hasMetaData = false;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfDataTable(String tableName) {
-        setTableName(tableName);
+        _tableDbName = tableName;
     }
 
     // ===================================================================================
@@ -55,7 +57,7 @@ public class DfDataTable {
     }
 
     public DfDataRow addRow() {
-        DfDataRow row = new DfDataRow(this);
+        final DfDataRow row = new DfDataRow(this);
         _rows.add(row);
         row.setState(DfDtsRowStates.CREATED);
         return row;
@@ -71,7 +73,7 @@ public class DfDataTable {
 
     public DfDataRow[] removeRows() {
         for (int i = 0; i < _rows.size();) {
-            DfDataRow row = getRow(i);
+            final DfDataRow row = getRow(i);
             if (row.getState().equals(DfDtsRowStates.REMOVED)) {
                 _removedRows.add(row);
                 _rows.remove(i);
@@ -91,10 +93,10 @@ public class DfDataTable {
     }
 
     public DfDataColumn getColumn(String columnName) {
-        DfDataColumn column = getColumn0(columnName);
+        final DfDataColumn column = getColumn0(columnName);
         if (column == null) {
             String msg = "The column was not found in the table: ";
-            msg = msg + " tableName=" + _tableName + " columnName=" + columnName;
+            msg = msg + " tableName=" + _tableDbName + " columnName=" + columnName;
             throw new IllegalStateException(msg);
         }
         return column;
@@ -109,7 +111,7 @@ public class DfDataTable {
     }
 
     public String getColumnName(int index) {
-        return getColumn(index).getColumnName();
+        return getColumn(index).getColumnDbName();
     }
 
     public DfDtsColumnType getColumnType(int index) {
@@ -125,7 +127,7 @@ public class DfDataTable {
     }
 
     public DfDataColumn addColumn(String columnName, DfDtsColumnType columnType) {
-        DfDataColumn column = new DfDataColumn(columnName, columnType, _columnMap.size());
+        final DfDataColumn column = new DfDataColumn(columnName, columnType, _columnMap.size());
         _columnMap.put(columnName, column);
         _columnList.add(column);
         return column;
@@ -140,12 +142,12 @@ public class DfDataTable {
         final Set<String> primaryKeySet = getPrimaryKeySet(metaData, unifiedSchema);
         for (int i = 0; i < getColumnSize(); ++i) {
             final DfDataColumn column = getColumn(i);
-            if (primaryKeySet.contains(column.getColumnName())) {
+            if (primaryKeySet.contains(column.getColumnDbName())) {
                 column.setPrimaryKey(true);
             } else {
                 column.setPrimaryKey(false);
             }
-            final DfColumnMetaInfo metaInfo = metaMap.get(column.getColumnName());
+            final DfColumnMetaInfo metaInfo = metaMap.get(column.getColumnDbName());
             if (metaInfo != null) {
                 column.setWritable(true);
                 final int jdbcDefValue = metaInfo.getJdbcDefValue();
@@ -162,8 +164,8 @@ public class DfDataTable {
     //                                                                       =============
     protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
-        final List<DfColumnMetaInfo> metaList = new DfColumnHandler()
-                .getColumnList(metaData, unifiedSchema, _tableName);
+        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumnList(metaData, unifiedSchema,
+                _tableDbName);
         final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : metaList) {
             metaMap.put(metaInfo.getColumnName(), metaInfo);
@@ -174,11 +176,11 @@ public class DfDataTable {
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) {
         try {
             final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyHandler().getPrimaryKey(metaData, unifiedSchema,
-                    _tableName);
+                    _tableDbName);
             final List<String> list = pkInfo.getPrimaryKeyList();
             return new HashSet<String>(list);
         } catch (SQLException e) {
-            String msg = "SQLException occured: unifiedSchema=" + unifiedSchema + " tableName=" + _tableName;
+            String msg = "SQLException occured: unifiedSchema=" + unifiedSchema + " tableName=" + _tableDbName;
             throw new IllegalStateException(msg);
         }
     }
@@ -186,23 +188,25 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer(100);
-        buf.append(_tableName);
-        buf.append(":");
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append(_tableDbName);
+        sb.append(":");
         for (int i = 0; i < _columnMap.size(); ++i) {
-            buf.append(getColumnName(i));
-            buf.append(", ");
+            sb.append(getColumnName(i));
+            sb.append(", ");
         }
-        buf.setLength(buf.length() - 2);
-        buf.append("\n");
+        sb.setLength(sb.length() - 2);
+        sb.append("\n");
         for (int i = 0; i < _rows.size(); ++i) {
-            buf.append(getRow(i) + "\n");
+            sb.append(getRow(i) + "\n");
         }
-        buf.setLength(buf.length() - 1);
-        return buf.toString();
+        sb.setLength(sb.length() - 1);
+        return sb.toString();
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -210,7 +214,7 @@ public class DfDataTable {
         if (!(o instanceof DfDataTable)) {
             return false;
         }
-        DfDataTable other = (DfDataTable) o;
+        final DfDataTable other = (DfDataTable) o;
         if (getRowSize() != other.getRowSize()) {
             return false;
         }
@@ -233,11 +237,16 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getTableName() {
-        return _tableName;
+    public String getTableDbName() {
+        return _tableDbName;
     }
 
-    public void setTableName(String tableName) {
-        this._tableName = tableName;
+    public String getTableSqlName() {
+        return quoteTableNameIfNeeds(_tableDbName);
+    }
+
+    protected String quoteTableNameIfNeeds(String tableDbName) {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return prop.quoteTableNameIfNeeds(tableDbName, true);
     }
 }

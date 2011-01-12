@@ -107,7 +107,7 @@ public class DfDataXlsTemplateHandlerTest extends PlainTestCase {
                 final DfDataRow dataRow = dataTable.getRow(j);
                 for (int k = 0; k < columnSize; k++) {
                     final DfDataColumn dataColumn = dataTable.getColumn(k);
-                    final String columnName = dataColumn.getColumnName();
+                    final String columnName = dataColumn.getColumnDbName();
                     final Object value = dataRow.getValue(columnName);
                     assertNotNull(value);
                     log(columnName + " = " + value);
