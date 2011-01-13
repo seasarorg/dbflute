@@ -31,6 +31,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -299,20 +300,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
 
     protected ResultSet extractUniqueKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, boolean retry) throws SQLException {
-        try {
-            final boolean uniqueKeyOnly = true;
-            final String catalogName = unifiedSchema.getPureCatalog();
-            final String schemaName = unifiedSchema.getPureSchema();
-            return metaData.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
-        } catch (SQLException e) {
-            if (retry) {
-                // because the exception may be thrown when the table is not found
-                // (for example, Sybase)
-                return null;
-            } else {
-                throw e;
-            }
-        }
+        final boolean uniqueKeyOnly = true;
+        final DfBasicProperties prop = getBasicProperties();
+        return DfIndexHandler.delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly,
+                retry, prop);
     }
 
     protected void assertUQColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {

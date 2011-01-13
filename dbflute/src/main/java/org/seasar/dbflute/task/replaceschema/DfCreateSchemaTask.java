@@ -1,13 +1,7 @@
 package org.seasar.dbflute.task.replaceschema;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,7 +27,6 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
-import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory.InitializeType;
@@ -224,51 +217,12 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         fireMan.setExecutorName("Create Schema");
         final DfSqlFileFireResult result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
         try {
-            dumpFireResult(result);
+            dumpResult(result);
         } catch (Throwable ignored) {
-            _log.info("Failed to dump create-schema result: " + result, ignored);
+            _log.warn("*Failed to dump create-schema result: " + result, ignored);
         }
         _log.info(""); // for space line
         destroyChangeUserConnection();
-    }
-
-    protected void dumpFireResult(DfSqlFileFireResult result) {
-        final File file = new File(CREATE_SCHEMA_LOG_PATH);
-        if (file.exists()) {
-            boolean deleted = file.delete();
-            if (!deleted) {
-                return; // skip to dump!
-            }
-        }
-        final String resultMessage = result.getResultMessage();
-        if (resultMessage == null || resultMessage.trim().length() == 0) {
-            return; // nothing to dump!
-        }
-        BufferedWriter bw = null;
-        try {
-            final StringBuilder contentsSb = new StringBuilder();
-            contentsSb.append(resultMessage).append(ln()).append(result.existsError());
-            final String detailMessage = result.getDetailMessage();
-            if (detailMessage != null && detailMessage.trim().length() > 0) {
-                contentsSb.append(ln()).append(detailMessage);
-            }
-            final FileOutputStream fos = new FileOutputStream(file);
-            bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-            bw.write(contentsSb.toString());
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
     }
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
@@ -549,11 +503,14 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     // ===================================================================================
-    //                                                                          Final Info
-    //                                                                          ==========
-    @Override
-    protected DfLoadDataFinalInfo getLoadDataFinalInfo() {
-        return null; // means it does not executed yet
+    //                                                                         Result Dump
+    //                                                                         ===========
+    protected void dumpResult(DfSqlFileFireResult result) {
+        final String resultMessage = result.getResultMessage();
+        final boolean failure = result.existsError();
+        final String detailMessage = result.getDetailMessage();
+        final File dumpFile = new File(CREATE_SCHEMA_LOG_PATH);
+        dumpProcessResult(dumpFile, resultMessage, failure, detailMessage);
     }
 
     // ===================================================================================

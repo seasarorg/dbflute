@@ -25,7 +25,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -150,12 +152,29 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
 
     protected ResultSet extractIndexMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
             boolean retry) throws SQLException {
+        final boolean uniqueKeyOnly = false;
+        final DfBasicProperties prop = getBasicProperties();
+        return delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly, retry, prop);
+    }
+
+    // public static for recycle
+    public static ResultSet delegateExtractIndexInfoMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, boolean uniqueKeyOnly, boolean retry, DfBasicProperties prop) throws SQLException {
+        final String catalogName = unifiedSchema.getPureCatalog();
+        final String schemaName = unifiedSchema.getPureSchema();
         try {
-            final boolean uniqueKeyOnly = false;
-            final String catalogName = unifiedSchema.getPureCatalog();
-            final String schemaName = unifiedSchema.getPureSchema();
             return metaData.getIndexInfo(catalogName, schemaName, tableName, uniqueKeyOnly, true);
         } catch (SQLException e) {
+            if (prop.isDatabaseOracle() && !Srl.isQuotedDouble(tableName)) {
+                // Oracle JDBC Driver does not allow Japanese table names
+                // about index info so retry it with quoted here
+                // (however PK, FK are allowed about it...)
+                final String quoted = Srl.quoteDouble(tableName);
+                try {
+                    return metaData.getIndexInfo(catalogName, schemaName, quoted, uniqueKeyOnly, true);
+                } catch (SQLException ignored) {
+                }
+            }
             if (retry) {
                 // because the exception may be thrown when the table is not found
                 // (for example, Sybase)

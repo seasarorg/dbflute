@@ -28,7 +28,6 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.generate.dataassert.DfDataAssertHandler;
 import org.seasar.dbflute.logic.generate.dataassert.DfDataAssertProvider;
-import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
@@ -356,13 +355,6 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
-    @Override
-    protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
-        // because load-data stops if it fails
-        // (this task is going, means all data was loaded)
-        finalInfo.addDetailMessage("o (succeeded)");
-    }
-
     @Override
     protected DfTakeFinallyFinalInfo getTakeFinallyFinalInfo() {
         return extractTakeFinallyFinalInfo(_takeFinallyFireResult);

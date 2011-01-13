@@ -1,11 +1,14 @@
 package org.seasar.dbflute.task.replaceschema;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
@@ -30,6 +33,7 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
     //                                                                          Definition
     //                                                                          ==========
     protected static final String CREATE_SCHEMA_LOG_PATH = "./log/create-schema.log";
+    protected static final String LOAD_DATA_LOG_PATH = "./log/load-data.log";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -68,6 +72,44 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
     }
 
     // ===================================================================================
+    //                                                                         Result Dump
+    //                                                                         ===========
+    protected void dumpProcessResult(File dumpFile, String resultMessage, boolean failure, String detailMessage) {
+        if (dumpFile.exists()) {
+            boolean deleted = dumpFile.delete();
+            if (!deleted) {
+                return; // skip to dump!
+            }
+        }
+        if (resultMessage == null || resultMessage.trim().length() == 0) {
+            return; // nothing to dump!
+        }
+        BufferedWriter bw = null;
+        try {
+            final StringBuilder contentsSb = new StringBuilder();
+            contentsSb.append(resultMessage).append(ln()).append(failure);
+            if (detailMessage != null && detailMessage.trim().length() > 0) {
+                contentsSb.append(ln()).append(detailMessage);
+            }
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dumpFile), "UTF-8"));
+            bw.write(contentsSb.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
     @Override
@@ -85,30 +127,27 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
 
     protected DfReplaceSchemaFinalInfo createReplaceSchemaFinalInfo() {
         final DfCreateSchemaFinalInfo createSchemaFinalInfo = extractCreateSchemaFinalInfo();
-        final DfLoadDataFinalInfo loadDataFinalInfo = getLoadDataFinalInfo();
+        final DfLoadDataFinalInfo loadDataFinalInfo = extractLoadDataFinalInfo();
         final DfTakeFinallyFinalInfo takeFinallyFinalInfo = getTakeFinallyFinalInfo();
         return new DfReplaceSchemaFinalInfo(createSchemaFinalInfo, loadDataFinalInfo, takeFinallyFinalInfo);
     }
 
-    protected DfLoadDataFinalInfo getLoadDataFinalInfo() { // should be overridden as null if create-schema
-        final DfLoadDataFinalInfo finalInfo = new DfLoadDataFinalInfo();
-        finalInfo.setResultMessage("{LoadData}");
-        setupLoadDataFinalInfoDetail(finalInfo);
+    protected DfCreateSchemaFinalInfo extractCreateSchemaFinalInfo() {
+        final DfCreateSchemaFinalInfo finalInfo = new DfCreateSchemaFinalInfo();
+        setupDumpedFinalInfo(CREATE_SCHEMA_LOG_PATH, finalInfo);
         return finalInfo;
     }
 
-    protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
-        // should be overridden if load-data and take-finally
+    protected DfLoadDataFinalInfo extractLoadDataFinalInfo() {
+        final DfLoadDataFinalInfo finalInfo = new DfLoadDataFinalInfo();
+        setupDumpedFinalInfo(CREATE_SCHEMA_LOG_PATH, finalInfo);
+        return finalInfo;
     }
 
-    protected DfTakeFinallyFinalInfo getTakeFinallyFinalInfo() {
-        return null; // as default (should be overridden if take-finally)
-    }
-
-    protected DfCreateSchemaFinalInfo extractCreateSchemaFinalInfo() {
-        final File file = new File(CREATE_SCHEMA_LOG_PATH);
+    protected void setupDumpedFinalInfo(String path, DfAbstractSchemaTaskFinalInfo finalInfo) {
+        final File file = new File(path);
         if (!file.exists()) {
-            return null;
+            return;
         }
         BufferedReader br = null;
         try {
@@ -122,9 +161,8 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
             // - - - - - - - - - - - -
             final String line = br.readLine();
             if (line == null) {
-                return null;
+                return;
             }
-            final DfCreateSchemaFinalInfo finalInfo = new DfCreateSchemaFinalInfo();
             finalInfo.setResultMessage(line);
             final String line2 = br.readLine();
             if (line2 != null) {
@@ -137,7 +175,6 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
                 }
             }
             finalInfo.setFailure(line2 != null && line2.trim().equalsIgnoreCase("true"));
-            return finalInfo;
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         } catch (FileNotFoundException e) {
@@ -158,6 +195,10 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
                 }
             }
         }
+    }
+
+    protected DfTakeFinallyFinalInfo getTakeFinallyFinalInfo() {
+        return null; // as default (should be overridden if take-finally)
     }
 
     protected DfTakeFinallyFinalInfo extractTakeFinallyFinalInfo(DfSqlFileFireResult takeFinallyFireResult) {
@@ -188,33 +229,39 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
         boolean firstDone = false;
 
         // Create Schema
-        final DfCreateSchemaFinalInfo createSchemaFinalInfo = replaceSchemaFinalInfo.getCreateSchemaFinalInfo();
-        if (createSchemaFinalInfo != null) {
-            if (firstDone) {
-                sb.append(ln()).append(ln());
+        {
+            final DfCreateSchemaFinalInfo createSchemaFinalInfo = replaceSchemaFinalInfo.getCreateSchemaFinalInfo();
+            if (createSchemaFinalInfo != null) {
+                if (firstDone) {
+                    sb.append(ln()).append(ln());
+                }
+                firstDone = true;
+                buildSchemaTaskContents(sb, createSchemaFinalInfo);
             }
-            firstDone = true;
-            buildSchemaTaskContents(sb, createSchemaFinalInfo);
         }
 
-        // *Load Data does not exist because loading data is not continued if it causes an error
-        final DfLoadDataFinalInfo loadDataFinalInfo = replaceSchemaFinalInfo.getLoadDataFinalInfo();
-        if (loadDataFinalInfo != null) {
-            if (firstDone) {
-                sb.append(ln()).append(ln());
+        // Load Data
+        {
+            final DfLoadDataFinalInfo loadDataFinalInfo = replaceSchemaFinalInfo.getLoadDataFinalInfo();
+            if (loadDataFinalInfo != null) {
+                if (firstDone) {
+                    sb.append(ln()).append(ln());
+                }
+                firstDone = true;
+                buildSchemaTaskContents(sb, loadDataFinalInfo);
             }
-            firstDone = true;
-            buildSchemaTaskContents(sb, loadDataFinalInfo);
         }
 
         // Take Finally
-        final DfTakeFinallyFinalInfo takeFinallyFinalInfo = replaceSchemaFinalInfo.getTakeFinallyFinalInfo();
-        if (takeFinallyFinalInfo != null) {
-            if (firstDone) {
-                sb.append(ln()).append(ln());
+        {
+            final DfTakeFinallyFinalInfo takeFinallyFinalInfo = replaceSchemaFinalInfo.getTakeFinallyFinalInfo();
+            if (takeFinallyFinalInfo != null) {
+                if (firstDone) {
+                    sb.append(ln()).append(ln());
+                }
+                firstDone = true;
+                buildSchemaTaskContents(sb, takeFinallyFinalInfo);
             }
-            firstDone = true;
-            buildSchemaTaskContents(sb, takeFinallyFinalInfo);
         }
 
         if (replaceSchemaFinalInfo.hasFailure()) {

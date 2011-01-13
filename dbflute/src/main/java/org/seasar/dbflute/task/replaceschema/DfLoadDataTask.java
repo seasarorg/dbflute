@@ -1,5 +1,6 @@
 package org.seasar.dbflute.task.replaceschema;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -7,7 +8,6 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHandlingInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
@@ -50,16 +50,24 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         _log.info("* Load Data         *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        writeDbFromDelimiterFileAsCommonData("tsv", "\t");
-        writeDbFromDelimiterFileAsCommonData("csv", ",");
-        writeDbFromXlsAsCommonData();
-        writeDbFromXlsAsCommonDataAdditional();
+        try {
+            writeDbFromDelimiterFileAsCommonData("tsv", "\t");
+            writeDbFromDelimiterFileAsCommonData("csv", ",");
+            writeDbFromXlsAsCommonData();
+            writeDbFromXlsAsCommonDataAdditional();
 
-        writeDbFromDelimiterFileAsLoadingTypeData("tsv", "\t");
-        writeDbFromDelimiterFileAsLoadingTypeData("csv", ",");
-        writeDbFromXlsAsLoadingTypeData();
-        writeDbFromXlsAsLoadingTypeDataAdditional();
-        _success = true; // means no exception
+            writeDbFromDelimiterFileAsLoadingTypeData("tsv", "\t");
+            writeDbFromDelimiterFileAsLoadingTypeData("csv", ",");
+            writeDbFromXlsAsLoadingTypeData();
+            writeDbFromXlsAsLoadingTypeDataAdditional();
+            _success = true; // means no exception
+        } finally {
+            try {
+                dumpResult();
+            } catch (Throwable ignored) {
+                _log.warn("*Failed to dump load-data result", ignored);
+            }
+        }
     }
 
     @Override
@@ -225,14 +233,13 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     }
 
     // ===================================================================================
-    //                                                                          Final Info
-    //                                                                          ==========
-    @Override
-    protected void setupLoadDataFinalInfoDetail(DfLoadDataFinalInfo finalInfo) {
+    //                                                                         Result Dump
+    //                                                                         ===========
+    protected void dumpResult() {
+        final String resultMessage = "{Load Data}: loaded-files=" + _handledFileCount;
+        final boolean failure = !_success;
         final String detailMessage;
         if (_success) {
-            // only when validTaskEndInformation is true
-            // (means an independent execution)
             if (_handledFileCount > 0) {
                 detailMessage = "o (succeeded)";
             } else {
@@ -240,9 +247,9 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             }
         } else {
             detailMessage = "x (failed: Look the exception message)";
-            finalInfo.setFailure(true);
         }
-        finalInfo.addDetailMessage(detailMessage);
+        final File dumpFile = new File(LOAD_DATA_LOG_PATH);
+        dumpProcessResult(dumpFile, resultMessage, failure, detailMessage);
     }
 
     // ===================================================================================
