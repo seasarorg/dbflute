@@ -35,6 +35,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
+import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
@@ -94,8 +95,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         }
         final Map<String, DfColumnMetaInfo> columnMap = getColumnInfoMap(tableName);
         if (columnMap.isEmpty()) {
-            String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
-            throw new IllegalStateException(msg);
+            throwTableNotFoundException(tableName, _filename);
         }
 
         // process before handling table
@@ -245,13 +245,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildExceptionMessage(_filename, tableName, lineString, nextEx);
+                String msg = buildRegistrationExceptionMessage(_filename, tableName, lineString, nextEx);
                 throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildExceptionMessage(_filename, tableName, lineString, e);
+            String msg = buildRegistrationExceptionMessage(_filename, tableName, lineString, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
-            String msg = buildExceptionMessage(_filename, tableName, lineString, e);
+            String msg = buildRegistrationExceptionMessage(_filename, tableName, lineString, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             try {
@@ -286,7 +286,21 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
-    protected String buildExceptionMessage(String filename, String tableName, String lineString, Exception e) {
+    protected void throwTableNotFoundException(String tableName, String filename) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table specified on the delimiter file was not found in the schema.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the name about its spell.");
+        br.addElement("And confirm that whether the DLL executions have errors.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Delimiter File");
+        br.addElement(filename);
+        final String msg = br.buildExceptionMessage();
+        throw new DfTableNotFoundException(msg);
+    }
+
+    protected String buildRegistrationExceptionMessage(String filename, String tableName, String lineString, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
         br.addItem("File");

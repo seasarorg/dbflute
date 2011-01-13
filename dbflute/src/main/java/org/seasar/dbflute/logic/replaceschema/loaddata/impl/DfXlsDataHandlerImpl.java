@@ -163,10 +163,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildExceptionMessage(file, tableName, nextEx);
+                String msg = buildRegistrationExceptionMessage(file, tableName, nextEx);
                 throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildExceptionMessage(file, tableName, e);
+            String msg = buildRegistrationExceptionMessage(file, tableName, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             if (ps != null) {
@@ -188,7 +188,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    protected String buildExceptionMessage(File file, String tableName, Exception e) {
+    protected String buildRegistrationExceptionMessage(File file, String tableName, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
         br.addItem("Xls File");
@@ -236,9 +236,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
         final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
         if (columnValueMap.isEmpty()) {
-            String msg = "The table was not found in the file:";
-            msg = msg + " tableName=" + tableName + " file=" + file;
-            throw new DfTableNotFoundException(msg);
+            throwTableNotFoundException(tableName, file);
         }
         if (_loggingInsertSql) {
             final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
@@ -280,6 +278,20 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         } else {
             ps.addBatch();
         }
+    }
+
+    protected void throwTableNotFoundException(String tableName, File file) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table specified on the xls file was not found in the schema.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the name about its spell.");
+        br.addElement("And confirm that whether the DLL executions have errors.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Xls File");
+        br.addElement(file);
+        final String msg = br.buildExceptionMessage();
+        throw new DfTableNotFoundException(msg);
     }
 
     // ===================================================================================

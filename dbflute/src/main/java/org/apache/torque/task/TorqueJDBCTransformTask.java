@@ -77,8 +77,9 @@ import org.apache.xerces.dom.DocumentTypeImpl;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.seasar.dbflute.exception.DfSchemaEmptyException;
 import org.seasar.dbflute.exception.DfTableDuplicateException;
-import org.seasar.dbflute.exception.DfTableNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
@@ -278,7 +279,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         final boolean additionalTableExists = setupAddtionalTableIfNeeds();
         if (tableList.isEmpty() && !additionalTableExists) {
-            throwTableNotFoundException();
+            throwSchemaEmptyException();
         }
         _doc.appendChild(_databaseNode);
     }
@@ -499,24 +500,21 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
-    protected void throwTableNotFoundException() {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "A table was NOT FOUND in the schema!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the database connection settings." + ln();
-        msg = msg + "If you've not created the schema yet, please create it." + ln();
-        msg = msg + "You can create easily by using replace-schema." + ln();
-        msg = msg + "Set up ./playsql/replace-schema.sql and execute ReplaceSchema task." + ln();
-        msg = msg + ln();
-        msg = msg + "[Connection Settings]" + ln();
-        msg = msg + " driver = " + _driver + ln();
-        msg = msg + " url    = " + _url + ln();
-        msg = msg + " schema = " + _mainSchema + ln();
-        msg = msg + " user   = " + _userId + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfTableNotFoundException(msg);
+    protected void throwSchemaEmptyException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The schema was empty (does not have a table).");
+        br.addItem("Advice");
+        br.addElement("Please confirm the database connection settings.");
+        br.addElement("If you've not created the schema yet, please create it.");
+        br.addElement("You can create easily by using replace-schema.");
+        br.addElement("Set up ./playsql/replace-schema.sql and execute ReplaceSchema task");
+        br.addItem("Connection Settings");
+        br.addElement("driver = " + _driver);
+        br.addElement("url = " + _url);
+        br.addElement("schema = " + _mainSchema);
+        br.addElement("user = " + _userId);
+        final String msg = br.buildExceptionMessage();
+        throw new DfSchemaEmptyException(msg);
     }
 
     // ===================================================================================
