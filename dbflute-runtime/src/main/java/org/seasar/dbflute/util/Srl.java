@@ -1148,19 +1148,35 @@ public class Srl {
     // ===================================================================================
     //                                                                  Quotation Handling
     //                                                                  ==================
-    public static boolean isSingleQuoted(String str) {
+    public static boolean isQuotedSingle(String str) {
         assertStringNotNull(str);
         return str.length() > 1 && str.startsWith("'") && str.endsWith("'");
     }
 
-    public static boolean isDoubleQuoted(String str) {
+    public static boolean isQuotedDouble(String str) {
         assertStringNotNull(str);
         return str.length() > 1 && str.startsWith("\"") && str.endsWith("\"");
     }
 
+    public static String quoteSingle(String str) {
+        assertStringNotNull(str);
+        if (isQuotedSingle(str)) {
+            return str;
+        }
+        return "'" + str + "'";
+    }
+
+    public static String quoteDouble(String str) {
+        assertStringNotNull(str);
+        if (isQuotedDouble(str)) {
+            return str;
+        }
+        return "\"" + str + "\"";
+    }
+
     public static String unquoteSingle(String str) {
         assertStringNotNull(str);
-        if (!isSingleQuoted(str)) {
+        if (!isQuotedSingle(str)) {
             return str;
         }
         return trim(str, "'");
@@ -1168,7 +1184,7 @@ public class Srl {
 
     public static String unquoteDouble(String str) {
         assertStringNotNull(str);
-        if (!isDoubleQuoted(str)) {
+        if (!isQuotedDouble(str)) {
             return str;
         }
         return trim(str, "\"");

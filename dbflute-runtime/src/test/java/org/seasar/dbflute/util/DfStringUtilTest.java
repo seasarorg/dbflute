@@ -65,6 +65,8 @@ import static org.seasar.dbflute.util.Srl.is_Null_or_Empty;
 import static org.seasar.dbflute.util.Srl.is_Null_or_TrimmedEmpty;
 import static org.seasar.dbflute.util.Srl.length;
 import static org.seasar.dbflute.util.Srl.ltrim;
+import static org.seasar.dbflute.util.Srl.quoteDouble;
+import static org.seasar.dbflute.util.Srl.quoteSingle;
 import static org.seasar.dbflute.util.Srl.removeBlockComment;
 import static org.seasar.dbflute.util.Srl.removeEmptyLine;
 import static org.seasar.dbflute.util.Srl.removeLineComment;
@@ -961,6 +963,26 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                  Quotation Handling
     //                                                                  ==================
+    public void test_quoteSingle_basic() {
+        assertEquals("''", quoteSingle(""));
+        assertEquals("''", quoteSingle("''"));
+        assertEquals("' '", quoteSingle(" "));
+        assertEquals("'foo'", quoteSingle("foo"));
+        assertEquals("'foo'", quoteSingle("'foo'"));
+        assertEquals("'\"foo\"'", quoteSingle("\"foo\""));
+        assertEquals("''foo'", quoteSingle("'foo"));
+    }
+
+    public void test_quoteDouble_basic() {
+        assertEquals("\"\"", quoteDouble(""));
+        assertEquals("\"\"", quoteDouble("\"\""));
+        assertEquals("\" \"", quoteDouble(" "));
+        assertEquals("\"foo\"", quoteDouble("foo"));
+        assertEquals("\"foo\"", quoteDouble("\"foo\""));
+        assertEquals("\"'foo'\"", quoteDouble("'foo'"));
+        assertEquals("\"\"foo\"", quoteDouble("\"foo"));
+    }
+
     public void test_unquoteSingle_basic() {
         assertEquals("", unquoteSingle(""));
         assertEquals("", unquoteSingle("''"));
