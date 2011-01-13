@@ -134,17 +134,17 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
 
     protected DfCreateSchemaFinalInfo extractCreateSchemaFinalInfo() {
         final DfCreateSchemaFinalInfo finalInfo = new DfCreateSchemaFinalInfo();
-        setupDumpedFinalInfo(CREATE_SCHEMA_LOG_PATH, finalInfo);
+        reflectDumpedFinalInfo(CREATE_SCHEMA_LOG_PATH, finalInfo);
         return finalInfo;
     }
 
     protected DfLoadDataFinalInfo extractLoadDataFinalInfo() {
         final DfLoadDataFinalInfo finalInfo = new DfLoadDataFinalInfo();
-        setupDumpedFinalInfo(CREATE_SCHEMA_LOG_PATH, finalInfo);
+        reflectDumpedFinalInfo(LOAD_DATA_LOG_PATH, finalInfo);
         return finalInfo;
     }
 
-    protected void setupDumpedFinalInfo(String path, DfAbstractSchemaTaskFinalInfo finalInfo) {
+    protected void reflectDumpedFinalInfo(String path, DfAbstractSchemaTaskFinalInfo finalInfo) {
         final File file = new File(path);
         if (!file.exists()) {
             return;
@@ -231,7 +231,7 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
         // Create Schema
         {
             final DfCreateSchemaFinalInfo createSchemaFinalInfo = replaceSchemaFinalInfo.getCreateSchemaFinalInfo();
-            if (createSchemaFinalInfo != null) {
+            if (createSchemaFinalInfo != null && createSchemaFinalInfo.isValidInfo()) {
                 if (firstDone) {
                     sb.append(ln()).append(ln());
                 }
@@ -243,7 +243,7 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
         // Load Data
         {
             final DfLoadDataFinalInfo loadDataFinalInfo = replaceSchemaFinalInfo.getLoadDataFinalInfo();
-            if (loadDataFinalInfo != null) {
+            if (loadDataFinalInfo != null && loadDataFinalInfo.isValidInfo()) {
                 if (firstDone) {
                     sb.append(ln()).append(ln());
                 }
@@ -255,7 +255,7 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
         // Take Finally
         {
             final DfTakeFinallyFinalInfo takeFinallyFinalInfo = replaceSchemaFinalInfo.getTakeFinallyFinalInfo();
-            if (takeFinallyFinalInfo != null) {
+            if (takeFinallyFinalInfo != null && takeFinallyFinalInfo.isValidInfo()) {
                 if (firstDone) {
                     sb.append(ln()).append(ln());
                 }

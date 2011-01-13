@@ -191,6 +191,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                 Table
     //                                                 -----
     protected Set<String> _quoteTableNameSet;
+    protected Boolean _quoteTableNameAll;
 
     protected Set<String> getQuoteTableNameSet() {
         if (_quoteTableNameSet != null) {
@@ -205,11 +206,16 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         } else {
             _quoteTableNameSet = new HashSet<String>();
         }
+        _quoteTableNameAll = _quoteTableNameSet.contains("$$ALL$$");
         return _quoteTableNameSet;
     }
 
     public boolean isQuoteTable(String tableName) {
-        return getQuoteTableNameSet().contains(tableName);
+        final Set<String> quoteTableNameSet = getQuoteTableNameSet(); // also initialize
+        if (_quoteTableNameAll != null && _quoteTableNameAll) { // after initialization
+            return true;
+        }
+        return quoteTableNameSet.contains(tableName);
     }
 
     public String quoteTableNameIfNeeds(String tableName) {
@@ -227,6 +233,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                Column
     //                                                ------
     protected Set<String> _quoteColumnNameSet;
+    protected Boolean _quoteColumnNameAll;
 
     protected Set<String> getQuoteColumnNameSet() {
         if (_quoteColumnNameSet != null) {
@@ -241,11 +248,16 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         } else {
             _quoteColumnNameSet = new HashSet<String>();
         }
+        _quoteColumnNameAll = _quoteColumnNameSet.contains("$$ALL$$");
         return _quoteColumnNameSet;
     }
 
     public boolean isQuoteColumn(String columnName) {
-        return getQuoteColumnNameSet().contains(columnName);
+        final Set<String> quoteColumnNameSet = getQuoteColumnNameSet(); // also initialize
+        if (_quoteColumnNameAll != null && _quoteColumnNameAll) { // after initialization
+            return true;
+        }
+        return quoteColumnNameSet.contains(columnName);
     }
 
     public String quoteColumnNameIfNeeds(String columnName) {

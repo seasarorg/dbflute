@@ -236,16 +236,21 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                                                         Result Dump
     //                                                                         ===========
     protected void dumpResult() {
-        final String resultMessage = "{Load Data}: loaded-files=" + _handledFileCount;
-        final boolean failure = !_success;
+        final String title = "{Load Data}";
+        final String resultMessage;
+        final boolean failure;
         final String detailMessage;
         if (_success) {
+            resultMessage = title + ": loaded-files=" + _handledFileCount;
+            failure = false;
             if (_handledFileCount > 0) {
                 detailMessage = "o (succeeded)";
             } else {
                 detailMessage = "- (no data file)";
             }
         } else {
+            resultMessage = title;
+            failure = true;
             detailMessage = "x (failed: Look the exception message)";
         }
         final File dumpFile = new File(LOAD_DATA_LOG_PATH);
