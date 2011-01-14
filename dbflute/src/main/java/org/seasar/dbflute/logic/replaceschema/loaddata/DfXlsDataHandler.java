@@ -25,9 +25,13 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
  */
 public interface DfXlsDataHandler {
 
-    List<DfDataSet> readSeveralData(String dataDirectoryName);
+    List<DfDataSet> readSeveralData(DfXlsDataResource resource);
 
-    DfXlsDataResultInfo writeSeveralData(String dataDirectoryName);
+    /**
+     * @param resource The resource of xls data handling. (NotNull)
+     * @param loadedDataInfo The info of loaded data for history. (NotNull)
+     */
+    void writeSeveralData(DfXlsDataResource resource, DfLoadedDataInfo loadedDataInfo);
 
-    List<File> getXlsList(String dataDirectoryName);
+    List<File> getXlsList(DfXlsDataResource resource);
 }

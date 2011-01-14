@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2011 the Seasar Foundation and the Others.
+ * Copyright 2004-2006 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,51 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author jflute
  */
-public class DfDelimiterDataResultInfo {
+public class DfDelimiterDataResource {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Set<String>> _notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
+    protected String _envType;
+    protected String _basePath;
+    protected String _fileType;
+    protected String _delimiter;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, Set<String>> getNotFoundColumnMap() {
-        return _notFoundColumnMap;
+    public String getEnvType() {
+        return _envType;
+    }
+
+    public void setEnvType(String envType) {
+        this._envType = envType;
+    }
+
+    public String getBasePath() {
+        return _basePath;
+    }
+
+    public void setBasePath(String basePath) {
+        this._basePath = basePath;
+    }
+
+    public String getFileType() {
+        return _fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this._fileType = fileType;
+    }
+
+    public String getDelimiter() {
+        return _delimiter;
+    }
+
+    public void setDelimiter(String delimter) {
+        this._delimiter = delimter;
     }
 }

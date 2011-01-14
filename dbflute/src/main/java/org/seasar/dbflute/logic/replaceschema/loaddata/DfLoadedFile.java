@@ -18,21 +18,42 @@ package org.seasar.dbflute.logic.replaceschema.loaddata;
 /**
  * @author jflute
  */
-public class DfXlsDataResultInfo {
+public class DfLoadedFile {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected int _handledFileCount;
+    protected final String _envType;
+    protected final String _fileType;
+    protected final String _encoding;
+    protected final String _fileName;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    public DfLoadedFile(String envType, String fileType, String encoding, String fileName) {
+        _envType = envType;
+        _fileType = fileType;
+        _encoding = encoding;
+        _fileName = fileName;
+    }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public int getHandledFileCount() {
-        return _handledFileCount;
+    public String getEnvType() {
+        return _envType;
     }
 
-    public void incrementHandledFileCount() {
-        ++_handledFileCount;
+    public String getFileType() {
+        return _fileType;
+    }
+
+    public String getEncoding() {
+        return _encoding;
+    }
+
+    public String getFileName() {
+        return _fileName;
     }
 }

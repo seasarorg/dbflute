@@ -20,5 +20,10 @@ package org.seasar.dbflute.logic.replaceschema.loaddata;
  */
 public interface DfDelimiterDataHandler {
 
-    DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataSeveralHandlingInfo info);
+    /**
+     * @param resource The resource of delimiter data handling. (NotNull)
+     * @param loadedDataInfo The info of loaded data for history. (NotNull)
+     * @return The result info of delimiter data. (NotNull)
+     */
+    DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataResource resource, DfLoadedDataInfo loadedDataInfo);
 }

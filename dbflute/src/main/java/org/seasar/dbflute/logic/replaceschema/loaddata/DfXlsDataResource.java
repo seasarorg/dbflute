@@ -18,49 +18,30 @@ package org.seasar.dbflute.logic.replaceschema.loaddata;
 /**
  * @author jflute
  */
-public class DfDelimiterDataSeveralHandlingInfo {
+public class DfXlsDataResource {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String basePath;
-    protected String typeName;
-    protected String delimter;
-    protected boolean errorContinue;
+    protected String _envType;
+    protected String _dataDirectory;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getBasePath() {
-        return basePath;
+    public String getEnvType() {
+        return _envType;
     }
 
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
+    public void setEnvType(String envType) {
+        this._envType = envType;
     }
 
-    public String getDelimter() {
-        return delimter;
+    public String getDataDirectory() {
+        return _dataDirectory;
     }
 
-    public void setDelimter(String delimter) {
-        this.delimter = delimter;
+    public void setDataDirectory(String dataDirectory) {
+        this._dataDirectory = dataDirectory;
     }
-
-    public boolean isErrorContinue() {
-        return errorContinue;
-    }
-
-    public void setErrorContinue(boolean errorContinue) {
-        this.errorContinue = errorContinue;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
 }

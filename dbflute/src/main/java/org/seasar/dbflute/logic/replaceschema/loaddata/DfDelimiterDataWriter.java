@@ -27,7 +27,7 @@ public interface DfDelimiterDataWriter {
 
     /**
      * Write data from delimiter-file.
-     * @param notFoundColumnMap Not found column map. (NotNUl)
+     * @param notFoundColumnMap The map of not-found column for history. (NotNull)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */

@@ -1,6 +1,7 @@
 package org.seasar.dbflute.task.replaceschema;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -8,10 +9,13 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataSeveralHandlingInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedFile;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResultInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
@@ -29,6 +33,12 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfLoadDataTask.class);
     protected static final String LOG_PATH = "./log/load-data.log";
+    protected static final String COMMON_ENV_TYPE = "common";
+    protected static final String TSV_FILE_TYPE = "tsv";
+    protected static final String CSV_FILE_TYPE = "csv";
+    protected static final String XLS_FILE_TYPE = "xls";
+    protected static final String TSV_DELIMITER = "\t";
+    protected static final String CSV_DELIMITER = ",";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -37,7 +47,9 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     protected DfXlsDataHandlerImpl _xlsDataHandlerImpl;
     protected DfDelimiterDataHandlerImpl _delimiterDataHandlerImpl;
     protected boolean _success;
-    protected int _handledFileCount;
+
+    /** The info of loaded data. This info has loaded files when it fails too. */
+    protected final DfLoadedDataInfo _loadedDataInfo = new DfLoadedDataInfo();
 
     // ===================================================================================
     //                                                                             Execute
@@ -51,13 +63,15 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         try {
-            writeDbFromDelimiterFileAsCommonData("tsv", "\t");
-            writeDbFromDelimiterFileAsCommonData("csv", ",");
+            // common (tsv -> csv -> xls)
+            writeDbFromDelimiterFileAsCommonData(TSV_FILE_TYPE, TSV_DELIMITER);
+            writeDbFromDelimiterFileAsCommonData(CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsCommonData();
             writeDbFromXlsAsCommonDataAdditional();
 
-            writeDbFromDelimiterFileAsLoadingTypeData("tsv", "\t");
-            writeDbFromDelimiterFileAsLoadingTypeData("csv", ",");
+            // specified environment (tsv -> csv -> xls)
+            writeDbFromDelimiterFileAsLoadingTypeData(TSV_FILE_TYPE, TSV_DELIMITER);
+            writeDbFromDelimiterFileAsLoadingTypeData(CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsLoadingTypeData();
             writeDbFromXlsAsLoadingTypeDataAdditional();
             _success = true; // means no exception
@@ -94,29 +108,28 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     // --------------------------------------------
     //                               Delimiter Data
     //                               --------------
-    protected void writeDbFromDelimiterFileAsCommonData(String typeName, String delimter) {
+    protected void writeDbFromDelimiterFileAsCommonData(String fileType, String delimter) {
         final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
-        final String path = doGetCommonDataDirectoryPath(dir, typeName);
-        writeDbFromDelimiterFile(path, typeName, delimter);
+        final String path = doGetCommonDataDirectoryPath(dir, fileType);
+        writeDbFromDelimiterFile(COMMON_ENV_TYPE, path, fileType, delimter);
     }
 
-    protected void writeDbFromDelimiterFileAsLoadingTypeData(String typeName, String delimter) {
+    protected void writeDbFromDelimiterFileAsLoadingTypeData(String fileType, String delimter) {
         final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
         final String envType = getDataLoadingType();
-        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, typeName);
-        writeDbFromDelimiterFile(path, typeName, delimter);
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, fileType);
+        writeDbFromDelimiterFile(envType, path, fileType, delimter);
     }
 
-    protected void writeDbFromDelimiterFile(String directoryPath, String typeName, String delimter) {
-        final DfDelimiterDataHandlerImpl handler = getDelimiterDataHandlerImpl();
-        final DfDelimiterDataSeveralHandlingInfo handlingInfo = new DfDelimiterDataSeveralHandlingInfo();
-        handlingInfo.setBasePath(directoryPath);
-        handlingInfo.setTypeName(typeName);
-        handlingInfo.setDelimter(delimter);
-        handlingInfo.setErrorContinue(true);
-        final DfDelimiterDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
-        showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
-        _handledFileCount = _handledFileCount + resultInfo.getHandledFileCount();
+    protected void writeDbFromDelimiterFile(String envType, String directoryPath, String fileType, String delimiter) {
+        final DfDelimiterDataResource resource = new DfDelimiterDataResource();
+        resource.setEnvType(envType);
+        resource.setBasePath(directoryPath);
+        resource.setFileType(fileType);
+        resource.setDelimiter(delimiter);
+        final DfDelimiterDataHandler handler = getDelimiterDataHandlerImpl();
+        final DfDelimiterDataResultInfo resultInfo = handler.writeSeveralData(resource, _loadedDataInfo);
+        showNotFoundColumn(fileType, resultInfo.getNotFoundColumnMap());
     }
 
     protected DfDelimiterDataHandlerImpl getDelimiterDataHandlerImpl() {
@@ -157,8 +170,8 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                     --------
     protected void writeDbFromXlsAsCommonData() {
         final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
-        final String path = doGetCommonDataDirectoryPath(dir, "xls");
-        writeDbFromXls(path);
+        final String path = doGetCommonDataDirectoryPath(dir, XLS_FILE_TYPE);
+        writeDbFromXls(COMMON_ENV_TYPE, path);
     }
 
     protected void writeDbFromXlsAsCommonDataAdditional() {
@@ -166,15 +179,15 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         if (Srl.is_Null_or_TrimmedEmpty(dir)) {
             return;
         }
-        final String path = doGetCommonDataDirectoryPath(dir, "xls");
-        writeDbFromXls(path);
+        final String path = doGetCommonDataDirectoryPath(dir, XLS_FILE_TYPE);
+        writeDbFromXls(COMMON_ENV_TYPE, path);
     }
 
     protected void writeDbFromXlsAsLoadingTypeData() {
         final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
         final String envType = getDataLoadingType();
-        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, "xls");
-        writeDbFromXls(path);
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, XLS_FILE_TYPE);
+        writeDbFromXls(envType, path);
     }
 
     protected void writeDbFromXlsAsLoadingTypeDataAdditional() {
@@ -183,14 +196,16 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             return;
         }
         final String envType = getDataLoadingType();
-        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, "xls");
-        writeDbFromXls(path);
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, XLS_FILE_TYPE);
+        writeDbFromXls(envType, path);
     }
 
-    protected void writeDbFromXls(String directoryPath) {
-        final DfXlsDataHandler xlsDataHandler = getXlsDataHandlerImpl();
-        final DfXlsDataResultInfo resultInfo = xlsDataHandler.writeSeveralData(directoryPath);
-        _handledFileCount = _handledFileCount + resultInfo.getHandledFileCount();
+    protected void writeDbFromXls(String envType, String dataDirectory) {
+        final DfXlsDataResource resource = new DfXlsDataResource();
+        resource.setEnvType(envType);
+        resource.setDataDirectory(dataDirectory);
+        final DfXlsDataHandler handler = getXlsDataHandlerImpl();
+        handler.writeSeveralData(resource, _loadedDataInfo);
     }
 
     protected DfXlsDataHandlerImpl getXlsDataHandlerImpl() {
@@ -236,25 +251,87 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                                                         Result Dump
     //                                                                         ===========
     protected void dumpResult() {
+        final List<DfLoadedFile> loadedFileList = _loadedDataInfo.getLoadedFileList();
+        final int loadedFileCount = loadedFileList.size();
         final String title = "{Load Data}";
-        final String resultMessage;
+        final String resultMessage = title + ": loaded-files=" + loadedFileCount;
         final boolean failure;
         final String detailMessage;
         if (_success) {
-            resultMessage = title + ": loaded-files=" + _handledFileCount;
             failure = false;
-            if (_handledFileCount > 0) {
-                detailMessage = "o (succeeded)";
+            if (loadedFileCount > 0) {
+                final StringBuilder detailMessageSb = new StringBuilder();
+                setupDetailMessage(detailMessageSb); // has the last line separator
+                detailMessage = Srl.rtrim(detailMessageSb.toString()); // with removing the last line separator
             } else {
                 detailMessage = "- (no data file)";
             }
         } else {
-            resultMessage = title;
+            // it is the precondition that LoadData stops at the first failure
             failure = true;
-            detailMessage = "x (failed: Look the exception message)";
+            final StringBuilder detailMessageSb = new StringBuilder();
+            if (loadedFileCount > 0) {
+                setupDetailMessage(detailMessageSb); // has the last line separator
+            }
+            detailMessageSb.append("x (failed: Look the exception message)");
+            detailMessage = detailMessageSb.toString();
         }
         final File dumpFile = new File(LOAD_DATA_LOG_PATH);
         dumpProcessResult(dumpFile, resultMessage, failure, detailMessage);
+    }
+
+    protected void setupDetailMessage(StringBuilder detailMessageSb) {
+        final Map<String, Map<String, List<DfLoadedFile>>> hierarchyMap = _loadedDataInfo
+                .getLoadedFileListHierarchyMap();
+
+        // order according to registration
+        doSetupDetailMessageEnvType(detailMessageSb, COMMON_ENV_TYPE, hierarchyMap.get(COMMON_ENV_TYPE));
+        for (Entry<String, Map<String, List<DfLoadedFile>>> entry : hierarchyMap.entrySet()) {
+            final String envType = entry.getKey();
+            if (COMMON_ENV_TYPE.equals(envType)) {
+                continue; // already processed
+            }
+            doSetupDetailMessageEnvType(detailMessageSb, envType, entry.getValue());
+        }
+    }
+
+    protected void doSetupDetailMessageEnvType(StringBuilder detailMessageSb, String envType,
+            Map<String, List<DfLoadedFile>> fileTypeKeyListMap) {
+        if (fileTypeKeyListMap == null || fileTypeKeyListMap.isEmpty()) {
+            return;
+        }
+        detailMessageSb.append("(").append(envType).append(")").append(ln());
+        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(TSV_FILE_TYPE), 3);
+        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(CSV_FILE_TYPE), 3);
+        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);
+    }
+
+    protected void doSetupDetailMessageFileType(StringBuilder detailMessageSb, List<DfLoadedFile> loadedFileList,
+            int limit) {
+        if (loadedFileList == null || loadedFileList.isEmpty()) {
+            return; // means no files for the file type
+        }
+        // for example:
+        // 
+        // (common)
+        // o 10-master.xls
+        // (ut)
+        // o 10-TABLE_NAME.tsv
+        // o (and other tsv files...)
+        // o 20-member.xls
+        // o 30-product.xls
+        int index = 0;
+        for (DfLoadedFile loadedFile : loadedFileList) {
+            if (index >= limit) {
+                final String fileType = loadedFile.getFileType();
+                detailMessageSb.append("o (and other ").append(fileType).append(" files...)").append(ln());
+                break;
+            }
+            final String fileName = loadedFile.getFileName();
+
+            detailMessageSb.append("o ").append(fileName).append(ln());
+            ++index;
+        }
     }
 
     // ===================================================================================

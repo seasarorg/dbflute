@@ -51,8 +51,9 @@ import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResultInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**
@@ -82,11 +83,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public List<DfDataSet> readSeveralData(String dataDirectoryName) {
-        final List<File> xlsList = getXlsList(dataDirectoryName);
+    public List<DfDataSet> readSeveralData(DfXlsDataResource resource) {
+        final String dataDirectory = resource.getDataDirectory();
+        final List<File> xlsList = getXlsList(resource);
         final List<DfDataSet> ls = new ArrayList<DfDataSet>();
         for (File file : xlsList) {
-            final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
+            final DfXlsReader xlsReader = createXlsReader(dataDirectory, file);
             ls.add(xlsReader.read());
         }
         return ls;
@@ -95,24 +97,23 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
-    public DfXlsDataResultInfo writeSeveralData(String dataDirectoryName) {
-        final DfXlsDataResultInfo resultInfo = new DfXlsDataResultInfo();
-        final List<File> xlsList = getXlsList(dataDirectoryName);
+    public void writeSeveralData(DfXlsDataResource resource, DfLoadedDataInfo loadedDataInfo) {
+        final String dataDirectory = resource.getDataDirectory();
+        final List<File> xlsList = getXlsList(resource);
         for (File file : xlsList) {
             _log.info("");
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
-            final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
+            final DfXlsReader xlsReader = createXlsReader(dataDirectory, file);
             final DfDataSet dataSet = xlsReader.read();
 
             filterValidColumn(dataSet);
-            setupDefaultValue(dataDirectoryName, dataSet);
+            setupDefaultValue(dataDirectory, dataSet);
 
             doWriteDataSet(file, dataSet);
-            resultInfo.incrementHandledFileCount();
+            loadedDataInfo.addLoadedFile(resource.getEnvType(), "xls", null, file.getName());
         }
-        return resultInfo;
     }
 
     protected void doWriteDataSet(File file, DfDataSet dataSet) {
@@ -297,10 +298,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                        Xls Handling
     //                                                                        ============
-    protected DfXlsReader createXlsReader(String dataDirectoryName, File file) {
-        final Map<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
-        final Map<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
-        final Map<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectoryName);
+    protected DfXlsReader createXlsReader(String dataDirectory, File file) {
+        final Map<String, String> tableNameMap = getTableNameMap(dataDirectory);
+        final Map<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectory);
+        final Map<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectory);
         final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap,
                 emptyStringTableColumnMap, _skipSheetPattern);
         if (tableNameMap != null && !tableNameMap.isEmpty()) {
@@ -311,7 +312,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return xlsReader;
     }
 
-    public List<File> getXlsList(String dataDirectoryName) {
+    public List<File> getXlsList(DfXlsDataResource resource) {
         final Comparator<File> fileNameAscComparator = new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -319,7 +320,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         };
         final SortedSet<File> sortedFileSet = new TreeSet<File>(fileNameAscComparator);
 
-        final File dir = new File(dataDirectoryName);
+        final String dataDirectory = resource.getDataDirectory();
+        final File dir = new File(dataDirectory);
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith(".xls");
@@ -353,8 +355,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    protected void setupDefaultValue(String dataDirectoryName, final DfDataSet dataSet) {
-        final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectoryName);
+    protected void setupDefaultValue(String dataDirectory, final DfDataSet dataSet) {
+        final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable table = dataSet.getTable(i);
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
@@ -387,24 +389,24 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
+    private Map<String, String> getDefaultValueMap(String dataDirectory) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/defaultValueMap.dataprop";
+        String path = dataDirectory + "/defaultValueMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return resultMap;
         }
-        path = dataDirectoryName + "/default-value.txt";
+        path = dataDirectory + "/default-value.txt";
         resultMap = reader.readMapAsStringValue(path);
         return resultMap;
     }
 
-    private Map<String, String> getTableNameMap(String dataDirectoryName) {
+    private Map<String, String> getTableNameMap(String dataDirectory) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/tableNameMap.dataprop";
+        String path = dataDirectory + "/tableNameMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectoryName + "/table-name.txt";
+            path = dataDirectory + "/table-name.txt";
             resultMap = reader.readMapAsStringValue(path);
         }
         final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
@@ -412,12 +414,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return flmap;
     }
 
-    private Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
+    private Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectory) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/notTrimColumnMap.dataprop";
+        String path = dataDirectory + "/notTrimColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectoryName + "/not-trim-column.txt";
+            path = dataDirectory + "/not-trim-column.txt";
             resultMap = reader.readMapAsStringListValue(path);
         }
         final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();
@@ -428,12 +430,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return stringKeyMap;
     }
 
-    private Map<String, List<String>> getEmptyStringTableColumnMap(String dataDirectoryName) {
+    private Map<String, List<String>> getEmptyStringTableColumnMap(String dataDirectory) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/emptyStringColumnMap.dataprop";
+        String path = dataDirectory + "/emptyStringColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectoryName + "/empty-string-column.txt";
+            path = dataDirectory + "/empty-string-column.txt";
             resultMap = reader.readMapAsStringListValue(path);
         }
         final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();

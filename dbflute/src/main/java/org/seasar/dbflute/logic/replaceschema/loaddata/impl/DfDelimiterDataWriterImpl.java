@@ -57,7 +57,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _filename;
+    protected String _fileName;
     protected String _encoding;
     protected String _delimiter;
     protected Map<String, Map<String, String>> _convertValueMap;
@@ -76,26 +76,21 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
-    /**
-     * Write data from delimiter-file.
-     * @param notFoundColumnMap Not found column map. (NotNUl)
-     * @throws java.io.IOException
-     */
     public void writeData(Map<String, Set<String>> notFoundColumnMap) throws IOException {
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
-        _log.info("writeData(" + _filename + ", " + _encoding + ")");
+        _log.info("writeData(" + _fileName + ", " + _encoding + ")");
         _log.info("= = = = = = =/");
         FileInputStream fis = null;
         InputStreamReader ir = null;
         BufferedReader br = null;
 
-        String tableName = _filename.substring(_filename.lastIndexOf("/") + 1, _filename.lastIndexOf("."));
+        String tableName = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
         if (tableName.indexOf("-") >= 0) {
             tableName = tableName.substring(tableName.indexOf("-") + "-".length());
         }
         final Map<String, DfColumnMetaInfo> columnMap = getColumnInfoMap(tableName);
         if (columnMap.isEmpty()) {
-            throwTableNotFoundException(tableName, _filename);
+            throwTableNotFoundException(tableName, _fileName);
         }
 
         // process before handling table
@@ -110,7 +105,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         Connection conn = null;
         PreparedStatement ps = null;
         try {
-            fis = new FileInputStream(_filename);
+            fis = new FileInputStream(_fileName);
             ir = new InputStreamReader(fis, _encoding);
             br = new BufferedReader(ir);
 
@@ -245,13 +240,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildRegistrationExceptionMessage(_filename, tableName, lineString, nextEx);
+                String msg = buildRegistrationExceptionMessage(_fileName, tableName, lineString, nextEx);
                 throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildRegistrationExceptionMessage(_filename, tableName, lineString, e);
+            String msg = buildRegistrationExceptionMessage(_fileName, tableName, lineString, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
-            String msg = buildRegistrationExceptionMessage(_filename, tableName, lineString, e);
+            String msg = buildRegistrationExceptionMessage(_fileName, tableName, lineString, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             try {
@@ -605,12 +600,12 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         this._encoding = encoding;
     }
 
-    public String getFilename() {
-        return _filename;
+    public String getFileName() {
+        return _fileName;
     }
 
-    public void setFilename(String filename) {
-        this._filename = filename;
+    public void setFileName(String fileName) {
+        this._fileName = fileName;
     }
 
     public Map<String, Map<String, String>> getConvertValueMap() {
