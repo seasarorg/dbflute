@@ -67,6 +67,8 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             writeDbFromDelimiterFileAsCommonData(TSV_FILE_TYPE, TSV_DELIMITER);
             writeDbFromDelimiterFileAsCommonData(CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsCommonData();
+            // additionalPlaySql is used only for xls
+            // this is the fixed specification
             writeDbFromXlsAsCommonDataAdditional();
 
             // specified environment (tsv -> csv -> xls)
