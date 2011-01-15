@@ -290,7 +290,8 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected static String replace(String str, String fromStr, String toStr) { // copy from Srl 
+    // copied from DBFlute's utilities for independence of this class
+    protected static String replace(String str, String fromStr, String toStr) {
         StringBuilder sb = null; // lazy load
         int pos = 0;
         int pos2 = 0;
