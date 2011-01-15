@@ -35,16 +35,16 @@ public class WayOfSQLServer implements DBWay {
         return "select @@identity";
     }
 
-    public String buildIdentityDisableSql(String tableName) {
-        return buildIdentityOnOffSql(tableName, true);
+    public String buildIdentityDisableSql(String tableSqlName) {
+        return buildIdentityOnOffSql(tableSqlName, true);
     }
 
-    public String buildIdentityEnableSql(String tableName) {
-        return buildIdentityOnOffSql(tableName, false);
+    public String buildIdentityEnableSql(String tableSqlName) {
+        return buildIdentityOnOffSql(tableSqlName, false);
     }
 
-    protected String buildIdentityOnOffSql(String tableName, boolean insertOn) {
-        return "set identity_insert " + tableName + " " + (insertOn ? "on" : "off");
+    protected String buildIdentityOnOffSql(String tableSqlName, boolean insertOn) {
+        return "set identity_insert " + tableSqlName + " " + (insertOn ? "on" : "off");
     }
 
     // ===================================================================================
