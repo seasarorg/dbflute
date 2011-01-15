@@ -371,7 +371,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 _selectIndexMap.put(columnDbName.ToLower(), selectIndex); // lower because of case sensitive map
                 onQueryName = buildSelectIndexAliasName(selectIndex);
             } else {
-                onQueryName = columnName;
+                onQueryName = columnSqlName;
             }
             sb.append(realColumnName).append(" as ").append(onQueryName);
             _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
@@ -389,7 +389,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             bool existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
             bool finishedForeignIndent = false;
             foreach (SelectedSelectColumnInfo selectColumnInfo in selectColumnInfoList) {
-                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
+                if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnDbName())) {
                     continue;
                 }
 
