@@ -269,8 +269,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
             // both side quotations
             if (isSingleQuoted(value)) {
                 value = unquoteSingle(value);
-            }
-            if (isDoubleQuoted(value)) {
+            } else if (isDoubleQuoted(value)) {
                 value = unquoteDouble(value);
             }
 
@@ -317,22 +316,22 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
         } while (true);
     }
 
-    public static boolean isSingleQuoted(String str) {
+    protected static boolean isSingleQuoted(String str) {
         return str.length() > 1 && str.startsWith("'") && str.endsWith("'");
     }
 
-    public static boolean isDoubleQuoted(String str) {
+    protected static boolean isDoubleQuoted(String str) {
         return str.length() > 1 && str.startsWith("\"") && str.endsWith("\"");
     }
 
-    public static String unquoteSingle(String str) {
+    protected static String unquoteSingle(String str) {
         if (!isSingleQuoted(str)) {
             return str;
         }
         return str.substring("'".length(), str.length() - "'".length());
     }
 
-    public static String unquoteDouble(String str) {
+    protected static String unquoteDouble(String str) {
         if (!isDoubleQuoted(str)) {
             return str;
         }
