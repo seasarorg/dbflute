@@ -299,7 +299,7 @@ public class Column {
 
     public String getColumnSqlNameDirectUse() {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.quoteColumnNameIfNeeds(getName(), true);
+        return prop.quoteColumnNameIfNeedsDirectUse(getName());
     }
 
     // -----------------------------------------------------

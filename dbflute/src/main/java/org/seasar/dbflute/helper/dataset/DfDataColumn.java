@@ -43,7 +43,7 @@ public class DfDataColumn {
 
     protected String quoteColumnNameIfNeeds(String columnDbName) {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        return prop.quoteColumnNameIfNeeds(columnDbName, true);
+        return prop.quoteColumnNameIfNeedsDirectUse(columnDbName);
     }
 
     public DfDtsColumnType getColumnType() {

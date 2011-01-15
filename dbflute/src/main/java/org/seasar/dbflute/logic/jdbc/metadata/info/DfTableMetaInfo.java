@@ -79,7 +79,7 @@ public class DfTableMetaInfo {
 
     public String buildTableSqlName() {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        final String quotedName = prop.quoteTableNameIfNeeds(_tableName, true);
+        final String quotedName = prop.quoteTableNameIfNeedsDirectUse(_tableName);
         return _unifiedSchema.buildSqlName(quotedName);
     }
 

@@ -318,7 +318,7 @@ public class Table {
 
     protected String quoteTableNameIfNeedsDirectUse(String tableName) {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.quoteTableNameIfNeeds(tableName, true);
+        return prop.quoteTableNameIfNeedsDirectUse(tableName);
     }
 
     // -----------------------------------------------------

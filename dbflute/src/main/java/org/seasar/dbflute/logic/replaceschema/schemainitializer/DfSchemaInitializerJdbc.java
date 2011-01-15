@@ -533,7 +533,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         //    tableName = _unifiedSchema.buildFullQualifiedName(tableName);
         //}
         DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        tableName = prop.quoteTableNameIfNeeds(tableName, true);
+        tableName = prop.quoteTableNameIfNeedsDirectUse(tableName);
         return tableName;
     }
 

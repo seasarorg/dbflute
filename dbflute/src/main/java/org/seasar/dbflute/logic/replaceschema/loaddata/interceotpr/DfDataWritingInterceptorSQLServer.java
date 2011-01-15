@@ -78,7 +78,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
 
     protected String quoteTableNameIfNeeds(String tableDbName) {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        return prop.quoteTableNameIfNeeds(tableDbName, true);
+        return prop.quoteTableNameIfNeedsDirectUse(tableDbName);
     }
 
     // ===================================================================================

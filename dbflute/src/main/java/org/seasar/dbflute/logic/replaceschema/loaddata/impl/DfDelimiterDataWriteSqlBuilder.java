@@ -59,12 +59,12 @@ public class DfDelimiterDataWriteSqlBuilder {
 
     protected String quoteTableNameIfNeeds(String tableDbName) {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        return prop.quoteTableNameIfNeeds(tableDbName, true);
+        return prop.quoteTableNameIfNeedsDirectUse(tableDbName);
     }
 
     protected String quoteColumnNameIfNeeds(String columnDbName) {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        return prop.quoteColumnNameIfNeeds(columnDbName, true);
+        return prop.quoteColumnNameIfNeedsDirectUse(columnDbName);
     }
 
     // ===================================================================================

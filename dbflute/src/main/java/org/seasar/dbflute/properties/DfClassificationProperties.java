@@ -274,11 +274,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
             String orderBy) {
-        final String code = element.getCode();
-        final String name = element.getName();
-        final String alias = element.getAlias();
-        final String comment = element.getComment();
-        final StringBuffer sb = new StringBuffer();
+        final String code = quoteColumnNameIfNeedsDirectUse(element.getCode());
+        final String name = quoteColumnNameIfNeedsDirectUse(element.getName());
+        final String alias = quoteColumnNameIfNeedsDirectUse(element.getAlias());
+        final String comment = quoteColumnNameIfNeedsDirectUse(element.getComment());
+        final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(code).append(" as cls_code");
         sb.append(", ").append(name).append(" as cls_name");
         sb.append(ln());
@@ -286,7 +286,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String commentColumn = Srl.is_NotNull_and_NotTrimmedEmpty(comment) ? comment : "null";
         sb.append(", ").append(commentColumn).append(" as cls_comment");
         sb.append(ln());
-        sb.append("  from ").append(table);
+        sb.append("  from ").append(quoteTableNameIfNeedsDirectUse(table));
+        // where and order-by is unsupported to be quoted
         if (Srl.is_NotNull_and_NotTrimmedEmpty(where)) {
             sb.append(ln());
             sb.append(" where ").append(where);
@@ -296,6 +297,16 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             sb.append(" order by ").append(orderBy);
         }
         return sb.toString();
+    }
+
+    protected String quoteTableNameIfNeedsDirectUse(String tableName) {
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        return littleProp.quoteTableNameIfNeedsDirectUse(tableName);
+    }
+
+    protected String quoteColumnNameIfNeedsDirectUse(String columnName) {
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        return littleProp.quoteColumnNameIfNeedsDirectUse(columnName);
     }
 
     protected Set<String> extractExceptCodeSet(final Map<?, ?> elementMap) {

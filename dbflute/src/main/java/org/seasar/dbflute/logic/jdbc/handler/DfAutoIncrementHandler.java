@@ -111,7 +111,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
     }
 
     protected String buildMetaDataSql(String pkName, String tableName) {
-        pkName = getProperties().getLittleAdjustmentProperties().quoteColumnNameIfNeeds(pkName, true);
+        pkName = getProperties().getLittleAdjustmentProperties().quoteColumnNameIfNeedsDirectUse(pkName);
         return "select " + pkName + " from " + tableName + " where 0 = 1";
     }
 }
