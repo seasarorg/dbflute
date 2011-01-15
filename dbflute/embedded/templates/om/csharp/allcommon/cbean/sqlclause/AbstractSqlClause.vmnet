@@ -772,6 +772,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             String columnSqlName = columnInfo.ColumnSqlName;
             SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
             selectColumnInfo.setTableAliasName(foreignTableAliasName);
+            selectColumnInfo.setColumnDbName(columnDbName);
             selectColumnInfo.setColumnSqlName(columnSqlName);
             selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
             resultMap.put(columnDbName, selectColumnInfo);
@@ -781,6 +782,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     public class SelectedSelectColumnInfo {
         protected String tableAliasName;
+        protected String columnDbName;
         protected String columnSqlName;
         protected String columnAliasName;
         public String buildRealColumnName() {
@@ -795,6 +797,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         public void setTableAliasName(String tableAliasName) {
             this.tableAliasName = tableAliasName;
+        }
+        public String getColumnDbName() {
+            return columnDbName;
+        }
+        public void setColumnDbName(String columnDbName) {
+            this.columnDbName = columnDbName;
         }
         public String getColumnSqlName() {
             return columnSqlName;
