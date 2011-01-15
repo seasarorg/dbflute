@@ -24,7 +24,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
  */
 public interface DfDataWritingInterceptor {
 
-    void processBeforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap);
+    void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap);
 
-    void processFinallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap);
+    void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap);
 }

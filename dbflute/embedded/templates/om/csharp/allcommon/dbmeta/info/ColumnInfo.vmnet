@@ -20,6 +20,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                       =========
         protected ${glDBMeta} dbmeta;
         protected String columnDbName;
+        protected String columnSqlName;
         protected String columnSynonym;
         protected String columnAlias;
         protected bool notNull;
@@ -38,18 +39,20 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnSynonym
-                            , String columnAlias, bool notNull, String propertyName
+        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnSqlName
+                            , String columnSynonym, String columnAlias, bool notNull, String propertyName
                             , Type propertyType, bool primary, String columnDbType, int? columnSize
                             , int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType
                             , String columnComment, List<String> foreignPropList, List<String> referrerPropList) {
             AssertObjectNotNull("dbmeta", dbmeta);
             AssertObjectNotNull("columnDbName", columnDbName);
+            AssertObjectNotNull("columnSqlName", columnSqlName);
             AssertObjectNotNull("propertyName", propertyName);
             AssertObjectNotNull("propertyType", propertyType);
             AssertObjectNotNull("optimisticLockType", optimisticLockType);
             this.dbmeta = dbmeta;
             this.columnDbName = columnDbName;
+            this.columnSqlName = columnSqlName;
             this.columnSynonym = columnSynonym;
             this.columnAlias = columnAlias;
             this.notNull = notNull;
@@ -128,6 +131,10 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public String ColumnDbName {
             get { return columnDbName; }
+        }
+
+        public String ColumnSqlName {
+            get { return columnSqlName; }
         }
 
         public String ColumnSynonym {

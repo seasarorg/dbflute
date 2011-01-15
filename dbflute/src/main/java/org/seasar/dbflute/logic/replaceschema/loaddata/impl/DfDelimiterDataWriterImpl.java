@@ -34,8 +34,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfDelimiterDataColumnDefFailureException;
+import org.seasar.dbflute.exception.DfDelimiterDataTableNotFoundException;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
-import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
@@ -84,20 +85,21 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         InputStreamReader ir = null;
         BufferedReader br = null;
 
-        String tableName = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
-        if (tableName.indexOf("-") >= 0) {
-            tableName = tableName.substring(tableName.indexOf("-") + "-".length());
+        String tableDbName = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
+        if (tableDbName.indexOf("-") >= 0) {
+            tableDbName = tableDbName.substring(tableDbName.indexOf("-") + "-".length());
         }
-        final Map<String, DfColumnMetaInfo> columnMap = getColumnInfoMap(tableName);
-        if (columnMap.isEmpty()) {
-            throwTableNotFoundException(tableName, _fileName);
+        final Map<String, DfColumnMetaInfo> columnInfoMap = getColumnInfoMap(tableDbName);
+        if (columnInfoMap.isEmpty()) {
+            throwTableNotFoundException(_fileName, tableDbName);
         }
 
         // process before handling table
-        beforeHandlingTable(tableName, columnMap);
+        beforeHandlingTable(tableDbName, columnInfoMap);
 
         String lineString = null;
         String preContinueString = "";
+        String executedSql = null;
         final List<String> columnNameList = new ArrayList<String>();
         final List<String> additionalColumnList = new ArrayList<String>();
         final List<String> valueList = new ArrayList<String>();
@@ -125,6 +127,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     firstLineInfo = getFirstLineInfo(_delimiter, lineString);
                     columnNameList.addAll(firstLineInfo.getColumnNameList());
+                    if (columnNameList.isEmpty()) {
+                        throwDelimiterDataColumnDefFailureException(_fileName, tableDbName);
+                    }
                     final StringSet columnSet = StringSet.createAsFlexible();
                     columnSet.addAll(columnNameList);
                     for (String defaultColumn : _defaultValueMap.keySet()) {
@@ -163,8 +168,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     }
 
                     final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
-                    sqlBuilder.setTableName(tableName);
-                    sqlBuilder.setColumnMap(columnMap);
+                    sqlBuilder.setTableDbName(tableDbName);
+                    sqlBuilder.setColumnMap(columnInfoMap);
                     sqlBuilder.setColumnNameList(columnNameList);
                     sqlBuilder.setValueList(valueList);
                     sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
@@ -174,11 +179,12 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         conn = _dataSource.getConnection();
                     }
                     if (ps == null) {
-                        ps = conn.prepareStatement(sqlBuilder.buildSql());
+                        executedSql = sqlBuilder.buildSql();
+                        ps = conn.prepareStatement(executedSql);
                     }
                     final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                     if (_loggingInsertSql) {
-                        _log.info(buildSql4Log(tableName, columnNameList, columnValueMap.values()));
+                        _log.info(buildSql4Log(tableDbName, columnNameList, columnValueMap.values()));
                     }
                     int bindCount = 1;
                     final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
@@ -189,7 +195,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // - - - - - - - - - - - - - - - - - - -
                         // Process Null (against Null Headache)
                         // - - - - - - - - - - - - - - - - - - -
-                        if (processNull(tableName, columnName, obj, ps, bindCount, columnMap)) {
+                        if (processNull(tableDbName, columnName, obj, ps, bindCount, columnInfoMap)) {
                             bindCount++;
                             continue;
                         }
@@ -199,7 +205,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // - - - - - - - - - - - - - - -
                         // If the value is not null and the value has the own type except string,
                         // It registers the value to statement by the type.
-                        if (processNotNullNotString(tableName, columnName, obj, conn, ps, bindCount, columnMap)) {
+                        if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnInfoMap)) {
                             bindCount++;
                             continue;
                         }
@@ -208,7 +214,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         // Process NotNull and StringExpression
                         // - - - - - - - - - - - - - - - - - - -
                         final String value = (String) obj;
-                        processNotNullString(tableName, columnName, value, conn, ps, bindCount, columnMap);
+                        processNotNullString(tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
                         bindCount++;
                     }
                     if (_suppressBatchUpdate) {
@@ -240,13 +246,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildRegistrationExceptionMessage(_fileName, tableName, lineString, nextEx);
+                String msg = buildRegistrationExceptionMessage(_fileName, tableDbName, lineString, executedSql, nextEx);
                 throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildRegistrationExceptionMessage(_fileName, tableName, lineString, e);
+            String msg = buildRegistrationExceptionMessage(_fileName, tableDbName, lineString, executedSql, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
-            String msg = buildRegistrationExceptionMessage(_fileName, tableName, lineString, e);
+            String msg = buildRegistrationExceptionMessage(_fileName, tableDbName, lineString, executedSql, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             try {
@@ -277,36 +283,39 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
             }
             // process after (finally) handling table
-            finallyHandlingTable(tableName, columnMap);
+            finallyHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
-    protected void throwTableNotFoundException(String tableName, String filename) {
+    protected void throwTableNotFoundException(String fileName, String tableDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The table specified on the delimiter file was not found in the schema.");
         br.addItem("Advice");
-        br.addElement("Please confirm the name about its spell.");
+        br.addElement("Please confirm the name about its spelling.");
         br.addElement("And confirm that whether the DLL executions have errors.");
-        br.addItem("Table");
-        br.addElement(tableName);
         br.addItem("Delimiter File");
-        br.addElement(filename);
+        br.addElement(fileName);
+        br.addItem("Table");
+        br.addElement(tableDbName);
         final String msg = br.buildExceptionMessage();
-        throw new DfTableNotFoundException(msg);
+        throw new DfDelimiterDataTableNotFoundException(msg);
     }
 
-    protected String buildRegistrationExceptionMessage(String filename, String tableName, String lineString, Exception e) {
+    protected String buildRegistrationExceptionMessage(String fileName, String tableDbName, String lineString,
+            String executedSql, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
-        br.addItem("File");
-        br.addElement(filename);
+        br.addItem("Delimiter File");
+        br.addElement(fileName);
         br.addItem("Table");
-        br.addElement(tableName);
-        br.addItem("Line String");
+        br.addElement(tableDbName);
+        br.addItem("Current Line");
         br.addElement(lineString);
+        br.addItem("Executed SQL");
+        br.addElement(executedSql);
         br.addItem("Message");
         br.addElement(e.getMessage());
-        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableName);
+        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
         if (bindTypeCacheMap != null) {
             br.addItem("Bind Type");
             final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
@@ -314,7 +323,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 br.addElement(entry.getKey() + " = " + entry.getValue());
             }
         }
-        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableName);
+        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
         if (bindTypeCacheMap != null) {
             br.addItem("String Processor");
             final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
@@ -325,16 +334,29 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         return br.buildExceptionMessage();
     }
 
-    protected void beforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
+    protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processBeforeHandlingTable(tableName, columnMap);
+            _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
-    protected void finallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
+    protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processFinallyHandlingTable(tableName, columnMap);
+            _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
         }
+    }
+
+    protected void throwDelimiterDataColumnDefFailureException(String fileName, String tableDbName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table specified on the delimiter file does not have columns.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the header definition of the delimiter file.");
+        br.addItem("Delimiter File");
+        br.addElement(fileName);
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfDelimiterDataColumnDefFailureException(msg);
     }
 
     // ===================================================================================
@@ -396,7 +418,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                          Value List
     //                                                                          ==========
     protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
-        // Don't use split!
+        // Don't use String.split() because the method
+        // does not match this (detail) specification!
         //final String[] values = lineString.split(delimiter);
         final List<String> valueList = Srl.splitList(lineString, delimiter);
         return arrangeValueList(valueList, delimiter);

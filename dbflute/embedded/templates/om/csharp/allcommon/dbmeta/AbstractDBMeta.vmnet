@@ -52,7 +52,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // createColumnInfo()
-        protected ${glColumnInfo} cci(String columnDbName, String columnSynonym, String columnAlias, bool notNull
+        protected ${glColumnInfo} cci(String columnDbName, String columnSqlName
+                , String columnSynonym, String columnAlias, bool notNull
                 , String propertyName, Type propertyType, bool primary, String columnDbType
                 , int? columnSize, int? columnDecimalDigits, bool commonColumn
                 , OptimisticLockType optimisticLockType, String columnComment
@@ -74,7 +75,8 @@ namespace ${glPackageBaseCommonDBMeta} {
                     referrerPropList.add(referrerProp.Trim());
                 }
             }
-            return new ${glColumnInfo}(this, columnDbName, columnSynonym, columnAlias, notNull, propertyName
+            return new ${glColumnInfo}(this, columnDbName, columnSqlName
+                    , columnSynonym, columnAlias, notNull, propertyName
                     , propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn
                     , optimisticLockType, columnComment, foreignPropList, referrerPropList);
         }
@@ -220,7 +222,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                   Name Handling
         //                                                                   =============
         public bool HasFlexibleName(String flexibleName) {
-            String key = flexibleName.ToLower();
+            String key = RemoveQuoteIfExists(flexibleName.ToLower());
             if (DbNamePropertyNameKeyToLowerMap.containsKey(key)) {
                 return true;
             }
@@ -231,7 +233,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         public String FindDbName(String flexibleName) {
-            String key = flexibleName.ToLower();
+            String key = RemoveQuoteIfExists(flexibleName.ToLower());
             if (PropertyNameDbNameKeyToLowerMap.containsKey(key)) {
                 return PropertyNameDbNameKeyToLowerMap.get(key);
             }
@@ -246,7 +248,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         public String FindPropertyName(String flexibleName) {
-            String key = flexibleName.ToLower();
+            String key = RemoveQuoteIfExists(flexibleName.ToLower());
             if (DbNamePropertyNameKeyToLowerMap.containsKey(key)) {
                 return DbNamePropertyNameKeyToLowerMap.get(key);
             }
@@ -258,6 +260,17 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
             String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
             throw new SystemException(msg);
+        }
+
+        protected static String RemoveQuoteIfExists(String name) {
+            if (name.StartsWith("\"") && name.EndsWith("\"")) {
+                name = name.Substring(1);
+                name = name.Substring(0, name.Length - 1);
+            } else if (name.StartsWith("[") && name.EndsWith("]")) {
+                name = name.Substring(1);
+                name = name.Substring(0, name.Length - 1);
+            }
+            return name;
         }
 
         // ===============================================================================

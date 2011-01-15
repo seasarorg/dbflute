@@ -26,9 +26,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.dbway.WayOfSQLServer;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * @author jflute
@@ -57,26 +59,34 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     }
 
     // ===================================================================================
-    //                                                                            Override
-    //                                                                            ========
-    public void processBeforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
-        if (hasIdentityColumn(_dataSource, tableName, columnMap)) {
-            turnOnIdentityInsert(_dataSource, tableName);
-            _identityTableSet.add(tableName);
+    //                                                                      Implementation
+    //                                                                      ==============
+    public void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+        final String tableSqlName = quoteTableNameIfNeeds(tableDbName);
+        if (hasIdentityColumn(_dataSource, tableSqlName, columnInfoMap)) {
+            turnOnIdentityInsert(_dataSource, tableSqlName);
+            _identityTableSet.add(tableSqlName);
         }
     }
 
-    public void processFinallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
-        if (_identityTableSet.contains(tableName)) {
-            turnOffIdentityInsert(_dataSource, tableName);
+    public void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+        final String tableSqlName = quoteTableNameIfNeeds(tableDbName);
+        if (_identityTableSet.contains(tableSqlName)) {
+            turnOffIdentityInsert(_dataSource, tableSqlName);
         }
+    }
+
+    protected String quoteTableNameIfNeeds(String tableDbName) {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return prop.quoteTableNameIfNeeds(tableDbName, true);
     }
 
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
-    protected boolean hasIdentityColumn(DataSource dataSource, String tableName, Map<String, DfColumnMetaInfo> columnMap) {
-        final String sql = "select ident_current ('" + tableName + "') as IDENT_CURRENT";
+    protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName,
+            Map<String, DfColumnMetaInfo> columnInfoMap) {
+        final String sql = "select ident_current ('" + tableSqlName + "') as IDENT_CURRENT";
         final Connection conn = getConnection(dataSource);
         Statement stmt = null;
         ResultSet rs = null;
@@ -112,16 +122,16 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
         }
     }
 
-    protected void turnOnIdentityInsert(DataSource dataSource, String tableName) {
-        setIdentityInsert(dataSource, tableName, true);
+    protected void turnOnIdentityInsert(DataSource dataSource, String tableSqlName) {
+        setIdentityInsert(dataSource, tableSqlName, true);
     }
 
-    protected void turnOffIdentityInsert(DataSource dataSource, String tableName) {
-        setIdentityInsert(dataSource, tableName, false);
+    protected void turnOffIdentityInsert(DataSource dataSource, String tableSqlName) {
+        setIdentityInsert(dataSource, tableSqlName, false);
     }
 
-    protected void setIdentityInsert(DataSource dataSource, String tableName, boolean insertOn) {
-        final String sql = buildIdentityInsertSettingSql(tableName, insertOn);
+    protected void setIdentityInsert(DataSource dataSource, String tableSqlName, boolean insertOn) {
+        final String sql = buildIdentityInsertSettingSql(tableSqlName, insertOn);
         if (_loggingSql) {
             _log.info(sql);
         }
@@ -146,12 +156,12 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
         }
     }
 
-    protected String buildIdentityInsertSettingSql(String tableName, boolean insertOn) {
+    protected String buildIdentityInsertSettingSql(String tableSqlName, boolean insertOn) {
         final WayOfSQLServer wayOfSQLServer = new WayOfSQLServer();
         if (insertOn) {
-            return wayOfSQLServer.buildIdentityDisableSql(tableName);
+            return wayOfSQLServer.buildIdentityDisableSql(tableSqlName);
         } else {
-            return wayOfSQLServer.buildIdentityEnableSql(tableName);
+            return wayOfSQLServer.buildIdentityEnableSql(tableSqlName);
         }
     }
 

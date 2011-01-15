@@ -513,7 +513,7 @@ namespace ${myExtendedEntityPackageName} {
 #if ($col.isIdentity())
         [Seasar.Dao.Attrs.ID("identity")]
 #end
-        [Seasar.Dao.Attrs.Column("${col.Name}")]
+        [Seasar.Dao.Attrs.Column("${col.columnSqlName}")]
         public ${col.JavaNative} ${col.javaName} {
 #if ($col.isEntityConvertEmptyStringToNull())
             get { return ConvertEmptyToNull(_${col.uncapitalisedJavaName}); }

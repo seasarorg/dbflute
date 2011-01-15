@@ -21,6 +21,7 @@ import java.util.List;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 
 /**
+ * The handler of xls data. (reading, writing)
  * @author jflute
  */
 public interface DfXlsDataHandler {

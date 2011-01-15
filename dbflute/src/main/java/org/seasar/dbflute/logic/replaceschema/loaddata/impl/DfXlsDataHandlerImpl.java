@@ -38,7 +38,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
-import org.seasar.dbflute.exception.DfTableNotFoundException;
+import org.seasar.dbflute.exception.DfXlsDataColumnDefFailureException;
+import org.seasar.dbflute.exception.DfXlsDataTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.DfDataColumn;
@@ -57,6 +58,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**
+ * The implementation of xls data handler. And also of writer.
  * @author jflute
  */
 public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDataHandler {
@@ -124,17 +126,20 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void doWriteDataTable(File file, DfDataTable dataTable) {
-        final String tableName = dataTable.getTableDbName();
+        final String tableDbName = dataTable.getTableDbName();
         if (dataTable.getRowSize() == 0) {
-            _log.info("*Not found row at the table: " + tableName);
+            _log.info("*Not found row at the table: " + tableDbName);
             return;
         }
 
         // set up columnMetaInfo
-        final Map<String, DfColumnMetaInfo> columnMap = getColumnInfoMap(tableName);
+        final Map<String, DfColumnMetaInfo> columnInfoMap = getColumnInfoMap(tableDbName);
+        if (columnInfoMap.isEmpty()) {
+            throwTableNotFoundException(file, tableDbName);
+        }
 
         // process before handling table
-        beforeHandlingTable(dataTable.getTableDbName(), columnMap);
+        beforeHandlingTable(tableDbName, columnInfoMap);
 
         // set up columnNameList
         final List<String> columnNameList = new ArrayList<String>();
@@ -155,7 +160,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
                     ps = conn.prepareStatement(preparedSql);
                 }
-                doWriteDataRow(file, dataTable, dataRow, columnMap, columnNameList, conn, ps);
+                doWriteDataRow(file, dataTable, dataRow, columnInfoMap, columnNameList, conn, ps);
             }
             if (!_suppressBatchUpdate) {
                 ps.executeBatch();
@@ -164,10 +169,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildRegistrationExceptionMessage(file, tableName, nextEx);
+                String msg = buildRegistrationExceptionMessage(file, tableDbName, nextEx);
                 throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildRegistrationExceptionMessage(file, tableName, e);
+            String msg = buildRegistrationExceptionMessage(file, tableDbName, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             if (ps != null) {
@@ -185,20 +190,34 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 }
             }
             // process after (finally) handling table
-            finallyHandlingTable(dataTable.getTableDbName(), columnMap);
+            finallyHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
-    protected String buildRegistrationExceptionMessage(File file, String tableName, Exception e) {
+    protected void throwTableNotFoundException(File file, String tableDbName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table specified on the xls file was not found in the schema.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the name about its spelling.");
+        br.addElement("And confirm that whether the DLL executions have errors.");
+        br.addItem("Xls File");
+        br.addElement(file);
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsDataTableNotFoundException(msg);
+    }
+
+    protected String buildRegistrationExceptionMessage(File file, String tableDbName, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
         br.addItem("Xls File");
         br.addElement(file);
         br.addItem("Table");
-        br.addElement(tableName);
+        br.addElement(tableDbName);
         br.addItem("Message");
         br.addElement(e.getMessage());
-        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableName);
+        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
         if (bindTypeCacheMap != null) {
             br.addItem("Bind Type");
             final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
@@ -206,7 +225,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 br.addElement(entry.getKey() + " = " + entry.getValue());
             }
         }
-        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableName);
+        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
         if (bindTypeCacheMap != null) {
             br.addItem("String Processor");
             final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
@@ -217,31 +236,31 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return br.buildExceptionMessage();
     }
 
-    protected void beforeHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
+    protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processBeforeHandlingTable(tableName, columnMap);
+            _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
-    protected void finallyHandlingTable(String tableName, Map<String, DfColumnMetaInfo> columnMap) {
+    protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
-            _dataWritingInterceptor.processFinallyHandlingTable(tableName, columnMap);
+            _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap, List<String> columnNameList, Connection conn,
+            Map<String, DfColumnMetaInfo> columnInfoMap, List<String> columnNameList, Connection conn,
             PreparedStatement ps) throws SQLException {
-        final String tableName = dataTable.getTableDbName();
+        final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
         final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
         if (columnValueMap.isEmpty()) {
-            throwTableNotFoundException(tableName, file);
+            throwXlsDataColumnDefFailureException(file, dataTable);
         }
         if (_loggingInsertSql) {
             final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
-            _log.info(getSql4Log(tableName, columnNameList, valueList));
+            _log.info(getSql4Log(tableDbName, columnNameList, valueList));
         }
         int bindCount = 1;
         final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
@@ -252,7 +271,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // - - - - - - - - - - - - - - - - - - -
             // Process Null (against Null Headache)
             // - - - - - - - - - - - - - - - - - - -
-            if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+            if (processNull(tableDbName, columnName, obj, ps, bindCount, columnInfoMap)) {
                 bindCount++;
                 continue;
             }
@@ -262,7 +281,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // - - - - - - - - - - - - - - -
             // If the value is not null and the value has the own type except string,
             // It registers the value to statement by the type.
-            if (processNotNullNotString(tableName, columnName, obj, conn, ps, bindCount, columnMetaInfoMap)) {
+            if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnInfoMap)) {
                 bindCount++;
                 continue;
             }
@@ -271,7 +290,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // Process NotNull and StringExpression
             // - - - - - - - - - - - - - - - - - - -
             final String value = (String) obj;
-            processNotNullString(tableName, columnName, value, conn, ps, bindCount, columnMetaInfoMap);
+            processNotNullString(tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
             bindCount++;
         }
         if (_suppressBatchUpdate) {
@@ -281,18 +300,28 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    protected void throwTableNotFoundException(String tableName, File file) {
+    protected void throwXlsDataColumnDefFailureException(File file, DfDataTable dataTable) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The table specified on the xls file was not found in the schema.");
+        br.addNotice("The table specified on the xls file does not have (writable) columns.");
         br.addItem("Advice");
-        br.addElement("Please confirm the name about its spell.");
-        br.addElement("And confirm that whether the DLL executions have errors.");
-        br.addItem("Table");
-        br.addElement(tableName);
+        br.addElement("Please confirm the column names about their spellings.");
+        br.addElement("And confirm the column definition of the table.");
         br.addItem("Xls File");
         br.addElement(file);
+        br.addItem("Table");
+        br.addElement(dataTable.getTableDbName());
+        br.addItem("Defined Column");
+        final int columnSize = dataTable.getColumnSize();
+        if (columnSize > 0) {
+            for (int i = 0; i < dataTable.getColumnSize(); i++) {
+                final DfDataColumn dataColumn = dataTable.getColumn(i);
+                br.addElement(dataColumn.getColumnDbName());
+            }
+        } else {
+            br.addElement("(no column)");
+        }
         final String msg = br.buildExceptionMessage();
-        throw new DfTableNotFoundException(msg);
+        throw new DfXlsDataColumnDefFailureException(msg);
     }
 
     // ===================================================================================

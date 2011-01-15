@@ -32,7 +32,8 @@ public class DfDataWritingInterceptorSybase extends DfDataWritingInterceptorSQLS
     }
 
     @Override
-    protected boolean hasIdentityColumn(DataSource dataSource, String tableName, Map<String, DfColumnMetaInfo> columnMap) {
+    protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName,
+            Map<String, DfColumnMetaInfo> columnMap) {
         for (DfColumnMetaInfo info : columnMap.values()) {
             if (info.isSybaseAutoIncrement()) {
                 return true;
@@ -42,12 +43,12 @@ public class DfDataWritingInterceptorSybase extends DfDataWritingInterceptorSQLS
     }
 
     @Override
-    protected String buildIdentityInsertSettingSql(String tableName, boolean insertOn) {
+    protected String buildIdentityInsertSettingSql(String tableSqlName, boolean insertOn) {
         final WayOfSybase wayOfSybase = new WayOfSybase();
         if (insertOn) {
-            return wayOfSybase.buildIdentityDisableSql(tableName);
+            return wayOfSybase.buildIdentityDisableSql(tableSqlName);
         } else {
-            return wayOfSybase.buildIdentityEnableSql(tableName);
+            return wayOfSybase.buildIdentityEnableSql(tableSqlName);
         }
     }
 }

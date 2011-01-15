@@ -24,7 +24,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     //====================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _tableName;
+    protected String _tableDbName;
     protected Map<String, DfColumnMetaInfo> _columnMap;
     protected List<String> _columnNameList;
     protected List<String> _valueList;
@@ -46,7 +46,7 @@ public class DfDelimiterDataWriteSqlBuilder {
             sb.append(", ").append(columnSqlName);
             sbValues.append(", ?");
         }
-        final String tableSqlName = quoteTableNameIfNeeds(_tableName);
+        final String tableSqlName = quoteTableNameIfNeeds(_tableDbName);
         sb.delete(0, ", ".length()).insert(0, "insert into " + tableSqlName + " (").append(")");
         sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
         sb.append(sbValues);
@@ -82,10 +82,10 @@ public class DfDelimiterDataWriteSqlBuilder {
                 if (hasDefaultValue(columnName)) {
                     continue;
                 }
-                Set<String> notFoundColumnSet = _notFoundColumnMap.get(_tableName);
+                Set<String> notFoundColumnSet = _notFoundColumnMap.get(_tableDbName);
                 if (notFoundColumnSet == null) {
                     notFoundColumnSet = new LinkedHashSet<String>();
-                    _notFoundColumnMap.put(_tableName, notFoundColumnSet);
+                    _notFoundColumnMap.put(_tableDbName, notFoundColumnSet);
                 }
                 notFoundColumnSet.add(columnName);
                 continue;
@@ -99,7 +99,7 @@ public class DfDelimiterDataWriteSqlBuilder {
                 }
             } catch (RuntimeException e) {
                 String msg = "valueList.get(columnCount) threw the exception:";
-                msg = msg + " tableName=" + _tableName + " columnNameList=" + _columnNameList;
+                msg = msg + " tableName=" + _tableDbName + " columnNameList=" + _columnNameList;
                 msg = msg + " valueList=" + _valueList + " columnCount=" + columnCount;
                 throw new DfTableDataRegistrationFailureException(msg, e);
             }
@@ -246,12 +246,12 @@ public class DfDelimiterDataWriteSqlBuilder {
         this._notFoundColumnMap = notFoundColumnMap;
     }
 
-    public String getTableName() {
-        return _tableName;
+    public String getTableDbName() {
+        return _tableDbName;
     }
 
-    public void setTableName(String tableName) {
-        this._tableName = tableName;
+    public void setTableDbName(String tableDbName) {
+        this._tableDbName = tableDbName;
     }
 
     public List<String> getValueList() {

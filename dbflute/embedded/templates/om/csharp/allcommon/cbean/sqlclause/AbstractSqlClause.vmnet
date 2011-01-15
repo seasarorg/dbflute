@@ -337,10 +337,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
         // Columns of local table.
         bool needsDelimiter = false;
         foreach (${glColumnInfo} columnInfo in columnInfoList) {
-            String columnName = columnInfo.ColumnDbName;
+            String columnDbName = columnInfo.ColumnDbName;
+            String columnSqlName = columnInfo.ColumnSqlName;
             
             // [DBFlute-0.7.4]
-            if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
+            if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
                 if (isSelectClauseTypeCountOrScalar() && hasUnionQuery()) {
                     // Here it must be with union query.
                     // So the primary Key is target for saving unique.
@@ -363,11 +364,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 sb.append(" ");
                 needsDelimiter = true;
             }
-            String realColumnName = getBasePointAliasName() + "." + columnName;
+            String realColumnName = getBasePointAliasName() + "." + columnSqlName;
             String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
-                _selectIndexMap.put(columnName.ToLower(), selectIndex); // lower because of case sensitive map
+                _selectIndexMap.put(columnDbName.ToLower(), selectIndex); // lower because of case sensitive map
                 onQueryName = buildSelectIndexAliasName(selectIndex);
             } else {
                 onQueryName = columnName;
@@ -598,7 +599,8 @@ public abstract class ${myClassName} : ${glSqlClause} {
             } else {
                 sb.append(" left outer join "); // is main!
             }
-            String foreignTableSqlName = findDBMeta(foreignTableDbName).TableSqlName;
+            ${glDBMeta} foreignDBMeta = findDBMeta(foreignTableDbName);
+            String foreignTableSqlName = foreignDBMeta.TableSqlName;
             List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
             String tableExp;
             if (inlineWhereClauseList.isEmpty()) {
@@ -767,9 +769,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
         ${glDBMeta} foreignDBMeta = foreignInfo.ForeignDBMeta;
         foreach (${glColumnInfo} columnInfo in foreignDBMeta.ColumnInfoList) {
             String columnDbName = columnInfo.ColumnDbName;
+            String columnSqlName = columnInfo.ColumnSqlName;
             SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
             selectColumnInfo.setTableAliasName(foreignTableAliasName);
-            selectColumnInfo.setColumnName(columnDbName);
+            selectColumnInfo.setColumnSqlName(columnSqlName);
             selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
             resultMap.put(columnDbName, selectColumnInfo);
         }
@@ -778,13 +781,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     public class SelectedSelectColumnInfo {
         protected String tableAliasName;
-        protected String columnName;
+        protected String columnSqlName;
         protected String columnAliasName;
         public String buildRealColumnName() {
             if (tableAliasName != null) {
-                return tableAliasName + "." + columnName;
+                return tableAliasName + "." + columnSqlName;
             } else {
-                return columnName;
+                return columnSqlName;
             }
         }
         public String getTableAliasName() {
@@ -793,11 +796,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
         public void setTableAliasName(String tableAliasName) {
             this.tableAliasName = tableAliasName;
         }
-        public String getColumnName() {
-            return columnName;
+        public String getColumnSqlName() {
+            return columnSqlName;
         }
-        public void setColumnName(String columnName) {
-            this.columnName = columnName;
+        public void setColumnSqlName(String columnSqlName) {
+            this.columnSqlName = columnSqlName;
         }
         public String getColumnAliasName() {
             return columnAliasName;

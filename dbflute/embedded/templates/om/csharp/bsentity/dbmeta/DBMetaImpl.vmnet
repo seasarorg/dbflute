@@ -59,7 +59,7 @@ namespace ${myDBMetaPackageName} {
 
         protected void InitializeColumnInfo() {
 #foreach ($col in $table.columns)
-            _column${col.javaName} = cci("${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaName}", ${col.javaNativeTypeLiteral}, ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression});
+            _column${col.javaName} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaName}", ${col.javaNativeTypeLiteral}, ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression});
 #end
         }
 

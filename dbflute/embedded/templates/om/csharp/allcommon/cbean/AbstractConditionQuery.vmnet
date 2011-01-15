@@ -118,13 +118,17 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
-    public String toColumnRealName(String columnName) {
-        assertColumnName(columnName);
-        return buildRealColumnName(xgetAliasName(), columnName);
+    public String toColumnRealName(String columnDbName) {
+        assertColumnName(columnDbName);
+        return buildRealColumnName(xgetAliasName(), toColumnSqlName(columnDbName));
     }
 
-	protected String buildRealColumnName(String aliasName, String columnName) {
-        return aliasName + "." + columnName;
+	protected String buildRealColumnName(String aliasName, String columnDbName) {
+        return aliasName + "." + columnDbName;
+    }
+
+    public String toColumnSqlName(String columnDbName) {
+        return findDBMeta(getTableDbName()).FindColumnInfo(columnDbName).ColumnSqlName;
     }
 
     // -----------------------------------------------------
