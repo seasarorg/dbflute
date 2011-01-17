@@ -240,7 +240,7 @@ namespace ${myExtendedEntityPackageName} {
         protected ${foreignEntityClassName} ${foreignVariableName};
 
         /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${fk.foreignPropertyNameInitCap}'.</summary>
-        [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$fk.RelationKeysCommaString")]
+        [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$fk.relationKeysCommaString")]
         public ${foreignEntityClassName} ${fk.foreignPropertyNameInitCap} {
             get { return ${foreignVariableName}; }
             set { ${foreignVariableName} = value; }

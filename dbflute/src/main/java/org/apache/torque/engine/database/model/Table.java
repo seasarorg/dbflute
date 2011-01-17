@@ -1014,7 +1014,7 @@ public class Table {
         ForeignKey firstFK = null;
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = iter.next();
-            List<String> localColumns = key.getLocalColumns();
+            List<String> localColumns = key.getLocalColumnNameList();
             if (Srl.containsElementIgnoreCase(localColumns, columnName)) {
                 if (firstFK == null) {
                     firstFK = key;
@@ -1028,7 +1028,7 @@ public class Table {
         List<ForeignKey> fkList = new ArrayList<ForeignKey>();
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = iter.next();
-            List<String> localColumns = key.getLocalColumns();
+            List<String> localColumns = key.getLocalColumnNameList();
             if (Srl.containsElementIgnoreCase(localColumns, columnName)) {
                 fkList.add(key);
             }
@@ -1174,12 +1174,12 @@ public class Table {
                 continue;
             }
             final StringSet currentLocalColumnNameSet = StringSet.createAsFlexibleOrdered();
-            currentLocalColumnNameSet.addAll(key.getLocalColumns());
+            currentLocalColumnNameSet.addAll(key.getLocalColumnNameList());
             if (!localColumnNameSet.equalsUnderCharOption(currentLocalColumnNameSet)) {
                 continue;
             }
             final StringSet currentForeignColumnNameSet = StringSet.createAsFlexibleOrdered();
-            currentForeignColumnNameSet.addAll(key.getForeignColumns());
+            currentForeignColumnNameSet.addAll(key.getForeignColumnNameList());
             if (!foreignColumnNameSet.equalsUnderCharOption(currentForeignColumnNameSet)) {
                 continue;
             }

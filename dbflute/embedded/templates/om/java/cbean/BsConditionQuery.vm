@@ -523,7 +523,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected void xsetupOuterJoin${fk.foreignPropertyNameInitCap}() {
         ${foreignCQClassName} cq = getConditionQuery${fk.foreignPropertyNameInitCap}();
         Map<String, String> joinOnMap = newLinkedHashMap();
-#foreach ($columnName in $fk.LocalColumns)
+#foreach ($columnName in $fk.localColumnNameList)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $fk.getLocalForeignMapping().get($columnName))
         joinOnMap.put("${localColumn.name}", "${foreignColumnName}");
@@ -567,7 +567,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected void xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}() {
         ${relatedCQClassName} cq = getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
         Map<String, String> joinOnMap = newLinkedHashMap();
-#foreach ($columnName in $referrer.foreignColumns)
+#foreach ($columnName in $referrer.foreignColumnNameList)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))
         joinOnMap.put("${foreignColumn.name}", "${referrerColumnName}");
@@ -635,7 +635,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerExistsReferrer(cb.query(), "${referrer.foreignColumnNames}", "${referrer.localColumnNames}", subQueryPropertyName);
+        registerExistsReferrer(cb.query(), "${referrer.foreignColumnNames}", "${referrer.localColumnNameCommaString}", subQueryPropertyName);
     }
     protected Map<String, ${relatedCQClassName}> _${subQueryPropertyName}Map;
     public Map<String, ${relatedCQClassName}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }

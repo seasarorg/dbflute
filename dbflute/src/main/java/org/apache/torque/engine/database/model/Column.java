@@ -783,7 +783,7 @@ public class Column {
                 continue;
             }
             // same table reference was found
-            final List<String> columnsNameList = fks[i].getLocalColumns();
+            final List<String> columnsNameList = fks[i].getLocalColumnNameList();
 
             // the bug exists but it doesn't have heavy problem so not fixed for compatibility
             //  if FOO_ID, BAR_ID, QUX_ID : FK_ONE(FOO_ID, BAR_ID), FK_TWO(BAR_ID, QUX_ID)
@@ -1609,34 +1609,15 @@ public class Column {
     }
 
     // ===================================================================================
-    //                                                                      Column Utility
-    //                                                                      ==============
-    public static String makeList(List<String> columns) {
-        Object obj = columns.get(0);
-        boolean isColumnList = (obj instanceof Column);
-        if (isColumnList) {
-            obj = ((Column) obj).getName();
-        }
-        StringBuilder buf = new StringBuilder((String) obj);
-        for (int i = 1; i < columns.size(); i++) {
-            obj = columns.get(i);
-            if (isColumnList) {
-                obj = ((Column) obj).getName();
-            }
-            buf.append(", ").append(obj);
-        }
-        return buf.toString();
-    }
-
-    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     /**
      * String representation of the column. This is an xml representation.
      * @return string representation in xml
      */
+    @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         result.append("    <column name=\"").append(_name).append('"');
 
         if (_javaName != null) {

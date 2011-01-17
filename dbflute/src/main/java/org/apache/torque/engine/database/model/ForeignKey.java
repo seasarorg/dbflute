@@ -87,6 +87,9 @@ public class ForeignKey {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected String _name; // constraint name (no change because it's used by templates)
 
     protected Table _localTable;
@@ -96,12 +99,23 @@ public class ForeignKey {
     protected String _fixedSuffix;
     protected String _comment;
 
+    // -----------------------------------------------------
+    //                                            Additional
+    //                                            ----------
     protected boolean _additionalForeignKey;
     protected String _foreignPropertyNamePrefix;
 
-    protected final List<String> _localColumns = new ArrayList<String>(3);
-    protected final List<String> _foreignColumns = new ArrayList<String>(3);
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
+    protected List<Column> _localColumnList; // lazy-loaded
+    protected List<Column> _foreignColumnList; // lazy-loaded
+    protected final List<String> _localColumnNameList = new ArrayList<String>(3);
+    protected final List<String> _foreignColumnNameList = new ArrayList<String>(3);
 
+    // -----------------------------------------------------
+    //                                               Mapping
+    //                                               -------
     protected final Map<String, String> _localForeignMap = StringKeyMap.createAsFlexibleOrdered();
     protected final Map<String, String> _foreignLocalMap = StringKeyMap.createAsFlexibleOrdered();
     protected final Map<String, String> _dynamicFixedConditionMap = DfCollectionUtil.newLinkedHashMap();
@@ -138,8 +152,8 @@ public class ForeignKey {
      * @param foreign name of the foreign column
      */
     public void addReference(String local, String foreign) {
-        _localColumns.add(local);
-        _foreignColumns.add(foreign);
+        _localColumnNameList.add(local);
+        _foreignColumnNameList.add(foreign);
         _localForeignMap.put(local, foreign);
         _foreignLocalMap.put(foreign, local);
     }
@@ -150,173 +164,12 @@ public class ForeignKey {
      * @param foreignColumnNameList Name list of the foreign column
      */
     public void addReference(List<String> localColumnNameList, List<String> foreignColumnNameList) {
-        _localColumns.addAll(localColumnNameList);
-        _foreignColumns.addAll(foreignColumnNameList);
+        _localColumnNameList.addAll(localColumnNameList);
+        _foreignColumnNameList.addAll(foreignColumnNameList);
         for (int i = 0; i < localColumnNameList.size(); i++) {
             _localForeignMap.put(localColumnNameList.get(i), foreignColumnNameList.get(i));
             _foreignLocalMap.put(foreignColumnNameList.get(i), localColumnNameList.get(i));
         }
-    }
-
-    // ===================================================================================
-    //                                                                          Class Name
-    //                                                                          ==========
-    // -----------------------------------------------------
-    //                                    Foreign Class Name
-    //                                    ------------------
-    public String getForeignTableExtendedEntityClassName() {
-        return getForeignTable().getExtendedEntityClassName();
-    }
-
-    public String getForeignTableDBMetaClassName() {
-        return getForeignTable().getDBMetaClassName();
-    }
-
-    public String getForeignTableExtendedConditionBeanClassName() {
-        return getForeignTable().getExtendedConditionBeanClassName();
-    }
-
-    public String getForeignTableExtendedConditionQueryClassName() {
-        return getForeignTable().getExtendedConditionQueryClassName();
-    }
-
-    public String getForeignTableNestSelectSetupperClassName() {
-        return getForeignTable().getNestSelectSetupperClassName();
-    }
-
-    public String getForeignTableNestSelectSetupperTerminalClassName() {
-        return getForeignTable().getNestSelectSetupperTerminalClassName();
-    }
-
-    public String getForeignTableExtendedSimpleDtoClassName() {
-        return getForeignTable().getExtendedSimpleDtoClassName();
-    }
-
-    // -----------------------------------------------------
-    //                                   Referrer Class Name
-    //                                   -------------------
-    public String getReferrerTableExtendedEntityClassName() {
-        return getTable().getExtendedEntityClassName();
-    }
-
-    public String getReferrerTableExtendedBehaviorClassName() {
-        return getTable().getExtendedBehaviorClassName();
-    }
-
-    public String getReferrerTableDBMetaClassName() {
-        return getTable().getDBMetaClassName();
-    }
-
-    public String getReferrerTableExtendedConditionBeanClassName() {
-        return getTable().getExtendedConditionBeanClassName();
-    }
-
-    public String getReferrerTableExtendedConditionQueryClassName() {
-        return getTable().getExtendedConditionQueryClassName();
-    }
-
-    public String getReferrerTableNestSelectSetupperClassName() {
-        return getTable().getNestSelectSetupperClassName();
-    }
-
-    public String getReferrerTableNestSelectSetupperTerminalClassName() {
-        return getTable().getNestSelectSetupperTerminalClassName();
-    }
-
-    public String getReferrerTableExtendedSimpleDtoClassName() {
-        return getTable().getExtendedSimpleDtoClassName();
-    }
-
-    // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
-    /**
-     * Is this relation 'one-to-one'?
-     * @return Determination.
-     */
-    public boolean isOneToOne() {
-        final List<Column> localColumnList = getLocalColumnObjectList();
-        final List<Column> localPrimaryColumnList = getTable().getPrimaryKey();
-        if (localColumnList.equals(localPrimaryColumnList)) {
-            return true;
-        } else {
-            final List<Unique> uniqueList = getTable().getUniqueList();
-            for (final Unique unique : uniqueList) {
-                if (unique.hasSameColumnSet(localColumnList)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean isBizOneToOne() {
-        return isOneToOne() && hasFixedCondition();
-    }
-
-    public boolean isSimpleKeyFK() {
-        return _localColumns.size() == 1;
-    }
-
-    public boolean isCompoundFK() {
-        return _localColumns.size() > 1;
-    }
-
-    public boolean isSelfReference() {
-        return _localTable.getName().equals(_foreignTableName);
-    }
-
-    public boolean canBeReferrer() {
-        if (hasFixedCondition()) {
-            return false;
-        }
-        return isForeignColumnPrimaryKey() || isForeignColumnUnique();
-
-        // *reference to unique key is unsupported basically
-        //  (a-little-supported)
-    }
-
-    /**
-     * Are all local columns primary-key?
-     * @return Determination.
-     */
-    public boolean isLocalColumnPrimaryKey() {
-        return isColumnPrimaryKey(getLocalColumnList());
-    }
-
-    /**
-     * Are all foreign columns primary-key? <br />
-     * Basically true. If biz-one-to-one and unique key, false.
-     * @return Determination.
-     */
-    public boolean isForeignColumnPrimaryKey() {
-        return isColumnPrimaryKey(getForeignColumnList());
-    }
-
-    /**
-     * Are all foreign columns unique-key? <br />
-     * @return Determination.
-     */
-    public boolean isForeignColumnUnique() {
-        return isColumnUnique(getForeignColumnList());
-    }
-
-    protected boolean isColumnPrimaryKey(List<Column> columnList) {
-        for (Column column : columnList) {
-            if (!column.isPrimaryKey()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    protected boolean isColumnUnique(List<Column> columnList) {
-        for (Column column : columnList) {
-            if (!column.isUnique()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     // ===================================================================================
@@ -336,191 +189,11 @@ public class ForeignKey {
     }
 
     // ===================================================================================
-    //                                                                              Column
-    //                                                                              ======
+    //                                                                       Property Name
+    //                                                                       =============
     // -----------------------------------------------------
-    //                                         Local Element
-    //                                         -------------
-    public List<String> getLocalColumns() {
-        return _localColumns;
-    }
-
-    public List<Column> getLocalColumnList() {
-        return getLocalColumnObjectList();
-    }
-
-    public Column getLocalColumnAsOne() {
-        return getTable().getColumn(getLocalColumnNameAsOne());
-    }
-
-    public String getLocalColumnNameAsOne() {
-        if (getLocalColumns().size() != 1) {
-            String msg = "This method is for only-one foreign-key:";
-            msg = msg + " getForeignColumns().size()=" + getLocalColumns().size();
-            msg = msg + " baseTable=" + getTable().getName() + " foreignTable=" + getForeignTable().getName();
-            throw new IllegalStateException(msg);
-        }
-        return getLocalColumns().get(0);
-    }
-
-    public String getLocalColumnJavaNameAsOne() {
-        return getLocalColumnAsOne().getJavaName();
-    }
-
-    public List<String> getLocalColumnJavaNameList() {
-        final List<String> resultList = new ArrayList<String>();
-        final List<Column> localColumnList = getLocalColumnList();
-        for (Column column : localColumnList) {
-            resultList.add(column.getJavaName());
-        }
-        return resultList;
-    }
-
-    public List<Column> getLocalColumnObjectList() {
-        final List<String> columnList = getLocalColumns();
-        if (columnList == null || columnList.isEmpty()) {
-            String msg = "The localColumnList is null or empty." + columnList;
-            throw new IllegalStateException(msg);
-        }
-        final List<Column> resultList = new ArrayList<Column>();
-        for (final Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
-            final String name = (String) ite.next();
-            final Column col = getTable().getColumn(name);
-            if (col == null) {
-                String msg = "The columnName is not existing at the table: ";
-                msg = msg + "columnName=" + name + " tableName=" + getTable().getName();
-                throw new IllegalStateException(msg);
-            }
-            resultList.add(col);
-        }
-        return resultList;
-    }
-
-    public Column getLocalColumnByForeignColumn(Column foreignColumn) {
-        final String localColumnName = getForeignLocalMapping().get(foreignColumn.getName());
-        return getTable().getColumn(localColumnName);
-    }
-
-    public boolean hasLocalColumnExceptPrimaryKey() {
-        final List<Column> localColumnList = getLocalColumnList();
-        for (Column column : localColumnList) {
-            if (!column.isPrimaryKey()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // -----------------------------------------------------
-    //                                       Foreign Element
-    //                                       ---------------
-    public List<Column> getForeignColumnList() {
-        return getForeignColumnObjectList();
-    }
-
-    public List<String> getForeignColumnNameList() {
-        return _foreignColumns;
-    }
-
-    public List<String> getForeignColumns() {// Old Style Name
-        return _foreignColumns;
-    }
-
-    public Column getForeignColumnAsOne() {
-        return getForeignTable().getColumn(getForeignColumnNameAsOne());
-    }
-
-    public String getForeignColumnNameAsOne() {
-        if (getForeignColumns().size() != 1) {
-            String msg = "This method is for only-one foreign-key:";
-            msg = msg + " getForeignColumns().size()=" + getForeignColumns().size();
-            msg = msg + " baseTable=" + getTable().getName();
-            msg = msg + " foreignTable=" + getForeignTable().getName();
-            throw new IllegalStateException(msg);
-        }
-        return getForeignColumns().get(0);
-    }
-
-    public String getForeignColumnJavaNameAsOne() {
-        final String columnName = getForeignColumnNameAsOne();
-        final Table foreignTable = getForeignTable();
-        return foreignTable.getColumn(columnName).getJavaName();
-    }
-
-    /**
-     * Returns the list of foreign column objects. You should not edit this List.
-     * @return the foreign objects
-     */
-    public List<Column> getForeignColumnObjectList() {
-        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
-        final List<String> columnList = getForeignColumns();
-        if (columnList == null || columnList.isEmpty()) {
-            String msg = "The getForeignColumns() is null or empty." + columnList;
-            throw new IllegalStateException(msg);
-        }
-        final List<Column> resultList = new ArrayList<Column>();
-        for (Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
-            final String name = (String) ite.next();
-            final Column foreignCol = foreignTable.getColumn(name);
-            resultList.add(foreignCol);
-        }
-        return resultList;
-    }
-
-    public Column getForeignColumnByLocalColumn(Column localColumn) {
-        final String foreignColumnName = getLocalForeignMapping().get(localColumn.getName());
-        return getForeignTable().getColumn(foreignColumnName);
-    }
-
-    // ==========================================================================================
-    //                                                                             Column Mapping
-    //                                                                             ==============
-    // -----------------------------------------------------
-    //                                               Mapping
+    //                                               Foreign
     //                                               -------
-    public Map<String, String> getLocalForeignMapping() {
-        return _localForeignMap;
-    }
-
-    public Map<String, String> getForeignLocalMapping() {
-        return _foreignLocalMap;
-    }
-
-    // -----------------------------------------------------
-    //                                       String Accessor
-    //                                       ---------------
-    /**
-     * Returns a comma delimited string of local column names
-     * @return Generated string.
-     */
-    public String getLocalColumnNames() {
-        return Column.makeList(getLocalColumns());
-    }
-
-    /**
-     * Returns a comma delimited string of foreign column names
-     * @return Generated string.
-     */
-    public String getForeignColumnNames() {
-        return Column.makeList(getForeignColumns());
-    }
-
-    /**
-     * Returns first local column name.
-     * @return Fisrt local column name.
-     */
-    public String getFirstLocalColumnName() {
-        return getLocalColumns().get(0);
-    }
-
-    /**
-     * Returns first local column name.
-     * @return Fisrt local column name.
-     */
-    public String getFirstForeignColumnName() {
-        return getForeignColumns().get(0);
-    }
-
     /**
      * Get the value of foreign property name.
      * @return Generated string.
@@ -551,7 +224,7 @@ public class ForeignKey {
      * @return Generated string.
      */
     protected String getForeignPropertyName(boolean isJavaBeansRule) {
-        final List<Column> localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnList();
         String name = "";
         if (hasFixedSuffix()) {
             name = getFixedSuffix();
@@ -600,6 +273,14 @@ public class ForeignKey {
         return columnAliasName;
     }
 
+    public String getForeignPropertyNameInitCap() {
+        final String foreignPropertyName = getForeignPropertyName();
+        return foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
+    }
+
+    // -----------------------------------------------------
+    //                                              Referrer
+    //                                              --------
     public String getReferrerPropertyName() {
         return getReferrerPropertyName(false);
     }
@@ -614,7 +295,7 @@ public class ForeignKey {
     }
 
     public String getReferrerPropertyName(boolean isJavaBeansRule) {
-        final List<Column> localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnList();
 
         final List<String> columnNameList = new ArrayList<String>();
 
@@ -630,7 +311,7 @@ public class ForeignKey {
                     result = result + col.getJavaName();
                 }
             }
-            if (result.trim().length() != 0) {// isMultipleFK()==true
+            if (result.trim().length() != 0) { // isMultipleFK()==true
                 final String aliasName = getMultipleFKPropertyColumnAliasName(getForeignTable().getName(),
                         columnNameList);
                 if (aliasName != null && aliasName.trim().length() != 0) {
@@ -676,7 +357,7 @@ public class ForeignKey {
     }
 
     protected String getReferrerPropertyNameAsOne(boolean isJavaBeansRule) {
-        final List<Column> localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnList();
 
         String result = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
@@ -699,64 +380,213 @@ public class ForeignKey {
         }
     }
 
-    public String getForeignPropertyNameInitCap() {
-        final String foreignPropertyName = getForeignPropertyName();
-        return foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
-    }
-
     public String getReferrerPropertyNameInitCap() {
         final String referrerPropertyName = getReferrerPropertyName();
         return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
     }
 
-    // For S2JDBC
-    public String getReferrerPropertyNameAsOneS2Jdbc() {
-        final List<Column> localColumnList = getLocalColumnObjectList();
-
-        String result = "";
-        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
-
-            if (col.isMultipleFK()) {
-                result = result + col.getJavaName();
+    // ===================================================================================
+    //                                                                              Column
+    //                                                                              ======
+    // -----------------------------------------------------
+    //                                                 Local
+    //                                                 -----
+    public List<Column> getLocalColumnList() {
+        if (_localColumnList != null) {
+            return _localColumnList;
+        }
+        final List<String> columnList = getLocalColumnNameList();
+        if (columnList == null || columnList.isEmpty()) {
+            String msg = "The list of local column is null or empty." + columnList;
+            throw new IllegalStateException(msg);
+        }
+        final List<Column> resultList = new ArrayList<Column>();
+        for (final Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
+            final String name = (String) ite.next();
+            final Column col = getTable().getColumn(name);
+            if (col == null) {
+                String msg = "The columnName is not existing at the table: ";
+                msg = msg + "columnName=" + name + " tableName=" + getTable().getName();
+                throw new IllegalStateException(msg);
             }
+            resultList.add(col);
         }
-        if (result.trim().length() != 0) {
-            result = "By" + result;
-        }
-        if (getTable().getName().equals(getForeignTable().getName())) {
-            result = result + "Self";
-        }
-        return getTable().getUncapitalisedJavaName() + result;
+        _localColumnList = resultList;
+        return _localColumnList;
     }
 
+    public List<String> getLocalColumnNameList() {
+        return _localColumnNameList;
+    }
+
+    public List<String> getLocalColumnJavaNameList() {
+        final List<String> resultList = new ArrayList<String>();
+        final List<Column> localColumnList = getLocalColumnList();
+        for (Column column : localColumnList) {
+            resultList.add(column.getJavaName());
+        }
+        return resultList;
+    }
+
+    public Column getLocalColumnAsOne() {
+        return getTable().getColumn(getLocalColumnNameAsOne());
+    }
+
+    public String getLocalColumnNameAsOne() {
+        final List<String> columnNameList = getLocalColumnNameList();
+        if (columnNameList.size() != 1) {
+            String msg = "This method is for only-one foreign-key:";
+            msg = msg + " getLocalColumnNameList().size()=" + columnNameList.size();
+            msg = msg + " baseTable=" + getTable().getName() + " foreignTable=" + getForeignTable().getName();
+            throw new IllegalStateException(msg);
+        }
+        return columnNameList.get(0);
+    }
+
+    public String getLocalColumnJavaNameAsOne() {
+        return getLocalColumnAsOne().getJavaName();
+    }
+
+    public Column getLocalColumnByForeignColumn(Column foreignColumn) {
+        final String localColumnName = getForeignLocalMapping().get(foreignColumn.getName());
+        return getTable().getColumn(localColumnName);
+    }
+
+    public boolean hasLocalColumnExceptPrimaryKey() {
+        final List<Column> localColumnList = getLocalColumnList();
+        for (Column column : localColumnList) {
+            if (!column.isPrimaryKey()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // -----------------------------------------------------
+    //                                       Foreign Element
+    //                                       ---------------
+    public List<Column> getForeignColumnList() {
+        if (_foreignColumnList != null) {
+            return _foreignColumnList;
+        }
+        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
+        final List<String> columnList = getForeignColumnNameList();
+        if (columnList == null || columnList.isEmpty()) {
+            String msg = "The list of foreign column is null or empty." + columnList;
+            throw new IllegalStateException(msg);
+        }
+        final List<Column> resultList = new ArrayList<Column>();
+        for (Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
+            final String name = (String) ite.next();
+            final Column foreignCol = foreignTable.getColumn(name);
+            resultList.add(foreignCol);
+        }
+        _foreignColumnList = resultList;
+        return _foreignColumnList;
+    }
+
+    public List<String> getForeignColumnNameList() {
+        return _foreignColumnNameList;
+    }
+
+    public Column getForeignColumnAsOne() {
+        return getForeignTable().getColumn(getForeignColumnNameAsOne());
+    }
+
+    public String getForeignColumnNameAsOne() {
+        final List<String> columnNameList = getForeignColumnNameList();
+        if (columnNameList.size() != 1) {
+            String msg = "This method is for only-one foreign-key:";
+            msg = msg + " getForeignColumnNameList().size()=" + columnNameList.size();
+            msg = msg + " baseTable=" + getTable().getName();
+            msg = msg + " foreignTable=" + getForeignTable().getName();
+            throw new IllegalStateException(msg);
+        }
+        return columnNameList.get(0);
+    }
+
+    public String getForeignColumnJavaNameAsOne() {
+        final String columnName = getForeignColumnNameAsOne();
+        final Table foreignTable = getForeignTable();
+        return foreignTable.getColumn(columnName).getJavaName();
+    }
+
+    public Column getForeignColumnByLocalColumn(Column localColumn) {
+        final String foreignColumnName = getLocalForeignMapping().get(localColumn.getName());
+        return getForeignTable().getColumn(foreignColumnName);
+    }
+
+    // ===================================================================================
+    //                                                                      Column Mapping
+    //                                                                      ==============
+    public Map<String, String> getLocalForeignMapping() {
+        return _localForeignMap;
+    }
+
+    public Map<String, String> getForeignLocalMapping() {
+        return _foreignLocalMap;
+    }
+
+    // ===================================================================================
+    //                                                                   Column Expression
+    //                                                                   =================
+    // -----------------------------------------------------
+    //                                                 Local
+    //                                                 -----
     /**
-     * Returns comma-string for local column name.
+     * Returns a comma delimited string of local column names.
      * @return Generated string.
      */
-    public String getLocalColumnNameCommaString() {
+    public String getLocalColumnNameCommaString() { // same as 
         return DfColumnListToStringUtil.getColumnNameCommaString(getLocalColumnList());
     }
 
     /**
-     * Returns LocalColumn-Getter-CommaString.[getRcvlcqNo(), getSprlptTp()]
+     * Returns a comma delimited string of local column getters. [getRcvlcqNo(), getSprlptTp()]
      * @return Generated string.
      */
     public String getLocalColumnGetterCommaString() {
-        final List<Column> localColumnList = getLocalColumnObjectList();
-        String result = "";
-        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
-            final String getterString = "get" + col.getJavaName() + "()";
-            if ("".equals(result)) {
-                result = getterString;
-            } else {
-                result = result + ", " + getterString;
-            }
-        }
-        return result;
+        return DfColumnListToStringUtil.getColumnGetterCommaString(getLocalColumnList());
     }
 
+    /**
+     * Returns a local column name of first element.
+     * @return Selected string.
+     */
+    public String getFirstLocalColumnName() {
+        return getLocalColumnNameList().get(0);
+    }
+
+    // -----------------------------------------------------
+    //                                               Foreign
+    //                                               -------
+    /**
+     * Returns a comma delimited string of foreign column names.
+     * @return Generated string.
+     */
+    public String getForeignColumnNameCommaString() {
+        return DfColumnListToStringUtil.getColumnNameCommaString(getForeignColumnList());
+    }
+
+    /**
+     * Returns a comma delimited string of foreign column getters. [getRcvlcqNo(), getSprlptTp()]
+     * @return Generated string.
+     */
+    public String getForeignColumnGetterCommaString() {
+        return DfColumnListToStringUtil.getColumnGetterCommaString(getForeignColumnList());
+    }
+
+    /**
+     * Returns a foreign column name of first element.
+     * @return Selected string.
+     */
+    public String getFirstForeignColumnName() {
+        return getForeignColumnNameList().get(0);
+    }
+
+    // -----------------------------------------------------
+    //                                          Setup String
+    //                                          ------------
     /**
      * Returns ForeignTable-BeanSetupString. [setRcvlcqNo_Suffix(getRcvlcqNo()).setSprlptTp_Suffix(getSprlptTp())]
      * @param setterSuffix Setter suffix(_Equal and _IsNotNull and so on...).
@@ -767,7 +597,7 @@ public class ForeignKey {
     }
 
     public String getForeignTableBeanSetupString(String setterSuffix, String setterPrefix) {
-        final List<Column> localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnList();
         String result = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
@@ -785,7 +615,7 @@ public class ForeignKey {
 
     /**
      * Returns ChildrenTable-BeanSetupString. [setRcvlcqNo_Suffix(getRcvlcqNo()).setSprlptTp_Suffix(getSprlptTp());]
-     * Abount ForeginKey that Table#getReferrer() returns, Local means children.
+     * About ForeginKey that Table#getReferrer() returns, Local means children.
      * @param setterSuffix Setter suffix(_Equal and _IsNotNull and so on...).
      * @return Generated string.
      */
@@ -794,7 +624,7 @@ public class ForeignKey {
     }
 
     public String getChildrenTableBeanSetupString(String setterSuffix, String setterPrefix) {
-        List<Column> localColumnList = getLocalColumnObjectList();
+        List<Column> localColumnList = getLocalColumnList();
         String result = "";
 
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
@@ -811,19 +641,22 @@ public class ForeignKey {
         return result;
     }
 
+    // -----------------------------------------------------
+    //                                         for S2Dao.NET
+    //                                         -------------
     /**
      * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (LOCAL:FOREIGN) <br />
      * (for s2dao)
      * @return Generated string.
      */
-    public String getRelationKeysCommaString() {
-        final List<Column> localColumnList = getLocalColumnObjectList();
+    public String getRelationKeysCommaString() { // for S2Dao.NET (only used for C#)
+        final List<Column> localColumnList = getLocalColumnList();
         String result = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
             final Column foreignCol = getForeignColumnByLocalColumn(localCol);
-            final String localName = localCol.getName();
-            final String foreignName = foreignCol.getName();
+            final String localName = localCol.getColumnSqlName();
+            final String foreignName = foreignCol.getColumnSqlName();
             if ("".equals(result)) {
                 result = localName + ":" + foreignName;
             } else {
@@ -838,14 +671,14 @@ public class ForeignKey {
      * (for s2dao)
      * @return Generated string.
      */
-    public String getRelationKeysCommaStringForOneToOneReferrer() {
-        final List<Column> foreignColumnList = getForeignColumnObjectList();
+    public String getRelationKeysCommaStringForOneToOneReferrer() { // for S2Dao.NET (only used for C#)
+        final List<Column> foreignColumnList = getForeignColumnList();
         String result = "";
         for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
             final Column foreignCol = (Column) ite.next();
             final Column localCol = getLocalColumnByForeignColumn(foreignCol);
-            final String foreignName = foreignCol.getName();
-            final String localName = localCol.getName();
+            final String foreignName = foreignCol.getColumnSqlName();
+            final String localName = localCol.getColumnSqlName();
 
             if ("".equals(result)) {
                 result = foreignName + ":" + localName;
@@ -856,27 +689,27 @@ public class ForeignKey {
         return result;
     }
 
-    /**
-     * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br />
-     * (for s2dao)
-     * @return Generated string.
-     */
-    public String getChildKeysCommaString() {
-        final List<Column> foreignColumnList = getForeignColumnObjectList();
-        String result = "";
-        for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
-            final Column foreignCol = (Column) ite.next();
-            final Column localCol = getLocalColumnByForeignColumn(foreignCol);
-            final String foreignName = foreignCol.getName();
-            final String localName = localCol.getName();
+    // -----------------------------------------------------
+    //                                            for S2JDBC
+    //                                            ----------
+    public String getReferrerPropertyNameAsOneS2Jdbc() { // for S2JDBC
+        final List<Column> localColumnList = getLocalColumnList();
 
-            if ("".equals(result)) {
-                result = foreignName + ":" + localName;
-            } else {
-                result = result + ", " + foreignName + ":" + localName;
+        String result = "";
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
+            final Column col = (Column) ite.next();
+
+            if (col.isMultipleFK()) {
+                result = result + col.getJavaName();
             }
         }
-        return result;
+        if (result.trim().length() != 0) {
+            result = "By" + result;
+        }
+        if (getTable().getName().equals(getForeignTable().getName())) {
+            result = result + "Self";
+        }
+        return getTable().getUncapitalisedJavaName() + result;
     }
 
     // ===================================================================================
@@ -1087,6 +920,167 @@ public class ForeignKey {
     }
 
     // ===================================================================================
+    //                                                                          Class Name
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                    Foreign Class Name
+    //                                    ------------------
+    public String getForeignTableExtendedEntityClassName() {
+        return getForeignTable().getExtendedEntityClassName();
+    }
+
+    public String getForeignTableDBMetaClassName() {
+        return getForeignTable().getDBMetaClassName();
+    }
+
+    public String getForeignTableExtendedConditionBeanClassName() {
+        return getForeignTable().getExtendedConditionBeanClassName();
+    }
+
+    public String getForeignTableExtendedConditionQueryClassName() {
+        return getForeignTable().getExtendedConditionQueryClassName();
+    }
+
+    public String getForeignTableNestSelectSetupperClassName() {
+        return getForeignTable().getNestSelectSetupperClassName();
+    }
+
+    public String getForeignTableNestSelectSetupperTerminalClassName() {
+        return getForeignTable().getNestSelectSetupperTerminalClassName();
+    }
+
+    public String getForeignTableExtendedSimpleDtoClassName() {
+        return getForeignTable().getExtendedSimpleDtoClassName();
+    }
+
+    // -----------------------------------------------------
+    //                                   Referrer Class Name
+    //                                   -------------------
+    public String getReferrerTableExtendedEntityClassName() {
+        return getTable().getExtendedEntityClassName();
+    }
+
+    public String getReferrerTableExtendedBehaviorClassName() {
+        return getTable().getExtendedBehaviorClassName();
+    }
+
+    public String getReferrerTableDBMetaClassName() {
+        return getTable().getDBMetaClassName();
+    }
+
+    public String getReferrerTableExtendedConditionBeanClassName() {
+        return getTable().getExtendedConditionBeanClassName();
+    }
+
+    public String getReferrerTableExtendedConditionQueryClassName() {
+        return getTable().getExtendedConditionQueryClassName();
+    }
+
+    public String getReferrerTableNestSelectSetupperClassName() {
+        return getTable().getNestSelectSetupperClassName();
+    }
+
+    public String getReferrerTableNestSelectSetupperTerminalClassName() {
+        return getTable().getNestSelectSetupperTerminalClassName();
+    }
+
+    public String getReferrerTableExtendedSimpleDtoClassName() {
+        return getTable().getExtendedSimpleDtoClassName();
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    /**
+     * Is this relation 'one-to-one'?
+     * @return Determination.
+     */
+    public boolean isOneToOne() {
+        final List<Column> localColumnList = getLocalColumnList();
+        final List<Column> localPrimaryColumnList = getTable().getPrimaryKey();
+        if (localColumnList.equals(localPrimaryColumnList)) {
+            return true;
+        } else {
+            final List<Unique> uniqueList = getTable().getUniqueList();
+            for (final Unique unique : uniqueList) {
+                if (unique.hasSameColumnSet(localColumnList)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isBizOneToOne() {
+        return isOneToOne() && hasFixedCondition();
+    }
+
+    public boolean isSimpleKeyFK() {
+        return _localColumnNameList.size() == 1;
+    }
+
+    public boolean isCompoundFK() {
+        return _localColumnNameList.size() > 1;
+    }
+
+    public boolean isSelfReference() {
+        return _localTable.getName().equals(_foreignTableName);
+    }
+
+    public boolean canBeReferrer() {
+        if (hasFixedCondition()) {
+            return false;
+        }
+        return isForeignColumnPrimaryKey() || isForeignColumnUnique();
+
+        // *reference to unique key is unsupported basically
+        //  (a-little-supported)
+    }
+
+    /**
+     * Are all local columns primary-key?
+     * @return Determination.
+     */
+    public boolean isLocalColumnPrimaryKey() {
+        return isColumnPrimaryKey(getLocalColumnList());
+    }
+
+    /**
+     * Are all foreign columns primary-key? <br />
+     * Basically true. If biz-one-to-one and unique key, false.
+     * @return Determination.
+     */
+    public boolean isForeignColumnPrimaryKey() {
+        return isColumnPrimaryKey(getForeignColumnList());
+    }
+
+    /**
+     * Are all foreign columns unique-key? <br />
+     * @return Determination.
+     */
+    public boolean isForeignColumnUnique() {
+        return isColumnUnique(getForeignColumnList());
+    }
+
+    protected boolean isColumnPrimaryKey(List<Column> columnList) {
+        for (Column column : columnList) {
+            if (!column.isPrimaryKey()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean isColumnUnique(List<Column> columnList) {
+        for (Column column : columnList) {
+            if (!column.isUnique()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ===================================================================================
     //                                                                             Display
     //                                                                             =======
     // -----------------------------------------------------
@@ -1250,9 +1244,9 @@ public class ForeignKey {
         sb.append(" name=\"").append(getName()).append("\"");
         sb.append(">\n");
 
-        for (int i = 0; i < _localColumns.size(); i++) {
-            sb.append("        <reference local=\"").append(_localColumns.get(i));
-            sb.append("\" foreign=\"").append(_foreignColumns.get(i)).append("\"/>\n");
+        for (int i = 0; i < _localColumnNameList.size(); i++) {
+            sb.append("        <reference local=\"").append(_localColumnNameList.get(i));
+            sb.append("\" foreign=\"").append(_foreignColumnNameList.get(i)).append("\"/>\n");
         }
         sb.append("    </foreign-key>");
         return sb.toString();

@@ -278,7 +278,7 @@ public class Database {
                     }
 
                     // local column references
-                    final Iterator<String> localColumnNames = currFK.getLocalColumns().iterator();
+                    final Iterator<String> localColumnNames = currFK.getLocalColumnNameList().iterator();
                     while (localColumnNames.hasNext()) {
                         final String localColumnName = localColumnNames.next();
                         final Column local = currTable.getColumn(localColumnName);
@@ -299,10 +299,10 @@ public class Database {
                     }
 
                     // foreign column references
-                    Iterator<String> foreignColumnNames = currFK.getForeignColumns().iterator();
+                    final Iterator<String> foreignColumnNames = currFK.getForeignColumnNameList().iterator();
                     while (foreignColumnNames.hasNext()) {
-                        String foreignColumnName = (String) foreignColumnNames.next();
-                        Column foreign = foreignTable.getColumn(foreignColumnName);
+                        final String foreignColumnName = (String) foreignColumnNames.next();
+                        final Column foreign = foreignTable.getColumn(foreignColumnName);
                         // if the foreign column does not exist, we may have an
                         // external reference or a misspelling
                         if (foreign == null) {
