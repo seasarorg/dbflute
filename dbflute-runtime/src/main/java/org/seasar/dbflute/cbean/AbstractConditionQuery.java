@@ -60,6 +60,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -736,7 +737,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String existsOption) {
-        assertObjectNotNull("ExistsReferrer(" + columnDbName + ")", subQuery);
+        assertSubQueryNotNull("ExistsReferrer", relatedColumnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
@@ -772,7 +773,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String inScopeOption) {
-        assertObjectNotNull("InScopeRelation(" + columnDbName + ")", subQuery);
+        assertSubQueryNotNull("InScopeRelation", columnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
@@ -803,8 +804,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                              ------------------------
     protected void registerSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String aliasName, DerivedReferrerOption option) {
-        assertObjectNotNull("SpecifyDerivedReferrer(function)", function);
-        assertObjectNotNull("SpecifyDerivedReferrer(" + columnDbName + ")", subQuery);
+        assertFunctionNotNull("SpecifyDerivedReferrer", columnDbName, function);
+        assertSubQueryNotNull("SpecifyDerivedReferrer", columnDbName, subQuery);
         if (option == null) {
             option = new DerivedReferrerOption(); // as default
         }
@@ -836,8 +837,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String operand, Object value,
             String parameterPropertyName, DerivedReferrerOption option) {
-        assertObjectNotNull("QueryDerivedReferrer(function)", function);
-        assertObjectNotNull("QueryDerivedReferrer(" + columnDbName + ")", subQuery);
+        assertFunctionNotNull("QueryDerivedReferrer", columnDbName, function);
+        assertSubQueryNotNull("QueryDerivedReferrer", columnDbName, subQuery);
         if (option == null) {
             option = new DerivedReferrerOption(); // as default
         }
@@ -868,7 +869,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                       ---------------
     protected void registerScalarCondition(String function, final ConditionQuery subQuery, String propertyName,
             String operand) {
-        assertObjectNotNull("ScalarCondition(" + propertyName + ")", subQuery);
+        assertSubQueryNotNull("ScalarCondition", propertyName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
@@ -894,6 +895,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected class GeneralColumnRealNameProvider implements ColumnRealNameProvider {
         public ColumnRealName provide(String columnDbName) {
             return toColumnRealName(columnDbName);
+        }
+    }
+
+    // these assertions are basically for internal
+    protected void assertSubQueryNotNull(String title, String columnDbName, ConditionQuery subQuery) {
+        if (subQuery == null) {
+            String msg = "The condition-query for the sub-query should not be null:";
+            msg = msg + " " + title + "(" + columnDbName + ")";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertFunctionNotNull(String title, String columnDbName, String function) {
+        if (function == null) {
+            String msg = "The function for the sub-query should not be null:";
+            msg = msg + " " + title + "(" + columnDbName + ")";
+            throw new IllegalStateException(msg);
         }
     }
 
@@ -971,17 +989,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     public void innerJoin() {
         if (isBaseQuery()) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "The method 'innerJoin()' should be called for a relation query!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + "Please confirm your program. " + ln();
-            msg = msg + "  For example:" + ln();
-            msg = msg + "    (x) - cb.query().innerJoin();" + ln();
-            msg = msg + "    (o) - cb.query().queryMemberStatusCode().innerJoin();" + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg);
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The method 'innerJoin()' should be called for a relation query.");
+            br.addItem("Advice");
+            br.addElement("Please confirm your program.");
+            br.addElement("For example:");
+            br.addElement("  (x) - cb.query().innerJoin();");
+            br.addElement("  (o) - cb.query().queryMemberStatus().innerJoin();");
+            br.addItem("Base Table");
+            br.addElement(getTableDbName());
+            final String msg = br.buildExceptionMessage();
+            throw new IllegalConditionBeanOperationException(msg);
         }
         xgetSqlClause().changeToInnerJoin(xgetAliasName());
     }
