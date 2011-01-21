@@ -62,7 +62,6 @@ import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
-import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -455,7 +454,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Normal Query
     //                                          ------------
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        if (!isValidQuery(key, value, cvalue, columnDbName)) {
+        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
@@ -463,18 +462,29 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
             ConditionOption option) {
-        if (!isValidQuery(key, value, cvalue, columnDbName)) {
+        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
     }
 
-    protected boolean isValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+    protected boolean isValidQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        return xdoIsValidQuery(key, value, cvalue, columnDbName, true);
+    }
+
+    protected boolean isValidQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        return xdoIsValidQuery(key, value, cvalue, columnDbName, false);
+    }
+
+    protected boolean xdoIsValidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
+            boolean checked) {
         final ColumnRealName callerName = toColumnRealName(columnDbName); // logging only
         if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, callerName)) {
             return true;
         } else {
-            handleInvalidQuery(key, value, columnDbName);
+            if (checked) {
+                handleInvalidQuery(key, value, columnDbName);
+            }
             return false;
         }
     }
@@ -546,7 +556,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         InScope Query
     //                                         -------------
     protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String columnDbName) {
-        if (!isValidQuery(key, value, cvalue, columnDbName)) {
+        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         final int inScopeLimit = xgetSqlClause().getInScopeLimit();
@@ -600,28 +610,22 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          FromTo Query
     //                                          ------------
     protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
-        InvalidQueryRegisteredException fromEx = null;
         final ConditionKey fromKey = option.getFromDateConditionKey();
-        try {
-            final Date filteredFromDate = option.filterFromDate(fromDate);
-            if (isValidQuery(fromKey, filteredFromDate, cvalue, columnDbName)) {
-                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
-            }
-        } catch (InvalidQueryRegisteredException marked) {
-            fromEx = marked;
+        boolean fromInvalid = false;
+        final Date filteredFromDate = option.filterFromDate(fromDate);
+        if (isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName)) {
+            setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
+        } else {
+            fromInvalid = true;
         }
         final ConditionKey toKey = option.getToDateConditionKey();
-        try {
-            final Date filteredToDate = option.filterToDate(toDate);
-            if (isValidQuery(toKey, filteredToDate, cvalue, columnDbName)) {
-                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
-            }
-        } catch (InvalidQueryRegisteredException ignored) { // means at the check mode
-            if (fromEx != null) { // means both queries are invalid
+        final Date filteredToDate = option.filterToDate(toDate);
+        if (isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName)) {
+            setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
+        } else {
+            if (fromInvalid) { // means both queries are invalid
                 final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
                 final List<Date> valueList = newArrayList(fromDate, toDate);
-                // always throws the exception because to be thrown
-                // an exception means this query is at the check mode
                 handleInvalidQueryList(keyList, valueList, columnDbName);
             }
         }
@@ -641,7 +645,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throwLikeSearchOptionNotFoundException(columnDbName, value);
             return; // unreachable
         }
-        if (!isValidQuery(key, value, cvalue, columnDbName)) {
+        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         if (xsuppressEscape()) {
@@ -726,7 +730,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Inline Query
     //                                          ------------
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        if (!isValidQuery(key, value, cvalue, columnDbName)) {
+        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());
@@ -746,7 +750,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void regIQ(final ConditionKey key, final Object value, final ConditionValue cvalue,
             final String columnDbName, final ConditionOption option) {
-        if (!isValidQuery(key, value, cvalue, columnDbName)) {
+        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
             return;
         }
         final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());
