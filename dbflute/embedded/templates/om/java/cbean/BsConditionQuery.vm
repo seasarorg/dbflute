@@ -635,7 +635,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerExistsReferrer(cb.query(), "${referrer.foreignColumnNames}", "${referrer.localColumnNameCommaString}", subQueryPropertyName);
+        registerExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", subQueryPropertyName);
     }
     protected Map<String, ${relatedCQClassName}> _${subQueryPropertyName}Map;
     public Map<String, ${relatedCQClassName}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
