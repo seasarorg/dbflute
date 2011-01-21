@@ -134,6 +134,7 @@ public class SplitOptionParts implements Serializable {
             throw new IllegalArgumentException(msg);
         }
         value = resolveSubSplit(value);
+
         final StringTokenizer st = new StringTokenizer(value, _delimiter);
         final String[] tokenizedValues = new String[st.countTokens()];
         int count = 0;
@@ -141,6 +142,7 @@ public class SplitOptionParts implements Serializable {
             tokenizedValues[count] = st.nextToken();
             count++;
         }
+        // "FOO|BAR||QUX" should be treated as "FOO, BAR, QUX" (three elements)
         final String[] values = removeInvalidValue(tokenizedValues);
         if (_splitLimitCount > 0 && values.length > _splitLimitCount) {
             final String[] realValues = new String[_splitLimitCount];
@@ -154,7 +156,6 @@ public class SplitOptionParts implements Serializable {
         } else {
             return values;
         }
-
     }
 
     protected String resolveSubSplit(String value) {

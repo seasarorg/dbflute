@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -61,6 +62,7 @@ import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
@@ -472,13 +474,38 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (key.isValidRegistration(xcreateQueryModeProvider(), cvalue, value, callerName)) {
             return true;
         } else {
-            final HpInvalidQueryInfo invalidQueryInfo = xcreateInvalidQueryInfo(key, value, columnDbName);
-            if (xgetSqlClause().isInvalidQueryChecked()) {
-                throwInvalidQueryRegisteredException(invalidQueryInfo);
-                return false; // unreachable
-            } else {
+            handleInvalidQuery(key, value, columnDbName);
+            return false;
+        }
+    }
+
+    protected void handleInvalidQuery(ConditionKey key, Object value, String columnDbName) {
+        final HpInvalidQueryInfo invalidQueryInfo = xcreateInvalidQueryInfo(key, value, columnDbName);
+        xdoHandleInvalidQuery(columnDbName, invalidQueryInfo);
+    }
+
+    protected void handleInvalidQueryList(List<ConditionKey> keyList, List<? extends Object> valueList,
+            String columnDbName) {
+        if (keyList.size() != valueList.size()) {
+            String msg = "The argument 'keyList' should have the same size as 'valueList'";
+            throw new IllegalArgumentException(msg);
+        }
+        final HpInvalidQueryInfo[] invalidQueryInfoAry = new HpInvalidQueryInfo[keyList.size()];
+        int index = 0;
+        for (ConditionKey key : keyList) {
+            final Object value = valueList.get(index);
+            invalidQueryInfoAry[index] = xcreateInvalidQueryInfo(key, value, columnDbName);
+            ++index;
+        }
+        xdoHandleInvalidQuery(columnDbName, invalidQueryInfoAry);
+    }
+
+    protected void xdoHandleInvalidQuery(String columnDbName, HpInvalidQueryInfo... invalidQueryInfoAry) {
+        if (xgetSqlClause().isInvalidQueryChecked()) {
+            throwInvalidQueryRegisteredException(invalidQueryInfoAry);
+        } else {
+            for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
                 xgetSqlClause().saveInvalidQuery(invalidQueryInfo);
-                return false;
             }
         }
     }
@@ -511,8 +538,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         };
     }
 
-    protected void throwInvalidQueryRegisteredException(HpInvalidQueryInfo invalidQueryInfo) {
-        createCBExThrower().throwInvalidQueryRegisteredException(invalidQueryInfo);
+    protected void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
+        createCBExThrower().throwInvalidQueryRegisteredException(invalidQueryInfoAry);
     }
 
     // -----------------------------------------------------
@@ -572,20 +599,30 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
-    protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue, String columnDbName,
-            FromToOption option) {
-        {
-            final ConditionKey fromKey = option.getFromDateConditionKey();
-            final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
+    protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
+        InvalidQueryRegisteredException fromEx = null;
+        final ConditionKey fromKey = option.getFromDateConditionKey();
+        try {
+            final Date filteredFromDate = option.filterFromDate(fromDate);
             if (isValidQuery(fromKey, filteredFromDate, cvalue, columnDbName)) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
             }
+        } catch (InvalidQueryRegisteredException marked) {
+            fromEx = marked;
         }
-        {
-            final ConditionKey toKey = option.getToDateConditionKey();
-            final java.util.Date filteredToDate = option.filterToDate(toDate);
+        final ConditionKey toKey = option.getToDateConditionKey();
+        try {
+            final Date filteredToDate = option.filterToDate(toDate);
             if (isValidQuery(toKey, filteredToDate, cvalue, columnDbName)) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
+            }
+        } catch (InvalidQueryRegisteredException ignored) { // means at the check mode
+            if (fromEx != null) { // means both queries are invalid
+                final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
+                final List<Date> valueList = newArrayList(fromDate, toDate);
+                // always throws the exception because to be thrown
+                // an exception means this query is at the check mode
+                handleInvalidQueryList(keyList, valueList, columnDbName);
             }
         }
     }
@@ -618,7 +655,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // - - - - - - - - -
         // Use splitByXxx().
         // - - - - - - - - -
+        // these values should be valid only (already filtered before)
+        // and invalid values are ignored even at the check mode
+        // but if all elements are invalid, it is an exception
         final String[] strArray = option.generateSplitValueArray(value);
+        if (strArray.length == 0) {
+            handleInvalidQuery(key, value, columnDbName);
+            return;
+        }
         final boolean orScopeQuery = xgetSqlClause().isOrScopeQueryEffective();
         final boolean orScopeQueryAndPart = xgetSqlClause().isOrScopeQueryAndPartEffective();
         if (!option.isAsOrSplit()) {
@@ -1695,6 +1739,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
     protected final String replaceString(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
     }
@@ -1712,28 +1759,26 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // -----------------------------------------------------
-    //                                  Collection Generator
-    //                                  --------------------
+    //                                            Collection
+    //                                            ----------
     protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
-        return new HashMap<KEY, VALUE>();
+        return DfCollectionUtil.newHashMap();
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
-        return new LinkedHashMap<KEY, VALUE>();
+        return DfCollectionUtil.newLinkedHashMap();
     }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
-        return new ArrayList<ELEMENT>();
+        return DfCollectionUtil.newArrayList();
     }
 
-    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT element) {
-        ArrayList<ELEMENT> arrayList = new ArrayList<ELEMENT>();
-        arrayList.add(element);
-        return arrayList;
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
+        return DfCollectionUtil.newArrayList(elements);
     }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
-        return new ArrayList<ELEMENT>(collection);
+        return DfCollectionUtil.newArrayList(collection);
     }
 
     // -----------------------------------------------------

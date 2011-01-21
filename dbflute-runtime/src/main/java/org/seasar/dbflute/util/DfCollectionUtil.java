@@ -64,18 +64,18 @@ public class DfCollectionUtil {
     // ===================================================================================
     //                                                                                List
     //                                                                                ====
-    public static <ELEMENT> List<ELEMENT> newArrayList() {
+    public static <ELEMENT> ArrayList<ELEMENT> newArrayList() {
         return new ArrayList<ELEMENT>();
     }
 
-    public static <ELEMENT> List<ELEMENT> newArrayList(Collection<ELEMENT> elements) {
-        final List<ELEMENT> list = newArrayList();
+    public static <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> elements) {
+        final ArrayList<ELEMENT> list = newArrayList();
         list.addAll(elements);
         return list;
     }
 
-    public static <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
-        final List<ELEMENT> list = newArrayList();
+    public static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
+        final ArrayList<ELEMENT> list = newArrayList();
         for (ELEMENT element : elements) {
             list.add(element);
         }
@@ -108,15 +108,15 @@ public class DfCollectionUtil {
     // ===================================================================================
     //                                                                                 Map
     //                                                                                 ===
-    public static <KEY, VALUE> Map<KEY, VALUE> newHashMap() {
+    public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
         return new HashMap<KEY, VALUE>();
     }
 
-    public static <KEY, VALUE> Map<KEY, VALUE> newLinkedHashMap() {
+    public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }
 
-    public static <KEY, VALUE> Map<KEY, VALUE> newConcurrentHashMap() {
+    public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
     }
 
@@ -128,36 +128,36 @@ public class DfCollectionUtil {
     // ===================================================================================
     //                                                                                 Set
     //                                                                                 ===
-    public static <ELEMENT> Set<ELEMENT> newHashSet() {
+    public static <ELEMENT> HashSet<ELEMENT> newHashSet() {
         return new HashSet<ELEMENT>();
     }
 
-    public static <ELEMENT> Set<ELEMENT> newHashSet(Collection<ELEMENT> elements) {
-        final Set<ELEMENT> set = newHashSet();
+    public static <ELEMENT> HashSet<ELEMENT> newHashSet(Collection<ELEMENT> elements) {
+        final HashSet<ELEMENT> set = newHashSet();
         set.addAll(elements);
         return set;
     }
 
-    public static <ELEMENT> Set<ELEMENT> newHashSet(ELEMENT... elements) {
-        final Set<ELEMENT> set = newHashSet();
+    public static <ELEMENT> HashSet<ELEMENT> newHashSet(ELEMENT... elements) {
+        final HashSet<ELEMENT> set = newHashSet();
         for (ELEMENT element : elements) {
             set.add(element);
         }
         return set;
     }
 
-    public static <ELEMENT> Set<ELEMENT> newLinkedHashSet() {
+    public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet() {
         return new LinkedHashSet<ELEMENT>();
     }
 
-    public static <ELEMENT> Set<ELEMENT> newLinkedHashSet(Collection<ELEMENT> elements) {
-        final Set<ELEMENT> set = newLinkedHashSet();
+    public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(Collection<ELEMENT> elements) {
+        final LinkedHashSet<ELEMENT> set = newLinkedHashSet();
         set.addAll(elements);
         return set;
     }
 
-    public static <ELEMENT> Set<ELEMENT> newLinkedHashSet(ELEMENT... elements) {
-        final Set<ELEMENT> set = newLinkedHashSet();
+    public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(ELEMENT... elements) {
+        final LinkedHashSet<ELEMENT> set = newLinkedHashSet();
         for (ELEMENT element : elements) {
             set.add(element);
         }

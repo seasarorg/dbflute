@@ -656,9 +656,9 @@ public class ConditionBeanExceptionThrower {
         throw new QueryIllegalPurposeException(msg);
     }
 
-    public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo invalidQueryInfo) {
+    public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("An invalid query was registered. (check is working)");
+        br.addNotice("The invalid query was registered. (check is working)");
         br.addItem("Advice");
         br.addElement("You should not set an invalid query when the check is valid.");
         br.addElement("For example:");
@@ -674,7 +674,9 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(null);");
         br.addItem("Invalid Query");
-        br.addElement(invalidQueryInfo.buildDisplay());
+        for (HpInvalidQueryInfo invalidQueryInfo : invalidQueryInfoAry) {
+            br.addElement(invalidQueryInfo.buildDisplay());
+        }
         final String msg = br.buildExceptionMessage();
         throw new InvalidQueryRegisteredException(msg);
     }
