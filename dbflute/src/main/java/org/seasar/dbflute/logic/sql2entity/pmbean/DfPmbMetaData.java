@@ -21,6 +21,7 @@ public class DfPmbMetaData {
 
     // for typed parameter-bean
     protected File _sqlFile;
+    protected Map<String, String> _bqpElementMap;
     protected DfCustomizeEntityInfo _customizeEntityInfo;
 
     // -----------------------------------------------------
@@ -88,6 +89,14 @@ public class DfPmbMetaData {
 
     public void setSqlFile(File sqlFile) {
         this._sqlFile = sqlFile;
+    }
+
+    public Map<String, String> getBqpElementMap() {
+        return _bqpElementMap;
+    }
+
+    public void setBqpElementMap(Map<String, String> bqpElementMap) {
+        this._bqpElementMap = bqpElementMap;
     }
 
     public DfCustomizeEntityInfo getCustomizeEntityInfo() {

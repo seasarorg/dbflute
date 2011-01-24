@@ -20,6 +20,7 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
@@ -27,6 +28,7 @@ import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -49,6 +51,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
     protected final DfSqlFileNameResolver _sqlFileNameResolver = new DfSqlFileNameResolver();
     protected final DfPropertyTypePackageResolver _propertyTypePackageResolver = new DfPropertyTypePackageResolver();
+    protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -263,6 +266,12 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
             }
         }
         pmbMetaData.setSqlFile(_sqlFile);
+        final Map<String, Map<String, String>> bqpMap = _bqpSetupper.extractBasicBqpMap(DfCollectionUtil
+                .newArrayList(_sqlFile));
+        if (!bqpMap.isEmpty()) {
+            final Map<String, String> bqpElementMap = bqpMap.values().iterator().next();
+            pmbMetaData.setBqpElementMap(bqpElementMap);
+        }
         return pmbMetaData;
     }
 

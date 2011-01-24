@@ -20,7 +20,6 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -163,9 +162,7 @@ public class DfPmbBasicHandler {
     //                                                                          Typed Info
     //                                                                          ==========
     public boolean isTypedParameterBean(String className) {
-        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
-        final File sqlFile = pmbMetaData.getSqlFile();
-        if (sqlFile == null) {
+        if (!hasBehaviorQueryPath(className)) {
             return false;
         }
         return isTypedListHandling(className) || isTypedCursorHandling(className) || isTypedPagingHandling(className)
@@ -173,16 +170,25 @@ public class DfPmbBasicHandler {
     }
 
     public boolean isTypedListHandling(String className) {
+        if (!hasBehaviorQueryPath(className)) {
+            return false;
+        }
         final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
         return customizeEntityInfo != null ? customizeEntityInfo.isNormalHandling() : false;
     }
 
     public boolean isTypedCursorHandling(String className) {
+        if (!hasBehaviorQueryPath(className)) {
+            return false;
+        }
         final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
         return customizeEntityInfo != null ? customizeEntityInfo.isCursorHandling() : false;
     }
 
     public boolean isTypedPagingHandling(String className) {
+        if (!hasBehaviorQueryPath(className)) {
+            return false;
+        }
         final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
         return customizeEntityInfo != null ? hasPagingExtension(className) : false;
     }
@@ -202,8 +208,7 @@ public class DfPmbBasicHandler {
     }
 
     public boolean isTypedExecuteHandling(String className) {
-        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        if (customizeEntityInfo != null) {
+        if (!hasBehaviorQueryPath(className) || hasCustomizeEntity(className)) {
             return false;
         }
         final Map<String, String> elementMap = findBqpElementMap(className);
@@ -215,6 +220,14 @@ public class DfPmbBasicHandler {
         return !bqpPath.startsWith("select");
     }
 
+    protected boolean hasCustomizeEntity(String className) {
+        return findCustomizeEntityInfo(className) != null;
+    }
+
+    protected boolean hasBehaviorQueryPath(String className) {
+        return findBqpElementMap(className) != null;
+    }
+
     protected DfCustomizeEntityInfo findCustomizeEntityInfo(String className) {
         final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
         return pmbMetaData.getCustomizeEntityInfo();
@@ -222,16 +235,7 @@ public class DfPmbBasicHandler {
 
     protected Map<String, String> findBqpElementMap(String className) {
         final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
-        final File sqlFile = pmbMetaData.getSqlFile();
-        if (sqlFile == null) {
-            return null;
-        }
-        final Map<String, Map<String, String>> bqpMap = _bqpSetupper.extractBasicBqpMap(DfCollectionUtil
-                .newArrayList(sqlFile));
-        if (bqpMap.isEmpty()) {
-            return null; // means the file was not under behavior query path
-        }
-        return bqpMap.get(0); // must be only one
+        return pmbMetaData.getBqpElementMap();
     }
 
     // ===================================================================================
