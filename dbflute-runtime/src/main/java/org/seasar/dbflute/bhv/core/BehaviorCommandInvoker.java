@@ -474,15 +474,15 @@ public class BehaviorCommandInvoker {
                     final String tableDbName = outsideSqlContext.getTableDbName();
                     final String behaviorClassName = findBehaviorClassNameFromDBMeta(tableDbName);
                     invokeClassName = behaviorClassName + ".outsideSql()";
-                    if (originalName.endsWith("OutsideSqlEntityExecutor")) {
+                    if (originalName.contains("Entity")) {
                         invokeClassName = invokeClassName + ".entityHandling()";
-                    } else if (originalName.endsWith("OutsideSqlPagingExecutor")) {
+                    } else if (originalName.contains("Paging")) {
                         if (outsideSqlContext.isAutoPagingLogging()) {
                             invokeClassName = invokeClassName + ".autoPaging()";
                         } else {
                             invokeClassName = invokeClassName + ".manualPaging()";
                         }
-                    } else if (originalName.endsWith("OutsideSqlCursorExecutor")) {
+                    } else if (originalName.contains("Cursor")) {
                         invokeClassName = invokeClassName + ".cursorHandling()";
                     }
                 } else {
