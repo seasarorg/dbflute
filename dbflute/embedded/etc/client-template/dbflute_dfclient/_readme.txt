@@ -18,6 +18,27 @@ which generates classes corresponding your tables,
 for example, entities, condition-beans to specified
 directories by DBFlute properties on "dfprop" directory.
 
+Generated structures (directories and classes) are like this:
+/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+allcommon : classes bridging to DBFlute Runtime
+bsbhv     : base behaviors
+bsentity  : base entities
+cbean     : condition-beans (both base and extended)
+exbhv     : extended behaviors
+exentity  : extended entities
+- - - - - - - - - -/
+
+For example, if a table called "MEMBER" exists,
+you can use these classes like this:
+/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+MemberCB cb = new MemberCB();
+cb.query().setMemberId_Equal(3);
+Member member = memberBhv.selectEntity(cb); 
+// MemberCB  : ConditionBean
+// memberBhv : Behavior (instance)
+// Member    : Entity
+- - - - - - - - - -/
+
 sql2entity.bat, sql2entity.sh:
 A execution command of Sql2Entity task
 which generates classes corresponding your outside-SQL files,
@@ -47,4 +68,3 @@ schema     : Directory for files of schema info
 The files, _project.bat, _project.sh, build.properties
 are for internal processes of DBFlute tasks so basically
 you don't need to touch them.
- 
