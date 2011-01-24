@@ -9,6 +9,10 @@ public class DfGrammarInfoPhp implements DfGrammarInfo {
         return "extends";
     }
 
+    public String getImplementsStringMark() {
+        return "implements";
+    }
+
     public String getClassFileExtension() {
         return "php";
     }

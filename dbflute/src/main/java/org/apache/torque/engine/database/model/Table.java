@@ -1766,8 +1766,8 @@ public class Table {
     }
 
     public String getAbstractBaseConditionQueryClassName() {
-        final String projectPrefix = getDatabase().getProjectPrefix();
-        final String basePrefix = getDatabase().getBasePrefix();
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String basePrefix = getBasicProperties().getBasePrefix();
         return projectPrefix + "Abstract" + basePrefix + getSchemaClassPrefix() + getJavaName() + "CQ";
     }
 
@@ -1779,7 +1779,7 @@ public class Table {
     //                                   Extended Class Name
     //                                   -------------------
     public String getExtendedEntityClassName() {
-        final String projectPrefix = getDatabase().getProjectPrefix();
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
         return buildExtendedEntityClassName(projectPrefix);
     }
 
@@ -1804,7 +1804,7 @@ public class Table {
     }
 
     public String getExtendedDaoFullClassName() {
-        final String extendedDaoPackage = getDatabase().getExtendedDaoPackage();
+        final String extendedDaoPackage = getBasicProperties().getExtendedDaoPackage();
         return extendedDaoPackage + "." + getExtendedDaoClassName();
     }
 
@@ -1823,12 +1823,12 @@ public class Table {
     }
 
     public String getExtendedBehaviorFullClassName() {
-        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
+        final String extendedBehaviorPackage = getBasicProperties().getExtendedBehaviorPackage();
         return extendedBehaviorPackage + "." + getExtendedBehaviorClassName();
     }
 
     public String getExtendedBehaviorApFullClassName() {
-        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
+        final String extendedBehaviorPackage = getBasicProperties().getExtendedBehaviorPackage();
         return extendedBehaviorPackage + "." + getExtendedBehaviorApClassName();
     }
 

@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 
 using ${glPackageBaseCommon};
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+using ${glPackageBaseCommonCBean};
+#end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 using ${glPackageBaseCommonCBeanOutsidesql};
 #end
@@ -64,8 +67,8 @@ namespace ${glPackageExtendedParameterBean} {
     
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
         // ===============================================================================
-        //                                                                       Procedure
-        //                                                                       =========
+        //                                                        Procedure Implementation
+        //                                                        ========================
         public virtual String ProcedureName { get {
             return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
         }}

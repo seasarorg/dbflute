@@ -309,18 +309,11 @@ public final class DfBuildProperties {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Integer getVersion() {
+    public Integer getVersion() { // means DBFlute's version
         return _version;
     }
 
     public void setVersion(Integer version) {
         this._version = version;
-    }
-
-    public boolean isVersionJavaOverNinety() {
-        if (!getBasicProperties().isTargetLanguageJava()) {
-            return false;
-        }
-        return _version != null && _version >= 90;
     }
 }

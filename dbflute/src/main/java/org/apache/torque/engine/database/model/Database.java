@@ -335,16 +335,24 @@ public class Database {
     // -----------------------------------------------------
     //                                              MetaData
     //                                              --------
-    public boolean isExistPmbMetaData() {
-        return getPmbBasicHandler().isExistPmbMetaData();
-    }
-
     public Collection<DfPmbMetaData> getPmbMetaDataList() {
         return getPmbBasicHandler().getPmbMetaDataList();
     }
 
+    public boolean isExistPmbMetaData() {
+        return getPmbBasicHandler().isExistPmbMetaData();
+    }
+
     public String getPmbMetaDataSuperClassDefinition(String className) {
         return getPmbBasicHandler().getSuperClassDefinition(className);
+    }
+
+    public String getPmbMetaDataInterfaceDefinition(String className) {
+        return getPmbBasicHandler().getInterfaceDefinition(className);
+    }
+
+    public boolean hasPmbMetaDataPagingExtension(String className) {
+        return getPmbBasicHandler().hasPagingExtension(className);
     }
 
     public boolean hasPmbMetaDataCheckSafetyResult(String className) {
@@ -377,6 +385,33 @@ public class Database {
 
     public boolean isPmbMetaDataPropertyJavaNativeBooleanObject(String className, String propertyName) {
         return getPmbBasicHandler().isPmbMetaDataPropertyJavaNativeBooleanObject(className, propertyName);
+    }
+
+    // -----------------------------------------------------
+    //                                            Typed Info
+    //                                            ----------
+    public boolean isPmbMetaDataTypedParameterBean(String className) {
+        return getPmbBasicHandler().isTypedParameterBean(className);
+    }
+
+    public boolean isPmbMetaDataTypedSelectPmb(String className) {
+        return getPmbBasicHandler().isTypedSelectPmb(className);
+    }
+
+    public boolean isPmbMetaDataTypedUpdatePmb(String className) {
+        return getPmbBasicHandler().isTypedUpdatePmb(className);
+    }
+
+    public boolean isPmbMetaDataTypedReturnEntityPmb(String className) {
+        return getPmbBasicHandler().isTypedReturnEntityPmb(className);
+    }
+
+    public String getPmbMetaDataBehaviorQueryPath(String className) {
+        return getPmbBasicHandler().getBehaviorQueryPath(className);
+    }
+
+    public String getPmbMetaDataCustomizeEntityType(String className) {
+        return getPmbBasicHandler().getCustomizeEntityType(className);
     }
 
     // -----------------------------------------------------

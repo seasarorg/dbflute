@@ -12,15 +12,14 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchyArranger;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
+import org.seasar.dbflute.outsidesql.executor.*;
 #if ($table.isBuriTarget())
 import ${glPackagePluginBuri}.${glBuriDef};
 #end
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
 #end
-#if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
-#end
 import ${glPackageExtendedEntity}.*;
 import ${myDBMetaPackageName}.*;
 import ${glPackageCB}.*;
@@ -1645,6 +1644,44 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 #end
 #end
+
+    // ===================================================================================
+    //                                                                          OutsideSql
+    //                                                                          ==========
+    /**
+     * Prepare the basic executor of outside-SQL to execute it. <br />
+     * The invoker of behavior command should be not null when you call this method.
+     * <pre>
+     * You can use the methods for outside-SQL are as follows:
+     * {Basic}
+     *   o selectList()
+     *   o execute()
+     *   o call()
+     * 
+     * {Entity}
+     *   o entityHandling().selectEntity()
+     *   o entityHandling().selectEntityWithDeletedCheck()
+     * 
+     * {Paging}
+     *   o autoPaging().selectList()
+     *   o autoPaging().selectPage()
+     *   o manualPaging().selectList()
+     *   o manualPaging().selectPage()
+     * 
+     * {Cursor}
+     *   o cursorHandling().selectCursor()
+     * 
+     * {Option}
+     *   o dynamicBinding().selectList()
+     *   o removeBlockComment().selectList()
+     *   o removeLineComment().selectList()
+     *   o formatSql().selectList()
+     * </pre>
+     * @return The basic executor of outside-SQL. (NotNull) 
+     */
+    public OutsideSqlBasicExecutor<${myExtendedBhvClassName}> outsideSql() {
+        return doOutsideSql();
+    }
 #if ($table.isBuriTarget())
 
     // ===================================================================================

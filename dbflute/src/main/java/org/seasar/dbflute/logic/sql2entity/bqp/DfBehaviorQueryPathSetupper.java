@@ -61,6 +61,10 @@ public class DfBehaviorQueryPathSetupper {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfBehaviorQueryPathSetupper.class);
 
+    public static final String KEY_BEHAVIOR_NAME = "behaviorName";
+    public static final String KEY_BEHAVIOR_QUERY_PATH = "behaviorQueryPath";
+    public static final String KEY_SQL = "sql";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -215,8 +219,8 @@ public class DfBehaviorQueryPathSetupper {
             behaviorQueryElement.put("path", path);
             behaviorQueryElement.put("subDirectoryPath", subDirectoryPath);
             behaviorQueryElement.put("entityName", entityName);
-            behaviorQueryElement.put("behaviorName", behaviorName);
-            behaviorQueryElement.put("behaviorQueryPath", behaviorQueryPath);
+            behaviorQueryElement.put(KEY_BEHAVIOR_NAME, behaviorName);
+            behaviorQueryElement.put(KEY_BEHAVIOR_QUERY_PATH, behaviorQueryPath);
             behaviorQueryPathMap.put(path, behaviorQueryElement);
 
             // setup informations in the SQL file
@@ -248,7 +252,7 @@ public class DfBehaviorQueryPathSetupper {
         elementMap.put("cursor", analyzer.isCursor(sql) ? "cursor" : null);
         elementMap.put("title", analyzer.getTitle(sql));
         elementMap.put("description", analyzer.getDescription(sql));
-        elementMap.put("sql", sql);
+        elementMap.put(KEY_SQL, sql);
     }
 
     protected InputStreamReader newInputStreamReader(File sqlFile) {

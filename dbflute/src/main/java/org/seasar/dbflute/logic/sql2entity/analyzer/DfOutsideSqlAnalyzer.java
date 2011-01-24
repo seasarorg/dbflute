@@ -1,3 +1,18 @@
+/*
+ * Copyright 2004-2011 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.logic.sql2entity.analyzer;
 
 import java.io.File;
@@ -15,10 +30,10 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
@@ -26,6 +41,7 @@ import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtract
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData.DfPagingType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -122,17 +138,13 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                     // saves for setting to pmbMetaData
                     customizeEntityInfo = new DfCustomizeEntityInfo(entityName, columnMetaInfoMap);
                     customizeEntityInfo.setSqlFile(_sqlFile);
-                    _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
                     if (isCursor(sql)) {
                         customizeEntityInfo.setCursorHandling(true);
-                        _sql2entityMeta.addCursorInfo(entityName, DfSql2EntityMeta.CURSOR_INFO_DUMMY);
                     } else if (isScalar(sql)) {
                         customizeEntityInfo.setScalarHandling(true);
                     }
-                    _sql2entityMeta.addEntitySqlFile(entityName, _sqlFile);
-                    final List<String> primaryKeyList = getPrimaryKeyColumnNameList(sql);
-                    customizeEntityInfo.setPrimaryKeyList(primaryKeyList);
-                    _sql2entityMeta.addPrimaryKey(entityName, primaryKeyList);
+                    customizeEntityInfo.setPrimaryKeyList(getPrimaryKeyColumnNameList(sql));
+                    _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
                 }
             }
             if (isTargetParameterBeanMakingSql(sql)) {
@@ -277,15 +289,16 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected void resolveSuperClassSimplePagingBean(final DfPmbMetaData pmbMetaData) {
         final String superClassName = pmbMetaData.getSuperClassName();
-        if (superClassName.equalsIgnoreCase("Paging") // main
-                || superClassName.equalsIgnoreCase("SPB")) { // an old style for compatibility before 0.9.7.5
-            final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
-            final String projectPrefix = getBasicProperties().getProjectPrefix();
-            final DfBasicProperties basicProperties = getProperties().getBasicProperties();
-            final DfLanguageDependencyInfo languageDependencyInfo = basicProperties.getLanguageDependencyInfo();
-            final String cbeanPackageName = languageDependencyInfo.getConditionBeanPackageName();
-            final String spbName = "SimplePagingBean";
-            pmbMetaData.setSuperClassName(baseCommonPackage + "." + cbeanPackageName + "." + projectPrefix + spbName);
+        if (Srl.endsWithIgnoreCase(superClassName, "Paging") // main
+                || Srl.equalsIgnoreCase(superClassName, "SPB")) { // an old style for compatibility before 0.9.7.5
+            pmbMetaData.setSuperClassName("SimplePagingBean");
+            if (Srl.equalsIgnoreCase(superClassName, "ManualPaging")) {
+                pmbMetaData.setPagingType(DfPagingType.MANUAL);
+            } else if (Srl.equalsIgnoreCase(superClassName, "AutoPaging")) {
+                pmbMetaData.setPagingType(DfPagingType.AUTO);
+            } else {
+                pmbMetaData.setPagingType(DfPagingType.UNKNOWN);
+            }
         }
     }
 
@@ -343,18 +356,19 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     //                                                                   Assert Definition
     //                                                                   =================
     protected void assertDuplicateEntity(String entityName, File currentSqlFile) {
-        final File sqlFile = _sql2entityMeta.getEntitySqlFileMap().get(entityName);
-        if (sqlFile == null) {
+        final DfCustomizeEntityInfo entityInfo = _sql2entityMeta.getEntityInfoMap().get(entityName);
+        if (entityInfo == null) {
             return;
         }
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The customize entity was duplicated!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Customize Entity]" + ln() + entityName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL Files]" + ln() + sqlFile + ln() + currentSqlFile + ln();
-        msg = msg + "* * * * * * * * * */";
+        final File sqlFile = entityInfo.getSqlFile();
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The same-name customize-entities were found.");
+        br.addItem("CustomizeEntity");
+        br.addElement(entityName);
+        br.addItem("SQL Files");
+        br.addElement(sqlFile);
+        br.addElement(currentSqlFile);
+        final String msg = br.buildExceptionMessage();
         throw new DfCustomizeEntityDuplicateException(msg);
     }
 
@@ -363,14 +377,14 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         if (metaData == null) {
             return;
         }
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The parameter-bean was duplicated!" + ln();
-        msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + pmbName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL Files]" + ln() + metaData.getSqlFile() + ln() + currentSqlFile + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The same-name parameter-beans were found.");
+        br.addItem("ParameterBean");
+        br.addElement(pmbName);
+        br.addItem("SQL Files");
+        br.addElement(metaData.getSqlFile());
+        br.addElement(currentSqlFile);
+        final String msg = br.buildExceptionMessage();
         throw new DfParameterBeanDuplicateException(msg);
     }
 
@@ -413,6 +427,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         return _sqlFileNameResolver.resolvePmbNameIfNeeds(className, file.getName());
     }
 
+    // ===================================================================================
+    //                                                                          SQL Helper
+    //                                                                          ==========
     protected String removeBlockComment(final String sql) {
         return Srl.removeBlockComment(sql);
     }

@@ -16,6 +16,11 @@ public interface DfGrammarInfo {
     public String getExtendsStringMark();
 
     /**
+     * @return The string mark of 'implements'. (NotNull)
+     */
+    public String getImplementsStringMark();
+
+    /**
      * @return The definition of 'public'. (NotNull)
      */
     public String getPublicDefinition();

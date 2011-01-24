@@ -311,7 +311,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         database.setSkipDeleteOldClass(DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile() != null);
 
         final Map<String, DfCustomizeEntityInfo> entityInfoMap = _sql2entityMeta.getEntityInfoMap();
-        final Map<String, Object> cursorInfoMap = _sql2entityMeta.getCursorInfoMap();
         final Set<String> entityNameSet = entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
             final DfCustomizeEntityInfo entityInfo = entityInfoMap.get(entityName);
@@ -329,11 +328,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             if (entityInfo.isAdditionalSchema()) {
                 tbl.setUnifiedSchema(entityInfo.getAdditionalSchema()); // basically when STRUCT type
             }
-            tbl.setSql2EntityTypeSafeCursor(cursorInfoMap.get(entityName) != null);
-            database.addTable(tbl);
+            tbl.setSql2EntityTypeSafeCursor(entityInfo.isCursorHandling());
             _log.info(entityName);
 
-            final StringKeyMap<String> pkMap = getPrimaryKeyMap(entityName);
+            final StringKeyMap<String> pkMap = getPrimaryKeyMap(entityInfo);
             final boolean allCommonColumn = hasAllCommonColumn(metaMap);
             final Set<String> columnNameSet = metaMap.keySet();
             for (String columnName : columnNameSet) {
@@ -354,6 +352,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             if (!pkMap.isEmpty()) { // if not-removed columns exist
                 throwPrimaryKeyNotFoundException(entityName, pkMap, columnNameSet);
             }
+
+            if (entityInfo.isScalarHandling()) {
+                entityInfo.setScalarJavaNative(tbl.getColumnList().get(0).getJavaNative());
+                continue; // does not generate an entity that has only one column
+            }
+
+            // initialize a class name of the entity for typed parameter-bean
+            entityInfo.setEntityClassName(tbl.getExtendedEntityClassName());
+
+            database.addTable(tbl);
             _log.info("");
         }
         final String databaseType = getBasicProperties().getDatabaseType();
@@ -364,10 +372,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return context;
     }
 
-    protected StringKeyMap<String> getPrimaryKeyMap(String entityName) {
+    protected StringKeyMap<String> getPrimaryKeyMap(DfCustomizeEntityInfo entityInfo) {
         final StringKeyMap<String> pkMap = StringKeyMap.createAsFlexibleOrdered();
-        final Map<String, List<String>> primaryKeyMap = _sql2entityMeta.getPrimaryKeyMap();
-        final List<String> pkList = primaryKeyMap.get(entityName);
+        final List<String> pkList = entityInfo.getPrimaryKeyList();
         if (pkList != null) {
             for (String pk : pkList) {
                 if (Srl.contains(pk, ".")) {

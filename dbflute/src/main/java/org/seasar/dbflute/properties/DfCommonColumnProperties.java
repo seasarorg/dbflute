@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -266,7 +265,6 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                ------
     protected void filterCommonColumnSetupValue(Map<String, Object> map) {
         final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
         final Set<String> keySet = map.keySet();
         for (String key : keySet) {
             String value = (String) map.get(key);
@@ -274,13 +272,8 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
                 value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
             }
             if (value != null && value.contains("$$AccessContext$$")) {
-                if (DfBuildProperties.getInstance().isVersionJavaOverNinety()) { // as patch for 90
-                    final String accessContext = "org.seasar.dbflute.AccessContext";
-                    value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
-                } else {
-                    final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
-                    value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
-                }
+                final String accessContext = "org.seasar.dbflute.AccessContext";
+                value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
             }
             final String prefixMark = COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK;
             final String secondMark = COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK;

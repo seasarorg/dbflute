@@ -4,10 +4,17 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 import java.io.Serializable;
 import java.util.*;
 
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+import org.seasar.dbflute.cbean.SimplePagingBean;
+#end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #else
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+import org.seasar.dbflute.outsidesql.typed.*;
+#else
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
+#end
 #end
 import org.seasar.dbflute.jdbc.*;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
@@ -21,7 +28,10 @@ import org.seasar.dbflute.cbean.coption.FromToOption;
 #end
 import org.seasar.dbflute.util.DfTypeUtil;
 import ${glPackageBaseCommon}.*;
-#if ($database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+import ${glPackageExtendedBhv}.*;
+#end
+#if ($database.isPmbMetaDataTypedReturnEntityPmb($pmbClassName) || $database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}.*;
 #end
 
@@ -32,7 +42,7 @@ import ${glPackageExtendedCustomizeEntity}.*;
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 public class ${myClassName} implements ProcedurePmb, FetchBean, Serializable {
 #else
-public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean, FetchBean, Serializable {
+public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}${database.getPmbMetaDataInterfaceDefinition($pmbClassName)} {
 #end
 
     // ===================================================================================
@@ -120,10 +130,31 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     public ${myClassName}() {
     }
 
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+    // ===================================================================================
+    //                                                                Typed Implementation
+    //                                                                ====================
+    /**
+     * {@inheritDoc}
+     */
+    public String getOutsideSqlPath() {
+        return "${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}";
+    }
+
+#if ($database.isPmbMetaDataTypedSelectPmb($pmbClassName))
+    /**
+     * {@inheritDoc}
+     */
+    public Class<${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}> getEntityType() {
+        return ${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}.class;
+    }
+
+#end
+#end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
     // ===================================================================================
-    //                                                                           Procedure
-    //                                                                           =========
+    //                                                            Procedure Implementation
+    //                                                            ========================
     /**
      * {@inheritDoc}
      */
