@@ -19,12 +19,12 @@ import java.util.List;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 

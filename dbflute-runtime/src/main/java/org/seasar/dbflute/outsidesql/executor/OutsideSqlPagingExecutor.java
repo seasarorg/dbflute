@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
@@ -31,6 +30,7 @@ import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 
 /**
  * The paging executor of outside-SQL.

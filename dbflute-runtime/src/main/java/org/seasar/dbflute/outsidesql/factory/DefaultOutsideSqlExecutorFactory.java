@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.outsidesql.factory;
+package org.seasar.dbflute.outsidesql.factory;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
@@ -24,8 +24,6 @@ import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlCursorExecutor;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlEntityExecutor;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlPagingExecutor;
-import org.seasar.dbflute.outsidesql.factory.DefaultOutsideSqlContextFactory;
-import org.seasar.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 
 /**
  * @author jflute

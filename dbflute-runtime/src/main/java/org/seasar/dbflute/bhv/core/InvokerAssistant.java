@@ -19,7 +19,6 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
-import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
@@ -27,6 +26,7 @@ import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
