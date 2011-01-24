@@ -76,7 +76,8 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     //                                                                  ==================
     /**
      * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * You can call this method by only a typed parameter-bean.
+     * You can call this method by only a typed parameter-bean
+     * which can resolve its own path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
@@ -203,7 +204,8 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     //                                                                      ==============
     /**
      * Select entity with deleted check by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * You can call this method by only a typed parameter-bean.
+     * You can call this method by only a typed parameter-bean
+     * which can resolve its own path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);

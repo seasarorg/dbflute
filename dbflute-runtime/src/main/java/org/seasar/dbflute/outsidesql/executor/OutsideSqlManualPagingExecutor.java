@@ -47,7 +47,8 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
     /**
      * Select page by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
      * (both count-select and paging-select are executed)<br />
-     * You can call this method by only a typed parameter-bean.
+     * You can call this method by only a typed parameter-bean
+     * which can resolve its own path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
@@ -118,7 +119,8 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
     /**
      * Select list with paging by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
      * (count-select is not executed, only paging-select)<br />
-     * You can call this method by only a typed parameter-bean.
+     * You can call this method by only a typed parameter-bean
+     * which can resolve its own path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");

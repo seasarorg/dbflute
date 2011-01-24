@@ -136,7 +136,8 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                                                              ======
     /**
      * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * You can call this method by only a typed parameter-bean.
+     * You can call this method by only a typed parameter-bean
+     * which can resolve its own path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
@@ -240,7 +241,8 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                                                             =======
     /**
      * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br />
-     * You can call this method by only a typed parameter-bean.
+     * You can call this method by only a typed parameter-bean
+     * which can resolve its own path.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();

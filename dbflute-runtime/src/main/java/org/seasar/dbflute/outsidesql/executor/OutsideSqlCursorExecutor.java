@@ -78,7 +78,8 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
     //                                                                              ======
     /**
      * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * You can call this method by only a typed parameter-bean.
+     * You can call this method by only a typed parameter-bean
+     * which can resolve its own path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
