@@ -6,13 +6,13 @@ o databaseInfoMap.dfprop
 At first, you should set these properties
 before executions of DBFlute tasks.
 
-Properties for additional info:
+Properties for additional informations:
 o additionalForeignKeyMap.dfprop
 o additionalPrimaryKeyMap.dfprop
 o additionalUniqueKeyMap.dfprop
 o additionalTableMap.dfprop
 
-Properties for implementations:
+Properties for implementation environments:
 o commonColumnMap.dfprop
 o classificationDefinitionMap.dfprop
 o classificationDeploymentMap.dfprop

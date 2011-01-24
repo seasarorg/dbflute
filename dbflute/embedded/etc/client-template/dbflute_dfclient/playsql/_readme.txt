@@ -1,11 +1,11 @@
 Directory for ReplaceSchema task
 
-replace-schema.sql:
+replace-schema-*.sql:
 DDL statements for creation of your schema.
 You should write your own DDL statements in this file.
 (A SQL separator is semicolon ";")
 
-take-finally.sql:
+take-finally-*.sql:
 SQL statements for check loaded data (or DDL after data loading)
 You should write your own SQL statements in this file.
 (basically same specifications as replace-schema.sql)
