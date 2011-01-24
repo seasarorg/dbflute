@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.outsidesql;
+package org.seasar.dbflute.outsidesql.executor;
 
 import java.util.List;
 

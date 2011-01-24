@@ -17,12 +17,12 @@ package org.seasar.dbflute.bhv.outsidesql.factory;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
-import org.seasar.dbflute.bhv.outsidesql.OutsideSqlCursorExecutor;
-import org.seasar.dbflute.bhv.outsidesql.OutsideSqlEntityExecutor;
-import org.seasar.dbflute.bhv.outsidesql.OutsideSqlPagingExecutor;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlCursorExecutor;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlEntityExecutor;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlPagingExecutor;
 
 /**
  * @author jflute

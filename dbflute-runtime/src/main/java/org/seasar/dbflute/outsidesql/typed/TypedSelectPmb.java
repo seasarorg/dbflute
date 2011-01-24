@@ -13,13 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.outsidesql.typed;
+package org.seasar.dbflute.outsidesql.typed;
 
 /**
- * The parameter-bean for manual paging handling.
+ * The interface of typed parameter-bean for select.
  * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @param <ENTITY> The type of an entity (may be scalar) for result.
  */
-public interface ManualPagingHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY> {
+public interface TypedSelectPmb<BEHAVIOR, ENTITY> extends TypedParameterBean<BEHAVIOR> {
+
+    /**
+     * Get the type of an entity for result.
+     * @return The type instance of an entity. (NotNull)
+     */
+    Class<?> getEntityType();
 }

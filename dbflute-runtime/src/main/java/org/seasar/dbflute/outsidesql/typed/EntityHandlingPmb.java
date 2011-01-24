@@ -13,12 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.outsidesql.typed;
+package org.seasar.dbflute.outsidesql.typed;
 
 /**
- * The interface of typed parameter-bean for update.
+ * The parameter-bean for entity (single result) handling.
  * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
+ * @param <ENTITY> The type of an entity (may be scalar) for result.
  */
-public interface TypedUpdatePmb<BEHAVIOR> extends TypedParameterBean<BEHAVIOR> {
+public interface EntityHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY> {
 }

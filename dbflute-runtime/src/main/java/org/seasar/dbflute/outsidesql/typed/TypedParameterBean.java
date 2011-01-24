@@ -13,12 +13,20 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.outsidesql.typed;
+package org.seasar.dbflute.outsidesql.typed;
+
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 
 /**
- * The parameter-bean for list handling.
+ * The interface of typed parameter-bean.
  * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
  */
-public interface ExecuteHandlingPmb<BEHAVIOR> extends TypedUpdatePmb<BEHAVIOR> {
+public interface TypedParameterBean<BEHAVIOR> extends ParameterBean {
+
+    /**
+     * Get the path of the outside-SQL (basically as behavior query path).
+     * @return The string expression of path. (NotNull)
+     */
+    String getOutsideSqlPath();
 }
