@@ -24,6 +24,8 @@ import org.seasar.dbflute.bhv.outsidesql.OutsideSqlPagingExecutor;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.outsidesql.factory.DefaultOutsideSqlContextFactory;
+import org.seasar.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 
 /**
  * @author jflute

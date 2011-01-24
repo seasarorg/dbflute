@@ -13,21 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.outsidesql.factory;
-
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+package org.seasar.dbflute.bhv.outsidesql.typed;
 
 /**
+ * The parameter-bean for cursor handling.
  * @author jflute
+ * @param <BEHAVIOR> The type of a corresponding behavior.
  */
-public interface OutsideSqlContextFactory {
-
-    /**
-     * Create the context of outside-SQL.
-     * @param dbmetaProvider The provider of DB meta. (NotNull)
-     * @param outsideSqlPackage The package of outside-SQL. (NotNull)
-     * @return The context of outside-SQL. (NotNull)
-     */
-    OutsideSqlContext createContext(DBMetaProvider dbmetaProvider, String outsideSqlPackage);
+public interface CursorHandlingPmb<BEHAVIOR> extends TypedSelectPmb<BEHAVIOR, Void> {
 }

@@ -16,12 +16,12 @@
 package org.seasar.dbflute.bhv.core.command;
 
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**

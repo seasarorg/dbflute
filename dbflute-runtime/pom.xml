@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.8.0-01-SNAPSHOT</version><!-- Latest RC version is 01-SNAPSHOT -->
+	<version>0.9.8.0-02-SNAPSHOT</version><!-- Latest RC version is 01-SNAPSHOT -->
 
 	<name>DBFlute Runtime</name>
 	<description>The runtime library of DBFlute</description>

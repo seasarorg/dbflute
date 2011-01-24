@@ -19,12 +19,12 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectCursorCommand;
-import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.bhv.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 
 /**
  * The cursor executor of outside-SQL.

@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.bhv.outsidesql.factory;
+package org.seasar.dbflute.outsidesql.factory;
 
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
