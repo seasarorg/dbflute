@@ -37,7 +37,7 @@ import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
  * @param <BEHAVIOR> The type of behavior.
  * @author jflute
  */
-public class OutsideSqlPagingExecutor<BEHAVIOR> {
+public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -63,7 +63,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+    public AbstractOutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
             DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
             OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
@@ -107,7 +107,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
      * You can realize by pagingBean's isPaging() method on your 'Parameter Comment'.
      * It returns false when it executes Count. And it returns true when it executes Paging.
      * <pre>
-     * ex) ManualPaging and MySQL
+     * e.g. ManualPaging and MySQL
      * <span style="color: #3F7E5E">/*IF pmb.isPaging()&#42;/</span>
      * select member.MEMBER_ID
      *      , member.MEMBER_NAME
@@ -144,6 +144,18 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
      * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> PagingResultBean<ENTITY> selectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
+        return doSelectPage(path, pmb, entityType);
+    }
+
+    protected <ENTITY> PagingResultBean<ENTITY> doSelectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
+        if (path == null) {
+            String msg = "The argument 'path' of outside-SQL should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (entityType == null) {
+            String msg = "The argument 'entityType' for result should not be null: path=" + path;
+            throw new IllegalArgumentException(msg);
+        }
         try {
             final PagingHandler<ENTITY> handler = createPagingHandler(path, pmb, entityType);
             final PagingInvoker<ENTITY> invoker = createPagingInvoker(pmb);
@@ -156,7 +168,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
 
     protected <ENTITY> PagingHandler<ENTITY> createPagingHandler(final String path, final PagingBean pmb,
             final Class<ENTITY> entityType) {
-        final OutsideSqlEntityExecutor<BEHAVIOR, PagingBean> countExecutor = createCountExecutor();
+        final OutsideSqlEntityExecutor<BEHAVIOR> countExecutor = createCountExecutor();
         return new PagingHandler<ENTITY>() {
             public PagingBean getPagingBean() {
                 return pmb;
@@ -179,7 +191,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
         };
     }
 
-    protected OutsideSqlEntityExecutor<BEHAVIOR, PagingBean> createCountExecutor() {
+    protected OutsideSqlEntityExecutor<BEHAVIOR> createCountExecutor() {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
         return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, countOption);
@@ -217,7 +229,9 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select list with paging by the outside-SQL. (count-select is not executed, only paging-select)<br />
+     * Select list with paging by the outside-SQL. {Flexible Interface}<br />
+     * (count-select is not executed, only paging-select)<br />
+     * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -239,7 +253,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
      * </pre>
      * You don't need to use pagingBean's isPaging() method on your 'Parameter Comment'.
      * <pre>
-     * ex) ManualPaging and MySQL 
+     * e.g. ManualPaging and MySQL 
      * select member.MEMBER_ID
      *      , member.MEMBER_NAME
      *      , memberStatus.MEMBER_STATUS_NAME
@@ -271,6 +285,14 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
     }
 
     protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
+        if (path == null) {
+            String msg = "The argument 'path' of outside-SQL should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (entityType == null) {
+            String msg = "The argument 'entityType' for result should not be null: path=" + path;
+            throw new IllegalArgumentException(msg);
+        }
         setupScrollableCursorIfNeeds();
         try {
             return createBasicExecutor().selectList(path, pmb, entityType);
@@ -292,7 +314,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor<BEHAVIOR> removeBlockComment() {
+    public AbstractOutsideSqlPagingExecutor<BEHAVIOR> removeBlockComment() {
         _outsideSqlOption.removeBlockComment();
         return this;
     }
@@ -301,7 +323,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
      * Set up remove-line-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor<BEHAVIOR> removeLineComment() {
+    public AbstractOutsideSqlPagingExecutor<BEHAVIOR> removeLineComment() {
         _outsideSqlOption.removeLineComment();
         return this;
     }
@@ -311,7 +333,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor<BEHAVIOR> formatSql() {
+    public AbstractOutsideSqlPagingExecutor<BEHAVIOR> formatSql() {
         _outsideSqlOption.formatSql();
         return this;
     }
@@ -321,7 +343,7 @@ public class OutsideSqlPagingExecutor<BEHAVIOR> {
      * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
+    public AbstractOutsideSqlPagingExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }

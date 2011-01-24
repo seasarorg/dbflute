@@ -35,7 +35,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * The arranger of hierarchy.
  * <pre>
- * ex) LIBRARY Hierarchy
+ * e.g. LIBRARY Hierarchy
  * 
  * LIBRARY
  *  |1
@@ -75,7 +75,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  *                                 |--1 BLACK_ACTION_LOOKUP (Foreign)
  *          
  *          
- * ex) The SQL of LIBRARY Hierarchy as FLAT
+ * e.g. The SQL of LIBRARY Hierarchy as FLAT
  * 
  * select library.LIBRARY_ID as LIBRARY_ID
  *      , library.LIBRARY_NAME as LIBRARY_NAME
@@ -117,7 +117,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  *       left outer join LB_USER lbUser on libraryUser.LB_USER_ID = lbUser.LB_USER_ID
  * 
  * 
- * ex) Invoking Hierarchy Arranger
+ * e.g. Invoking Hierarchy Arranger
  * 
  * private List&lt;Library&gt; makeLibraryList() {
  *     final HierarchyRequest&lt;Library&gt; request = createHierarchyRequest(createFlatLibraryList());
@@ -125,7 +125,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * }
  * 
  * 
- * ex) Creating Hierarchy Request
+ * e.g. Creating Hierarchy Request
  * 
  * private HierarchyRequest&lt;Library&gt; createHierarchsyRequest(java.util.List&gt;HierarchyFlatLibrary&gt; flatLibraryList) {
  * 

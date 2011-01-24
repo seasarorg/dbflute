@@ -80,7 +80,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Is existing previous page?
      * Using values are currentPageNumber.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * <span style="color: #FD4747">previous</span> 3 4 5 6 <span style="color: #FD4747">7</span> 8 9 10 11 12 13 next
      * </pre>
@@ -94,7 +94,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Is existing next page?
      * Using values are currentPageNumber and allPageCount.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 <span style="color: #FD4747">9</span> 10 11 12 13 <span style="color: #FD4747">next</span>
      * </pre>
@@ -168,7 +168,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     /**
      * Get the value of pageGroupBean.
      * <pre>
-     * ex) group-size=10, current-page=8 
+     * e.g. group-size=10, current-page=8 
      * page.<span style="color: #FD4747">setPageGroupSize</span>(10);
      * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageGroup()</span>.createPageNumberList();
      * 
@@ -225,7 +225,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * pageRange() needs this setting before calling. <br />
      * This method is easy-to-use of setPageRangeOption(). (only setting size)
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      * page.<span style="color: #FD4747">setPageRangeSize</span>(5);
      * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageRange()</span>.createPageNumberList();
      * 
@@ -245,7 +245,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * pageRange() needs this setting before calling. <br />
      * If you want to use fill-limit option, use this instead of setPageRangeSize()
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      * PageRangeOption option = new PageRangeOption();
      * option.<span style="color: #FD4747">setPageRangeSize</span>(5);
      * option.<span style="color: #FD4747">setFillLimit</span>(true);
@@ -255,7 +255,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
      * 
-     * <span style="color: #3F7E5E">// ex) fillLimit=true, current-page=3</span>
+     * <span style="color: #3F7E5E">// e.g. fillLimit=true, current-page=3</span>
      * <span style="color: #3F7E5E">//  3 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">//</span> <span style="color: #FD4747">1 2 3 4 5 6 7 8 9 10 11</span> <span style="color: #3F7E5E">next</span>
      * </pre>
@@ -269,7 +269,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     /**
      * Get the value of pageRangeBean.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      * page.<span style="color: #FD4747">setPageRangeSize</span>(5);
      * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageRange()</span>.createPageNumberList();
      * 
@@ -416,7 +416,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of allRecordCount when no paging. <br />
      * This is not same as size() basically.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (<span style="color: #FD4747">453</span> records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
@@ -457,7 +457,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     /**
      * Get the value of currentPageNumber.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  <span style="color: #FD4747">8</span> / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
@@ -482,7 +482,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     /**
      * Get the value of allPageCount that is calculated.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / <span style="color: #FD4747">23</span> pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
@@ -496,7 +496,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of prePageNumber that is calculated. <br />
      * You should use this.isExistPrePage() before calling this. (call only when true)
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * <span style="color: #FD4747">previous</span> 3 4 5 6 <span style="color: #FD4747">7</span> 8 9 10 11 12 13 next
      * </pre>
@@ -515,7 +515,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of nextPageNumber that is calculated. <br />
      * You should use this.isExistNextPage() before calling this. (call only when true)
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 <span style="color: #FD4747">9</span> 10 11 12 13 <span style="color: #FD4747">next</span>
      * </pre>

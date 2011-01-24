@@ -64,7 +64,7 @@ public class PageGroupBean implements Serializable {
     /**
      * Create the list of page number.
      * <pre>
-     * ex) group-size=10, current-page=8 
+     * e.g. group-size=10, current-page=8 
      * page.<span style="color: #FD4747">setPageGroupSize</span>(10);
      * List&lt;Integer&gt; numberList = page.pageGroup().<span style="color: #FD4747">createPageNumberList()</span>;
      * 
@@ -136,7 +136,7 @@ public class PageGroupBean implements Serializable {
      * Is existing previous page-group?
      * Using values are currentPageNumber and pageGroupSize.
      * <pre>
-     * ex) group-size=10, current-page=12
+     * e.g. group-size=10, current-page=12
      *  12 / 23 pages (453 records)
      * previous 11 12 13 14 15 16 17 18 19 20 next
      * 
@@ -153,7 +153,7 @@ public class PageGroupBean implements Serializable {
      * Is existing next page-group?
      * Using values are currentPageNumber and pageGroupSize and allPageCount.
      * <pre>
-     * ex) group-size=10, current-page=12
+     * e.g. group-size=10, current-page=12
      *  12 / 23 pages (453 records)
      * previous 11 12 13 14 15 16 17 18 19 20 next
      * 
@@ -242,7 +242,7 @@ public class PageGroupBean implements Serializable {
      * Get the value of preGroupNearestPageNumber that is calculated. <br />
      * You should use this.isExistPrePageGroup() before calling this. (call only when true)
      * <pre>
-     * ex) group-size=10, current-page=12
+     * e.g. group-size=10, current-page=12
      *  12 / 23 pages (453 records)
      * previous 11 12 13 14 15 16 17 18 19 20 next
      * 
@@ -264,7 +264,7 @@ public class PageGroupBean implements Serializable {
      * Get the value of nextGroupNearestPageNumber that is calculated. <br />
      * You should use this.isExistNextPageGroup() before calling this. (call only when true)
      * <pre>
-     * ex) group-size=10, current-page=12
+     * e.g. group-size=10, current-page=12
      *  12 / 23 pages (453 records)
      * previous 11 12 13 14 15 16 17 18 19 20 next
      * 

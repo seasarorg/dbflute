@@ -35,6 +35,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.seasar.dbflute.outsidesql.typed.ExecuteHandlingPmb;
 import org.seasar.dbflute.outsidesql.typed.ListHandlingPmb;
 
 /**
@@ -134,41 +135,8 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select the list of the entity by the outsideSql.
-     * <pre>
-     * String path = MemberBhv.PATH_selectSimpleMember;
-     * SimpleMemberPmb pmb = new SimpleMemberPmb();
-     * pmb.setMemberName_PrefixSearch("S");
-     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
-     * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #FD4747">selectList</span>(path, pmb, entityType);
-     * for (SimpleMember member : memberList) {
-     *     ... = member.get...();
-     * }
-     * </pre>
-     * It needs to use customize-entity and parameter-bean.
-     * The way to generate them is following:
-     * <pre>
-     * -- #df:entity#
-     * -- !df:pmb!
-     * -- !!Integer memberId!!
-     * -- !!String memberName!!
-     * -- !!...!!
-     * </pre>
-     * @param <ENTITY> The type of entity for element.
-     * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
-     * @param entityType The element type of entity. (NotNull)
-     * @return The result bean of selected list. (NotNull)
-     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
-     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
-     */
-    public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
-        return doSelectList(path, pmb, entityType);
-    }
-
-    /**
-     * Select the list of the entity by the outsideSql.
+     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * You can call this method by only a typed parameter-bean.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
@@ -201,7 +169,50 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
         return doSelectList(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());
     }
 
+    /**
+     * Select the list of the entity by the outsideSql. {Flexible Interface}<br />
+     * This method can accept each element: path, parameter-bean(Object type), entity-type.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * ListResultBean&lt;SimpleMember&gt; memberList
+     *     = memberBhv.outsideSql().<span style="color: #FD4747">selectList</span>(path, pmb, entityType);
+     * for (SimpleMember member : memberList) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * It needs to use customize-entity and parameter-bean.
+     * The way to generate them is following:
+     * <pre>
+     * -- #df:entity#
+     * -- !df:pmb!
+     * -- !!Integer memberId!!
+     * -- !!String memberName!!
+     * -- !!...!!
+     * </pre>
+     * @param <ENTITY> The type of entity for element.
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
+     * @param entityType The element type of entity. (NotNull)
+     * @return The result bean of selected list. (NotNull)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
+        return doSelectList(path, pmb, entityType);
+    }
+
     protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, Object pmb, Class<ENTITY> entityType) {
+        if (path == null) {
+            String msg = "The argument 'path' of outside-SQL should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (entityType == null) {
+            String msg = "The argument 'entityType' for result should not be null: path=" + path;
+            throw new IllegalArgumentException(msg);
+        }
         try {
             List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
             return createListResultBean(resultList);
@@ -228,7 +239,30 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute the outsideSql. {insert, update, delete, etc...}
+     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br />
+     * You can call this method by only a typed parameter-bean.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * int count = memberBhv.outsideSql().<span style="color: #FD4747">execute</span>(path, pmb);
+     * </pre>
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
+     * @return The count of execution.
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     */
+    public int execute(String path, ExecuteHandlingPmb<BEHAVIOR> pmb) {
+        if (pmb == null) {
+            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        return doExecute(pmb.getOutsideSqlPath(), pmb);
+    }
+
+    /**
+     * Execute the outsideSql. (insert, update, delete, etc...) {Flexible Interface}<br />
+     * This method can accept each element: path, parameter-bean(Object type).
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -241,6 +275,14 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
     public int execute(String path, Object pmb) {
+        return doExecute(path, pmb);
+    }
+
+    protected int doExecute(String path, Object pmb) {
+        if (path == null) {
+            String msg = "The argument 'path' of outside-SQL should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         return invoke(createExecuteCommand(path, pmb));
     }
 
@@ -263,7 +305,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      */
     public void call(ProcedurePmb pmb) {
         if (pmb == null) {
-            throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!");
+            throw new IllegalArgumentException("The argument 'pmb' of procedure should not be null.");
         }
         try {
             invoke(createCallCommand(pmb.getProcedureName(), pmb));
@@ -329,16 +371,35 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     // ===================================================================================
+    //                                                                              Entity
+    //                                                                              ======
+    /**
+     * Prepare entity handling.
+     * <pre>
+     * memberBhv.outsideSql().<span style="color: #FD4747">entityHandling()</span>.selectEntityWithDeletedCheck(pmb);
+     * </pre>
+     * @return The cursor executor of outsideSql. (NotNull)
+     */
+    public OutsideSqlEntityExecutor<BEHAVIOR> entityHandling() {
+        return createOutsideSqlEntityExecutor();
+    }
+
+    protected OutsideSqlEntityExecutor<BEHAVIOR> createOutsideSqlEntityExecutor() {
+        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _defaultStatementConfig, _outsideSqlOption);
+    }
+
+    // ===================================================================================
     //                                                                              Paging
     //                                                                              ======
     /**
-     * Prepare the paging as manualPaging.
+     * Prepare the paging as manual-paging.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">manualPaging()</span>.selectPage(path, pmb, SimpleMember.class);
+     * memberBhv.outsideSql().<span style="color: #FD4747">manualPaging()</span>.selectPage(pmb);
      * </pre>
      * If you call this, you need to write paging condition on your SQL.
      * <pre>
-     * ex) MySQL
+     * e.g. MySQL
      * select member.MEMBER_ID, member...
      *   from Member member
      *  where ...
@@ -347,19 +408,24 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * </pre>
      * @return The executor of paging that the paging mode is manual. (NotNull)
      */
-    public OutsideSqlPagingExecutor<BEHAVIOR> manualPaging() {
+    public OutsideSqlManualPagingExecutor<BEHAVIOR> manualPaging() {
         _outsideSqlOption.manualPaging();
-        return createOutsideSqlPagingExecutor();
+        return createOutsideSqlManualPagingExecutor();
+    }
+
+    protected OutsideSqlManualPagingExecutor<BEHAVIOR> createOutsideSqlManualPagingExecutor() {
+        return _outsideSqlExecutorFactory.createManualPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+                _defaultStatementConfig, _outsideSqlOption);
     }
 
     /**
-     * Prepare the paging as autoPaging.
+     * Prepare the paging as auto-paging.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">autoPaging()</span>.selectPage(path, pmb, SimpleMember.class);
+     * memberBhv.outsideSql().<span style="color: #FD4747">autoPaging()</span>.selectPage(pmb);
      * </pre>
      * If you call this, you don't need to write paging condition on your SQL.
      * <pre>
-     * ex) MySQL
+     * e.g. MySQL
      * select member.MEMBER_ID, member...
      *   from Member member
      *  where ...
@@ -368,13 +434,13 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * </pre>
      * @return The executor of paging that the paging mode is auto. (NotNull)
      */
-    public OutsideSqlPagingExecutor<BEHAVIOR> autoPaging() {
+    public OutsideSqlAutoPagingExecutor<BEHAVIOR> autoPaging() {
         _outsideSqlOption.autoPaging();
-        return createOutsideSqlPagingExecutor();
+        return createOutsideSqlAutoPagingExecutor();
     }
 
-    protected OutsideSqlPagingExecutor<BEHAVIOR> createOutsideSqlPagingExecutor() {
-        return _outsideSqlExecutorFactory.createPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
+    protected OutsideSqlAutoPagingExecutor<BEHAVIOR> createOutsideSqlAutoPagingExecutor() {
+        return _outsideSqlExecutorFactory.createAutoPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
 
@@ -384,33 +450,17 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /**
      * Prepare cursor handling.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">cursorHandling()</span>.selectCursor(path, pmb, handler);
+     * memberBhv.outsideSql().<span style="color: #FD4747">cursorHandling()</span>.selectCursor(pmb);
      * </pre>
      * @return The cursor executor of outsideSql. (NotNull)
      */
-    public OutsideSqlCursorExecutor<BEHAVIOR, Object> cursorHandling() {
+    public OutsideSqlCursorExecutor<BEHAVIOR> cursorHandling() {
         return createOutsideSqlCursorExecutor();
     }
 
-    protected OutsideSqlCursorExecutor<BEHAVIOR, Object> createOutsideSqlCursorExecutor() {
+    protected OutsideSqlCursorExecutor<BEHAVIOR> createOutsideSqlCursorExecutor() {
         return _outsideSqlExecutorFactory.createCursor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _outsideSqlOption);
-    }
-
-    /**
-     * Prepare entity handling.
-     * <pre>
-     * memberBhv.outsideSql().<span style="color: #FD4747">entityHandling()</span>.selectEntityWithDeletedCheck(path, pmb, SimpleMember.class);
-     * </pre>
-     * @return The cursor executor of outsideSql. (NotNull)
-     */
-    public OutsideSqlEntityExecutor<BEHAVIOR, Object> entityHandling() {
-        return createOutsideSqlEntityExecutor();
-    }
-
-    protected OutsideSqlEntityExecutor<BEHAVIOR, Object> createOutsideSqlEntityExecutor() {
-        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
-                _defaultStatementConfig, _outsideSqlOption);
     }
 
     // ===================================================================================

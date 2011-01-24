@@ -15,11 +15,13 @@
  */
 package org.seasar.dbflute.outsidesql.typed;
 
+import org.seasar.dbflute.cbean.PagingBean;
+
 /**
- * The parameter-bean for manual paging handling.
+ * The parameter-bean for manual-paging handling.
  * @author jflute
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @param <ENTITY> The type of an entity (may be scalar) for result.
  */
-public interface ManualPagingHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY> {
+public interface ManualPagingHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY>, PagingBean {
 }

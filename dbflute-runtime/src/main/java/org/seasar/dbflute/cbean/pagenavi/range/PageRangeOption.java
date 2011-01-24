@@ -65,7 +65,7 @@ public class PageRangeOption implements Serializable {
     /**
      * Set the size of page range.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      * PageRangeOption option = new PageRangeOption();
      * option.<span style="color: #FD4747">setPageRangeSize</span>(5);
      * page.<span style="color: #FD4747">setPageRangeOption</span>(option);
@@ -91,7 +91,7 @@ public class PageRangeOption implements Serializable {
     /**
      * Set fill-limit option.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      * PageRangeOption option = new PageRangeOption();
      * option.<span style="color: #FD4747">setPageRangeSize</span>(5);
      * option.<span style="color: #FD4747">setFillLimit</span>(true);
@@ -101,7 +101,7 @@ public class PageRangeOption implements Serializable {
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
      * 
-     * <span style="color: #3F7E5E">// ex) fillLimit=true, current-page=3</span>
+     * <span style="color: #3F7E5E">// e.g. fillLimit=true, current-page=3</span>
      * <span style="color: #3F7E5E">//  3 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">//</span> <span style="color: #FD4747">1 2 3 4 5 6 7 8 9 10 11</span> <span style="color: #3F7E5E">next</span>
      * </pre>

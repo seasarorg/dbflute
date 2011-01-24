@@ -25,7 +25,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * The option of from-to for Date type.
  * <pre>
- * ex) from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+ * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
  * 
  * [Comparison Pattern]
  *   new FromToOption().compareAsDate(); 
@@ -105,7 +105,7 @@ public class FromToOption implements ConditionOption, Serializable {
      * Compare as date. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * ex) from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
      * 
      *   new FromToOption().compareAsDate();
      *     --&gt; column &gt;= '2007/04/10 00:00:00'
@@ -126,7 +126,7 @@ public class FromToOption implements ConditionOption, Serializable {
      * Compare as month. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * ex) from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
+     * e.g. from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
      * 
      *   new FromToOption().compareAsMonth();
      *     --&gt; column &gt;= '2007/04/01 00:00:00'
@@ -147,7 +147,7 @@ public class FromToOption implements ConditionOption, Serializable {
      * Compare as year. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * ex) from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
+     * e.g. from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
      * 
      *   new FromToOption().compareAsYear();
      *     --&gt; column &gt;= '2007/01/01 00:00:00'

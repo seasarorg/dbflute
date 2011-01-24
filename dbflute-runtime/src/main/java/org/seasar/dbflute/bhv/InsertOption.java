@@ -48,10 +48,10 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * member.set...(value);
      * InsertOption&lt;MemberCB&gt; option = <span style="color: #FD4747">new InsertOption&lt;MemberCB&gt;()</span>;
      * 
-     * <span style="color: #3F7E5E">// ex) you can insert by your values for common columns</span>
+     * <span style="color: #3F7E5E">// e.g. you can insert by your values for common columns</span>
      * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
      * 
-     * <span style="color: #3F7E5E">// ex) you can insert by your values for primary key</span>
+     * <span style="color: #3F7E5E">// e.g. you can insert by your values for primary key</span>
      * option.<span style="color: #FD4747">disablePrimaryKeyIdentity</span>();
      * 
      * memberBhv.<span style="color: #FD4747">varyingInsert</span>(member, option);

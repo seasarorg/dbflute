@@ -72,7 +72,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * purchase.setPurchaseId(value); <span style="color: #3F7E5E">// required</span>
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * 
-     * <span style="color: #3F7E5E">// ex) you can update by self calculation values</span>
+     * <span style="color: #3F7E5E">// e.g. you can update by self calculation values</span>
      * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #FD4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
      * option.<span style="color: #FD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     public void specify(PurchaseCB cb) {
@@ -80,7 +80,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      *     }
      * }).<span style="color: #FD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
      * 
-     * <span style="color: #3F7E5E">// ex) you can update by your values for common columns</span>
+     * <span style="color: #3F7E5E">// e.g. you can update by your values for common columns</span>
      * option.<span style="color: #FD4747">disableCommonColumnAutoSetup</span>();
      * 
      * purchaseBhv.<span style="color: #FD4747">varyingUpdate</span>(purchase, option);

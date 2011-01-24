@@ -20,10 +20,11 @@ import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlAutoPagingExecutor;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlCursorExecutor;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlEntityExecutor;
-import org.seasar.dbflute.outsidesql.executor.OutsideSqlPagingExecutor;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlManualPagingExecutor;
 
 /**
  * @author jflute
@@ -45,13 +46,12 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     /**
      * {@inheritDoc}
      */
-    public <BEHAVIOR, PARAMETER_BEAN> OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> createCursor(
-            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
-            OutsideSqlOption outsideSqlOption) {
+    public <BEHAVIOR> OutsideSqlCursorExecutor<BEHAVIOR> createCursor(BehaviorCommandInvoker behaviorCommandInvoker,
+            String tableDbName, DBDef currentDBDef, OutsideSqlOption outsideSqlOption) {
         final OutsideSqlContextFactory outsideSqlContextFactory = createOutsideSqlContextFactory();
         final OutsideSqlFilter outsideSqlFilter = createOutsideSqlExecutionFilter();
-        return new OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName,
-                currentDBDef, outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
+        return new OutsideSqlCursorExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef,
+                outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
     }
 
     /**
@@ -75,20 +75,30 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     /**
      * {@inheritDoc}
      */
-    public <BEHAVIOR, PARAMETER_BEAN> OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> createEntity(
-            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
-            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
-        return new OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName,
-                currentDBDef, defaultStatementConfig, outsideSqlOption, this);
+    public <BEHAVIOR> OutsideSqlEntityExecutor<BEHAVIOR> createEntity(BehaviorCommandInvoker behaviorCommandInvoker,
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
+            OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlEntityExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef,
+                defaultStatementConfig, outsideSqlOption, this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public <BEHAVIOR> OutsideSqlPagingExecutor<BEHAVIOR> createPaging(BehaviorCommandInvoker behaviorCommandInvoker,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
-            OutsideSqlOption outsideSqlOption) {
-        return new OutsideSqlPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef,
+    public <BEHAVIOR> OutsideSqlManualPagingExecutor<BEHAVIOR> createManualPaging(
+            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlManualPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef,
+                defaultStatementConfig, outsideSqlOption, this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public <BEHAVIOR> OutsideSqlAutoPagingExecutor<BEHAVIOR> createAutoPaging(
+            BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlAutoPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef,
                 defaultStatementConfig, outsideSqlOption, this);
     }
 }

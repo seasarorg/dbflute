@@ -514,7 +514,7 @@ public class IfCommentEvaluator {
         msg = msg + "If you want to write a complex condition, write an ExParameterBean property." + ln();
         msg = msg + "And use the property in IF comment." + ln();
         msg = msg + "For example, ExParameterBean original property:" + ln();
-        msg = msg + "  ex) ExParameterBean (your original property)" + ln();
+        msg = msg + "  e.g. ExParameterBean (your original property)" + ln();
         msg = msg + "  /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "  public boolean isOriginalMemberProperty() {" + ln();
         msg = msg + "      return (getMemberId() != null || getBirthdate() != null) && getMemberName() != null);"
@@ -522,7 +522,7 @@ public class IfCommentEvaluator {
         msg = msg + "  }" + ln();
         msg = msg + "  - - - - - - - - - -/" + ln();
         msg = msg + "  " + ln();
-        msg = msg + "  ex) IF comment" + ln();
+        msg = msg + "  e.g. IF comment" + ln();
         msg = msg + "  /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "  /*IF pmb.originalMemberProperty*/" + ln();
         msg = msg + "  - - - - - - - - - -/" + ln();

@@ -25,14 +25,14 @@ import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.seasar.dbflute.outsidesql.typed.CursorHandlingPmb;
 
 /**
  * The cursor executor of outside-SQL.
  * @param <BEHAVIOR> The type of behavior.
- * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author jflute
  */
-public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
+public class OutsideSqlCursorExecutor<BEHAVIOR> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -77,14 +77,52 @@ public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select the cursor of the entity by outside-SQL.
+     * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * You can call this method by only a typed parameter-bean.
+     * <pre>
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * memberBhv.outsideSql().cursorHandling()
+     *         .<span style="color: #FD4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
+     *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
+     *         while (cursor.next()) {
+     *             Integer memberId = cursor.getMemberId();
+     *             String memberName = cursor.getMemberName();
+     *             ...
+     *         }
+     *         return null;
+     *     }
+     * });
+     * </pre>
+     * It needs to use type-safe-cursor instead of customize-entity.
+     * The way to generate it is following:
+     * <pre>
+     * <span style="color: #3F7E5E">-- #df:entity#</span>
+     * <span style="color: #3F7E5E">-- +cursor+</span>
+     * </pre>
+     * @param pmb The typed parameter-bean for cursor handling. (NotNull)
+     * @param handler The handler of cursor called back with result set. (NotNull)
+     * @return The result object that the cursor handler returns. (NullAllowed)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     */
+    public Object selectCursor(CursorHandlingPmb<BEHAVIOR> pmb, CursorHandler handler) {
+        if (pmb == null) {
+            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        return doSelectCursor(pmb.getOutsideSqlPath(), pmb, handler);
+    }
+
+    /**
+     * Select the cursor of the entity by outside-SQL. {Flexible Interface}<br />
+     * This method can accept each element: path, parameter-bean(Object type), cursor-handler.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
      *         .<span style="color: #FD4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
-     *     public void Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
+     *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
      *             String memberName = cursor.getMemberName();
@@ -101,19 +139,31 @@ public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * <span style="color: #3F7E5E">-- +cursor+</span>
      * </pre>
      * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
-     * @param handler The handler of cursor. (NotNull)
+     * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
+     * @param handler The handler of cursor called back with result set. (NotNull)
      * @return The result object that the cursor handler returns. (NullAllowed)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
-    public Object selectCursor(String path, PARAMETER_BEAN pmb, CursorHandler handler) {
+    public Object selectCursor(String path, Object pmb, CursorHandler handler) {
+        return doSelectCursor(path, pmb, handler);
+    }
+
+    protected Object doSelectCursor(String path, Object pmb, CursorHandler handler) {
+        if (path == null) {
+            String msg = "The argument 'path' of outside-SQL should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (handler == null) {
+            String msg = "The argument 'handler' of cursor should not be null: path=" + path;
+            throw new IllegalArgumentException(msg);
+        }
         return invoke(createSelectCursorCommand(path, pmb, handler));
     }
 
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected BehaviorCommand<Object> createSelectCursorCommand(String path, PARAMETER_BEAN pmb, CursorHandler handler) {
+    protected BehaviorCommand<Object> createSelectCursorCommand(String path, Object pmb, CursorHandler handler) {
         return xsetupCommand(newOutsideSqlSelectCursorCommand(), path, pmb, handler);
     }
 
@@ -121,8 +171,8 @@ public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
         return new OutsideSqlSelectCursorCommand();
     }
 
-    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand cmd, String path,
-            PARAMETER_BEAN pmb, CursorHandler handler) {
+    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand cmd, String path, Object pmb,
+            CursorHandler handler) {
         cmd.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setOutsideSqlPath(path);
@@ -152,7 +202,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> removeBlockComment() {
+    public OutsideSqlCursorExecutor<BEHAVIOR> removeBlockComment() {
         _outsideSqlOption.removeBlockComment();
         return this;
     }
@@ -161,7 +211,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * Set up remove-line-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> removeLineComment() {
+    public OutsideSqlCursorExecutor<BEHAVIOR> removeLineComment() {
         _outsideSqlOption.removeLineComment();
         return this;
     }
@@ -171,7 +221,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> formatSql() {
+    public OutsideSqlCursorExecutor<BEHAVIOR> formatSql() {
         _outsideSqlOption.formatSql();
         return this;
     }
@@ -181,7 +231,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> configure(StatementConfig statementConfig) {
+    public OutsideSqlCursorExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }

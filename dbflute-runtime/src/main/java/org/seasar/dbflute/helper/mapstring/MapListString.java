@@ -21,10 +21,10 @@ import java.util.Map;
 /**
  * The string for map and list.
  * <pre> 
- * ex) map-string
+ * e.g. map-string
  *   map:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
  * 
- * ex) list-string
+ * e.g. list-string
  *   list:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
  * </pre>
  * @author jflute

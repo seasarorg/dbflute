@@ -64,7 +64,7 @@ public class PageRangeBean implements Serializable {
     /**
      * Create the list of page number.
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      * page.<span style="color: #FD4747">setPageRangeSize</span>(5);
      * List&lt;Integer&gt; numberList = page.pageRange().<span style="color: #FD4747">createPageNumberList()</span>;
      * 
@@ -131,7 +131,7 @@ public class PageRangeBean implements Serializable {
     /**
      * Is existing previous page range?
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
@@ -151,7 +151,7 @@ public class PageRangeBean implements Serializable {
     /**
      * Is existing next page range?
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
@@ -232,7 +232,7 @@ public class PageRangeBean implements Serializable {
      * Get the value of preRangeNearestPageNumber that is calculated. <br />
      * You should use this.isExistPrePageRange() before calling this. (call only when true)
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
@@ -254,7 +254,7 @@ public class PageRangeBean implements Serializable {
      * Get the value of nextRangeNearestPageNumber that is calculated. <br />
      * You should use this.isExistNextPageRange() before calling this. (call only when true)
      * <pre>
-     * ex) range-size=5, current-page=8 
+     * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 

@@ -248,7 +248,7 @@ public class MapListStringImpl implements MapListString {
 
             // If delimiter exists and delimiter is closer than end brace, 
             // Everything from the head of the present remainder string to the delimiter becomes map value.
-            //   ex) value1,key2=value2}
+            //   e.g. value1,key2=value2}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String mapValue = _remainderString.substring(0, delimiterIndex);
                 currentMap.put(mapKey, filterMapListValue(mapValue));
@@ -259,7 +259,7 @@ public class MapListStringImpl implements MapListString {
             }
 
             // Everything from the head of the present remainder string to the delimiter becomes map value.
-            //   ex) value1}, key2=value2}
+            //   e.g. value1}, key2=value2}
             final String mapValue = _remainderString.substring(0, endBraceIndex);
             currentMap.put(mapKey, filterMapListValue(mapValue));
 
@@ -305,7 +305,7 @@ public class MapListStringImpl implements MapListString {
 
             // If delimiter exists and delimiter is closer than end brace, 
             // Everything from the head of the present remainder string to the delimiter becomes list value.
-            //   ex) value1,value2,value3}
+            //   e.g. value1,value2,value3}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String listValue = _remainderString.substring(0, delimiterIndex);
                 currentList.add(filterMapListValue(listValue));
@@ -316,7 +316,7 @@ public class MapListStringImpl implements MapListString {
             }
 
             // Everything from the head of the present remainder string to the delimiter becomes list value.
-            //   ex) value1}, value2, }
+            //   e.g. value1}, value2, }
             final String listValue = _remainderString.substring(0, endBraceIndex);
             currentList.add(filterMapListValue(listValue));
 

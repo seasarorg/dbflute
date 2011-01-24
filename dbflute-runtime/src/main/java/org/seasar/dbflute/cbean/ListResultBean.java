@@ -73,7 +73,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * Split the list per group. <br />
      * This method needs the property 'selectedList' only.
      * <pre>
-     * ex) grouping per three records
+     * e.g. grouping per three records
      * GroupingOption&lt;Member&gt; groupingOption = new GroupingOption&lt;Member&gt;(<span style="color: #FD4747">3</span>);
      * List&lt;List&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #FD4747">groupingList</span>(new GroupingRowSetupper&lt;List&lt;Member&gt;, Member&gt;() {
      *     public List&lt;Member&gt; setup(GroupingRowResource&lt;Member&gt; groupingRowResource) {
@@ -81,7 +81,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      *     }
      * }, groupingOption);
      * 
-     * ex) grouping per initial character of MEMBER_NAME
+     * e.g. grouping per initial character of MEMBER_NAME
      * <span style="color: #3F7E5E">// the breakCount is unnecessary in this case</span>
      * GroupingOption&lt;Member&gt; groupingOption = new GroupingOption&lt;Member&gt;();
      * groupingOption.setGroupingRowEndDeterminer(new GroupingRowEndDeterminer&lt;Member&gt;() {

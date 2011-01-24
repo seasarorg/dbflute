@@ -99,7 +99,7 @@ public interface ConditionQuery {
     String xgetForeignPropertyName();
 
     /**
-     * Get the path of foreign relation. ex) _0_1
+     * Get the path of foreign relation. e.g. _0_1
      * @return The path of foreign relation. (NullAllowed)
      */
     String xgetRelationPath();

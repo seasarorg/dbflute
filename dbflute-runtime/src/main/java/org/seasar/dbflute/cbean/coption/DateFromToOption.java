@@ -18,7 +18,7 @@ package org.seasar.dbflute.cbean.coption;
 /**
  * The option of date-from-to.
  * <pre>
- * ex) fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
+ * e.g. fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
  *
  *   new DateFromToOption(); 
  *     --&gt; column &gt;= '2007/04/10 00:00:00'

@@ -18,7 +18,7 @@ package org.seasar.dbflute.cbean;
 /**
  * The interface of or-query.
  * <pre>
- * ex) OrScopeQuery
+ * e.g. OrScopeQuery
  * cb.orScopeQuery(new OrQuery&lt;FooCB&gt;() {
  *     public void query(FooCB orCB) {
  *         orCB.query().setFoo...

@@ -48,7 +48,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     /**
      * Set up paging resources.
      * <pre>
-     * ex) ConditionBean
+     * e.g. ConditionBean
      * MemberCB cb = new MemberCB();
      * cb.query().setMemberName_PrefixSearch("S");
      * cb.query().addOrderBy_Birthdate_Desc();
@@ -82,7 +82,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                       =============
     /**
      * Fetch first records only.
-     * ex) ConditionBean
+     * e.g. ConditionBean
      * MemberCB cb = new MemberCB();
      * cb.query().setMemberName_PrefixSearch("S");
      * cb.query().addOrderBy_Birthdate_Desc();

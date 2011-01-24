@@ -25,16 +25,16 @@ import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.seasar.dbflute.outsidesql.typed.EntityHandlingPmb;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The cursor executor of outside-SQL.
  * @param <BEHAVIOR> The type of behavior.
- * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author jflute
  */
-public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
+public class OutsideSqlEntityExecutor<BEHAVIOR> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -46,7 +46,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
     protected final String _tableDbName;
 
     /** The current database definition. (NotNull) */
-    protected DBDef _currentDBDef;
+    protected final DBDef _currentDBDef;
 
     /** The default configuration of statement. (NullAllowed) */
     protected final StatementConfig _defaultStatementConfig;
@@ -72,10 +72,39 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
     }
 
     // ===================================================================================
-    //                                                                              Select
-    //                                                                              ======
+    //                                                                  Entity NullAllowed
+    //                                                                  ==================
     /**
-     * Select entity by the outside-SQL.
+     * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * You can call this method by only a typed parameter-bean.
+     * <pre>
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * SimpleMember member
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #FD4747">selectEntity</span>(pmb);
+     * if (member != null) {
+     *     ... = member.get...();
+     * } else {
+     *     ...
+     * }
+     * </pre>
+     * @param <ENTITY> The type of entity.
+     * @param pmb The typed parameter-bean for entity handling. (NotNull)
+     * @return The selected entity. (NullAllowed)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     */
+    public <ENTITY> ENTITY selectEntity(EntityHandlingPmb<BEHAVIOR, ENTITY> pmb) {
+        if (pmb == null) {
+            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        return doSelectEntity(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());
+    }
+
+    /**
+     * Select entity by the outside-SQL. {Flexible Interface}<br />
+     * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -91,13 +120,25 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
+     * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (NullAllowed)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
-    public <ENTITY> ENTITY selectEntity(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+    public <ENTITY> ENTITY selectEntity(String path, Object pmb, Class<ENTITY> entityType) {
+        return doSelectEntity(path, pmb, entityType);
+    }
+
+    protected <ENTITY> ENTITY doSelectEntity(String path, Object pmb, Class<ENTITY> entityType) {
+        if (path == null) {
+            String msg = "The argument 'path' of outside-SQL should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (entityType == null) {
+            String msg = "The argument 'entityType' for result should not be null: path=" + path;
+            throw new IllegalArgumentException(msg);
+        }
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOneIfNeed(pmb);
         final List<ENTITY> ls;
         try {
@@ -119,7 +160,36 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
         return ls.get(0);
     }
 
-    protected <ENTITY> List<ENTITY> doSelectList(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+    protected int xcheckSafetyResultAsOneIfNeed(Object pmb) {
+        if (pmb instanceof FetchBean) {
+            final int safetyMaxResultSize = ((FetchBean) pmb).getSafetyMaxResultSize();
+            ((FetchBean) pmb).checkSafetyResult(1);
+            return safetyMaxResultSize;
+        }
+        return 0;
+    }
+
+    protected void xrestoreSafetyResultIfNeed(Object pmb, int preSafetyMaxResultSize) {
+        if (pmb instanceof FetchBean) {
+            ((FetchBean) pmb).checkSafetyResult(preSafetyMaxResultSize);
+        }
+    }
+
+    protected <ENTITY> String buildSearchKey4Exception(String path, Object pmb, Class<ENTITY> entityType) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("table  = ").append(_outsideSqlOption.getTableDbName()).append(ln());
+        sb.append("path   = ").append(path).append(ln());
+        sb.append("pmbean = ").append(DfTypeUtil.toClassTitle(pmb)).append(":").append(pmb).append(ln());
+        sb.append("entity = ").append(DfTypeUtil.toClassTitle(entityType)).append(ln());
+        sb.append("option = ").append(_outsideSqlOption);
+        return sb.toString();
+    }
+
+    protected void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
+        createBhvExThrower().throwSelectEntityDuplicatedException(resultCountExp, searchKey, cause);
+    }
+
+    protected <ENTITY> List<ENTITY> doSelectList(String path, Object pmb, Class<ENTITY> entityType) {
         return createBasicExecutor().selectList(path, pmb, entityType);
     }
 
@@ -128,8 +198,39 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
                 _defaultStatementConfig, _outsideSqlOption);
     }
 
+    // ===================================================================================
+    //                                                                      Entity NotNull
+    //                                                                      ==============
     /**
-     * Select entity with deleted check by the outside-SQL.
+     * Select entity with deleted check by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * You can call this method by only a typed parameter-bean.
+     * <pre>
+     * String path = MemberBhv.PATH_selectSimpleMember;
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberId(3);
+     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
+     * SimpleMember member
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #FD4747">selectEntityWithDeletedCheck</span>(path, pmb, entityType);
+     * ... = member.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
+     * </pre>
+     * @param <ENTITY> The type of entity.
+     * @param pmb The typed parameter-bean for entity handling. (NotNull)
+     * @return The selected entity. (NullAllowed)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted(not found).
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     */
+    public <ENTITY> ENTITY selectEntityWithDeletedCheck(EntityHandlingPmb<BEHAVIOR, ENTITY> pmb) {
+        if (pmb == null) {
+            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        return doSelectEntityWithDeletedCheck(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());
+    }
+
+    /**
+     * Select entity with deleted check by the outside-SQL. {Flexible Interface}<br />
+     * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -148,7 +249,11 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted(not found).
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
-    public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+    public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, Object pmb, Class<ENTITY> entityType) {
+        return doSelectEntityWithDeletedCheck(path, pmb, entityType);
+    }
+
+    protected <ENTITY> ENTITY doSelectEntityWithDeletedCheck(String path, Object pmb, Class<ENTITY> entityType) {
         final ENTITY entity = selectEntity(path, pmb, entityType);
         if (entity == null) {
             throwSelectEntityAlreadyDeletedException(buildSearchKey4Exception(path, pmb, entityType));
@@ -156,36 +261,8 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
         return entity;
     }
 
-    protected <ENTITY> String buildSearchKey4Exception(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        String tmp = "table  = " + _outsideSqlOption.getTableDbName() + ln();
-        tmp = tmp + "path   = " + path + ln();
-        tmp = tmp + "pmbean = " + DfTypeUtil.toClassTitle(pmb) + ":" + pmb + ln();
-        tmp = tmp + "entity = " + DfTypeUtil.toClassTitle(entityType) + ln();
-        tmp = tmp + "option = " + _outsideSqlOption;
-        return tmp;
-    }
-
-    protected int xcheckSafetyResultAsOneIfNeed(PARAMETER_BEAN pmb) {
-        if (pmb instanceof FetchBean) {
-            final int safetyMaxResultSize = ((FetchBean) pmb).getSafetyMaxResultSize();
-            ((FetchBean) pmb).checkSafetyResult(1);
-            return safetyMaxResultSize;
-        }
-        return 0;
-    }
-
-    protected void xrestoreSafetyResultIfNeed(PARAMETER_BEAN pmb, int preSafetyMaxResultSize) {
-        if (pmb instanceof FetchBean) {
-            ((FetchBean) pmb).checkSafetyResult(preSafetyMaxResultSize);
-        }
-    }
-
     protected void throwSelectEntityAlreadyDeletedException(Object searchKey) {
         createBhvExThrower().throwSelectEntityAlreadyDeletedException(searchKey);
-    }
-
-    protected void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
-        createBhvExThrower().throwSelectEntityDuplicatedException(resultCountExp, searchKey, cause);
     }
 
     // ===================================================================================
@@ -195,7 +272,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> removeBlockComment() {
+    public OutsideSqlEntityExecutor<BEHAVIOR> removeBlockComment() {
         _outsideSqlOption.removeBlockComment();
         return this;
     }
@@ -204,7 +281,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * Set up remove-line-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> removeLineComment() {
+    public OutsideSqlEntityExecutor<BEHAVIOR> removeLineComment() {
         _outsideSqlOption.removeLineComment();
         return this;
     }
@@ -214,7 +291,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> formatSql() {
+    public OutsideSqlEntityExecutor<BEHAVIOR> formatSql() {
         _outsideSqlOption.formatSql();
         return this;
     }
@@ -224,7 +301,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
      * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> configure(StatementConfig statementConfig) {
+    public OutsideSqlEntityExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
