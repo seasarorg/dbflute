@@ -245,10 +245,12 @@ public class DfPmbBasicHandler {
     }
 
     public boolean isTypedEntityHandling(String className) {
-        if (isTypedPagingHandling(className)) {
-            return false;
-        }
-        return isTypedListHandling(className); // no difference with list handling
+        // *allowed to use entity handling with paging handling
+        //if (isTypedPagingHandling(className)) {
+        //    return false;
+        //}
+        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
+        return customizeEntityInfo != null ? customizeEntityInfo.isNormalHandling() : false;
     }
 
     public boolean isTypedPagingHandling(String className) { // abstract judgement
