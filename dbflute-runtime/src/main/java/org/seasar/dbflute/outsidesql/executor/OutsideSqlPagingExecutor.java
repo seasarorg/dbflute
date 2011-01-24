@@ -34,9 +34,10 @@ import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 
 /**
  * The paging executor of outside-SQL.
+ * @param <BEHAVIOR> The type of behavior.
  * @author jflute
  */
-public class OutsideSqlPagingExecutor {
+public class OutsideSqlPagingExecutor<BEHAVIOR> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -155,7 +156,7 @@ public class OutsideSqlPagingExecutor {
 
     protected <ENTITY> PagingHandler<ENTITY> createPagingHandler(final String path, final PagingBean pmb,
             final Class<ENTITY> entityType) {
-        final OutsideSqlEntityExecutor<PagingBean> countExecutor = createCountExecutor();
+        final OutsideSqlEntityExecutor<BEHAVIOR, PagingBean> countExecutor = createCountExecutor();
         return new PagingHandler<ENTITY>() {
             public PagingBean getPagingBean() {
                 return pmb;
@@ -178,7 +179,7 @@ public class OutsideSqlPagingExecutor {
         };
     }
 
-    protected OutsideSqlEntityExecutor<PagingBean> createCountExecutor() {
+    protected OutsideSqlEntityExecutor<BEHAVIOR, PagingBean> createCountExecutor() {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
         return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, countOption);
@@ -279,7 +280,7 @@ public class OutsideSqlPagingExecutor {
         }
     }
 
-    protected OutsideSqlBasicExecutor createBasicExecutor() {
+    protected OutsideSqlBasicExecutor<BEHAVIOR> createBasicExecutor() {
         return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
@@ -291,7 +292,7 @@ public class OutsideSqlPagingExecutor {
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor removeBlockComment() {
+    public OutsideSqlPagingExecutor<BEHAVIOR> removeBlockComment() {
         _outsideSqlOption.removeBlockComment();
         return this;
     }
@@ -300,7 +301,7 @@ public class OutsideSqlPagingExecutor {
      * Set up remove-line-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor removeLineComment() {
+    public OutsideSqlPagingExecutor<BEHAVIOR> removeLineComment() {
         _outsideSqlOption.removeLineComment();
         return this;
     }
@@ -310,7 +311,7 @@ public class OutsideSqlPagingExecutor {
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor formatSql() {
+    public OutsideSqlPagingExecutor<BEHAVIOR> formatSql() {
         _outsideSqlOption.formatSql();
         return this;
     }
@@ -320,7 +321,7 @@ public class OutsideSqlPagingExecutor {
      * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
-    public OutsideSqlPagingExecutor configure(StatementConfig statementConfig) {
+    public OutsideSqlPagingExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }

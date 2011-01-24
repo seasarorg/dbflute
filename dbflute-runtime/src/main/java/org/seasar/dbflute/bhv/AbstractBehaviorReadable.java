@@ -454,38 +454,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                          OutsideSql
     //                                                                          ==========
-    /**
-     * Get the basic executor of outside-SQL. <br />
-     * The invoker of behavior command should be not null when you call this method.
-     * <pre>
-     * You can use the methods for outside-SQL are as follows:
-     * {Basic}
-     *   o selectList()
-     *   o execute()
-     *   o call()
-     * 
-     * {Entity}
-     *   o entityHandling().selectEntity()
-     *   o entityHandling().selectEntityWithDeletedCheck()
-     * 
-     * {Paging}
-     *   o autoPaging().selectList()
-     *   o autoPaging().selectPage()
-     *   o manualPaging().selectList()
-     *   o manualPaging().selectPage()
-     * 
-     * {Cursor}
-     *   o cursorHandling().selectCursor()
-     * 
-     * {Option}
-     *   o dynamicBinding().selectList()
-     *   o removeBlockComment().selectList()
-     *   o removeLineComment().selectList()
-     *   o formatSql().selectList()
-     * </pre>
-     * @return The basic executor of outside-SQL. (NotNull) 
-     */
-    public OutsideSqlBasicExecutor outsideSql() {
+    protected <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> doOutsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
         return _behaviorCommandInvoker.createOutsideSqlBasicExecutor(getTableDbName());
     }

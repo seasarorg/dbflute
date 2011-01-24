@@ -30,10 +30,11 @@ import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The cursor executor of outside-SQL.
+ * @param <BEHAVIOR> The type of behavior.
  * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author jflute
  */
-public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
+public class OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -122,7 +123,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         return createBasicExecutor().selectList(path, pmb, entityType);
     }
 
-    protected OutsideSqlBasicExecutor createBasicExecutor() {
+    protected OutsideSqlBasicExecutor<BEHAVIOR> createBasicExecutor() {
         return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
@@ -194,7 +195,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<PARAMETER_BEAN> removeBlockComment() {
+    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> removeBlockComment() {
         _outsideSqlOption.removeBlockComment();
         return this;
     }
@@ -203,7 +204,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * Set up remove-line-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<PARAMETER_BEAN> removeLineComment() {
+    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> removeLineComment() {
         _outsideSqlOption.removeLineComment();
         return this;
     }
@@ -213,7 +214,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<PARAMETER_BEAN> formatSql() {
+    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> formatSql() {
         _outsideSqlOption.formatSql();
         return this;
     }
@@ -223,7 +224,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
-    public OutsideSqlEntityExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {
+    public OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }

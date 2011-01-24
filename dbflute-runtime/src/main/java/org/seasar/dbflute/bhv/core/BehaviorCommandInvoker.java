@@ -849,10 +849,11 @@ public class BehaviorCommandInvoker {
     //                                                                          OutsideSql
     //                                                                          ==========
     /**
+     * @param <BEHAVIOR> The type of behavior.
      * @param tableDbName The DB name of table. (NotNull)
      * @return The basic executor of outside SQL. (NotNull) 
      */
-    public OutsideSqlBasicExecutor createOutsideSqlBasicExecutor(String tableDbName) {
+    public <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> createOutsideSqlBasicExecutor(String tableDbName) {
         final OutsideSqlExecutorFactory factory = _invokerAssistant.assistOutsideSqlExecutorFactory();
         final DBDef dbdef = _invokerAssistant.assistCurrentDBDef();
         final StatementConfig config = _invokerAssistant.assistDefaultStatementConfig();

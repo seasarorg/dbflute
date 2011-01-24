@@ -16,7 +16,7 @@
 package org.seasar.dbflute.twowaysql.pmbean;
 
 /**
- * The parameter-bean.
+ * The bean for parameters of a SQL. (called parameter-bean)
  * @author jflute
  */
 public interface ParameterBean {

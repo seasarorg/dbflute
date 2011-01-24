@@ -28,10 +28,11 @@ import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 
 /**
  * The cursor executor of outside-SQL.
+ * @param <BEHAVIOR> The type of behavior.
  * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author jflute
  */
-public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
+public class OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -151,7 +152,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * Set up remove-block-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<PARAMETER_BEAN> removeBlockComment() {
+    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> removeBlockComment() {
         _outsideSqlOption.removeBlockComment();
         return this;
     }
@@ -160,7 +161,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * Set up remove-line-comment for this outside-SQL.
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<PARAMETER_BEAN> removeLineComment() {
+    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> removeLineComment() {
         _outsideSqlOption.removeLineComment();
         return this;
     }
@@ -170,7 +171,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<PARAMETER_BEAN> formatSql() {
+    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> formatSql() {
         _outsideSqlOption.formatSql();
         return this;
     }
@@ -180,7 +181,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
      * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
-    public OutsideSqlCursorExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {
+    public OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }

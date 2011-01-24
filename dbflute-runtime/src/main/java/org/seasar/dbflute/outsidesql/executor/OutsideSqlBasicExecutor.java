@@ -35,6 +35,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.seasar.dbflute.outsidesql.typed.ListHandlingPmb;
 
 /**
  * The executor of outside-SQL.
@@ -63,9 +64,10 @@ import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
  *   o removeLineComment().selectList()
  *   o formatSql().selectList()
  * </pre>
+ * @param <BEHAVIOR> The type of behavior.
  * @author jflute
  */
-public class OutsideSqlBasicExecutor {
+public class OutsideSqlBasicExecutor<BEHAVIOR> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -163,6 +165,40 @@ public class OutsideSqlBasicExecutor {
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         return doSelectList(path, pmb, entityType);
+    }
+
+    /**
+     * Select the list of the entity by the outsideSql.
+     * <pre>
+     * SimpleMemberPmb pmb = new SimpleMemberPmb();
+     * pmb.setMemberName_PrefixSearch("S");
+     * ListResultBean&lt;SimpleMember&gt; memberList
+     *     = memberBhv.outsideSql().<span style="color: #FD4747">selectList</span>(pmb);
+     * for (SimpleMember member : memberList) {
+     *     ... = member.get...();
+     * }
+     * </pre>
+     * It needs to use customize-entity and parameter-bean.
+     * The way to generate them is following:
+     * <pre>
+     * -- #df:entity#
+     * -- !df:pmb!
+     * -- !!Integer memberId!!
+     * -- !!String memberName!!
+     * -- !!...!!
+     * </pre>
+     * @param <ENTITY> The type of entity for element.
+     * @param pmb The typed parameter-bean for list handling. (NotNull)
+     * @return The result bean of selected list. (NotNull)
+     * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    public <ENTITY> ListResultBean<ENTITY> selectList(ListHandlingPmb<BEHAVIOR, ENTITY> pmb) {
+        if (pmb == null) {
+            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        return doSelectList(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());
     }
 
     protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, Object pmb, Class<ENTITY> entityType) {
@@ -311,7 +347,7 @@ public class OutsideSqlBasicExecutor {
      * </pre>
      * @return The executor of paging that the paging mode is manual. (NotNull)
      */
-    public OutsideSqlPagingExecutor manualPaging() {
+    public OutsideSqlPagingExecutor<BEHAVIOR> manualPaging() {
         _outsideSqlOption.manualPaging();
         return createOutsideSqlPagingExecutor();
     }
@@ -332,12 +368,12 @@ public class OutsideSqlBasicExecutor {
      * </pre>
      * @return The executor of paging that the paging mode is auto. (NotNull)
      */
-    public OutsideSqlPagingExecutor autoPaging() {
+    public OutsideSqlPagingExecutor<BEHAVIOR> autoPaging() {
         _outsideSqlOption.autoPaging();
         return createOutsideSqlPagingExecutor();
     }
 
-    protected OutsideSqlPagingExecutor createOutsideSqlPagingExecutor() {
+    protected OutsideSqlPagingExecutor<BEHAVIOR> createOutsideSqlPagingExecutor() {
         return _outsideSqlExecutorFactory.createPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
@@ -352,11 +388,11 @@ public class OutsideSqlBasicExecutor {
      * </pre>
      * @return The cursor executor of outsideSql. (NotNull)
      */
-    public OutsideSqlCursorExecutor<Object> cursorHandling() {
+    public OutsideSqlCursorExecutor<BEHAVIOR, Object> cursorHandling() {
         return createOutsideSqlCursorExecutor();
     }
 
-    protected OutsideSqlCursorExecutor<Object> createOutsideSqlCursorExecutor() {
+    protected OutsideSqlCursorExecutor<BEHAVIOR, Object> createOutsideSqlCursorExecutor() {
         return _outsideSqlExecutorFactory.createCursor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _outsideSqlOption);
     }
@@ -368,11 +404,11 @@ public class OutsideSqlBasicExecutor {
      * </pre>
      * @return The cursor executor of outsideSql. (NotNull)
      */
-    public OutsideSqlEntityExecutor<Object> entityHandling() {
+    public OutsideSqlEntityExecutor<BEHAVIOR, Object> entityHandling() {
         return createOutsideSqlEntityExecutor();
     }
 
-    protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor() {
+    protected OutsideSqlEntityExecutor<BEHAVIOR, Object> createOutsideSqlEntityExecutor() {
         return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, _outsideSqlOption);
     }
@@ -387,7 +423,7 @@ public class OutsideSqlBasicExecutor {
      * Set up remove-block-comment for this outsideSql.
      * @return this. (NotNull)
      */
-    public OutsideSqlBasicExecutor removeBlockComment() {
+    public OutsideSqlBasicExecutor<BEHAVIOR> removeBlockComment() {
         _outsideSqlOption.removeBlockComment();
         return this;
     }
@@ -396,7 +432,7 @@ public class OutsideSqlBasicExecutor {
      * Set up remove-line-comment for this outsideSql.
      * @return this. (NotNull)
      */
-    public OutsideSqlBasicExecutor removeLineComment() {
+    public OutsideSqlBasicExecutor<BEHAVIOR> removeLineComment() {
         _outsideSqlOption.removeLineComment();
         return this;
     }
@@ -409,20 +445,20 @@ public class OutsideSqlBasicExecutor {
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
-    public OutsideSqlBasicExecutor formatSql() {
+    public OutsideSqlBasicExecutor<BEHAVIOR> formatSql() {
         _outsideSqlOption.formatSql();
         return this;
     }
 
     // -----------------------------------------------------
-    //                                      Statement Config
-    //                                      ----------------
+    //                                       StatementConfig
+    //                                       ---------------
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
      * @param statementConfig The configuration of statement. (NullAllowed)
      * @return this. (NotNull)
      */
-    public OutsideSqlBasicExecutor configure(StatementConfig statementConfig) {
+    public OutsideSqlBasicExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }

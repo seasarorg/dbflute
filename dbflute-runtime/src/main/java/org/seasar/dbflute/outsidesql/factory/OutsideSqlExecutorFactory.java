@@ -31,6 +31,7 @@ public interface OutsideSqlExecutorFactory {
 
     /**
      * Create the basic executor of outside-SQL.
+     * @param <BEHAVIOR> The type of behavior.
      * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
      * @param currentDBDef The definition of current DBMS. (NotNull)
@@ -38,11 +39,13 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NullAllowed: if null, means for an entry instance)
      * @return The instance of executor. (NotNull)
      */
-    OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
+    <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> createBasic(BehaviorCommandInvoker behaviorCommandInvoker,
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
+            OutsideSqlOption outsideSqlOption);
 
     /**
      * Create the cursor executor of outside-SQL.
+     * @param <BEHAVIOR> The type of behavior.
      * @param <PARAMETER_BEAN> The type of parameter-bean.
      * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
@@ -50,12 +53,13 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
-    <PARAMETER_BEAN> OutsideSqlCursorExecutor<PARAMETER_BEAN> createCursor(
+    <BEHAVIOR, PARAMETER_BEAN> OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> createCursor(
             BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
             OutsideSqlOption outsideSqlOption);
 
     /**
      * Create the entity executor of outside-SQL.
+     * @param <BEHAVIOR> The type of behavior.
      * @param <PARAMETER_BEAN> The type of parameter-bean.
      * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
@@ -64,12 +68,13 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
-    <PARAMETER_BEAN> OutsideSqlEntityExecutor<PARAMETER_BEAN> createEntity(
+    <BEHAVIOR, PARAMETER_BEAN> OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> createEntity(
             BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
             StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
 
     /**
      * Create the paging executor of outside-SQL.
+     * @param <BEHAVIOR> The type of behavior.
      * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
      * @param tableDbName The DB name of table. (NotNull)
      * @param currentDBDef The definition of current DBMS. (NotNull)
@@ -77,6 +82,7 @@ public interface OutsideSqlExecutorFactory {
      * @param outsideSqlOption The option of outsideSql. (NotNull)
      * @return The instance of executor. (NotNull)
      */
-    OutsideSqlPagingExecutor createPaging(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption);
+    <BEHAVIOR> OutsideSqlPagingExecutor<BEHAVIOR> createPaging(BehaviorCommandInvoker behaviorCommandInvoker,
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
+            OutsideSqlOption outsideSqlOption);
 }

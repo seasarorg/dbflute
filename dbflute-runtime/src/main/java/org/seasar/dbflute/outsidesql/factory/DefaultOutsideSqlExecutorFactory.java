@@ -33,24 +33,25 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     /**
      * {@inheritDoc}
      */
-    public OutsideSqlBasicExecutor createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+    public <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> createBasic(BehaviorCommandInvoker behaviorCommandInvoker,
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
+            OutsideSqlOption outsideSqlOption) {
         final OutsideSqlContextFactory outsideSqlContextFactory = createOutsideSqlContextFactory();
         final OutsideSqlFilter outsideSqlFilter = createOutsideSqlExecutionFilter();
-        return new OutsideSqlBasicExecutor(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
-                outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
+        return new OutsideSqlBasicExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef,
+                defaultStatementConfig, outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public <PARAMETER_BEAN> OutsideSqlCursorExecutor<PARAMETER_BEAN> createCursor(
+    public <BEHAVIOR, PARAMETER_BEAN> OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN> createCursor(
             BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
             OutsideSqlOption outsideSqlOption) {
         final OutsideSqlContextFactory outsideSqlContextFactory = createOutsideSqlContextFactory();
         final OutsideSqlFilter outsideSqlFilter = createOutsideSqlExecutionFilter();
-        return new OutsideSqlCursorExecutor<PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName, currentDBDef,
-                outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
+        return new OutsideSqlCursorExecutor<BEHAVIOR, PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName,
+                currentDBDef, outsideSqlOption, outsideSqlContextFactory, outsideSqlFilter, this);
     }
 
     /**
@@ -74,19 +75,20 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     /**
      * {@inheritDoc}
      */
-    public <PARAMETER_BEAN> OutsideSqlEntityExecutor<PARAMETER_BEAN> createEntity(
+    public <BEHAVIOR, PARAMETER_BEAN> OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN> createEntity(
             BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
             StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
-        return new OutsideSqlEntityExecutor<PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName, currentDBDef,
-                defaultStatementConfig, outsideSqlOption, this);
+        return new OutsideSqlEntityExecutor<BEHAVIOR, PARAMETER_BEAN>(behaviorCommandInvoker, tableDbName,
+                currentDBDef, defaultStatementConfig, outsideSqlOption, this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public OutsideSqlPagingExecutor createPaging(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
-        return new OutsideSqlPagingExecutor(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
-                outsideSqlOption, this);
+    public <BEHAVIOR> OutsideSqlPagingExecutor<BEHAVIOR> createPaging(BehaviorCommandInvoker behaviorCommandInvoker,
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig,
+            OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef,
+                defaultStatementConfig, outsideSqlOption, this);
     }
 }

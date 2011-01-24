@@ -27,5 +27,5 @@ public interface TypedSelectPmb<BEHAVIOR, ENTITY> extends TypedParameterBean<BEH
      * Get the type of an entity for result.
      * @return The type instance of an entity. (NotNull)
      */
-    Class<?> getEntityType();
+    Class<ENTITY> getEntityType();
 }
