@@ -32,13 +32,13 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfSqlFileAnalyzer extends DfSqlFileRunnerBase {
+public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSqlFileAnalyzer.class);
+    private static final Log _log = LogFactory.getLog(DfOutsideSqlAnalyzer.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -53,7 +53,7 @@ public class DfSqlFileAnalyzer extends DfSqlFileRunnerBase {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSqlFileAnalyzer(DfRunnerInformation runInfo, DataSource dataSource, DfSql2EntityMeta sqlFileMeta) {
+    public DfOutsideSqlAnalyzer(DfRunnerInformation runInfo, DataSource dataSource, DfSql2EntityMeta sqlFileMeta) {
         super(runInfo, dataSource);
         _sql2entityMeta = sqlFileMeta;
         _currentDBDef = currentDBDef();

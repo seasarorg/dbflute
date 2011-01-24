@@ -5,7 +5,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfParameterBeanMarkInvalidException;
-import org.seasar.dbflute.logic.outsidesqltest.check.DfOutsideSqlChecker;
+import org.seasar.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
 import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;

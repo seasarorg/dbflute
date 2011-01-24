@@ -49,7 +49,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMeta;
-import org.seasar.dbflute.logic.sql2entity.analyzer.DfSqlFileAnalyzer;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
@@ -216,7 +216,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      * @return SQL file runner. (NotNull)
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
-        return new DfSqlFileAnalyzer(runInfo, getDataSource(), _sql2entityMeta);
+        return new DfOutsideSqlAnalyzer(runInfo, getDataSource(), _sql2entityMeta);
     }
 
     protected void handleNotFoundResult(List<File> sqlFileList) {
