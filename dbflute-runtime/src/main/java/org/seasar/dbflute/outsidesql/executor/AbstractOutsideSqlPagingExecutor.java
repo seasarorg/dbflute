@@ -100,7 +100,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      * The parameter-bean needs to extend SimplePagingBean.
      * The way to generate it is following:
      * <pre>
-     * <span style="color: #3F7E5E">-- !df:pmb extends SPB!</span>
+     * <span style="color: #3F7E5E">-- !df:pmb extends Paging!</span>
      * <span style="color: #3F7E5E">-- !!Integer memberId!!</span>
      * <span style="color: #3F7E5E">-- !!...!!</span>
      * </pre>
@@ -247,7 +247,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      * The parameter-bean needs to extend SimplePagingBean.
      * The way to generate it is following:
      * <pre>
-     * <span style="color: #3F7E5E">-- !df:pmb extends SPB!</span>
+     * <span style="color: #3F7E5E">-- !df:pmb extends Paging!</span>
      * <span style="color: #3F7E5E">-- !!Integer memberId!!</span>
      * <span style="color: #3F7E5E">-- !!...!!</span>
      * </pre>
