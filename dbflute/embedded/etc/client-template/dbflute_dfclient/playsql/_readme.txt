@@ -25,8 +25,18 @@ playsql
            |-defaultValueMap.dataprop
 - - - - - - - - - -/
 
+The format of a xls file is like this:
+/- - - - - - - - - - - - - - - - - - - -
+|MEMBER_ID|MEMBER_NAME|BIRTHDATE |
+|        1|Stojkovic  |1965/03/03|
+|        2|Savicevic  |          |
+|        3|...        |...       |
 
-The defaultValueMap.dataprop is 
+(Sheet)
+MEMBER / MEMBER_LOGIN / MEMBER_SECURITY
+- - - - - - - - - -/
+
+The defaultValueMap.dataprop is for common columns like this:
 /- - - - - - - - - - - - - - - - - - - -
 map:{
     ; REGISTER_DATETIME = sysdate
