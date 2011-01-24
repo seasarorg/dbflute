@@ -252,7 +252,7 @@ public class DfPmbBasicHandler {
     }
 
     public boolean isTypedPagingHandling(String className) { // abstract judgement
-        return isTypedManualPagingHandling(className) || isTypedManualPagingHandling(className);
+        return isTypedManualPagingHandling(className) || isTypedAutoPagingHandling(className);
     }
 
     public boolean isTypedManualPagingHandling(String className) {
@@ -308,7 +308,8 @@ public class DfPmbBasicHandler {
         } else if (getBasicProperties().isDatabaseSQLServer()) {
             return Srl.containsAllIgnoreCase(sql, "row_number()");
         } else if (getBasicProperties().isDatabaseH2()) {
-            return Srl.containsAllIgnoreCase(sql, "offset", "limit");
+            // H2 implements both limit only and offset + limit
+            return Srl.containsAllIgnoreCase(sql, "limit");
         } else if (getBasicProperties().isDatabaseDerby()) {
             return Srl.containsAllIgnoreCase(sql, "offset", "fetch");
         } else if (getBasicProperties().isDatabaseSQLite()) {
