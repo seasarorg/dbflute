@@ -177,7 +177,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     //                                                                 ===================
     protected void setupBehaviorQueryPath() {
         final List<File> sqlFileList = collectSqlFileList();
-        final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper(getProperties());
+        final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         setupper.setupBehaviorQueryPath(sqlFileList);
     }
 }

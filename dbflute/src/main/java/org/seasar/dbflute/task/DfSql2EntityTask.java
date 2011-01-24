@@ -47,9 +47,9 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMeta;
-import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
@@ -296,7 +296,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                 ===================
     protected void setupBehaviorQueryPath() {
         final List<File> sqlFileList = collectSqlFileList();
-        final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper(getProperties());
+        final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         setupper.setupBehaviorQueryPath(sqlFileList);
     }
 

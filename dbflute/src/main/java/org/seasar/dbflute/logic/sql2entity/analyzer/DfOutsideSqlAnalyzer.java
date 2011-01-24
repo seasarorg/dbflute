@@ -81,6 +81,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     protected void execSQL(String sql) {
         ResultSet rs = null;
         try {
+            DfCustomizeEntityInfo customizeEntityInfo = null;
             boolean alreadyIncrementGoodSqlCount = false;
             if (isTargetEntityMakingSql(sql)) {
                 final String executedActuallySql;
@@ -115,12 +116,20 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 if (entityName != null) {
                     entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
                     assertDuplicateEntity(entityName, _sqlFile);
-                    _sql2entityMeta.addEntityInfo(entityName, new DfCustomizeEntityInfo(entityName, columnMetaInfoMap));
+                    // saves for setting to pmbMetaData
+                    customizeEntityInfo = new DfCustomizeEntityInfo(entityName, columnMetaInfoMap);
+                    customizeEntityInfo.setSqlFile(_sqlFile);
+                    _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
                     if (isCursor(sql)) {
+                        customizeEntityInfo.setCursorHandling(true);
                         _sql2entityMeta.addCursorInfo(entityName, DfSql2EntityMeta.CURSOR_INFO_DUMMY);
+                    } else if (isScalar(sql)) {
+                        customizeEntityInfo.setScalarHandling(true);
                     }
                     _sql2entityMeta.addEntitySqlFile(entityName, _sqlFile);
-                    _sql2entityMeta.addPrimaryKey(entityName, getPrimaryKeyColumnNameList(sql));
+                    final List<String> primaryKeyList = getPrimaryKeyColumnNameList(sql);
+                    customizeEntityInfo.setPrimaryKeyList(primaryKeyList);
+                    _sql2entityMeta.addPrimaryKey(entityName, primaryKeyList);
                 }
             }
             if (isTargetParameterBeanMakingSql(sql)) {
@@ -129,11 +138,14 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 }
 
                 // for Parameter Bean
-                final DfPmbMetaData parameterBeanMetaData = extractParameterBeanMetaData(sql);
-                if (parameterBeanMetaData != null) {
-                    final String pmbName = parameterBeanMetaData.getClassName();
+                final DfPmbMetaData pmbMetaData = extractPmbMetaData(sql);
+                if (pmbMetaData != null) {
+                    if (customizeEntityInfo != null) {
+                        pmbMetaData.setCustomizeEntityInfo(customizeEntityInfo);
+                    }
+                    final String pmbName = pmbMetaData.getClassName();
                     assertDuplicateParameterBean(pmbName, _sqlFile);
-                    _sql2entityMeta.addPmbMetaData(pmbName, parameterBeanMetaData);
+                    _sql2entityMeta.addPmbMetaData(pmbName, pmbMetaData);
                 }
             }
         } catch (SQLException e) {
@@ -196,7 +208,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
      * @param sql Target SQL. (NotNull and NotEmpty)
      * @return the meta data of parameter bean. (NullAllowed: If it returns null, it means 'not found'.)
      */
-    protected DfPmbMetaData extractParameterBeanMetaData(String sql) {
+    protected DfPmbMetaData extractPmbMetaData(String sql) {
         final String parameterBeanName = getParameterBeanName(sql);
         if (parameterBeanName == null) {
             return null;
@@ -362,6 +374,10 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected boolean isCursor(final String sql) {
         return _outsideSqlMarkAnalyzer.isCursor(sql);
+    }
+
+    protected boolean isScalar(final String sql) {
+        return _outsideSqlMarkAnalyzer.isScalar(sql);
     }
 
     protected List<String> getEntityPropertyTypeList(final String sql) {

@@ -328,9 +328,7 @@ public class Database {
         if (_pmbBasicHandler != null) {
             return _pmbBasicHandler;
         }
-        final DfBasicProperties basicProp = getBasicProperties();
-        final DfClassificationProperties classificationProp = getClassificationProperties();
-        _pmbBasicHandler = new DfPmbBasicHandler(_pmbMetaDataMap, basicProp, classificationProp);
+        _pmbBasicHandler = new DfPmbBasicHandler(_pmbMetaDataMap);
         return _pmbBasicHandler;
     }
 
@@ -2052,7 +2050,7 @@ public class Database {
         if (_tableBqpMap != null) {
             return _tableBqpMap;
         }
-        final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper(getProperties());
+        final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         try {
             _tableBqpMap = setupper.extractTableBqpMap(collectSqlFileList());
         } catch (RuntimeException e) {

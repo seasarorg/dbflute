@@ -1,5 +1,7 @@
 package org.seasar.dbflute.logic.sql2entity.cmentity;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
@@ -18,6 +20,12 @@ public class DfCustomizeEntityInfo {
     protected final Map<String, DfColumnMetaInfo> _columnMap;
     protected final DfTypeStructInfo _typeStructInfo;
 
+    // additional information (if procedure, not used)
+    protected File _sqlFile;
+    protected List<String> _primaryKeyList;
+    protected boolean _cursorHandling;
+    protected boolean _scalarHandling;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -30,6 +38,13 @@ public class DfCustomizeEntityInfo {
         _tableDbName = tableDbName;
         _columnMap = columnMap;
         _typeStructInfo = typeStructInfo;
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isNormalHandling() {
+        return !_cursorHandling && !_scalarHandling;
     }
 
     // ===================================================================================
@@ -71,5 +86,37 @@ public class DfCustomizeEntityInfo {
 
     public DfTypeStructInfo getTypeStructInfo() {
         return _typeStructInfo;
+    }
+
+    public File getSqlFile() {
+        return _sqlFile;
+    }
+
+    public void setSqlFile(File sqlFile) {
+        this._sqlFile = sqlFile;
+    }
+
+    public List<String> getPrimaryKeyList() {
+        return _primaryKeyList;
+    }
+
+    public void setPrimaryKeyList(List<String> primaryKeyList) {
+        this._primaryKeyList = primaryKeyList;
+    }
+
+    public boolean isCursorHandling() {
+        return _cursorHandling;
+    }
+
+    public void setCursorHandling(boolean cursorHandling) {
+        this._cursorHandling = cursorHandling;
+    }
+
+    public boolean isScalarHandling() {
+        return _scalarHandling;
+    }
+
+    public void setScalarHandling(boolean scalarHandling) {
+        this._scalarHandling = scalarHandling;
     }
 }

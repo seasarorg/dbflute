@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.sql2entity.pmbean;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,13 @@ import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -29,26 +32,22 @@ public class DfPmbBasicHandler {
     //                                                                           Attribute
     //                                                                           =========
     /** The meta data of parameter bean. */
-    protected Map<String, DfPmbMetaData> _pmbMetaDataMap;
+    protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
 
-    protected DfBasicProperties _basicProperties;
-    protected DfClassificationProperties _classificationProperties;
-
-    private static DfColumnHandler _columnHandler = new DfColumnHandler();
+    // helper
+    protected final DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPmbBasicHandler(Map<String, DfPmbMetaData> pmbMetaDataMap, DfBasicProperties basicProperties,
-            DfClassificationProperties classificationProperties) {
+    public DfPmbBasicHandler(Map<String, DfPmbMetaData> pmbMetaDataMap) {
         _pmbMetaDataMap = pmbMetaDataMap;
-        _basicProperties = basicProperties;
-        _classificationProperties = classificationProperties;
     }
 
     // ===================================================================================
-    //                                                                            MetaData
-    //                                                                            ========
+    //                                                                           Meta Data
+    //                                                                           =========
     public boolean isExistPmbMetaData() {
         return _pmbMetaDataMap != null && !_pmbMetaDataMap.isEmpty();
     }
@@ -63,18 +62,35 @@ public class DfPmbBasicHandler {
 
     public String getSuperClassDefinition(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        final DfPmbMetaData metaData = findPmbMetaData(className);
-        String superClassName = metaData.getSuperClassName();
-        if (superClassName == null || superClassName.trim().length() == 0) {
+        if (!hasSuperClassDefinition(className)) {
             return "";
         }
+        final DfPmbMetaData metaData = findPmbMetaData(className);
+        String superClassName = metaData.getSuperClassName();
         if (DfBuildProperties.getInstance().isVersionJavaOverNinety()) { // as patch for 90
             if (superClassName.contains("SimplePagingBean")) {
                 superClassName = "org.seasar.dbflute.cbean.SimplePagingBean";
             }
         }
-        final DfLanguageDependencyInfo languageDependencyInfo = _basicProperties.getLanguageDependencyInfo();
+        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         return " " + languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName;
+    }
+
+    public boolean hasSuperClassDefinition(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        final DfPmbMetaData metaData = findPmbMetaData(className);
+        String superClassName = metaData.getSuperClassName();
+        return superClassName != null && superClassName.trim().length() > 0;
+    }
+
+    public boolean hasPagingExtension(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        if (!hasSuperClassDefinition(className)) {
+            return false;
+        }
+        final DfPmbMetaData metaData = findPmbMetaData(className);
+        final String superClassName = metaData.getSuperClassName();
+        return superClassName.contains("Paging");
     }
 
     public boolean hasPmbMetaDataCheckSafetyResult(String className) {
@@ -141,6 +157,81 @@ public class DfPmbBasicHandler {
         final String propertyType = getPropertyType(className, propertyName);
         final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
         return prop.isJavaNativeBooleanObject(propertyType);
+    }
+
+    // ===================================================================================
+    //                                                                          Typed Info
+    //                                                                          ==========
+    public boolean isTypedParameterBean(String className) {
+        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
+        final File sqlFile = pmbMetaData.getSqlFile();
+        if (sqlFile == null) {
+            return false;
+        }
+        return isTypedListHandling(className) || isTypedCursorHandling(className) || isTypedPagingHandling(className)
+                || isTypedExecuteHandling(className);
+    }
+
+    public boolean isTypedListHandling(String className) {
+        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
+        return customizeEntityInfo != null ? customizeEntityInfo.isNormalHandling() : false;
+    }
+
+    public boolean isTypedCursorHandling(String className) {
+        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
+        return customizeEntityInfo != null ? customizeEntityInfo.isCursorHandling() : false;
+    }
+
+    public boolean isTypedPagingHandling(String className) {
+        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
+        return customizeEntityInfo != null ? hasPagingExtension(className) : false;
+    }
+
+    public boolean isTypedAutoPagingHandling(String className) {
+        if (!isTypedPagingHandling(className)) {
+            return false;
+        }
+        return false; // TODO;
+    }
+
+    public boolean isTypedManualPagingHandling(String className) {
+        if (!isTypedPagingHandling(className)) {
+            return false;
+        }
+        return false; // TODO;
+    }
+
+    public boolean isTypedExecuteHandling(String className) {
+        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
+        if (customizeEntityInfo != null) {
+            return false;
+        }
+        final Map<String, String> elementMap = findBqpElementMap(className);
+        final String bqpPath = elementMap.get("behaviorQueryPath");
+        if (bqpPath == null) {
+            String msg = "The element value 'behaviorQueryPath' should not be null: " + elementMap;
+            throw new IllegalStateException(msg);
+        }
+        return !bqpPath.startsWith("select");
+    }
+
+    protected DfCustomizeEntityInfo findCustomizeEntityInfo(String className) {
+        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
+        return pmbMetaData.getCustomizeEntityInfo();
+    }
+
+    protected Map<String, String> findBqpElementMap(String className) {
+        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
+        final File sqlFile = pmbMetaData.getSqlFile();
+        if (sqlFile == null) {
+            return null;
+        }
+        final Map<String, Map<String, String>> bqpMap = _bqpSetupper.extractBasicBqpMap(DfCollectionUtil
+                .newArrayList(sqlFile));
+        if (bqpMap.isEmpty()) {
+            return null; // means the file was not under behavior query path
+        }
+        return bqpMap.get(0); // must be only one
     }
 
     // ===================================================================================
@@ -584,7 +675,8 @@ public class DfPmbBasicHandler {
 
     protected DfPmbPropertyOptionClassification createPropertyOptionClassification(String className, String propertyName) {
         final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(className, propertyName);
-        return new DfPmbPropertyOptionClassification(className, propertyName, _classificationProperties, finder);
+        final DfClassificationProperties clsProp = getClassificationProperties();
+        return new DfPmbPropertyOptionClassification(className, propertyName, clsProp, finder);
     }
 
     protected DfPmbPropertyOptionReference createPropertyOptionReference(String className, String propertyName) {
@@ -612,6 +704,10 @@ public class DfPmbBasicHandler {
         return getProperties().getBasicProperties();
     }
 
+    protected DfClassificationProperties getClassificationProperties() {
+        return getProperties().getClassificationProperties();
+    }
+
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
     }
@@ -619,8 +715,20 @@ public class DfPmbBasicHandler {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    public String replaceString(String text, String fromText, String toText) {
+        return Srl.replace(text, fromText, toText);
+    }
+
+    public String getSlashPath(File file) {
+        return replaceString(file.getPath(), getFileSeparator(), "/");
+    }
+
+    public String getFileSeparator() {
+        return File.separator;
+    }
+
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return "\n";
     }
 
     // ===================================================================================

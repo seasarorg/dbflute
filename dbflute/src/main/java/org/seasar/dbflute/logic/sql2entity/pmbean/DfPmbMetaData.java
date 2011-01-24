@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
+import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 
 /**
  * @author jflute
@@ -18,6 +19,10 @@ public class DfPmbMetaData {
     protected Map<String, String> _propertyNameTypeMap;
     protected Map<String, String> _propertyNameOptionMap;
 
+    // for typed parameter-bean
+    protected File _sqlFile;
+    protected DfCustomizeEntityInfo _customizeEntityInfo;
+
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
@@ -25,7 +30,6 @@ public class DfPmbMetaData {
     protected String _procedureName;
     protected Map<String, String> _propertyNameColumnNameMap;
     protected Map<String, DfProcedureColumnMetaInfo> _propertyNameColumnInfoMap;
-    protected File _sqlFile;
     protected boolean _procedureCalledBySelect;
     protected boolean _refCustomizeEntity;
 
@@ -78,6 +82,22 @@ public class DfPmbMetaData {
         this._propertyNameOptionMap = propertyNameOptionMap;
     }
 
+    public File getSqlFile() {
+        return _sqlFile;
+    }
+
+    public void setSqlFile(File sqlFile) {
+        this._sqlFile = sqlFile;
+    }
+
+    public DfCustomizeEntityInfo getCustomizeEntityInfo() {
+        return _customizeEntityInfo;
+    }
+
+    public void setCustomizeEntityInfo(DfCustomizeEntityInfo customizeEntityInfo) {
+        this._customizeEntityInfo = customizeEntityInfo;
+    }
+
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
@@ -103,14 +123,6 @@ public class DfPmbMetaData {
 
     public void setPropertyNameColumnInfoMap(Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap) {
         this._propertyNameColumnInfoMap = propertyNameColumnInfoMap;
-    }
-
-    public File getSqlFile() {
-        return _sqlFile;
-    }
-
-    public void setSqlFile(File sqlFile) {
-        this._sqlFile = sqlFile;
     }
 
     public boolean isProcedureCalledBySelect() {

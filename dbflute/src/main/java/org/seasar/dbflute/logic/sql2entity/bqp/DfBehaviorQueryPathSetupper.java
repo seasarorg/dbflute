@@ -64,14 +64,12 @@ public class DfBehaviorQueryPathSetupper {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfBuildProperties _buildProperties;
     protected String _flatDirectoryPackage;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfBehaviorQueryPathSetupper(DfBuildProperties buildProperties) {
-        _buildProperties = buildProperties;
+    public DfBehaviorQueryPathSetupper() {
     }
 
     // ===================================================================================
@@ -88,13 +86,22 @@ public class DfBehaviorQueryPathSetupper {
         if (sqlFileList.isEmpty()) {
             return;
         }
-        final Map<String, Map<String, String>> behaviorQueryPathMap = createBehaviorQueryPathMap(sqlFileList);
+        final Map<String, Map<String, String>> behaviorQueryPathMap = doExtractBehaviorQueryPathMap(sqlFileList);
         reflectBehaviorQueryPath(behaviorQueryPathMap);
     }
 
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
+    /**
+     * Extract the basic map of behavior query path
+     * @param sqlFileList
+     * @return The basic map of behavior query path. The key is slash-path. (NotNull, EmptyAllowd: means not found)
+     */
+    public Map<String, Map<String, String>> extractBasicBqpMap(List<File> sqlFileList) {
+        return doExtractBehaviorQueryPathMap(sqlFileList);
+    }
+
     /**
      * Extract the case insensitive map of table behavior query path.
      * <pre>
@@ -111,14 +118,14 @@ public class DfBehaviorQueryPathSetupper {
      * }
      * </pre>
      * @param sqlFileList The list of SQL file. (NotNull)
-     * @return The case insensitive map of table behavior query path. (NotNull)
+     * @return The case insensitive map of behavior query path per table. The key is table name. (NotNull, EmptyAllowd: means not found)
      */
     public Map<String, Map<String, Map<String, String>>> extractTableBqpMap(List<File> sqlFileList) {
         final Map<String, Map<String, Map<String, String>>> resultMap = StringKeyMap.createAsFlexibleOrdered();
         if (sqlFileList.isEmpty()) {
             return resultMap;
         }
-        final Map<String, Map<String, String>> bqpMap = createBehaviorQueryPathMap(sqlFileList);
+        final Map<String, Map<String, String>> bqpMap = doExtractBehaviorQueryPathMap(sqlFileList);
         final Map<File, Map<String, Map<String, String>>> resourceMap = createReflectResourceMap(bqpMap);
         final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = resourceMap.entrySet();
         for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
@@ -153,25 +160,14 @@ public class DfBehaviorQueryPathSetupper {
         return resultMap;
     }
 
-    protected InputStreamReader newInputStreamReader(File sqlFile) {
-        final String encoding = getProperties().getOutsideSqlProperties().getSqlFileEncoding();
-        try {
-            return new InputStreamReader(new FileInputStream(sqlFile), encoding);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException("The file does not exist: " + sqlFile, e);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("The encoding is unsupported: " + encoding, e);
-        }
-    }
-
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                        Main Process
+    //                                                                        ============
     /**
      * @param sqlFileList The list of SQL file. (NotNull)
      * @return The map of behavior query path. (NotNull)
      */
-    protected Map<String, Map<String, String>> createBehaviorQueryPathMap(List<File> sqlFileList) {
+    protected Map<String, Map<String, String>> doExtractBehaviorQueryPathMap(List<File> sqlFileList) {
         final String exbhvName;
         {
             String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
@@ -252,6 +248,18 @@ public class DfBehaviorQueryPathSetupper {
         elementMap.put("cursor", analyzer.isCursor(sql) ? "cursor" : null);
         elementMap.put("title", analyzer.getTitle(sql));
         elementMap.put("description", analyzer.getDescription(sql));
+        elementMap.put("sql", sql);
+    }
+
+    protected InputStreamReader newInputStreamReader(File sqlFile) {
+        final String encoding = getProperties().getOutsideSqlProperties().getSqlFileEncoding();
+        try {
+            return new InputStreamReader(new FileInputStream(sqlFile), encoding);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException("The file does not exist: " + sqlFile, e);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("The encoding is unsupported: " + encoding, e);
+        }
     }
 
     /**
@@ -578,19 +586,19 @@ public class DfBehaviorQueryPathSetupper {
     //                                                                            Accessor
     //                                                                            ========
     protected DfBuildProperties getProperties() {
-        return _buildProperties;
+        return DfBuildProperties.getInstance();
     }
 
     protected DfBasicProperties getBasicProperties() {
-        return _buildProperties.getBasicProperties();
+        return getProperties().getBasicProperties();
     }
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
-        return _buildProperties.getOutsideSqlProperties();
+        return getProperties().getOutsideSqlProperties();
     }
 
     protected DfDocumentProperties getDocumentProperties() {
-        return _buildProperties.getDocumentProperties();
+        return getProperties().getDocumentProperties();
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {

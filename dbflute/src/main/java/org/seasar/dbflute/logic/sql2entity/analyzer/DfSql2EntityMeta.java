@@ -13,18 +13,32 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  */
 public class DfSql2EntityMeta {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     // cursor info is actually only flag, use cursor or not
     public static final Object CURSOR_INFO_DUMMY = new Object();
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // key=entityName
     // an entity name for a map key is a name not resolved about project prefix
     // (the prefix is resolved in Table class)
     protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, Object> _cursorInfoMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, File> _entitySqlFileMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, List<String>> _primaryKeyMap = DfCollectionUtil.newLinkedHashMap();
-    protected final Map<String, DfPmbMetaData> _pmbMetaDataMap = DfCollectionUtil.newLinkedHashMap();
-    protected final Map<String, String> exceptionInfoMap = DfCollectionUtil.newLinkedHashMap();
 
+    // key=pmbName
+    protected final Map<String, DfPmbMetaData> _pmbMetaDataMap = DfCollectionUtil.newLinkedHashMap();
+
+    // key=fileName
+    protected final Map<String, String> _exceptionInfoMap = DfCollectionUtil.newLinkedHashMap();
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public Map<String, DfCustomizeEntityInfo> getEntityInfoMap() {
         return _entityInfoMap;
     }
@@ -66,10 +80,10 @@ public class DfSql2EntityMeta {
     }
 
     public Map<String, String> getExceptionInfoMap() {
-        return exceptionInfoMap;
+        return _exceptionInfoMap;
     }
 
     public void addExceptionInfo(String fileName, String exceptionInfo) {
-        exceptionInfoMap.put(fileName, exceptionInfo);
+        _exceptionInfoMap.put(fileName, exceptionInfo);
     }
 }

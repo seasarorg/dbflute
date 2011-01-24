@@ -37,6 +37,11 @@ public class DfSql2EntityMarkAnalyzer {
         return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
     }
 
+    public boolean isScalar(final String sql) {
+        final String targetString = getTargetString(sql, "+");
+        return targetString != null && (targetString.contains("scalar") || targetString.contains("scalar"));
+    }
+
     public List<String> getCustomizeEntityPropertyTypeList(final String sql) {
         return getTargetList(sql, "##");
     }
