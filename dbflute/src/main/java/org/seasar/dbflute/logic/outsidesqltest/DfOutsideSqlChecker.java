@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.outsidesqltest.check;
+package org.seasar.dbflute.logic.outsidesqltest;
 
 import java.util.List;
 
