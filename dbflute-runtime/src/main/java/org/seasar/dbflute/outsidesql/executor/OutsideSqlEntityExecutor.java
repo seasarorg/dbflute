@@ -205,12 +205,10 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * Select entity with deleted check by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
      * You can call this method by only a typed parameter-bean.
      * <pre>
-     * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #FD4747">selectEntityWithDeletedCheck</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #FD4747">selectEntityWithDeletedCheck</span>(pmb);
      * ... = member.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
      * </pre>
      * @param <ENTITY> The type of entity.
