@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.sql2entity.outsidesql;
+package org.seasar.dbflute.logic.sql2entity.analyzer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  * @since 0.9.5 (2009/04/10 Friday)
  */
-public class DfOutsideSqlMarkAnalyzer {
+public class DfSql2EntityMarkAnalyzer {
 
     // ===================================================================================
     //                                                                          Definition

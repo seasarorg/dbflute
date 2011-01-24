@@ -6,6 +6,7 @@ import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfParameterBeanMarkInvalidException;
 import org.seasar.dbflute.exception.DfRequiredOutsideSqlDescriptionNotFoundException;
 import org.seasar.dbflute.exception.DfRequiredOutsideSqlTitleNotFoundException;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.IfCommentEvaluator;
 import org.seasar.dbflute.twowaysql.node.ParameterFinder;
@@ -122,7 +123,7 @@ public class DfOutsideSqlChecker {
         if (!_requiredTitleCheck) {
             return;
         }
-        final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
+        final DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
         final String title = analyzer.getTitle(sql);
         if (Srl.is_Null_or_TrimmedEmpty(title)) {
             throwRequiredOutsideSqlTitleNotFoundException(fileName, sql);
@@ -157,7 +158,7 @@ public class DfOutsideSqlChecker {
         if (!_requiredDescriptionCheck) {
             return;
         }
-        final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
+        final DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
         final String description = analyzer.getDescription(sql);
         if (Srl.is_Null_or_TrimmedEmpty(description)) {
             throwRequiredOutsideSqlDescriptionNotFoundException(fileName, sql);

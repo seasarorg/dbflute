@@ -43,7 +43,7 @@ import org.seasar.dbflute.exception.DfBehaviorNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.seasar.dbflute.logic.sql2entity.outsidesql.DfOutsideSqlMarkAnalyzer;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -229,7 +229,7 @@ public class DfBehaviorQueryPathSetupper {
     }
 
     protected void setupInfoInSqlFile(File sqlFile, Map<String, String> elementMap) {
-        final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
+        final DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
         final BufferedReader reader = new BufferedReader(newInputStreamReader(sqlFile));
         final StringBuilder sb = new StringBuilder();
         try {
