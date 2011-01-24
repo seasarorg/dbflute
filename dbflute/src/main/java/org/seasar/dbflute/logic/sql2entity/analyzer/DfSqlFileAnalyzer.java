@@ -23,7 +23,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
-import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;

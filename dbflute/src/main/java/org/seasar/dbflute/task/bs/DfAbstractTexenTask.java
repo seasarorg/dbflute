@@ -54,7 +54,7 @@ import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
-import org.seasar.dbflute.logic.sql2entity.outsidesql.DfSqlFileCollector;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfSqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
