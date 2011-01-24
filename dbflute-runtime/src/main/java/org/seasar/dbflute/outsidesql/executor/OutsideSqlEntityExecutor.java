@@ -77,7 +77,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     /**
      * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
      * You can call this method by only a typed parameter-bean
-     * which can resolve its own path and entity-type.
+     * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
@@ -104,7 +104,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select entity by the outside-SQL. {Flexible Interface}<br />
+     * Select entity by the outside-SQL. {FreeStyle Interface}<br />
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -205,7 +205,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     /**
      * Select entity with deleted check by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
      * You can call this method by only a typed parameter-bean
-     * which can resolve its own path and entity-type.
+     * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
@@ -229,7 +229,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select entity with deleted check by the outside-SQL. {Flexible Interface}<br />
+     * Select entity with deleted check by the outside-SQL. {FreeStyle Interface}<br />
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;

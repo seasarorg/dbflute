@@ -79,7 +79,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
     /**
      * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
      * You can call this method by only a typed parameter-bean
-     * which can resolve its own path and entity-type.
+     * which is related to its own (outside-SQL) path.
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
@@ -115,7 +115,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select the cursor of the entity by outside-SQL. {Flexible Interface}<br />
+     * Select the cursor of the entity by outside-SQL. {FreeStyle Interface}<br />
      * This method can accept each element: path, parameter-bean(Object type), cursor-handler.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
