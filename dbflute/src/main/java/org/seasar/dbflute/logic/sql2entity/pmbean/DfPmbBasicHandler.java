@@ -311,8 +311,8 @@ public class DfPmbBasicHandler {
             return Srl.containsAllIgnoreCase(sql, "row_number()");
         } else if (getBasicProperties().isDatabaseH2()) {
             // H2 implements both limit only and offset + limit
-            return Srl.containsAllIgnoreCase(sql, "limit", "pmb.fetchSize")
-                    || Srl.containsAllIgnoreCase(sql, "offset", "limit");
+            return Srl.containsAllIgnoreCase(sql, "offset", "limit")
+                    || Srl.containsAllIgnoreCase(sql, "limit", "pmb.fetchSize");
         } else if (getBasicProperties().isDatabaseDerby()) {
             return Srl.containsAllIgnoreCase(sql, "offset", "fetch");
         } else if (getBasicProperties().isDatabaseSQLite()) {
