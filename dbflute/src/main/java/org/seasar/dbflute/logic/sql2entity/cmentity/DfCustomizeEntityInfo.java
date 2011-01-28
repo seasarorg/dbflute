@@ -60,8 +60,8 @@ public class DfCustomizeEntityInfo {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public boolean isNormalHandling() {
-        return !_cursorHandling && !_scalarHandling;
+    public boolean isResultHandling() {
+        return !_cursorHandling;
     }
 
     // ===================================================================================

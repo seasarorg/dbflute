@@ -49,12 +49,12 @@ public class DfSql2EntityMarkAnalyzer {
 
     public boolean isCursor(final String sql) {
         final String targetString = getTargetString(sql, "+");
-        return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
+        return targetString != null && Srl.containsAnyIgnoreCase(targetString, "cursor", "cursol");
     }
 
     public boolean isScalar(final String sql) {
         final String targetString = getTargetString(sql, "+");
-        return targetString != null && (targetString.contains("scalar") || targetString.contains("scalar"));
+        return targetString != null && Srl.containsIgnoreCase(targetString, "scalar");
     }
 
     public List<String> getCustomizeEntityPropertyTypeList(final String sql) {

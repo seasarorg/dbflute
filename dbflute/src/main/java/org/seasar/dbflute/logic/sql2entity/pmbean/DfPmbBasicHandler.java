@@ -233,6 +233,10 @@ public class DfPmbBasicHandler {
     }
 
     public boolean isTypedReturnEntityPmb(String className) {
+        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
+        if (customizeEntityInfo != null && customizeEntityInfo.isScalarHandling()) {
+            return false;
+        }
         return isTypedListHandling(className) || isTypedEntityHandling(className) || isTypedPagingHandling(className);
     }
 
@@ -241,7 +245,7 @@ public class DfPmbBasicHandler {
             return false;
         }
         final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        return customizeEntityInfo != null ? customizeEntityInfo.isNormalHandling() : false;
+        return customizeEntityInfo != null ? customizeEntityInfo.isResultHandling() : false;
     }
 
     public boolean isTypedEntityHandling(String className) {
@@ -250,7 +254,7 @@ public class DfPmbBasicHandler {
         //    return false;
         //}
         final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        return customizeEntityInfo != null ? customizeEntityInfo.isNormalHandling() : false;
+        return customizeEntityInfo != null ? customizeEntityInfo.isResultHandling() : false;
     }
 
     public boolean isTypedPagingHandling(String className) { // abstract judgement
