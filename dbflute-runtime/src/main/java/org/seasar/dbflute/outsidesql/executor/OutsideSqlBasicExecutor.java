@@ -244,17 +244,15 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path.
      * <pre>
-     * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #FD4747">execute</span>(path, pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #FD4747">execute</span>(pmb);
      * </pre>
-     * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
-    public int execute(String path, ExecuteHandlingPmb<BEHAVIOR> pmb) {
+    public int execute(ExecuteHandlingPmb<BEHAVIOR> pmb) {
         if (pmb == null) {
             String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
             throw new IllegalArgumentException(msg);
