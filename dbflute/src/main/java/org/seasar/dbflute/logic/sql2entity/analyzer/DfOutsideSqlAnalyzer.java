@@ -18,7 +18,6 @@ package org.seasar.dbflute.logic.sql2entity.analyzer;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,10 +40,8 @@ import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtract
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData.DfPagingType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -78,6 +75,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         _currentDBDef = currentDBDef();
     }
 
+    // ===================================================================================
+    //                                                                              Filter
+    //                                                                              ======
     /**
      * Filter the string of SQL. Resolve JDBC dependency.
      * @param sql The string of SQL. (NotNull)
@@ -96,6 +96,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         return super.filterSql(sql);
     }
 
+    // ===================================================================================
+    //                                                                           Execution
+    //                                                                           =========
     @Override
     protected void execSQL(String sql) {
         ResultSet rs = null;
@@ -153,7 +156,8 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 }
 
                 // for Parameter Bean
-                final DfPmbMetaData pmbMetaData = extractPmbMetaData(sql);
+                final DfParameterBeanResolver resolver = new DfParameterBeanResolver(_sql2entityMeta, _sqlFile);
+                final DfPmbMetaData pmbMetaData = resolver.extractPmbMetaData(sql);
                 if (pmbMetaData != null) {
                     if (customizeEntityInfo != null) {
                         pmbMetaData.setCustomizeEntityInfo(customizeEntityInfo);
@@ -202,6 +206,13 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         return columnJavaNativeMap;
     }
 
+    protected String resolvePackageName(String typeName) { // [DBFLUTE-271]
+        return _propertyTypePackageResolver.resolvePackageName(typeName);
+    }
+
+    // ===================================================================================
+    //                                                                     CustomizeEntity
+    //                                                                     ===============
     protected boolean isTargetEntityMakingSql(String sql) {
         final String entityName = getCustomizeEntityName(sql);
         if (entityName == null) {
@@ -213,103 +224,17 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         return true;
     }
 
+    // ===================================================================================
+    //                                                                       ParameterBean
+    //                                                                       =============
     protected boolean isTargetParameterBeanMakingSql(String sql) {
         final String parameterBeanName = getParameterBeanName(sql);
         return parameterBeanName != null;
     }
 
-    /**
-     * Extract the meta data of parameter bean.
-     * @param sql Target SQL. (NotNull and NotEmpty)
-     * @return the meta data of parameter bean. (NullAllowed: If it returns null, it means 'not found'.)
-     */
-    protected DfPmbMetaData extractPmbMetaData(String sql) {
-        final String parameterBeanName = getParameterBeanName(sql);
-        if (parameterBeanName == null) {
-            return null;
-        }
-        final DfPmbMetaData pmbMetaData = new DfPmbMetaData();
-        {
-            final String delimiter = "extends";
-            final int idx = parameterBeanName.indexOf(delimiter);
-            {
-                String className = (idx >= 0) ? parameterBeanName.substring(0, idx) : parameterBeanName;
-                className = className.trim();
-                className = resolvePmbNameIfNeeds(className, _sqlFile);
-                pmbMetaData.setClassName(className);
-            }
-            if (idx >= 0) {
-                final String superClassName = parameterBeanName.substring(idx + delimiter.length()).trim();
-                pmbMetaData.setSuperClassName(superClassName);
-                resolveSuperClassSimplePagingBean(pmbMetaData);
-            }
-        }
-
-        final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
-        final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
-        pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
-        pmbMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
-        final List<String> parameterBeanElement = getParameterBeanPropertyTypeList(sql);
-        for (String element : parameterBeanElement) {
-            final String nameDelimiter = " ";
-            final String optionDelimiter = ":";
-            element = element.trim();
-            final int optionIndex = element.indexOf(optionDelimiter);
-            final String propertyDef;
-            final String optionDef;
-            if (optionIndex > 0) {
-                propertyDef = element.substring(0, optionIndex).trim();
-                optionDef = element.substring(optionIndex + optionDelimiter.length()).trim();
-            } else {
-                propertyDef = element;
-                optionDef = null;
-            }
-            final int nameIndex = propertyDef.lastIndexOf(nameDelimiter);
-            if (nameIndex <= 0) {
-                String msg = "The parameter bean element should be [typeName propertyName].";
-                msg = msg + " But: element=" + element + " srcFile=" + _sqlFile;
-                throw new IllegalStateException(msg);
-            }
-            final String typeName = resolvePackageNameExceptUtil(propertyDef.substring(0, nameIndex).trim());
-            final String propertyName = propertyDef.substring(nameIndex + nameDelimiter.length()).trim();
-            propertyNameTypeMap.put(propertyName, typeName);
-            if (optionDef != null) {
-                propertyNameOptionMap.put(propertyName, optionDef);
-            }
-        }
-        pmbMetaData.setSqlFile(_sqlFile);
-        final Map<String, Map<String, String>> bqpMap = _bqpSetupper.extractBasicBqpMap(DfCollectionUtil
-                .newArrayList(_sqlFile));
-        if (!bqpMap.isEmpty()) {
-            final Map<String, String> bqpElementMap = bqpMap.values().iterator().next();
-            pmbMetaData.setBqpElementMap(bqpElementMap);
-        }
-        return pmbMetaData;
-    }
-
-    protected void resolveSuperClassSimplePagingBean(final DfPmbMetaData pmbMetaData) {
-        final String superClassName = pmbMetaData.getSuperClassName();
-        if (Srl.endsWithIgnoreCase(superClassName, "Paging") // main
-                || Srl.equalsIgnoreCase(superClassName, "SPB")) { // an old style for compatibility before 0.9.7.5
-            pmbMetaData.setSuperClassName("SimplePagingBean");
-            if (Srl.equalsIgnoreCase(superClassName, "ManualPaging")) {
-                pmbMetaData.setPagingType(DfPagingType.MANUAL);
-            } else if (Srl.equalsIgnoreCase(superClassName, "AutoPaging")) {
-                pmbMetaData.setPagingType(DfPagingType.AUTO);
-            } else {
-                pmbMetaData.setPagingType(DfPagingType.UNKNOWN);
-            }
-        }
-    }
-
-    protected String resolvePackageName(String typeName) { // [DBFLUTE-271]
-        return _propertyTypePackageResolver.resolvePackageName(typeName);
-    }
-
-    protected String resolvePackageNameExceptUtil(String typeName) {
-        return _propertyTypePackageResolver.resolvePackageNameExceptUtil(typeName);
-    }
-
+    // ===================================================================================
+    //                                                                 Override Adjustment
+    //                                                                 ===================
     @Override
     protected String replaceCommentQuestionMarkIfNeeds(String line) {
         if (line.indexOf("--!!") >= 0 || line.indexOf("-- !!") >= 0) {
@@ -411,20 +336,12 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         return _outsideSqlMarkAnalyzer.getParameterBeanName(sql);
     }
 
-    protected List<String> getParameterBeanPropertyTypeList(final String sql) {
-        return _outsideSqlMarkAnalyzer.getParameterBeanPropertyTypeList(sql);
-    }
-
     protected List<String> getPrimaryKeyColumnNameList(final String sql) {
         return _outsideSqlMarkAnalyzer.getPrimaryKeyColumnNameList(sql);
     }
 
     protected String resolveEntityNameIfNeeds(String className, File file) {
         return _sqlFileNameResolver.resolveEntityNameIfNeeds(className, file.getName());
-    }
-
-    protected String resolvePmbNameIfNeeds(String className, File file) {
-        return _sqlFileNameResolver.resolvePmbNameIfNeeds(className, file.getName());
     }
 
     // ===================================================================================
