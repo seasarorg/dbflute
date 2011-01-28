@@ -99,7 +99,12 @@ public class DfPmbBasicHandler {
         final StringBuilder sb = new StringBuilder();
         if (isTypedParameterBean(className)) {
             final String behaviorClassName = getBehaviorClassName(className);
-            final String customizeEntityType = getCustomizeEntityType(className);
+            final String customizeEntityType;
+            if (hasCustomizeEntity(className)) {
+                customizeEntityType = getCustomizeEntityType(className);
+            } else {
+                customizeEntityType = null; // no used
+            }
             final String entityGenericDef = "<" + behaviorClassName + ", " + customizeEntityType + ">";
             final String noResultGenericDef = "<" + behaviorClassName + ">";
 
@@ -304,7 +309,7 @@ public class DfPmbBasicHandler {
             throw new IllegalStateException(msg);
         }
         if (getBasicProperties().isDatabaseMySQL()) {
-            return Srl.containsAllIgnoreCase(sql, "limit", "pmb.fetchSize");
+            return Srl.containsIgnoreCase(sql, "limit") && Srl.contains(sql, "pmb.fetchSize");
         } else if (getBasicProperties().isDatabasePostgreSQL()) {
             return Srl.containsAllIgnoreCase(sql, "offset", "limit");
         } else if (getBasicProperties().isDatabaseOracle()) {
@@ -316,7 +321,7 @@ public class DfPmbBasicHandler {
         } else if (getBasicProperties().isDatabaseH2()) {
             // H2 implements both limit only and offset + limit
             return Srl.containsAllIgnoreCase(sql, "offset", "limit")
-                    || Srl.containsAllIgnoreCase(sql, "limit", "pmb.fetchSize");
+                    || (Srl.containsIgnoreCase(sql, "limit") && Srl.contains(sql, "pmb.fetchSize"));
         } else if (getBasicProperties().isDatabaseDerby()) {
             return Srl.containsAllIgnoreCase(sql, "offset", "fetch");
         } else if (getBasicProperties().isDatabaseSQLite()) {
