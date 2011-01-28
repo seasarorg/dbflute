@@ -88,6 +88,7 @@ import static org.seasar.dbflute.util.Srl.substringLastRearIgnoreCase;
 import static org.seasar.dbflute.util.Srl.toLowerCase;
 import static org.seasar.dbflute.util.Srl.toUpperCase;
 import static org.seasar.dbflute.util.Srl.trim;
+import static org.seasar.dbflute.util.Srl.unquoteAnything;
 import static org.seasar.dbflute.util.Srl.unquoteDouble;
 import static org.seasar.dbflute.util.Srl.unquoteSingle;
 
@@ -183,6 +184,7 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("foo", trim("\"foo\"", "\""));
         assertEquals("f\"o\"o", trim("\"f\"o\"o\"", "\""));
         assertEquals("fo\"\"o", trim("\"fo\"\"o\"", "\""));
+        assertEquals("Long", trim(">>Long>>", ">"));
     }
 
     public void test_ltrim_default() {
@@ -195,9 +197,12 @@ public class DfStringUtilTest extends PlainTestCase {
 
     public void test_ltrim_originalTrimTarget() {
         assertEquals(" foo ", ltrim("\n foo ", "\n"));
+        assertEquals(" foo ", ltrim("\n\n foo ", "\n"));
         assertEquals(" \n foo ", ltrim(" \n foo ", "\n"));
         assertEquals("\r foo ", ltrim("\n\r foo ", "\n"));
         assertEquals(" foo ", ltrim("\r\n foo ", "\r\n"));
+        assertEquals("Long>", ltrim("List<Long>", "List<"));
+        assertEquals("Long>>", ltrim("List<List<Long>>", "List<"));
     }
 
     public void test_rtrim_default() {
@@ -209,10 +214,13 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     public void test_rtrim_originalTrimTarget() {
-        assertEquals(" foo ", DfStringUtil.rtrim(" foo \n", "\n"));
-        assertEquals(" foo \n ", DfStringUtil.rtrim(" foo \n ", "\n"));
-        assertEquals(" foo \r", DfStringUtil.rtrim(" foo \r\n", "\n"));
-        assertEquals(" foo ", DfStringUtil.rtrim(" foo \r\n", "\r\n"));
+        assertEquals(" foo ", rtrim(" foo \n", "\n"));
+        assertEquals(" foo ", rtrim(" foo \n\n", "\n"));
+        assertEquals(" foo \n ", rtrim(" foo \n ", "\n"));
+        assertEquals(" foo \r", rtrim(" foo \r\n", "\n"));
+        assertEquals(" foo ", rtrim(" foo \r\n", "\r\n"));
+        assertEquals("List<Long", rtrim("List<Long>", ">"));
+        assertEquals("List<List<Long", rtrim("List<List<Long>>", ">"));
     }
 
     // ===================================================================================
@@ -963,35 +971,34 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                  Quotation Handling
     //                                                                  ==================
-    public void test_quoteSingle_basic() {
-        assertEquals("''", quoteSingle(""));
-        assertEquals("''", quoteSingle("''"));
-        assertEquals("' '", quoteSingle(" "));
-        assertEquals("'foo'", quoteSingle("foo"));
-        assertEquals("'foo'", quoteSingle("'foo'"));
-        assertEquals("'\"foo\"'", quoteSingle("\"foo\""));
-        assertEquals("''foo'", quoteSingle("'foo"));
+    public void test_quoteAnything_basic() {
+        assertEquals("foo%", unquoteAnything("foo%", "%"));
+        assertEquals("%foo", unquoteAnything("%foo", "%"));
+        assertEquals("foo", unquoteAnything("%foo%", "%"));
+        assertEquals("foo", unquoteAnything("<foo<", "<"));
+        assertEquals("%foo", unquoteAnything("%%foo%", "%"));
+        assertEquals("foo", unquoteAnything("List<foo>", "List<", ">"));
+        assertEquals("List<foo>", unquoteAnything("List<List<foo>>", "List<", ">"));
     }
 
     public void test_quoteDouble_basic() {
         assertEquals("\"\"", quoteDouble(""));
-        assertEquals("\"\"", quoteDouble("\"\""));
+        assertEquals("\"\"\"\"", quoteDouble("\"\""));
         assertEquals("\" \"", quoteDouble(" "));
         assertEquals("\"foo\"", quoteDouble("foo"));
-        assertEquals("\"foo\"", quoteDouble("\"foo\""));
+        assertEquals("\"\"foo\"\"", quoteDouble("\"foo\""));
         assertEquals("\"'foo'\"", quoteDouble("'foo'"));
         assertEquals("\"\"foo\"", quoteDouble("\"foo"));
     }
 
-    public void test_unquoteSingle_basic() {
-        assertEquals("", unquoteSingle(""));
-        assertEquals("", unquoteSingle("''"));
-        assertEquals("f", unquoteSingle("'f'"));
-        assertEquals("foo", unquoteSingle("'foo'"));
-        assertEquals("foo", unquoteSingle("foo"));
-        assertEquals("\"foo\"", unquoteSingle("\"foo\""));
-        assertEquals("'foo", unquoteSingle("'foo"));
-        assertEquals("\"foo\"", unquoteSingle("'\"foo\"'"));
+    public void test_quoteSingle_basic() {
+        assertEquals("''", quoteSingle(""));
+        assertEquals("''''", quoteSingle("''"));
+        assertEquals("' '", quoteSingle(" "));
+        assertEquals("'foo'", quoteSingle("foo"));
+        assertEquals("''foo''", quoteSingle("'foo'"));
+        assertEquals("'\"foo\"'", quoteSingle("\"foo\""));
+        assertEquals("''foo'", quoteSingle("'foo"));
     }
 
     public void test_unquoteDouble_basic() {
@@ -1003,6 +1010,19 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("'foo'", unquoteDouble("'foo'"));
         assertEquals("\"foo", unquoteDouble("\"foo"));
         assertEquals("'foo'", unquoteDouble("\"'foo'\""));
+        assertEquals("\"foo\"", unquoteDouble("\"\"foo\"\""));
+    }
+
+    public void test_unquoteSingle_basic() {
+        assertEquals("", unquoteSingle(""));
+        assertEquals("", unquoteSingle("''"));
+        assertEquals("f", unquoteSingle("'f'"));
+        assertEquals("foo", unquoteSingle("'foo'"));
+        assertEquals("foo", unquoteSingle("foo"));
+        assertEquals("\"foo\"", unquoteSingle("\"foo\""));
+        assertEquals("'foo", unquoteSingle("'foo"));
+        assertEquals("\"foo\"", unquoteSingle("'\"foo\"'"));
+        assertEquals("'foo'", unquoteSingle("''foo''"));
     }
 
     // ===================================================================================

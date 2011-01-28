@@ -22,15 +22,28 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  */
 public interface Node {
 
+    /**
+     * Get the size of children.
+     * @return The size of children.
+     */
     int getChildSize();
 
+    /**
+     * Get the child node by the index.
+     * @param index The value of index
+     * @return The node instance for the corresponding child. (NotNull)
+     */
     Node getChild(int index);
 
+    /**
+     * Add the child node.
+     * @param node The node instance for the added child. (NotNull)
+     */
     void addChild(Node node);
 
     /**
-     * Accept context.
-     * @param ctx The context of command. (NotNull)
+     * Accept the context of command.
+     * @param ctx The instance of command context. (NotNull)
      */
     void accept(CommandContext ctx);
 }

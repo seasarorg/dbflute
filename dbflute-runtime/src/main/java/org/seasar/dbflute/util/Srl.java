@@ -117,10 +117,11 @@ public class Srl {
         }
 
         // for original trim target
-        int pos;
-        for (pos = 0; pos < str.length() && trimStr.indexOf(str.charAt(pos)) >= 0; pos++)
-            ;
-        return str.substring(pos);
+        String trimmed = str;
+        for (; trimmed.startsWith(trimStr);) {
+            trimmed = substringFirstRear(trimmed, trimStr);
+        }
+        return trimmed;
     }
 
     protected static String doRTrim(final String str, final String trimStr) {
@@ -133,10 +134,11 @@ public class Srl {
         }
 
         // for original trim target
-        int pos;
-        for (pos = str.length() - 1; pos >= 0 && trimStr.indexOf(str.charAt(pos)) >= 0; pos--)
-            ;
-        return str.substring(0, pos + 1);
+        String trimmed = str;
+        for (; trimmed.endsWith(trimStr);) {
+            trimmed = substringLastFront(trimmed, trimStr);
+        }
+        return trimmed;
     }
 
     // ===================================================================================
@@ -1148,46 +1150,78 @@ public class Srl {
     // ===================================================================================
     //                                                                  Quotation Handling
     //                                                                  ==================
-    public static boolean isQuotedSingle(String str) {
+    public static boolean isQuotedAnything(String str, String quotation) {
         assertStringNotNull(str);
-        return str.length() > 1 && str.startsWith("'") && str.endsWith("'");
+        assertQuotationNotNull(quotation);
+        return isQuotedAnything(str, quotation, quotation);
+    }
+
+    public static boolean isQuotedAnything(String str, String beginMark, String endMark) {
+        assertStringNotNull(str);
+        assertBeginMarkNotNull(beginMark);
+        assertEndMarkNotNull(endMark);
+        return str.length() > 1 && str.startsWith(beginMark) && str.endsWith(endMark);
     }
 
     public static boolean isQuotedDouble(String str) {
         assertStringNotNull(str);
-        return str.length() > 1 && str.startsWith("\"") && str.endsWith("\"");
+        return isQuotedAnything(str, "\"");
     }
 
-    public static String quoteSingle(String str) {
+    public static boolean isQuotedSingle(String str) {
         assertStringNotNull(str);
-        if (isQuotedSingle(str)) {
-            return str;
-        }
-        return "'" + str + "'";
+        return isQuotedAnything(str, "'");
+    }
+
+    public static String quoteAnything(String str, String quotation) {
+        assertStringNotNull(str);
+        assertQuotationNotNull(quotation);
+        return quoteAnything(str, quotation, quotation);
+    }
+
+    public static String quoteAnything(String str, String beginMark, String endMark) {
+        assertStringNotNull(str);
+        assertBeginMarkNotNull(beginMark);
+        assertEndMarkNotNull(endMark);
+        return beginMark + str + endMark;
     }
 
     public static String quoteDouble(String str) {
         assertStringNotNull(str);
-        if (isQuotedDouble(str)) {
-            return str;
-        }
-        return "\"" + str + "\"";
+        return quoteAnything(str, "\"");
     }
 
-    public static String unquoteSingle(String str) {
+    public static String quoteSingle(String str) {
         assertStringNotNull(str);
-        if (!isQuotedSingle(str)) {
+        return quoteAnything(str, "'");
+    }
+
+    public static String unquoteAnything(String str, String quotation) {
+        assertStringNotNull(str);
+        assertQuotationNotNull(quotation);
+        return unquoteAnything(str, quotation, quotation);
+    }
+
+    public static String unquoteAnything(String str, String beginMark, String endMark) {
+        assertStringNotNull(str);
+        assertBeginMarkNotNull(beginMark);
+        assertEndMarkNotNull(endMark);
+        if (!isQuotedAnything(str, beginMark, endMark)) {
             return str;
         }
-        return trim(str, "'");
+        str = Srl.substring(str, beginMark.length());
+        str = Srl.substring(str, 0, str.length() - endMark.length());
+        return str;
     }
 
     public static String unquoteDouble(String str) {
         assertStringNotNull(str);
-        if (!isQuotedDouble(str)) {
-            return str;
-        }
-        return trim(str, "\"");
+        return unquoteAnything(str, "\"");
+    }
+
+    public static String unquoteSingle(String str) {
+        assertStringNotNull(str);
+        return unquoteAnything(str, "'");
     }
 
     // ===================================================================================
@@ -1971,6 +2005,10 @@ public class Srl {
 
     protected static void assertToStringNotNull(String toStr) {
         assertObjectNotNull("toStr", toStr);
+    }
+
+    protected static void assertQuotationNotNull(String quotation) {
+        assertObjectNotNull("quotation", quotation);
     }
 
     protected static void assertBeginMarkNotNull(String beginMark) {

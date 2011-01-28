@@ -239,4 +239,11 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
     public String toString() {
         return DfTypeUtil.toClassTitle(this) + ":{" + _expression + "}";
     }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getExpression() {
+        return _expression;
+    }
 }

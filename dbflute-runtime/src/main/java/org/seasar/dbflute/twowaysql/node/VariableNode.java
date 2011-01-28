@@ -221,6 +221,18 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getExpression() {
+        return _expression;
+    }
+
+    public String getTestValue() {
+        return _testValue;
+    }
+
+    public String getOption() {
+        return _option;
+    }
+
     public boolean isBlockNullParameter() {
         return _blockNullParameter;
     }

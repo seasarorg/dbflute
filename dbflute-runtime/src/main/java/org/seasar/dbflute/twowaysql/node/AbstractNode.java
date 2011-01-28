@@ -29,7 +29,7 @@ public abstract class AbstractNode implements Node {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private List<Node> _children = DfCollectionUtil.newArrayList();
+    protected final List<Node> _childList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -41,15 +41,15 @@ public abstract class AbstractNode implements Node {
     //                                                                      Child Handling
     //                                                                      ==============
     public int getChildSize() {
-        return _children.size();
+        return _childList.size();
     }
 
     public Node getChild(int index) {
-        return (Node) _children.get(index);
+        return (Node) _childList.get(index);
     }
 
     public void addChild(Node node) {
-        _children.add(node);
+        _childList.add(node);
     }
 
     protected boolean isBeginChildAndValidSql(CommandContext ctx, String sql) {

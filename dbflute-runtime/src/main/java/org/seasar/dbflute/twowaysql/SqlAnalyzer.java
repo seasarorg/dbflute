@@ -56,7 +56,7 @@ public class SqlAnalyzer {
     protected String _specifiedSql;
     protected boolean _blockNullParameter;
     protected SqlTokenizer _tokenizer;
-    protected Stack<Node> _nodeStack = new Stack<Node>();
+    protected final Stack<Node> _nodeStack = new Stack<Node>();
     protected boolean _inBeginScope;
     protected List<String> _researchIfCommentList;
     protected List<String> _researchForCommentList;
