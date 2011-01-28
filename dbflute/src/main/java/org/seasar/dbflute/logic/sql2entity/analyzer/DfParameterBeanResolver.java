@@ -37,7 +37,6 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
-import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -199,14 +198,14 @@ public class DfParameterBeanResolver {
 
     protected void doProcessAutoDetect(String sql, Map<String, String> propertyNameTypeMap,
             Map<String, String> propertyNameOptionMap, Node node) {
+        // only bind variable comment is supported
+        // because simple specification is very important here
         if (node instanceof BindVariableNode) {
             final BindVariableNode bindNode = (BindVariableNode) node;
             processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, bindNode);
-            // EmbeddedVariableNode is unsupported because it is not important node.
-        } else if (node instanceof IfNode) {
-            final IfNode ifNode = (IfNode) node;
-            processAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
-            // ForNode is unsupported because an element type of the list is unknown
+            //} else if (node instanceof IfNode) {
+            //    final IfNode ifNode = (IfNode) node;
+            //    doProcessAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
         }
         for (int i = 0; i < node.getChildSize(); i++) {
             final Node childNode = node.getChild(i);
@@ -224,10 +223,23 @@ public class DfParameterBeanResolver {
         if (Srl.count(expression, ".") != 1) { // e.g. "pmb.memberIdList.size()"
             return;
         }
+        if (!Srl.startsWith(expression, "pmb.")) {
+            return;
+        }
         final String propertyName = Srl.substringFirstRear(expression, "pmb.");
+        if (Srl.equalsIgnoreCase(propertyName, "OutsideSqlPath", "EntityType", "FetchStartIndex", "FetchSize",
+                "FetchPageNumber", "PageStartIndex", "PageEndIndex", "SafetyMaxResultSize", "ParameterMap",
+                "OrderByClause", "OrderByComponent")) {
+            // reservation names should be skipped
+            // (properties for TypedParameterBean and SimplePagingBean and so on...)
+            return;
+        }
         final String typeName = derivePropertyTypeFromTestValue(testValue);
-        propertyNameTypeMap.put(propertyName, typeName);
+        propertyNameTypeMap.put(propertyName, typeName); // override if same one exists
         final String option = variableNode.getOption();
+        // add option if it exists
+        // so it is enough to set an option to only one bind variable comment
+        // if several bind variable comments for the same property exist
         if (Srl.is_NotNull_and_NotTrimmedEmpty(option)) {
             propertyNameOptionMap.put(propertyName, option);
         } else {
@@ -382,22 +394,23 @@ public class DfParameterBeanResolver {
         return null;
     }
 
-    protected void processAutoDetectIfNode(String sql, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap, IfNode ifNode) {
-        final String expression = ifNode.getExpression();
-        if (Srl.count(expression, ".") != 1) { // e.g. "pmb.memberIdList.size()"
-            return;
-        }
-        if (Srl.containsAny(expression, "=", "<>", "!=", ">", "<")) {
-            return; // unknown (type)
-        }
-        if (Srl.contains(expression, "()")) {
-            return; // method type
-        }
-        // only Boolean type is detected
-        final String propertyName = Srl.substringFirstRear(expression, "pmb.").trim();
-        propertyNameTypeMap.put(propertyName, "Boolean");
-    }
+    // *IF comment is unsupported about auto-detection
+    //protected void doProcessAutoDetectIfNode(String sql, Map<String, String> propertyNameTypeMap,
+    //        Map<String, String> propertyNameOptionMap, IfNode ifNode) {
+    //    final String expression = ifNode.getExpression();
+    //    if (Srl.count(expression, ".") != 1) { // e.g. "pmb.memberIdList.size()"
+    //        return;
+    //    }
+    //    if (Srl.containsAny(expression, "=", "<>", "!=", ">", "<")) {
+    //        return; // unknown (type)
+    //    }
+    //    if (Srl.contains(expression, "()")) {
+    //        return; // method type
+    //    }
+    //    // only Boolean type is detected
+    //    final String propertyName = Srl.substringFirstRear(expression, "pmb.").trim();
+    //    propertyNameTypeMap.put(propertyName, "Boolean");
+    //}
 
     // ===================================================================================
     //                                                                   Assert Definition
