@@ -194,17 +194,23 @@ public class DfParameterBeanResolver {
             Map<String, String> propertyNameOptionMap) {
         final SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         final Node rootNode = analyzer.analyze();
-        for (int i = 0; i < rootNode.getChildSize(); i++) {
-            final Node childNode = rootNode.getChild(i);
-            if (childNode instanceof BindVariableNode) {
-                final BindVariableNode bindNode = (BindVariableNode) childNode;
-                processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, bindNode);
-                // EmbeddedVariableNode is unsupported because it is not important node.
-            } else if (childNode instanceof IfNode) {
-                final IfNode ifNode = (IfNode) childNode;
-                processAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
-                // ForNode is unsupported because an element type of the list is unknown
-            }
+        doProcessAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, rootNode);
+    }
+
+    protected void doProcessAutoDetect(String sql, Map<String, String> propertyNameTypeMap,
+            Map<String, String> propertyNameOptionMap, Node node) {
+        if (node instanceof BindVariableNode) {
+            final BindVariableNode bindNode = (BindVariableNode) node;
+            processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, bindNode);
+            // EmbeddedVariableNode is unsupported because it is not important node.
+        } else if (node instanceof IfNode) {
+            final IfNode ifNode = (IfNode) node;
+            processAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
+            // ForNode is unsupported because an element type of the list is unknown
+        }
+        for (int i = 0; i < node.getChildSize(); i++) {
+            final Node childNode = node.getChild(i);
+            doProcessAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, childNode); // recursive call
         }
     }
 
