@@ -188,8 +188,8 @@ $database.info("public void parseParameterBean() {")
 
   #foreach ($pmbMetaData in $database.pmbMetaDataList)
     #set ($pmbClassName = "$pmbMetaData.className")
-    #set ($myBaseParameterBeanClassName = "${glProjectPrefix}${glBasePrefix}${pmbClassName}")
-    #set ($myExtendedParameterBeanClassName = "${glProjectPrefix}${pmbClassName}")
+    #set ($myBaseParameterBeanClassName = "$pmbMetaData.baseClassName")
+    #set ($myExtendedParameterBeanClassName = "$pmbMetaData.extendedClassName")
 
     $database.info("    parse('${myExtendedParameterBeanClassName}');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )

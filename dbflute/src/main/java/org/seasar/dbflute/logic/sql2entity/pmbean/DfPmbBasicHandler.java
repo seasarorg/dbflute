@@ -793,14 +793,14 @@ public class DfPmbBasicHandler {
 
     protected void assertArgumentPmbMetaDataClassName(String className) {
         if (className == null || className.trim().length() == 0) {
-            String msg = "The className should not be null or empty: [" + className + "]";
+            String msg = "The className should not be null or empty: " + className;
             throw new IllegalArgumentException(msg);
         }
     }
 
     protected void assertArgumentPmbMetaDataPropertyName(String propertyName) {
         if (propertyName == null || propertyName.trim().length() == 0) {
-            String msg = "The propertyName should not be null or empty: [" + propertyName + "]";
+            String msg = "The propertyName should not be null or empty: " + propertyName;
             throw new IllegalArgumentException(msg);
         }
     }

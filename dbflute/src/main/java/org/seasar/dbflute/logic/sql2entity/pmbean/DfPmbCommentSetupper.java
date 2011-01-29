@@ -72,7 +72,7 @@ public class DfPmbCommentSetupper {
         final String fileExt = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
                 .getClassFileExtension();
         for (DfPmbMetaData pmbMetaData : _pmbMetaDataList) {
-            final String classFilePath = basePath + "/" + pmbMetaData.getClassName() + "." + fileExt;
+            final String classFilePath = basePath + "/" + pmbMetaData.getExtendedClassName() + "." + fileExt;
             final File pmbeanFile = new File(classFilePath);
             reflectExtendedClassDescription(pmbMetaData, pmbeanFile);
         }

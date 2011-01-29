@@ -685,8 +685,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final Map<String, DfPmbMetaData> pmbMetaDataMap = _sql2entityMeta.getPmbMetaDataMap();
         for (Entry<String, DfPmbMetaData> pmbEntry : pmbMetaDataMap.entrySet()) {
             final DfPmbMetaData pmbMetaData = pmbEntry.getValue();
-            final String className = pmbMetaData.getClassName();
-            logSb.append(className);
+            logSb.append(pmbMetaData.getClassName());
             if (pmbMetaData.hasSuperClassDefinition()) {
                 logSb.append(" extends ").append(pmbMetaData.getSuperClassName());
             }

@@ -74,6 +74,17 @@ public class DfPmbMetaData {
         return pmbTitleName;
     }
 
+    public String getBaseClassName() {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String basePrefix = getBasicProperties().getBasePrefix();
+        return projectPrefix + basePrefix + _className;
+    }
+
+    public String getExtendedClassName() {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        return projectPrefix + _className;
+    }
+
     public String getBehaviorClassName() {
         return getBqpElement(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_NAME);
     }
