@@ -28,6 +28,14 @@ import org.seasar.dbflute.util.Srl;
 public abstract class VariableNode extends AbstractNode implements LoopAcceptable {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String INLOOP_OPTION_LIKE_PREFIX = "likePrefix";
+    protected static final String INLOOP_OPTION_LIKE_SUFFIX = "likeSuffix";
+    protected static final String INLOOP_OPTION_LIKE_CONTAIN = "likeContain";
+    protected static final String INLOOP_OPTION_NOT_LIKE = "notLike";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final String _expression;
@@ -131,7 +139,8 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     //                                                                   LikeSearch Helper
     //                                                                   =================
     protected void assertInLoopOption(LoopInfo loopInfo) {
-        if (loopInfo == null && Srl.is_NotNull_and_NotTrimmedEmpty(_option)) {
+        final String onlyInLoop = INLOOP_OPTION_NOT_LIKE;
+        if (loopInfo == null && Srl.is_NotNull_and_NotTrimmedEmpty(_option) && _option.contains(onlyInLoop)) {
             throwInLoopOptionOutOfLoopException();
         }
     }
@@ -142,7 +151,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         }
         final List<String> optionList = Srl.splitListTrimmed(_option, "|");
         for (String option : optionList) {
-            if (option.equals("notLike")) {
+            if (option.equals(INLOOP_OPTION_NOT_LIKE)) {
                 return false;
             }
         }
@@ -155,12 +164,12 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         }
         final List<String> optionList = Srl.splitListTrimmed(_option, "|");
         for (String option : optionList) {
-            if (option.equals("likePrefix")) {
+            if (option.equals(INLOOP_OPTION_LIKE_PREFIX)) {
                 return new LikeSearchOption().likePrefix();
-            } else if (option.equals("likeContain")) {
-                return new LikeSearchOption().likeContain();
-            } else if (option.equals("likeSuffix")) {
+            } else if (option.equals(INLOOP_OPTION_LIKE_SUFFIX)) {
                 return new LikeSearchOption().likeSuffix();
+            } else if (option.equals(INLOOP_OPTION_LIKE_CONTAIN)) {
+                return new LikeSearchOption().likeContain();
             }
         }
         return null;
