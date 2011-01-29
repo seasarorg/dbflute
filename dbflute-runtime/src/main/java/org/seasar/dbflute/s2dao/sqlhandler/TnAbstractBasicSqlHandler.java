@@ -185,9 +185,17 @@ public abstract class TnAbstractBasicSqlHandler {
     }
 
     protected String buildDisplaySql(Object[] args) {
+        return createDisplaySqlBuilder().buildDisplaySql(_sql, args);
+    }
+
+    protected String getBindVariableText(Object bindVariable) { // basically for sub-class
+        return createDisplaySqlBuilder().getBindVariableText(bindVariable);
+    }
+
+    protected DisplaySqlBuilder createDisplaySqlBuilder() {
         final String logDateFormat = ResourceContext.getLogDateFormat();
         final String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return DisplaySqlBuilder.buildDisplaySql(_sql, args, logDateFormat, logTimestampFormat);
+        return new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
     }
 
     protected SqlLogHandler getSqlLogHander() {
@@ -222,15 +230,6 @@ public abstract class TnAbstractBasicSqlHandler {
 
     protected void saveDisplaySqlForResultInfo(String displaySql) {
         InternalMapContext.setResultInfoDisplaySql(displaySql);
-    }
-
-    // -----------------------------------------------------
-    //                                               Various
-    //                                               -------
-    protected String getBindVariableText(Object bindVariable) {
-        String logDateFormat = ResourceContext.getLogDateFormat();
-        String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return DisplaySqlBuilder.getBindVariableText(bindVariable, logDateFormat, logTimestampFormat);
     }
 
     // ===================================================================================

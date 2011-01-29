@@ -556,8 +556,8 @@ public class SqlAnalyzer {
             node.accept(context);
         }
         final String preparedSql = context.getSql();
-        return DisplaySqlBuilder.buildDisplaySql(preparedSql, context.getBindVariables(), logDateFormat,
-                logTimestampFormat);
+        final DisplaySqlBuilder builder = new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
+        return builder.buildDisplaySql(preparedSql, context.getBindVariables());
     }
 
     protected static SqlAnalyzer createSqlAnalyzer4DisplaySql(SqlAnalyzerFactory factory, String twoWaySql) {
