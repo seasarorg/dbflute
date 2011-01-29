@@ -48,7 +48,7 @@ public class EmbeddedVariableNode extends VariableNode {
     //                                                                              Accept
     //                                                                              ======
     @Override
-    protected void doProcess(CommandContext ctx, ValueAndType valueAndType) {
+    protected void doProcess(CommandContext ctx, ValueAndType valueAndType, LoopInfo loopInfo) {
         final Object finalValue = valueAndType.getTargetValue();
         final Class<?> finalType = valueAndType.getTargetType();
         if (isInScope()) {
@@ -81,7 +81,7 @@ public class EmbeddedVariableNode extends VariableNode {
             assertNotContainBindSymbol(embeddedString);
             if (isQuotedScalar()) { // basically for condition value
                 ctx.addSql(quote(embeddedString));
-                if (isAcceptableLike()) {
+                if (isAcceptableInLoopLike(loopInfo)) {
                     setupRearOption(ctx, valueAndType);
                 }
                 return;

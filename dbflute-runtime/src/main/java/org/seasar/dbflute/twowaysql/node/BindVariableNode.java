@@ -37,7 +37,7 @@ public class BindVariableNode extends VariableNode {
     //                                                                              Accept
     //                                                                              ======
     @Override
-    protected void doProcess(CommandContext ctx, ValueAndType valueAndType) {
+    protected void doProcess(CommandContext ctx, ValueAndType valueAndType, LoopInfo loopInfo) {
         final Object finalValue = valueAndType.getTargetValue();
         final Class<?> finalType = valueAndType.getTargetType();
         if (isInScope()) {
@@ -53,7 +53,7 @@ public class BindVariableNode extends VariableNode {
             }
         } else {
             ctx.addSql("?", finalValue, finalType); // if null, bind as null
-            if (isAcceptableLike()) {
+            if (isAcceptableInLoopLike(loopInfo)) {
                 setupRearOption(ctx, valueAndType);
             }
         }

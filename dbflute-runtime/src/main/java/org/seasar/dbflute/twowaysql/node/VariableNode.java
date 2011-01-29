@@ -95,8 +95,8 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         valueAndType.setFirstValue(firstValue);
         valueAndType.setFirstType(firstType);
         setupValueAndType(valueAndType);
-        if (isAcceptableLike()) {
-            final LikeSearchOption inLoopLikeSearchOption = getInLoopLikeSearchOption();
+        if (isAcceptableInLoopLike(loopInfo)) {
+            final LikeSearchOption inLoopLikeSearchOption = getInLoopLikeSearchOption(loopInfo);
             if (inLoopLikeSearchOption != null) { // forced option
                 valueAndType.setLikeSearchOption(inLoopLikeSearchOption);
             } else {
@@ -109,10 +109,10 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         if (_blockNullParameter && valueAndType.getTargetValue() == null) {
             throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
         }
-        doProcess(ctx, valueAndType);
+        doProcess(ctx, valueAndType, loopInfo);
     }
 
-    protected abstract void doProcess(CommandContext ctx, ValueAndType valueAndType);
+    protected abstract void doProcess(CommandContext ctx, ValueAndType valueAndType, LoopInfo loopInfo);
 
     protected void assertFirstNameAsNormal(CommandContext ctx, String firstName) {
         if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
@@ -151,31 +151,30 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         }
     }
 
-    protected boolean isAcceptableLike() { // basically true
-        if (Srl.is_Null_or_TrimmedEmpty(_optionDef)) {
-            return true;
+    protected boolean isAcceptableInLoopLike(LoopInfo loopInfo) {
+        if (loopInfo == null) {
+            return false; // not in loop
         }
-        final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
-        for (String option : optionList) {
-            if (option.equals(INLOOP_OPTION_NOT_LIKE)) {
-                return false;
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
+            final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
+            if (optionList.contains(INLOOP_OPTION_NOT_LIKE)) {
+                return false; // specified not-like
             }
         }
         return true;
     }
 
-    protected LikeSearchOption getInLoopLikeSearchOption() {
-        if (Srl.is_Null_or_TrimmedEmpty(_optionDef)) {
-            return null;
-        }
-        final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
-        for (String option : optionList) {
-            if (option.equals(INLOOP_OPTION_LIKE_PREFIX)) {
-                return new LikeSearchOption().likePrefix();
-            } else if (option.equals(INLOOP_OPTION_LIKE_SUFFIX)) {
-                return new LikeSearchOption().likeSuffix();
-            } else if (option.equals(INLOOP_OPTION_LIKE_CONTAIN)) {
-                return new LikeSearchOption().likeContain();
+    protected LikeSearchOption getInLoopLikeSearchOption(LoopInfo loopInfo) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
+            final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
+            for (String option : optionList) {
+                if (option.equals(INLOOP_OPTION_LIKE_PREFIX)) {
+                    return new LikeSearchOption().likePrefix();
+                } else if (option.equals(INLOOP_OPTION_LIKE_SUFFIX)) {
+                    return new LikeSearchOption().likeSuffix();
+                } else if (option.equals(INLOOP_OPTION_LIKE_CONTAIN)) {
+                    return new LikeSearchOption().likeContain();
+                }
             }
         }
         return null;
