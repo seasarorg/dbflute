@@ -81,7 +81,7 @@ public class EmbeddedVariableNode extends VariableNode {
             assertNotContainBindSymbol(embeddedString);
             if (isQuotedScalar()) { // basically for condition value
                 ctx.addSql(quote(embeddedString));
-                if (isAcceptableInLoopLike(loopInfo)) {
+                if (isAcceptableLikeSearch(loopInfo)) {
                     setupRearOption(ctx, valueAndType);
                 }
                 return;

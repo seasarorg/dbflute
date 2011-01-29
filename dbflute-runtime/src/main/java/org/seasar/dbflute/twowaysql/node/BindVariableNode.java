@@ -53,7 +53,7 @@ public class BindVariableNode extends VariableNode {
             }
         } else {
             ctx.addSql("?", finalValue, finalType); // if null, bind as null
-            if (isAcceptableInLoopLike(loopInfo)) {
+            if (isAcceptableLikeSearch(loopInfo)) {
                 setupRearOption(ctx, valueAndType);
             }
         }

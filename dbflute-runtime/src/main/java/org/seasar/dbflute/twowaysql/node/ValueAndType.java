@@ -35,10 +35,7 @@ public class ValueAndType {
     //                                                                         Rear Option
     //                                                                         ===========
     public void filterValueByOptionIfNeeds() {
-        if (_likeSearchOption == null) {
-            return;
-        }
-        if (_targetValue == null) {
+        if (_likeSearchOption == null || _targetValue == null) {
             return;
         }
         if (_targetValue instanceof String) {
@@ -47,10 +44,7 @@ public class ValueAndType {
     }
 
     public String buildRearOptionOnSql() {
-        if (_likeSearchOption == null) {
-            return null;
-        }
-        if (_targetValue == null) {
+        if (_likeSearchOption == null || _targetValue == null) {
             return null;
         }
         if (_targetValue instanceof String) {
@@ -62,16 +56,12 @@ public class ValueAndType {
     }
 
     protected void inheritLikeSearchOptionIfNeeds(LoopInfo loopInfo) {
-        if (loopInfo == null) {
-            return;
-        }
-        final LikeSearchOption current = getLikeSearchOption();
-        if (current != null) {
+        if (loopInfo == null || _likeSearchOption != null) {
             return;
         }
         final LikeSearchOption parent = loopInfo.getLikeSearchOption();
         if (parent != null) {
-            setLikeSearchOption(parent); // inherit
+            _likeSearchOption = parent; // inherit
         }
     }
 

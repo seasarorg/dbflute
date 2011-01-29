@@ -90,22 +90,12 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
 
     protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo,
             boolean inheritLoop) {
-        assertInLoopOption(loopInfo);
+        assertInLoopOnlyOptionInLoop(loopInfo);
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setFirstValue(firstValue);
         valueAndType.setFirstType(firstType);
         setupValueAndType(valueAndType);
-        if (isAcceptableInLoopLike(loopInfo)) {
-            final LikeSearchOption inLoopLikeSearchOption = getInLoopLikeSearchOption(loopInfo);
-            if (inLoopLikeSearchOption != null) { // forced option
-                valueAndType.setLikeSearchOption(inLoopLikeSearchOption);
-            } else {
-                if (inheritLoop) {
-                    valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
-                }
-            }
-            valueAndType.filterValueByOptionIfNeeds();
-        }
+        processLikeSearch(valueAndType, loopInfo, inheritLoop);
         if (_blockNullParameter && valueAndType.getTargetValue() == null) {
             throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
         }
@@ -138,33 +128,32 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     // ===================================================================================
     //                                                                   LikeSearch Helper
     //                                                                   =================
-    protected void assertInLoopOption(LoopInfo loopInfo) {
-        if (loopInfo == null && Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
-            final String onlyInLoop = INLOOP_OPTION_NOT_LIKE;
-            final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
-            for (String option : optionList) {
-                if (onlyInLoop.equals(option)) {
-                    // means 'notLike' is specified at out of loop
-                    throwInLoopOptionOutOfLoopException();
-                }
+    protected void processLikeSearch(ValueAndType valueAndType, LoopInfo loopInfo, boolean inheritLoop) {
+        if (!isAcceptableLikeSearch(loopInfo)) {
+            return;
+        }
+        final LikeSearchOption inLoopForcedLikeSearchOption = getInLoopForcedLikeSearchOption(loopInfo);
+        if (inLoopForcedLikeSearchOption != null) { // forced option
+            valueAndType.setLikeSearchOption(inLoopForcedLikeSearchOption);
+        } else {
+            if (inheritLoop) {
+                valueAndType.inheritLikeSearchOptionIfNeeds(loopInfo);
             }
         }
+        valueAndType.filterValueByOptionIfNeeds();
     }
 
-    protected boolean isAcceptableInLoopLike(LoopInfo loopInfo) {
-        if (loopInfo == null) {
-            return false; // not in loop
-        }
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
+    protected boolean isAcceptableLikeSearch(LoopInfo loopInfo) {
+        if (loopInfo != null && Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
             final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
             if (optionList.contains(INLOOP_OPTION_NOT_LIKE)) {
-                return false; // specified not-like
+                return false; // specified not-like in loop
             }
         }
-        return true;
+        return true; // basically true
     }
 
-    protected LikeSearchOption getInLoopLikeSearchOption(LoopInfo loopInfo) {
+    protected LikeSearchOption getInLoopForcedLikeSearchOption(LoopInfo loopInfo) {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
             final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
             for (String option : optionList) {
@@ -180,7 +169,20 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         return null;
     }
 
-    protected void setupRearOption(CommandContext ctx, ValueAndType valueAndType) {
+    protected void assertInLoopOnlyOptionInLoop(LoopInfo loopInfo) {
+        if (loopInfo == null && Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
+            final String onlyInLoop = INLOOP_OPTION_NOT_LIKE;
+            final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
+            for (String option : optionList) {
+                if (onlyInLoop.equals(option)) {
+                    // means 'notLike' is specified at out of loop
+                    throwInLoopOptionOutOfLoopException();
+                }
+            }
+        }
+    }
+
+    protected void setupRearOption(CommandContext ctx, ValueAndType valueAndType) { // for sub-class
         final String rearOption = valueAndType.buildRearOptionOnSql();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(rearOption)) {
             ctx.addSql(rearOption);
