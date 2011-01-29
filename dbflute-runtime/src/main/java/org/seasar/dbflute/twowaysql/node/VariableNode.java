@@ -40,7 +40,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     //                                                                           =========
     protected final String _expression;
     protected final String _testValue;
-    protected final String _option;
+    protected final String _optionDef;
     protected final List<String> _nameList;
     protected final String _specifiedSql;
     protected final boolean _blockNullParameter;
@@ -51,10 +51,10 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     public VariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         if (expression.contains(":")) {
             this._expression = Srl.substringFirstFront(expression, ":").trim();
-            this._option = Srl.substringFirstRear(expression, ":").trim();
+            this._optionDef = Srl.substringFirstRear(expression, ":").trim();
         } else {
             this._expression = expression;
-            this._option = null;
+            this._optionDef = null;
         }
         this._testValue = testValue;
         this._nameList = Srl.splitList(_expression, ".");
@@ -139,17 +139,23 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     //                                                                   LikeSearch Helper
     //                                                                   =================
     protected void assertInLoopOption(LoopInfo loopInfo) {
-        final String onlyInLoop = INLOOP_OPTION_NOT_LIKE;
-        if (loopInfo == null && Srl.is_NotNull_and_NotTrimmedEmpty(_option) && _option.contains(onlyInLoop)) {
-            throwInLoopOptionOutOfLoopException();
+        if (loopInfo == null && Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
+            final String onlyInLoop = INLOOP_OPTION_NOT_LIKE;
+            final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
+            for (String option : optionList) {
+                if (onlyInLoop.equals(option)) {
+                    // means 'notLike' is specified at out of loop
+                    throwInLoopOptionOutOfLoopException();
+                }
+            }
         }
     }
 
     protected boolean isAcceptableLike() { // basically true
-        if (Srl.is_Null_or_TrimmedEmpty(_option)) {
+        if (Srl.is_Null_or_TrimmedEmpty(_optionDef)) {
             return true;
         }
-        final List<String> optionList = Srl.splitListTrimmed(_option, "|");
+        final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
         for (String option : optionList) {
             if (option.equals(INLOOP_OPTION_NOT_LIKE)) {
                 return false;
@@ -159,10 +165,10 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     }
 
     protected LikeSearchOption getInLoopLikeSearchOption() {
-        if (Srl.is_Null_or_TrimmedEmpty(_option)) {
+        if (Srl.is_Null_or_TrimmedEmpty(_optionDef)) {
             return null;
         }
-        final List<String> optionList = Srl.splitListTrimmed(_option, "|");
+        final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
         for (String option : optionList) {
             if (option.equals(INLOOP_OPTION_LIKE_PREFIX)) {
                 return new LikeSearchOption().likePrefix();
@@ -220,7 +226,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     }
 
     protected void throwInLoopOptionOutOfLoopException() {
-        NodeUtil.throwInLoopOptionOutOfLoopException(_expression, _specifiedSql, _option);
+        NodeUtil.throwInLoopOptionOutOfLoopException(_expression, _specifiedSql, _optionDef);
     }
 
     protected boolean isBind() {
@@ -238,8 +244,8 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         return _testValue;
     }
 
-    public String getOption() {
-        return _option;
+    public String getOptionDef() {
+        return _optionDef;
     }
 
     public boolean isBlockNullParameter() {
