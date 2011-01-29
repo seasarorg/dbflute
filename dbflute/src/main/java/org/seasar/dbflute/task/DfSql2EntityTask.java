@@ -705,32 +705,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 }
             } else {
                 if (pmbMetaData.isTypedParameterBean()) {
-                    logSb.append(" (typed to ");
-                    final StringBuilder typedSb = new StringBuilder();
-                    if (pmbMetaData.isTypedListHandling()) {
-                        typedSb.append(", list");
-                    }
-                    if (pmbMetaData.isTypedEntityHandling()) {
-                        typedSb.append(", entity");
-                    }
-                    if (pmbMetaData.isTypedPagingHandling()) {
-                        if (pmbMetaData.isTypedManualPagingHandling()) {
-                            typedSb.append(", manual-paging");
-                        } else if (pmbMetaData.isTypedAutoPagingHandling()) {
-                            typedSb.append(", auto-paging");
-                        } else { // basically no way
-                            typedSb.append(", paging");
-                        }
-                    }
-                    if (pmbMetaData.isTypedCursorHandling()) {
-                        typedSb.append(", cursor");
-                    }
-                    if (pmbMetaData.isTypedExecuteHandling()) {
-                        typedSb.append(", execute");
-                    }
-                    typedSb.delete(0, ", ".length());
-                    typedSb.append(")");
-                    logSb.append(typedSb);
+                    logSb.append(" ").append(pmbMetaData.buildTypedDisp());
                 }
                 logSb.append(ln());
                 final Map<String, String> propertyNameTypeMap = pmbMetaData.getPropertyNameTypeMap();

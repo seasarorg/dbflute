@@ -38,7 +38,7 @@ import ${glPackageExtendedCustomizeEntity}.*;
 /**
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
  * The base class for typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
- * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" of ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
+ * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" on ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
 #else
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
  * The base class for procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
@@ -120,11 +120,11 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-    /** ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} */
+    /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
     protected ${propertyType} ${variableName};
 
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
-    /** The value of likeSearchOption for ${propertyName}. */
+    /** The option of like-search for ${propertyName}. */
     protected LikeSearchOption ${variableName}InternalLikeSearchOption;
 
 #end
@@ -140,7 +140,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     /**
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
      * Constructor for the typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
-     * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" of ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
+     * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" on ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
 #else
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
      * Constructor for the procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
@@ -405,7 +405,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
 
     /**
-     * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't Invoke This!}
+     * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't invoke this}
      * @return The internal option of likeSearch for ${propertyName}. (NullAllowed)
      */
     public LikeSearchOption get${database.initCap($propertyName)}InternalLikeSearchOption() {

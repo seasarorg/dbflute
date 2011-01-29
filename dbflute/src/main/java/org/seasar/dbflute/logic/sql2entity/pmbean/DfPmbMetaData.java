@@ -261,6 +261,39 @@ public class DfPmbMetaData {
         return entityClassName;
     }
 
+    public String buildTypedDisp() {
+        final StringBuilder logSb = new StringBuilder();
+        if (isTypedParameterBean()) {
+            logSb.append("(typed to ");
+            final StringBuilder typedSb = new StringBuilder();
+            if (isTypedListHandling()) {
+                typedSb.append(", list");
+            }
+            if (isTypedEntityHandling()) {
+                typedSb.append(", entity");
+            }
+            if (isTypedPagingHandling()) {
+                if (isTypedManualPagingHandling()) {
+                    typedSb.append(", manual-paging");
+                } else if (isTypedAutoPagingHandling()) {
+                    typedSb.append(", auto-paging");
+                } else { // basically no way
+                    typedSb.append(", paging");
+                }
+            }
+            if (isTypedCursorHandling()) {
+                typedSb.append(", cursor");
+            }
+            if (isTypedExecuteHandling()) {
+                typedSb.append(", execute");
+            }
+            typedSb.delete(0, ", ".length());
+            typedSb.append(")");
+            logSb.append(typedSb);
+        }
+        return logSb.toString();
+    }
+
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========

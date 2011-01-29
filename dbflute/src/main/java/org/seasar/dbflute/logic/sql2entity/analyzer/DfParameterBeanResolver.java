@@ -227,16 +227,16 @@ public class DfParameterBeanResolver {
             return;
         }
         final String propertyName = Srl.substringFirstRear(expression, "pmb.");
-        if (Srl.equalsIgnoreCase(propertyName, "OutsideSqlPath", "EntityType", "FetchStartIndex", "FetchSize",
-                "FetchPageNumber", "PageStartIndex", "PageEndIndex", "SafetyMaxResultSize", "ParameterMap",
-                "OrderByClause", "OrderByComponent")) {
+        if (Srl.equalsIgnoreCase(propertyName, "OutsideSqlPath", "EntityType", "ProcedureName", "EscapeStatement",
+                "CalledBySelect", "FetchStartIndex", "FetchSize", "FetchPageNumber", "PageStartIndex", "PageEndIndex",
+                "SafetyMaxResultSize", "ParameterMap", "OrderByClause", "OrderByComponent")) {
             // reservation names should be skipped
             // (properties for TypedParameterBean and SimplePagingBean and so on...)
             return;
         }
         final String typeName = derivePropertyTypeFromTestValue(testValue);
         propertyNameTypeMap.put(propertyName, typeName); // override if same one exists
-        final String option = variableNode.getOption();
+        final String option = variableNode.getOptionDef();
         // add option if it exists
         // so it is enough to set an option to only one bind variable comment
         // if several bind variable comments for the same property exist
