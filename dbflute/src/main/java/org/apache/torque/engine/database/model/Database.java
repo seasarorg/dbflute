@@ -853,6 +853,10 @@ public class Database {
         return getBasicProperties().getProjectName();
     }
 
+    public boolean isApplicationBehaviorProject() {
+        return getBasicProperties().isApplicationBehaviorProject();
+    }
+
     // -----------------------------------------------------
     //                                              Database
     //                                              --------

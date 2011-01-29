@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.sql2entity.pmbean;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -64,11 +65,7 @@ public class DfPmbBasicHandler {
     //                                                                          Basic Info
     //                                                                          ==========
     public Collection<DfPmbMetaData> getPmbMetaDataList() {
-        if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
-            String msg = "The pmbMetaDataMap should not be null or empty.";
-            throw new IllegalStateException(msg);
-        }
-        return _pmbMetaDataMap.values();
+        return _pmbMetaDataMap != null ? _pmbMetaDataMap.values() : new ArrayList<DfPmbMetaData>();
     }
 
     public boolean isExistPmbMetaData() {

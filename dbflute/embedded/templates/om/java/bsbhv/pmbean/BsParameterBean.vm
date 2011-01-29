@@ -29,7 +29,11 @@ import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.util.DfTypeUtil;
 import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+#if ($database.isApplicationBehaviorProject())
+import ${database.libraryBehaviorPackage}.*;
+#else
 import ${glPackageExtendedBhv}.*;
+#end
 #end
 #if ($database.isPmbMetaDataTypedReturnEntityPmb($pmbClassName) || $database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}.*;
