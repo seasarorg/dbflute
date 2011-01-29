@@ -12,7 +12,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 #end
 using ${glPackageBaseCommonCOption};
-#if ($database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
+#if ($database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
 using ${glPackageExtendedCustomizeEntity};
 #end
 

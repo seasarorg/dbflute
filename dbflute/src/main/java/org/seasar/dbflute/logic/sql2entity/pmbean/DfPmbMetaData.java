@@ -18,8 +18,14 @@ package org.seasar.dbflute.logic.sql2entity.pmbean;
 import java.io.File;
 import java.util.Map;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
+import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
+import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -31,14 +37,12 @@ public class DfPmbMetaData {
     //                                                                           =========
     protected String _className;
     protected String _superClassName;
+    protected DfPagingType _pagingType; // null means no paging
     protected Map<String, String> _propertyNameTypeMap;
     protected Map<String, String> _propertyNameOptionMap;
-
-    // for typed parameter-bean
     protected File _sqlFile;
     protected Map<String, String> _bqpElementMap;
     protected DfCustomizeEntityInfo _customizeEntityInfo;
-    protected DfPagingType _pagingType; // null means no paging
 
     public enum DfPagingType {
         UNKNOWN, MANUAL, AUTO
@@ -52,7 +56,229 @@ public class DfPmbMetaData {
     protected Map<String, String> _propertyNameColumnNameMap;
     protected Map<String, DfProcedureColumnMetaInfo> _propertyNameColumnInfoMap;
     protected boolean _procedureCalledBySelect;
-    protected boolean _refCustomizeEntity;
+    protected boolean _procedureRefCustomizeEntity;
+
+    // ===================================================================================
+    //                                                                          Basic Info
+    //                                                                          ==========
+    public String getBusinessName() {
+        final String pmbTitleName;
+        {
+            final String pmbClassName = _className;
+            if (pmbClassName.endsWith("Pmb")) {
+                pmbTitleName = Srl.substringLastFront(pmbClassName, "Pmb");
+            } else {
+                pmbTitleName = pmbClassName;
+            }
+        }
+        return pmbTitleName;
+    }
+
+    public String getBehaviorClassName() {
+        return getBqpElement(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_NAME);
+    }
+
+    public String getBehaviorQueryPath() { // resolved sub-directory
+        final String subDirPath = getBqpElement(DfBehaviorQueryPathSetupper.KEY_SUB_DIRECTORY_PATH);
+        final StringBuilder sb = new StringBuilder();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(subDirPath)) {
+            sb.append(Srl.replace(subDirPath, "/", ":")).append(":");
+        }
+        final String plainPath = getBqpElement(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_QUERY_PATH);
+        sb.append(plainPath);
+        return sb.toString();
+    }
+
+    public String getSqlTitle() {
+        return getBqpElement(DfBehaviorQueryPathSetupper.KEY_TITLE);
+    }
+
+    public String getSqlDescription() {
+        return getBqpElement(DfBehaviorQueryPathSetupper.KEY_DESCRIPTION);
+    }
+
+    protected String getBqpElement(String key) {
+        return isRelatedToBehaviorQuery() ? _bqpElementMap.get(key) : null;
+    }
+
+    public boolean hasSuperClassDefinition() {
+        return _superClassName != null && _superClassName.trim().length() > 0;
+    }
+
+    public boolean hasPagingExtension() {
+        return hasSuperClassDefinition() && _pagingType != null;
+    }
+
+    public boolean isRelatedToBehaviorQuery() {
+        return _bqpElementMap != null;
+    }
+
+    public boolean isRelatedToCustomizeEntity() {
+        return _customizeEntityInfo != null;
+    }
+
+    public boolean isRelatedToProcedure() {
+        return _procedureName != null;
+    }
+
+    // ===================================================================================
+    //                                                                  TypedParameterBean
+    //                                                                  ==================
+    public boolean isTypedParameterBean() {
+        return isTypedSelectPmb() || isTypedUpdatePmb();
+    }
+
+    public boolean isTypedSelectPmb() {
+        return isTypedListHandling() || isTypedEntityHandling() || isTypedCursorHandling() || isTypedPagingHandling();
+    }
+
+    public boolean isTypedUpdatePmb() {
+        return isTypedExecuteHandling();
+    }
+
+    public boolean isTypedReturnEntityPmb() {
+        if (isRelatedToCustomizeEntity() && _customizeEntityInfo.isScalarHandling()) {
+            return false;
+        }
+        return isTypedListHandling() || isTypedEntityHandling() || isTypedPagingHandling();
+    }
+
+    public boolean isTypedListHandling() {
+        if (isTypedPagingHandling()) {
+            return false;
+        }
+        return isRelatedToCustomizeEntity() ? _customizeEntityInfo.isResultHandling() : false;
+    }
+
+    public boolean isTypedEntityHandling() {
+        // *allowed to use entity handling with paging handling
+        //if (isTypedPagingHandling()) {
+        //    return false;
+        //}
+        return isRelatedToCustomizeEntity() ? _customizeEntityInfo.isResultHandling() : false;
+    }
+
+    public boolean isTypedPagingHandling() { // abstract judgment
+        return isTypedManualPagingHandling() || isTypedAutoPagingHandling();
+    }
+
+    public boolean isTypedManualPagingHandling() {
+        return judgeTypedPagingHandling(DfPagingType.MANUAL);
+    }
+
+    public boolean isTypedAutoPagingHandling() {
+        return judgeTypedPagingHandling(DfPagingType.AUTO);
+    }
+
+    protected boolean judgeTypedPagingHandling(DfPagingType targetType) {
+        if (!isRelatedToBehaviorQuery()) {
+            return false;
+        }
+        if (!isRelatedToCustomizeEntity()) {
+            return false;
+        }
+        if (!hasPagingExtension()) {
+            return false;
+        }
+        if (DfPagingType.UNKNOWN.equals(_pagingType)) { // "extends Paging"
+            final boolean research = researchManualPaging();
+            return DfPagingType.MANUAL.equals(targetType) ? research : !research;
+        } else {
+            // "extends ManualPaging" or "extends AutoPaging"
+            return targetType.equals(_pagingType);
+        }
+    }
+
+    protected boolean researchManualPaging() {
+        if (!hasPagingExtension()) {
+            return false;
+        }
+        if (_bqpElementMap == null) {
+            return false;
+        }
+        final String sql = _bqpElementMap.get("sql");
+        if (sql == null) {
+            String msg = "The element value 'sql' should not be null: " + _bqpElementMap;
+            throw new IllegalStateException(msg);
+        }
+        if (getBasicProperties().isDatabaseMySQL()) {
+            return Srl.containsIgnoreCase(sql, "limit") && Srl.contains(sql, "pmb.fetchSize");
+        } else if (getBasicProperties().isDatabasePostgreSQL()) {
+            return Srl.containsAllIgnoreCase(sql, "offset", "limit");
+        } else if (getBasicProperties().isDatabaseOracle()) {
+            return Srl.containsAllIgnoreCase(sql, "rownum");
+        } else if (getBasicProperties().isDatabaseDB2()) {
+            return Srl.containsAllIgnoreCase(sql, "row_number()");
+        } else if (getBasicProperties().isDatabaseSQLServer()) {
+            return Srl.containsAllIgnoreCase(sql, "row_number()");
+        } else if (getBasicProperties().isDatabaseH2()) {
+            // H2 implements both limit only and offset + limit
+            return Srl.containsAllIgnoreCase(sql, "offset", "limit")
+                    || (Srl.containsIgnoreCase(sql, "limit") && Srl.contains(sql, "pmb.fetchSize"));
+        } else if (getBasicProperties().isDatabaseDerby()) {
+            return Srl.containsAllIgnoreCase(sql, "offset", "fetch");
+        } else if (getBasicProperties().isDatabaseSQLite()) {
+            return Srl.containsAllIgnoreCase(sql, "offset", "limit");
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isTypedCursorHandling() {
+        if (!isRelatedToBehaviorQuery()) {
+            return false;
+        }
+        return isRelatedToCustomizeEntity() ? _customizeEntityInfo.isCursorHandling() : false;
+    }
+
+    public boolean isTypedExecuteHandling() {
+        if (!isRelatedToBehaviorQuery()) {
+            return false;
+        }
+        if (isRelatedToCustomizeEntity()) {
+            return false; // means select
+        }
+        final String bqpPath = getBehaviorQueryPath();
+        return !bqpPath.startsWith("select");
+    }
+
+    public String getCustomizeEntityType() {
+        if (!isRelatedToCustomizeEntity()) {
+            String msg = "This parameter-bean was not related to customize entity.";
+            throw new IllegalStateException(msg);
+        }
+        if (_customizeEntityInfo.isCursorHandling()) {
+            return "Void";
+        }
+        if (_customizeEntityInfo.isScalarHandling()) {
+            return _customizeEntityInfo.getScalarJavaNative();
+        }
+        final String entityClassName = _customizeEntityInfo.getEntityClassName();
+        if (entityClassName == null) {
+            String msg = "The class name of the customize entity was not found.";
+            throw new IllegalStateException(msg);
+        }
+        return entityClassName;
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfClassificationProperties getClassificationProperties() {
+        return getProperties().getClassificationProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -170,11 +396,11 @@ public class DfPmbMetaData {
         this._procedureCalledBySelect = procedureCalledBySelect;
     }
 
-    public boolean isRefCustomizeEntity() {
-        return _refCustomizeEntity;
+    public boolean isProcedureRefCustomizeEntity() {
+        return _procedureRefCustomizeEntity;
     }
 
-    public void setRefCustomizeEntity(boolean refCustomizeEntity) {
-        this._refCustomizeEntity = refCustomizeEntity;
+    public void setProcedureRefCustomizeEntity(boolean procedureRefCustomizeEntity) {
+        this._procedureRefCustomizeEntity = procedureRefCustomizeEntity;
     }
 }

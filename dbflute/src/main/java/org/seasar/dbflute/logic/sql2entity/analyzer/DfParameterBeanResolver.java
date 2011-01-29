@@ -129,7 +129,7 @@ public class DfParameterBeanResolver {
         pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
         pmbMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
         final List<String> parameterBeanElement = getParameterBeanPropertyTypeList(sql);
-        final String autoDetectMark = "$$AutoDetect$$";
+        final String autoDetectMark = "AutoDetect";
         for (String element : parameterBeanElement) {
             element = element.trim();
             if (element.equalsIgnoreCase(autoDetectMark)) {

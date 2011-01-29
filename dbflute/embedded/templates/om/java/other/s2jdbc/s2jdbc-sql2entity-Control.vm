@@ -34,10 +34,8 @@
 #set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.javalike")
 #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
 #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
-#set ($glPackageBaseDaoCursor = "${database.baseDaoPackage}.cursor" )
 #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
 #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
-#set ($glPackageExtendedDaoCursor = "${database.extendedDaoPackage}.cursor")
 #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
 #if ($database.isTargetLanguageCSharp())
   #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
@@ -49,10 +47,8 @@
   #set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.JavaLike")
   #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
   #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
-  #set ($glPackageBaseDaoCursor = "${database.baseDaoPackage}.Cursor" )
   #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
   #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
-  #set ($glPackageExtendedDaoCursor = "${database.extendedDaoPackage}.Cursor")
   #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
 #end
 

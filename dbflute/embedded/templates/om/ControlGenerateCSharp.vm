@@ -1508,10 +1508,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleSystemUtil.${gl
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonUtil})}${glTraceViewUtil}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/util/TraceViewUtil.${glTemplateFileExtension}",$path,"", "")
 
-## -----------------------------------------------------------------------------------------------------
-##                                                                                    Parse table object
-##                                                                                    ------------------
-## for Sql2Entity
+## ===================================================================================
+##                                                                         Table Class
+##                                                                         ===========
+## this is for table class (not for Sql2Entity)
 #set ($isSql2Entity = false)
 
 #set ($path = $database.getPackageAsPath(${glPackageBaseBhv}))
@@ -1565,11 +1565,11 @@ $database.deleteOldTableClass()
 ##
 ## Loop by tables.
 ##
-$database.info("/* * * * * * * * * * * * * * {Table Class}")
+$database.info("public void parseTableClass() {")
 #foreach ($table in $database.tables)
   #if (!$table.isForReferenceOnly())
 
-    $database.info("parseTable('${table.Name}');")
+    $database.info("    parse('${table.Name}');")
     ##
     ## The name of objects
     ##
@@ -1683,5 +1683,5 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
     #end
   #end
 #end
-$database.info("* * * * * * * * * */")
+$database.info("}")
 $database.info(" ")

@@ -57,6 +57,7 @@ import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -718,7 +719,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                    Skip Information
     //                                                                    ================
     protected void showSkippedFileInformation() {
-        boolean skipGenerateIfSameFile = getProperties().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
+        final boolean skipGenerateIfSameFile = getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
         if (!skipGenerateIfSameFile) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("All class files have been generated. (overrided)");
@@ -726,8 +727,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             _log.info("");
             return;
         }
-        List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
-        int parseSize = parseFileNameList.size();
+        final List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
+        final int parseSize = parseFileNameList.size();
         if (parseSize == 0) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("No class file has been parsed.");
@@ -735,8 +736,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             _log.info("");
             return;
         }
-        List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
-        int skipSize = skipFileNameList.size();
+        final List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
+        final int skipSize = skipFileNameList.size();
         if (skipSize == 0) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("All class files have been generated. (overrided)");
@@ -771,6 +772,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     protected DfDatabaseProperties getDatabaseProperties() {
         return getProperties().getDatabaseProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

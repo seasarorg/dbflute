@@ -135,9 +135,7 @@ $database.makeDirectory($path)
 ##
 $database.deleteOldCustomizeClass();
 
-$database.debug("public void parseCustomizeEntity() {")
-$database.debug("    final List<String> tableNameList = getTableList();")
-$database.debug("    for (String tableName : tableNameList) {")
+$database.info("public void parseCustomizeEntity() {")
 #foreach ($table in $database.tableList)
   #set ($myBaseObjectClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}")
   #set ($myBaseEntityPackageName = "${glPackageBaseCustomizeEntity}")
@@ -150,8 +148,8 @@ $database.debug("    for (String tableName : tableNameList) {")
   #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
   #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
 
-  #set ($myBaseDaoCursorPackageName = "${glPackageBaseCursor}")
-  #set ($myExtendedDaoCursorPackageName = "${glPackageExtendedCursor}")
+  #set ($myBaseCursorPackageName = "${glPackageBaseCursor}")
+  #set ($myExtendedCursorPackageName = "${glPackageExtendedCursor}")
   #set ($myBaseTypeSafeCursorClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}Cursor")
   #set ($myBaseTypeSafeCursorHandlerClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}CursorHandler")
   #set ($myExtendedTypeSafeCursorClassName = "${glProjectPrefix}${table.javaName}Cursor")
@@ -161,57 +159,49 @@ $database.debug("    for (String tableName : tableNameList) {")
   #set ($isExistConditionBean = false)
 
   #if ($table.isSql2EntityTypeSafeCursor())
-    #set ($path = $database.getPackageAsPath(${myBaseDaoCursorPackageName}))
+    #set ($path = $database.getPackageAsPath(${myBaseCursorPackageName}))
     $database.makeDirectory($path)
 
-    $database.debug("        parse('BaseTypeSafeCursor')")
-    #set ( $path = "${database.getPackageAsPath(${myBaseDaoCursorPackageName})}${myBaseTypeSafeCursorClassName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${myBaseCursorPackageName})}${myBaseTypeSafeCursorClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/BsTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
 
-    $database.debug("        parse('BaseTypeSafeCursorHandler')")
-    #set ( $path = "${database.getPackageAsPath(${myBaseDaoCursorPackageName})}${myBaseTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${myBaseCursorPackageName})}${myBaseTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/BsTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
 
-    #set ($path = $database.getPackageAsPath(${myExtendedDaoCursorPackageName}))
+    #set ($path = $database.getPackageAsPath(${myExtendedCursorPackageName}))
     $database.makeDirectory($path)
 
-    $database.debug("        parse('ExtendedTypeSafeCursor')")
-    #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorClassName}.${glClassFileExtension}" )
+    $database.info("    parse('${myExtendedTypeSafeCursorClassName}')")
+    #set ( $path = "${database.getPackageAsPath(${myExtendedCursorPackageName})}${myExtendedTypeSafeCursorClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 
-    $database.debug("        parse('ExtendedTypeSafeCursorHandler')")
-    #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${myExtendedCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
     #end
   #else
-    $database.debug("        parseBaseCustomizeEntity(tableName);     // ${myBaseObjectClassName}")
+    $database.info("    parse('${myExtendedObjectClassName}')")
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
 
-    $database.debug("        parseCustomizeDBMeta(tableName);         // ${myDBMetaClassName}")
     #set ( $path = "${database.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
 
     #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.outputPath},$path).exists())
-      $database.debug("        parseExtendedCustomizeEntity(tableName); // ${myExtendedObjectClassName}")
       $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
     #end
   #end
 #end
-$database.debug("    }")
-$database.debug("}")
+$database.info("}")
 
 ## -----------------------------------------------------------------------------------------------------
 ##                                                                                  Parse parameter bean
 ##                                                                                  --------------------
 #if ($database.isExistPmbMetaData())
-$database.debug("public void parseParameterBean() {")
-$database.debug("    final List<DfParameterBeanMetaData> parameterBeanList = getParameterBeanList();")
-$database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanList) {")
+$database.info("public void parseParameterBean() {")
 
 #set ($glPackageBaseParameterBean = "${database.sql2EntityBaseParameterBeanPackage}" )
 #set ($glPackageExtendedParameterBean = "${database.sql2EntityExtendedParameterBeanPackage}" )
@@ -226,25 +216,23 @@ $database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanL
     #set ($myBaseParameterBeanClassName = "${glProjectPrefix}${glBasePrefix}${pmbClassName}")
     #set ($myExtendedParameterBeanClassName = "${glProjectPrefix}${pmbClassName}")
 
-    $database.debug("        parseBaseParameterBean(parameterBean);     // ${myBaseParameterBeanClassName}")
+    $database.info("    parse('${myExtendedParameterBeanClassName}');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/bsbhv/pmbean/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
 
     #set ( $path = "${database.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.outputPath},$path).exists())
-      $database.debug("        parseExtendedParameterBean(parameterBean); // ${myExtendedParameterBeanClassName}")
       $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
     #end
   #end
-$database.debug("    }")
-$database.debug("}")
+$database.info("}")
 #end
 
 ## ===================================================================================
 ##                                                                          Simple Dto
 ##                                                                          ==========
 #if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
-  $database.debug("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
+  $database.info("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
   #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}.customize")
   #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}.customize")
   #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
@@ -267,7 +255,7 @@ $database.debug("}")
     #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
     #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
-    $database.debug("    parse('${myExtendedObjectClassName}');")
+    $database.info("    parse('${myExtendedObjectClassName}');")
 
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
@@ -285,7 +273,7 @@ $database.debug("}")
     #end
     #end
   #end
-  $database.debug("}")
+  $database.info("}")
 #end
 
 ## ===================================================================================
@@ -293,7 +281,7 @@ $database.debug("}")
 ##                                                                            ========
 #if ($database.hasFlexDtoDefinition() && $database.isTargetLanguageJava())
   $database.enableFlexDtoOutputDirectory()
-  $database.debug("parseFlexDto() {")
+  $database.info("parseFlexDto() {")
   #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
   #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
 
@@ -309,7 +297,7 @@ $database.debug("}")
     #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
     #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.customize.${myExtendedObjectClassName}")
 
-    $database.debug("    parse('${myExtendedObjectClassName}');")
+    $database.info("    parse('${myExtendedObjectClassName}');")
 
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
     $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
@@ -322,6 +310,6 @@ $database.debug("}")
     #end
     #end
   #end
-  $database.debug("}")
+  $database.info("}")
   $database.enableSql2EntityOutputDirectory()
 #end

@@ -1,7 +1,7 @@
-${database.allClassCopyright}package ${myExtendedDaoCursorPackageName};
+${database.allClassCopyright}package ${myExtendedCursorPackageName};
 #set ($myClassName = "${myExtendedTypeSafeCursorHandlerClassName}")
 
-import ${myBaseDaoCursorPackageName}.${myBaseTypeSafeCursorHandlerClassName};
+import ${myBaseCursorPackageName}.${myBaseTypeSafeCursorHandlerClassName};
 
 /**
  * The cursor handler of ${table.name}.

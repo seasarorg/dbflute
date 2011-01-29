@@ -31,12 +31,22 @@ import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
 import ${glPackageExtendedBhv}.*;
 #end
-#if ($database.isPmbMetaDataTypedReturnEntityPmb($pmbClassName) || $database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
+#if ($database.isPmbMetaDataTypedReturnEntityPmb($pmbClassName) || $database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}.*;
 #end
 
 /**
- * The parameter-bean of ${pmbClassName}.
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+ * The base class for typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+ * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" of ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
+#else
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+ * The base class for procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+ * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataProcedureName($pmbClassName)}</span>".
+#else
+ * The base class for parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}.
+#end
+#end
  * @author ${database.classAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
@@ -127,6 +137,19 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+     * Constructor for the typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+     * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" of ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
+#else
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+     * Constructor for the procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+     * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataProcedureName($pmbClassName)}</span>".
+#else
+     * Constructor for the parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}.
+#end
+#end
+     */
     public ${myClassName}() {
     }
 

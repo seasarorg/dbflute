@@ -4,7 +4,7 @@ using System;
 using System.Data;
 using ${glPackageBaseCommonJdbc};
 
-namespace ${myExtendedDaoCursorPackageName} {
+namespace ${myExtendedCursorPackageName} {
 
     [System.Serializable]
     public partial class ${myClassName} : ${glPackageBaseCommonJdbc}.${glCursorHandler} {

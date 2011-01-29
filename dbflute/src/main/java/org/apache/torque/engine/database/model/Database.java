@@ -343,6 +343,10 @@ public class Database {
         return getPmbBasicHandler().isExistPmbMetaData();
     }
 
+    public String getPmbMetaDataBusinessName(String className) {
+        return getPmbBasicHandler().getBusinessName(className);
+    }
+
     public String getPmbMetaDataSuperClassDefinition(String className) {
         return getPmbBasicHandler().getSuperClassDefinition(className);
     }
@@ -406,6 +410,10 @@ public class Database {
         return getPmbBasicHandler().isTypedReturnEntityPmb(className);
     }
 
+    public String getPmbMetaDataBehaviorClassName(String className) {
+        return getPmbBasicHandler().getBehaviorClassName(className);
+    }
+
     public String getPmbMetaDataBehaviorQueryPath(String className) {
         return getPmbBasicHandler().getBehaviorQueryPath(className);
     }
@@ -429,8 +437,8 @@ public class Database {
         return getPmbBasicHandler().isProcedureCalledBySelect(className);
     }
 
-    public boolean isPmbMetaDataRefCustomizeEntity(String className) {
-        return getPmbBasicHandler().isRefCustomizeEntity(className);
+    public boolean isPmbMetaDataProcedureRefCustomizeEntity(String className) {
+        return getPmbBasicHandler().isProcedureRefCustomizeEntity(className);
     }
 
     public boolean hasPmbMetaDataProcedureOverload(String className) {
@@ -1102,14 +1110,22 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                   Behavior Query Path
-    //                                   -------------------
+    //                                        Begin/End Mark
+    //                                        --------------
     public String getBehaviorQueryPathBeginMark() {
         return getBasicProperties().getBehaviorQueryPathBeginMark();
     }
 
     public String getBehaviorQueryPathEndMark() {
         return getBasicProperties().getBehaviorQueryPathEndMark();
+    }
+
+    public String getExtendedClassDescriptionBeginMark() {
+        return getBasicProperties().getExtendedClassDescriptionBeginMark();
+    }
+
+    public String getExtendedClassDescriptionEndMark() {
+        return getBasicProperties().getExtendedClassDescriptionEndMark();
     }
 
     // -----------------------------------------------------

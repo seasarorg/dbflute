@@ -1,4 +1,4 @@
-${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
+${database.allClassCopyright}package ${myBaseCursorPackageName};
 #set ($myClassName = "${myBaseTypeSafeCursorClassName}")
 
 import java.sql.ResultSet;

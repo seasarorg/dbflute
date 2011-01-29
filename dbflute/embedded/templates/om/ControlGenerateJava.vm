@@ -1,4 +1,4 @@
-#
+parseContainerConfig#
 # @since DBFlute-0.9.0
 #
 #set ($database = $schemaData.database)
@@ -233,15 +233,15 @@ $database.info("public void parseContainerConfig() {")
       $database.makeDirectory($path)
 
       #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-      $database.info("    ${path}")
+      $database.info("    parse('${path}')")
       $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/HotDeployDicon.${glTemplateFileExtension}", $path, "", "")
 
       #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
-      $database.info("    ${path}")
+      $database.info("    parse('${path}')")
       $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CreatorDicon.${glTemplateFileExtension}", $path, "", "")
 
       #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
-      $database.info("    ${path}")
+      $database.info("    parse('${path}')")
       $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CustomizerDicon.${glTemplateFileExtension}", $path, "", "")
     #end
   #else
@@ -250,7 +250,7 @@ $database.info("public void parseContainerConfig() {")
       $database.makeDirectory($path)
 
       #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-      $database.info("    ${path}")
+      $database.info("    parse('${path}')")
       $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/DBFluteDicon.${glTemplateFileExtension}", $path, "", "")
     #end
   #end
@@ -261,7 +261,7 @@ $database.info("public void parseContainerConfig() {")
     $database.makeDirectory($path)
 
     #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
-    $database.info("    ${path}")
+    $database.info("    parse('${path}')")
     $generator.parse("om/${glResourceDirectory}/allcommon/container/spring/SpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
   #end
 #end
@@ -271,26 +271,26 @@ $database.info("public void parseContainerConfig() {")
     $database.makeDirectory($path)
 
     #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
-    $database.info("    ${path}")
+    $database.info("    parse('${path}')")
     $generator.parse("om/${glResourceDirectory}/allcommon/container/lucy/LucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
   #end
 #end
 #if ($database.isTargetContainerGuice())
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
-  $database.info("    ${path}")
+  $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/guice/GuiceDBFluteModule.${glTemplateFileExtension}", $path, "", "")
 #end
 #if ($database.isTargetContainerSlim3())
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
-  $database.info("    ${path}")
+  $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/slim3/Slim3DBFluteModule.${glTemplateFileExtension}", $path, "", "")
 #end
 $database.info("}")
 
 ## ===================================================================================
-##                                                                        Table Object
-##                                                                        ============
-## for Sql2Entity
+##                                                                         Table Class
+##                                                                         ===========
+## this is for table class (not for Sql2Entity)
 #set ($isSql2Entity = false)
 
 #set ($path = $database.getPackageAsPath(${glPackageBaseBhv}))
@@ -334,11 +334,11 @@ $database.deleteOldTableClass()
 ##
 ## Loop by tables.
 ##
-$database.info("/* * * * * * * * * * * * * * {Table Class}")
+$database.info("public void parseTableClass() {")
 #foreach ($table in $database.tables)
   #if (!$table.isForReferenceOnly())
 
-    $database.info("parseTable('${table.Name}');")
+    $database.info("    parse('${table.name}');")
     ##
     ## The name of objects
     ##
@@ -442,7 +442,7 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
     $database.reflectAllExCopyright($path)
   #end
 #end
-$database.info("* * * * * * * * * */")
+$database.info("}")
 $database.info(" ")
 
 ## ===================================================================================

@@ -55,10 +55,7 @@ public class DfOldClassHandler {
     //                                                                     Old Table Class
     //                                                                     ===============
     public void deleteOldTableClass() {
-        info("");
-        info("// /- - - - - - - - - - - - -");
-        info("// Delete old table classes!");
-        info("// - - - - - - - - - -/");
+        info("public void deleteOldTableClass() {");
         deleteOldTableClass_for_BaseBehavior();
         deleteOldTableClass_for_BaseDao();
         deleteOldTableClass_for_BaseEntity();
@@ -73,7 +70,7 @@ public class DfOldClassHandler {
         deleteOldTableClass_for_ExtendedBehavior();
         deleteOldTableClass_for_ExtendedDao();
         deleteOldTableClass_for_ExtendedEntity();
-        info("");
+        info("}");
     }
 
     protected List<String> _deletedOldTableBaseBehaviorList;
@@ -262,7 +259,7 @@ public class DfOldClassHandler {
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
-                _log.info("deleteOldTableClass('" + extendedClassName + "');");
+                _log.info("    delete('" + extendedClassName + "');");
             }
         }
     }
@@ -285,7 +282,7 @@ public class DfOldClassHandler {
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
-                info("deleteOldTableClass('" + extendedClassName + "');");
+                info("    delete('" + extendedClassName + "');");
             }
         }
     }
@@ -308,7 +305,7 @@ public class DfOldClassHandler {
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
-                info("deleteOldTableClass('" + extendedClassName + "');");
+                info("    delete('" + extendedClassName + "');");
             }
         }
     }
@@ -319,7 +316,7 @@ public class DfOldClassHandler {
 
     protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
         for (String className : deletedClassNameList) {
-            info("deleteOldTableClass('" + className + "');");
+            info("    delete('" + className + "');");
         }
     }
 
@@ -351,10 +348,7 @@ public class DfOldClassHandler {
     //                                                                 Old Customize Class
     //                                                                 ===================
     public void deleteOldCustomizeClass() {
-        info("");
-        info("// /- - - - - - - - - - - - - - -");
-        info("// Delete old customize classes!");
-        info("// - - - - - - - - - -/");
+        info("public void deleteOldCustomizeClass() {");
         deleteOldCustomizeClass_for_BaseCustomizeEntity();
         deleteOldCustomizeClass_for_DBMeta();
         deleteOldCustomizeClass_for_BaseCursor();
@@ -364,7 +358,7 @@ public class DfOldClassHandler {
         deleteOldCustomizeClass_for_ExtendedCursor();
         deleteOldCustomizeClass_for_ExtendedCursorHandler();
         deleteOldCustomizeClass_for_ExtendedParameterBean();
-        info("");
+        info("}");
     }
 
     protected List<String> _deletedOldCustomizeBaseEntityList;
@@ -521,7 +515,7 @@ public class DfOldClassHandler {
                 final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
                 if (file.exists()) {
                     file.delete();
-                    _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
+                    info("    delete('" + extendedClassName + "');");
                 }
             }
         }

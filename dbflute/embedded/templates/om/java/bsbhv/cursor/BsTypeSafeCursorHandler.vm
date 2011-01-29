@@ -1,10 +1,10 @@
-${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
+${database.allClassCopyright}package ${myBaseCursorPackageName};
 #set ($myClassName = "${myBaseTypeSafeCursorHandlerClassName}")
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.seasar.dbflute.jdbc.CursorHandler;
-import ${myExtendedDaoCursorPackageName}.${myExtendedTypeSafeCursorClassName};
+import ${myExtendedCursorPackageName}.${myExtendedTypeSafeCursorClassName};
 
 /**
  * The cursor handler of ${table.name}.

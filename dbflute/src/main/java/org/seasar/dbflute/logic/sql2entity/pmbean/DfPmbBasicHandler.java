@@ -31,8 +31,6 @@ import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
-import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData.DfPagingType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -63,8 +61,8 @@ public class DfPmbBasicHandler {
     }
 
     // ===================================================================================
-    //                                                                           Meta Data
-    //                                                                           =========
+    //                                                                          Basic Info
+    //                                                                          ==========
     public Collection<DfPmbMetaData> getPmbMetaDataList() {
         if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
             String msg = "The pmbMetaDataMap should not be null or empty.";
@@ -75,6 +73,11 @@ public class DfPmbBasicHandler {
 
     public boolean isExistPmbMetaData() {
         return _pmbMetaDataMap != null && !_pmbMetaDataMap.isEmpty();
+    }
+
+    public String getBusinessName(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        return findPmbMetaData(className).getBusinessName();
     }
 
     public String getSuperClassDefinition(String className) {
@@ -100,7 +103,7 @@ public class DfPmbBasicHandler {
         if (isTypedParameterBean(className)) {
             final String behaviorClassName = getBehaviorClassName(className);
             final String customizeEntityType;
-            if (hasCustomizeEntity(className)) {
+            if (isRelatedToCustomizeEntity(className)) {
                 customizeEntityType = getCustomizeEntityType(className);
             } else {
                 customizeEntityType = null; // no used
@@ -221,202 +224,78 @@ public class DfPmbBasicHandler {
         return prop.isJavaNativeBooleanObject(propertyType);
     }
 
+    public String getBehaviorClassName(String className) {
+        return findPmbMetaData(className).getBehaviorClassName();
+    }
+
+    public String getBehaviorQueryPath(String className) {
+        return findPmbMetaData(className).getBehaviorQueryPath();
+    }
+
+    public String getCustomizeEntityType(String className) {
+        return findPmbMetaData(className).getCustomizeEntityType();
+    }
+
+    protected boolean isRelatedToBehaviorQuery(String className) {
+        return findPmbMetaData(className).isRelatedToBehaviorQuery();
+    }
+
+    protected boolean isRelatedToCustomizeEntity(String className) {
+        return findPmbMetaData(className).isRelatedToCustomizeEntity();
+    }
+
     // ===================================================================================
     //                                                                          Typed Info
     //                                                                          ==========
     public boolean isTypedParameterBean(String className) {
-        return isTypedSelectPmb(className) || isTypedUpdatePmb(className);
+        return findPmbMetaData(className).isTypedParameterBean();
     }
 
     public boolean isTypedSelectPmb(String className) {
-        return isTypedListHandling(className) || isTypedEntityHandling(className) || isTypedCursorHandling(className)
-                || isTypedPagingHandling(className);
+        return findPmbMetaData(className).isTypedSelectPmb();
     }
 
     public boolean isTypedUpdatePmb(String className) {
-        return isTypedExecuteHandling(className);
+        return findPmbMetaData(className).isTypedUpdatePmb();
     }
 
     public boolean isTypedReturnEntityPmb(String className) {
-        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        if (customizeEntityInfo != null && customizeEntityInfo.isScalarHandling()) {
-            return false;
-        }
-        return isTypedListHandling(className) || isTypedEntityHandling(className) || isTypedPagingHandling(className);
+        return findPmbMetaData(className).isTypedReturnEntityPmb();
     }
 
     public boolean isTypedListHandling(String className) {
-        if (isTypedPagingHandling(className)) {
-            return false;
-        }
-        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        return customizeEntityInfo != null ? customizeEntityInfo.isResultHandling() : false;
+        return findPmbMetaData(className).isTypedListHandling();
     }
 
     public boolean isTypedEntityHandling(String className) {
-        // *allowed to use entity handling with paging handling
-        //if (isTypedPagingHandling(className)) {
-        //    return false;
-        //}
-        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        return customizeEntityInfo != null ? customizeEntityInfo.isResultHandling() : false;
+        return findPmbMetaData(className).isTypedEntityHandling();
     }
 
-    public boolean isTypedPagingHandling(String className) { // abstract judgement
-        return isTypedManualPagingHandling(className) || isTypedAutoPagingHandling(className);
+    public boolean isTypedPagingHandling(String className) { // abstract judgment
+        return findPmbMetaData(className).isTypedPagingHandling();
     }
 
     public boolean isTypedManualPagingHandling(String className) {
-        return judgeTypedPagingHandling(className, DfPagingType.MANUAL);
+        return findPmbMetaData(className).isTypedManualPagingHandling();
     }
 
     public boolean isTypedAutoPagingHandling(String className) {
-        return judgeTypedPagingHandling(className, DfPagingType.AUTO);
-    }
-
-    protected boolean judgeTypedPagingHandling(String className, DfPagingType targetType) {
-        if (!hasBehaviorQueryPath(className)) {
-            return false;
-        }
-        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        if (customizeEntityInfo == null) {
-            return false;
-        }
-        if (!hasPagingExtension(className)) {
-            return false;
-        }
-        final DfPagingType pagingType = findPmbMetaData(className).getPagingType();
-        if (DfPagingType.UNKNOWN.equals(pagingType)) { // "extends Paging"
-            final boolean research = researchManualPaging(className);
-            return DfPagingType.MANUAL.equals(targetType) ? research : !research;
-        } else {
-            // "extends ManualPaging" or "extends AutoPaging"
-            return targetType.equals(pagingType);
-        }
-    }
-
-    protected boolean researchManualPaging(String className) {
-        if (!hasPagingExtension(className)) {
-            return false;
-        }
-        final Map<String, String> elementMap = findBqpElementMap(className);
-        if (elementMap == null) {
-            return false;
-        }
-        final String sql = elementMap.get("sql");
-        if (sql == null) {
-            String msg = "The element value 'sql' should not be null: " + elementMap;
-            throw new IllegalStateException(msg);
-        }
-        if (getBasicProperties().isDatabaseMySQL()) {
-            return Srl.containsIgnoreCase(sql, "limit") && Srl.contains(sql, "pmb.fetchSize");
-        } else if (getBasicProperties().isDatabasePostgreSQL()) {
-            return Srl.containsAllIgnoreCase(sql, "offset", "limit");
-        } else if (getBasicProperties().isDatabaseOracle()) {
-            return Srl.containsAllIgnoreCase(sql, "rownum");
-        } else if (getBasicProperties().isDatabaseDB2()) {
-            return Srl.containsAllIgnoreCase(sql, "row_number()");
-        } else if (getBasicProperties().isDatabaseSQLServer()) {
-            return Srl.containsAllIgnoreCase(sql, "row_number()");
-        } else if (getBasicProperties().isDatabaseH2()) {
-            // H2 implements both limit only and offset + limit
-            return Srl.containsAllIgnoreCase(sql, "offset", "limit")
-                    || (Srl.containsIgnoreCase(sql, "limit") && Srl.contains(sql, "pmb.fetchSize"));
-        } else if (getBasicProperties().isDatabaseDerby()) {
-            return Srl.containsAllIgnoreCase(sql, "offset", "fetch");
-        } else if (getBasicProperties().isDatabaseSQLite()) {
-            return Srl.containsAllIgnoreCase(sql, "offset", "limit");
-        } else {
-            return false;
-        }
+        return findPmbMetaData(className).isTypedAutoPagingHandling();
     }
 
     public boolean isTypedCursorHandling(String className) {
-        if (!hasBehaviorQueryPath(className)) {
-            return false;
-        }
-        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        return customizeEntityInfo != null ? customizeEntityInfo.isCursorHandling() : false;
+        return findPmbMetaData(className).isTypedCursorHandling();
     }
 
     public boolean isTypedExecuteHandling(String className) {
-        if (!hasBehaviorQueryPath(className)) {
-            return false;
-        }
-        if (hasCustomizeEntity(className)) {
-            return false; // means select
-        }
-        final String bqpPath = getBehaviorQueryPath(className);
-        return !bqpPath.startsWith("select");
-    }
-
-    public String getBehaviorClassName(String className) {
-        final Map<String, String> elementMap = findBqpElementMap(className);
-        final String key = DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_NAME;
-        final String bqpPath = elementMap.get(key);
-        if (bqpPath == null) {
-            String msg = "The element value '" + key + "' should not be null:";
-            msg = msg + " className=" + className + " elementMap=" + elementMap;
-            throw new IllegalStateException(msg);
-        }
-        return bqpPath;
-    }
-
-    public String getBehaviorQueryPath(String className) {
-        final Map<String, String> elementMap = findBqpElementMap(className);
-        final String key = DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_QUERY_PATH;
-        final String bqpPath = elementMap.get(key);
-        if (bqpPath == null) {
-            String msg = "The element value '" + key + "' should not be null:";
-            msg = msg + " className=" + className + " elementMap=" + elementMap;
-            throw new IllegalStateException(msg);
-        }
-        return bqpPath;
-    }
-
-    public String getCustomizeEntityType(String className) {
-        final DfCustomizeEntityInfo customizeEntityInfo = findCustomizeEntityInfo(className);
-        if (customizeEntityInfo == null) {
-            String msg = "The customize entity info was not found: className=" + className;
-            throw new IllegalStateException(msg);
-        }
-        if (customizeEntityInfo.isCursorHandling()) {
-            return "Void";
-        }
-        if (customizeEntityInfo.isScalarHandling()) {
-            return customizeEntityInfo.getScalarJavaNative();
-        }
-        final String entityClassName = customizeEntityInfo.getEntityClassName();
-        if (entityClassName == null) {
-            String msg = "The class name of the customize entity was not found: className=" + className;
-            throw new IllegalStateException(msg);
-        }
-        return entityClassName;
-    }
-
-    protected boolean hasCustomizeEntity(String className) {
-        return findCustomizeEntityInfo(className) != null;
-    }
-
-    protected boolean hasBehaviorQueryPath(String className) {
-        return findBqpElementMap(className) != null;
-    }
-
-    protected DfCustomizeEntityInfo findCustomizeEntityInfo(String className) {
-        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
-        return pmbMetaData.getCustomizeEntityInfo();
-    }
-
-    protected Map<String, String> findBqpElementMap(String className) {
-        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
-        return pmbMetaData.getBqpElementMap();
+        return findPmbMetaData(className).isTypedExecuteHandling();
     }
 
     // ===================================================================================
     //                                                                           Procedure
     //                                                                           =========
     public boolean isForProcedure(String className) {
-        return findPmbMetaData(className).getProcedureName() != null;
+        return findPmbMetaData(className).isRelatedToProcedure();
     }
 
     public String getProcedureName(String className) {
@@ -424,16 +303,11 @@ public class DfPmbBasicHandler {
     }
 
     public boolean isProcedureCalledBySelect(String className) {
-        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
-        return pmbMetaData.isProcedureCalledBySelect();
+        return findPmbMetaData(className).isProcedureCalledBySelect();
     }
 
-    public boolean isRefCustomizeEntity(String className) {
-        final DfPmbMetaData metaData = _pmbMetaDataMap.get(className);
-        if (metaData == null) {
-            return false;
-        }
-        return metaData.isRefCustomizeEntity();
+    public boolean isProcedureRefCustomizeEntity(String className) {
+        return findPmbMetaData(className).isProcedureRefCustomizeEntity();
     }
 
     public boolean hasProcedureOverload(String className) {

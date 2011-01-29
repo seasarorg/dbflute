@@ -4,7 +4,8 @@ ${database.allClassCopyright}package ${glPackageExtendedParameterBean};
 import ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName};
 
 /**
- * The parameter-bean of ${pmbClassName}.
+ * ${database.extendedClassDescriptionBeginMark}
+ * ${database.extendedClassDescriptionEndMark}
  * <p>
  * You can implement your original methods here.
  * This class remains when re-generating.

@@ -4,7 +4,7 @@ using System;
 using System.Data;
 using Seasar.Framework.Util;
 
-namespace ${myExtendedDaoCursorPackageName} {
+namespace ${myExtendedCursorPackageName} {
 
     public partial class ${myClassName} {
 

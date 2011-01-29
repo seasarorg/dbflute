@@ -17,6 +17,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    // here fixed line separator (simplified)
     protected static final String NORMAL_LINE_SEPARATOR = "\n";
     protected static final String SPECIAL_LINE_SEPARATOR = "&#xa;";
 

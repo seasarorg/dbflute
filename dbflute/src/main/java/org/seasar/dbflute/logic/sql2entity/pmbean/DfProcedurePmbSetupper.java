@@ -180,7 +180,7 @@ public class DfProcedurePmbSetupper {
             parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
             parameterBeanMetaData.setPropertyNameColumnInfoMap(propertyNameColumnInfoMap);
             parameterBeanMetaData.setProcedureCalledBySelect(procedure.isCalledBySelect());
-            parameterBeanMetaData.setRefCustomizeEntity(refCustomizeEntity);
+            parameterBeanMetaData.setProcedureRefCustomizeEntity(refCustomizeEntity);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
         }
         _log.info("= = = = = = = = = =/");

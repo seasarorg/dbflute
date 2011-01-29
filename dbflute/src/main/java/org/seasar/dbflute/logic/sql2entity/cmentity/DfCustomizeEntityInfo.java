@@ -91,6 +91,22 @@ public class DfCustomizeEntityInfo {
     }
 
     // ===================================================================================
+    //                                                                             Display
+    //                                                                             =======
+    public String buildHandlingDisp() {
+        if (isCursorHandling()) {
+            return "(cursor)";
+        }
+        if (isScalarHandling()) {
+            return "(scalar)";
+        }
+        if (hasTypeStructInfo()) {
+            return "(struct)";
+        }
+        return "";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getTableDbName() {

@@ -61,14 +61,14 @@ public class DfBehaviorQueryPathSetupper {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfBehaviorQueryPathSetupper.class);
 
+    public static final String KEY_PATH = "path";
+    public static final String KEY_SUB_DIRECTORY_PATH = "subDirectoryPath";
+    public static final String KEY_ENTITY_NAME = "entityName";
     public static final String KEY_BEHAVIOR_NAME = "behaviorName";
     public static final String KEY_BEHAVIOR_QUERY_PATH = "behaviorQueryPath";
+    public static final String KEY_TITLE = "title";
+    public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_SQL = "sql";
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected String _flatDirectoryPackage;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -216,9 +216,9 @@ public class DfBehaviorQueryPathSetupper {
             final String behaviorQueryPath = simpleFileName.substring(behaviorQueryPathStartIndex,
                     behaviorQueryPathEndIndex);
             final Map<String, String> behaviorQueryElement = new LinkedHashMap<String, String>();
-            behaviorQueryElement.put("path", path);
-            behaviorQueryElement.put("subDirectoryPath", subDirectoryPath);
-            behaviorQueryElement.put("entityName", entityName);
+            behaviorQueryElement.put(KEY_PATH, path);
+            behaviorQueryElement.put(KEY_SUB_DIRECTORY_PATH, subDirectoryPath);
+            behaviorQueryElement.put(KEY_ENTITY_NAME, entityName);
             behaviorQueryElement.put(KEY_BEHAVIOR_NAME, behaviorName);
             behaviorQueryElement.put(KEY_BEHAVIOR_QUERY_PATH, behaviorQueryPath);
             behaviorQueryPathMap.put(path, behaviorQueryElement);
@@ -250,8 +250,8 @@ public class DfBehaviorQueryPathSetupper {
         elementMap.put("customizeEntity", customizeEntity);
         elementMap.put("parameterBean", parameterBean);
         elementMap.put("cursor", analyzer.isCursor(sql) ? "cursor" : null);
-        elementMap.put("title", analyzer.getTitle(sql));
-        elementMap.put("description", analyzer.getDescription(sql));
+        elementMap.put(KEY_TITLE, analyzer.getTitle(sql));
+        elementMap.put(KEY_DESCRIPTION, analyzer.getDescription(sql));
         elementMap.put(KEY_SQL, sql);
     }
 
@@ -311,8 +311,9 @@ public class DfBehaviorQueryPathSetupper {
         final Set<Entry<String, Map<String, String>>> entrySet = behaviorQueryPathMap.entrySet();
         for (Entry<String, Map<String, String>> entry : entrySet) {
             final Map<String, String> behaviorQueryElementMap = entry.getValue();
-            final String behaviorName = behaviorQueryElementMap.get("behaviorName"); // on SQL file
-            final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
+            final String behaviorName = behaviorQueryElementMap.get(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_NAME); // on SQL file
+            final String behaviorQueryPath = behaviorQueryElementMap
+                    .get(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_QUERY_PATH);
 
             // relation point between SQL file and BsBhv
             File bsbhvFile = bsbhvFileMap.get(behaviorName);
@@ -380,8 +381,8 @@ public class DfBehaviorQueryPathSetupper {
 
     protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap,
             Map<String, String> behaviorQueryElementMap, String bsbhvPathBase) {
-        final String path = behaviorQueryElementMap.get("path");
-        final String behaviorName = behaviorQueryElementMap.get("behaviorName");
+        final String path = behaviorQueryElementMap.get(KEY_PATH);
+        final String behaviorName = behaviorQueryElementMap.get(KEY_BEHAVIOR_NAME);
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The behavior was Not Found!" + ln();
@@ -405,15 +406,12 @@ public class DfBehaviorQueryPathSetupper {
      * @param reflectResourceMap The map of reflect resource. (NotNull)
      */
     protected void handleReflectResource(Map<File, Map<String, Map<String, String>>> reflectResourceMap) {
-        _log.info(" ");
-        _log.info("[Behavior Query Path]");
         final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = reflectResourceMap.entrySet();
         for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
             final File bsbhvFile = entry.getKey();
             final Map<String, Map<String, String>> resourceElementMap = entry.getValue();
             writeBehaviorQueryPath(bsbhvFile, resourceElementMap);
         }
-        _log.info(" ");
     }
 
     /**
@@ -422,37 +420,32 @@ public class DfBehaviorQueryPathSetupper {
      */
     protected void writeBehaviorQueryPath(File bsbhvFile, Map<String, Map<String, String>> resourceElementMap) {
         final String encoding = getBasicProperties().getSourceFileEncoding();
-        final BufferedReader bufferedReader;
-        try {
-            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(bsbhvFile), encoding));
-        } catch (UnsupportedEncodingException e) {
-            String msg = "The encoding is unsupported: encoding=" + encoding;
-            throw new IllegalStateException(msg, e);
-        } catch (FileNotFoundException e) {
-            String msg = "The file of base behavior was Not Found: bsbhvFile=" + bsbhvFile;
-            throw new IllegalStateException(msg, e);
-        }
-        final StringBuilder logSb = new StringBuilder();
-        final String path = getSlashPath(bsbhvFile);
-        if (path.contains("/")) {
-            logSb.append(path.substring(path.lastIndexOf("/") + "/".length()));
-        } else {
-            logSb.append(path);
-        }
+        final String lineSep = getBasicProperties().getSourceCodeLineSeparator();
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
         final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
         final String behaviorQueryPathEndMark = getBasicProperties().getBehaviorQueryPathEndMark();
         final DfDocumentProperties docprop = getDocumentProperties();
+        final BufferedReader br;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(bsbhvFile), encoding));
+        } catch (UnsupportedEncodingException e) {
+            String msg = "The encoding is unsupported: encoding=" + encoding;
+            throw new IllegalStateException(msg, e);
+        } catch (FileNotFoundException e) {
+            String msg = "The file of base behavior was not found: bsbhvFile=" + bsbhvFile;
+            throw new IllegalStateException(msg, e);
+        }
         String lineString = null;
         final StringBuilder sb = new StringBuilder();
         try {
             boolean targetArea = false;
             boolean done = false;
             while (true) {
-                lineString = bufferedReader.readLine();
+                lineString = br.readLine();
                 if (lineString == null) {
                     if (targetArea) {
-                        String msg = "The end mark of behavior query path was NOT found: bsbhvFile=" + bsbhvFile;
+                        String msg = "The end mark of behavior query path was not found:";
+                        msg = msg + " bsbhvFile=" + bsbhvFile;
                         throw new IllegalStateException(msg);
                     }
                     break;
@@ -464,30 +457,30 @@ public class DfBehaviorQueryPathSetupper {
                         continue;
                     }
                 }
-                sb.append(lineString).append("\n");
+                sb.append(lineString).append(lineSep);
                 if (!done && lineString.contains(behaviorQueryPathBeginMark)) {
                     targetArea = true;
+                    final String indent = lineString.substring(0, lineString.indexOf(behaviorQueryPathBeginMark));
                     final Set<String> behaviorQueryPathSet = resourceElementMap.keySet();
                     for (String behaviorQueryPath : behaviorQueryPathSet) {
                         final Map<String, String> behaviorQueryElementMap = resourceElementMap.get(behaviorQueryPath);
                         final StringBuilder definitionLineSb = new StringBuilder();
-                        final String indent = lineString.substring(0, lineString.indexOf(behaviorQueryPathBeginMark));
 
                         final String title = behaviorQueryElementMap.get("title");
                         if (title != null && title.trim().length() > 0) {
                             final String resolvedTitle = docprop.resolveTextForJavaDoc(title, indent);
                             final String commentExp;
                             if (getBasicProperties().isTargetLanguageCSharp()) {
-                                commentExp = indent + "/// <summary>" + resolvedTitle + " </summary>\n";
+                                commentExp = indent + "/// <summary>" + resolvedTitle + " </summary>" + lineSep;
                             } else {
-                                commentExp = indent + "/** " + resolvedTitle + " */\n"; // basically here
+                                commentExp = indent + "/** " + resolvedTitle + " */" + lineSep; // basically here
                             }
                             definitionLineSb.append(commentExp);
                         }
 
                         definitionLineSb.append(indent);
                         definitionLineSb.append(grammarInfo.getPublicStaticDefinition());
-                        final String subDirectoryPath = behaviorQueryElementMap.get("subDirectoryPath");
+                        final String subDirectoryPath = behaviorQueryElementMap.get(KEY_SUB_DIRECTORY_PATH);
                         if (Srl.is_NotNull_and_NotTrimmedEmpty(subDirectoryPath)) {
                             final String subDirectoryName = Srl.replace(subDirectoryPath, "/", "_");
                             final String subDirectoryValue = Srl.replace(subDirectoryPath, "/", ":");
@@ -501,35 +494,31 @@ public class DfBehaviorQueryPathSetupper {
                             definitionLineSb.append(" = \"").append(behaviorQueryPath).append("\";");
                         }
 
-                        String tmp4log = definitionLineSb.toString();
-                        logSb.append("\n").append(tmp4log.substring(tmp4log.indexOf(" PATH_")));
-
-                        definitionLineSb.append("\n");
+                        definitionLineSb.append(lineSep);
                         sb.append(definitionLineSb);
                     }
                     done = true;
                 }
             }
-            _log.info(logSb.toString());
             if (!done) {
-                _log.info("  --> The mark of behavior query path was Not Found!");
+                _log.warn("*The mark of behavior query path was not found: " + bsbhvFile);
             }
         } catch (IOException e) {
-            String msg = "bufferedReader.readLine() threw the exception: current line=" + lineString;
+            String msg = "BufferedReader.readLine() threw the exception: current line=" + lineString;
             throw new IllegalStateException(msg, e);
         } finally {
             try {
-                bufferedReader.close();
+                br.close();
             } catch (IOException ignored) {
                 _log.warn(ignored.getMessage());
             }
         }
 
-        BufferedWriter bufferedWriter = null;
+        BufferedWriter bw = null;
         try {
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(bsbhvFile), encoding));
-            bufferedWriter.write(sb.toString());
-            bufferedWriter.flush();
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(bsbhvFile), encoding));
+            bw.write(sb.toString());
+            bw.flush();
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: encoding=" + encoding;
             throw new IllegalStateException(msg, e);
@@ -537,12 +526,12 @@ public class DfBehaviorQueryPathSetupper {
             String msg = "The file of base behavior was not found: bsbhvFile=" + bsbhvFile;
             throw new IllegalStateException(msg, e);
         } catch (IOException e) {
-            String msg = "bufferedWriter.write() threw the exception: bsbhvFile=" + bsbhvFile;
+            String msg = "BufferedWriter.write() threw the exception: bsbhvFile=" + bsbhvFile;
             throw new IllegalStateException(msg, e);
         } finally {
-            if (bufferedWriter != null) {
+            if (bw != null) {
                 try {
-                    bufferedWriter.close();
+                    bw.close();
                 } catch (IOException ignored) {
                     _log.warn(ignored.getMessage());
                 }
@@ -619,13 +608,5 @@ public class DfBehaviorQueryPathSetupper {
 
     protected String getApplicationBehaviorAdditionalSuffix() {
         return getBasicProperties().getApplicationBehaviorAdditionalSuffix();
-    }
-
-    public String getFlatDirectoryPackage() {
-        return _flatDirectoryPackage;
-    }
-
-    public void setFlatDirectoryPackage(String flatDirectoryPackage) {
-        this._flatDirectoryPackage = flatDirectoryPackage;
     }
 }
