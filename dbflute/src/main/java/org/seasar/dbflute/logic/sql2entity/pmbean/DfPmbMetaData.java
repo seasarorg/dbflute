@@ -155,18 +155,24 @@ public class DfPmbMetaData {
     }
 
     public boolean isTypedListHandling() {
+        if (!isRelatedToBehaviorQuery() || !isRelatedToCustomizeEntity()) {
+            return false;
+        }
         if (isTypedPagingHandling()) {
             return false;
         }
-        return isRelatedToCustomizeEntity() ? _customizeEntityInfo.isResultHandling() : false;
+        return _customizeEntityInfo.isResultHandling();
     }
 
     public boolean isTypedEntityHandling() {
+        if (!isRelatedToBehaviorQuery() || !isRelatedToCustomizeEntity()) {
+            return false;
+        }
         // *allowed to use entity handling with paging handling
         //if (isTypedPagingHandling()) {
         //    return false;
         //}
-        return isRelatedToCustomizeEntity() ? _customizeEntityInfo.isResultHandling() : false;
+        return _customizeEntityInfo.isResultHandling();
     }
 
     public boolean isTypedPagingHandling() { // abstract judgment
@@ -182,10 +188,7 @@ public class DfPmbMetaData {
     }
 
     protected boolean judgeTypedPagingHandling(DfPagingType targetType) {
-        if (!isRelatedToBehaviorQuery()) {
-            return false;
-        }
-        if (!isRelatedToCustomizeEntity()) {
+        if (!isRelatedToBehaviorQuery() || !isRelatedToCustomizeEntity()) {
             return false;
         }
         if (!hasPagingExtension()) {
@@ -236,10 +239,10 @@ public class DfPmbMetaData {
     }
 
     public boolean isTypedCursorHandling() {
-        if (!isRelatedToBehaviorQuery()) {
+        if (!isRelatedToBehaviorQuery() || !isRelatedToCustomizeEntity()) {
             return false;
         }
-        return isRelatedToCustomizeEntity() ? _customizeEntityInfo.isCursorHandling() : false;
+        return _customizeEntityInfo.isCursorHandling();
     }
 
     public boolean isTypedExecuteHandling() {
