@@ -372,11 +372,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             if (entityInfo.isScalarHandling()) {
                 // it does not generate an entity that has only one column
+                tbl.setDatabase(database); // one-way love for utility
                 entityInfo.setScalarJavaNative(tbl.getColumnList().get(0).getJavaNative());
             } else {
                 // initialize a class name of the entity for typed parameter-bean
+                database.addTable(tbl); // should be before getting names
                 entityInfo.setEntityClassName(tbl.getExtendedEntityClassName());
-                database.addTable(tbl);
             }
             logSb.append(ln());
         }

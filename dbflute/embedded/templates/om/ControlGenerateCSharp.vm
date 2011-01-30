@@ -1259,6 +1259,7 @@ $generator.parse("om/${glResourceDirectory}/allcommon/DBFluteConfig.${glTemplate
   $database.info("    parse('JavaReflection');")
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaReflection}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaReflection.${glTemplateFileExtension}",$path,"", "")
+  $database.info("}")
 #end
 
 ## -----------------------------------------------------------------------------------------------------
