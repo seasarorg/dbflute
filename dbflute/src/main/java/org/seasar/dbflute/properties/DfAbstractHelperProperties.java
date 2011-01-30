@@ -502,19 +502,23 @@ public abstract class DfAbstractHelperProperties {
     }
 
     protected DfBasicProperties getBasicProperties() {
-        return DfPropertiesHandler.getInstance().getBasicProperties(getProperties());
+        return handler().getBasicProperties(getProperties());
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {
-        return DfPropertiesHandler.getInstance().getDatabaseProperties(getProperties());
+        return handler().getDatabaseProperties(getProperties());
     }
 
     protected DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
-        return DfPropertiesHandler.getInstance().getAdditionalForeignKeyProperties(getProperties());
+        return handler().getAdditionalForeignKeyProperties(getProperties());
+    }
+
+    protected DfCommonColumnProperties getCommonColumnProperties() {
+        return handler().getCommonColumnProperties(getProperties());
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
-        return DfPropertiesHandler.getInstance().getLittleAdjustmentProperties(getProperties());
+        return handler().getLittleAdjustmentProperties(getProperties());
     }
 
     // ===============================================================================

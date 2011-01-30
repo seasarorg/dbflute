@@ -272,7 +272,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
                 value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
             }
             if (value != null && value.contains("$$AccessContext$$")) {
-                final String accessContext = "org.seasar.dbflute.AccessContext";
+                final String accessContext = getAccessContextFqcn();
                 value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
             }
             final String prefixMark = COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK;
@@ -287,6 +287,18 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             }
             map.put(key, value);
         }
+    }
+
+    public String getAccessContextFqcn() {
+        final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
+        final String accessContext;
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            final String projectPrefix = getBasicProperties().getProjectPrefix();
+            accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
+        } else {
+            accessContext = "org.seasar.dbflute.AccessContext";
+        }
+        return accessContext;
     }
 
     // -----------------------------------------------------

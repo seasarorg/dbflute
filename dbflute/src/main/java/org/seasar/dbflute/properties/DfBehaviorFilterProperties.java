@@ -206,7 +206,7 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
                 value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
             }
             if (value != null && value.contains("$$AccessContext$$")) {
-                final String accessContext = "org.seasar.dbflute.AccessContext";
+                final String accessContext = getCommonColumnProperties().getAccessContextFqcn();
                 value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
             }
             map.put(key, value);
