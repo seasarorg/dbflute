@@ -29,28 +29,22 @@ public class DfPmbPropertyOptionFinder {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _className;
     protected final String _propertyName;
-    protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
+    protected final DfPmbMetaData _pmbMetaData;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPmbPropertyOptionFinder(String className, String propertyName, Map<String, DfPmbMetaData> pmbMetaDataMap) {
-        _className = className;
+    public DfPmbPropertyOptionFinder(String propertyName, DfPmbMetaData pmbMetaData) {
         _propertyName = propertyName;
-        _pmbMetaDataMap = pmbMetaDataMap;
+        _pmbMetaData = pmbMetaData;
     }
 
     // ===================================================================================
     //                                                                         Find Option
     //                                                                         ===========
-    public String findPmbMetaDataPropertyOption(String className, String propertyName) {
-        final DfPmbMetaData meta = _pmbMetaDataMap.get(_className);
-        if (meta == null) {
-            return null;
-        }
-        final Map<String, String> optionMap = meta.getPropertyNameOptionMap();
+    public String findPmbMetaDataPropertyOption(String propertyName) {
+        final Map<String, String> optionMap = _pmbMetaData.getPropertyNameOptionMap();
         return optionMap != null ? optionMap.get(propertyName) : null;
     }
 
@@ -59,6 +53,6 @@ public class DfPmbPropertyOptionFinder {
     //                                                                         ===========
     public static List<String> splitOption(String option) {
         final String delimiter = "|";
-        return DfStringUtil.splitList(option, delimiter);
+        return DfStringUtil.splitListTrimmed(option, delimiter);
     }
 }

@@ -91,7 +91,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSqlFileCollector;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbBasicHandler;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbGenerationHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -322,13 +322,13 @@ public class Database {
     // ===================================================================================
     //                                                                      Parameter Bean
     //                                                                      ==============
-    protected DfPmbBasicHandler _pmbBasicHandler;
+    protected DfPmbGenerationHandler _pmbBasicHandler;
 
-    protected DfPmbBasicHandler getPmbBasicHandler() {
+    protected DfPmbGenerationHandler getPmbBasicHandler() {
         if (_pmbBasicHandler != null) {
             return _pmbBasicHandler;
         }
-        _pmbBasicHandler = new DfPmbBasicHandler(_pmbMetaDataMap);
+        _pmbBasicHandler = new DfPmbGenerationHandler(_pmbMetaDataMap);
         return _pmbBasicHandler;
     }
 
@@ -573,6 +573,11 @@ public class Database {
     // -----------------------------------------------------
     //                                 Option Classification
     //                                 ---------------------
+    public boolean isPmbMetaDataPropertyOptionClassificationSetter(String className, String propertyName) {
+        return getPmbBasicHandler()
+                .isPropertyOptionClassificationSetter(className, propertyName, _sql2entitySchemaData);
+    }
+
     public boolean isPmbMetaDataPropertyOptionClassification(String className, String propertyName) {
         return getPmbBasicHandler().isPropertyOptionClassification(className, propertyName, _sql2entitySchemaData);
     }
@@ -596,7 +601,7 @@ public class Database {
     //                                               -------
     public String getPmbMetaDataPropertyRefColumnInfo(String className, String propertyName) {
         try {
-            final DfPmbBasicHandler handler = getPmbBasicHandler();
+            final DfPmbGenerationHandler handler = getPmbBasicHandler();
             return handler.getPropertyRefColumnInfo(className, propertyName, _sql2entitySchemaData);
         } catch (RuntimeException e) { // just in case
             String msg = "Failed to get ref-column info:";

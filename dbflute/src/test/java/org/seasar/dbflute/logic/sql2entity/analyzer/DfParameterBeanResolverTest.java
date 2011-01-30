@@ -143,6 +143,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
     }
 
     protected DfParameterBeanResolver createTarget() {
-        return new DfParameterBeanResolver(null, null);
+        return new DfParameterBeanResolver(null, null, null);
     }
 }

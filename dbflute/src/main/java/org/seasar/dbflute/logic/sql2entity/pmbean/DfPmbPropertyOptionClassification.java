@@ -37,18 +37,18 @@ public class DfPmbPropertyOptionClassification {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _className;
-    protected String _propertyName;
-    protected DfClassificationProperties _classificationProperties;
-    protected DfPmbPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
+    protected final DfPmbMetaData _pmbMetaData;
+    protected final String _propertyName;
+    protected final DfClassificationProperties _classificationProperties;
+    protected final DfPmbPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPmbPropertyOptionClassification(String className, String propertyName,
+    public DfPmbPropertyOptionClassification(DfPmbMetaData pmbMetaData, String propertyName,
             DfClassificationProperties classificationProperties,
             DfPmbPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
-        _className = className;
+        _pmbMetaData = pmbMetaData;
         _propertyName = propertyName;
         _classificationProperties = classificationProperties;
         _pmbMetaDataPropertyOptionFinder = pmbMetaDataPropertyOptionFinder;
@@ -58,11 +58,11 @@ public class DfPmbPropertyOptionClassification {
     //                                                                      Classification
     //                                                                      ==============
     public boolean isPmbMetaDataPropertyOptionClassification() {
-        return extractClassificationNameFromOption(_className, _propertyName, false) != null;
+        return extractClassificationNameFromOption(_propertyName, false) != null;
     }
 
     public String getPmbMetaDataPropertyOptionClassificationName() {
-        return extractClassificationNameFromOption(_className, _propertyName, true);
+        return extractClassificationNameFromOption(_propertyName, true);
     }
 
     public String getPmbMetaDataPropertyOptionClassificationCodeType() {
@@ -77,7 +77,7 @@ public class DfPmbPropertyOptionClassification {
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList() {
-        final String classificationName = extractClassificationNameFromOption(_className, _propertyName, true);
+        final String classificationName = extractClassificationNameFromOption(_propertyName, true);
         final List<Map<String, String>> classificationMapList = _classificationProperties
                 .getClassificationMapList(classificationName);
         if (classificationMapList == null) {
@@ -90,18 +90,18 @@ public class DfPmbPropertyOptionClassification {
         String msg = "Look the message below:" + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
         msg = msg + "The classification was not found:" + ln();
-        msg = msg + " " + _className + " " + _propertyName;
+        msg = msg + " " + _pmbMetaData.getClassName() + " " + _propertyName;
         msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalStateException(msg);
     }
 
-    protected String extractClassificationNameFromOption(String className, String propertyName, boolean check) {
+    protected String extractClassificationNameFromOption(String propertyName, boolean check) {
         final String pmbMetaDataPropertyOption = getPmbMetaDataPropertyOption();
         if (pmbMetaDataPropertyOption == null) {
             if (check) {
                 String msg = "The property name didn't have its option:";
-                msg = msg + " " + className + "." + propertyName;
+                msg = msg + " " + _pmbMetaData.getClassName() + "." + propertyName;
                 throw new IllegalStateException(msg);
             } else {
                 return null;
@@ -112,7 +112,7 @@ public class DfPmbPropertyOptionClassification {
             if (option.trim().length() == 0) {
                 if (check) {
                     String msg = "The option of the property name should not be empty:";
-                    msg = msg + " property=" + className + "." + propertyName;
+                    msg = msg + " property=" + _pmbMetaData.getClassName() + "." + propertyName;
                     throw new IllegalStateException(msg);
                 } else {
                     return null;
@@ -121,7 +121,6 @@ public class DfPmbPropertyOptionClassification {
             final List<String> splitOption = splitOption(option);
             String firstOption = null;
             for (String element : splitOption) {
-                element = element.trim();
                 if (element.startsWith(OPTION_PREFIX) && element.endsWith(OPTION_SUFFIX)) {
                     firstOption = element;
                     break;
@@ -130,7 +129,7 @@ public class DfPmbPropertyOptionClassification {
             if (firstOption == null) {
                 if (check) {
                     String msg = "The option of class name and the property name should be 'cls(xxx)':";
-                    msg = msg + " property=" + className + "." + propertyName + ":" + option;
+                    msg = msg + " property=" + _pmbMetaData.getClassName() + "." + propertyName + ":" + option;
                     throw new IllegalStateException(msg);
                 } else {
                     return null;
@@ -146,7 +145,7 @@ public class DfPmbPropertyOptionClassification {
             String msg = "Look the message below:" + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
             msg = msg + "IndexOutOfBounds ocurred:" + ln();
-            msg = msg + " " + _className + " " + _propertyName;
+            msg = msg + " " + _pmbMetaData.getClassName() + " " + _propertyName;
             msg = msg + ":" + option + ln();
             msg = msg + "{" + option + "}.substring(" + clsIdx + ", " + clsEndIdx + ")" + ln();
             msg = msg + "* * * * * * * * * */";
@@ -158,7 +157,7 @@ public class DfPmbPropertyOptionClassification {
     //                                                                       Assist Helper
     //                                                                       =============
     protected String getPmbMetaDataPropertyOption() {
-        return _pmbMetaDataPropertyOptionFinder.findPmbMetaDataPropertyOption(_className, _propertyName);
+        return _pmbMetaDataPropertyOptionFinder.findPmbMetaDataPropertyOption(_propertyName);
     }
 
     protected List<String> splitOption(String option) {

@@ -20,9 +20,12 @@ import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.torque.engine.database.model.AppData;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
@@ -54,6 +57,7 @@ public class DfParameterBeanResolver {
     //                                                                           =========
     protected final DfSql2EntityMeta _sql2entityMeta;
     protected final File _sqlFile;
+    protected final AppData _schemaData;
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
     protected final DfSqlFileNameResolver _sqlFileNameResolver = new DfSqlFileNameResolver();
     protected final DfPropertyTypePackageResolver _propertyTypePackageResolver = new DfPropertyTypePackageResolver();
@@ -62,9 +66,10 @@ public class DfParameterBeanResolver {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfParameterBeanResolver(DfSql2EntityMeta sql2entityMeta, File sqlFile) {
+    public DfParameterBeanResolver(DfSql2EntityMeta sql2entityMeta, File sqlFile, AppData schemaData) {
         _sql2entityMeta = sql2entityMeta;
         _sqlFile = sqlFile;
+        _schemaData = schemaData;
     }
 
     // ===================================================================================
@@ -83,6 +88,7 @@ public class DfParameterBeanResolver {
         final DfPmbMetaData pmbMetaData = new DfPmbMetaData();
         processClassHeader(sql, parameterBeanName, pmbMetaData);
         processParameterProperty(sql, parameterBeanName, pmbMetaData);
+        pmbMetaData.adjustPropertyMetaFinally(_schemaData);
         return pmbMetaData;
     }
 
@@ -126,14 +132,16 @@ public class DfParameterBeanResolver {
     protected void processParameterProperty(String sql, String parameterBeanName, DfPmbMetaData pmbMetaData) {
         final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
         final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
+        final Set<String> autoDetectedPropertyNameSet = new LinkedHashSet<String>();
         pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
         pmbMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
+        pmbMetaData.setAutoDetectedPropertyNameSet(autoDetectedPropertyNameSet);
         final List<String> parameterBeanElement = getParameterBeanPropertyTypeList(sql);
         final String autoDetectMark = "AutoDetect";
         for (String element : parameterBeanElement) {
             element = element.trim();
             if (element.equalsIgnoreCase(autoDetectMark)) {
-                processAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap);
+                processAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
                 break;
             }
         }
@@ -160,6 +168,7 @@ public class DfParameterBeanResolver {
                 msg = msg + " But: element=" + element + " srcFile=" + _sqlFile;
                 throw new IllegalStateException(msg);
             }
+            // ParameterBean has the "import" clause of language-embedded utility
             final String typeName = resolvePackageNameExceptUtil(propertyDef.substring(0, nameIndex).trim());
             final String propertyName = propertyDef.substring(nameIndex + nameDelimiter.length()).trim();
             if (propertyNameTypeMap.containsKey(propertyName)) {
@@ -190,31 +199,35 @@ public class DfParameterBeanResolver {
     //                                            AutoDetect
     //                                            ----------
     protected void processAutoDetect(String sql, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap) {
+            Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet) {
         final SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         final Node rootNode = analyzer.analyze();
-        doProcessAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, rootNode);
+        doProcessAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet, rootNode);
     }
 
     protected void doProcessAutoDetect(String sql, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap, Node node) {
+            Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet, Node node) {
         // only bind variable comment is supported
         // because simple specification is very important here
         if (node instanceof BindVariableNode) {
             final BindVariableNode bindNode = (BindVariableNode) node;
-            processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, bindNode);
+            processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet,
+                    bindNode);
             //} else if (node instanceof IfNode) {
             //    final IfNode ifNode = (IfNode) node;
             //    doProcessAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
         }
         for (int i = 0; i < node.getChildSize(); i++) {
             final Node childNode = node.getChild(i);
-            doProcessAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, childNode); // recursive call
+
+            // recursive call
+            doProcessAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet, childNode);
         }
     }
 
     protected void processAutoDetectBindNode(String sql, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap, BindVariableNode variableNode) {
+            Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet,
+            BindVariableNode variableNode) {
         final String expression = variableNode.getExpression();
         final String testValue = variableNode.getTestValue();
         if (testValue == null) {
@@ -236,6 +249,7 @@ public class DfParameterBeanResolver {
         }
         final String typeName = derivePropertyTypeFromTestValue(testValue);
         propertyNameTypeMap.put(propertyName, typeName); // override if same one exists
+        autoDetectedPropertyNameSet.add(propertyName);
         final String option = variableNode.getOptionDef();
         // add option if it exists
         // so it is enough to set an option to only one bind variable comment

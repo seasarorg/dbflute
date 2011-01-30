@@ -193,7 +193,7 @@ namespace ${glPackageExtendedParameterBean} {
             ${variableName} = new ${glFromToOption}().CompareAsDate().filterToDate(${argumentName});
         }
 #end
-#if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
 #set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
 #set ($propertyTypeRemovedCSharpNullable = $database.getPmbMetaDataPropertyTypeRemovedCSharpNullable($pmbClassName, $propertyName))
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))

@@ -44,16 +44,16 @@ public class DfPmbPropertyOptionReference {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _className;
-    protected String _propertyName;
-    protected DfPmbPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
+    protected final DfPmbMetaData _pmbMetaData;
+    protected final String _propertyName;
+    protected final DfPmbPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPmbPropertyOptionReference(String className, String propertyName,
+    public DfPmbPropertyOptionReference(DfPmbMetaData pmbMetaData, String propertyName,
             DfPmbPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
-        _className = className;
+        _pmbMetaData = pmbMetaData;
         _propertyName = propertyName;
         _pmbMetaDataPropertyOptionFinder = pmbMetaDataPropertyOptionFinder;
     }
@@ -85,7 +85,6 @@ public class DfPmbPropertyOptionReference {
             final List<String> splitOption = splitOption(optionExp);
             String firstOption = null;
             for (String element : splitOption) {
-                element = element.trim();
                 if (element.startsWith(refPrefix) && element.endsWith(refSuffix)) {
                     firstOption = element;
                     break;
@@ -110,22 +109,26 @@ public class DfPmbPropertyOptionReference {
         }
         final Table table = database.getTable(tableName);
         if (table == null) {
-            throwParameterBeanReferenceTableNotFoundException(option, _className, _propertyName, tableName);
+            throwParameterBeanReferenceTableNotFoundException(option, tableName);
         }
-        final Column column;
+        final String columnKeyName;
         if (columnName != null) {
-            column = table.getColumn(columnName);
+            columnKeyName = columnName;
         } else {
-            column = table.getColumn(_propertyName);
+            if (_pmbMetaData.isPropertyTypeList(_propertyName) && Srl.endsWith(_propertyName, "List")) {
+                columnKeyName = Srl.substringLastFront(_propertyName, "List"); // e.g. statusList to status
+            } else {
+                columnKeyName = _propertyName;
+            }
         }
+        final Column column = table.getColumn(columnKeyName);
         if (column == null) {
-            throwParameterBeanReferenceColumnNotFoundException(option, _className, _propertyName, tableName, columnName);
+            throwParameterBeanReferenceColumnNotFoundException(option, tableName, columnName);
         }
         return column;
     }
 
-    protected void throwParameterBeanReferenceTableNotFoundException(String option, String className,
-            String propertyName, String tableName) {
+    protected void throwParameterBeanReferenceTableNotFoundException(String option, String tableName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The reference table for parameter-bean property was not found!");
         br.addItem("Advice");
@@ -136,9 +139,9 @@ public class DfPmbPropertyOptionReference {
         br.addElement("  (o):");
         br.addElement("    -- !!String memberName:ref(MEMBER.MEMBER_NAME)!!");
         br.addItem("ParameterBean");
-        br.addElement(className);
+        br.addElement(_pmbMetaData.getClassName());
         br.addItem("Property");
-        br.addElement(propertyName);
+        br.addElement(_propertyName);
         br.addItem("NotFound Table");
         br.addElement(tableName);
         br.addItem("Option");
@@ -147,8 +150,7 @@ public class DfPmbPropertyOptionReference {
         throw new DfParameterBeanReferenceTableNotFoundException(msg);
     }
 
-    protected void throwParameterBeanReferenceColumnNotFoundException(String option, String className,
-            String propertyName, String tableName, String columnName) {
+    protected void throwParameterBeanReferenceColumnNotFoundException(String option, String tableName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The reference column for parameter-bean property was not found!");
         br.addItem("Advice");
@@ -159,9 +161,9 @@ public class DfPmbPropertyOptionReference {
         br.addElement("  (o):");
         br.addElement("    -- !!String memberName:ref(MEMBER.MEMBER_NAME)!!");
         br.addItem("ParameterBean");
-        br.addElement(className);
+        br.addElement(_pmbMetaData.getClassName());
         br.addItem("Property");
-        br.addElement(propertyName);
+        br.addElement(_propertyName);
         br.addItem("Table");
         br.addElement(tableName);
         br.addItem("NotFound Column");
@@ -176,7 +178,7 @@ public class DfPmbPropertyOptionReference {
     //                                                                       Assist Helper
     //                                                                       =============
     protected String getPmbMetaDataPropertyOption() {
-        return _pmbMetaDataPropertyOptionFinder.findPmbMetaDataPropertyOption(_className, _propertyName);
+        return _pmbMetaDataPropertyOptionFinder.findPmbMetaDataPropertyOption(_propertyName);
     }
 
     protected List<String> splitOption(String option) {

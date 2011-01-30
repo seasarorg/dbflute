@@ -221,7 +221,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      * @return SQL file runner. (NotNull)
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
-        return new DfOutsideSqlAnalyzer(runInfo, getDataSource(), _sql2entityMeta);
+        return new DfOutsideSqlAnalyzer(runInfo, getDataSource(), _sql2entityMeta, _schemaData);
     }
 
     protected void handleNotFoundResult(List<File> sqlFileList) {

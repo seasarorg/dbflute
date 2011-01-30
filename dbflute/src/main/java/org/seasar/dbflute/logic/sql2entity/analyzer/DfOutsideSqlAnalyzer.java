@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.AppData;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
@@ -60,6 +61,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     //                                                                           =========
     protected final DfSql2EntityMeta _sql2entityMeta;
     protected final DBDef _currentDBDef;
+    protected final AppData _schemaData;
 
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
     protected final DfSqlFileNameResolver _sqlFileNameResolver = new DfSqlFileNameResolver();
@@ -69,10 +71,12 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOutsideSqlAnalyzer(DfRunnerInformation runInfo, DataSource dataSource, DfSql2EntityMeta sqlFileMeta) {
+    public DfOutsideSqlAnalyzer(DfRunnerInformation runInfo, DataSource dataSource, DfSql2EntityMeta sqlFileMeta,
+            AppData schemaData) {
         super(runInfo, dataSource);
         _sql2entityMeta = sqlFileMeta;
         _currentDBDef = currentDBDef();
+        _schemaData = schemaData;
     }
 
     // ===================================================================================
@@ -156,7 +160,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 }
 
                 // for Parameter Bean
-                final DfParameterBeanResolver resolver = new DfParameterBeanResolver(_sql2entityMeta, _sqlFile);
+                final DfParameterBeanResolver resolver = createParameterBeanResolver();
                 final DfPmbMetaData pmbMetaData = resolver.extractPmbMetaData(sql);
                 if (pmbMetaData != null) {
                     if (customizeEntityInfo != null) {
@@ -208,6 +212,10 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected String resolvePackageName(String typeName) { // [DBFLUTE-271]
         return _propertyTypePackageResolver.resolvePackageName(typeName);
+    }
+
+    protected DfParameterBeanResolver createParameterBeanResolver() {
+        return new DfParameterBeanResolver(_sql2entityMeta, _sqlFile, _schemaData);
     }
 
     // ===================================================================================
