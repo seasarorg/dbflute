@@ -68,26 +68,22 @@ public class DfPropertyTypePackageResolver {
                 return processed;
             }
         }
-        if (typeName.startsWith(VAR_CDEF)) {
+        if (typeName.contains(VAR_CDEF)) {
             final DfBasicProperties prop = getBasicProperties();
             final String pkg = prop.getBaseCommonPackage();
             final String prefix = prop.getProjectPrefix();
             typeName = DfStringUtil.replace(typeName, VAR_CDEF, pkg + "." + prefix + "CDef");
-            return typeName;
         }
-        if (typeName.startsWith(VAR_DOMAIN + ".")) { // as domain entity
-            final DfBasicProperties prop = getBasicProperties();
-            final String pkg = prop.getExtendedEntityPackage();
+        if (typeName.contains(VAR_DOMAIN + ".")) { // as domain entity
+            final String pkg = getBasicProperties().getExtendedEntityPackage();
             typeName = Srl.replace(typeName, VAR_DOMAIN + ".", pkg + ".");
         }
-        if (typeName.startsWith(VAR_CUSTOMIZE + ".")) { // as customize entity
-            final DfOutsideSqlProperties prop = getOutsideSqlProperties();
-            final String pkg = prop.getExtendedEntityPackage();
+        if (typeName.contains(VAR_CUSTOMIZE + ".")) { // as customize entity
+            final String pkg = getOutsideSqlProperties().getExtendedEntityPackage();
             typeName = Srl.replace(typeName, VAR_CUSTOMIZE + ".", pkg + ".");
         }
-        if (typeName.startsWith(VAR_PMB + ".")) { // as parameter-bean
-            final DfOutsideSqlProperties prop = getOutsideSqlProperties();
-            final String pkg = prop.getExtendedParameterBeanPackage();
+        if (typeName.contains(VAR_PMB + ".")) { // as parameter-bean
+            final String pkg = getOutsideSqlProperties().getExtendedParameterBeanPackage();
             typeName = Srl.replace(typeName, VAR_PMB + ".", pkg + ".");
         }
         return typeName;
