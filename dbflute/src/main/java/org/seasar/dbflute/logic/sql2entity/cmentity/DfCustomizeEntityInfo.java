@@ -35,13 +35,16 @@ public class DfCustomizeEntityInfo {
     protected final Map<String, DfColumnMetaInfo> _columnMap;
     protected final DfTypeStructInfo _typeStructInfo;
 
-    // additional information (if procedure, not used)
+    // additional information (outsideSql only)
     protected File _sqlFile;
     protected List<String> _primaryKeyList;
     protected boolean _cursorHandling;
     protected boolean _scalarHandling;
-    protected String _entityClassName;
+    protected String _entityClassName; // is set immediately before generation
     protected String _scalarJavaNative; // only when scalar handling
+
+    // additional information (procedure only)
+    protected boolean _procedureHandling;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -100,7 +103,13 @@ public class DfCustomizeEntityInfo {
         if (isScalarHandling()) {
             return "(scalar)";
         }
-        if (hasTypeStructInfo()) {
+        if (isProcedureHandling()) {
+            if (hasTypeStructInfo()) {
+                return "(procedure, struct)";
+            } else {
+                return "(procedure)";
+            }
+        } else if (hasTypeStructInfo()) {
             return "(struct)";
         }
         return "";
@@ -167,5 +176,13 @@ public class DfCustomizeEntityInfo {
 
     public void setScalarJavaNative(String scalarJavaNative) {
         this._scalarJavaNative = scalarJavaNative;
+    }
+
+    public boolean isProcedureHandling() {
+        return _procedureHandling;
+    }
+
+    public void setProcedureHandling(boolean procedureHandling) {
+        this._procedureHandling = procedureHandling;
     }
 }

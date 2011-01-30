@@ -157,8 +157,7 @@ public class DfProcedurePmbSetupper {
                 final String propertyType;
                 if (result.hasResultSetColumnInfo()) {
                     final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
-                    _entityInfoMap.put(entityName, new DfCustomizeEntityInfo(entityName, result
-                            .getResultSetColumnInfoMap()));
+                    _entityInfoMap.put(entityName, createEntityInfo(entityName, result.getResultSetColumnInfoMap()));
                     propertyType = convertProcedureListPropertyType(entityName);
                     refCustomizeEntity = true;
                 } else {
@@ -211,8 +210,7 @@ public class DfProcedurePmbSetupper {
         if (isResultSetProperty(column)) {
             if (column.hasResultSetColumnInfo()) {
                 final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
-                _entityInfoMap.put(entityName,
-                        new DfCustomizeEntityInfo(entityName, column.getResultSetColumnInfoMap()));
+                _entityInfoMap.put(entityName, createEntityInfo(entityName, column.getResultSetColumnInfoMap()));
                 propertyInfo.setPropertyType(convertProcedureListPropertyType(entityName));
                 propertyInfo.setRefCustomizeEntity(true);
             } else {
@@ -330,7 +328,7 @@ public class DfProcedurePmbSetupper {
         final String typeName = getStructEntityNameResouce(structInfo);
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
             final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-            _entityInfoMap.put(typeName, new DfCustomizeEntityInfo(typeName, attrMap, structInfo));
+            _entityInfoMap.put(typeName, createEntityInfo(typeName, attrMap, structInfo));
             setupStructAttribute(structInfo, propertyInfo);
         }
     }
@@ -385,6 +383,30 @@ public class DfProcedurePmbSetupper {
 
     protected String getStructEntityNameResouce(DfTypeStructInfo structInfo) {
         return structInfo.getTypePureName(); // *same names between schema is unsupported
+    }
+
+    // -----------------------------------------------------
+    //                                           Entity Info
+    //                                           -----------
+    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMetaInfo> columnMap) {
+        return doCreateEntityInfo(entityName, columnMap, null);
+    }
+
+    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMetaInfo> columnMap,
+            DfTypeStructInfo structInfo) {
+        return doCreateEntityInfo(entityName, columnMap, structInfo);
+    }
+
+    protected DfCustomizeEntityInfo doCreateEntityInfo(String entityName, Map<String, DfColumnMetaInfo> columnMap,
+            DfTypeStructInfo structInfo) {
+        final DfCustomizeEntityInfo entityInfo;
+        if (structInfo != null) {
+            entityInfo = new DfCustomizeEntityInfo(entityName, columnMap, structInfo);
+        } else {
+            entityInfo = new DfCustomizeEntityInfo(entityName, columnMap);
+        }
+        entityInfo.setProcedureHandling(true);
+        return entityInfo;
     }
 
     // -----------------------------------------------------
