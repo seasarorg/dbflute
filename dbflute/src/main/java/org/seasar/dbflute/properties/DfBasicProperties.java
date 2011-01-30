@@ -609,6 +609,17 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                             Friends
+    //                                                                             =======
+    public boolean isFriendsHibernate() {
+        return handler().getHibernateProperties(getProperties()).hasHibernateDefinition();
+    }
+
+    public boolean isFriendsS2JDBC() {
+        return handler().getS2JdbcProperties(getProperties()).hasS2jdbcDefinition();
+    }
+
+    // ===================================================================================
     //                                                                      Begin/End Mark
     //                                                                      ==============
     // these are not properties

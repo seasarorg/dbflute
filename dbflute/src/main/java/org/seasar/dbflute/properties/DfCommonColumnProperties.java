@@ -290,9 +290,13 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public String getAccessContextFqcn() {
-        final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
+        final DfBasicProperties prop = getBasicProperties();
+        final boolean csharp = prop.isTargetLanguageCSharp();
+        final boolean hibernate = prop.isFriendsHibernate();
         final String accessContext;
-        if (getBasicProperties().isTargetLanguageCSharp()) {
+        if (csharp || hibernate) {
+            // DBFlute.NET(C#) or before 0.9.0 (contains for Hibernate)
+            final String baseCommonPackage = prop.getBaseCommonPackage();
             final String projectPrefix = getBasicProperties().getProjectPrefix();
             accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
         } else {
