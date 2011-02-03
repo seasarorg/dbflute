@@ -161,6 +161,9 @@ public class DfPmbMetaData {
     // ===================================================================================
     //                                                                  TypedParameterBean
     //                                                                  ==================
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public boolean isTypedParameterBean() {
         return isTypedSelectPmb() || isTypedUpdatePmb();
     }
@@ -180,6 +183,17 @@ public class DfPmbMetaData {
         return isTypedListHandling() || isTypedEntityHandling() || isTypedPagingHandling();
     }
 
+    public boolean isTypedReturnCustomizeEntityPmb() {
+        return isTypedReturnEntityPmb() && !_customizeEntityInfo.isDomainHandling();
+    }
+
+    public boolean isTypedReturnDomainEntityPmb() {
+        return isTypedReturnEntityPmb() && _customizeEntityInfo.isDomainHandling();
+    }
+
+    // -----------------------------------------------------
+    //                                              Handling
+    //                                              --------
     public boolean isTypedListHandling() {
         if (!isRelatedToBehaviorQuery() || !isRelatedToCustomizeEntity()) {
             return false;
@@ -284,6 +298,9 @@ public class DfPmbMetaData {
         return !bqpPath.startsWith("select");
     }
 
+    // -----------------------------------------------------
+    //                                          Related Info
+    //                                          ------------
     public String getCustomizeEntityType() {
         if (!isRelatedToCustomizeEntity()) {
             String msg = "This parameter-bean was not related to customize entity.";

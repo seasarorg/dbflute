@@ -209,7 +209,7 @@ $database.info("}")
 ##                                                                          Simple Dto
 ##                                                                          ==========
 #if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
-  $database.info("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
+  $database.info("parseSimpleDto() { // mapper=$database.isSimpleDtoUseDtoMapper()")
   #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}.customize")
   #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}.customize")
   #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")

@@ -240,6 +240,9 @@ public class DfPmbGenerationHandler {
     // ===================================================================================
     //                                                                          Typed Info
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public boolean isTypedParameterBean(String className) {
         return findPmbMetaData(className).isTypedParameterBean();
     }
@@ -256,6 +259,17 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).isTypedReturnEntityPmb();
     }
 
+    public boolean isTypedReturnCustomizeEntityPmb(String className) {
+        return findPmbMetaData(className).isTypedReturnCustomizeEntityPmb();
+    }
+
+    public boolean isTypedReturnDomainEntityPmb(String className) {
+        return findPmbMetaData(className).isTypedReturnDomainEntityPmb();
+    }
+
+    // -----------------------------------------------------
+    //                                              Handling
+    //                                              --------
     public boolean isTypedListHandling(String className) {
         return findPmbMetaData(className).isTypedListHandling();
     }

@@ -410,6 +410,14 @@ public class Database {
         return getPmbBasicHandler().isTypedReturnEntityPmb(className);
     }
 
+    public boolean isPmbMetaDataTypedReturnCustomizeEntityPmb(String className) {
+        return getPmbBasicHandler().isTypedReturnCustomizeEntityPmb(className);
+    }
+
+    public boolean isPmbMetaDataTypedReturnDomainEntityPmb(String className) {
+        return getPmbBasicHandler().isTypedReturnDomainEntityPmb(className);
+    }
+
     public String getPmbMetaDataBehaviorClassName(String className) {
         return getPmbBasicHandler().getBehaviorClassName(className);
     }
@@ -1081,6 +1089,10 @@ public class Database {
 
     public String getLibraryBehaviorPackage() { // for Application Behavior
         return getBasicProperties().getLibraryBehaviorPackage();
+    }
+
+    public String getLibraryEntityPackage() { // for Application Behavior
+        return getBasicProperties().getLibraryEntityPackage();
     }
 
     public String getLibraryProjectPrefix() { // for Application Behavior

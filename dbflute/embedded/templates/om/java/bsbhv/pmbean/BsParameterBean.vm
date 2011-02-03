@@ -35,7 +35,14 @@ import ${database.libraryBehaviorPackage}.*;
 import ${glPackageExtendedBhv}.*;
 #end
 #end
-#if ($database.isPmbMetaDataTypedReturnEntityPmb($pmbClassName) || $database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
+#if ($database.isPmbMetaDataTypedReturnDomainEntityPmb($pmbClassName))
+#if ($database.isApplicationBehaviorProject())
+import ${database.libraryEntityPackage}.*;
+#else
+import ${glPackageExtendedEntity}.*;
+#end
+#end
+#if ($database.isPmbMetaDataTypedReturnCustomizeEntityPmb($pmbClassName) || $database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}.*;
 #end
 

@@ -496,6 +496,12 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return filterBase(exbhvSimplePackage, packageBase);
     }
 
+    public String getLibraryEntityPackage() {
+        final String packageBase = getLibraryProjectPackageBase();
+        final String entitySimplePackage = getPackageInfo().getExtendedEntityPackage();
+        return filterBase(entitySimplePackage, packageBase);
+    }
+
     public String getApplicationAllCommonPackage() {
         return filterBase(getPackageInfo().getBaseCommonPackage());
     }
