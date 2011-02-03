@@ -102,6 +102,10 @@ public class DfPmbMetaData {
         return projectPrefix + _className;
     }
 
+    public String getEntityClassName() {
+        return getBqpElement(DfBehaviorQueryPathSetupper.KEY_ENTITY_NAME);
+    }
+
     public String getBehaviorClassName() {
         return getBqpElement(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_NAME);
     }

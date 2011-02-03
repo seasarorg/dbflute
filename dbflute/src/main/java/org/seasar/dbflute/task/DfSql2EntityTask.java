@@ -36,6 +36,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
+import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureSetupFailureException;
 import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
@@ -370,10 +371,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 throwPrimaryKeyNotFoundException(entityName, pkMap, columnNameSet);
             }
 
-            if (entityInfo.isScalarHandling()) {
-                // it does not generate an entity that has only one column
+            if (entityInfo.isDomainHandling()) {
                 tbl.setDatabase(database); // one-way love for utility (just in case)
-                entityInfo.setScalarJavaNative(tbl.getColumnList().get(0).getJavaNative());
+                processDomainHandling(entityInfo, tbl);
+            } else if (entityInfo.isScalarHandling()) {
+                // it does not generate an only-one-column entity
+                tbl.setDatabase(database); // one-way love for utility (just in case)
+                processScalarHandling(entityInfo, tbl);
             } else {
                 // initialize a class name of the entity for typed parameter-bean
                 database.addTable(tbl); // should be before getting names
@@ -637,6 +641,118 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final String sql2EntityForcedJavaNative = metaInfo.getSql2EntityForcedJavaNative();
         column.setSql2EntityForcedJavaNative(sql2EntityForcedJavaNative);
         return sql2EntityForcedJavaNative;
+    }
+
+    // -----------------------------------------------------
+    //                                       Result Handling
+    //                                       ---------------
+    protected void processDomainHandling(DfCustomizeEntityInfo entityInfo, Table tbl) {
+        final DfPmbMetaData pmbMetaData = entityInfo.getPmbMetaData();
+        if (pmbMetaData == null || !pmbMetaData.isTypedReturnEntityPmb()) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The 'domain' option was not related to a typed parameter-bean.");
+            br.addItem("Advice");
+            br.addElement("A 'domain' option should be defined with a typed parameter-bean");
+            br.addElement("that is typed to things returning an entity.");
+            br.addElement("For example: (MemberBhv_selectPlainMember.sql)");
+            br.addElement("  -- #df:entity#");
+            br.addElement("  -- +domain+");
+            br.addElement("  ");
+            br.addElement("  -- !df:pmb!");
+            br.addElement("  select MEMBER_ID, MEMBER_NAME, ... from MEMBER");
+            br.addItem("SQL File");
+            br.addElement(entityInfo.getSqlFile());
+            final String msg = br.buildExceptionMessage();
+            throw new DfCustomizeEntityMarkInvalidException(msg);
+        }
+        final String entityClassName = pmbMetaData.getEntityClassName();
+        if (Srl.is_Null_or_TrimmedEmpty(entityClassName)) {
+            String msg = "The entity class name should not be null: " + entityInfo.getSqlFile();
+            throw new IllegalStateException(msg); // no way
+        }
+        final Database schemaDb;
+        try {
+            schemaDb = _schemaData.getDatabase();
+        } catch (EngineException e) {
+            throw new IllegalStateException(e);
+        }
+        Table domainTable = schemaDb.getTable(entityClassName);
+        if (domainTable == null) { // retry without project-prefix for a class name
+            final String projectPrefix = getBasicProperties().getProjectPrefix();
+            domainTable = schemaDb.getTable(Srl.substringFirstFront(entityClassName, projectPrefix));
+        }
+        if (domainTable == null) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The table of the behavior query was not found.");
+            br.addItem("Advice");
+            br.addElement("A 'domain' option should be defined under behavior query.");
+            br.addElement("And behavior query should have an existing table.");
+            br.addElement("For example, MemberBhv_selectPlainMember.sql.");
+            br.addItem("SQL File");
+            br.addElement(entityInfo.getSqlFile());
+            final String msg = br.buildExceptionMessage();
+            throw new DfCustomizeEntityMarkInvalidException(msg); // basically no way
+        }
+        final List<Column> columnList = tbl.getColumnList();
+        for (Column column : columnList) {
+            final Column found = domainTable.getColumn(column.getName());
+            if (found == null) {
+                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                br.addNotice("The selected column was not a column of domain table.");
+                br.addItem("Advice");
+                br.addElement("A selected column with a 'domain' option should be");
+                br.addElement("one of columns of domain table.");
+                br.addItem("SQL File");
+                br.addElement(entityInfo.getSqlFile());
+                br.addItem("Invalid Column");
+                br.addElement(column.getName());
+                br.addItem("Domain Table");
+                br.addElement(domainTable.getName());
+                final String msg = br.buildExceptionMessage();
+                throw new DfCustomizeEntityMarkInvalidException(msg);
+            }
+        }
+        entityInfo.setEntityClassName(domainTable.getExtendedEntityClassName());
+    }
+
+    protected void processScalarHandling(DfCustomizeEntityInfo entityInfo, Table tbl) {
+        final DfPmbMetaData pmbMetaData = entityInfo.getPmbMetaData(); // for check only
+        if (pmbMetaData == null || !pmbMetaData.isTypedSelectPmb()) { // not pinpoint (but enough)
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The 'scalar' option was not related to a typed parameter-bean.");
+            br.addItem("Advice");
+            br.addElement("A 'scalar' option should be defined with a typed parameter-bean");
+            br.addElement("that is typed to things returning an scalar value.");
+            br.addElement("For example: (MemberBhv_selectPlainBirthdate.sql)");
+            br.addElement("  -- #df:entity#");
+            br.addElement("  -- +scalar+");
+            br.addElement("  ");
+            br.addElement("  -- !df:pmb!");
+            br.addElement("  select BIRTHDATE from MEMBER");
+            br.addItem("SQL File");
+            br.addElement(entityInfo.getSqlFile());
+            final String msg = br.buildExceptionMessage();
+            throw new DfCustomizeEntityMarkInvalidException(msg);
+        }
+        final List<Column> columnList = tbl.getColumnList();
+        if (columnList.size() != 1) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("The 'scalar' option was related to non-only-one-column SQL.");
+            br.addItem("Advice");
+            br.addElement("A 'scalar' option should be defined on only-one-column SQL.");
+            br.addElement("For example:");
+            br.addElement("  -- #df:entity#");
+            br.addElement("  -- +scalar+");
+            br.addElement("  ");
+            br.addElement("  -- !df:pmb!");
+            br.addElement("  ");
+            br.addElement("  select BIRTHDATE from MEMBER");
+            br.addItem("SQL File");
+            br.addElement(entityInfo.getSqlFile());
+            final String msg = br.buildExceptionMessage();
+            throw new DfCustomizeEntityMarkInvalidException(msg);
+        }
+        entityInfo.setScalarJavaNative(columnList.get(0).getJavaNative());
     }
 
     // -----------------------------------------------------

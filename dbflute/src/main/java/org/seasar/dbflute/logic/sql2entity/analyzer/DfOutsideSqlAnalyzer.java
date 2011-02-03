@@ -145,7 +145,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                     // saves for setting to pmbMetaData
                     customizeEntityInfo = new DfCustomizeEntityInfo(entityName, columnMetaInfoMap);
                     customizeEntityInfo.setSqlFile(_sqlFile);
-                    if (isCursor(sql)) {
+                    if (isDomain(sql)) {
+                        customizeEntityInfo.setDomainHandling(true);
+                    } else if (isCursor(sql)) {
                         customizeEntityInfo.setCursorHandling(true);
                     } else if (isScalar(sql)) {
                         customizeEntityInfo.setScalarHandling(true);
@@ -165,6 +167,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 if (pmbMetaData != null) {
                     if (customizeEntityInfo != null) {
                         pmbMetaData.setCustomizeEntityInfo(customizeEntityInfo);
+                        customizeEntityInfo.setPmbMetaData(pmbMetaData); // reverse reference
                     }
                     final String pmbName = pmbMetaData.getClassName();
                     assertDuplicateParameterBean(pmbName, _sqlFile);
@@ -326,6 +329,10 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     //                                                                           =========
     protected String getCustomizeEntityName(final String sql) {
         return _outsideSqlMarkAnalyzer.getCustomizeEntityName(sql);
+    }
+
+    protected boolean isDomain(final String sql) {
+        return _outsideSqlMarkAnalyzer.isDomain(sql);
     }
 
     protected boolean isCursor(final String sql) {

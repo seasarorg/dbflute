@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 
 /**
  * @author jflute
@@ -38,8 +39,10 @@ public class DfCustomizeEntityInfo {
     // additional information (outsideSql only)
     protected File _sqlFile;
     protected List<String> _primaryKeyList;
+    protected boolean _domainHandling;
     protected boolean _cursorHandling;
     protected boolean _scalarHandling;
+    protected DfPmbMetaData _pmbMetaData; // is a related parameter-bean
     protected String _entityClassName; // is set immediately before generation
     protected String _scalarJavaNative; // only when scalar handling
 
@@ -97,6 +100,9 @@ public class DfCustomizeEntityInfo {
     //                                                                             Display
     //                                                                             =======
     public String buildHandlingDisp() {
+        if (isDomainHandling()) {
+            return "(domain)";
+        }
         if (isCursorHandling()) {
             return "(cursor)";
         }
@@ -146,6 +152,14 @@ public class DfCustomizeEntityInfo {
         this._primaryKeyList = primaryKeyList;
     }
 
+    public boolean isDomainHandling() {
+        return _domainHandling;
+    }
+
+    public void setDomainHandling(boolean domainHandling) {
+        this._domainHandling = domainHandling;
+    }
+
     public boolean isCursorHandling() {
         return _cursorHandling;
     }
@@ -160,6 +174,14 @@ public class DfCustomizeEntityInfo {
 
     public void setScalarHandling(boolean scalarHandling) {
         this._scalarHandling = scalarHandling;
+    }
+
+    public DfPmbMetaData getPmbMetaData() {
+        return _pmbMetaData;
+    }
+
+    public void setPmbMetaData(DfPmbMetaData pmbMetaData) {
+        this._pmbMetaData = pmbMetaData;
     }
 
     public String getEntityClassName() {

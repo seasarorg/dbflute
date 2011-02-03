@@ -47,9 +47,15 @@ public class DfSql2EntityMarkAnalyzer {
         return getTargetString(sql, "#");
     }
 
+    public boolean isDomain(final String sql) {
+        final String targetString = getTargetString(sql, "+");
+        return targetString != null && Srl.containsAnyIgnoreCase(targetString, "domain");
+    }
+
     public boolean isCursor(final String sql) {
         final String targetString = getTargetString(sql, "+");
         return targetString != null && Srl.containsAnyIgnoreCase(targetString, "cursor", "cursol");
+        // "cursol" is spell-miss but for compatibility with old versions
     }
 
     public boolean isScalar(final String sql) {
