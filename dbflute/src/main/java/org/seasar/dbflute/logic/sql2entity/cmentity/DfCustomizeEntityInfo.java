@@ -39,9 +39,9 @@ public class DfCustomizeEntityInfo {
     // additional information (outsideSql only)
     protected File _sqlFile;
     protected List<String> _primaryKeyList;
-    protected boolean _domainHandling;
     protected boolean _cursorHandling;
     protected boolean _scalarHandling;
+    protected boolean _domainHandling;
     protected DfPmbMetaData _pmbMetaData; // is a related parameter-bean
     protected String _entityClassName; // is set immediately before generation
     protected String _scalarJavaNative; // only when scalar handling
@@ -100,14 +100,14 @@ public class DfCustomizeEntityInfo {
     //                                                                             Display
     //                                                                             =======
     public String buildHandlingDisp() {
-        if (isDomainHandling()) {
-            return "(domain)";
-        }
         if (isCursorHandling()) {
             return "(cursor)";
         }
         if (isScalarHandling()) {
             return "(scalar)";
+        }
+        if (isDomainHandling()) {
+            return "(domain)";
         }
         if (isProcedureHandling()) {
             if (hasTypeStructInfo()) {
@@ -152,14 +152,6 @@ public class DfCustomizeEntityInfo {
         this._primaryKeyList = primaryKeyList;
     }
 
-    public boolean isDomainHandling() {
-        return _domainHandling;
-    }
-
-    public void setDomainHandling(boolean domainHandling) {
-        this._domainHandling = domainHandling;
-    }
-
     public boolean isCursorHandling() {
         return _cursorHandling;
     }
@@ -174,6 +166,14 @@ public class DfCustomizeEntityInfo {
 
     public void setScalarHandling(boolean scalarHandling) {
         this._scalarHandling = scalarHandling;
+    }
+
+    public boolean isDomainHandling() {
+        return _domainHandling;
+    }
+
+    public void setDomainHandling(boolean domainHandling) {
+        this._domainHandling = domainHandling;
     }
 
     public DfPmbMetaData getPmbMetaData() {

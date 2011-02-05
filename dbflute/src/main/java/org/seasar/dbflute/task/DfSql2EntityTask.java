@@ -371,13 +371,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 throwPrimaryKeyNotFoundException(entityName, pkMap, columnNameSet);
             }
 
-            if (entityInfo.isDomainHandling()) {
-                tbl.setDatabase(database); // one-way love for utility (just in case)
-                processDomainHandling(entityInfo, tbl);
-            } else if (entityInfo.isScalarHandling()) {
+            if (entityInfo.isScalarHandling()) {
                 // it does not generate an only-one-column entity
                 tbl.setDatabase(database); // one-way love for utility (just in case)
                 processScalarHandling(entityInfo, tbl);
+            } else if (entityInfo.isDomainHandling()) {
+                // it does not generate an customize-entity
+                tbl.setDatabase(database); // one-way love for utility (just in case)
+                processDomainHandling(entityInfo, tbl);
             } else {
                 // initialize a class name of the entity for typed parameter-bean
                 database.addTable(tbl); // should be before getting names
