@@ -90,6 +90,15 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
         } catch (SQLException e) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Failed to execute the SQL for getting auto-increment");
+            br.addItem("Advice");
+            br.addElement("DBFlute executes the SQL to get auto-increment meta data.");
+            br.addElement("The table might not exist on your schema. Or the schema");
+            br.addElement("to be set at 'dfprop' might be mistake in the first place.");
+            br.addElement("So check your settings.");
+            br.addItem("Table");
+            br.addElement(tableInfo.buildTableFullQualifiedName());
+            br.addItem("PrimaryKey");
+            br.addElement(primaryKeyColumnName);
             br.addItem("SQL for getting");
             br.addElement(sql);
             final String msg = br.buildExceptionMessage();
