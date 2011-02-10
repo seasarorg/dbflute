@@ -94,7 +94,8 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
             br.addElement("DBFlute executes the SQL to get auto-increment meta data.");
             br.addElement("The table might not exist on your schema. Or the schema");
             br.addElement("to be set at 'dfprop' might be mistake in the first place.");
-            br.addElement("So check your settings.");
+            br.addElement("(and other points can be causes, for example, authentication)");
+            br.addElement("So check your settings and environments.");
             br.addItem("Table");
             br.addElement(tableInfo.buildTableFullQualifiedName());
             br.addItem("PrimaryKey");
