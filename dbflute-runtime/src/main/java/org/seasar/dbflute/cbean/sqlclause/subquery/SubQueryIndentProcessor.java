@@ -59,7 +59,7 @@ public class SubQueryIndentProcessor implements Serializable {
                 preRemainder = null;
             }
             if (!throughBegin) {
-                if (line.contains(beginMarkPrefix)) {
+                if (line.contains(beginMarkPrefix)) { // begin line
                     throughBegin = true;
                     subSb = new StringBuilder();
                     final int markIndex = line.indexOf(beginMarkPrefix);
@@ -78,14 +78,19 @@ public class SubQueryIndentProcessor implements Serializable {
                     } else {
                         indent = buildSpaceBar(markIndex - preIndent.length());
                     }
-                } else {
+                } else { // normal line
+                    if (needsNormalLineConnection(mainSb)) {
+                        // if a previous line is sub-query,
+                        // it may not end with a line separator
+                        mainSb.append(ln());
+                    }
                     mainSb.append(line).append(ln());
                 }
             } else {
                 // - - - - - - - -
                 // In begin to end
                 // - - - - - - - -
-                if (line.contains(endMarkPrefix + subQueryIdentity)) { // the end
+                if (line.contains(endMarkPrefix + subQueryIdentity)) { // end line
                     final int markIndex = line.indexOf(endMarkPrefix);
                     final int terminalIndex = line.indexOf(identityTerminal);
                     if (terminalIndex < 0) {
@@ -99,7 +104,7 @@ public class SubQueryIndentProcessor implements Serializable {
                     mainSb.append(currentSql);
                     throughBegin = false;
                     throughBeginFirst = false;
-                } else {
+                } else { // in-scope line
                     if (!throughBeginFirst) {
                         subSb.append(line.trim()).append(ln());
                         throughBeginFirst = true;
@@ -121,6 +126,11 @@ public class SubQueryIndentProcessor implements Serializable {
             throwSubQueryAnyBeginMarkNotHandledException(subQueryIdentity, sql, filteredSql, originalSql);
         }
         return filteredSql;
+    }
+
+    protected boolean needsNormalLineConnection(StringBuilder sb) {
+        // strings exist and it does not end with a line separator
+        return sb.length() > 0 && !sb.substring(sb.length() - 1, sb.length()).equals(ln());
     }
 
     protected void throwSubQueryNotFoundEndMarkException(String subQueryIdentity, String sql, String filteredSql,
