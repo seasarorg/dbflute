@@ -1,5 +1,7 @@
 package org.seasar.dbflute.cbean.sqlclause.subquery;
 
+import java.util.List;
+
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
@@ -15,7 +17,6 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
  * @author jflute
@@ -77,11 +78,6 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
 
     protected String getSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option) {
-        if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasCompoundPrimaryKey()) {
-            String msg = "The derived-referrer is unsupported when no primary key or compound primary key:";
-            msg = msg + " table=" + _subQueryDBMeta.getTableDbName();
-            throw new IllegalConditionBeanOperationException(msg);
-        }
         final String tableAliasName = getSubQueryLocalAliasName();
         final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
         if (derivedColumnSqlName == null) {
@@ -137,10 +133,23 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         final String endMark = resolveSubQueryEndMark(_mainSubQueryIdentity);
         final String mainSql;
         {
-            final ColumnSqlName pkSqlName = _subQueryDBMeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-            final ColumnRealName pkRealName = new ColumnRealName(tableAliasName, pkSqlName);
+            final List<ColumnInfo> pkList = _subQueryDBMeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            final StringBuilder pkSb = new StringBuilder();
+            for (ColumnInfo pk : pkList) {
+                final ColumnSqlName pkSqlName = pk.getColumnSqlName();
+                if (pkSqlName.equals(derivedColumnRealName.getColumnSqlName())
+                        || pkSqlName.equals(relatedColumnSqlName)) {
+                    // to suppress same columns selected
+                    continue;
+                }
+                if (pkSb.length() > 0) {
+                    pkSb.append(", ");
+                }
+                pkSb.append(new ColumnRealName(tableAliasName, pk.getColumnSqlName()));
+            }
+            final String pkExp = pkSb.length() > 0 ? pkSb.toString() + ", " : "";
             final ColumnRealName relRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
-            final String selectClause = "select " + pkRealName + ", " + relRealName + ", " + derivedColumnRealName;
+            final String selectClause = "select " + pkExp + relRealName + ", " + derivedColumnRealName;
             final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
             mainSql = selectClause + " " + fromWhereClause;
         }
