@@ -103,12 +103,11 @@ public class DfPropertyUtil {
     // ===============================================================================
     //                                                                     Tag Utility
     //                                                                     ===========
-    @SuppressWarnings("unchecked")
-    public static String convertTag(String targetStr, Map convertMap) {
-        Set keySet = convertMap.keySet();
-        Collection valCol = convertMap.values();
-        Iterator keyIte = keySet.iterator();
-        Iterator valIte = valCol.iterator();
+    public static String convertTag(String targetStr, Map<String, String> convertMap) {
+        Set<String> keySet = convertMap.keySet();
+        Collection<String> valCol = convertMap.values();
+        Iterator<String> keyIte = keySet.iterator();
+        Iterator<String> valIte = valCol.iterator();
         Map<String, String> wk = new LinkedHashMap<String, String>(convertMap.size());
         while (keyIte.hasNext()) {
             String key = (String) keyIte.next();
@@ -165,18 +164,17 @@ public class DfPropertyUtil {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
-    public static String convertAll(String targetStr, Map convertMap) {
+    public static String convertAll(String targetStr, Map<String, String> convertMap) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");
         }
         if (convertMap == null) {
             throw new IllegalArgumentException("'replaceMap' is null");
         }
-        Set keySet = convertMap.keySet();
-        Collection valCol = convertMap.values();
-        Iterator keyIte = keySet.iterator();
-        Iterator valIte = valCol.iterator();
+        Set<String> keySet = convertMap.keySet();
+        Collection<String> valCol = convertMap.values();
+        Iterator<String> keyIte = keySet.iterator();
+        Iterator<String> valIte = valCol.iterator();
         while (keyIte.hasNext()) {
             String oldStr = (String) keyIte.next();
             String newStr = (String) valIte.next();

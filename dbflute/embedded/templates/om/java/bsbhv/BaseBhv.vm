@@ -703,10 +703,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void doCreate(Entity entity, InsertOption<? extends ConditionBean> option) {
         if (option == null) { insert(downcast(entity)); }
-        else { varyingInsert(downcast(entity), (InsertOption)option); }
+        else { varyingInsert(downcast(entity), downcast(option)); }
     }
 
     /**
@@ -770,10 +769,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void doModify(Entity entity, UpdateOption<? extends ConditionBean> option) {
         if (option == null) { update(downcast(entity)); }
-        else { varyingUpdate(downcast(entity), (UpdateOption)option); }
+        else { varyingUpdate(downcast(entity), downcast(option)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -809,13 +807,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     @Override
-#if ($table.hasOptimisticLock())
-    @SuppressWarnings("unchecked")
-#end
     protected void doModifyNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option) {
 #if ($table.hasOptimisticLock())
         if (option == null) { updateNonstrict(downcast(entity)); }
-        else { varyingUpdateNonstrict(downcast(entity), (UpdateOption)option); }
+        else { varyingUpdateNonstrict(downcast(entity), downcast(option)); }
 #else
         doModify(entity, option);
 #end
@@ -846,14 +841,13 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void doCreateOrModify(Entity entity, InsertOption<? extends ConditionBean> insertOption,
             UpdateOption<? extends ConditionBean> updateOption) {
         if (insertOption == null && updateOption == null) { insertOrUpdate(downcast(entity)); }
         else {
-            insertOption = insertOption == null ? new InsertOption() : insertOption;
-            updateOption = updateOption == null ? new UpdateOption() : updateOption;
-            varyingInsertOrUpdate(downcast(entity), (InsertOption)insertOption, (UpdateOption)updateOption);
+            insertOption = insertOption == null ? new InsertOption<${myConditionBeanClassName}>() : insertOption;
+            updateOption = updateOption == null ? new UpdateOption<${myConditionBeanClassName}>() : updateOption;
+            varyingInsertOrUpdate(downcast(entity), downcast(insertOption), downcast(updateOption));
         }
     }
 #if ($table.hasOptimisticLock())
@@ -878,17 +872,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     @Override
-#if ($table.hasOptimisticLock())
-    @SuppressWarnings("unchecked")
-#end
     protected void doCreateOrModifyNonstrict(Entity entity, InsertOption<? extends ConditionBean> insertOption,
             UpdateOption<? extends ConditionBean> updateOption) {
 #if ($table.hasOptimisticLock())
         if (insertOption == null && updateOption == null) { insertOrUpdateNonstrict(downcast(entity)); }
         else {
-            insertOption = insertOption == null ? new InsertOption() : insertOption;
-            updateOption = updateOption == null ? new UpdateOption() : updateOption;
-            varyingInsertOrUpdateNonstrict(downcast(entity), (InsertOption)insertOption, (UpdateOption)updateOption);
+            insertOption = insertOption == null ? new InsertOption<${myConditionBeanClassName}>() : insertOption;
+            updateOption = updateOption == null ? new UpdateOption<${myConditionBeanClassName}>() : updateOption;
+            varyingInsertOrUpdateNonstrict(downcast(entity), downcast(insertOption), downcast(updateOption));
         }
 #else
         doCreateOrModify(entity, insertOption, updateOption);
@@ -933,10 +924,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void doRemove(Entity entity, DeleteOption<? extends ConditionBean> option) {
         if (option == null) { delete(downcast(entity)); }
-        else { varyingDelete(downcast(entity), (DeleteOption)option); }
+        else { varyingDelete(downcast(entity), downcast(option)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -992,13 +982,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     @Override
-#if ($table.hasOptimisticLock())
-    @SuppressWarnings("unchecked")
-#end
     protected void doRemoveNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option) {
 #if ($table.hasOptimisticLock())
         if (option == null) { deleteNonstrict(downcast(entity)); }
-        else { varyingDeleteNonstrict(downcast(entity), (DeleteOption)option); }
+        else { varyingDeleteNonstrict(downcast(entity), downcast(option)); }
 #else
         doRemove(entity, option);
 #end
@@ -1027,10 +1014,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected int[] doLumpCreate(List<Entity> ls, InsertOption<? extends ConditionBean> option) {
-        if (option == null) { return batchInsert((List)ls); }
-        else { return varyingBatchInsert((List)ls, (InsertOption)option); }
+        if (option == null) { return batchInsert(downcast(ls)); }
+        else { return varyingBatchInsert(downcast(ls), downcast(option)); }
     }
 
     /**
@@ -1056,10 +1042,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected int[] doLumpModify(List<Entity> ls, UpdateOption<? extends ConditionBean> option) {
-        if (option == null) { return batchUpdate((List)ls); }
-        else { return varyingBatchUpdate((List)ls, (UpdateOption)option); }
+        if (option == null) { return batchUpdate(downcast(ls)); }
+        else { return varyingBatchUpdate(downcast(ls), downcast(option)); }
     }
 
     /**
@@ -1117,13 +1102,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     @Override
-#if ($table.hasOptimisticLock())
-    @SuppressWarnings("unchecked")
-#end
     protected int[] doLumpModifyNonstrict(List<Entity> ls, UpdateOption<? extends ConditionBean> option) {
 #if ($table.hasOptimisticLock())
-        if (option == null) { return batchUpdateNonstrict((List)ls); }
-        else { return varyingBatchUpdateNonstrict((List)ls, (UpdateOption)option); }
+        if (option == null) { return batchUpdateNonstrict(downcast(ls)); }
+        else { return varyingBatchUpdateNonstrict(downcast(ls), downcast(option)); }
 #else
         return doLumpModify(ls, option);
 #end
@@ -1151,10 +1133,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected int[] doLumpRemove(List<Entity> ls, DeleteOption<? extends ConditionBean> option) {
-        if (option == null) { return batchDelete((List)ls); }
-        else { return varyingBatchDelete((List)ls, (DeleteOption)option); }
+        if (option == null) { return batchDelete(downcast(ls)); }
+        else { return varyingBatchDelete(downcast(ls), downcast(option)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -1177,13 +1158,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     @Override
-#if ($table.hasOptimisticLock())
-    @SuppressWarnings("unchecked")
-#end
     protected int[] doLumpRemoveNonstrict(List<Entity> ls, DeleteOption<? extends ConditionBean> option) {
 #if ($table.hasOptimisticLock())
-        if (option == null) { return batchDeleteNonstrict((List)ls); }
-        else { return varyingBatchDeleteNonstrict((List)ls, (DeleteOption)option); }
+        if (option == null) { return batchDeleteNonstrict(downcast(ls)); }
+        else { return varyingBatchDeleteNonstrict(downcast(ls), downcast(option)); }
 #else
         return doLumpRemove(ls, option);
 #end
@@ -1195,7 +1173,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Insert the several entities by query (modified-only for fixed value).
      * <pre>
-     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryInsert</span>(new QueryInsertSetupper&lt;${myEntityVariableName}, ${myConditionBeanClassName}&gt;() {
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">queryInsert</span>(new QueryInsertSetupper&lt;${myExtendedObjectClassName}, ${myConditionBeanClassName}&gt;() {
      *     public ConditionBean setup(${myEntityVariableName} entity, ${myConditionBeanClassName} intoCB) {
      *         FooCB cb = FooCB();
      *         cb.setupSelect_Bar();
@@ -1238,10 +1216,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected int doRangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper, InsertOption<? extends ConditionBean> option) {
-        if (option == null) { return queryInsert((QueryInsertSetupper)setupper); }
-        else { return varyingQueryInsert((QueryInsertSetupper)setupper, (InsertOption)option); }
+        if (option == null) { return queryInsert(downcast(setupper)); }
+        else { return varyingQueryInsert(downcast(setupper), downcast(option)); }
     }
 
     /**
@@ -1277,10 +1254,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected int doRangeModify(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
         if (option == null) { return queryUpdate(downcast(entity), (${myConditionBeanClassName})cb); }
-        else { return varyingQueryUpdate(downcast(entity), (${myConditionBeanClassName})cb, (UpdateOption)option); }
+        else { return varyingQueryUpdate(downcast(entity), (${myConditionBeanClassName})cb, downcast(option)); }
     }
 
     /**
@@ -1305,10 +1281,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected int doRangeRemove(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
         if (option == null) { return queryDelete((${myConditionBeanClassName})cb); }
-        else { return varyingQueryDelete((${myConditionBeanClassName})cb, (DeleteOption)option); }
+        else { return varyingQueryDelete((${myConditionBeanClassName})cb, downcast(option)); }
     }
 
     // ===================================================================================
@@ -1788,7 +1763,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return getBehaviorSelector().select(${glPackageExtendedBhv}.BuriAllRoundStateBhv.class);
     }
 #end
-    
+
     // ===================================================================================
     //                                                                     Delegate Method
     //                                                                     ===============
@@ -1969,4 +1944,31 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     protected ${myConditionBeanClassName} downcast(ConditionBean cb) {
         return helpConditionBeanDowncastInternally(cb, ${myConditionBeanClassName}.class);
     }
+
+    @SuppressWarnings("unchecked")
+    protected List<${myExtendedObjectClassName}> downcast(List<? extends Entity> entityList) {
+        return (List<${myExtendedObjectClassName}>)entityList;
+    }
+#if ($table.isWritable())
+
+    @SuppressWarnings("unchecked")
+    protected InsertOption<${myConditionBeanClassName}> downcast(InsertOption<? extends ConditionBean> option) {
+        return (InsertOption<${myConditionBeanClassName}>)option;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected UpdateOption<${myConditionBeanClassName}> downcast(UpdateOption<? extends ConditionBean> option) {
+        return (UpdateOption<${myConditionBeanClassName}>)option;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected DeleteOption<${myConditionBeanClassName}> downcast(DeleteOption<? extends ConditionBean> option) {
+        return (DeleteOption<${myConditionBeanClassName}>)option;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> downcast(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> option) {
+        return (QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}>)option;
+    }
+#end
 }

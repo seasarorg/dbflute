@@ -34,7 +34,7 @@ public class DfDtsObjectType implements DfDtsColumnType {
             return false;
         }
         if ((arg1 instanceof Comparable) && (arg2 instanceof Comparable)) {
-            return ((Comparable) arg1).compareTo(arg2) == 0;
+            return ((Comparable<Object>) arg1).compareTo((Comparable<Object>) arg2) == 0;
         }
         return arg1.equals(arg2);
     }

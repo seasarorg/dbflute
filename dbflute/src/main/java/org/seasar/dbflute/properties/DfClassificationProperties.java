@@ -144,7 +144,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     msg = msg + " type=" + element.getClass() + " element=" + element;
                     throw new DfClassificationIllegalPropertyTypeException(msg);
                 }
-                final Map<?, ?> elementMap = (Map<?, ?>) element;
+                @SuppressWarnings("unchecked")
+                final Map<String, String> elementMap = (Map<String, String>) element;
 
                 // - - - - - -
                 // from Table

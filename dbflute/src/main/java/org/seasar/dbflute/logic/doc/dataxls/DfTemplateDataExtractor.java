@@ -78,18 +78,14 @@ public class DfTemplateDataExtractor {
         for (Column column : columnList) {
             final String columnName = column.getName();
             final ValueType valueType;
-            if (column == null) {
-                valueType = new StringType();
+            if (column.isJdbcTypeTime()) {
+                valueType = new TimeType();
+            } else if (column.isJdbcTypeTimestamp()) {
+                valueType = new TimestampType();
+            } else if (column.isJdbcTypeDate()) {
+                valueType = new UtilDateAsSqlDateType();
             } else {
-                if (column.isJdbcTypeTime()) {
-                    valueType = new TimeType();
-                } else if (column.isJdbcTypeTimestamp()) {
-                    valueType = new TimestampType();
-                } else if (column.isJdbcTypeDate()) {
-                    valueType = new UtilDateAsSqlDateType();
-                } else {
-                    valueType = new StringType();
-                }
+                valueType = new StringType();
             }
             columnValueTypeMap.put(columnName, valueType);
         }

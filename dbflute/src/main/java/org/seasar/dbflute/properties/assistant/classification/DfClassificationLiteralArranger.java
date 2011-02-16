@@ -9,8 +9,7 @@ import java.util.Map;
  */
 public class DfClassificationLiteralArranger {
 
-    @SuppressWarnings("unchecked")
-    public void arrange(String classificationName, Map elementMap, List<Map<String, String>> elementList) {
+    public void arrange(String classificationName, Map<String, String> elementMap, List<Map<String, String>> elementList) {
         final String codeKey = DfClassificationElement.KEY_CODE;
         final String nameKey = DfClassificationElement.KEY_NAME;
         final String aliasKey = DfClassificationElement.KEY_ALIAS;
