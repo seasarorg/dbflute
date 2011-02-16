@@ -25,7 +25,6 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.maven.ide.eclipse.maven2Nature</nature>
 		<nature>org.seasar.ymir.eclipse.viliProjectNature</nature>
-		<nature>org.seasar.dblauncher.nature</nature>
 		<nature>org.devzuz.q.maven.jdt.core.mavenNature</nature>
 	</natures>
 </projectDescription>
