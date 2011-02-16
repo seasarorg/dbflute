@@ -512,8 +512,7 @@ public class PlainResultSetWrapper implements ResultSet {
         original.updateObject(columnName, x, scale);
     }
 
-    @SuppressWarnings("unchecked")
-    public Object getObject(int i, Map map) throws SQLException {
+    public Object getObject(int i, Map<String, Class<?>> map) throws SQLException {
         return original.getObject(i, map);
     }
 
@@ -617,8 +616,7 @@ public class PlainResultSetWrapper implements ResultSet {
         return original.getTimestamp(columnIndex, cal);
     }
 
-    @SuppressWarnings("unchecked")
-    public Object getObject(String colName, Map map) throws SQLException {
+    public Object getObject(String colName, Map<String, Class<?>> map) throws SQLException {
         return original.getObject(colName, map);
     }
 

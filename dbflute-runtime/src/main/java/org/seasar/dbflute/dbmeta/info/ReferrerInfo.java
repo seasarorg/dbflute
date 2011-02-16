@@ -97,7 +97,7 @@ public class ReferrerInfo implements RelationInfo {
     //                                                                          Reflection
     //                                                                          ==========
     @SuppressWarnings("unchecked")
-    public <PROPERTY extends List> PROPERTY read(Entity localEntity) {
+    public <PROPERTY extends List<? extends Entity>> PROPERTY read(Entity localEntity) {
         return (PROPERTY) invokeMethod(reader(), localEntity, new Object[] {});
     }
 
