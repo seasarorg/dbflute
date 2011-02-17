@@ -28,11 +28,9 @@ o Q4E
  -> http://q4e.googlecode.com/svn/trunk/updatesite/
 o EMecha, ResourceSynchronizer
  -> http://eclipse.seasar.org/updates/3.3/
+o S2JSF Plugin
+ -> http://eclipse.seasar.org/updates/3.2/
 o FindBugs
  -> http://findbugs.cs.umd.edu/eclipse
-o Q4E
- -> http://q4e.googlecode.com/svn/trunk/updatesite/
 o Jadclipse
  -> http://webobjects.mdimension.com/jadclipse/3.6/
-o Groovy
- -> http://dist.codehaus.org/groovy/distributions/greclipse/snapshot/e3.6/
