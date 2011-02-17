@@ -17,9 +17,9 @@ package org.seasar.dbflute.bhv.core;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.DBDef;
@@ -78,8 +78,8 @@ public class BehaviorCommandInvoker {
     // -----------------------------------------------------
     //                                       Execution Cache
     //                                       ---------------
-    /** The map of SQL execution. (dispose target) */
-    protected final Map<String, SqlExecution> _executionMap = newConcurrentHashMap();
+    /** The map of SQL execution. (dispose target, synchronized manually) */
+    protected final Map<String, SqlExecution> _executionMap = newHashMap();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -91,7 +91,10 @@ public class BehaviorCommandInvoker {
     //                                                                     Execution Cache
     //                                                                     ===============
     public void clearExecutionCache() {
-        _executionMap.clear();
+        // basically should be called only for special case (e.g. HotDeploy)
+        synchronized (_executionMap) {
+            _executionMap.clear();
+        }
     }
 
     public boolean isExecutionCacheEmpty() {
@@ -276,7 +279,7 @@ public class BehaviorCommandInvoker {
                     beforeCmd = systemTime();
                 }
                 SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
-                execution = getSqlExecution(key, creator);
+                execution = getOrCreateSqlExecution(key, creator);
                 if (logEnabled) {
                     final long afterCmd = systemTime();
                     if (beforeCmd != afterCmd) {
@@ -294,30 +297,36 @@ public class BehaviorCommandInvoker {
 
     protected <RESULT> void initializeSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
         final String key = behaviorCommand.buildSqlExecutionKey();
-        SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
-        getSqlExecution(key, creator);
+        final SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
+        final SqlExecution execution = getSqlExecution(key);
+        if (execution != null) {
+            return; // already initialized
+        }
+        getOrCreateSqlExecution(key, creator); // initialize
     }
 
+    /**
+     * Get SQL-execution if it exists.
+     * @param key The key of SQL execution. (NotNull)
+     * @return The SQL execution that may be created then. (NullAllowed)
+     */
     protected SqlExecution getSqlExecution(String key) {
         return _executionMap.get(key);
     }
 
     /**
-     * @param key The key of SQL execution. (NotNull)
-     * @param executionCreator The creator of SQL execution. (NotNull)
-     * @return The SQL execution that may be created then. (NotNull)
+     * Get SQL-execution that may be created if it does not exist.
+     * @param key The key of SQL-execution. (NotNull)
+     * @param executionCreator The creator of SQL-execution. (NotNull)
+     * @return The SQL-execution that may be created then. (NotNull)
      */
-    protected SqlExecution getSqlExecution(String key, SqlExecutionCreator executionCreator) {
-        SqlExecution execution = getSqlExecution(key);
-        if (execution != null) {
-            return execution;
-        }
+    protected SqlExecution getOrCreateSqlExecution(String key, SqlExecutionCreator executionCreator) {
+        SqlExecution execution = null;
         synchronized (_executionMap) {
             execution = getSqlExecution(key);
             if (execution != null) {
-                if (isLogEnabled()) {
-                    log("...Getting sqlExecution as cache because the previous thread has already initialized.");
-                }
+                // an other thread might have initialized
+                // or reading might failed by same-time writing
                 return execution;
             }
             if (isLogEnabled()) {
@@ -931,8 +940,8 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
-        return new ConcurrentHashMap<KEY, VALUE>();
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
     }
 
     protected String ln() {

@@ -16,8 +16,8 @@
 package org.seasar.dbflute.bhv.core.supplement;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -39,7 +39,9 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, SequenceCache> _sequenceCacheMap = newConcurrentHashMap();
+    /** The map of sequence cache keyed by unique strings of the sequence. (synchronized manually) */
+    protected final Map<String, SequenceCache> _sequenceCacheMap = newHashMap();
+
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected boolean _internalDebug;
 
@@ -68,6 +70,8 @@ public class SequenceCacheHandler {
         synchronized (_sequenceCacheMap) {
             sequenceCache = getSequenceCache(key);
             if (sequenceCache != null) {
+                // an other thread might have initialized
+                // or reading might failed by same-time writing
                 return sequenceCache;
             }
             if (isLogEnabled()) {
@@ -258,8 +262,8 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
-        return new ConcurrentHashMap<KEY, VALUE>();
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
     }
 
     protected String ln() {

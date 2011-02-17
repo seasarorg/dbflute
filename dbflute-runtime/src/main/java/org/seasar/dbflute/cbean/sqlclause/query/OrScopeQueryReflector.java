@@ -18,8 +18,8 @@ package org.seasar.dbflute.cbean.sqlclause.query;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 

@@ -66,8 +66,8 @@ public class LineTokenImpl implements LineToken {
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
         assertObjectNotNull("lineMakingOption.getDelimiter()", delimiter);
-        return createLineString(valueList, delimiter, lineMakingOption.isQuoteAll(), lineMakingOption
-                .isQuoteMinimally(), lineMakingOption.isTrimSpace());
+        return createLineString(valueList, delimiter, lineMakingOption.isQuoteAll(),
+                lineMakingOption.isQuoteMinimally(), lineMakingOption.isTrimSpace());
     }
 
     protected String createLineString(List<String> valueList, String delimiter, boolean quoteAll,

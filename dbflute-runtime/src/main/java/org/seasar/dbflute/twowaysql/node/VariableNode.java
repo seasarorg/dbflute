@@ -204,8 +204,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     //                                                                           =========
     protected void throwBindOrEmbeddedCommentParameterNullValueException(ValueAndType valueAndType) {
         final Class<?> targetType = valueAndType.getTargetType();
-        NodeUtil
-                .throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, isBind());
+        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, isBind());
     }
 
     protected void throwBindOrEmbeddedCommentInScopeNotListException(ValueAndType valueAndType) {

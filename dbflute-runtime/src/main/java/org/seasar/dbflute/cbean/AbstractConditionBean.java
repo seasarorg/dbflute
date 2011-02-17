@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
@@ -45,10 +45,10 @@ import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
+import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 
 /**
  * The condition-bean as abstract.

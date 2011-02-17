@@ -31,6 +31,7 @@ import org.seasar.dbflute.twowaysql.node.BindVariableNode;
 import org.seasar.dbflute.twowaysql.node.ElseNode;
 import org.seasar.dbflute.twowaysql.node.EmbeddedVariableNode;
 import org.seasar.dbflute.twowaysql.node.ForNode;
+import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
 import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.LoopAbstractNode;
 import org.seasar.dbflute.twowaysql.node.LoopFirstNode;
@@ -41,7 +42,6 @@ import org.seasar.dbflute.twowaysql.node.RootNode;
 import org.seasar.dbflute.twowaysql.node.SqlConnectorAdjustable;
 import org.seasar.dbflute.twowaysql.node.SqlConnectorNode;
 import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
-import org.seasar.dbflute.twowaysql.node.ForNode.LoopVariableType;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 

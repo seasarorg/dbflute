@@ -71,7 +71,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                  Information Resource
     //                                  --------------------
-    // Initialized at its getter.
+    // lazy-initialized at corresponding getters
     private volatile StringKeyMap<String> _tableDbNameFlexibleMap;
     private volatile StringKeyMap<String> _tablePropertyNameFlexibleMap;
     private volatile List<ColumnInfo> _columnInfoList;
@@ -81,8 +81,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     private volatile List<ReferrerInfo> _referrerInfoList;
     private volatile StringKeyMap<ReferrerInfo> _referrerInfoFlexibleMap;
 
-    // Initialized at hasMethod().
-    private final Map<String, Object> _methodNameMap = newConcurrentHashMap();
+    // lazy-initialized at hasMethod()
+    private final Map<String, Object> _methodNameMap = newHashMap();
 
     // ===================================================================================
     //                                                             Resource Initialization
@@ -1033,17 +1033,22 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     protected boolean hasMethod(String methodName) {
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        if (_methodNameMap.isEmpty()) {
-            synchronized (_methodNameMap) {
-                if (_methodNameMap.isEmpty()) {
-                    final Method[] methods = this.getClass().getMethods();
-                    for (Method method : methods) {
-                        _methodNameMap.put(method.getName(), DUMMY_VALUE);
-                    }
-                }
-            }
+        if (_methodNameMap.containsKey(methodName)) {
+            return true;
         }
-        return _methodNameMap.containsKey(methodName);
+        synchronized (_methodNameMap) {
+            if (!_methodNameMap.isEmpty()) {
+                // an other thread might have initialized
+                // or reading might failed by same-time writing
+                return _methodNameMap.containsKey(methodName);
+            }
+            // initialize all methods
+            final Method[] methods = this.getClass().getMethods();
+            for (Method method : methods) {
+                _methodNameMap.put(method.getName(), DUMMY_VALUE);
+            }
+            return _methodNameMap.containsKey(methodName);
+        }
     }
 
     // -----------------------------------------------------

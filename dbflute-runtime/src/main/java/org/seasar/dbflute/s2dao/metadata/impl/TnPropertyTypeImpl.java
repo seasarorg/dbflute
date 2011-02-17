@@ -45,8 +45,8 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                         ===========
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
         // for non persistent property (for example, relation)
-        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), new ColumnSqlName(propertyDesc
-                .getPropertyName()));
+        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), new ColumnSqlName(
+                propertyDesc.getPropertyName()));
     }
 
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnDbName,

@@ -18,8 +18,8 @@ package org.seasar.dbflute.s2dao.metadata.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;

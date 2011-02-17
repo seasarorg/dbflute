@@ -485,7 +485,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
                 };
                 final List<SqlExecution> resultList = new ArrayList<SqlExecution>();
                 for (int i = 0; i < 100; i++) {
-                    resultList.add(invoker.getSqlExecution("key" + i, creator));
+                    resultList.add(invoker.getOrCreateSqlExecution("key" + i, creator));
                 }
                 return resultList;
             }

@@ -465,8 +465,8 @@ public class FileTokenImpl implements FileToken {
                 } else {
                     final java.util.LinkedHashMap<String, String> nameValueMap = rowResource.getNameValueMap();
                     if (!headerDone) {
-                        final java.util.List<String> columnNameList = new java.util.ArrayList<String>(nameValueMap
-                                .keySet());
+                        final java.util.List<String> columnNameList = new java.util.ArrayList<String>(
+                                nameValueMap.keySet());
                         final LineMakingOption lineMakingOption = new LineMakingOption();
                         lineMakingOption.setDelimiter(delimiter);
                         lineMakingOption.trimSpace();// Trimming is Header Only!

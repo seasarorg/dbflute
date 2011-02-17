@@ -28,7 +28,6 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
-@SuppressWarnings("unchecked")
 public class TnBeanArrayResultSetHandler extends TnBeanListResultSetHandler {
 
     // ===================================================================================
@@ -48,7 +47,8 @@ public class TnBeanArrayResultSetHandler extends TnBeanListResultSetHandler {
     //                                                                              Handle
     //                                                                              ======
     public Object handle(ResultSet rs) throws SQLException {
-        List list = (List) super.handle(rs);
-        return list.toArray((Object[]) Array.newInstance(getBeanMetaData().getBeanClass(), list.size()));
+        final List<?> list = (List<?>) super.handle(rs);
+        final Class<?> beanClass = getBeanMetaData().getBeanClass();
+        return list.toArray((Object[]) Array.newInstance(beanClass, list.size()));
     }
 }

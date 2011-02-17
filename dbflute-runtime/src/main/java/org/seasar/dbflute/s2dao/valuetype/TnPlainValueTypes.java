@@ -49,10 +49,11 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.jdbc.Classification;
@@ -71,7 +72,9 @@ public class TnPlainValueTypes {
     protected final Map<Class<?>, ValueType> _basicObjectValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
     protected final Map<Class<?>, ValueType> _basicInterfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
     protected final Map<String, ValueType> _pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
-    protected final Map<Integer, ValueType> _dynamicObjectValueTypeMap = new ConcurrentHashMap<Integer, ValueType>();
+
+    /** The map of value type keyed by JDBC definition type. (synchronized manually) */
+    protected final Map<Integer, ValueType> _dynamicObjectValueTypeMap = new HashMap<Integer, ValueType>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -255,16 +258,17 @@ public class TnPlainValueTypes {
             ValueType valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
             if (valueType != null) {
                 return valueType;
-            } else {
-                synchronized (_dynamicObjectValueTypeMap) {
-                    valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
-                    if (valueType != null) {
-                        return valueType;
-                    }
-                    final ObjectType objectType = new ObjectType(jdbcDefType);
-                    _dynamicObjectValueTypeMap.put(jdbcDefType, objectType);
-                    return objectType;
+            }
+            synchronized (_dynamicObjectValueTypeMap) {
+                valueType = _dynamicObjectValueTypeMap.get(jdbcDefType);
+                if (valueType != null) {
+                    // an other thread might have initialized
+                    // or reading might failed by same-time writing
+                    return valueType;
                 }
+                final ObjectType objectType = new ObjectType(jdbcDefType);
+                _dynamicObjectValueTypeMap.put(jdbcDefType, objectType);
+                return objectType;
             }
         } else {
             return getValueType(type);

@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -912,8 +912,8 @@ public class MapListStringImpl implements MapListString {
             throw new IllegalArgumentException(msg);
         }
 
-        final String expectedAsEndBrace = remainderListString.substring(endBraceIndex, endBraceIndex
-                + _endBrace.length());
+        final String expectedAsEndBrace = remainderListString.substring(endBraceIndex,
+                endBraceIndex + _endBrace.length());
         if (!expectedAsEndBrace.equals(_endBrace)) {
             String msg = "Argument[remainderListString] must have '" + _endBrace + "' at Argument[endBraceIndex]:";
             msg = msg + lnd() + " # remainderListString --> " + remainderListString;
