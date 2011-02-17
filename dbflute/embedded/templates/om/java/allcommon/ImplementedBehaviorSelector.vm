@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +46,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     //                                                                           Attribute
     //                                                                           =========
     /** The cache of behavior. */
-    protected final Map<Class<? extends BehaviorReadable>, BehaviorReadable> _behaviorCache = newConcurrentHashMap();
+    protected final Map<Class<? extends BehaviorReadable>, BehaviorReadable> _behaviorCache = newHashMap();
 
 #if ($database.isTargetContainerSeasar())
     /** The container of Seasar. */
@@ -112,6 +112,8 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
         synchronized (_behaviorCache) {
             bhv = (BEHAVIOR) _behaviorCache.get(behaviorType);
             if (bhv != null) {
+                // a previous thread might have initialized
+                // or reading might failed by same-time writing
                 return bhv;
             }
             bhv = (BEHAVIOR) getComponent(behaviorType);
@@ -201,8 +203,8 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
         return DfTypeUtil.toClassTitle(obj);
     }
 
-    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
-        return new ConcurrentHashMap<KEY, VALUE>();
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
     }
 
     // ===================================================================================

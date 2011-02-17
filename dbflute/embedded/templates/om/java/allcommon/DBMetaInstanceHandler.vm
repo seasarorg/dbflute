@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -23,7 +22,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     //                                                                        Resource Map
     //                                                                        ============
     /** Table DB-name instance map. */
-    protected static final Map<String, DBMeta> _tableDbNameInstanceMap = newConcurrentHashMap();
+    protected static final Map<String, DBMeta> _tableDbNameInstanceMap = newHashMap();
 
     /** The map of table DB name and class name. This is for initialization. */
     protected static final Map<String, String> _tableDbNameClassNameMap;
@@ -181,6 +180,8 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         synchronized (_tableDbNameInstanceMap) {
             dbmeta = _tableDbNameInstanceMap.get(tableDbName);
             if (dbmeta != null) {
+                // an other thread might have initialized
+                // or reading might failed by same-time writing
                 return dbmeta;
             }
             String entityName = _tableDbNameClassNameMap.get(tableDbName);
@@ -205,10 +206,6 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     //                                                                      ==============
     protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
         return new HashMap<KEY, VALUE>();
-    }
-
-    protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
-        return new ConcurrentHashMap<KEY, VALUE>();
     }
 
     // -----------------------------------------------------
