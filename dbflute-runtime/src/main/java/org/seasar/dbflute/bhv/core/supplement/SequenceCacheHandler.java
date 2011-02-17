@@ -53,8 +53,8 @@ public class SequenceCacheHandler {
      * @param sequenceName The name of sequence. (NotNull)
      * @param dataSource The data source for a database connection. (NotNull)
      * @param resultType The type of sequence result. (NotNull)
-     * @param cacheSize The size of sequence cache. (NullAllowed: If null, returns null)
-     * @param incrementSize The size of increment of sequence. (Nullable, If null, batch way is invalid) 
+     * @param cacheSize The size of sequence cache. (NullAllowed: if null, returns null)
+     * @param incrementSize The size of increment of sequence. (NullAllowed, f null, batch way is invalid) 
      * @return The object for sequence cache. (NullAllowed) 
      */
     public SequenceCache findSequenceCache(String tableName, String sequenceName, DataSource dataSource,
@@ -70,7 +70,7 @@ public class SequenceCacheHandler {
         synchronized (_sequenceCacheMap) {
             sequenceCache = getSequenceCache(key);
             if (sequenceCache != null) {
-                // an other thread might have initialized
+                // previous thread might have initialized
                 // or reading might failed by same-time writing
                 return sequenceCache;
             }

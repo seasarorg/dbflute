@@ -1038,7 +1038,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
         synchronized (_methodNameMap) {
             if (!_methodNameMap.isEmpty()) {
-                // an other thread might have initialized
+                // previous thread might have initialized
                 // or reading might failed by same-time writing
                 return _methodNameMap.containsKey(methodName);
             }

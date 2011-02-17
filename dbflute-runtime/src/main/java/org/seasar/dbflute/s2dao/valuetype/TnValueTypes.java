@@ -154,7 +154,7 @@ public class TnValueTypes {
         synchronized (_valueTypesMap) {
             valueTypes = _valueTypesMap.get(dbdef);
             if (valueTypes != null) {
-                // an other thread might have initialized
+                // previous thread might have initialized
                 // or reading might failed by same-time writing
                 return valueTypes;
             }
