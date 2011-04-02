@@ -42,6 +42,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -141,6 +142,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     columnNameList.addAll(additionalColumnList);
                     continue;
                 }
+                lineString = filterLineString(lineString);
                 {
                     final String realLineString;
                     if (preContinueString.equals("")) {
@@ -415,7 +417,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                          Value List
     //                                                                          ==========
-    protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
+    protected ValueLineInfo arrangeValueList(String lineString, String delimiter) {
         // Don't use String.split() because the method
         // does not match this (detail) specification!
         //final String[] values = lineString.split(delimiter);
@@ -432,7 +434,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             if (value == null) { // basically no way (valueList does not contain null)
                 continue;
             }
-            if (i == valueList.size() - 1) { // The last loop
+            if (i == valueList.size() - 1) { // last loop at the line
                 if (preString.equals("")) {
                     if (isFrontQOnly(value)) {
                         valueLineInfo.setContinueNextLine(true);
@@ -442,11 +444,11 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     } else if (isNotBothQ(value)) {
                         resultList.add(value);
                     } else {
-                        resultList.add(removeDoubleQuotation(value));
+                        resultList.add(resolveDoubleQuotation(value));
                     }
-                } else {
+                } else { // continued
                     if (endsQuote(value, false)) {
-                        resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
+                        resultList.add(resolveDoubleQuotation(connectPreString(preString, delimiter, value)));
                     } else {
                         valueLineInfo.setContinueNextLine(true);
                         resultList.add(connectPreString(preString, delimiter, value));
@@ -465,11 +467,11 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 } else if (isNotBothQ(value)) {
                     resultList.add(value);
                 } else {
-                    resultList.add(removeDoubleQuotation(value));
+                    resultList.add(resolveDoubleQuotation(value));
                 }
-            } else {
+            } else { // continued
                 if (endsQuote(value, false)) {
-                    resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
+                    resultList.add(resolveDoubleQuotation(connectPreString(preString, delimiter, value)));
                 } else {
                     preString = connectPreString(preString, delimiter, value);
                     continue;
@@ -524,23 +526,12 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         return (number % 2) != 0;
     }
 
-    protected String removeDoubleQuotation(String value) {
-        if (!value.startsWith("\"") && !value.endsWith("\"")) {
-            return value;
-        }
-        if (value.startsWith("\"")) {
+    protected String resolveDoubleQuotation(String value) {
+        if (value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
             value = value.substring(1);
-        }
-        if (value.endsWith("\"")) {
             value = value.substring(0, value.length() - 1);
-        }
-        value = Srl.replace(value, "\"\"", "\"");
-        return value;
-    }
-
-    protected String removeRightDoubleQuotation(String value) {
-        if (value.endsWith("\"")) {
-            value = value.substring(0, value.length() - 1);
+            // resolve escaped quotation : "" -> "
+            value = Srl.replace(value, "\"\"", "\"");
         }
         return value;
     }
@@ -600,6 +591,37 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             return true;
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                       Convert Value
+    //                                                                       =============
+    protected String filterLineString(String lineString) {
+        final Map<String, String> lineMapping = findConvertLineMapping();
+        if (lineMapping != null) {
+            final Set<Entry<String, String>> entrySet = lineMapping.entrySet();
+            for (Entry<String, String> entry : entrySet) {
+                final String before = entry.getKey();
+                final String after = entry.getValue();
+                lineString = Srl.replace(lineString, before, after);
+            }
+        }
+        return lineString;
+    }
+
+    protected Map<String, String> _convertLineMap;
+
+    protected Map<String, String> findConvertLineMapping() {
+        if (_convertLineMap != null) {
+            return _convertLineMap;
+        }
+        if (_convertValueMap != null) {
+            _convertLineMap = _convertValueMap.get("$$LINE$$");
+        }
+        if (_convertLineMap == null) {
+            _convertLineMap = DfCollectionUtil.emptyMap();
+        }
+        return _convertLineMap;
     }
 
     // ===================================================================================

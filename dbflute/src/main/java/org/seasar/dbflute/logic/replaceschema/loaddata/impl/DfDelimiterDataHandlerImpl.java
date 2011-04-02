@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -38,6 +39,8 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -131,22 +134,49 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
         }
     }
 
-    private Map<String, Map<String, String>> getConvertValueMap(DfDelimiterDataResource info, String encoding) {
+    protected Map<String, Map<String, String>> getConvertValueMap(DfDelimiterDataResource info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/convertValueMap.dataprop";
         final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
         Map<String, Map<String, String>> readMap = reader.readMapAsStringMapValue(path);
         if (readMap != null && !readMap.isEmpty()) {
             resultMap.putAll(readMap);
-            return resultMap;
+        } else {
+            path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
+            readMap = reader.readMapAsStringMapValue(path);
+            resultMap.putAll(readMap);
         }
-        path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
-        readMap = reader.readMapAsStringMapValue(path);
-        resultMap.putAll(readMap);
+        return resolveControlCharacter(resultMap);
+    }
+
+    protected Map<String, Map<String, String>> resolveControlCharacter(Map<String, Map<String, String>> convertValueMap) {
+        final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        for (Entry<String, Map<String, String>> entry : convertValueMap.entrySet()) {
+            final Map<String, String> elementMap = DfCollectionUtil.newLinkedHashMap();
+            for (Entry<String, String> nextEntry : entry.getValue().entrySet()) {
+                final String key = resolveControlCharacter(nextEntry.getKey());
+                final String value = resolveControlCharacter(nextEntry.getValue());
+                elementMap.put(key, value);
+            }
+            resultMap.put(entry.getKey(), elementMap);
+        }
         return resultMap;
     }
 
-    private Map<String, String> getDefaultValueMap(DfDelimiterDataResource info, String encoding) {
+    protected String resolveControlCharacter(String value) {
+        if (value == null) {
+            return null;
+        }
+        final String tmp = "${df:temporaryVariable}";
+        value = Srl.replace(value, "\\\\", tmp);
+        value = Srl.replace(value, "\\r", "\r");
+        value = Srl.replace(value, "\\n", "\n");
+        value = Srl.replace(value, "\\t", "\t");
+        value = Srl.replace(value, tmp, "\\");
+        return value;
+    }
+
+    protected Map<String, String> getDefaultValueMap(DfDelimiterDataResource info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.dataprop";
         final Map<String, String> resultMap = StringKeyMap.createAsFlexibleOrdered();

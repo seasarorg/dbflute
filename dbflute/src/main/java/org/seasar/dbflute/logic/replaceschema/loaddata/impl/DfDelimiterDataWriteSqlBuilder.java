@@ -140,8 +140,8 @@ public class DfDelimiterDataWriteSqlBuilder {
         boolean converted = false;
         final String containMark = DfNameHintUtil.CONTAIN_MARK;
         for (Entry<String, String> entry : valueMapping.entrySet()) {
-            final String before = resolveControlCharacter(entry.getKey());
-            final String after = resolveVariable(resolveControlCharacter(entry.getValue()));
+            final String before = entry.getKey();
+            final String after = resolveVariable(entry.getValue());
             if (Srl.startsWithIgnoreCase(before, containMark)) {
                 if (filteredValue != null) {
                     final String realBefore = resolveVariable(Srl.substringFirstRear(before, containMark));
@@ -163,19 +163,6 @@ public class DfDelimiterDataWriteSqlBuilder {
             convertedSet.add("converted");
         }
         return filteredValue;
-    }
-
-    protected String resolveControlCharacter(String value) {
-        if (value == null) {
-            return null;
-        }
-        final String tmp = "${df:temporaryVariable}";
-        value = Srl.replace(value, "\\\\", tmp);
-        value = Srl.replace(value, "\\r", "\r");
-        value = Srl.replace(value, "\\n", "\n");
-        value = Srl.replace(value, "\\t", "\t");
-        value = Srl.replace(value, tmp, "\\");
-        return value;
     }
 
     protected String resolveVariable(String value) {
