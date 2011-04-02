@@ -50,8 +50,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                        Alias Delimiter In DbComment
-    //                                                        ============================
+    //                                                                     Alias DbComment
+    //                                                                     ===============
     public boolean isAliasDelimiterInDbCommentValid() {
         final String delimiter = getAliasDelimiterInDbComment();
         return delimiter != null && delimiter.trim().length() > 0 && !delimiter.trim().equalsIgnoreCase("null");
@@ -66,33 +66,51 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String extractAliasFromDbComment(String comment) {
-        if (!hasAlias(comment)) {
-            return null;
+        if (!isAliasHandling(comment)) {
+            return comment;
         }
-        final String delimiter = getAliasDelimiterInDbComment();
-        return comment.substring(0, comment.indexOf(delimiter)).trim();
+        if (hasAliasDelimiter(comment)) {
+            final String delimiter = getAliasDelimiterInDbComment();
+            return comment.substring(0, comment.indexOf(delimiter)).trim();
+        } else {
+            if (isAliasBasisInDbComment()) {
+                return comment; // because the comment is for alias
+            } else {
+                return null;
+            }
+        }
     }
 
     public String extractCommentFromDbComment(String comment) {
-        if (!hasAlias(comment)) {
+        if (!isAliasHandling(comment)) {
             return comment;
         }
-        final String delimiter = getAliasDelimiterInDbComment();
-        return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
+        if (hasAliasDelimiter(comment)) {
+            final String delimiter = getAliasDelimiterInDbComment();
+            return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
+        } else {
+            if (isAliasBasisInDbComment()) {
+                return null; // because the comment is for alias
+            } else {
+                return comment;
+            }
+        }
     }
 
-    protected boolean hasAlias(String comment) {
+    protected boolean isAliasHandling(String comment) {
         if (comment == null || comment.trim().length() == 0) {
             return false;
         }
-        if (!isAliasDelimiterInDbCommentValid()) {
-            return false;
-        }
+        return isAliasDelimiterInDbCommentValid();
+    }
+
+    protected boolean hasAliasDelimiter(String comment) {
         final String delimiter = getAliasDelimiterInDbComment();
-        if (!comment.contains(delimiter)) {
-            return false;
-        }
-        return true;
+        return comment.contains(delimiter);
+    }
+
+    protected boolean isAliasBasisInDbComment() {
+        return isProperty("isAliasBasisInDbComment", false, getDocumentDefinitionMap());
     }
 
     // ===================================================================================

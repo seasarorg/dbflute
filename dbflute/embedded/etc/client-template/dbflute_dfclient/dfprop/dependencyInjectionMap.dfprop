@@ -47,7 +47,7 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o dbfluteDiconBeforeJ2eeIncludeDefinitionMap: (NotRequired - Default 'map:{}')
     #  The include definition of DBFlute DI configuration before j2ee including.
-    #  ex) map:{ jdbc-xxx.dicon = dummy }
+    #  e.g. map:{ jdbc-xxx.dicon = dummy }
     # 
     # @JavaSeasarOnly
     #; dbfluteDiconBeforeJ2eeIncludeDefinitionMap = map:{}
@@ -56,7 +56,7 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o dbfluteDiconOtherIncludeDefinitionMap: (NotRequired - Default 'map:{}')
     #  The other include definition of DBFlute DI configuration.
-    #  ex) map:{ common.dicon = dummy }
+    #  e.g. map:{ common.dicon = dummy }
     # 
     # @JavaSeasarOnly
     #; dbfluteDiconOtherIncludeDefinitionMap = map:{}

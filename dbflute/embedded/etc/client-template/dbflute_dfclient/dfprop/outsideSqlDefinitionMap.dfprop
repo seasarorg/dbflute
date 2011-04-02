@@ -60,7 +60,7 @@ map:{
     # o targetProcedureSchemaList: (NotRequired - Default list:{})
     #  You can specify target schema of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
-    #  ex) list:{PROCEDUREDB}
+    #  e.g. list:{PROCEDUREDB}
     #
     #; targetProcedureSchemaList = list:{FOO_SCHEMA ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
     # - - - - - - - - - -/
@@ -69,7 +69,7 @@ map:{
     # o targetProcedureNameList: (NotRequired - Default list:{})
     #  You can specify target name of generated parameter bean for procedure.
     #  This property is valid only when isGenerateProcedureParameterBean is valid.
-    #  ex) list:{prefix:SP_}
+    #  e.g. list:{prefix:SP_}
     #
     #; targetProcedureNameList = list:{FOO_PROCEDURE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
     # - - - - - - - - - -/
@@ -78,7 +78,7 @@ map:{
     # o executionMetaProcedureNameList: (NotRequired - Default list:{})
     #  You can specify target name of generated customize entity for procedure.
     #  This property is valid only when isGenerateProcedureCustomizeEntity is valid.
-    #  ex) list:{prefix:SP_}
+    #  e.g. list:{prefix:SP_}
     #
     #; executionMetaProcedureNameList = list:{FOO_PROCEDURE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
     # - - - - - - - - - -/

@@ -66,7 +66,7 @@ map:{
     #  If this property is specified and detail package properties is not specified, 
     #  Then the packages of generated class are as follows:
     #
-    #  ex) packageBase = com.example.dbflute.basic.dbflute
+    #  e.g. packageBase = com.example.dbflute.basic.dbflute
     #      --> com.example.dbflute.basic.dbflute.allcommon
     #      --> com.example.dbflute.basic.dbflute.bsbhv
     #      --> com.example.dbflute.basic.dbflute.bsentity
@@ -122,11 +122,11 @@ map:{
     #  Basically you don't need this if the style of table name is like 'FOO_STATUS'.
     #    [true]
     #      The table name is camel case.
-    #      ex) If the table name is 'OrderDetail', the class name is 'OrderDetail'.
+    #      e.g. If the table name is 'OrderDetail', the class name is 'OrderDetail'.
     # 
     #    [false]
-    #      ex) If the table name is 'ORDER_DETAIL', the class name is 'OrderDetail'.
-    #      ex) If the table name is 'OrderDetail', the class name is 'Orderdetail'.
+    #      e.g. If the table name is 'ORDER_DETAIL', the class name is 'OrderDetail'.
+    #      e.g. If the table name is 'OrderDetail', the class name is 'Orderdetail'.
     #
     #; isTableNameCamelCase = false
     # - - - - - - - - - -/
@@ -137,11 +137,11 @@ map:{
     #  Basically you don't need this if the style of column name is like 'FOO_NAME'.
     #    [true]
     #      The column name is camel case.
-    #      ex) If the column name is 'OrderDetailId', the class name is 'OrderDetailId'.
+    #      e.g. If the column name is 'OrderDetailId', the class name is 'OrderDetailId'.
     # 
     #    [false]
-    #      ex) If the column name is 'ORDER_DETAIL_ID', the class name is 'OrderDetailId'.
-    #      ex) If the column name is 'OrderDetailId',  the class name is 'Orderdetailid'.
+    #      e.g. If the column name is 'ORDER_DETAIL_ID', the class name is 'OrderDetailId'.
+    #      e.g. If the column name is 'OrderDetailId',  the class name is 'Orderdetailid'.
     #
     #; isColumnNameCamelCase = false
     # - - - - - - - - - -/
@@ -195,10 +195,10 @@ map:{
     #  Elements of this map are as below:
     #   o flatDirectoryPackage: (Required - Default '')
     #    This is only for CSharp.
-    #    ex) Aaa.Bbb.DBFlute --> Directory: source/Aaa.Bbb.DBFlute/AllCommon
+    #    e.g. Aaa.Bbb.DBFlute --> Directory: source/Aaa.Bbb.DBFlute/AllCommon
     #   o omitDirectoryPackage: (NotRequired - Default '')
     #    This is only for CSharp.
-    #    ex) Aaa --> Directory: source/Bbb/DBFlute/AllCommon
+    #    e.g. Aaa --> Directory: source/Bbb/DBFlute/AllCommon
     #
     #; outputPackageAdjustmentMap = map:{
     #    ; flatDirectoryPackage = Aaa.Bbb.DBFlute
