@@ -141,15 +141,15 @@ public class DfDelimiterDataWriteSqlBuilder {
         final String containMark = DfNameHintUtil.CONTAIN_MARK;
         for (Entry<String, String> entry : valueMapping.entrySet()) {
             final String before = resolveControlCharacter(entry.getKey());
-            final String after = resolveControlCharacter(entry.getValue());
+            final String after = resolveVariable(resolveControlCharacter(entry.getValue()));
             if (Srl.startsWithIgnoreCase(before, containMark)) {
                 if (filteredValue != null) {
-                    final String realBefore = resolveBeforeVariable(Srl.substringFirstRear(before, containMark));
+                    final String realBefore = resolveVariable(Srl.substringFirstRear(before, containMark));
                     filteredValue = Srl.replace(filteredValue, realBefore, (after != null ? after : ""));
                     converted = true;
                 }
             } else {
-                final String realBefore = resolveBeforeVariable(before);
+                final String realBefore = resolveVariable(before);
                 if (filteredValue != null && filteredValue.equals(realBefore)) {
                     filteredValue = after;
                     converted = true;
@@ -178,14 +178,14 @@ public class DfDelimiterDataWriteSqlBuilder {
         return value;
     }
 
-    protected String resolveBeforeVariable(String before) {
-        if ("$$empty$$".equalsIgnoreCase(before)) {
+    protected String resolveVariable(String value) {
+        if ("$$empty$$".equalsIgnoreCase(value)) {
             return "";
         }
-        if ("$$null$$".equalsIgnoreCase(before)) {
+        if ("$$null$$".equalsIgnoreCase(value)) {
             return null;
         }
-        return before;
+        return value;
     }
 
     protected Object filterEmptyAsNull(Object value) {

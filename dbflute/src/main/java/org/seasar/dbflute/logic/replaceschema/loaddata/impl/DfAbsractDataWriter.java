@@ -44,10 +44,10 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.DfTypeUtil.ParseBooleanException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -122,6 +122,7 @@ public abstract class DfAbsractDataWriter {
         if (!isNullValue(value)) {
             return false;
         }
+
         Map<String, Integer> cacheMap = _nullTypeCacheMap.get(tableName);
         if (cacheMap == null) {
             cacheMap = StringKeyMap.createAsFlexibleOrdered();
@@ -254,6 +255,8 @@ public abstract class DfAbsractDataWriter {
                 break;
             }
         }
+        // must be bound here
+        // (_stringProcessorList has processor for real string)
     }
 
     protected void throwColumnValueProcessingFailureException(StringProcessor processor, String tableName,

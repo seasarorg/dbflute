@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -364,16 +364,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                    ================
     @Override
     protected boolean isNullValue(Object value) {
-        if (value == null) {
-            return true;
-        }
+        return super.isNullValue(value);
 
-        // Because separated value!
-        if (!(value instanceof String)) {
-            return false;
-        }
-        String str = (String) value;
-        return str.length() == 0 || str.equals("\"\"");
+        // *This process was moved to DfDelimiterDataWriteSqlBuilder
+        //if (!(value instanceof String)) {
+        //    return false;
+        //}
+        //String str = (String) value;
+        //return str.length() == 0 || str.equals("\"\"");
     }
 
     // ===================================================================================
