@@ -6,13 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -119,50 +120,86 @@ public class DfDelimiterDataWriteSqlBuilder {
         for (Entry<String, String> entry : entrySet) {
             final String columnName = entry.getKey();
             final String plainValue = entry.getValue();
-            Object resolvedValue;
-            if (Srl.is_NotNull_and_NotEmpty(plainValue)) {
-                resolvedValue = resolveConvertValue(columnName, plainValue);
-            } else {
-                resolvedValue = resolveDefaultValue(columnName, plainValue);
+            final Set<String> convertedSet = DfCollectionUtil.newHashSet();
+            Object resolvedValue = resolveConvertValue(columnName, plainValue, convertedSet);
+            if (convertedSet.isEmpty()) { // if no convert
+                resolvedValue = filterEmptyAsNull(resolvedValue); // treated as null if empty string
+                resolvedValue = resolveDefaultValue(columnName, resolvedValue);
             }
             resolvedColumnValueMap.put(columnName, resolvedValue);
         }
         return resolvedColumnValueMap;
     }
 
-    protected String resolveConvertValue(String columnName, String plainValue) {
-        String resolvedValue = plainValue;
+    protected String resolveConvertValue(String columnName, String plainValue, Set<String> convertedSet) {
+        String filteredValue = plainValue;
         final Map<String, String> valueMapping = findConvertValueMapping(columnName);
         if (valueMapping == null || valueMapping.isEmpty()) {
-            return resolvedValue;
+            return filteredValue;
         }
+        boolean converted = false;
+        final String containMark = DfNameHintUtil.CONTAIN_MARK;
         for (Entry<String, String> entry : valueMapping.entrySet()) {
             final String before = resolveControlCharacter(entry.getKey());
             final String after = resolveControlCharacter(entry.getValue());
-            if (Srl.startsWithIgnoreCase(before, DfNameHintUtil.CONTAIN_MARK)) {
-                final String realBefore = Srl.substringFirstRear(before, DfNameHintUtil.CONTAIN_MARK);
-                resolvedValue = Srl.replace(resolvedValue, realBefore, after);
-            } else if (resolvedValue.equals(before)) { // case sensitive here
-                resolvedValue = after;
+            if (Srl.startsWithIgnoreCase(before, containMark)) {
+                if (filteredValue != null) {
+                    final String realBefore = resolveBeforeVariable(Srl.substringFirstRear(before, containMark));
+                    filteredValue = Srl.replace(filteredValue, realBefore, (after != null ? after : ""));
+                    converted = true;
+                }
+            } else {
+                final String realBefore = resolveBeforeVariable(before);
+                if (filteredValue != null && filteredValue.equals(realBefore)) {
+                    filteredValue = after;
+                    converted = true;
+                } else if (filteredValue == null && realBefore == null) {
+                    filteredValue = after;
+                    converted = true;
+                }
             }
         }
-        return resolvedValue;
+        if (converted) {
+            convertedSet.add("converted");
+        }
+        return filteredValue;
     }
 
-    protected String resolveControlCharacter(String after) {
-        if (after == null) {
+    protected String resolveControlCharacter(String value) {
+        if (value == null) {
             return null;
         }
         final String tmp = "${df:temporaryVariable}";
-        after = Srl.replace(after, "\\\\", tmp);
-        after = Srl.replace(after, "\\r", "\r");
-        after = Srl.replace(after, "\\n", "\n");
-        after = Srl.replace(after, "\\t", "\t");
-        after = Srl.replace(after, tmp, "\\");
-        return after;
+        value = Srl.replace(value, "\\\\", tmp);
+        value = Srl.replace(value, "\\r", "\r");
+        value = Srl.replace(value, "\\n", "\n");
+        value = Srl.replace(value, "\\t", "\t");
+        value = Srl.replace(value, tmp, "\\");
+        return value;
+    }
+
+    protected String resolveBeforeVariable(String before) {
+        if ("$$empty$$".equalsIgnoreCase(before)) {
+            return "";
+        }
+        if ("$$null$$".equalsIgnoreCase(before)) {
+            return null;
+        }
+        return before;
+    }
+
+    protected Object filterEmptyAsNull(Object value) {
+        if (value instanceof String && Srl.isEmpty((String) value)) {
+            return null;
+        }
+        return value;
     }
 
     protected Object resolveDefaultValue(String columnName, Object plainValue) {
+        if (plainValue != null) {
+            // empty string has already been resolved here
+            return plainValue;
+        }
         if (!hasDefaultValue(columnName)) {
             return plainValue;
         }
