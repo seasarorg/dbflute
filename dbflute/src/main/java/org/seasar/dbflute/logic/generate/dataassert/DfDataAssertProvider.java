@@ -9,15 +9,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.DfAssertionFailureCountNotExistsException;
-import org.seasar.dbflute.exception.DfAssertionFailureCountNotZeroException;
-import org.seasar.dbflute.exception.DfAssertionFailureListNotExistsException;
-import org.seasar.dbflute.exception.DfAssertionFailureListNotZeroException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureCountNotExistsException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureCountNotZeroException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureListNotExistsException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureListNotZeroException;
 import org.seasar.dbflute.exception.DfAssertionInvalidMarkException;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -222,7 +222,7 @@ public class DfDataAssertProvider {
     protected void throwAssertionFailureCountNotZeroException(File sqlFile, String sql, int resultCount) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects ZERO but the result is NOT ZERO!" + ln();
+        msg = msg + "The SQL expects ZERO but the result was NOT ZERO!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your test data!" + ln();
@@ -233,13 +233,13 @@ public class DfDataAssertProvider {
         msg = msg + ln();
         msg = msg + "[Result Count]" + ln() + resultCount + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureCountNotZeroException(msg);
+        throw new DfTakeFinallyAssertionFailureCountNotZeroException(msg);
     }
 
     protected void throwAssertionFailureCountNotExistsException(File sqlFile, String sql, int resultCount) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects EXISTS but the result is NOT EXISTS!" + ln();
+        msg = msg + "The SQL expects EXISTS but the result was NOT EXISTS!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your test data!" + ln();
@@ -250,14 +250,14 @@ public class DfDataAssertProvider {
         msg = msg + ln();
         msg = msg + "[Result Count]" + ln() + resultCount + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureCountNotExistsException(msg);
+        throw new DfTakeFinallyAssertionFailureCountNotExistsException(msg);
     }
 
     protected void throwAssertionFailureListNotZeroException(File sqlFile, String sql, int resultCount,
             List<Map<String, String>> resultList) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects ZERO but the result is NOT ZERO!" + ln();
+        msg = msg + "The SQL expects ZERO but the result was NOT ZERO!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your test data!" + ln();
@@ -273,14 +273,14 @@ public class DfDataAssertProvider {
             msg = msg + recordMap + ln();
         }
         msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureListNotZeroException(msg);
+        throw new DfTakeFinallyAssertionFailureListNotZeroException(msg);
     }
 
     protected void throwAssertionFailureListNotExistsException(File sqlFile, String sql, int resultCount,
             List<Map<String, String>> resultList) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects EXISTS but the result is NOT EXISTS!" + ln();
+        msg = msg + "The SQL expects EXISTS but the result was NOT EXISTS!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your test data!" + ln();
@@ -296,7 +296,7 @@ public class DfDataAssertProvider {
             msg = msg + recordMap + ln();
         }
         msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureListNotExistsException(msg);
+        throw new DfTakeFinallyAssertionFailureListNotExistsException(msg);
     }
 
     // ===================================================================================

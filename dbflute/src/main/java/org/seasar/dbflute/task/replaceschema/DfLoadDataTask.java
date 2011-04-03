@@ -3,8 +3,8 @@ package org.seasar.dbflute.task.replaceschema;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -131,7 +131,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         resource.setDelimiter(delimiter);
         final DfDelimiterDataHandler handler = getDelimiterDataHandlerImpl();
         final DfDelimiterDataResultInfo resultInfo = handler.writeSeveralData(resource, _loadedDataInfo);
-        showNotFoundColumn(fileType, resultInfo.getNotFoundColumnMap());
+        showDelimiterResult(fileType, resultInfo);
     }
 
     protected DfDelimiterDataHandlerImpl getDelimiterDataHandlerImpl() {
@@ -148,22 +148,35 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         return _delimiterDataHandlerImpl;
     }
 
-    protected void showNotFoundColumn(String typeName, Map<String, Set<String>> notFoundColumnMap) {
-        if (notFoundColumnMap.isEmpty()) {
-            return;
-        }
-        _log.warn("* * * * * * * * * * * * * * *");
-        _log.warn("Not Persistent Columns in " + typeName);
-        _log.warn("* * * * * * * * * * * * * * *");
-        Set<Entry<String, Set<String>>> entrySet = notFoundColumnMap.entrySet();
-        for (Entry<String, Set<String>> entry : entrySet) {
-            String tableName = entry.getKey();
-            Set<String> columnNameSet = entry.getValue();
-            _log.warn("[" + tableName + "]");
-            for (String columnName : columnNameSet) {
-                _log.warn("    " + columnName);
+    protected void showDelimiterResult(String typeName, DfDelimiterDataResultInfo resultInfo) {
+        final Map<String, Set<String>> notFoundColumnMap = resultInfo.getNotFoundColumnMap();
+        if (!notFoundColumnMap.isEmpty()) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("*Found non-persistent columns in ").append(typeName).append(":");
+            Set<Entry<String, Set<String>>> entrySet = notFoundColumnMap.entrySet();
+            for (Entry<String, Set<String>> entry : entrySet) {
+                final String tableName = entry.getKey();
+                final Set<String> columnNameSet = entry.getValue();
+                sb.append(ln()).append("[").append(tableName).append("]");
+                for (String columnName : columnNameSet) {
+                    sb.append(ln()).append("    ").append(columnName);
+                }
             }
-            _log.warn(" ");
+            _log.info(sb.toString());
+        }
+        final Map<String, List<String>> warningFileMap = resultInfo.getWarningFileMap();
+        if (!warningFileMap.isEmpty()) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("*Found warned files in ").append(typeName).append(":");
+            for (Entry<String, List<String>> entry : warningFileMap.entrySet()) {
+                final String key = entry.getKey();
+                final List<String> messageList = entry.getValue();
+                sb.append(ln()).append("[").append(key).append("]");
+                for (String message : messageList) {
+                    sb.append(ln()).append("    ").append(message);
+                }
+            }
+            _log.warn(sb.toString());
         }
     }
 
@@ -275,7 +288,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             if (loadedFileCount > 0) {
                 setupDetailMessage(detailMessageSb); // has the last line separator
             }
-            detailMessageSb.append("x (failed: Look the exception message)");
+            detailMessageSb.append("x (failed: Look at the exception message)");
             detailMessage = detailMessageSb.toString();
         }
         final File dumpFile = new File(LOAD_DATA_LOG_PATH);
@@ -322,17 +335,31 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         // o (and other tsv files...)
         // o 20-member.xls
         // o 30-product.xls
+
+        String fileType4Etc = null;
+        boolean etcExists = false;
+        boolean etcWarned = false;
         int index = 0;
         for (DfLoadedFile loadedFile : loadedFileList) {
+            if (fileType4Etc == null) { // first loop
+                fileType4Etc = loadedFile.getFileType();
+            }
             if (index >= limit) {
-                final String fileType = loadedFile.getFileType();
-                detailMessageSb.append("o (and other ").append(fileType).append(" files...)").append(ln());
-                break;
+                etcExists = true;
+                if (loadedFile.isWarned()) {
+                    etcWarned = true;
+                }
+                continue;
             }
             final String fileName = loadedFile.getFileName();
-
-            detailMessageSb.append("o ").append(fileName).append(ln());
+            final String mark = loadedFile.isWarned() ? "v " : "o ";
+            detailMessageSb.append(mark).append(fileName).append(ln());
             ++index;
+        }
+        if (etcExists) {
+            final String mark = etcWarned ? "v " : "o ";
+            detailMessageSb.append(mark).append("(and other ");
+            detailMessageSb.append(fileType4Etc).append(" files...)").append(ln());
         }
     }
 

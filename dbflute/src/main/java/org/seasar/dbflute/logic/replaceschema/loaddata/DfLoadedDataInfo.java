@@ -61,8 +61,8 @@ public class DfLoadedDataInfo {
         return _hierarchyListMap;
     }
 
-    public void addLoadedFile(String envType, String fileType, String encoding, String fileName) {
-        final DfLoadedFile loadedFile = new DfLoadedFile(envType, fileType, encoding, fileName);
+    public void addLoadedFile(String envType, String fileType, String encoding, String fileName, boolean warned) {
+        final DfLoadedFile loadedFile = new DfLoadedFile(envType, fileType, encoding, fileName, warned);
         _loadedFileList.add(loadedFile);
 
         Map<String, List<DfLoadedFile>> fileTypeKeyListMap = _hierarchyListMap.get(envType);

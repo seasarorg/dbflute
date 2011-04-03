@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -117,14 +117,16 @@ public class DfDelimiterDataWriteSqlBuilder {
     protected Map<String, Object> resolveColumnValueMap(Map<String, String> basicColumnValueMap) {
         final Map<String, Object> resolvedColumnValueMap = new LinkedHashMap<String, Object>();
         final Set<Entry<String, String>> entrySet = basicColumnValueMap.entrySet();
+        final Set<String> convertedSet = new HashSet<String>(1);
         for (Entry<String, String> entry : entrySet) {
             final String columnName = entry.getKey();
             final String plainValue = entry.getValue();
-            final Set<String> convertedSet = DfCollectionUtil.newHashSet();
             Object resolvedValue = resolveConvertValue(columnName, plainValue, convertedSet);
             if (convertedSet.isEmpty()) { // if no convert
                 resolvedValue = filterEmptyAsNull(resolvedValue); // treated as null if empty string
                 resolvedValue = resolveDefaultValue(columnName, resolvedValue);
+            } else {
+                convertedSet.clear(); // recycle
             }
             resolvedColumnValueMap.put(columnName, resolvedValue);
         }
@@ -143,8 +145,8 @@ public class DfDelimiterDataWriteSqlBuilder {
             final String before = entry.getKey();
             final String after = resolveVariable(entry.getValue());
             if (Srl.startsWithIgnoreCase(before, containMark)) {
-                if (filteredValue != null) {
-                    final String realBefore = resolveVariable(Srl.substringFirstRear(before, containMark));
+                final String realBefore = resolveVariable(Srl.substringFirstRear(before, containMark));
+                if (filteredValue != null && filteredValue.contains(realBefore)) {
                     filteredValue = Srl.replace(filteredValue, realBefore, (after != null ? after : ""));
                     converted = true;
                 }

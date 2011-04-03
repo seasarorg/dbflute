@@ -17,8 +17,6 @@ package org.seasar.dbflute.logic.replaceschema.loaddata;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author jflute
@@ -27,9 +25,9 @@ public interface DfDelimiterDataWriter {
 
     /**
      * Write data from delimiter-file.
-     * @param notFoundColumnMap The map of not-found column for history. (NotNull)
+     * @param resultInfo The information of writing result. (NotNull)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    void writeData(Map<String, Set<String>> notFoundColumnMap) throws FileNotFoundException, IOException;
+    void writeData(DfDelimiterDataResultInfo resultInfo) throws FileNotFoundException, IOException;
 }

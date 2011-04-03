@@ -87,7 +87,7 @@ public class DfPmbPropertyOptionClassification {
     }
 
     protected void throwClassificationNotFoundException(String classificationName) {
-        String msg = "Look the message below:" + ln();
+        String msg = "Look at the message below:" + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
         msg = msg + "The classification was not found:" + ln();
         msg = msg + " " + _pmbMetaData.getClassName() + " " + _propertyName;
@@ -142,7 +142,7 @@ public class DfPmbPropertyOptionClassification {
         try {
             return option.substring(clsIdx, clsEndIdx);
         } catch (StringIndexOutOfBoundsException e) {
-            String msg = "Look the message below:" + ln();
+            String msg = "Look at the message below:" + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
             msg = msg + "IndexOutOfBounds ocurred:" + ln();
             msg = msg + " " + _pmbMetaData.getClassName() + " " + _propertyName;

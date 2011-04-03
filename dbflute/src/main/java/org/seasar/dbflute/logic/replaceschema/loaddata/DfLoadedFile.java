@@ -27,15 +27,17 @@ public class DfLoadedFile {
     protected final String _fileType;
     protected final String _encoding;
     protected final String _fileName;
+    protected final boolean _warned;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    public DfLoadedFile(String envType, String fileType, String encoding, String fileName) {
+    public DfLoadedFile(String envType, String fileType, String encoding, String fileName, boolean warned) {
         _envType = envType;
         _fileType = fileType;
         _encoding = encoding;
         _fileName = fileName;
+        _warned = warned;
     }
 
     // ===================================================================================
@@ -55,5 +57,9 @@ public class DfLoadedFile {
 
     public String getFileName() {
         return _fileName;
+    }
+
+    public boolean isWarned() {
+        return _warned;
     }
 }

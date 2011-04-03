@@ -41,6 +41,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -78,7 +79,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
-    public void writeData(Map<String, Set<String>> notFoundColumnMap) throws IOException {
+    public void writeData(DfDelimiterDataResultInfo resultInfo) throws IOException {
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
         _log.info("writeData(" + _fileName + ", " + _encoding + ")");
         _log.info("= = = = = = =/");
@@ -162,10 +163,10 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 try {
                     if (isDifferentColumnValueCount(firstLineInfo, valueList, lineString)) {
                         String msg = "The count of values wasn't correct:";
-                        msg = msg + " columnNameSize=" + firstLineInfo.getColumnNameList().size();
-                        msg = msg + " valueSize=" + valueList.size();
-                        msg = msg + " lineString=" + lineString + " valueList=" + valueList;
-                        _log.warn(msg);
+                        msg = msg + " column=" + firstLineInfo.getColumnNameList().size();
+                        msg = msg + " value=" + valueList.size();
+                        msg = msg + " line=" + lineString;
+                        resultInfo.registerWarningFile(_fileName, msg);
                         continue;
                     }
 
@@ -174,7 +175,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     sqlBuilder.setColumnMap(columnInfoMap);
                     sqlBuilder.setColumnNameList(columnNameList);
                     sqlBuilder.setValueList(valueList);
-                    sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
+                    sqlBuilder.setNotFoundColumnMap(resultInfo.getNotFoundColumnMap());
                     sqlBuilder.setConvertValueMap(_convertValueMap);
                     sqlBuilder.setDefaultValueMap(_defaultValueMap);
                     if (conn == null) {

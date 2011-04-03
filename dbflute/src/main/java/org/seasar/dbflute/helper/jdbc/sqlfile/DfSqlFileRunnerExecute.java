@@ -86,13 +86,12 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     }
 
     protected void showContinueWarnLog(SQLException e, String sql) {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append("*Failure: ").append(e.getClass().getName()).append(ln());
         sb.append("/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
         sb.append("nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
         sb.append(ln());
         sb.append(sql).append(ln());
-        e.getSQLState();
         sb.append("- - - - - - - - - -").append(ln());
         sb.append(extractMessage(e)).append(ln());
         buildAdditionalErrorInfo(sb, e).append(ln());
@@ -108,7 +107,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 buildAdditionalErrorInfo(sb, nextNextEx).append(ln());
             }
         }
-        sb.append("nnnnnnnnnnnnnnnnnnnn/").append(ln());
+        sb.append("nnnnnnnnnnnnnnnnnnnn/");
         _log.warn(sb.toString());
     }
 

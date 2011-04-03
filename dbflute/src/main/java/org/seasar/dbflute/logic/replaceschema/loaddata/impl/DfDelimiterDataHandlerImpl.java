@@ -22,7 +22,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -67,7 +66,6 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     //                                                                                ====
     public DfDelimiterDataResultInfo writeSeveralData(DfDelimiterDataResource resource, DfLoadedDataInfo loadedDataInfo) {
         final DfDelimiterDataResultInfo resultInfo = new DfDelimiterDataResultInfo();
-        final Map<String, Set<String>> notFoundColumnMap = resultInfo.getNotFoundColumnMap();
         final String basePath = resource.getBasePath();
         final File baseDir = new File(basePath);
         final String[] dataDirectoryElements = baseDir.list(new FilenameFilter() {
@@ -114,8 +112,12 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setDefaultValueMap(defaultValueMap);
                     writer.setSuppressBatchUpdate(isSuppressBatchUpdate());
                     writer.setDataWritingInterceptor(_dataWritingInterceptor);
-                    writer.writeData(notFoundColumnMap);
-                    loadedDataInfo.addLoadedFile(resource.getEnvType(), resource.getFileType(), encoding, fileName);
+                    writer.writeData(resultInfo);
+
+                    final String envType = resource.getEnvType();
+                    final String fileType = resource.getFileType();
+                    final boolean warned = resultInfo.getWarningFileMap().containsKey(fileNamePath);
+                    loadedDataInfo.addLoadedFile(envType, fileType, encoding, fileName, warned);
                 }
             }
         } catch (IOException e) {

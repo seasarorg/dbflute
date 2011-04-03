@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
@@ -35,6 +36,7 @@ import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.factory.DfSeq
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
@@ -59,7 +61,18 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         final DfRunnerInformation runInfo = createRunnerInformation();
 
         beforeTakeFinally();
-        _takeFinallyFireResult = takeFinally(runInfo);
+        try {
+            _takeFinallyFireResult = takeFinally(runInfo);
+        } catch (DfTakeFinallyAssertionFailureException e) {
+            _takeFinallyFireResult = new DfSqlFileFireResult();
+            _takeFinallyFireResult.setExistsError(true);
+            _takeFinallyFireResult.setResultMessage("{Take Finally}: *asserted");
+            final StringBuilder sb = new StringBuilder();
+            sb.append(" >> ").append(DfTypeUtil.toClassTitle(e));
+            sb.append(ln()).append(" (Look at the exception message: console or dbflute.log)");
+            _takeFinallyFireResult.setDetailMessage(sb.toString());
+            throw e;
+        }
         incrementSequenceToDataMax();
         handleSchemaFailure();
     }
@@ -270,11 +283,11 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     protected void handleSchemaFailure() { // means continued errors
         final DfReplaceSchemaFinalInfo finalInfo = getReplaceSchemaFinalInfo();
         if (finalInfo.isCreateSchemaFailure()) {
-            String msg = "Failed to create schema (Look the final info)";
+            String msg = "Failed to create schema (Look at the final info)";
             throw new DfCreateSchemaFailureException(msg);
         }
         if (finalInfo.isTakeFinallyFailure()) {
-            String msg = "Failed to take finally (Look the final info)";
+            String msg = "Failed to take finally (Look at the final info)";
             throw new DfTakeFinallyFailureException(msg);
         }
     }
