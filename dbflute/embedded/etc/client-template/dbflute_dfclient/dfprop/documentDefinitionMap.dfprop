@@ -3,7 +3,7 @@
 #
 # o documentOutputDirectory (NotRequired - Default './output/doc')
 # o aliasDelimiterInDbComment (NotRequired - Default '')
-# o isDbCommentAliasBasis (NotRequired - Default false)
+# o isDbCommentOnAliasBasis (NotRequired - Default false)
 # o isEntityJavaDocDbCommentValid (NotRequired - Default false)
 # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
 # o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
@@ -16,7 +16,7 @@
 # map:{
 #     ; documentOutputDirectory = ./output/doc
 #     ; aliasDelimiterInDbComment = :
-#     ; isDbCommentAliasBasis = true
+#     ; isDbCommentOnAliasBasis = true
 #     ; isEntityJavaDocDbCommentValid = true
 #     ; isEntityDBMetaDbCommentValid = true
 #     ; schemaHtmlFileName = xxx.html
@@ -45,17 +45,18 @@ map:{
     #  you can use the alias in DBFlute world, java-doc, SchemaHTML...
     #  DB comment which does not have the delimiter is not treated
     #  as alias, treated as description (real comment).
-    #  But you can change it by 'isDbCommentAliasBasis'.
+    #  But you can change it by 'isDbCommentOnAliasBasis'.
     # 
     #; aliasDelimiterInDbComment = :
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDbCommentAliasBasis (NotRequired - Default false)
-    #  Are DB comments as alias basis?
+    # o isDbCommentOnAliasBasis (NotRequired - Default false)
+    #  Is DB comment on alias basis?
+    #  (Is DB comment alias name when it has no alias delimiter?)
     #  This property works with 'aliasDelimiterInDbComment'.
     # 
-    #; isDbCommentAliasBasis = false
+    #; isDbCommentOnAliasBasis = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

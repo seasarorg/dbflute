@@ -73,7 +73,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             final String delimiter = getAliasDelimiterInDbComment();
             return comment.substring(0, comment.indexOf(delimiter)).trim();
         } else {
-            if (isDbCommentAliasBasis()) {
+            if (isDbCommentOnAliasBasis()) {
                 return comment; // because the comment is for alias
             } else {
                 return null;
@@ -89,7 +89,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             final String delimiter = getAliasDelimiterInDbComment();
             return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
         } else {
-            if (isDbCommentAliasBasis()) {
+            if (isDbCommentOnAliasBasis()) {
                 return null; // because the comment is for alias
             } else {
                 return comment;
@@ -109,8 +109,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return comment.contains(delimiter);
     }
 
-    protected boolean isDbCommentAliasBasis() {
-        return isProperty("isDbCommentAliasBasis", false, getDocumentDefinitionMap());
+    protected boolean isDbCommentOnAliasBasis() {
+        return isProperty("isDbCommentOnAliasBasis", false, getDocumentDefinitionMap());
     }
 
     // ===================================================================================
