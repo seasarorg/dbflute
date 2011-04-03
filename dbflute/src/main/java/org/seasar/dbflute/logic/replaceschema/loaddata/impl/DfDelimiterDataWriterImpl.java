@@ -100,7 +100,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         beforeHandlingTable(tableDbName, columnInfoMap);
 
         String lineString = null;
-        String preContinueString = "";
+        String preContinueString = null;
         String executedSql = null;
         final List<String> columnNameList = new ArrayList<String>();
         final List<String> additionalColumnList = new ArrayList<String>();
@@ -123,10 +123,11 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 if (lineString == null) {
                     break;
                 }
+
+                // /- - - - - - - - - - - - - - - - - - - - - -
+                // initialize column definition from first line
+                // - - - - - - - - - -/
                 if (loopIndex == 0) {
-                    // - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                    // Initialize the information of columns by first line.
-                    // - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     firstLineInfo = getFirstLineInfo(_delimiter, lineString);
                     columnNameList.addAll(firstLineInfo.getColumnNameList());
                     if (columnNameList.isEmpty()) {
@@ -143,15 +144,16 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     columnNameList.addAll(additionalColumnList);
                     continue;
                 }
+
+                // /- - - - - - - - - - - - - - -
+                // analyze values in line strings
+                // - - - - - - - - - -/
                 lineString = filterLineString(lineString);
                 {
-                    final String realLineString;
-                    if (preContinueString.equals("")) {
-                        realLineString = lineString;
-                    } else {
-                        realLineString = preContinueString + "\n" + lineString;
+                    if (preContinueString != null && !preContinueString.equals("")) {
+                        lineString = preContinueString + "\n" + lineString;
                     }
-                    final ValueLineInfo valueLineInfo = arrangeValueList(realLineString, _delimiter);
+                    final ValueLineInfo valueLineInfo = arrangeValueList(lineString, _delimiter);
                     final List<String> ls = valueLineInfo.getValueList();
                     if (valueLineInfo.isContinueNextLine()) {
                         preContinueString = ls.remove(ls.size() - 1);
@@ -160,83 +162,97 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     }
                     valueList.addAll(ls);
                 }
-                try {
-                    if (isDifferentColumnValueCount(firstLineInfo, valueList, lineString)) {
-                        String msg = "The count of values wasn't correct:";
-                        msg = msg + " column=" + firstLineInfo.getColumnNameList().size();
-                        msg = msg + " value=" + valueList.size();
-                        msg = msg + " line=" + lineString;
-                        resultInfo.registerWarningFile(_fileName, msg);
+                // *one record is prepared here
+
+                // /- - - - - - - - - - - - - -
+                // check definition differences
+                // - - - - - - - - - -/
+                if (isDifferentColumnValueCount(firstLineInfo, valueList)) {
+                    String msg = "The count of values wasn't correct:";
+                    msg = msg + " column=" + firstLineInfo.getColumnNameList().size();
+                    msg = msg + " value=" + valueList.size();
+                    msg = msg + " -> " + valueList;
+                    resultInfo.registerWarningFile(_fileName, msg);
+
+                    // clear temporary variables
+                    valueList.clear();
+                    preContinueString = null;
+                    continue;
+                }
+
+                // /- - - - - - - - - - - - - - - -
+                // process registration to database
+                // - - - - - - - - - -/
+                final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
+                sqlBuilder.setTableDbName(tableDbName);
+                sqlBuilder.setColumnMap(columnInfoMap);
+                sqlBuilder.setColumnNameList(columnNameList);
+                sqlBuilder.setValueList(valueList);
+                sqlBuilder.setNotFoundColumnMap(resultInfo.getNotFoundColumnMap());
+                sqlBuilder.setConvertValueMap(_convertValueMap);
+                sqlBuilder.setDefaultValueMap(_defaultValueMap);
+                if (conn == null) {
+                    conn = _dataSource.getConnection();
+                }
+                if (ps == null) {
+                    executedSql = sqlBuilder.buildSql();
+                    ps = conn.prepareStatement(executedSql);
+                }
+                final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
+                if (_loggingInsertSql) {
+                    _log.info(buildSql4Log(tableDbName, columnNameList, columnValueMap.values()));
+                }
+                int bindCount = 1;
+                final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+                for (Entry<String, Object> entry : entrySet) {
+                    final String columnName = entry.getKey();
+                    final Object obj = entry.getValue();
+
+                    // /- - - - - - - - - - - - - - - - - -
+                    // process Null (against Null Headache)
+                    // - - - - - - - - - -/
+                    if (processNull(tableDbName, columnName, obj, ps, bindCount, columnInfoMap)) {
+                        bindCount++;
                         continue;
                     }
 
-                    final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
-                    sqlBuilder.setTableDbName(tableDbName);
-                    sqlBuilder.setColumnMap(columnInfoMap);
-                    sqlBuilder.setColumnNameList(columnNameList);
-                    sqlBuilder.setValueList(valueList);
-                    sqlBuilder.setNotFoundColumnMap(resultInfo.getNotFoundColumnMap());
-                    sqlBuilder.setConvertValueMap(_convertValueMap);
-                    sqlBuilder.setDefaultValueMap(_defaultValueMap);
-                    if (conn == null) {
-                        conn = _dataSource.getConnection();
-                    }
-                    if (ps == null) {
-                        executedSql = sqlBuilder.buildSql();
-                        ps = conn.prepareStatement(executedSql);
-                    }
-                    final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
-                    if (_loggingInsertSql) {
-                        _log.info(buildSql4Log(tableDbName, columnNameList, columnValueMap.values()));
-                    }
-                    int bindCount = 1;
-                    final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
-                    for (Entry<String, Object> entry : entrySet) {
-                        final String columnName = entry.getKey();
-                        final Object obj = entry.getValue();
-
-                        // - - - - - - - - - - - - - - - - - - -
-                        // Process Null (against Null Headache)
-                        // - - - - - - - - - - - - - - - - - - -
-                        if (processNull(tableDbName, columnName, obj, ps, bindCount, columnInfoMap)) {
-                            bindCount++;
-                            continue;
-                        }
-
-                        // - - - - - - - - - - - - - - -
-                        // Process NotNull and NotString
-                        // - - - - - - - - - - - - - - -
-                        // If the value is not null and the value has the own type except string,
-                        // It registers the value to statement by the type.
-                        if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnInfoMap)) {
-                            bindCount++;
-                            continue;
-                        }
-
-                        // - - - - - - - - - - - - - - - - - - -
-                        // Process NotNull and StringExpression
-                        // - - - - - - - - - - - - - - - - - - -
-                        final String value = (String) obj;
-                        processNotNullString(tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
+                    // /- - - - - - - - - - - - - - -
+                    // process NotNull and NotString
+                    // - - - - - - - - - -/
+                    // If the value is not null and the value has the own type except string,
+                    // It registers the value to statement by the type.
+                    if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnInfoMap)) {
                         bindCount++;
+                        continue;
                     }
-                    if (_suppressBatchUpdate) {
-                        ps.execute();
-                    } else {
-                        ps.addBatch();
-                        ++addedBatchSize;
-                        if (addedBatchSize == 100000) {
-                            // this is supported in only delimiter data writer
-                            // because delimiter data can treat large data
-                            ps.executeBatch(); // to avoid OutOfMemory
-                            ps.clearBatch(); // for next batch
-                            addedBatchSize = 0;
-                        }
-                    }
-                } finally {
-                    valueList.clear();
-                    preContinueString = "";
+
+                    // /- - - - - - - - - - - - - - - - - -
+                    // process NotNull and StringExpression
+                    // - - - - - - - - - -/
+                    final String value = (String) obj;
+                    processNotNullString(tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
+                    bindCount++;
                 }
+                if (_suppressBatchUpdate) {
+                    ps.execute();
+                } else {
+                    ps.addBatch();
+                    ++addedBatchSize;
+                    if (addedBatchSize == 100000) {
+                        // this is supported in only delimiter data writer
+                        // because delimiter data can treat large data
+                        ps.executeBatch(); // to avoid OutOfMemory
+                        ps.clearBatch(); // for next batch
+                        addedBatchSize = 0;
+                    }
+                }
+                // *one record is finished here
+
+                // clear temporary variables
+                // if an exception occurs from execute() or addBatch(),
+                // this valueList is to be information for debug
+                valueList.clear();
+                preContinueString = null;
             }
             if (ps != null && addedBatchSize > 0) {
                 ps.executeBatch();
@@ -249,13 +265,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildRegistrationExceptionMessage(_fileName, tableDbName, lineString, executedSql, nextEx);
+                String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, nextEx);
                 throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
             }
-            String msg = buildRegistrationExceptionMessage(_fileName, tableDbName, lineString, executedSql, e);
+            String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
-            String msg = buildRegistrationExceptionMessage(_fileName, tableDbName, lineString, executedSql, e);
+            String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
             throw new DfTableDataRegistrationFailureException(msg, e);
         } finally {
             try {
@@ -304,18 +320,25 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         throw new DfDelimiterDataTableNotFoundException(msg);
     }
 
-    protected String buildRegistrationExceptionMessage(String fileName, String tableDbName, String lineString,
-            String executedSql, Exception e) {
+    protected String buildRegExpMessage(String fileName, String tableDbName, String executedSql,
+            List<String> valueList, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
+        br.addItem("Advice");
+        br.addElement("If you don't know the cause, suppress batch update and retry it.");
+        br.addElement("Change the property 'isSuppressBatchUpdate' to false temporarily,");
+        br.addElement("and loading process is executed per one record,");
+        br.addElement("and you can find a record that causes the exception with logs.");
         br.addItem("Delimiter File");
         br.addElement(fileName);
         br.addItem("Table");
         br.addElement(tableDbName);
-        br.addItem("Current Line");
-        br.addElement(lineString);
         br.addItem("Executed SQL");
         br.addElement(executedSql);
+        if (!valueList.isEmpty()) { // basically when batch update is suppressed
+            br.addItem("Bound Values");
+            br.addElement(valueList);
+        }
         br.addItem("Message");
         br.addElement(e.getMessage());
         final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
@@ -587,7 +610,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
-    protected boolean isDifferentColumnValueCount(FirstLineInfo firstLineInfo, List<String> valueList, String lineString) {
+    protected boolean isDifferentColumnValueCount(FirstLineInfo firstLineInfo, List<String> valueList) {
         if (valueList.size() < firstLineInfo.getColumnNameList().size()) {
             return true;
         }
