@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -369,6 +370,19 @@ public abstract class DfAbsractDataWriter {
         }
     }
 
+    protected class BinaryFileStringProcessor implements StringProcessor {
+
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            return processBinary(dataFile, tableName, columnName, value, ps, bindCount, columnInfoMap);
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
     protected class RealStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
@@ -518,93 +532,6 @@ public abstract class DfAbsractDataWriter {
     }
 
     // -----------------------------------------------------
-    //                                                Binary
-    //                                                ------
-    protected boolean processBinary(String tableName, String columnName, String value, PreparedStatement ps,
-            int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
-        if (value == null) {
-            return false; // basically no way
-        }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
-        if (columnInfo != null) {
-            final Class<?> columnType = getBindType(tableName, columnInfo);
-            if (columnType != null) {
-                if (!byte[].class.isAssignableFrom(columnType)) {
-                    return false;
-                }
-                // the value should be a path to a binary file here
-                final String path = value.trim();
-                final File binaryFile = new File(path);
-                if (!binaryFile.exists()) {
-                    throwLoadDataBinaryFileNotFoundException(tableName, columnName, path);
-                }
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(binaryFile);
-                    final List<Byte> byteList = new ArrayList<Byte>();
-                    for (int b; (b = fis.read()) != -1;) {
-                        byteList.add((byte) b);
-                    }
-                    byte[] bytes = new byte[byteList.size()];
-                    for (int i = 0; i < byteList.size(); i++) {
-                        bytes[i] = byteList.get(i);
-                    }
-                    ps.setBytes(bindCount, bytes);
-                } catch (IOException e) {
-                    throwLoadDataBinaryFileReadFailureException(tableName, columnName, path, e);
-                } finally {
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException ignored) {
-                        }
-                    }
-                }
-                return true;
-            }
-        }
-        // unsupported when meta data is not found
-        return false;
-    }
-
-    protected String filterBinary(String value) {
-        if (value == null) {
-            return null;
-        }
-        value = value.trim();
-        return value;
-    }
-
-    protected void throwLoadDataBinaryFileNotFoundException(String tableName, String columnName, String path) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The binary file specified at delimiter data was not found.");
-        br.addItem("Advice");
-        br.addElement("Make sure your path to a binary file is correct.");
-        br.addItem("Table");
-        br.addElement(tableName);
-        br.addItem("Column");
-        br.addElement(columnName);
-        br.addItem("Path");
-        br.addElement(path);
-        final String msg = br.buildExceptionMessage();
-        throw new DfLoadDataRegistrationFailureException(msg);
-    }
-
-    protected void throwLoadDataBinaryFileReadFailureException(String tableName, String columnName, String path,
-            IOException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to read the binary file.");
-        br.addItem("Table");
-        br.addElement(tableName);
-        br.addItem("Column");
-        br.addElement(columnName);
-        br.addItem("Path");
-        br.addElement(path);
-        final String msg = br.buildExceptionMessage();
-        throw new DfLoadDataRegistrationFailureException(msg, e);
-    }
-
-    // -----------------------------------------------------
     //                                                  UUID
     //                                                  ----
     protected boolean processUUID(String tableName, String columnName, String value, Connection conn,
@@ -701,6 +628,103 @@ public abstract class DfAbsractDataWriter {
         }
         value = value.trim();
         return value;
+    }
+
+    // -----------------------------------------------------
+    //                                                Binary
+    //                                                ------
+    protected boolean processBinary(File dataFile, String tableName, String columnName, String value,
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+        if (value == null) {
+            return false; // basically no way
+        }
+        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        if (columnInfo != null) {
+            final Class<?> columnType = getBindType(tableName, columnInfo);
+            if (columnType != null) {
+                if (!byte[].class.isAssignableFrom(columnType)) {
+                    return false;
+                }
+                final String path;
+                {
+                    // the value should be a path to a binary file
+                    // from data file's current directory
+                    final String dataFilePath = Srl.replace(dataFile.getAbsolutePath(), "\\", "/");
+                    final String baseDirPath = Srl.substringLastFront(dataFilePath, "/");
+                    path = baseDirPath + "/" + value.trim();
+                }
+                final File binaryFile = new File(path);
+                if (!binaryFile.exists()) {
+                    throwLoadDataBinaryFileNotFoundException(tableName, columnName, path);
+                }
+                final List<Byte> byteList = new ArrayList<Byte>();
+                BufferedInputStream bis = null;
+                try {
+                    bis = new BufferedInputStream(new FileInputStream(binaryFile));
+                    for (int availableSize; (availableSize = bis.available()) > 0;) {
+                        final byte[] bytes = new byte[availableSize];
+                        bis.read(bytes);
+                        for (byte b : bytes) {
+                            byteList.add(b);
+                        }
+                    }
+                    byte[] bytes = new byte[byteList.size()];
+                    for (int i = 0; i < byteList.size(); i++) {
+                        bytes[i] = byteList.get(i);
+                    }
+                    ps.setBytes(bindCount, bytes);
+                } catch (IOException e) {
+                    throwLoadDataBinaryFileReadFailureException(tableName, columnName, path, e);
+                } finally {
+                    if (bis != null) {
+                        try {
+                            bis.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        // unsupported when meta data is not found
+        return false;
+    }
+
+    protected String filterBinary(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        return value;
+    }
+
+    protected void throwLoadDataBinaryFileNotFoundException(String tableName, String columnName, String path) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The binary file specified at delimiter data was not found.");
+        br.addItem("Advice");
+        br.addElement("Make sure your path to a binary file is correct.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Column");
+        br.addElement(columnName);
+        br.addItem("Path");
+        br.addElement(path);
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg);
+    }
+
+    protected void throwLoadDataBinaryFileReadFailureException(String tableName, String columnName, String path,
+            IOException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the binary file.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Column");
+        br.addElement(columnName);
+        br.addItem("Path");
+        br.addElement(path);
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg, e);
     }
 
     // ===================================================================================
