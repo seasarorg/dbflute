@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -301,11 +301,25 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     protected String quoteTableNameIfNeedsDirectUse(String tableName) {
+        if (Srl.is_Null_or_TrimmedEmpty(tableName)) {
+            return tableName;
+        }
+        final String sqlMark = "$sql:";
+        if (Srl.startsWithIgnoreCase(tableName, sqlMark)) {
+            return Srl.substringFirstRearIgnoreCase(tableName, sqlMark).trim();
+        }
         final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
         return littleProp.quoteTableNameIfNeedsDirectUse(tableName);
     }
 
     protected String quoteColumnNameIfNeedsDirectUse(String columnName) {
+        if (Srl.is_Null_or_TrimmedEmpty(columnName)) {
+            return columnName;
+        }
+        final String sqlMark = "$sql:";
+        if (Srl.startsWithIgnoreCase(columnName, sqlMark)) {
+            return Srl.substringFirstRearIgnoreCase(columnName, sqlMark).trim();
+        }
         final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
         return littleProp.quoteColumnNameIfNeedsDirectUse(columnName);
     }
