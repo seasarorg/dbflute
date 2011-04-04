@@ -104,6 +104,7 @@ public abstract class DfAbsractDataWriter {
         _stringProcessorList.add(new UUIDStringProcessor());
         _stringProcessorList.add(new ArrayStringProcessor());
         _stringProcessorList.add(new XmlStringProcessor());
+        _stringProcessorList.add(new BinaryFileStringProcessor());
         _stringProcessorList.add(new RealStringProcessor());
     }
 
