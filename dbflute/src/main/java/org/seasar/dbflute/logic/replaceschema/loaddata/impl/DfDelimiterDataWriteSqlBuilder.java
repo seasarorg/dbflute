@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
+import org.seasar.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfNameHintUtil;
@@ -102,7 +102,7 @@ public class DfDelimiterDataWriteSqlBuilder {
                 String msg = "valueList.get(columnCount) threw the exception:";
                 msg = msg + " tableName=" + _tableDbName + " columnNameList=" + _columnNameList;
                 msg = msg + " valueList=" + _valueList + " columnCount=" + columnCount;
-                throw new DfTableDataRegistrationFailureException(msg, e);
+                throw new DfDelimiterDataRegistrationFailureException(msg, e);
             }
             if (!_columnMap.isEmpty() && _columnMap.containsKey(columnName)) {
                 String realDbName = _columnMap.get(columnName).getColumnName();

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,9 +35,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.DfDelimiterDataColumnDefFailureException;
+import org.seasar.dbflute.exception.DfDelimiterDataColumnDefNotFoundException;
+import org.seasar.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfDelimiterDataTableNotFoundException;
-import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
@@ -106,10 +107,11 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         final List<String> additionalColumnList = new ArrayList<String>();
         final List<String> valueList = new ArrayList<String>();
 
+        final File dataFile = new File(_fileName);
         Connection conn = null;
         PreparedStatement ps = null;
         try {
-            fis = new FileInputStream(_fileName);
+            fis = new FileInputStream(dataFile);
             ir = new InputStreamReader(fis, _encoding);
             br = new BufferedReader(ir);
 
@@ -131,7 +133,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     firstLineInfo = getFirstLineInfo(_delimiter, lineString);
                     columnNameList.addAll(firstLineInfo.getColumnNameList());
                     if (columnNameList.isEmpty()) {
-                        throwDelimiterDataColumnDefFailureException(_fileName, tableDbName);
+                        throwDelimiterDataColumnDefNotFoundException(_fileName, tableDbName);
                     }
                     final StringSet columnSet = StringSet.createAsFlexible();
                     columnSet.addAll(columnNameList);
@@ -230,7 +232,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // process NotNull and StringExpression
                     // - - - - - - - - - -/
                     final String value = (String) obj;
-                    processNotNullString(tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
+                    processNotNullString(dataFile, tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
                     bindCount++;
                 }
                 if (_suppressBatchUpdate) {
@@ -266,13 +268,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
                 String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, nextEx);
-                throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
+                throw new DfDelimiterDataRegistrationFailureException(msg, nextEx); // switch!
             }
             String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
-            throw new DfTableDataRegistrationFailureException(msg, e);
+            throw new DfDelimiterDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
             String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
-            throw new DfTableDataRegistrationFailureException(msg, e);
+            throw new DfDelimiterDataRegistrationFailureException(msg, e);
         } finally {
             try {
                 if (fis != null) {
@@ -372,17 +374,17 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
-    protected void throwDelimiterDataColumnDefFailureException(String fileName, String tableDbName) {
+    protected void throwDelimiterDataColumnDefNotFoundException(String fileName, String tableDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The table specified on the delimiter file does not have columns.");
+        br.addNotice("The column definition on the delimiter file was not found.");
         br.addItem("Advice");
-        br.addElement("Please confirm the header definition of the delimiter file.");
+        br.addElement("Make sure the header definition of the delimiter file exists.");
         br.addItem("Delimiter File");
         br.addElement(fileName);
         br.addItem("Table");
         br.addElement(tableDbName);
         final String msg = br.buildExceptionMessage();
-        throw new DfDelimiterDataColumnDefFailureException(msg);
+        throw new DfDelimiterDataColumnDefNotFoundException(msg);
     }
 
     // ===================================================================================

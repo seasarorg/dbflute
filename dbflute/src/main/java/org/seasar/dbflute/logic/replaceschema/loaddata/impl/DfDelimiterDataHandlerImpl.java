@@ -30,7 +30,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
+import org.seasar.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
@@ -122,7 +122,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
             }
         } catch (IOException e) {
             String msg = "Failed to register delimiter data.";
-            throw new DfTableDataRegistrationFailureException(msg, e);
+            throw new DfDelimiterDataRegistrationFailureException(msg, e);
         }
         return resultInfo;
     }

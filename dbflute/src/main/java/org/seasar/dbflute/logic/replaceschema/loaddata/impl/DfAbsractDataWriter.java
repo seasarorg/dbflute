@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -23,6 +26,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,6 +37,7 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -226,8 +231,9 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                        NotNull String
     //                                        --------------
-    protected void processNotNullString(String tableName, String columnName, String value, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+    protected void processNotNullString(File dataFile, String tableName, String columnName, String value,
+            Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap)
+            throws SQLException {
         if (value == null) {
             String msg = "This method is only for NotNull and StringExpression:";
             msg = msg + " value=" + value + " type=" + (value != null ? value.getClass() : "null");
@@ -241,7 +247,7 @@ public abstract class DfAbsractDataWriter {
         }
         final StringProcessor processor = cacheMap.get(columnName);
         if (processor != null) { // cache hit
-            final boolean processed = processor.process(tableName, columnName, value, conn, ps, bindCount,
+            final boolean processed = processor.process(dataFile, tableName, columnName, value, conn, ps, bindCount,
                     columnInfoMap);
             if (!processed) {
                 throwColumnValueProcessingFailureException(processor, tableName, columnName, value);
@@ -250,7 +256,7 @@ public abstract class DfAbsractDataWriter {
         }
         for (StringProcessor tryProcessor : _stringProcessorList) {
             // processing and searching target processor
-            if (tryProcessor.process(tableName, columnName, value, conn, ps, bindCount, columnInfoMap)) {
+            if (tryProcessor.process(dataFile, tableName, columnName, value, conn, ps, bindCount, columnInfoMap)) {
                 cacheMap.put(columnName, tryProcessor); // use cache next times
                 break;
             }
@@ -281,13 +287,13 @@ public abstract class DfAbsractDataWriter {
     }
 
     public static interface StringProcessor {
-        boolean process(String tableName, String columnName, String value, Connection conn, PreparedStatement ps,
-                int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException;
+        boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException;
     }
 
     protected class DateStringProcessor implements StringProcessor {
 
-        public boolean process(String tableName, String columnName, String value, Connection conn,
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
             return processDate(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
@@ -300,7 +306,7 @@ public abstract class DfAbsractDataWriter {
 
     protected class BooleanStringProcessor implements StringProcessor {
 
-        public boolean process(String tableName, String columnName, String value, Connection conn,
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
             return processBoolean(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
@@ -313,7 +319,7 @@ public abstract class DfAbsractDataWriter {
 
     protected class NumberStringProcessor implements StringProcessor {
 
-        public boolean process(String tableName, String columnName, String value, Connection conn,
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
             return processNumber(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
@@ -326,7 +332,7 @@ public abstract class DfAbsractDataWriter {
 
     protected class UUIDStringProcessor implements StringProcessor {
 
-        public boolean process(String tableName, String columnName, String value, Connection conn,
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
             return processUUID(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
@@ -339,7 +345,7 @@ public abstract class DfAbsractDataWriter {
 
     protected class ArrayStringProcessor implements StringProcessor {
 
-        public boolean process(String tableName, String columnName, String value, Connection conn,
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
             return processArray(tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
@@ -352,7 +358,7 @@ public abstract class DfAbsractDataWriter {
 
     protected class XmlStringProcessor implements StringProcessor {
 
-        public boolean process(String tableName, String columnName, String value, Connection conn,
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
             return processXml(tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
@@ -365,7 +371,7 @@ public abstract class DfAbsractDataWriter {
 
     protected class RealStringProcessor implements StringProcessor {
 
-        public boolean process(String tableName, String columnName, String value, Connection conn,
+        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
             ps.setString(bindCount, value);
             return true;
@@ -400,6 +406,7 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
+        // if meta data is not found (basically no way)
         try {
             Timestamp timestamp = DfTypeUtil.toTimestamp(value);
             ps.setTimestamp(bindCount, timestamp);
@@ -435,8 +442,9 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
+        // if meta data is not found (basically no way) 
         try {
-            Boolean booleanValue = DfTypeUtil.toBoolean(value);
+            final Boolean booleanValue = DfTypeUtil.toBoolean(value);
             ps.setBoolean(bindCount, booleanValue);
             return true;
         } catch (ParseBooleanException ignored) {
@@ -463,6 +471,7 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
+        // if meta data is not found (basically no way)
         value = filterBigDecimalValue(value);
         if (!isBigDecimalValue(value)) {
             return false;
@@ -509,6 +518,93 @@ public abstract class DfAbsractDataWriter {
     }
 
     // -----------------------------------------------------
+    //                                                Binary
+    //                                                ------
+    protected boolean processBinary(String tableName, String columnName, String value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+        if (value == null) {
+            return false; // basically no way
+        }
+        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        if (columnInfo != null) {
+            final Class<?> columnType = getBindType(tableName, columnInfo);
+            if (columnType != null) {
+                if (!byte[].class.isAssignableFrom(columnType)) {
+                    return false;
+                }
+                // the value should be a path to a binary file here
+                final String path = value.trim();
+                final File binaryFile = new File(path);
+                if (!binaryFile.exists()) {
+                    throwLoadDataBinaryFileNotFoundException(tableName, columnName, path);
+                }
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(binaryFile);
+                    final List<Byte> byteList = new ArrayList<Byte>();
+                    for (int b; (b = fis.read()) != -1;) {
+                        byteList.add((byte) b);
+                    }
+                    byte[] bytes = new byte[byteList.size()];
+                    for (int i = 0; i < byteList.size(); i++) {
+                        bytes[i] = byteList.get(i);
+                    }
+                    ps.setBytes(bindCount, bytes);
+                } catch (IOException e) {
+                    throwLoadDataBinaryFileReadFailureException(tableName, columnName, path, e);
+                } finally {
+                    if (fis != null) {
+                        try {
+                            fis.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        // unsupported when meta data is not found
+        return false;
+    }
+
+    protected String filterBinary(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        return value;
+    }
+
+    protected void throwLoadDataBinaryFileNotFoundException(String tableName, String columnName, String path) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The binary file specified at delimiter data was not found.");
+        br.addItem("Advice");
+        br.addElement("Make sure your path to a binary file is correct.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Column");
+        br.addElement(columnName);
+        br.addItem("Path");
+        br.addElement(path);
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg);
+    }
+
+    protected void throwLoadDataBinaryFileReadFailureException(String tableName, String columnName, String path,
+            IOException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the binary file.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Column");
+        br.addElement(columnName);
+        br.addItem("Path");
+        br.addElement(path);
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg, e);
+    }
+
+    // -----------------------------------------------------
     //                                                  UUID
     //                                                  ----
     protected boolean processUUID(String tableName, String columnName, String value, Connection conn,
@@ -527,7 +623,7 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
-        // unsupported when meta information does not exist
+        // unsupported when meta data is not found
         return false;
     }
 
@@ -563,7 +659,7 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
-        // unsupported when meta information does not exist
+        // unsupported when meta data is not found
         return false;
     }
 
@@ -595,7 +691,7 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
-        // unsupported when meta information does not exist
+        // unsupported when meta data is not found
         return false;
     }
 
@@ -706,6 +802,9 @@ public abstract class DfAbsractDataWriter {
             bindType = java.util.Date.class;
         } else if (jdbcDefValue == Types.BIT || jdbcDefValue == Types.BOOLEAN) {
             bindType = Boolean.class;
+        } else if (jdbcDefValue == Types.BINARY || jdbcDefValue == Types.VARBINARY
+                || jdbcDefValue == Types.LONGVARBINARY || jdbcDefValue == Types.BLOB) {
+            bindType = byte[].class;
         } else if (jdbcDefValue == Types.OTHER && TypeMap.UUID.equalsIgnoreCase(jdbcType)) {
             // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
             bindType = UUID.class;

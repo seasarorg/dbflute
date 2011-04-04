@@ -3,7 +3,7 @@ package org.seasar.dbflute.exception;
 /**
  * @author jflute
  */
-public class DfPropertySettingColumnNotFoundException extends RuntimeException {
+public class DfPropertySettingColumnNotFoundException extends DfColumnNotFoundException {
 
     private static final long serialVersionUID = 1L;
 

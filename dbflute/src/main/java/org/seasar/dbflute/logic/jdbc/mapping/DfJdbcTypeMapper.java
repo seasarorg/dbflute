@@ -140,6 +140,10 @@ public class DfJdbcTypeMapper {
             return getTimeJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "clob")) {
             return getClobJdbcType();
+        } else if (containsIgnoreCase(dbTypeName, "binary")) {
+            return getBinaryJdbcType();
+        } else if (containsIgnoreCase(dbTypeName, "blob")) {
+            return getBlobJdbcType();
         } else {
             return null;
         }
@@ -310,6 +314,10 @@ public class DfJdbcTypeMapper {
 
     protected String getBlobJdbcType() {
         return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.BLOB);
+    }
+
+    protected String getBinaryJdbcType() {
+        return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.BINARY);
     }
 
     // ===================================================================================

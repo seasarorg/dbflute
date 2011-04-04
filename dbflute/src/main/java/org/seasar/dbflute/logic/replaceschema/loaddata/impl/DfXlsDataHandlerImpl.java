@@ -37,8 +37,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfXlsDataColumnDefFailureException;
+import org.seasar.dbflute.exception.DfXlsDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfXlsDataTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -169,12 +169,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         } catch (SQLException e) {
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
-                _log.warn("*Failed to register: " + e.getMessage());
+                _log.warn("*Failed to register the xls data: " + e.getMessage());
                 String msg = buildRegistrationExceptionMessage(file, tableDbName, nextEx);
-                throw new DfTableDataRegistrationFailureException(msg, nextEx); // switch!
+                throw new DfXlsDataRegistrationFailureException(msg, nextEx); // switch!
             }
             String msg = buildRegistrationExceptionMessage(file, tableDbName, e);
-            throw new DfTableDataRegistrationFailureException(msg, e);
+            throw new DfXlsDataRegistrationFailureException(msg, e);
         } finally {
             if (ps != null) {
                 try {
@@ -291,7 +291,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // Process NotNull and StringExpression
             // - - - - - - - - - - - - - - - - - - -
             final String value = (String) obj;
-            processNotNullString(tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
+            processNotNullString(file, tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
             bindCount++;
         }
         if (_suppressBatchUpdate) {

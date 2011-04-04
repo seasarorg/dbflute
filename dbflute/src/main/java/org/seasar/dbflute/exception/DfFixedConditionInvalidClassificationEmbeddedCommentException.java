@@ -3,7 +3,7 @@ package org.seasar.dbflute.exception;
 /**
  * @author jflute
  */
-public class DfFixedConditionInvalidClassificationEmbeddedCommentException extends RuntimeException {
+public class DfFixedConditionInvalidClassificationEmbeddedCommentException extends DfIllegalPropertySettingException {
 
     private static final long serialVersionUID = 1L;
 

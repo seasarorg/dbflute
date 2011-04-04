@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.generate.dataassert;
+package org.seasar.dbflute.logic.replaceschema.dataassert;
 
 import java.io.File;
 import java.sql.SQLException;

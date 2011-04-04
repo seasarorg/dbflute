@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.generate.dataassert;
+package org.seasar.dbflute.logic.replaceschema.dataassert;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -18,7 +18,7 @@ import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureCountNotExistsE
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureCountNotZeroException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureListNotExistsException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureListNotZeroException;
-import org.seasar.dbflute.exception.DfAssertionInvalidMarkException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionInvalidMarkException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -115,7 +115,7 @@ public class DfDataAssertProvider {
             }
             if (!rearString.contains(terminator)) {
                 String msg = "The data assert mark should ends '" + terminator + "':" + ln() + sql;
-                throw new DfAssertionInvalidMarkException(msg);
+                throw new DfTakeFinallyAssertionInvalidMarkException(msg);
             }
             final String option = rearString.substring(0, rearString.indexOf(terminator));
             if (option.startsWith(typeAtMark)) {
@@ -128,7 +128,7 @@ public class DfDataAssertProvider {
                 };
             } else {
                 String msg = "Unknown option '" + option + "':" + ln() + sql;
-                throw new DfAssertionInvalidMarkException(msg);
+                throw new DfTakeFinallyAssertionInvalidMarkException(msg);
             }
         }
         return defaultHandler; // when not found
