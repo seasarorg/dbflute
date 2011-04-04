@@ -646,13 +646,16 @@ public abstract class DfAbsractDataWriter {
                 if (!byte[].class.isAssignableFrom(columnType)) {
                     return false;
                 }
+                // the value should be a path to a binary file
+                // from data file's current directory
                 final String path;
-                {
-                    // the value should be a path to a binary file
-                    // from data file's current directory
+                final String trimmedValue = value.trim();
+                if (trimmedValue.startsWith("/")) { // means absolute path
+                    path = trimmedValue;
+                } else {
                     final String dataFilePath = Srl.replace(dataFile.getAbsolutePath(), "\\", "/");
                     final String baseDirPath = Srl.substringLastFront(dataFilePath, "/");
-                    path = baseDirPath + "/" + value.trim();
+                    path = baseDirPath + "/" + trimmedValue;
                 }
                 final File binaryFile = new File(path);
                 if (!binaryFile.exists()) {
