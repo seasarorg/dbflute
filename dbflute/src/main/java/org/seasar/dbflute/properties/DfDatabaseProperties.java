@@ -206,33 +206,49 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                     Table Except List
     //                                     -----------------
+    protected List<String> _tableExceptList;
+
     public List<String> getTableExceptList() { // for main schema
-        final List<String> vairousList = getVairousStringList("tableExceptList");
-        if (!vairousList.isEmpty()) {
-            return vairousList;
+        if (_tableExceptList != null) {
+            return _tableExceptList;
         }
-        final List<String> resultList = new ArrayList<String>();
-        final List<Object> listProp = listProp("torque.table.except.list", DEFAULT_EMPTY_LIST);
-        for (Object object : listProp) {
-            resultList.add((String) object);
+        final List<String> plainList = getVairousStringList("tableExceptList");
+        final List<String> resultList;
+        if (!plainList.isEmpty()) {
+            resultList = plainList;
+        } else {
+            resultList = new ArrayList<String>();
+            final List<Object> listProp = listProp("torque.table.except.list", DEFAULT_EMPTY_LIST);
+            for (Object object : listProp) {
+                resultList.add((String) object);
+            }
         }
-        return resultList;
+        _tableExceptList = resultList;
+        return _tableExceptList;
     }
 
     // -----------------------------------------------------
     //                                     Table Target List
     //                                     -----------------
+    protected List<String> _tableTargetList;
+
     public List<String> getTableTargetList() { // for main schema
-        final List<String> vairousList = getVairousStringList("tableTargetList");
-        if (!vairousList.isEmpty()) {
-            return vairousList;
+        if (_tableTargetList != null) {
+            return _tableTargetList;
         }
-        final List<String> resultList = new ArrayList<String>();
-        final List<Object> listProp = listProp("torque.table.target.list", DEFAULT_EMPTY_LIST);
-        for (Object object : listProp) {
-            resultList.add((String) object);
+        final List<String> plainList = getVairousStringList("tableTargetList");
+        final List<String> resultList;
+        if (!plainList.isEmpty()) {
+            resultList = plainList;
+        } else {
+            resultList = new ArrayList<String>();
+            final List<Object> listProp = listProp("torque.table.target.list", DEFAULT_EMPTY_LIST);
+            for (Object object : listProp) {
+                resultList.add((String) object);
+            }
         }
-        return resultList;
+        _tableTargetList = resultList;
+        return _tableTargetList;
     }
 
     // -----------------------------------------------------

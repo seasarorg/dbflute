@@ -40,7 +40,7 @@ map:{
         #  If you want to include other object types in generating target,
         #  you should specify the list of included object types as adding.
         #  This is only for the main schema. Additional schemas are unconcerned.
-        #  Howerber ReplaceSchema and Sql2Entity task also uses this.
+        #  However ReplaceSchema and Sql2Entity task also uses this.
         #  But you can set ReplaceSchema-original setting in its own dfprop.
         #    e.g. Synonym of Oracle --> list:{TABLE ; VIEW ; SYNONYM}
         #

@@ -16,6 +16,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
+import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
@@ -384,8 +385,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             obj = additionalDropMap.get("objectTypeList"); // old style
             if (obj == null) {
                 final List<String> defaultList = new ArrayList<String>();
-                defaultList.add("TABLE");
-                defaultList.add("VIEW");
+                defaultList.add(DfConnectionProperties.OBJECT_TYPE_TABLE);
+                defaultList.add(DfConnectionProperties.OBJECT_TYPE_VIEW);
                 return defaultList;
             }
         }

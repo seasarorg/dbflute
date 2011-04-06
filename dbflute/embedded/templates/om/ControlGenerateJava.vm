@@ -335,7 +335,7 @@ $database.deleteOldTableClass()
 ## Loop by tables.
 ##
 $database.info("public void parseTableClass() {")
-#foreach ($table in $database.tables)
+#foreach ($table in $database.tableList)
   #if (!$table.isForReferenceOnly())
 
     $database.info("    parse('${table.name}');")
@@ -462,7 +462,7 @@ $database.info(" ")
   $database.makeDirectory($path)
 
   $database.enableSimpleDtoOutputDirectory()
-  #foreach ($table in $database.tables)
+  #foreach ($table in $database.tableList)
     #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
     #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
 
@@ -485,7 +485,7 @@ $database.info(" ")
     $database.makeDirectory($path)
 
     $database.enableDtoMapperOutputDirectory()
-    #foreach ($table in $database.tables)
+    #foreach ($table in $database.tableList)
       #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
       #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
       #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
@@ -515,7 +515,7 @@ $database.info(" ")
   #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
   $database.makeDirectory($path)
 
-  #foreach ($table in $database.tables)
+  #foreach ($table in $database.tableList)
     #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
     #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
     #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.${myExtendedObjectClassName}")

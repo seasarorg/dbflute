@@ -1567,7 +1567,7 @@ $database.deleteOldTableClass()
 ## Loop by tables.
 ##
 $database.info("public void parseTableClass() {")
-#foreach ($table in $database.tables)
+#foreach ($table in $database.tableList)
   #if (!$table.isForReferenceOnly())
 
     $database.info("    parse('${table.Name}');")

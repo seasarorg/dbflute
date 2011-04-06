@@ -249,7 +249,7 @@ $database.info("}")
     $database.makeDirectory($path)
   #end
 
-  #foreach ($table in $database.tables)
+  #foreach ($table in $database.tableList)
     #if (!$table.isSql2EntityTypeSafeCursor())
     #set ($myBaseObjectClassName = "${database.simpleDtoBaseDtoPrefix}${table.javaName}${database.simpleDtoBaseDtoSuffix}")
     #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
@@ -291,7 +291,7 @@ $database.info("}")
   #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
   $database.makeDirectory($path)
 
-  #foreach ($table in $database.tables)
+  #foreach ($table in $database.tableList)
     #if (!$table.isSql2EntityTypeSafeCursor())
     #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
     #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")

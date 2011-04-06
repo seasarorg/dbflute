@@ -95,7 +95,7 @@ public class DfAdditionalForeignKeyInitializer {
         final StringSet foreignColumnSet = StringSet.createAsFlexible();
         foreignColumnSet.addAll(foreignColumnNameList);
 
-        for (final Table localTable : getTables()) {
+        for (final Table localTable : getTableList()) {
             final String localTableName = localTable.getName();
             final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                     foreignColumnNameList, localTableName, false);
@@ -405,8 +405,8 @@ public class DfAdditionalForeignKeyInitializer {
         return getDatabase().getTable(tableName);
     }
 
-    protected Table[] getTables() {
-        return getDatabase().getTables();
+    protected List<Table> getTableList() {
+        return getDatabase().getTableList();
     }
 
     // ===================================================================================

@@ -159,10 +159,10 @@ public class Database {
     protected boolean _skipDeleteOldClass;
 
     // [Unused on DBFlute]
-    // protected String _pkg;
-    // protected String _defaultIdMethod;
-    // protected String _defaultJavaType;
-    // protected boolean _isHeavyIndexing;
+    //protected String _pkg;
+    //protected String _defaultIdMethod;
+    //protected String _defaultJavaType;
+    //protected boolean _isHeavyIndexing;
 
     // ===================================================================================
     //                                                                             Version
@@ -184,28 +184,18 @@ public class Database {
         if (_defaultJavaNamingMethod == null) {
             _defaultJavaNamingMethod = NameGenerator.CONV_METHOD_UNDERSCORE; // Basically Here!
         }
-
     }
 
     // ===================================================================================
     //                                                                               Table
     //                                                                               =====
-    public Table[] getTables() {
-        int size = _tableList.size();
-        Table[] tbls = new Table[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Table) _tableList.get(i);
-        }
-        return tbls;
+    public List<Table> getTableList() {
+        return _tableList;
     }
 
-    public List<Table> getTableList() {
-        final List<Table> ls = new ArrayList<Table>();
-        final Table[] tables = getTables();
-        for (Table table : tables) {
-            ls.add(table);
-        }
-        return ls;
+    public Table[] getTables() { // old style, for compatibility
+        final List<Table> tableList = getTableList();
+        return tableList.toArray(new Table[tableList.size()]);
     }
 
     public List<Table> getTableDisplaySortedList() {
@@ -220,7 +210,7 @@ public class Database {
     }
 
     public Table addTable(Attributes attrib) {
-        Table tbl = new Table();
+        final Table tbl = new Table();
         tbl.setDatabase(this);
         tbl.loadFromXML(attrib);
         addTable(tbl);
@@ -234,9 +224,9 @@ public class Database {
     }
 
     public void doFinalInitialization() throws EngineException { // Unused on DBFlute
-        Table[] tables = getTables();
-        for (int i = 0; i < tables.length; i++) {
-            Table currTable = tables[i];
+        final List<Table> tableList = getTableList();
+        for (int i = 0; i < tableList.size(); i++) {
+            final Table currTable = tableList.get(i);
 
             // check schema integrity
             // if idMethod="autoincrement", make sure a column is
@@ -2195,10 +2185,11 @@ public class Database {
      * @return String representation in XML. (NotNull)
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("<database name=\"").append(getName()).append('"').append(">\n");
-        for (Iterator<Table> i = _tableList.iterator(); i.hasNext();) {
-            sb.append(i.next());
+        final List<Table> tableList = getTableList();
+        for (Table table : tableList) {
+            sb.append(table);
         }
         sb.append("</database>");
         return sb.toString();

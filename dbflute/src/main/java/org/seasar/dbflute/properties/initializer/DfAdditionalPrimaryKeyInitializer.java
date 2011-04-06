@@ -147,10 +147,6 @@ public class DfAdditionalPrimaryKeyInitializer {
         return getDatabase().getTable(tableName);
     }
 
-    protected Table[] getTables() {
-        return getDatabase().getTables();
-    }
-
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

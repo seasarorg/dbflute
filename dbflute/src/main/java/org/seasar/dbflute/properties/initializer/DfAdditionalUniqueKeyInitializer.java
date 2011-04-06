@@ -142,10 +142,6 @@ public class DfAdditionalUniqueKeyInitializer {
         return getDatabase().getTable(tableName);
     }
 
-    protected Table[] getTables() {
-        return getDatabase().getTables();
-    }
-
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
