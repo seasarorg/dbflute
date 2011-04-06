@@ -40,6 +40,8 @@ map:{
         #  If you want to include other object types in generating target,
         #  you should specify the list of included object types as adding.
         #  This is only for the main schema. Additional schemas are unconcerned.
+        #  Howerber ReplaceSchema and Sql2Entity task also uses this.
+        #  But you can set ReplaceSchema-original setting in its own dfprop.
         #    e.g. Synonym of Oracle --> list:{TABLE ; VIEW ; SYNONYM}
         #
         #; objectTypeTargetList = list:{TABLE ; VIEW}
@@ -48,6 +50,7 @@ map:{
         #  If you want to exclude some tables in generating target,
         #  you should specify the list of excepted table hints.
         #  This is only for the main schema. Additional schemas are unconcerned.
+        #  And ReplaceSchema task basically ignores this.
         #    e.g. list:{PRODUCT_STATUS ; prefix:TMP_}
         #
         #; tableExceptList = list:{FOO_TABLE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}
@@ -56,6 +59,7 @@ map:{
         #  If you want to include some tables in generating target expressly,
         #  you should specify the list of target table hints.
         #  This is only for the main schema. Additional schemas are unconcerned.
+        #  And ReplaceSchema task basically ignores this.
         #    e.g. list:{PURCHASE ; contain:MEMBER}
         #
         #; tableTargetList = list:{FOO_TABLE ; prefix:FOO_ ; suffix:_FOO ; contain:_FOO_}

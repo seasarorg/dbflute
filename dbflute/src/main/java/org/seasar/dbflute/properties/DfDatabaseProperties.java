@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -176,20 +176,27 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                               Object Type Target List
     //                               -----------------------
+    protected List<String> _objectTypeTargetList;
+
     public List<String> getObjectTypeTargetList() {
-        return getVairousStringList("objectTypeTargetList", getDatabaseTypeList());
+        if (_objectTypeTargetList != null) {
+            return _objectTypeTargetList;
+        }
+        final String key = "objectTypeTargetList";
+        _objectTypeTargetList = getVairousStringList(key, getDefaultObjectTypeTargetList());
+        return _objectTypeTargetList;
     }
 
     public boolean hasObjectTypeSynonym() {
         return DfConnectionProperties.hasObjectTypeSynonym(getObjectTypeTargetList());
     }
 
-    protected List<String> getDatabaseTypeList() { // Old Style
+    protected List<String> getDefaultObjectTypeTargetList() {
         final List<Object> defaultList = new ArrayList<Object>();
         defaultList.add(DfConnectionProperties.OBJECT_TYPE_TABLE);
         defaultList.add(DfConnectionProperties.OBJECT_TYPE_VIEW);
         final List<String> resultList = new ArrayList<String>();
-        final List<Object> listProp = listProp("torque.database.type.list", defaultList);
+        final List<Object> listProp = listProp("torque.database.type.list", defaultList); // old style
         for (Object object : listProp) {
             resultList.add((String) object);
         }

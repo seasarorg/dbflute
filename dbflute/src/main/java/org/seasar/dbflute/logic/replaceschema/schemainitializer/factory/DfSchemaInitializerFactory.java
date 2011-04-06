@@ -133,6 +133,7 @@ public class DfSchemaInitializerFactory {
         if (_initializeType.equals(InitializeType.MAIN)) {
             initializer.setDataSource(_dataSource);
             initializer.setUnifiedSchema(_databaseProperties.getDatabaseSchema());
+            initializer.setDropObjectTypeList(_replaceSchemaProperties.getObjectTypeTargetList());
             initializer.setDropGenerateTableOnly(_replaceSchemaProperties.isDropGenerateTableOnly());
             initializer.setDropGenerateProcedureOnly(_replaceSchemaProperties.isDropGenerateProcedureOnly());
             return;

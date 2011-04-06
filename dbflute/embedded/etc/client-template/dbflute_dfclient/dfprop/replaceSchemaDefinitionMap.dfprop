@@ -9,6 +9,7 @@
 # o skipSheet: (NotRequired - Default '')
 # o isIncrementSequenceToDataMax: (NotRequired - Default false)
 # o isSuppressBatchUpdate: (NotRequired - Default false)
+# o objectTypeTargetList: (NotRequired - Default databaseInfoMap's)
 # o isDropGenerateTableOnly: (NotRequired - Default false)
 # o isDropGenerateProcedureOnly: (NotRequired - Default false)
 # o filterVariablesMap: (NotRequired - Default map:{})
@@ -74,8 +75,16 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o objectTypeTargetList: (NotRequired - Default databaseInfoMap's)
+    #  This property overrides databaseInfoMap's one for ReplaceSchema.
+    #    e.g. Synonym of Oracle --> list:{TABLE ; VIEW ; SYNONYM}
+    #
+    #; objectTypeTargetList = list:{TABLE ; VIEW}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isDropGenerateTableOnly: (NotRequired - Default false)
-    #  Does it drop only generating target tables that are specified
+    #  Does it drop only generate-target tables that are specified
     #  in table-target or table-except setting?
     #
     #; isDropGenerateTableOnly = false
@@ -83,7 +92,7 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isDropGenerateProcedureOnly: (NotRequired - Default false)
-    #  Does it drop only generating target procedures that are specified
+    #  Does it drop only generate-target procedures that are specified
     #  in table-target or table-except setting?
     #
     #; isDropGenerateProcedureOnly = false

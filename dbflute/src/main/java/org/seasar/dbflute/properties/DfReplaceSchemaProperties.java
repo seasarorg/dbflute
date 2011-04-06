@@ -202,6 +202,32 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                             Object Type Target List
+    //                                                             =======================
+    protected List<String> _objectTypeTargetList;
+
+    public List<String> getObjectTypeTargetList() { // overrides the property of databaseInfoMap 
+        final Object obj = getReplaceSchemaDefinitionMap().get("objectTypeTargetList");
+        if (obj != null && !(obj instanceof List<?>)) {
+            String msg = "The type of the property 'objectTypeTargetList' should be List: " + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        final List<String> defaultObjectTypeTargetList = getDefaultObjectTypeTargetList();
+        if (obj == null) {
+            _objectTypeTargetList = defaultObjectTypeTargetList;
+        } else {
+            @SuppressWarnings("unchecked")
+            final List<String> list = (List<String>) obj;
+            _objectTypeTargetList = !list.isEmpty() ? list : defaultObjectTypeTargetList;
+        }
+        return _objectTypeTargetList;
+    }
+
+    protected List<String> getDefaultObjectTypeTargetList() {
+        return getDatabaseProperties().getObjectTypeTargetList(); // inherit
+    }
+
+    // ===================================================================================
     //                                                                  Drop Generate Only
     //                                                                  ==================
     public boolean isDropGenerateTableOnly() {
@@ -357,7 +383,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (obj == null) {
             obj = additionalDropMap.get("objectTypeList"); // old style
             if (obj == null) {
-                ArrayList<String> defaultList = new ArrayList<String>();
+                final List<String> defaultList = new ArrayList<String>();
                 defaultList.add("TABLE");
                 defaultList.add("VIEW");
                 return defaultList;
