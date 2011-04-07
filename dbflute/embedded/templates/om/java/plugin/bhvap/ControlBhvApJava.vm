@@ -141,24 +141,22 @@ $database.deleteOldTableClass()
 ##
 $database.info("public void parseTableClass() {")
 #foreach ($table in $database.tables)
-  #if (!$table.isForReferenceOnly())
 
-    $database.info("    parse('${table.name}');")
+  $database.info("    parse('${table.name}');")
 
-    #set ($myBaseBhvApClassName = "${table.baseBehaviorApClassName}")
-    #set ($myExtendedBhvApClassName = "${table.extendedBehaviorApClassName}")
-    #set ($myExtendedBhvLibClassName = "${table.extendedBehaviorLibClassName}")
+  #set ($myBaseBhvApClassName = "${table.baseBehaviorApClassName}")
+  #set ($myExtendedBhvApClassName = "${table.extendedBehaviorApClassName}")
+  #set ($myExtendedBhvLibClassName = "${table.extendedBehaviorLibClassName}")
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhvAp})}${myBaseBhvApClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApBaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhvAp})}${myBaseBhvApClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApBaseBhv.${glTemplateFileExtension}", $path, "table", $table)
 
-    #if (!$database.isStopGenerateExtendedBhv())
-      #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhvAp})}${myExtendedBhvApClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
-      #end
-      $database.reflectAllExCopyright($path)
+  #if (!$database.isStopGenerateExtendedBhv())
+    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhvAp})}${myExtendedBhvApClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
     #end
+    $database.reflectAllExCopyright($path)
   #end
 #end
 $database.info("}")

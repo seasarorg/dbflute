@@ -77,7 +77,7 @@ public class DfDtsColumnTypes {
     protected DfDtsColumnTypes() {
     }
 
-    // [Unused on DBFlute]
+    // *unused on DBFlute
     //    public static ValueType getValueType(int type) {
     //        switch (type) {
     //        case Types.TINYINT:

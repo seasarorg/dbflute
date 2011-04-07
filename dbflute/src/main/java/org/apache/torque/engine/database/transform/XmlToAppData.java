@@ -71,6 +71,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.torque.engine.database.model.Unique;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -86,29 +87,34 @@ import org.xml.sax.helpers.DefaultHandler;
 public class XmlToAppData extends DefaultHandler {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
+    //                                                                          Definition
+    //                                                                          ==========
     private static SAXParserFactory _saxFactory;
     static {
         _saxFactory = SAXParserFactory.newInstance();
         _saxFactory.setValidating(true);
     }
-    private final AppData _appData;
-    private Database _currentDB;
-    private Table _currentTable;
-    private Column _currentColumn;
-    private ForeignKey _currentFK;
-    private Index _currentIndex;
-    private Unique _currentUnique;
-    private String _currentPackage;
-    private String _currentXmlFile;
-    private boolean _firstPass;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final AppData _appData;
+    protected final XmlReadingTableFilter _tableFilter;
+    protected Database _currentDB;
+    protected Table _currentTable;
+    protected Column _currentColumn;
+    protected ForeignKey _currentFK;
+    protected Index _currentIndex;
+    protected Unique _currentUnique;
+    protected String _currentPackage;
+    protected String _currentXmlFile;
+    protected boolean _firstPass;
 
     /** this is the stack to store parsing data */
-    private final Stack<ParseStackElement> _parsingStack = new Stack<ParseStackElement>();
+    protected final Stack<ParseStackElement> _parsingStack = new Stack<ParseStackElement>();
 
     /** remember all files we have already parsed to detect looping. */
-    private Vector<String> _alreadyReadFiles;
+    protected Vector<String> _alreadyReadFiles;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -116,10 +122,16 @@ public class XmlToAppData extends DefaultHandler {
     /**
      * Creates a new instance for the specified database type.
      * @param databaseType The type of database for the application.
+     * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
      */
-    public XmlToAppData(String databaseType) {
+    public XmlToAppData(String databaseType, XmlReadingTableFilter tableFilter) {
         _appData = new AppData(databaseType);
+        _tableFilter = tableFilter;
         _firstPass = true;
+    }
+
+    public static interface XmlReadingTableFilter {
+        boolean isExcept(UnifiedSchema unifiedSchema, String tableName);
     }
 
     // ===================================================================================
@@ -151,15 +163,16 @@ public class XmlToAppData extends DefaultHandler {
         final String encoding = getProejctSchemaXMLEncoding();
         BufferedReader br = null;
         try {
-            // Uses InputStreamReader for setting an encoding for project schema XML.
+            // use InputStreamReader for setting an encoding for project schema XML
+            // for example, Japanese table names and comments need this
             br = new BufferedReader(new InputStreamReader(new FileInputStream(xmlFile), encoding));
             final InputSource is = new InputSource(br);
             final SAXParser parser = _saxFactory.newSAXParser();
             parser.parse(is, this);
         } catch (ParserConfigurationException e) {
-            handleException(e, xmlFile, encoding);
+            handleException(xmlFile, encoding, e);
         } catch (SAXException e) {
-            handleException(e, xmlFile, encoding);
+            handleException(xmlFile, encoding, e);
         } finally {
             if (br != null) {
                 try {
@@ -172,11 +185,7 @@ public class XmlToAppData extends DefaultHandler {
         return _appData;
     }
 
-    protected String getProejctSchemaXMLEncoding() {
-        return DfBuildProperties.getInstance().getBasicProperties().getProejctSchemaXMLEncoding();
-    }
-
-    protected void handleException(Exception e, String xmlFile, String encoding) {
+    protected void handleException(String xmlFile, String encoding, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse SchemaXML.");
         br.addItem("SchemaXML");
@@ -219,48 +228,41 @@ public class XmlToAppData extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String rawName, Attributes attributes) {
         try {
-            if (rawName.equals("database")) {
-                _currentDB = _appData.addDatabase(attributes);
-                // [Unused on DBFlute]
-                //} else if (rawName.equals("external-schema")) {
-                //    String xmlFile = attributes.getValue("filename");
-                //    if (xmlFile.charAt(0) != '/') {
-                //        File f = new File(currentXmlFile);
-                //        xmlFile = new File(f.getParent(), xmlFile).getPath();
-                //    }
-                //
-                //    // put current state onto the stack
-                //    ParseStackElement.pushState(this);
-                //
-                //    isExternalSchema = true;
-                //
-                //    parseFile(xmlFile);
-                //    // get the last state from the stack
-                //    ParseStackElement.popState(this);
-            } else if (rawName.equals("table")) {
-                _currentTable = _currentDB.addTable(attributes);
-            } else if (rawName.equals("column")) {
-                _currentColumn = _currentTable.addColumn(attributes);
-            } else if (rawName.equals("inheritance")) {
-                _currentColumn.addInheritance(attributes);
-            } else if (rawName.equals("foreign-key")) {
-                _currentFK = _currentTable.addForeignKey(attributes);
-            } else if (rawName.equals("reference")) {
-                _currentFK.addReference(attributes);
-            } else if (rawName.equals("index")) {
-                _currentIndex = _currentTable.addIndex(attributes);
-            } else if (rawName.equals("index-column")) {
-                _currentIndex.addColumn(attributes);
-            } else if (rawName.equals("unique")) {
-                _currentUnique = _currentTable.addUnique(attributes);
-            } else if (rawName.equals("unique-column")) {
-                _currentUnique.addColumn(attributes);
-            } else if (rawName.equals("id-method-parameter")) {
-                _currentTable.addIdMethodParameter(attributes);
+            if (rawName.equals("database")) { // basically only one on DBFlute
+                _currentDB = _appData.addDatabase(attributes); // two or more calls throws Exception
+            } else if (rawName.equals("table")) { // contains additional schema's tables
+                clearCurrentTableElements();
+                _currentTable = _currentDB.addTable(attributes, _tableFilter); // null allowed
+            } else if (_currentTable != null) { // check because the table may be filtered
+                // handle table elements
+                if (rawName.equals("column")) {
+                    _currentColumn = _currentTable.addColumn(attributes);
+                } else if (rawName.equals("foreign-key")) {
+                    // except foreign tables are adjusted later (at final initialization)
+                    _currentFK = _currentTable.addForeignKey(attributes);
+                } else if (rawName.equals("reference")) {
+                    _currentFK.addReference(attributes);
+                } else if (rawName.equals("unique")) {
+                    _currentUnique = _currentTable.addUnique(attributes);
+                } else if (rawName.equals("unique-column")) {
+                    _currentUnique.addColumn(attributes);
+                } else if (rawName.equals("index")) {
+                    _currentIndex = _currentTable.addIndex(attributes);
+                } else if (rawName.equals("index-column")) {
+                    _currentIndex.addColumn(attributes);
+                }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            String msg = "Failed to analyze schema data of the XML.";
+            throw new IllegalStateException(msg, e);
         }
+    }
+
+    protected void clearCurrentTableElements() {
+        _currentColumn = null;
+        _currentFK = null;
+        _currentIndex = null;
+        _currentUnique = null;
     }
 
     /**
@@ -273,10 +275,10 @@ public class XmlToAppData extends DefaultHandler {
      */
     @Override
     public void endElement(String uri, String localName, String rawName) {
-        // Comment out!
-        // if (log.isDebugEnabled()) {
-        //     log.debug("endElement(" + uri + ", " + localName + ", " + rawName + ") called");
-        // }
+        // *commented out because of too many logging
+        //if (log.isDebugEnabled()) {
+        //    log.debug("endElement(" + uri + ", " + localName + ", " + rawName + ") called");
+        //}
     }
 
     /**
@@ -323,5 +325,16 @@ public class XmlToAppData extends DefaultHandler {
         public static void pushState(XmlToAppData parser) {
             new ParseStackElement(parser);
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected String getProejctSchemaXMLEncoding() {
+        return getProperties().getBasicProperties().getProejctSchemaXMLEncoding();
+    }
+
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 }

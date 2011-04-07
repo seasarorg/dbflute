@@ -219,60 +219,60 @@ $database.info("}")
 $database.info("public void parseContainerConfig() {")
 #if ($database.isTargetContainerSeasar())
   #if ($database.isAvailableHotDeploy())
-    #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
-    #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
-    #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2Container}))
+  #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
+  #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
+  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2Container}))
+  $database.makeDirectory($path)
+
+  $database.info("    parse('BehaviorCreator');")
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
+
+  #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+    #set ($path = "${dbfluteDiconPackageName}" )
     $database.makeDirectory($path)
 
-    $database.info("    parse('BehaviorCreator');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
+    #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+    $database.info("    parse('${path}')")
+    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/HotDeployDicon.${glTemplateFileExtension}", $path, "", "")
 
-    #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-      #set ($path = "${dbfluteDiconPackageName}" )
-      $database.makeDirectory($path)
+    #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
+    $database.info("    parse('${path}')")
+    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CreatorDicon.${glTemplateFileExtension}", $path, "", "")
 
-      #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-      $database.info("    parse('${path}')")
-      $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/HotDeployDicon.${glTemplateFileExtension}", $path, "", "")
-
-      #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
-      $database.info("    parse('${path}')")
-      $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CreatorDicon.${glTemplateFileExtension}", $path, "", "")
-
-      #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
-      $database.info("    parse('${path}')")
-      $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CustomizerDicon.${glTemplateFileExtension}", $path, "", "")
-    #end
+    #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
+    $database.info("    parse('${path}')")
+    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CustomizerDicon.${glTemplateFileExtension}", $path, "", "")
+  #end
   #else
-    #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-      #set ($path = "${dbfluteDiconPackageName}" )
-      $database.makeDirectory($path)
+  #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+    #set ($path = "${dbfluteDiconPackageName}" )
+    $database.makeDirectory($path)
 
-      #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-      $database.info("    parse('${path}')")
-      $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/DBFluteDicon.${glTemplateFileExtension}", $path, "", "")
-    #end
+    #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+    $database.info("    parse('${path}')")
+    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/DBFluteDicon.${glTemplateFileExtension}", $path, "", "")
+  #end
   #end
 #end
 #if ($database.isTargetContainerSpring())
   #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
-    #set ($path = "${dbfluteBeansPackageName}" )
-    $database.makeDirectory($path)
+  #set ($path = "${dbfluteBeansPackageName}" )
+  $database.makeDirectory($path)
 
-    #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
-    $database.info("    parse('${path}')")
-    $generator.parse("om/${glResourceDirectory}/allcommon/container/spring/SpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+  #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/spring/SpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
   #end
 #end
 #if ($database.isTargetContainerLucy())
   #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
-    #set ($path = "${dbfluteBeansPackageName}" )
-    $database.makeDirectory($path)
+  #set ($path = "${dbfluteBeansPackageName}" )
+  $database.makeDirectory($path)
 
-    #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
-    $database.info("    parse('${path}')")
-    $generator.parse("om/${glResourceDirectory}/allcommon/container/lucy/LucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+  #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/lucy/LucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
   #end
 #end
 #if ($database.isTargetContainerGuice())
@@ -336,111 +336,109 @@ $database.deleteOldTableClass()
 ##
 $database.info("public void parseTableClass() {")
 #foreach ($table in $database.tableList)
-  #if (!$table.isForReferenceOnly())
+  $database.info("    parse('${table.name}');")
 
-    $database.info("    parse('${table.name}');")
-    ##
-    ## The name of objects
-    ##
-    #set ($myExtendedDaoClassName = "${table.extendedDaoClassName}")
-    #set ($myExtendedDaoPackageName = "${glPackageExtendedDao}")
+  ##
+  ## The name of objects
+  ##
+  #set ($myExtendedDaoClassName = "${table.extendedDaoClassName}")
+  #set ($myExtendedDaoPackageName = "${glPackageExtendedDao}")
 
-    #set ($myBaseDaoClassName = "${table.baseDaoClassName}")
-    #set ($myBaseDaoPackageName = "${glPackageBaseDao}")
+  #set ($myBaseDaoClassName = "${table.baseDaoClassName}")
+  #set ($myBaseDaoPackageName = "${glPackageBaseDao}")
 
-    #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
-    #set ($myBaseBhvPackageName = "${glPackageBaseBhv}")
-    #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
-    #set ($myExtendedBhvPackageName = "${glPackageExtendedBhv}")
+  #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
+  #set ($myBaseBhvPackageName = "${glPackageBaseBhv}")
+  #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
+  #set ($myExtendedBhvPackageName = "${glPackageExtendedBhv}")
 
-    #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
-    #set ($myBaseEntityPackageName = "${glPackageBaseEntity}")
+  #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
+  #set ($myBaseEntityPackageName = "${glPackageBaseEntity}")
 
-    #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
-    #set ($myExtendedEntityPackageName = "${glPackageExtendedEntity}")
+  #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
+  #set ($myExtendedEntityPackageName = "${glPackageExtendedEntity}")
 
-    #set ($myBaseConditionBeanClassName = "${table.baseConditionBeanClassName}")
-    #set ($myConditionBeanClassName = "${table.extendedConditionBeanClassName}")
-    #set ($myAbstractBaseConditionQueryClassName = "${table.abstractBaseConditionQueryClassName}")
-    #set ($myBaseConditionQueryClassName = "${table.baseConditionQueryClassName}")
-    #set ($myConditionQueryClassName = "${table.extendedConditionQueryClassName}")
-    #set ($myConditionInlineQueryClassName = "${table.extendedConditionInlineQueryClassName}")
-    #set ($myNestSelectSetupperClassName = "${table.nestSelectSetupperClassName}")
-    #set ($myNestSelectSetupperTerminalClassName = "${table.nestSelectSetupperTerminalClassName}")
+  #set ($myBaseConditionBeanClassName = "${table.baseConditionBeanClassName}")
+  #set ($myConditionBeanClassName = "${table.extendedConditionBeanClassName}")
+  #set ($myAbstractBaseConditionQueryClassName = "${table.abstractBaseConditionQueryClassName}")
+  #set ($myBaseConditionQueryClassName = "${table.baseConditionQueryClassName}")
+  #set ($myConditionQueryClassName = "${table.extendedConditionQueryClassName}")
+  #set ($myConditionInlineQueryClassName = "${table.extendedConditionInlineQueryClassName}")
+  #set ($myNestSelectSetupperClassName = "${table.nestSelectSetupperClassName}")
+  #set ($myNestSelectSetupperTerminalClassName = "${table.nestSelectSetupperTerminalClassName}")
 
-    #set ($myDBMetaClassName = "${table.DBMetaClassName}")
-    #set ($myDBMetaPackageName = "${glPackageBaseDBMeta}")
+  #set ($myDBMetaClassName = "${table.DBMetaClassName}")
+  #set ($myDBMetaPackageName = "${glPackageBaseDBMeta}")
 
-    ##
-    ## The variable name
-    ##
-    #set ($myAttachedCBArgsString = "${glPackageCB}.${myConditionBeanClassName} ${glAttachedCBArgsVariableName}")
+  ##
+  ## The variable name
+  ##
+  #set ($myAttachedCBArgsString = "${glPackageCB}.${myConditionBeanClassName} ${glAttachedCBArgsVariableName}")
 
-    #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
-    #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
-    #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
-    #set ($myBehaviorVariableName = "${table.uncapitalisedJavaName}Bhv")
+  #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
+  #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
+  #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
+  #set ($myBehaviorVariableName = "${table.uncapitalisedJavaName}Bhv")
 
-    ##
-    ## Determination
-    ##
-    #set ($isExistBehavior = false)
-    #set ($isExistBehavior = true)
-    #set ($isExistDao = true)
-    #set ($isExistConditionBean = true)
+  ##
+  ## Determination
+  ##
+  #set ($isExistBehavior = false)
+  #set ($isExistBehavior = true)
+  #set ($isExistDao = true)
+  #set ($isExistConditionBean = true)
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseEntity})}${myBaseObjectClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseEntity})}${myBaseObjectClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseDBMeta})}${myDBMetaClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseDBMeta})}${myDBMetaClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
 
-    #if (!$database.isStopGenerateExtendedBhv())
-      #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
-      #end
-      $database.reflectAllExCopyright($path)
-    #end
-
-    #if (!$database.isStopGenerateExtendedEntity())
-      #set ( $path = "${database.getPackageAsPath(${glPackageExtendedEntity})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-      #end
-      $database.reflectAllExCopyright($path)
-    #end
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myAbstractBaseConditionQueryClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/cbean/AbstractBsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageCIQ})}${myConditionInlineQueryClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/cbean/BsConditionInlineQuery.${glTemplateFileExtension}", $path, "table", $table)
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
+  #if (!$database.isStopGenerateExtendedBhv())
+    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.outputPath},$path).exists())
-      $generator.parse("om/${glResourceDirectory}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
-    #end
-    $database.reflectAllExCopyright($path)
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.outputPath},$path).exists())
-      $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+      $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
     #end
     $database.reflectAllExCopyright($path)
   #end
+
+  #if (!$database.isStopGenerateExtendedEntity())
+    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedEntity})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+    #end
+    $database.reflectAllExCopyright($path)
+  #end
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myAbstractBaseConditionQueryClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/cbean/AbstractBsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageCIQ})}${myConditionInlineQueryClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/cbean/BsConditionInlineQuery.${glTemplateFileExtension}", $path, "table", $table)
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("om/${glResourceDirectory}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+  #end
+  $database.reflectAllExCopyright($path)
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+  #end
+  $database.reflectAllExCopyright($path)
 #end
 $database.info("}")
 $database.info(" ")
@@ -463,38 +461,38 @@ $database.info(" ")
 
   $database.enableSimpleDtoOutputDirectory()
   #foreach ($table in $database.tableList)
-    #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
-    #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
+  #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
+  #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
 
-    $database.info("    parse('${myExtendedObjectClassName}');")
+  $database.info("    parse('${myExtendedObjectClassName}');")
 
-    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+  #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 
-    #if (!$database.isStopGenerateExtendedEntity())
-      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-      #end
-      $database.reflectAllExCopyright($path)
+  #if (!$database.isStopGenerateExtendedEntity())
+    #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
     #end
+    $database.reflectAllExCopyright($path)
+  #end
   #end
 
   #if ($database.isSimpleDtoUseDtoMapper())
-    #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
-    $database.makeDirectory($path)
+  #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
+  $database.makeDirectory($path)
 
-    $database.enableDtoMapperOutputDirectory()
-    #foreach ($table in $database.tableList)
-      #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
-      #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
-      #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+  $database.enableDtoMapperOutputDirectory()
+  #foreach ($table in $database.tableList)
+    #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
+    #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
+    #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
 
-      $database.info("    parse('${myDtoMapperClassName}');")
+    $database.info("    parse('${myDtoMapperClassName}');")
 
-      #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
-    #end
+    #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
+  #end
   #end
   $database.info("}")
   $database.backToGenerateOutputDirectory()
@@ -516,22 +514,22 @@ $database.info(" ")
   $database.makeDirectory($path)
 
   #foreach ($table in $database.tableList)
-    #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
-    #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
-    #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.${myExtendedObjectClassName}")
+  #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
+  #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
+  #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.${myExtendedObjectClassName}")
 
-    $database.info("    parse('${myExtendedObjectClassName}');")
+  $database.info("    parse('${myExtendedObjectClassName}');")
 
-    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
-    $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+  #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
+  $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 
-    #if (!$database.isStopGenerateExtendedEntity())
-      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
-      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
-        $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
-      #end
-      $database.reflectAllExCopyright($path)
+  #if (!$database.isStopGenerateExtendedEntity())
+    #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
+    #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
     #end
+    $database.reflectAllExCopyright($path)
+  #end
   #end
   $database.info("}")
   $database.backToGenerateOutputDirectory()

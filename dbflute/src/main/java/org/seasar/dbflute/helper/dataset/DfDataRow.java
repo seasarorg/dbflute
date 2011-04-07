@@ -30,11 +30,11 @@ public class DfDataRow {
     public DfDataRow(DfDataTable table) {
         _table = table;
 
-        // [Unused on DBFlute]
+        // *unused on DBFlute
         // initValues();
     }
 
-    // [Unused on DBFlute]
+    // *unused on DBFlute
     // private void initValues() {
     //     for (int i = 0; i < _table.getColumnSize(); ++i) {
     //         _values.add(null);
@@ -59,7 +59,7 @@ public class DfDataRow {
         modify();
     }
 
-    // [Unused on DBFlute]
+    // *unused on DBFlute
     // public void setValue(int index, Object value) {
     //     final DataColumn column = _table.getColumn(index);
     //     _values.set(index, column.convert(value));

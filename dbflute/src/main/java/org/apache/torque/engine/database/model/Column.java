@@ -58,8 +58,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,9 +73,9 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
@@ -111,8 +111,6 @@ public class Column {
     private boolean _isAutoIncrement;
     private String _defaultValue;
     private String _plainComment;
-    private String _description; // [Unused on DBFlute]
-    private int _position; // [Unused on DBFlute]
 
     // -----------------------------------------------------
     //                                           Primary Key
@@ -124,7 +122,7 @@ public class Column {
     // -----------------------------------------------------
     //                                           Foreign Key
     //                                           -----------
-    private List<ForeignKey> _referrers;
+    private List<ForeignKey> _referrerList;
 
     // -----------------------------------------------------
     //                                       Java Definition
@@ -138,22 +136,6 @@ public class Column {
     private Table _sql2EntityRelatedTable;
     private Column _sql2EntityRelatedColumn;
     private String _sql2EntityForcedJavaNative;
-
-    // -----------------------------------------------------
-    //                                       Other Component
-    //                                       ---------------
-    // only one type is supported currently, which assumes the
-    // column either contains the classnames or a key to
-    // classnames specified in the schema.  Others may be
-    // supported later.
-    // [Unused on DBFlute]
-    private String _inheritanceType;
-    private boolean _isInheritance;
-    private boolean _isEnumeratedClasses;
-    private List<Inheritance> _inheritanceList;
-    private String _javaNamingMethod;
-
-    //private String _inputValidator = null;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -170,55 +152,45 @@ public class Column {
      * @param name column name
      */
     public Column(String name) {
-        this._name = name;
+        _name = name;
     }
 
     // -----------------------------------------------------
     //                                         Load from XML
     //                                         -------------
     public void loadFromXML(Attributes attrib) {
-        // Name
-        _name = attrib.getValue("name");
+        // name
+        _name = attrib.getValue("name"); // column name
         _javaName = attrib.getValue("javaName");
 
-        // retrieves the method for converting from specified name to a java name.
-        _javaNamingMethod = attrib.getValue("javaNamingMethod");
-        if (_javaNamingMethod == null) {
-            _javaNamingMethod = _table.getDatabase().getDefaultJavaNamingMethod();
-        }
-
-        // Primary Key
+        // primary key
         _isPrimaryKey = ("true".equals(attrib.getValue("primaryKey")));
         _primaryKeyName = attrib.getValue("pkName");
 
-        // HELP: Should primary key, index, and/or idMethod="native"
-        // affect isNotNull?  If not, please document why here.
-        final String notNull = attrib.getValue("required");
-        _isNotNull = (notNull != null && "true".equals(notNull));
-
-        // AutoIncrement/Sequences
-        final String autoIncrement = attrib.getValue("autoIncrement");
-        _isAutoIncrement = ("true".equals(autoIncrement));
-
-        _plainComment = attrib.getValue("comment");
-        _defaultValue = attrib.getValue("default");
+        // data type and size
+        _jdbcType = attrib.getValue("type");
+        _dbType = attrib.getValue("dbType");
         _columnSize = attrib.getValue("size");
-
-        setJdbcType(attrib.getValue("type"));
-        setDbType(attrib.getValue("dbType"));
 
         // It is not necessary to use this value on XML
         // because it uses the JavaNative value.
+        // The value javaType on XML is for various purposes.
         //_javaType = attrib.getValue("javaType");
         //if (_javaType != null && _javaType.length() == 0) {
         //    _javaType = null;
         //}
 
-        _inheritanceType = attrib.getValue("inheritance");
-        _isInheritance = (_inheritanceType != null && !_inheritanceType.equals("false"));
+        // not null
+        final String notNull = attrib.getValue("required");
+        _isNotNull = (notNull != null && "true".equals(notNull));
 
-        //this._inputValidator = attrib.getValue("inputValidator");
-        _description = attrib.getValue("description");
+        // auto-increment
+        final String autoIncrement = attrib.getValue("autoIncrement");
+        _isAutoIncrement = ("true".equals(autoIncrement));
+
+        // others
+        _defaultValue = attrib.getValue("default");
+        _plainComment = attrib.getValue("comment");
 
         handleProgramReservationWord();
     }
@@ -569,32 +541,6 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                              Position
-    //                                              --------
-    /**
-     * Get the location of this column within the table (one-based).
-     * @return value of position.
-     */
-    public int getPosition() { // [Unused on DBFlute]
-        return _position;
-    }
-
-    public void setPosition(int v) {
-        this._position = v;
-    }
-
-    // -----------------------------------------------------
-    //                                           Description
-    //                                           -----------
-    public String getDescription() { // [Unused on DBFlute]
-        return _description;
-    }
-
-    public void setDescription(String newDescription) {
-        _description = newDescription;
-    }
-
-    // -----------------------------------------------------
     //                                               Display
     //                                               -------
     public String getColumnDefinitionLineDisp() {
@@ -923,27 +869,27 @@ public class Column {
      * Adds the foreign key from another table that refers to this column.
      */
     public boolean hasReferrer() {
-        return !getReferrers().isEmpty();
+        return !getReferrerList().isEmpty();
     }
 
     /**
      * Adds the foreign key from another table that refers to this column.
      */
     public void addReferrer(ForeignKey fk) {
-        if (_referrers == null) {
-            _referrers = new ArrayList<ForeignKey>(5);
+        if (_referrerList == null) {
+            _referrerList = new ArrayList<ForeignKey>(5);
         }
-        _referrers.add(fk);
+        _referrerList.add(fk);
     }
 
     /**
      * Get list of references to this column.
      */
     public List<ForeignKey> getReferrerList() {
-        if (_referrers == null) {
-            _referrers = new ArrayList<ForeignKey>(5);
+        if (_referrerList == null) {
+            _referrerList = new ArrayList<ForeignKey>(5);
         }
-        return _referrers;
+        return _referrerList;
     }
 
     /**
@@ -984,11 +930,11 @@ public class Column {
     }
 
     public String getReferrerCommaString() {
-        if (_referrers == null) {
-            _referrers = new ArrayList<ForeignKey>(5);
+        if (_referrerList == null) {
+            _referrerList = new ArrayList<ForeignKey>(5);
         }
         final StringBuffer sb = new StringBuffer();
-        for (ForeignKey fk : _referrers) {
+        for (ForeignKey fk : _referrerList) {
             final Table reffererTable = fk.getTable();
             final String name = reffererTable.getName();
             sb.append(", ").append(name);
@@ -998,14 +944,14 @@ public class Column {
     }
 
     public String getReferrerTableCommaStringWithHtmlHref() { // mainly for SchemaHTML
-        if (_referrers == null) {
-            _referrers = new ArrayList<ForeignKey>(5);
+        if (_referrerList == null) {
+            _referrerList = new ArrayList<ForeignKey>(5);
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ",<br />";
         final StringBuffer sb = new StringBuffer();
-        for (ForeignKey fk : _referrers) {
+        for (ForeignKey fk : _referrerList) {
             final Table referrerTable = fk.getTable();
             final String referrerTableName = referrerTable.getName();
             sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
@@ -1559,56 +1505,6 @@ public class Column {
     }
 
     // ===================================================================================
-    //                                                                     Other Component
-    //                                                                     ===============
-    /**
-     * A utility function to create a new column
-     * from attrib and add it to this table.
-     */
-    public Inheritance addInheritance(Attributes attrib) {
-        Inheritance inh = new Inheritance();
-        inh.loadFromXML(attrib);
-        addInheritance(inh);
-
-        return inh;
-    }
-
-    /**
-     * Adds a new inheritance definition to the inheritance list and set the
-     * parent column of the inheritance to the current column
-     */
-    public void addInheritance(Inheritance inh) {
-        inh.setColumn(this);
-        if (_inheritanceList == null) {
-            _inheritanceList = new ArrayList<Inheritance>();
-            _isEnumeratedClasses = true;
-        }
-        _inheritanceList.add(inh);
-    }
-
-    /**
-     * Get the inheritance definitions.
-     */
-    public List<Inheritance> getChildren() {
-        return _inheritanceList;
-    }
-
-    /**
-     * Determine if this column is a normal property or specifies a
-     * the classes that are represented in the table containing this column.
-     */
-    public boolean isInheritance() {
-        return _isInheritance;
-    }
-
-    /**
-     * Determine if possible classes have been enumerated in the xml file.
-     */
-    public boolean isEnumeratedClasses() {
-        return _isEnumeratedClasses;
-    }
-
-    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     /**
@@ -1616,7 +1512,7 @@ public class Column {
      * @return string representation in xml
      */
     @Override
-    public String toString() {
+    public String toString() { // basically no maintenance
         final StringBuilder result = new StringBuilder();
         result.append("    <column name=\"").append(_name).append('"');
 
@@ -1642,10 +1538,6 @@ public class Column {
 
         if (_defaultValue != null) {
             result.append(" default=\"").append(_defaultValue).append('"');
-        }
-
-        if (isInheritance()) {
-            result.append(" inheritance=\"").append(_inheritanceType).append('"');
         }
 
         // Close the column.

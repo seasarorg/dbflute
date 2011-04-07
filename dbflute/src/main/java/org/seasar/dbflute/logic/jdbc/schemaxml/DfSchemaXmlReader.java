@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.transform.XmlToAppData;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 
 public class DfSchemaXmlReader {
 
@@ -12,14 +13,16 @@ public class DfSchemaXmlReader {
     //                                                                           =========
     protected final String _schemaXml;
     protected final String _targetDatabase;
+    protected final XmlReadingTableFilter _tableFilter;
     protected AppData _schemaData; // not null after reading
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSchemaXmlReader(String schemaXml, String targetDatabase) {
+    public DfSchemaXmlReader(String schemaXml, String targetDatabase, XmlReadingTableFilter tableFilter) {
         _schemaXml = schemaXml;
         _targetDatabase = targetDatabase;
+        _tableFilter = tableFilter;
     }
 
     // ===================================================================================
@@ -30,7 +33,7 @@ public class DfSchemaXmlReader {
             String msg = "The property 'schemaXml' should not be null!";
             throw new IllegalStateException(msg);
         }
-        _schemaData = newInstanceXmlToAppData().parseFile(_schemaXml);
+        _schemaData = createXmlToAppData().parseFile(_schemaXml);
         _schemaData.setName(grokName(_schemaXml));
     }
 
@@ -51,8 +54,8 @@ public class DfSchemaXmlReader {
         return name;
     }
 
-    protected XmlToAppData newInstanceXmlToAppData() {
-        return new XmlToAppData(_targetDatabase);
+    protected XmlToAppData createXmlToAppData() {
+        return new XmlToAppData(_targetDatabase, _tableFilter);
     }
 
     // ===================================================================================

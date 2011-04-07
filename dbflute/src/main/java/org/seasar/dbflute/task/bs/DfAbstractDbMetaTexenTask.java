@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.tools.ant.types.FileSet;
 import org.apache.torque.engine.database.model.AppData;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
@@ -57,8 +58,12 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
     protected DfSchemaXmlReader createSchemaFileReader() {
         final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
-        return new DfSchemaXmlReader(filePath, getTargetDatabase());
+        final String targetDatabase = getTargetDatabase();
+        final XmlReadingTableFilter tableFilter = createXmlReadingTableFilter();
+        return new DfSchemaXmlReader(filePath, targetDatabase, tableFilter);
     }
+
+    protected abstract XmlReadingTableFilter createXmlReadingTableFilter();
 
     protected VelocityContext createVelocityContext(final AppData appData) {
         final DfVelocityContextFactory factory = new DfVelocityContextFactory();

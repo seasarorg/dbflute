@@ -68,6 +68,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -81,9 +82,9 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -114,37 +115,30 @@ public class Table {
     private String _type;
     private UnifiedSchema _unifiedSchema;
     private String _plainComment;
-    private String _description; // [Unused on DBFlute]
     private boolean _existSameNameTable;
 
     // -----------------------------------------------------
     //                                                Column
     //                                                ------
-    private List<Column> _columnList;
-    private StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
+    private final List<Column> _columnList = new ArrayList<Column>();
+    private final StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
 
     // -----------------------------------------------------
     //                                           Foreign Key
     //                                           -----------
-    private List<ForeignKey> _foreignKeys;
-    private List<String> _foreignTableNames;
-    private boolean _containsForeignPK;
-    private boolean _isForReferenceOnly;
-
-    // -----------------------------------------------------
-    //                                              Referrer
-    //                                              --------
-    private List<ForeignKey> _referrerList;
+    // map style because you can remove them after 
+    private final Map<String, ForeignKey> _foreignKeyMap = StringKeyMap.createAsFlexibleOrdered();
+    private final Map<String, ForeignKey> _referrerMap = StringKeyMap.createAsFlexibleOrdered();
 
     // -----------------------------------------------------
     //                                                Unique
     //                                                ------
-    private List<Unique> _unices;
+    private final List<Unique> _unices = new ArrayList<Unique>(5);
 
     // -----------------------------------------------------
     //                                                 Index
     //                                                 -----
-    private List<Index> _indices;
+    private final List<Index> _indices = new ArrayList<Index>(5);
 
     // -----------------------------------------------------
     //                                       Java Definition
@@ -157,22 +151,6 @@ public class Table {
     private boolean _sql2entityCustomize;
     private boolean _sql2entityCustomizeHasNested;
     private boolean _sql2entityTypeSafeCursor;
-
-    // -----------------------------------------------------
-    //                                       Other Component
-    //                                       ---------------
-    // [Unused on DBFlute]
-    private List<IdMethodParameter> _idMethodParameters;
-    private Column _inheritanceColumn;
-
-    // private String _idMethod;
-    // private AttributeListImpl attributes;
-    // private boolean _skipSql;
-    // private boolean _abstractValue;
-    // private boolean _isHeavyIndexing;
-    // private String _alias;
-    // private String _interface;
-    // private String _pkg;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -189,12 +167,7 @@ public class Table {
      * @param name table name
      */
     public Table(String name) {
-        this._name = name;
-        _columnList = new ArrayList<Column>();
-        _foreignKeys = new ArrayList<ForeignKey>(5);
-        _referrerList = new ArrayList<ForeignKey>(5);
-        _indices = new ArrayList<Index>(5);
-        _unices = new ArrayList<Unique>(5);
+        _name = name;
     }
 
     // -----------------------------------------------------
@@ -203,41 +176,19 @@ public class Table {
     /**
      * Load the table object from an XML tag.
      * @param attrib XML attributes. (NotNull)
+     * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
+     * @return Should be the table excepted?
      */
-    public void loadFromXML(Attributes attrib) {
-        _name = attrib.getValue("name");
-        _type = attrib.getValue("type");
-        final String plainSchema = attrib.getValue("schema");
-        _unifiedSchema = UnifiedSchema.createAsDynamicSchema(plainSchema);
+    public boolean loadFromXML(Attributes attrib, XmlReadingTableFilter tableFilter) {
+        _name = attrib.getValue("name"); // table name
+        _type = attrib.getValue("type"); // TABLE, VIEW, SYNONYM...
+        _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
+        if (tableFilter != null && tableFilter.isExcept(_unifiedSchema, _name)) {
+            return false;
+        }
         _plainComment = attrib.getValue("comment");
         _javaName = attrib.getValue("javaName");
-
-        // It retrieves the method for converting from specified name to a java name.
-        // *Attention: Always use Default-JavaNamingMethod!!!
-        // [Unused on DBFlute]
-        //_javaNamingMethod = getDatabase().getDefaultJavaNamingMethod();
-
-        // [Unused on DBFlute]
-        //_idMethod = attrib.getValue("idMethod");
-        //if ("null".equals(_idMethod)) {
-        //    _idMethod = defaultIdMethod;
-        //}
-        //if ("autoincrement".equals(_idMethod) || "sequence".equals(_idMethod)) {
-        //    _log.warn("The value '" + _idMethod + "' for Torque's "
-        //            + "table.idMethod attribute has been deprecated in favor " + "of '" + NATIVE
-        //            + "'.  Please adjust your " + "Torque XML schema accordingly.");
-        //    _idMethod = NATIVE;
-        //}
-        //_skipSql = "true".equals(attrib.getValue("skipSql"));
-        //_pkg = attrib.getValue("package");
-        //_alias = attrib.getValue("alias");
-        //_interface = attrib.getValue("interface");
-        //_abstractValue = "true".equals(attrib.getValue("abstract"));
-        //_baseClass = attrib.getValue("baseClass");
-        //_basePeer = attrib.getValue("basePeer");
-
-        // These are unused on DBFlute
-        _description = attrib.getValue("description");
+        return true;
     }
 
     // ===================================================================================
@@ -419,7 +370,7 @@ public class Table {
     // -----------------------------------------------------
     //                                         Table Comment
     //                                         -------------
-    public String getPlainComment() {
+    public String getPlainComment() { // may contain its alias name
         return _plainComment;
     }
 
@@ -483,54 +434,6 @@ public class Table {
         return " title=\"" + prop.resolveAttributeForSchemaHtml(sb.toString()) + "\"";
     }
 
-    // -----------------------------------------------------
-    //                                           Description
-    //                                           -----------
-    /**
-     * Get the description for the Table
-     */
-    public String getDescription() { // [Unused on DBFlute]
-        return _description;
-    }
-
-    /**
-     * Set the description for the Table
-     * @param newDescription description for the Table
-     */
-    public void setDescription(String newDescription) {
-        _description = newDescription;
-    }
-
-    // -----------------------------------------------------
-    //                                               Unknown
-    //                                               -------
-    /**
-     * Gets the column that subclasses of the class representing this
-     * table can be produced from.
-     * 
-     * @return Children column.
-     */
-    public Column getChildrenColumn() {
-        return _inheritanceColumn;
-    }
-
-    /**
-     * Get the objects that can be created from this table.
-     * 
-     * @return Children name list.
-     */
-    public List<String> getChildrenNames() {
-        if (_inheritanceColumn == null || !_inheritanceColumn.isEnumeratedClasses()) {
-            return null;
-        }
-        List<Inheritance> children = _inheritanceColumn.getChildren();
-        List<String> names = new ArrayList<String>(children.size());
-        for (int i = 0; i < children.size(); i++) {
-            names.add(((Inheritance) children.get(i)).getClassName());
-        }
-        return names;
-    }
-
     // ===================================================================================
     //                                                                              Column
     //                                                                              ======
@@ -557,16 +460,12 @@ public class Table {
      */
     public void addColumn(Column col) {
         col.setTable(this);
-        if (col.isInheritance()) {
-            _inheritanceColumn = col;
-        }
         _columnList.add(col);
         _columnMap.put(col.getName(), col);
         final String synonym = col.getSynonym();
         if (synonym != null) {
             _columnMap.put(synonym, col); // to find by synonym name
         }
-        col.setPosition(_columnList.size());
     }
 
     /**
@@ -991,16 +890,19 @@ public class Table {
     //                                                 Basic
     //                                                 -----
     /**
+     * Returns a List containing all the FKs in the table
+     * @return Foreign-key list.
+     */
+    public List<ForeignKey> getForeignKeyList() {
+        return new ArrayList<ForeignKey>(_foreignKeyMap.values());
+    }
+
+    /**
      * Returns an Array containing all the FKs in the table
      * @return Foreign-key array.
      */
     public ForeignKey[] getForeignKeys() {
-        final int size = _foreignKeys.size();
-        final ForeignKey[] tbls = new ForeignKey[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (ForeignKey) _foreignKeys.get(i);
-        }
-        return tbls;
+        return _foreignKeyMap.values().toArray(new ForeignKey[_foreignKeyMap.size()]);
     }
 
     /**
@@ -1012,12 +914,11 @@ public class Table {
      */
     public ForeignKey getForeignKey(String columnName) {
         ForeignKey firstFK = null;
-        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = iter.next();
-            List<String> localColumns = key.getLocalColumnNameList();
+        for (ForeignKey fk : _foreignKeyMap.values()) {
+            final List<String> localColumns = fk.getLocalColumnNameList();
             if (Srl.containsElementIgnoreCase(localColumns, columnName)) {
                 if (firstFK == null) {
-                    firstFK = key;
+                    firstFK = fk;
                 }
             }
         }
@@ -1025,12 +926,11 @@ public class Table {
     }
 
     public List<ForeignKey> getForeignKeyList(String columnName) {
-        List<ForeignKey> fkList = new ArrayList<ForeignKey>();
-        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = iter.next();
-            List<String> localColumns = key.getLocalColumnNameList();
+        final List<ForeignKey> fkList = new ArrayList<ForeignKey>();
+        for (ForeignKey fk : _foreignKeyMap.values()) {
+            final List<String> localColumns = fk.getLocalColumnNameList();
             if (Srl.containsElementIgnoreCase(localColumns, columnName)) {
-                fkList.add(key);
+                fkList.add(fk);
             }
         }
         return fkList;
@@ -1040,13 +940,31 @@ public class Table {
      * A utility function to create a new foreign key
      * from attrib and add it to this table.
      * @param attrib the xml attributes
-     * @return the created ForeignKey
+     * @return the created ForeignKey. (NotNull)
      */
     public ForeignKey addForeignKey(Attributes attrib) {
         final ForeignKey fk = new ForeignKey();
         fk.loadFromXML(attrib);
         addForeignKey(fk);
         return fk;
+    }
+
+    /**
+     * Adds a new FK to the FK list and set the
+     * parent table of the column to the current table
+     * @param fk A foreign key
+     */
+    public void addForeignKey(ForeignKey fk) {
+        fk.setTable(this);
+        _foreignKeyMap.put(fk.getName(), fk);
+    }
+
+    /**
+     * Remove the foreign key, for example, foreign table is excepted.
+     * @param fk The removed foreign key. (NotNull)
+     */
+    public void removeForeignKey(ForeignKey fk) {
+        _foreignKeyMap.remove(fk.getName());
     }
 
     // -----------------------------------------------------
@@ -1060,7 +978,7 @@ public class Table {
     public String getForeignTableNameCommaString() {
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
-        final List<ForeignKey> foreignKeyList = _foreignKeys;
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
         for (int i = 0; i < foreignKeyList.size(); i++) {
             final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();
@@ -1070,13 +988,11 @@ public class Table {
             tableSet.add(name);
             sb.append(", ").append(name).append(fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         }
-        List<ForeignKey> referrerList = _referrerList;
-        for (int i = 0; i < referrerList.size(); i++) {
-            final ForeignKey fk = referrerList.get(i);
-            if (!fk.isOneToOne()) {
+        for (ForeignKey referrer : _referrerMap.values()) {
+            if (!referrer.isOneToOne()) {
                 continue;
             }
-            final String name = fk.getTable().getName();
+            final String name = referrer.getTable().getName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1092,7 +1008,7 @@ public class Table {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ", ";
-        final List<ForeignKey> foreignKeyList = _foreignKeys;
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
         final int size = foreignKeyList.size();
         if (size == 0) {
             return "&nbsp;";
@@ -1113,51 +1029,24 @@ public class Table {
     public String getForeignPropertyNameCommaString() {
         final StringBuilder sb = new StringBuilder();
 
-        final List<ForeignKey> ls = _foreignKeys;
+        final List<ForeignKey> ls = getForeignKeyList();
         final int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
             sb.append(", ").append(fk.getForeignPropertyName());
         }
-        final List<ForeignKey> referrerList = _referrerList;
-        for (ForeignKey fk : referrerList) {
-            if (fk.isOneToOne()) {
-                sb.append(", ").append(fk.getReferrerPropertyNameAsOne());
+        for (ForeignKey referrer : _referrerMap.values()) {
+            if (referrer.isOneToOne()) {
+                sb.append(", ").append(referrer.getReferrerPropertyNameAsOne());
             }
         }
         sb.delete(0, ", ".length());
         return sb.toString();
     }
 
-    /**
-     * A list of tables referenced by foreign keys in this table
-     *
-     * @return A list of tables
-     */
-    public List<String> getForeignTableNames() {
-        if (_foreignTableNames == null) {
-            _foreignTableNames = new ArrayList<String>(1);
-        }
-        return _foreignTableNames;
-    }
-
-    /**
-     * Adds a new FK to the FK list and set the
-     * parent table of the column to the current table
-     * @param fk A foreign key
-     */
-    public void addForeignKey(ForeignKey fk) {
-        fk.setTable(this);
-        _foreignKeys.add(fk);
-
-        if (_foreignTableNames == null) {
-            _foreignTableNames = new ArrayList<String>(5);
-        }
-        if (_foreignTableNames.contains(fk.getForeignTableName())) {
-            _foreignTableNames.add(fk.getForeignTableName());
-        }
-    }
-
+    // -----------------------------------------------------
+    //                                         Determination
+    //                                         -------------
     public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList, String fixedSuffix) {
         final StringSet localColumnNameSet = StringSet.createAsFlexibleOrdered();
@@ -1198,24 +1087,6 @@ public class Table {
      */
     public boolean hasRelation() {
         return (hasForeignKey() || hasReferrer());
-    }
-
-    /**
-     * Flag to determine if code/sql gets created for this table.
-     * Table will be skipped, if return true.
-     * @return value of forReferenceOnly.
-     */
-    public boolean isForReferenceOnly() { // Unused on DBFlute but template uses...
-        return _isForReferenceOnly;
-    }
-
-    /**
-     * Flag to determine if code/sql gets created for this table.
-     * Table will be skipped, if set to true.
-     * @param v  Value to assign to forReferenceOnly.
-     */
-    public void setForReferenceOnly(boolean v) {
-        this._isForReferenceOnly = v;
     }
 
     // ===================================================================================
@@ -1329,15 +1200,12 @@ public class Table {
         if (!fk.canBeReferrer()) {
             return false;
         }
-        if (_referrerList == null) {
-            _referrerList = DfCollectionUtil.newArrayList();
-        }
-        _referrerList.add(fk);
+        _referrerMap.put(fk.getName(), fk);
         return true;
     }
 
     public List<ForeignKey> getReferrerList() {
-        return _referrerList;
+        return new ArrayList<ForeignKey>(_referrerMap.values());
     }
 
     public List<ForeignKey> getReferrerAsManyList() {
@@ -1509,14 +1377,6 @@ public class Table {
         }
         sb.delete(0, ", ".length());
         return sb.toString();
-    }
-
-    public void setContainsForeignPK(boolean b) {
-        _containsForeignPK = b;
-    }
-
-    public boolean getContainsForeignPK() {
-        return _containsForeignPK;
     }
 
     // ===================================================================================
@@ -3040,7 +2900,7 @@ public class Table {
      * @return XML representation of this table
      */
     public String toString() {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         result.append("<table name=\"").append(getName()).append('\"');
         if (_javaName != null) {
             result.append(" javaName=\"").append(_javaName).append('\"');
@@ -3051,15 +2911,10 @@ public class Table {
                 result.append(iter.next());
             }
         }
-        if (_foreignKeys != null) {
-            for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
-                result.append(iter.next());
-            }
-        }
-        if (_idMethodParameters != null) {
-            Iterator<IdMethodParameter> iter = _idMethodParameters.iterator();
-            while (iter.hasNext()) {
-                result.append(iter.next());
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        if (!foreignKeyList.isEmpty()) {
+            for (ForeignKey fk : foreignKeyList) {
+                result.append(fk);
             }
         }
         result.append("</table>\n");
@@ -3077,13 +2932,6 @@ public class Table {
      * provided with a name.</p>
      */
     public void doFinalInitialization() {
-        // Heavy indexing must wait until after all columns composing
-        // a table's primary key have been parsed.
-        // [Unused on DBFlute]
-        //if (_isHeavyIndexing) {
-        //    doHeavyIndexing();
-        //}
-
         // Name any indices which are missing a name using the
         // appropriate algorithm.
         doNaming();
@@ -3100,8 +2948,9 @@ public class Table {
 
         // Assure names are unique across all databases.
         try {
-            for (i = 0, size = _foreignKeys.size(); i < size; i++) {
-                ForeignKey fk = (ForeignKey) _foreignKeys.get(i);
+            final List<ForeignKey> foreignKeyList = getForeignKeyList();
+            for (i = 0, size = foreignKeyList.size(); i < size; i++) {
+                final ForeignKey fk = (ForeignKey) foreignKeyList.get(i);
                 name = fk.getName();
                 if (Srl.is_Null_or_Empty(name)) {
                     name = acquireConstraintName("FK", i + 1);
@@ -3135,36 +2984,11 @@ public class Table {
      * @throws EngineException
      */
     private final String acquireConstraintName(String nameType, int nbr) throws EngineException {
-        List<Object> inputs = new ArrayList<Object>(4);
+        final List<Object> inputs = new ArrayList<Object>(4);
         inputs.add(getDatabase());
         inputs.add(getName());
         inputs.add(nameType);
         inputs.add(new Integer(nbr));
         return NameFactory.generateName(NameFactory.CONSTRAINT_GENERATOR, inputs);
-    }
-
-    /**
-     * A utility function to create a new id method parameter
-     * from attrib and add it to this table.
-     */
-    public IdMethodParameter addIdMethodParameter(Attributes attrib) {
-        IdMethodParameter imp = new IdMethodParameter();
-        imp.loadFromXML(attrib);
-        addIdMethodParameter(imp);
-        return imp;
-    }
-
-    /**
-     * Adds a new ID method parameter to the list and sets the parent
-     * table of the column associated with the supplied parameter to this table.
-     *
-     * @param imp The column to add as an ID method parameter.
-     */
-    public void addIdMethodParameter(IdMethodParameter imp) {
-        imp.setTable(this);
-        if (_idMethodParameters == null) {
-            _idMethodParameters = new ArrayList<IdMethodParameter>(2);
-        }
-        _idMethodParameters.add(imp);
     }
 }

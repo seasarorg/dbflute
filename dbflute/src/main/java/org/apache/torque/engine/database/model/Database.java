@@ -62,7 +62,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,11 +72,11 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
 import org.seasar.dbflute.exception.DfColumnNotFoundException;
-import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
@@ -108,7 +107,8 @@ import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
- * A class for holding application data structures.
+ * A class for holding application data structures. <br />
+ * DBFlute treats all tables containing other schema's as one database object.
  * @author Modified by jflute
  */
 public class Database {
@@ -137,8 +137,10 @@ public class Database {
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
-    protected List<Table> _tableList = new ArrayList<Table>(100);
-    protected StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexibleOrdered();
+    // use duplicate collection to suppress a little performance cost
+    // because tables are frequently referred
+    protected List<Table> _tableList = new ArrayList<Table>(100); // for ordering
+    protected StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexible(); // for key-map
 
     // -----------------------------------------------------
     //                                         ParameterBean
@@ -158,7 +160,7 @@ public class Database {
     protected String _defaultJavaNamingMethod;
     protected boolean _skipDeleteOldClass;
 
-    // [Unused on DBFlute]
+    // *unused on DBFlute
     //protected String _pkg;
     //protected String _defaultIdMethod;
     //protected String _defaultJavaType;
@@ -209,10 +211,18 @@ public class Database {
         return _tableMap.get(name);
     }
 
-    public Table addTable(Attributes attrib) {
+    /**
+     * Add table from attributes of SchemaXML.
+     * @param attrib The attributes of SchemaXML. (NotNull)
+     * @param tableFilter The filter of table. (NullAllowed)
+     * @return The instance of added table. (NullAllowed: if null, means the table is excepted) 
+     */
+    public Table addTable(Attributes attrib, XmlReadingTableFilter tableFilter) {
         final Table tbl = new Table();
         tbl.setDatabase(this);
-        tbl.loadFromXML(attrib);
+        if (!tbl.loadFromXML(attrib, tableFilter)) {
+            return null;
+        }
         addTable(tbl);
         return tbl;
     }
@@ -223,86 +233,63 @@ public class Database {
         _tableMap.put(tbl.getName(), tbl);
     }
 
-    public void doFinalInitialization() throws EngineException { // Unused on DBFlute
+    /**
+     * Initialize detail points after loading as final process.
+     */
+    public void doFinalInitialization() {
         final List<Table> tableList = getTableList();
         for (int i = 0; i < tableList.size(); i++) {
-            final Table currTable = tableList.get(i);
+            final Table table = tableList.get(i);
+            table.doFinalInitialization();
 
-            // check schema integrity
-            // if idMethod="autoincrement", make sure a column is
-            // specified as autoIncrement="true"
-            // F I X M E: Handle idMethod="native" via DB adapter.
-            // [Unused on DBFlute]
-            // if (currTable.getIdMethod().equals("autoincrement")) {
-            //     Column[] columns = currTable.getColumns();
-            //     boolean foundOne = false;
-            //     for (int j = 0; j < columns.length && !foundOne; j++) {
-            //         foundOne = columns[j].isAutoIncrement();
-            //     }
-            // 
-            //     if (!foundOne) {
-            //         String errorMessage = "Table '" + currTable.getName()
-            //                 + "' is marked as autoincrement, but it does not "
-            //                 + "have a column which declared as the one to "
-            //                 + "auto increment (i.e. autoIncrement=\"true\")\n";
-            //         throw new EngineException("Error in XML schema: " + errorMessage);
-            //     }
-            // }
-
-            currTable.doFinalInitialization();
-
-            // setup reverse fk relations
-            final ForeignKey[] fks = currTable.getForeignKeys();
-            for (int j = 0; j < fks.length; j++) {
-                final ForeignKey currFK = fks[j];
-                final String foreignTableName = currFK.getForeignTableName();
+            // setup reverse relations and check existences
+            final List<ForeignKey> fkList = table.getForeignKeyList();
+            for (int j = 0; j < fkList.size(); j++) {
+                final ForeignKey fk = fkList.get(j);
+                final String foreignTableName = fk.getForeignTableName();
                 final Table foreignTable = getTable(foreignTableName);
-                if (foreignTable == null) {
-                    String msg = "Not found the table:";
-                    msg = msg + " fk=" + currFK.getName() + " foreignTableName=" + foreignTableName;
-                    throw new DfTableNotFoundException(msg);
-                } else {
-                    final List<ForeignKey> refererList = foreignTable.getRefererList();
-                    if ((refererList == null || !refererList.contains(currFK))) {
-                        foreignTable.addReferrer(currFK);
-                    }
 
-                    // local column references
-                    final Iterator<String> localColumnNames = currFK.getLocalColumnNameList().iterator();
-                    while (localColumnNames.hasNext()) {
-                        final String localColumnName = localColumnNames.next();
-                        final Column local = currTable.getColumn(localColumnName);
-                        // give notice of a schema inconsistency.
-                        // note we do not prevent the npe as there is nothing
-                        // that we can do, if it is to occur.
-                        if (local == null) {
-                            String msg = "Not found the column in the table:";
-                            msg = msg + " fk=" + currFK.getName() + " foreignTableName=" + foreignTableName;
-                            msg = msg + " table=" + currTable + " localColumn=" + localColumnName;
-                            throw new DfColumnNotFoundException(msg);
-                        } else {
-                            //check for foreign pk's
-                            if (local.isPrimaryKey()) {
-                                currTable.setContainsForeignPK(true);
-                            }
-                        }
-                    }
+                // check an existence of foreign table
+                if (foreignTable == null) { // may be except table generate-only
+                    table.removeForeignKey(fk);
+                    continue;
+                }
 
-                    // foreign column references
-                    final Iterator<String> foreignColumnNames = currFK.getForeignColumnNameList().iterator();
-                    while (foreignColumnNames.hasNext()) {
-                        final String foreignColumnName = (String) foreignColumnNames.next();
-                        final Column foreign = foreignTable.getColumn(foreignColumnName);
-                        // if the foreign column does not exist, we may have an
-                        // external reference or a misspelling
-                        if (foreign == null) {
-                            String msg = "Not found the column in the table:";
-                            msg = msg + " fk=" + currFK.getName() + " foreignTableName=" + foreignTableName;
-                            msg = msg + " table=" + currTable + " foreignColumn=" + foreignColumnName;
-                            throw new DfColumnNotFoundException(msg);
-                        } else {
-                            foreign.addReferrer(currFK);
-                        }
+                // adjust reverse relation
+                final List<ForeignKey> refererList = foreignTable.getRefererList();
+                if ((refererList == null || !refererList.contains(fk))) {
+                    foreignTable.addReferrer(fk);
+                }
+
+                // local column references
+                final List<String> localColumnNameList = fk.getLocalColumnNameList();
+                for (String localColumnName : localColumnNameList) {
+                    final Column localColumn = table.getColumn(localColumnName);
+                    // give notice of a schema inconsistency.
+                    // note we do not prevent the npe as there is nothing
+                    // that we can do, if it is to occur.
+                    if (localColumn == null) {
+                        String msg = "Not found the column in the table:";
+                        msg = msg + " fk=" + fk.getName() + " foreignTableName=" + foreignTableName;
+                        msg = msg + " table=" + table + " localColumn=" + localColumnName;
+                        throw new DfColumnNotFoundException(msg);
+                    }
+                    // column has no information of its foreign keys
+                }
+
+                // foreign column references
+                final List<String> foreignColumnNameList = fk.getForeignColumnNameList();
+                for (String foreignColumnName : foreignColumnNameList) {
+                    final Column foreignColumn = foreignTable.getColumn(foreignColumnName);
+                    // if the foreign column does not exist, we may have an
+                    // external reference or a misspelling
+                    if (foreignColumn == null) {
+                        String msg = "Not found the column in the table:";
+                        msg = msg + " fk=" + fk.getName() + " foreignTableName=" + foreignTableName;
+                        msg = msg + " table=" + table + " foreignColumn=" + foreignColumnName;
+                        throw new DfColumnNotFoundException(msg);
+                    } else {
+                        foreignColumn.addReferrer(fk);
                     }
                 }
             }
@@ -674,11 +661,7 @@ public class Database {
 
         // If this is in sql2entity task, initialize schema database.
         if (_sql2entitySchemaData != null) {
-            try {
-                clsProp.initializeClassificationDeployment(_sql2entitySchemaData.getDatabase());
-            } catch (EngineException e) {
-                throw new IllegalStateException(e);
-            }
+            clsProp.initializeClassificationDeployment(_sql2entitySchemaData.getDatabase());
         }
     }
 

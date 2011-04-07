@@ -59,8 +59,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
@@ -121,15 +121,15 @@ public class ForeignKey {
     protected final Map<String, String> _dynamicFixedConditionMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
-    //                                                                                Load
-    //                                                                                ====
+    //                                                                       Load from XML
+    //                                                                       =============
     /**
      * Imports foreign key from an XML specification
      * @param attrib the XML attributes
      */
     public void loadFromXML(Attributes attrib) {
         _foreignTableName = attrib.getValue("foreignTable");
-        _name = attrib.getValue("name");
+        _name = attrib.getValue("name"); // constraint name for this FK
     }
 
     public void setForeignPropertyNamePrefix(String propertyNamePrefix) {

@@ -17,7 +17,6 @@ package org.seasar.dbflute.logic.sql2entity.pmbean;
 
 import java.util.List;
 
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -65,12 +64,7 @@ public class DfPmbPropertyOptionReference {
         if (appData == null) {
             return null;
         }
-        final Database database;
-        try {
-            database = appData.getDatabase();
-        } catch (EngineException e) {
-            throw new IllegalStateException(e);
-        }
+        final Database database = appData.getDatabase();
         if (database == null) {
             return null;
         }

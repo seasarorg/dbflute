@@ -14,6 +14,7 @@ public class DfAdditionalSchemaInfo {
     protected UnifiedSchema _unifiedSchema;
     protected List<String> _objectTypeTargetList;
     protected List<String> _tableExceptList;
+    protected List<String> _tableExceptGenOnlyList;
     protected List<String> _tableTargetList;
     protected Map<String, List<String>> _columnExceptMap;
     protected boolean _suppressCommonColumn;
@@ -60,6 +61,14 @@ public class DfAdditionalSchemaInfo {
 
     public void setTableExceptList(List<String> tableExceptList) {
         this._tableExceptList = tableExceptList;
+    }
+
+    public List<String> getTableExceptGenOnlyList() {
+        return _tableExceptGenOnlyList;
+    }
+
+    public void setTableExceptGenOnlyList(List<String> tableExceptGenOnlyList) {
+        this._tableExceptGenOnlyList = tableExceptGenOnlyList;
     }
 
     public List<String> getTableTargetList() {

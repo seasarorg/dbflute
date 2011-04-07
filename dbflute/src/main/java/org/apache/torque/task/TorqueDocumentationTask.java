@@ -66,10 +66,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
@@ -85,7 +85,7 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
- * The task for documentation. {SchemaHTML and DataXlsTemplate}
+ * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and DataXlsTemplate.
  * @author Modified by jflute
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
@@ -95,6 +95,23 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(TorqueDocumentationTask.class);
+
+    // ===================================================================================
+    //                                                                         Data Source
+    //                                                                         ===========
+    @Override
+    protected boolean isUseDataSource() {
+        // at old age, this is false, but after all, classification needs a connection 
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                                        Table Filter
+    //                                                                        ============
+    @Override
+    protected XmlReadingTableFilter createXmlReadingTableFilter() {
+        return null; // no need to filter at this task
+    }
 
     // ===================================================================================
     //                                                                             Execute
@@ -134,25 +151,21 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
         final Map<String, String> commonColumnMap = getCommonColumnMap();
-        try {
-            final Database database = _schemaData.getDatabase();
-            final List<Table> tableList = database.getTableList();
-            for (Table table : tableList) {
-                if (additionalTableMap.containsKey(table.getName())) {
+        final Database database = _schemaData.getDatabase();
+        final List<Table> tableList = database.getTableList();
+        for (Table table : tableList) {
+            if (additionalTableMap.containsKey(table.getName())) {
+                continue;
+            }
+            final Column[] columns = table.getColumns();
+            final List<Column> columnNameList = new ArrayList<Column>();
+            for (Column column : columns) {
+                if (!containsCommonColumn && commonColumnMap.containsKey(column.getName())) {
                     continue;
                 }
-                final Column[] columns = table.getColumns();
-                final List<Column> columnNameList = new ArrayList<Column>();
-                for (Column column : columns) {
-                    if (!containsCommonColumn && commonColumnMap.containsKey(column.getName())) {
-                        continue;
-                    }
-                    columnNameList.add(column);
-                }
-                tableColumnMap.put(table.getTableSqlNameDirectUse(), columnNameList);
+                columnNameList.add(column);
             }
-        } catch (EngineException e) {
-            throw new IllegalStateException(e);
+            tableColumnMap.put(table.getTableSqlNameDirectUse(), columnNameList);
         }
         _log.info("...Outputting data xls template: tables=" + tableColumnMap.size());
         outputDataXlsTemplate(tableColumnMap);
@@ -214,13 +227,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                 throw new IllegalStateException(msg, e);
             }
         }
-    }
-
-    // ===================================================================================
-    //                                                                         Data Source
-    //                                                                         ===========
-    protected boolean isUseDataSource() {
-        return true;
     }
 
     // ===================================================================================

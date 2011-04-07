@@ -54,16 +54,12 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
+ * The schema data for your application.
  * @author Modified by jflute
  */
 public class AppData {
@@ -71,10 +67,12 @@ public class AppData {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // DBFlute treats all tables that contains other schema's as one database object.
+    // Other schema's tables is handled by DBFlute original function AdditionalSchema.
     /**
-     * The list of databases for this application.
+     * The database for this application.
      */
-    private List<Database> _dbList = new ArrayList<Database>(5);
+    private Database _database;
 
     /**
      * The type for our databases.
@@ -129,51 +127,12 @@ public class AppData {
     }
 
     /**
-     * Get database object of first element in list. <br />
-     * DBFlute uses this method!
-     * @return Database database of first element in list. (NotNull)
+     * Get database object for application. <br />
+     * @return The instance of the database. (NullAllowed: if null, not loaded yet)
      */
-    public Database getDatabase() throws EngineException {
+    public Database getDatabase() {
         doFinalInitialization();
-        return (Database) _dbList.get(0);
-    }
-
-    /**
-     * Return an array of all databases
-     * @return Array of Database objects
-     */
-    public Database[] getDatabases() throws EngineException {
-        doFinalInitialization();
-        int size = _dbList.size();
-        Database[] dbs = new Database[size];
-        for (int i = 0; i < size; i++) {
-            dbs[i] = (Database) _dbList.get(i);
-        }
-        return dbs;
-    }
-
-    /**
-     * Returns whether this application has multiple databases.
-     * @return true if the application has multiple databases
-     */
-    public boolean hasMultipleDatabases() {
-        return (_dbList.size() > 1);
-    }
-
-    /**
-     * Return the database with the specified name.
-     * @param name database name
-     * @return A Database object.  If it does not exist it returns null
-     */
-    public Database getDatabase(String name) throws EngineException {
-        doFinalInitialization();
-        for (Iterator<Database> i = _dbList.iterator(); i.hasNext();) {
-            Database db = (Database) i.next();
-            if (db.getName().equals(name)) {
-                return db;
-            }
-        }
-        return null;
+        return _database;
     }
 
     /**
@@ -182,7 +141,7 @@ public class AppData {
      * @return the database
      */
     public Database addDatabase(Attributes attrib) {
-        Database db = new Database();
+        final Database db = new Database();
         db.loadFromXML(attrib);
         addDatabase(db);
         return db;
@@ -192,24 +151,24 @@ public class AppData {
      * Add a database to the list and sets the AppData property to this AppData
      * @param db the database to add
      */
-    public void addDatabase(Database db) {
+    public void addDatabase(Database db) { // called only once
+        if (_database != null) {
+            String msg = "Already added a database. DBFlute uses only one database objects.";
+            throw new IllegalStateException(msg);
+        }
         db.setAppData(this);
         if (db.getName() == null) {
-            /** @task check this */
             db.setName("default"); // Torque.getDefaultDB());
         }
         if (db.getDatabaseType() == null) {
             db.setDatabaseType(_databaseType);
         }
-        _dbList.add(db);
+        _database = db;
     }
 
-    private void doFinalInitialization() throws EngineException {
+    private void doFinalInitialization() {
         if (!_isInitialized) {
-            Iterator<Database> dbs = _dbList.iterator();
-            while (dbs.hasNext()) {
-                ((Database) dbs.next()).doFinalInitialization();
-            }
+            _database.doFinalInitialization();
             _isInitialized = true;
         }
     }
@@ -222,15 +181,13 @@ public class AppData {
      * The representation is given in xml format.
      * @return representation in xml format
      */
-    public String toString() {
-        StringBuffer result = new StringBuffer();
+    public String toString() { // basically no maintenance
+        final StringBuilder result = new StringBuilder();
 
         result.append("<?xml version=\"1.0\"?>\n");
         result.append("<!DOCTYPE database SYSTEM \"" + DTDResolver.WEB_SITE_DTD + "\">\n");
         result.append("<!-- Autogenerated by SQLToXMLSchema! -->\n");
-        for (Iterator<Database> i = _dbList.iterator(); i.hasNext();) {
-            result.append(i.next());
-        }
+        result.append(_database);
         return result.toString();
     }
 }

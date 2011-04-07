@@ -58,9 +58,9 @@ package org.apache.torque.engine.database.model;
  * Interface for various ID retrieval method types
  * (i.e. auto-increment, sequence, ID broker, etc.).
  * @author Modified by jflute
- * @deprecated [Unused on DBFlute]
+ * @deprecated unused on DBFlute
  */
-public interface IDMethod { // [Unused on DBFlute]
+public interface IDMethod { // *unused on DBFlute
 
     /**
      * Key generation via database-specific ID method

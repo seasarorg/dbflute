@@ -20,18 +20,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
+import org.apache.torque.task.TorqueDataModelTask.GenetateXmlReadingTableFilter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
@@ -136,21 +137,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         refreshResources();
     }
 
-    protected void setupSchemaInformation() {
-        final DfSchemaXmlReader schemaFileReader = createSchemaFileReader();
-        try {
-            schemaFileReader.read();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        _schemaData = schemaFileReader.getSchemaData();
-    }
-
-    protected DfSchemaXmlReader createSchemaFileReader() {
-        final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
-        return new DfSchemaXmlReader(filePath, getTargetDatabase());
-    }
-
     protected void setupControlTemplate() {
         final DfLittleAdjustmentProperties littleProp = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         if (littleProp.isAlternateSql2EntityControlValid()) {
@@ -194,6 +180,27 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info("...Using " + language + " control: " + control);
             setControlTemplate(control);
         }
+    }
+
+    protected void setupSchemaInformation() {
+        final DfSchemaXmlReader schemaFileReader = createSchemaFileReader();
+        try {
+            schemaFileReader.read();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        _schemaData = schemaFileReader.getSchemaData();
+    }
+
+    protected DfSchemaXmlReader createSchemaFileReader() {
+        final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
+        final String targetDatabase = getTargetDatabase();
+        final XmlReadingTableFilter tableFilter = createXmlReadingTableFilter();
+        return new DfSchemaXmlReader(filePath, targetDatabase, tableFilter);
+    }
+
+    protected XmlReadingTableFilter createXmlReadingTableFilter() { // same as Generate task's one
+        return new GenetateXmlReadingTableFilter(getDatabaseProperties());
     }
 
     // ===================================================================================
@@ -626,13 +633,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (_schemaData == null) {
             return null;
         }
-        final Table relatedTable;
-        try {
-            relatedTable = _schemaData.getDatabase().getTable(sql2EntityRelatedTableName);
-        } catch (EngineException e) {
-            String msg = "Failed to get database information: schemaData=" + _schemaData;
-            throw new IllegalStateException(msg);
-        }
+        final Table relatedTable = _schemaData.getDatabase().getTable(sql2EntityRelatedTableName);
         return relatedTable;
     }
 
@@ -680,16 +681,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             String msg = "The entity class name should not be null: " + entityInfo.getSqlFile();
             throw new IllegalStateException(msg); // no way
         }
-        final Database schemaDb;
-        try {
-            schemaDb = _schemaData.getDatabase();
-        } catch (EngineException e) {
-            throw new IllegalStateException(e);
-        }
-        Table domainTable = schemaDb.getTable(entityClassName);
+        final Database database = _schemaData.getDatabase();
+        Table domainTable = database.getTable(entityClassName);
         if (domainTable == null) { // retry without project-prefix for a class name
             final String projectPrefix = getBasicProperties().getProjectPrefix();
-            domainTable = schemaDb.getTable(Srl.substringFirstFront(entityClassName, projectPrefix));
+            domainTable = database.getTable(Srl.substringFirstFront(entityClassName, projectPrefix));
         }
         if (domainTable == null) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();

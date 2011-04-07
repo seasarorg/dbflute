@@ -77,6 +77,7 @@ public class DTDResolver implements EntityResolver {
 
     /** URL the DTD is located on the web. */
     public static final String WEB_SITE_DTD = "http://dbflute.sandbox.seasar.org/meta/database.dtd";
+    // at the future, remove sandbox when DBFlute becomes product
 
     // ===================================================================================
     //                                                                           Attribute

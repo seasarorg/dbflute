@@ -207,6 +207,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     //                                     Table Except List
     //                                     -----------------
     protected List<String> _tableExceptList;
+    protected List<String> _tableExceptGenOnlyList; // getting meta data but no generating classes
 
     public List<String> getTableExceptList() { // for main schema
         if (_tableExceptList != null) {
@@ -223,8 +224,30 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 resultList.add((String) object);
             }
         }
-        _tableExceptList = resultList;
+        _tableExceptList = new ArrayList<String>();
+        _tableExceptGenOnlyList = new ArrayList<String>();
+        setupTableExceptList(plainList, _tableExceptList, _tableExceptGenOnlyList);
         return _tableExceptList;
+    }
+
+    public List<String> getTableExceptGenOnlyList() { // for main schema
+        if (_tableExceptGenOnlyList != null) {
+            return _tableExceptGenOnlyList;
+        }
+        getTableExceptList(); // initialize
+        return _tableExceptGenOnlyList;
+    }
+
+    protected void setupTableExceptList(List<String> plainList, List<String> tableExceptList,
+            List<String> tableExceptGenOnlyList) {
+        final String genOnlySuffix = "@gen";
+        for (String element : plainList) {
+            if (Srl.endsWithIgnoreCase(element, genOnlySuffix)) {
+                tableExceptGenOnlyList.add(Srl.substringLastFrontIgnoreCase(element, genOnlySuffix));
+            } else {
+                tableExceptList.add(element);
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -388,14 +411,20 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         if (obj == null) {
             final List<String> tableExceptList = DfCollectionUtil.emptyList();
             info.setTableExceptList(tableExceptList);
+            final List<String> tableExceptGenOnlyList = DfCollectionUtil.emptyList();
+            info.setTableExceptGenOnlyList(tableExceptGenOnlyList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of tableExceptList in the property 'additionalSchemaMap' should be List:";
             msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")
-            final List<String> tableExceptList = (List<String>) obj;
+            final List<String> plainList = (List<String>) obj;
+            final List<String> tableExceptList = new ArrayList<String>();
+            final List<String> tableExceptGenOnlyList = new ArrayList<String>();
+            setupTableExceptList(plainList, tableExceptList, tableExceptGenOnlyList);
             info.setTableExceptList(tableExceptList);
+            info.setTableExceptGenOnlyList(tableExceptGenOnlyList);
         }
     }
 

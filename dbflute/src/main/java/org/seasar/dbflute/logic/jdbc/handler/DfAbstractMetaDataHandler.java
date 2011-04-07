@@ -135,7 +135,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
         return getColumnExceptMap();
     }
 
-    protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
+    protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
 

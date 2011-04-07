@@ -6,10 +6,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
@@ -181,7 +180,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
         try {
             _previousDb = reader.getSchemaData().getDatabase();
-        } catch (EngineException e) {
+        } catch (RuntimeException e) {
             _loadingFailure = true;
             handleException(e);
         }
@@ -205,7 +204,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
         try {
             _nextDb = reader.getSchemaData().getDatabase();
-        } catch (EngineException e) {
+        } catch (RuntimeException e) {
             handleException(e);
         }
         _diffDate = new Date(DfSystemUtil.currentTimeMillis());
@@ -956,7 +955,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                       Schema Reader
     //                                                                       =============
     protected DfSchemaXmlReader createSchemaXmlReader() {
-        return new DfSchemaXmlReader(getSchemaXmlFilePath(), getDatabaseType());
+        // no need to filter when reading here
+        return new DfSchemaXmlReader(getSchemaXmlFilePath(), getDatabaseType(), null);
     }
 
     protected String getSchemaXmlFilePath() {

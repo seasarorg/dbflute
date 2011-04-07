@@ -17,7 +17,7 @@ public class DfNameHintUtil {
     // ===================================================================================
     //                                                                              Target
     //                                                                              ======
-    public static boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
+    public static boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         if (targetList == null) {
             throw new IllegalArgumentException("The argument 'targetList' should not be null!");
         }
@@ -35,7 +35,7 @@ public class DfNameHintUtil {
         return true;
     }
 
-    protected static boolean isHitByTargetList(final String name, final List<String> targetList) {
+    protected static boolean isHitByTargetList(String name, List<String> targetList) {
         for (String tableHint : targetList) {
             if (isHitByTheHint(name, tableHint)) {
                 return true;
