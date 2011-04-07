@@ -238,14 +238,12 @@ public class Database {
      */
     public void doFinalInitialization() {
         final List<Table> tableList = getTableList();
-        for (int i = 0; i < tableList.size(); i++) {
-            final Table table = tableList.get(i);
+        for (Table table : tableList) {
             table.doFinalInitialization();
 
             // setup reverse relations and check existences
             final List<ForeignKey> fkList = table.getForeignKeyList();
-            for (int j = 0; j < fkList.size(); j++) {
-                final ForeignKey fk = fkList.get(j);
+            for (ForeignKey fk : fkList) {
                 final String foreignTableName = fk.getForeignTableName();
                 final Table foreignTable = getTable(foreignTableName);
 

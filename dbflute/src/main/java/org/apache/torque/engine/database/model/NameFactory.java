@@ -127,14 +127,14 @@ public class NameFactory {
      * @throws EngineException an exception
      */
     public static String generateName(String algorithmName, List<?> inputs) throws EngineException {
-        NameGenerator algorithm = instance.getAlgorithm(algorithmName);
+        final NameGenerator algorithm = instance.getAlgorithm(algorithmName);
         return algorithm.generateName(inputs);
     }
 
     public static String generateJavaNameByMethodUnderscore(String name) {
         try {
-            NameGenerator algorithm = instance.getAlgorithm(NameFactory.JAVA_GENERATOR);
-            List<String> inputs = new ArrayList<String>();
+            final NameGenerator algorithm = instance.getAlgorithm(NameFactory.JAVA_GENERATOR);
+            final List<String> inputs = new ArrayList<String>();
             inputs.add(name);
             inputs.add(NameGenerator.CONV_METHOD_UNDERSCORE);
             return algorithm.generateName(inputs);

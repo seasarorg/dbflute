@@ -166,6 +166,9 @@ public class AppData {
         _database = db;
     }
 
+    /**
+     * Initialize detail points after loading as final process.
+     */
     private void doFinalInitialization() {
         if (!_isInitialized) {
             _database.doFinalInitialization();
