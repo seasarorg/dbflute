@@ -53,8 +53,8 @@ map:{
         #  This is only for the main schema. Additional schemas are unconcerned.
         #  And ReplaceSchema task basically ignores this.
         #
-        #  Normally excepted tables are not handled completely in the DBFlute world.
-        #  (means no getting meta data, so the tables are not existing in SchemaHTML).
+        #  Normally this 'except' means no getting meta data for excepted tables.
+        #  (so the tables are not existing in SchemaHTML and HistoryHTML and so on).
         #  But you can specify the '@gen' suffix that means generate-only except.
         #  A table with the mark can be treated as documents but no generating classes.
         #
