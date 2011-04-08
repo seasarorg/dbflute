@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -27,7 +28,6 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
-import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -331,7 +331,7 @@ public interface SqlClause {
 
     void addNullsLastToPreviousOrderBy();
 
-    void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo);
+    void addManualOrderToPreviousOrderByElement(ManualOrderBean manualOrderBean);
 
     /**
      * Does it have order-by clauses? <br />
@@ -760,4 +760,29 @@ public interface SqlClause {
      * @return The limit of inScope. (If it's zero or minus, it means no limit)
      */
     int getInScopeLimit();
+
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    /**
+     * Get the map for free parameters for parameter comment. {Internal}
+     * @return The map for free parameters. (NullAllowed: if null, means no parameter)
+     */
+    Map<String, Object> getFreeParameterMap();
+
+    /**
+     * Register free parameters. {Internal}
+     * @param key The key for the parameter. (NotNull)
+     * @param value The value for the parameter. (NullAllowed)
+     * @return The expression for binding. (NotNull)
+     */
+    String registerFreeParameter(String key, Object value);
+
+    /**
+     * Register free parameters to theme list. {Internal}
+     * @param themeKey The theme as key for the parameter. (NotNull)
+     * @param addedValue The value added to theme list for the parameter. (NullAllowed)
+     * @return The expression for binding. (NotNull)
+     */
+    String registerFreeParameterToThemeList(String themeKey, Object addedValue);
 }

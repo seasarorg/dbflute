@@ -17,7 +17,6 @@ package org.seasar.dbflute.cbean;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -76,9 +75,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** Can the paging re-select? {Internal} */
     private boolean _pagingReSelect = true;
-
-    /** The map for free parameters. {Internal} (NullAllowed) */
-    private Map<String, Object> _freeParameterMap;
 
     /** The list of condition-bean for union. {Internal} (NullAllowed) */
     private List<ConditionBean> _unionCBeanList;
@@ -903,17 +899,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public Map<String, Object> getFreeParameterMap() {
-        return _freeParameterMap;
+        return getSqlClause().getFreeParameterMap();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void xregisterFreeParameter(String key, Object value) {
-        if (_freeParameterMap == null) {
-            _freeParameterMap = new LinkedHashMap<String, Object>();
-        }
-        _freeParameterMap.put(key, value);
+    public String xregisterFreeParameter(String key, Object value) {
+        return getSqlClause().registerFreeParameter(key, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String xregisterFreeParameterToThemeList(String key, Object value) {
+        return getSqlClause().registerFreeParameterToThemeList(key, value);
     }
 
     // ===================================================================================

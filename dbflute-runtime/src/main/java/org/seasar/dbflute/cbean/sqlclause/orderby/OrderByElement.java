@@ -19,7 +19,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.cbean.ManualOrderBean;
+import org.seasar.dbflute.cbean.ManualOrderBean.CaseWhenElement;
+import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -51,8 +53,8 @@ public class OrderByElement implements Serializable {
     /** Is nulls ordered first? */
     protected boolean _nullsFirst;
 
-    /** The information of manual order. */
-    protected transient OrderByClause.ManumalOrderInfo _manualOrderInfo;
+    /** The bean of manual order. */
+    protected transient ManualOrderBean _manualOrderBean;
 
     // ===================================================================================
     //                                                                        Manipulation
@@ -117,7 +119,7 @@ public class OrderByElement implements Serializable {
             throw new IllegalStateException(msg);
         }
         final StringBuilder sb = new StringBuilder();
-        if (_manualOrderInfo != null && _manualOrderInfo.hasManualValueList()) {
+        if (_manualOrderBean != null && _manualOrderBean.hasManualOrder()) {
             setupManualOrderClause(sb, getColumnFullName());
             return sb.toString();
         } else {
@@ -144,7 +146,7 @@ public class OrderByElement implements Serializable {
             throwOrderByColumnNotFoundException(getColumnFullName(), selectClauseRealColumnAliasMap);
         }
         final StringBuilder sb = new StringBuilder();
-        if (_manualOrderInfo != null && _manualOrderInfo.hasManualValueList()) {
+        if (_manualOrderBean != null && _manualOrderBean.hasManualOrder()) {
             setupManualOrderClause(sb, columnAlias);
             return sb.toString();
         } else {
@@ -158,26 +160,33 @@ public class OrderByElement implements Serializable {
     }
 
     protected void setupManualOrderClause(StringBuilder sb, String columnAlias) {
-        final List<? extends Object> manualValueList = _manualOrderInfo.getManualValueList();
+        final List<CaseWhenElement> caseWhenList = _manualOrderBean.getCaseWhenBoundList();
         sb.append(ln()).append("   case").append(ln());
         int index = 0;
-        for (Object value : manualValueList) {
-            if (value == null) {
-                continue;
-            }
-            if (value instanceof Classification) {
-                value = ((Classification) value).code();
-            }
-            final String q = (value instanceof Number) ? "" : "'";
-            sb.append("     when ");
-            if (value != null) {
-                sb.append(columnAlias).append(" = ").append(q).append(value).append(q);
+        for (CaseWhenElement element : caseWhenList) {
+            final ConditionKey conditionKey = element.getConditionKey();
+            final String keyExp = conditionKey.getConditionKey();
+            if (isManualOrderConditionKeyNullHandling(conditionKey)) {
+                sb.append("     when ");
+                sb.append(columnAlias).append(" ").append(keyExp);
+                sb.append(" then ").append(index).append(ln());
+            } else {
+                final Object bindExp = element.getOrderValue();
+                if (bindExp == null) {
+                    continue; // ignores null value
+                }
+                sb.append("     when ");
+                sb.append(columnAlias).append(" ").append(keyExp).append(" ").append(bindExp);
                 sb.append(" then ").append(index).append(ln());
             }
             ++index;
         }
         sb.append("     else ").append(index).append(ln());
         sb.append("   end ").append(_ascDesc);
+    }
+
+    protected boolean isManualOrderConditionKeyNullHandling(ConditionKey conditionKey) {
+        return conditionKey.equals(ConditionKey.CK_IS_NULL) || conditionKey.equals(ConditionKey.CK_IS_NOT_NULL);
     }
 
     protected void throwOrderByColumnNotFoundException(String columnName,
@@ -273,7 +282,7 @@ public class OrderByElement implements Serializable {
         _nullsFirst = nullsFirst;
     }
 
-    public void setManumalOrderInfo(OrderByClause.ManumalOrderInfo manualOrderInfo) {
-        _manualOrderInfo = manualOrderInfo;
+    public void setManualOrderBean(ManualOrderBean manualOrderBean) {
+        _manualOrderBean = manualOrderBean;
     }
 }

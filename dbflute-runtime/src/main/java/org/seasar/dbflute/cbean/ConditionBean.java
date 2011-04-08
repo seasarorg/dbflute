@@ -217,8 +217,17 @@ public interface ConditionBean extends PagingBean {
      * Register free parameters. {Internal}
      * @param key The key for the parameter. (NotNull)
      * @param value The value for the parameter. (NullAllowed)
+     * @return The expression for binding. (NotNull)
      */
-    void xregisterFreeParameter(String key, Object value);
+    String xregisterFreeParameter(String key, Object value);
+
+    /**
+     * Register free parameters to theme list. {Internal}
+     * @param themeKey The theme as key for the parameter. (NotNull)
+     * @param addedValue The value added to theme list for the parameter. (NullAllowed)
+     * @return The expression for binding. (NotNull)
+     */
+    String xregisterFreeParameterToThemeList(String themeKey, Object addedValue);
 
     // ===================================================================================
     //                                                                  Query Synchronizer

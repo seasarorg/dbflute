@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeListHandler;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -43,7 +44,6 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
-import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.cbean.sqlclause.subquery.ExistsReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.InScopeRelation;
@@ -1105,8 +1105,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * Order with the list of manual values. <br />
-     * This function with Union is unsupported!
+     * Order along the list of manual values. <br />
+     * This function with Union is unsupported! <br />
+     * The order values are bound (treated as bind parameter).
      * <pre>
      * MemberCB cb = new MemberCB();
      * List&lt;String&gt; statusCodeList = Arrays.asList("WDL", "FML", "PRV");
@@ -1119,13 +1120,40 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * <span style="color: #3F7E5E">//     else 3</span>
      * <span style="color: #3F7E5E">//   end asc, ...</span>
      * </pre>
-     * @param manualValueList The list of manual values. (NotNull)
+     * @param orderValueList The list of order values for manual ordering. (NotNull)
      */
-    public void withManualOrder(List<? extends Object> manualValueList) { // is user public!
-        assertObjectNotNull("withManualOrder(manualValueList)", manualValueList);
-        final ManumalOrderInfo manumalOrderInfo = new ManumalOrderInfo();
-        manumalOrderInfo.setManualValueList(manualValueList);
-        xgetSqlClause().addManualOrderToPreviousOrderByElement(manumalOrderInfo);
+    public void withManualOrder(List<? extends Object> orderValueList) { // is user public!
+        assertObjectNotNull("withManualOrder(orderValueList)", orderValueList);
+        final ManualOrderBean manualOrderBean = new ManualOrderBean();
+        manualOrderBean.acceptOrderValueList(orderValueList);
+        withManualOrder(manualOrderBean);
+    }
+
+    /**
+     * Order along manual ordering information. <br />
+     * This function with Union is unsupported! <br />
+     * The order values are bound (treated as bind parameter).
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * ManualOrderBean mob = new ManualOrderBean();
+     * mob.when_GreaterEqual(priorityDate); <span style="color: #3F7E5E">// 2000/01/01</span>
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #FD4747">withManualOrder(mob)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>
+     * <span style="color: #3F7E5E">//     else 1</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     * </pre>
+     * @param manualOrderBean The bean of manual order containing order values. (NotNull)
+     */
+    public void withManualOrder(ManualOrderBean manualOrderBean) { // is user public!
+        assertObjectNotNull("withManualOrder(manualOrderBean)", manualOrderBean);
+        manualOrderBean.bind(new FreeParameterManualOrderThemeListHandler() {
+            public String register(String themeKey, Object orderValue) {
+                return xregisterFreeParameterToThemeList(themeKey, orderValue);
+            }
+        });
+        xgetSqlClause().addManualOrderToPreviousOrderByElement(manualOrderBean);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
@@ -1731,6 +1759,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     public Map<String, ParameterOption> getOptionParameterMap() { // for parameter comment
         return _parameterOptionMap;
+    }
+
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    protected Map<String, Object> getFreeParameterMap() {
+        return xgetSqlClause().getFreeParameterMap();
+    }
+
+    protected String xregisterFreeParameter(String key, Object value) {
+        return xgetSqlClause().registerFreeParameter(key, value);
+    }
+
+    protected String xregisterFreeParameterToThemeList(String themeKey, Object addedValue) {
+        return xgetSqlClause().registerFreeParameterToThemeList(themeKey, addedValue);
     }
 
     // ===================================================================================

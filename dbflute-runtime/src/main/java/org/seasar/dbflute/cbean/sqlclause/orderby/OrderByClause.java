@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.seasar.dbflute.cbean.ManualOrderBean;
+
 /**
  * @author jflute
  */
@@ -101,42 +103,12 @@ public class OrderByClause implements Serializable {
         public String setup(String columnName, String orderByElementClause, boolean nullsFirst);
     }
 
-    public void addManualOrderByElement(ManumalOrderInfo manumalOrderInfo) {
+    public void addManualOrderByElement(ManualOrderBean manumalOrderBean) {
         if (_orderByList.isEmpty()) {
             return;
         }
         final OrderByElement last = _orderByList.get(_orderByList.size() - 1);
-        last.setManumalOrderInfo(manumalOrderInfo);
-    }
-
-    public static class ManumalOrderInfo {
-
-        /** Serial version UID. (Default) */
-        private static final long serialVersionUID = 1L;
-
-        protected List<? extends Object> manualValueList;
-
-        public boolean hasManualValueList() {
-            return manualValueList != null && !manualValueList.isEmpty();
-        }
-
-        public List<? extends Object> getManualValueList() {
-            return manualValueList;
-        }
-
-        public void setManualValueList(List<? extends Object> manualValueList) {
-            if (manualValueList == null) {
-                this.manualValueList = null;
-                return;
-            }
-            List<Object> list = new ArrayList<Object>();
-            for (Object value : manualValueList) {
-                if (value != null) {
-                    list.add(value);
-                }
-            }
-            this.manualValueList = list;
-        }
+        last.setManualOrderBean(manumalOrderBean);
     }
 
     // ===================================================================================

@@ -213,7 +213,12 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public void xregisterFreeParameter(String key, Object value) {
+    public String xregisterFreeParameter(String key, Object value) {
+        return null;
+    }
+
+    public String xregisterFreeParameterToThemeList(String themeKey, Object addedValue) {
+        return null;
     }
 
     public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {

@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -39,7 +40,6 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
-import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryAndPartQueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.OrScopeQueryInfo;
@@ -216,6 +216,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          ------------
     /** The purpose of condition-bean for check at condition-query. (NotNull) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
+
+    // -----------------------------------------------------
+    //                                        Free Parameter
+    //                                        --------------
+    /** The map for free parameters. {Internal} (NullAllowed) */
+    protected Map<String, Object> _freeParameterMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -1439,13 +1445,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         };
     }
 
-    public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo) {
-        assertObjectNotNull("manumalOrderInfo", manumalOrderInfo);
+    public void addManualOrderToPreviousOrderByElement(ManualOrderBean manualOrderBean) {
+        assertObjectNotNull("manualOrderBean", manualOrderBean);
         if (hasUnionQuery()) {
-            String msg = "ManualOrder with UnionQuery is unsupported: " + manumalOrderInfo.getManualValueList();
+            String msg = "ManualOrder with UnionQuery is unsupported: " + manualOrderBean;
             throw new IllegalConditionBeanOperationException(msg);
         }
-        getOrderBy().addManualOrderByElement(manumalOrderInfo);
+        getOrderBy().addManualOrderByElement(manualOrderBean);
     }
 
     protected OrderByClause getOrderBy() {
@@ -2289,6 +2295,47 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                       =============
     public int getInScopeLimit() {
         return 0; // as default
+    }
+
+    // [DBFlute-0.9.8.2]
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, Object> getFreeParameterMap() {
+        return _freeParameterMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String registerFreeParameter(String key, Object value) {
+        if (_freeParameterMap == null) {
+            _freeParameterMap = new LinkedHashMap<String, Object>();
+        }
+        _freeParameterMap.put(key, value);
+        return buildFreeParameterBindExp(key);
+    }
+
+    public String registerFreeParameterToThemeList(String key, Object value) {
+        if (_freeParameterMap == null) {
+            _freeParameterMap = new LinkedHashMap<String, Object>();
+        }
+        @SuppressWarnings("unchecked")
+        List<Object> valueList = (List<Object>) _freeParameterMap.get(key);
+        if (valueList == null) {
+            valueList = new ArrayList<Object>();
+            _freeParameterMap.put(key, valueList);
+        }
+        final int listIndex = valueList.size();
+        valueList.add(value);
+        return buildFreeParameterBindExp("get(" + listIndex + ")");
+    }
+
+    protected String buildFreeParameterBindExp(String relativePath) {
+        return "/*pmb.freeParameterMap." + relativePath + "*/null";
     }
 
     // ===================================================================================
