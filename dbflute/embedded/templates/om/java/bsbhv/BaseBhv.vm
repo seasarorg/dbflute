@@ -532,8 +532,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
                     sb.append(aliasName).append(".${referrerColumn.name} = ");
                     identity = "${referrer.referrerJavaBeansRulePropertyName}${localColumn.javaName}" + index;
-                    sb.append("/*pmb.freeParameterMap.").append(identity).append("*/null");
-                    cb.xregisterFreeParameter(identity, primaryKeyMap.get("${localColumn.javaName}"));
+                    sb.append(cb.xregisterFreeParameter(identity, primaryKeyMap.get("${localColumn.javaName}")));
 #set ($referrerColumnIndex = $referrerColumnIndex + 1)
 #end
                     ++index;
