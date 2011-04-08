@@ -303,27 +303,27 @@ public class ManualOrderBean {
         }
 
         public ConnectedOrderBean or_Equal(Object orderValue) {
-            return doOr(ConditionKey.CK_EQUAL, null);
+            return doOr(ConditionKey.CK_EQUAL, orderValue);
         }
 
         public ConnectedOrderBean or_NotEqual(Object orderValue) {
-            return doOr(ConditionKey.CK_NOT_EQUAL_STANDARD, null);
+            return doOr(ConditionKey.CK_NOT_EQUAL_STANDARD, orderValue);
         }
 
         public ConnectedOrderBean or_GreaterThan(Object orderValue) {
-            return doOr(ConditionKey.CK_GREATER_THAN, null);
+            return doOr(ConditionKey.CK_GREATER_THAN, orderValue);
         }
 
         public ConnectedOrderBean or_LessThan(Object orderValue) {
-            return doOr(ConditionKey.CK_LESS_THAN, null);
+            return doOr(ConditionKey.CK_LESS_THAN, orderValue);
         }
 
         public ConnectedOrderBean or_GreaterEqual(Object orderValue) {
-            return doOr(ConditionKey.CK_GREATER_EQUAL, null);
+            return doOr(ConditionKey.CK_GREATER_EQUAL, orderValue);
         }
 
         public ConnectedOrderBean or_LessEqual(Object orderValue) {
-            return doOr(ConditionKey.CK_LESS_EQUAL, null);
+            return doOr(ConditionKey.CK_LESS_EQUAL, orderValue);
         }
 
         public ConnectedOrderBean or_IsNull() {
