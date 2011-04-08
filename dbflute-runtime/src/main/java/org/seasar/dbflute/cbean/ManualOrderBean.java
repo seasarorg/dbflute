@@ -149,7 +149,7 @@ public class ManualOrderBean {
         }
         final ConditionKey fromDateConditionKey = option.getFromDateConditionKey();
         final ConditionKey toDateConditionKey = option.getToDateConditionKey();
-        final Date filteredFromDate = option.filterFromDate(toDate);
+        final Date filteredFromDate = option.filterFromDate(fromDate);
         final Date filteredToDate = option.filterToDate(toDate);
         return doWhen(fromDateConditionKey, filteredFromDate).doAnd(toDateConditionKey, filteredToDate);
     }
@@ -466,7 +466,9 @@ public class ManualOrderBean {
     protected CaseWhenElement doBind(FreeParameterManualOrderThemeListHandler handler, CaseWhenElement element) {
         final Object orderValue = getResolvedOrderValue(element);
         final String bindExp = handler.register(THEME_KEY, orderValue);
-        return createElement(element.getConditionKey(), bindExp);
+        final CaseWhenElement boundElement = createElement(element.getConditionKey(), bindExp);
+        boundElement.setConnectionMode(element.getConnectionMode());
+        return boundElement;
     }
 
     protected Object getResolvedOrderValue(CaseWhenElement element) {
