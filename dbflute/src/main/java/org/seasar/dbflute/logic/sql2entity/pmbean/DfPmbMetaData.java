@@ -52,6 +52,7 @@ public class DfPmbMetaData {
     protected Map<String, String> _propertyNameTypeMap;
     protected Map<String, String> _propertyNameOptionMap;
     protected Set<String> _autoDetectedPropertyNameSet;
+    protected Set<String> _alternateBooleanMethodNameSet;
     protected File _sqlFile;
     protected Map<String, String> _bqpElementMap;
     protected DfCustomizeEntityInfo _customizeEntityInfo;
@@ -894,6 +895,14 @@ public class DfPmbMetaData {
 
     public void setAutoDetectedPropertyNameSet(Set<String> autoDetectedPropertyNameSet) {
         this._autoDetectedPropertyNameSet = autoDetectedPropertyNameSet;
+    }
+
+    public Set<String> getAlternateMethodBooleanNameSet() {
+        return _alternateBooleanMethodNameSet;
+    }
+
+    public void setAlternateMethodBooleanNameSet(Set<String> alternateBooleanMethodNameSet) {
+        this._alternateBooleanMethodNameSet = alternateBooleanMethodNameSet;
     }
 
     public File getSqlFile() {

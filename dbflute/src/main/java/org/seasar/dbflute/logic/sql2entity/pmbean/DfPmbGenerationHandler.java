@@ -18,6 +18,7 @@ package org.seasar.dbflute.logic.sql2entity.pmbean;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,11 @@ public class DfPmbGenerationHandler {
     public String getBusinessName(String className) {
         assertArgumentPmbMetaDataClassName(className);
         return findPmbMetaData(className).getBusinessName();
+    }
+
+    public String getAbstractDefinition(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        return existsAlternateBooleanMethodNameSet(className) ? " abstract" : "";
     }
 
     public String getSuperClassDefinition(String className) {
@@ -373,6 +379,19 @@ public class DfPmbGenerationHandler {
     public List<Map<String, String>> getPropertyOptionClassificationMapList(String className, String propertyName,
             AppData schemaData) {
         return findPmbMetaData(className).getPropertyOptionClassificationMapList(propertyName, schemaData);
+    }
+
+    // -----------------------------------------------------
+    //                                      Alternate Method
+    //                                      ----------------
+    public boolean existsAlternateBooleanMethodNameSet(String className) {
+        return !getAlternateBooleanMethodNameSet(className).isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<String> getAlternateBooleanMethodNameSet(String className) {
+        final Set<String> nameSet = findPmbMetaData(className).getAlternateMethodBooleanNameSet();
+        return nameSet != null ? nameSet : Collections.EMPTY_SET;
     }
 
     // -----------------------------------------------------

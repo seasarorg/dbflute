@@ -61,9 +61,9 @@ import ${glPackageExtendedCustomizeEntity}.*;
  * @author ${database.classAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-public class ${myClassName} implements ProcedurePmb, FetchBean, Serializable {
+public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName} implements ProcedurePmb, FetchBean, Serializable {
 #else
-public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}${database.getPmbMetaDataInterfaceDefinition($pmbClassName)} {
+public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}${database.getPmbMetaDataInterfaceDefinition($pmbClassName)} {
 #end
 
     // ===================================================================================
@@ -229,6 +229,19 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return _safetyMaxResultSize;
     }
 
+#end
+#if ($database.existsPmbMetaDataAlternateBooleanMethodNameSet($pmbClassName))
+    // ===================================================================================
+    //                                                                   Alternate Boolean
+    //                                                                   =================
+#foreach ($alternateBooleanMethodName in $database.getPmbMetaDataAlternateBooleanMethodNameSet($pmbClassName))
+    /**
+     * This is an alternate boolean method waiting for your overriding.
+     * @return Determination for your complex conditions.
+     */
+    public abstract boolean ${alternateBooleanMethodName}();
+
+#end
 #end
     // ===================================================================================
     //                                                                       Assist Helper

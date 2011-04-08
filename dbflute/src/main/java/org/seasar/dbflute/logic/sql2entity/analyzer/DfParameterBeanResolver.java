@@ -16,9 +16,11 @@
 package org.seasar.dbflute.logic.sql2entity.analyzer;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,29 +30,49 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.AppData;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.cbean.SimplePagingBean;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData.DfPagingType;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
+import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
+import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
 public class DfParameterBeanResolver {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final List<String> _reservBooleanMethodList = new ArrayList<String>();
+    static {
+        for (Method method : SimplePagingBean.class.getMethods()) {
+            if (method.getReturnType().equals(boolean.class)) {
+                _reservBooleanMethodList.add(method.getName());
+            }
+        }
+        for (Method method : ProcedurePmb.class.getMethods()) {
+            if (method.getReturnType().equals(boolean.class)) {
+                _reservBooleanMethodList.add(method.getName());
+            }
+        }
+    }
 
     // ===================================================================================
     //                                                                           Attribute
@@ -62,6 +84,9 @@ public class DfParameterBeanResolver {
     protected final DfSqlFileNameResolver _sqlFileNameResolver = new DfSqlFileNameResolver();
     protected final DfPropertyTypePackageResolver _propertyTypePackageResolver = new DfPropertyTypePackageResolver();
     protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
+
+    // temporary collection resolved by auto-detect
+    protected final Set<String> _alternateBooleanMethodNameSet = new LinkedHashSet<String>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -89,7 +114,37 @@ public class DfParameterBeanResolver {
         processClassHeader(sql, parameterBeanName, pmbMetaData);
         processParameterProperty(sql, parameterBeanName, pmbMetaData);
         pmbMetaData.adjustPropertyMetaFinally(_schemaData);
+
+        filterAlternateBooleanMethod(pmbMetaData);
+        if (!_alternateBooleanMethodNameSet.isEmpty()) {
+            // copy and clear the collection just in case
+            final Set<String> set = new LinkedHashSet<String>(_alternateBooleanMethodNameSet);
+            pmbMetaData.setAlternateMethodBooleanNameSet(set);
+            _alternateBooleanMethodNameSet.clear();
+        }
         return pmbMetaData;
+    }
+
+    protected void filterAlternateBooleanMethod(DfPmbMetaData pmbMetaData) {
+        if (_alternateBooleanMethodNameSet.isEmpty()) {
+            return;
+        }
+        for (String reservBooleanMethod : _reservBooleanMethodList) {
+            if (_alternateBooleanMethodNameSet.contains(reservBooleanMethod)) {
+                _alternateBooleanMethodNameSet.remove(reservBooleanMethod);
+            }
+        }
+        final Map<String, String> propertyNameTypeMap = pmbMetaData.getPropertyNameTypeMap();
+        for (String propertyName : propertyNameTypeMap.keySet()) {
+            final String getterName = "get" + Srl.initCap(propertyName);
+            if (_alternateBooleanMethodNameSet.contains(getterName)) {
+                _alternateBooleanMethodNameSet.remove(getterName);
+            }
+            final String isName = "is" + Srl.initCap(propertyName);
+            if (_alternateBooleanMethodNameSet.contains(isName)) {
+                _alternateBooleanMethodNameSet.remove(isName);
+            }
+        }
     }
 
     // ===================================================================================
@@ -213,9 +268,14 @@ public class DfParameterBeanResolver {
             final BindVariableNode bindNode = (BindVariableNode) node;
             processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet,
                     bindNode);
-            //} else if (node instanceof IfNode) {
-            //    final IfNode ifNode = (IfNode) node;
-            //    doProcessAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
+        } else if (node instanceof IfNode) {
+            final IfNode ifNode = (IfNode) node;
+            // *IF comment is unsupported about auto-detection
+            //doProcessAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
+
+            // process alternate boolean methods
+            // which is supported with auto-detect
+            doProcessAlternateBooleanMethodIfNode(sql, ifNode);
         }
         for (int i = 0; i < node.getChildSize(); i++) {
             final Node childNode = node.getChild(i);
@@ -425,6 +485,23 @@ public class DfParameterBeanResolver {
     //    final String propertyName = Srl.substringFirstRear(expression, "pmb.").trim();
     //    propertyNameTypeMap.put(propertyName, "Boolean");
     //}
+
+    protected void doProcessAlternateBooleanMethodIfNode(String sql, IfNode ifNode) {
+        final String expression = ifNode.getExpression().trim();
+        if (Srl.count(expression, ".") != 1) { // e.g. "pmb.memberIdList.size()"
+            return;
+        }
+        if (Srl.containsAny(expression, "=", "<>", "!=", ">", "<")) {
+            return; // unknown (type)
+        }
+        if (!Srl.endsWith(expression, "()")) {
+            return; // no method type
+        }
+        // pmb.foo() or !pmb.foo() here
+        String methodName = Srl.substringFirstRear(expression, "pmb.").trim(); // -> foo()
+        methodName = Srl.substringLastFront(methodName, "()"); // -> foo
+        _alternateBooleanMethodNameSet.add(methodName); // filter later
+    }
 
     // ===================================================================================
     //                                                                   Assert Definition

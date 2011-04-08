@@ -322,6 +322,10 @@ public class Database {
         return getPmbBasicHandler().getBusinessName(className);
     }
 
+    public String getPmbMetaDataAbstractDefinition(String className) {
+        return getPmbBasicHandler().getAbstractDefinition(className);
+    }
+
     public String getPmbMetaDataSuperClassDefinition(String className) {
         return getPmbBasicHandler().getSuperClassDefinition(className);
     }
@@ -577,6 +581,17 @@ public class Database {
             String propertyName) {
         return getPmbBasicHandler().getPropertyOptionClassificationMapList(className, propertyName,
                 _sql2entitySchemaData);
+    }
+
+    // -----------------------------------------------------
+    //                              Alternate Boolean Method
+    //                              ------------------------
+    public boolean existsPmbMetaDataAlternateBooleanMethodNameSet(String className) {
+        return getPmbBasicHandler().existsAlternateBooleanMethodNameSet(className);
+    }
+
+    public Set<String> getPmbMetaDataAlternateBooleanMethodNameSet(String className) {
+        return getPmbBasicHandler().getAlternateBooleanMethodNameSet(className);
     }
 
     // -----------------------------------------------------
