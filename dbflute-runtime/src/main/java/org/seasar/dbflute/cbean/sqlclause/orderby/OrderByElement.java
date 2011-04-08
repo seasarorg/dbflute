@@ -22,6 +22,7 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.ManualOrderBean.CaseWhenElement;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -164,25 +165,32 @@ public class OrderByElement implements Serializable {
         sb.append(ln()).append("   case").append(ln());
         int index = 0;
         for (CaseWhenElement element : caseWhenList) {
-            final ConditionKey conditionKey = element.getConditionKey();
-            final String keyExp = conditionKey.getOperand();
-            if (isManualOrderConditionKeyNullHandling(conditionKey)) {
-                sb.append("     when ");
-                sb.append(columnAlias).append(" ").append(keyExp);
-                sb.append(" then ").append(index).append(ln());
-            } else {
-                final Object bindExp = element.getOrderValue();
-                if (bindExp == null) {
-                    continue; // ignores null value
-                }
-                sb.append("     when ");
-                sb.append(columnAlias).append(" ").append(keyExp).append(" ").append(bindExp);
-                sb.append(" then ").append(index).append(ln());
+            sb.append("     when ");
+            doSetupManualOrderClause(sb, columnAlias, element);
+            final List<CaseWhenElement> connectedElementList = element.getConnectedElementList();
+            for (CaseWhenElement connectedElement : connectedElementList) {
+                doSetupManualOrderClause(sb, columnAlias, connectedElement);
             }
+            sb.append(" then ").append(index).append(ln());
             ++index;
         }
         sb.append("     else ").append(index).append(ln());
         sb.append("   end ").append(_ascDesc);
+    }
+
+    protected void doSetupManualOrderClause(StringBuilder sb, String columnAlias, CaseWhenElement element) {
+        final ConditionKey conditionKey = element.getConditionKey();
+        final String keyExp = conditionKey.getOperand();
+        final String connector = element.toConnector();
+        if (connector != null) { // only connected elements
+            sb.append(" ").append(connector).append(" ");
+        }
+        if (isManualOrderConditionKeyNullHandling(conditionKey)) {
+            sb.append(columnAlias).append(" ").append(keyExp);
+        } else {
+            final Object bindExp = element.getOrderValue();
+            sb.append(columnAlias).append(" ").append(keyExp).append(" ").append(bindExp);
+        }
     }
 
     protected boolean isManualOrderConditionKeyNullHandling(ConditionKey conditionKey) {
@@ -198,8 +206,8 @@ public class OrderByElement implements Serializable {
         msg = msg + "[Advice]" + ln();
         msg = msg + "If you use 'union()' or 'unionAll()', check your condition-bean!" + ln();
         msg = msg + "You can use only order-by columns on select-clause if union." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    [before (x)]" + ln();
+        msg = msg + "For example:" + ln();
+        msg = msg + "  (x):" + ln();
         msg = msg + "    AaaCB cb = new AaaCB();" + ln();
         msg = msg + "    cb.query().setXxx...();" + ln();
         msg = msg + "    cb.union(new UnionQuery<AaaCB>() {" + ln();
@@ -209,7 +217,7 @@ public class OrderByElement implements Serializable {
         msg = msg + "    }" + ln();
         msg = msg + "    cb.query().queryBbb().addOrderBy_BbbName_Asc();// *NG!" + ln();
         msg = msg + "    " + ln();
-        msg = msg + "    [after (o)]" + ln();
+        msg = msg + "  (o):" + ln();
         msg = msg + "    AaaCB cb = new AaaCB();" + ln();
         msg = msg + "    cb.setupSelect_Bbb();// *Point!" + ln();
         msg = msg + "    cb.query().setXxx...();" + ln();
@@ -228,7 +236,7 @@ public class OrderByElement implements Serializable {
         msg = msg + "[Internal Object]" + ln();
         msg = msg + "selectClauseRealColumnAliasMap=" + selectClauseRealColumnAliasMap + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IllegalStateException(msg);
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     protected String ln() {
