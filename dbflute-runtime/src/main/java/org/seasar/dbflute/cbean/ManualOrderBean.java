@@ -22,6 +22,7 @@ import java.util.List;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.DateFromToOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
+import org.seasar.dbflute.jdbc.Classification;
 
 /**
  * The bean for manual order.
@@ -158,7 +159,11 @@ public class ManualOrderBean {
             return;
         }
         for (CaseWhenElement element : _caseWhenAcceptedList) {
-            final String bindExp = handler.register(THEME_KEY, element.getOrderValue());
+            Object orderValue = element.getOrderValue();
+            if (orderValue instanceof Classification) {
+                orderValue = ((Classification) orderValue).code();
+            }
+            final String bindExp = handler.register(THEME_KEY, orderValue);
             _caseWhenBoundList.add(createElement(element.getConditionKey(), bindExp));
         }
     }
