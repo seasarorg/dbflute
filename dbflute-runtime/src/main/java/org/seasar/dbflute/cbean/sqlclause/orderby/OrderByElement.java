@@ -165,7 +165,7 @@ public class OrderByElement implements Serializable {
         int index = 0;
         for (CaseWhenElement element : caseWhenList) {
             final ConditionKey conditionKey = element.getConditionKey();
-            final String keyExp = conditionKey.getConditionKey();
+            final String keyExp = conditionKey.getOperand();
             if (isManualOrderConditionKeyNullHandling(conditionKey)) {
                 sb.append("     when ");
                 sb.append(columnAlias).append(" ").append(keyExp);

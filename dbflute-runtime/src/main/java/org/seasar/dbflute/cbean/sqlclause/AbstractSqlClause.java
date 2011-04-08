@@ -2319,19 +2319,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return buildFreeParameterBindExp(key);
     }
 
-    public String registerFreeParameterToThemeList(String key, Object value) {
+    public String registerFreeParameterToThemeList(String themeKey, Object addedValue) {
         if (_freeParameterMap == null) {
             _freeParameterMap = new LinkedHashMap<String, Object>();
         }
         @SuppressWarnings("unchecked")
-        List<Object> valueList = (List<Object>) _freeParameterMap.get(key);
+        List<Object> valueList = (List<Object>) _freeParameterMap.get(themeKey);
         if (valueList == null) {
             valueList = new ArrayList<Object>();
-            _freeParameterMap.put(key, valueList);
+            _freeParameterMap.put(themeKey, valueList);
         }
         final int listIndex = valueList.size();
-        valueList.add(value);
-        return buildFreeParameterBindExp("get(" + listIndex + ")");
+        valueList.add(addedValue);
+        return buildFreeParameterBindExp(themeKey + ".get(" + listIndex + ")");
     }
 
     protected String buildFreeParameterBindExp(String relativePath) {
