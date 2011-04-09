@@ -140,8 +140,6 @@ public class DfJdbcTypeMapper {
             return getTimeJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "clob")) {
             return getClobJdbcType();
-        } else if (containsIgnoreCase(dbTypeName, "binary")) {
-            return getBinaryJdbcType();
         } else if (containsIgnoreCase(dbTypeName, "blob")) {
             return getBlobJdbcType();
         } else {

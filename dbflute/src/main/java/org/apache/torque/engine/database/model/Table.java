@@ -106,7 +106,7 @@ public class Table {
     // -----------------------------------------------------
     //                                              Database
     //                                              --------
-    private Database _tableParent;
+    private Database _database;
 
     // -----------------------------------------------------
     //                                      Table Definition
@@ -126,9 +126,14 @@ public class Table {
     // -----------------------------------------------------
     //                                           Foreign Key
     //                                           -----------
-    // map style because you can remove them after 
+    // map style because of removing in the final initialization
+    // and names of foreign key should be unique in a table
     private final Map<String, ForeignKey> _foreignKeyMap = StringKeyMap.createAsFlexibleOrdered();
-    private final Map<String, ForeignKey> _referrerMap = StringKeyMap.createAsFlexibleOrdered();
+
+    // on the other hand, names of referrer are not
+    // always unique because a referrer may be synonym
+    // (fortunately, removing is not required about referrer)
+    private final List<ForeignKey> _referrerList = new ArrayList<ForeignKey>(5);
 
     // -----------------------------------------------------
     //                                                Unique
@@ -199,7 +204,7 @@ public class Table {
      * @param parent the parant database
      */
     public void setDatabase(Database parent) {
-        _tableParent = parent;
+        _database = parent;
     }
 
     /**
@@ -207,7 +212,7 @@ public class Table {
      * @return the parant database
      */
     public Database getDatabase() {
-        return _tableParent;
+        return _database;
     }
 
     // ===================================================================================
@@ -988,7 +993,7 @@ public class Table {
             tableSet.add(name);
             sb.append(", ").append(name).append(fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         }
-        for (ForeignKey referrer : _referrerMap.values()) {
+        for (ForeignKey referrer : _referrerList) {
             if (!referrer.isOneToOne()) {
                 continue;
             }
@@ -1035,7 +1040,7 @@ public class Table {
             final ForeignKey fk = ls.get(i);
             sb.append(", ").append(fk.getForeignPropertyName());
         }
-        for (ForeignKey referrer : _referrerMap.values()) {
+        for (ForeignKey referrer : _referrerList) {
             if (referrer.isOneToOne()) {
                 sb.append(", ").append(referrer.getReferrerPropertyNameAsOne());
             }
@@ -1200,12 +1205,12 @@ public class Table {
         if (!fk.canBeReferrer()) {
             return false;
         }
-        _referrerMap.put(fk.getName(), fk);
+        _referrerList.add(fk);
         return true;
     }
 
     public List<ForeignKey> getReferrerList() {
-        return new ArrayList<ForeignKey>(_referrerMap.values());
+        return _referrerList;
     }
 
     public List<ForeignKey> getReferrerAsManyList() {
