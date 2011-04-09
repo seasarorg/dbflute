@@ -67,7 +67,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String extractAliasFromDbComment(String comment) {
         if (!isAliasHandling(comment)) {
-            return comment;
+            // alias does not exist everywhere
+            // if alias handling is not valid
+            return null;
         }
         if (hasAliasDelimiter(comment)) {
             final String delimiter = getAliasDelimiterInDbComment();
