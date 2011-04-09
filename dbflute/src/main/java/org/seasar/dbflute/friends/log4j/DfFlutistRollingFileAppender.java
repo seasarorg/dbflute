@@ -9,21 +9,20 @@ import org.apache.log4j.helpers.CountingQuietWriter;
 import org.apache.log4j.helpers.LogLog;
 
 /**
- * DBFlute original appender with rolling-file that extends the RollingFileAppender of Logj4. <br />
- * Thanks, Velocity!
+ * The appender using rolling-file for DBFlute.
  * @author jflute
  * @since 0.9.5.1 (2009/06/23 Tuesday)
  */
-public class DfOriginalRollingFileAppender extends RollingFileAppender {
+public class DfFlutistRollingFileAppender extends RollingFileAppender {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOriginalRollingFileAppender() {
+    public DfFlutistRollingFileAppender() {
         super();
     }
 
-    public DfOriginalRollingFileAppender(Layout layout, String filename, boolean append) throws IOException {
+    public DfFlutistRollingFileAppender(Layout layout, String filename, boolean append) throws IOException {
         super(layout, filename, append);
     }
 
@@ -38,38 +37,40 @@ public class DfOriginalRollingFileAppender extends RollingFileAppender {
         LogLog.debug("maxBackupIndex=" + maxBackupIndex);
 
         if (maxBackupIndex > 0) {
-            File file = null;
-            File target = null;
+            deleteOldest();
+            moveNext();
 
-            final String oldestBackupFileName = buildBackupFileName(fileName, maxBackupIndex);
-            file = new File(oldestBackupFileName);
-            if (file.exists()) {
-                file.delete();
-            }
-
-            for (int i = maxBackupIndex - 1; i >= 1; i--) {
-                file = new File(buildBackupFileName(fileName, i));
-                if (file.exists()) {
-                    target = new File(buildBackupFileName(fileName, (i + 1)));
-                    LogLog.debug("Renaming file " + file + " to " + target);
-                    file.renameTo(target);
-                }
-            }
-
-            final String newestBackupFile = buildBackupFileName(fileName, 1);
-            target = new File(newestBackupFile);
-
+            final File newestBackupFile = new File(buildBackupFileName(fileName, 1));
             closeFile();
 
-            file = new File(fileName);
-            LogLog.debug("Renaming file " + file + " to " + target);
-            file.renameTo(target);
+            final File basicFile = new File(fileName);
+            LogLog.debug("Renaming file " + basicFile + " to " + newestBackupFile);
+            basicFile.renameTo(newestBackupFile);
         }
 
         try {
             this.setFile(fileName, false, bufferedIO, bufferSize);
         } catch (IOException e) {
             LogLog.error("setFile(" + fileName + ", false) call failed.", e);
+        }
+    }
+
+    protected void deleteOldest() {
+        final String oldestBackupFileName = buildBackupFileName(fileName, maxBackupIndex);
+        final File oldestBackupFile = new File(oldestBackupFileName);
+        if (oldestBackupFile.exists()) {
+            oldestBackupFile.delete();
+        }
+    }
+
+    protected void moveNext() {
+        for (int i = maxBackupIndex - 1; i >= 1; i--) {
+            final File fromFile = new File(buildBackupFileName(fileName, i));
+            if (fromFile.exists()) {
+                final File toFile = new File(buildBackupFileName(fileName, (i + 1)));
+                LogLog.debug("Renaming file " + fromFile + " to " + toFile);
+                fromFile.renameTo(toFile);
+            }
         }
     }
 

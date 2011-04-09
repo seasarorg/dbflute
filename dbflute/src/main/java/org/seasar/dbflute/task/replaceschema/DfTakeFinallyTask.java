@@ -137,7 +137,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         _log.info("* * * * * * * **");
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Take Finally");
-        return fireMan.execute(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
+        return fireMan.fire(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
     }
 
     protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {

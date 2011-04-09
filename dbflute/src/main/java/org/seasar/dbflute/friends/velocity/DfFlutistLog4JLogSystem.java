@@ -7,27 +7,26 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.SimpleLog4JLogSystem;
-import org.seasar.dbflute.friends.log4j.DfOriginalRollingFileAppender;
+import org.seasar.dbflute.friends.log4j.DfFlutistRollingFileAppender;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * DBFlute original LogSystem using Log4j that extends the SimpleLog4JLogSystem of Velocity. <br />
- * Thanks, Velocity!
+ * The log system using Log4j for DBFlute.
  * @author jflute
  * @since 0.9.5.1 (2009/06/23 Tuesday)
  */
-public class DfOriginalLog4JLogSystem extends SimpleLog4JLogSystem {
+public class DfFlutistLog4JLogSystem extends SimpleLog4JLogSystem {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for DBFlute log. */
-    private static final Log _log = LogFactory.getLog(DfOriginalLog4JLogSystem.class);
+    private static final Log _log = LogFactory.getLog(DfFlutistLog4JLogSystem.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOriginalLog4JLogSystem() {
+    public DfFlutistLog4JLogSystem() {
     }
 
     // ===================================================================================
@@ -40,7 +39,7 @@ public class DfOriginalLog4JLogSystem extends SimpleLog4JLogSystem {
             logger.setAdditivity(false);
             logger.setLevel(Level.DEBUG);
 
-            final DfOriginalRollingFileAppender appender = createOriginalRollingFileAppender(logfile);
+            final DfFlutistRollingFileAppender appender = createOriginalRollingFileAppender(logfile);
             appender.setMaxBackupIndex(2);
             appender.setMaximumFileSize(100000);
             logger.addAppender(appender);
@@ -52,7 +51,7 @@ public class DfOriginalLog4JLogSystem extends SimpleLog4JLogSystem {
         }
     }
 
-    protected DfOriginalRollingFileAppender createOriginalRollingFileAppender(String logfile) throws Exception {
-        return new DfOriginalRollingFileAppender(new PatternLayout("%d - %m%n"), logfile, true);
+    protected DfFlutistRollingFileAppender createOriginalRollingFileAppender(String logfile) throws Exception {
+        return new DfFlutistRollingFileAppender(new PatternLayout("%d - %m%n"), logfile, true);
     }
 }

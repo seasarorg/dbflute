@@ -26,13 +26,13 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.seasar.dbflute.exception.DfTemplateParsingException;
 
 /**
- * DBFlute original generator that refers to the generator of Velocity. <br />
+ * The generator for DBFlute, referring to the generator of Velocity. <br />
  * Thanks, Velocity!
  * @author modified by taktos
  * @author modified by jflute
  * @since 0.7.6 (2008/07/01 Tuesday)
  */
-public class DfOriginalGenerator extends DfGenerator {
+public class DfFlutistGenerator extends DfGenerator {
 
     // ===================================================================================
     //                                                                          Definition
@@ -42,7 +42,7 @@ public class DfOriginalGenerator extends DfGenerator {
      * output withing the control template. This could
      * use some cleaning up.
      */
-    private static DfOriginalGenerator instance = new DfOriginalGenerator();
+    private static DfFlutistGenerator instance = new DfFlutistGenerator();
 
     /**
      * Where the texen output will placed.
@@ -103,7 +103,7 @@ public class DfOriginalGenerator extends DfGenerator {
     /**
      * Default constructor.
      */
-    private DfOriginalGenerator() {
+    private DfFlutistGenerator() {
         setDefaultProps();
     }
 
@@ -111,7 +111,7 @@ public class DfOriginalGenerator extends DfGenerator {
      * Create a new generator object with default properties.
      * @return Generator generator used in the control context.
      */
-    public static DfOriginalGenerator getInstance() {
+    public static DfFlutistGenerator getInstance() {
         return instance;
     }
 
@@ -120,7 +120,7 @@ public class DfOriginalGenerator extends DfGenerator {
      * set. The property set will be duplicated.
      * @param props properties object to help populate the control context.
      */
-    public DfOriginalGenerator(Properties props) {
+    public DfFlutistGenerator(Properties props) {
         this.props = (Properties) props.clone();
     }
 

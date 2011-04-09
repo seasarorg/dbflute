@@ -122,7 +122,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         final List<File> sqlFileList = getTargetSqlFileList();
-        fireMan.execute(runner, sqlFileList);
+        fireMan.fire(runner, sqlFileList);
 
         setupProcedure();
 

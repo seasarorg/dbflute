@@ -19,7 +19,7 @@ public abstract class DfGenerator {
     /** Log instance. */
     public static final Log _log = LogFactory.getLog(DfGenerator.class);
 
-    /** The generator of Velocity. (Singleton) */
+    /** The implementation instance of generator. (Singleton) */
     private static volatile DfGenerator _instance;
 
     // ===================================================================================
@@ -40,7 +40,7 @@ public abstract class DfGenerator {
                 return _instance;
             }
             if (isSkipGenerateIfSameFile()) {
-                _instance = DfOriginalGenerator.getInstance();
+                _instance = DfFlutistGenerator.getInstance();
             } else {
                 _instance = new DfVelocityGenerator();
             }

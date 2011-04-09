@@ -176,7 +176,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     protected void traceResult(int goodSqlCount, int totalSqlCount) {
-        _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
+        _log.info("  -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
     }
 
     protected String filterSql(String sql) { // for override

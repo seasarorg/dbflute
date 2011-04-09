@@ -117,16 +117,12 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
             @Override
             protected void traceSql(String sql) {
-                String msg = ln() + "";
-                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
-                msg = msg + sql + ln();
-                msg = msg + "* * * * * * * * * */";
-                _log.info(msg);
+                _log.info("SQL:" + ln() + sql);
             }
 
             @Override
             protected void traceResult(int goodSqlCount, int totalSqlCount) {
-                _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + ln());
+                _log.info("  -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + ln());
             }
 
             @Override

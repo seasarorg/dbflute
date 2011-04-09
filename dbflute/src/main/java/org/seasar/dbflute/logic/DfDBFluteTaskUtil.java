@@ -22,9 +22,9 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +34,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.friends.log4j.DfFlutistEmergencyLog4JLogger;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -41,7 +42,7 @@ import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * Ant task utility.
+ * Utilities for DBFlute task.
  * @author jflute
  */
 public final class DfDBFluteTaskUtil {
@@ -50,7 +51,15 @@ public final class DfDBFluteTaskUtil {
     //                                                                          Definition
     //                                                                          ==========
     /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(DfDBFluteTaskUtil.class);
+    private static final Log _log;
+    static {
+        final File emergencyFile = new File("./log/emergency-logging.dfmark");
+        if (emergencyFile.exists()) { // for log4j accident
+            _log = new DfFlutistEmergencyLog4JLogger();
+        } else {
+            _log = LogFactory.getLog(DfDBFluteTaskUtil.class);
+        }
+    }
 
     // ===================================================================================
     //                                                             Build-Properties Set up
@@ -79,7 +88,6 @@ public final class DfDBFluteTaskUtil {
                         // from DBFlute module directory (old style)
                         targetFile = project.resolveFile(source);
                     }
-                    _log.info("...Using contextProperties: " + targetFile);
                     fis = new FileInputStream(targetFile);
                     currentProp.load(fis);
                 } catch (IOException e) {
@@ -119,14 +127,6 @@ public final class DfDBFluteTaskUtil {
                     prop.setProperty((String) entry.getKey(), (String) entry.getValue());
                 }
             }
-
-            // show properties
-            final Set<Entry<Object, Object>> entrySet = prop.entrySet();
-            _log.info("[Build-Properties]: size=" + prop.size());
-            for (Entry<Object, Object> entry : entrySet) {
-                _log.info("  " + entry.getKey() + " = " + entry.getValue());
-            }
-            _log.info("");
         } catch (RuntimeException e) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Failed to get build.properties.");
@@ -137,7 +137,7 @@ public final class DfDBFluteTaskUtil {
             br.addItem("Project");
             br.addElement(project);
             final String msg = br.buildExceptionMessage();
-            throw new IllegalStateException(msg, e);
+            throw new BuildException(msg, e);
         }
         return prop;
     }
@@ -145,6 +145,10 @@ public final class DfDBFluteTaskUtil {
     // ===================================================================================
     //                                                                             Logging
     //                                                                             =======
+    public static void logFinalInfo(String msg) {
+        _log.info(msg);
+    }
+
     public static void logException(Exception e, String taskName, DfConnectionMetaInfo metaInfo) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         setupCommonMessage(br, taskName, metaInfo);
@@ -247,7 +251,7 @@ public final class DfDBFluteTaskUtil {
             conn = DriverManager.getConnection(shutdownUrl);
         } catch (SQLException e) {
             if ("XJ015".equals(e.getSQLState())) {
-                _log.info(" --> success: " + e.getMessage());
+                _log.info(" -> success: " + e.getMessage());
             } else {
                 String msg = "Failed to shut down the connection to Derby:";
                 msg = msg + " shutdownUrl=" + shutdownUrl;

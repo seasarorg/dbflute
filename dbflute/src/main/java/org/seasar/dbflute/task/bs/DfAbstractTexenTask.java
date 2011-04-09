@@ -47,8 +47,8 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
+import org.seasar.dbflute.friends.velocity.DfFlutistLog4JLogSystem;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
-import org.seasar.dbflute.friends.velocity.DfOriginalLog4JLogSystem;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
@@ -183,7 +183,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
         final StringBuilder sb = new StringBuilder();
         final String ln = ln();
-        sb.append(ln);
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
         sb.append(ln).append("[Task End]: ").append(getPerformanceView(after - before));
         if (abort) {
@@ -220,7 +219,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             sb.append(finalInformation);
         }
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
-        _log.info(sb.toString());
+        DfDBFluteTaskUtil.logFinalInfo(sb.toString());
     }
 
     private String buildAdditionalSchemaDisp() {
@@ -311,7 +310,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         }
     }
 
-    abstract protected void doExecute();
+    protected abstract void doExecute();
 
     /**
      * Get performance view.
@@ -436,7 +435,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     private void setupVelocityLogProperty() {
-        Velocity.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfOriginalLog4JLogSystem.class.getName());
+        Velocity.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfFlutistLog4JLogSystem.class.getName());
     }
 
     private DfGenerator setupGenerator() {

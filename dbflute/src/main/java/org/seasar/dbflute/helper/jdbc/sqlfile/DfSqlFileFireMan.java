@@ -46,10 +46,10 @@ public class DfSqlFileFireMan {
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Load the SQL files and then execute them.
+     * Load the SQL files and then fire them.
      * @return The result about firing SQL. (NotNull)
      */
-    public DfSqlFileFireResult execute(DfSqlFileRunner runner, List<File> fileList) {
+    public DfSqlFileFireResult fire(DfSqlFileRunner runner, List<File> fileList) {
         final DfSqlFileFireResult fireResult = new DfSqlFileFireResult();
         int goodSqlCount = 0;
         int totalSqlCount = 0;
@@ -60,7 +60,7 @@ public class DfSqlFileFireMan {
             }
 
             if (_log.isInfoEnabled()) {
-                _log.info("{SQL File}: " + file);
+                _log.info("...Firing: " + file.getName());
             }
 
             runner.prepare(file);
@@ -74,8 +74,8 @@ public class DfSqlFileFireMan {
 
         // Result Message
         final StringBuilder resultSb = new StringBuilder();
-        resultSb.append("{").append(title).append("}: success=").append(goodSqlCount).append(" failure=").append(
-                (totalSqlCount - goodSqlCount)).append(" (in ").append(fileList.size()).append(" files)");
+        resultSb.append("{").append(title).append("}: success=").append(goodSqlCount).append(" failure=")
+                .append((totalSqlCount - goodSqlCount)).append(" (in ").append(fileList.size()).append(" files)");
         _log.info(resultSb.toString());
         fireResult.setResultMessage(resultSb.toString());
 
@@ -113,8 +113,8 @@ public class DfSqlFileFireMan {
                         ++elementIndex;
                     }
                     detailSb.append(ln());
-                    detailSb.append("    (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=").append(
-                            sqlEx.getErrorCode()).append(")");
+                    detailSb.append("    (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=")
+                            .append(sqlEx.getErrorCode()).append(")");
                 }
             }
         }

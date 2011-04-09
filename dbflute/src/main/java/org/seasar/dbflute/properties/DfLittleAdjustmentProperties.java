@@ -90,11 +90,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isForceClassificationSetting", false);
     }
 
-    public boolean isCDefToStringReturnsName() { // It's closet!
+    public boolean isCDefToStringReturnsName() { // closet
         return isProperty("isCDefToStringReturnsName", false);
     }
 
-    public boolean isMakeEntityOldStyleClassify() { // It's closet!
+    public boolean isMakeEntityOldStyleClassify() { // closet
         return isProperty("isMakeEntityOldStyleClassify", true);
     }
 
@@ -116,7 +116,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
 
-    public boolean isMakeConditionQueryNotEqualAsStandard() { // It's closet!
+    public boolean isMakeConditionQueryNotEqualAsStandard() { // closet
         // DBFlute had used tradition for a long time
         // but default value is true (uses standard) since 0.9.7.2
         return isProperty("isMakeConditionQueryNotEqualAsStandard", true);
@@ -306,7 +306,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                 ===================
     protected List<String> _pgReservColumnList;
 
-    protected List<String> getPgReservColumnList() { // It's closet!
+    protected List<String> getPgReservColumnList() { // closet
         if (_pgReservColumnList != null) {
             return _pgReservColumnList;
         }
@@ -414,7 +414,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // S2Dao.NET does not implement ValueType attribute,
     // so this property is INVALID now. At the future,
     // DBFlute may implement ValueType Framework. 
-    public boolean isUseAnsiStringTypeToNotUnicode() { // It's closet! CSharp Only
+    public boolean isUseAnsiStringTypeToNotUnicode() { // closet, CSharp only
         return isProperty("isUseAnsiStringTypeToNotUnicode", false);
     }
 
@@ -426,7 +426,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    public String getAlternateGenerateControl() { // It's closet!
+    public String getAlternateGenerateControl() { // closet
         return getProperty("alternateGenerateControl", null);
     }
 
@@ -435,29 +435,29 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    public String getAlternateSql2EntityControl() { // It's closet!
+    public String getAlternateSql2EntityControl() { // closet
         return getProperty("alternateSql2EntityControl", null);
     }
 
     // ===================================================================================
     //                                                                       Stop Generate
     //                                                                       =============
-    public boolean isStopGenerateExtendedBhv() { // It's closet and secret!
+    public boolean isStopGenerateExtendedBhv() { // closet
         return isProperty("isStopGenerateExtendedBhv", false);
     }
 
-    public boolean isStopGenerateExtendedDao() { // It's closet and secret!
+    public boolean isStopGenerateExtendedDao() { // closet
         return isProperty("isStopGenerateExtendedDao", false);
     }
 
-    public boolean isStopGenerateExtendedEntity() { // It's closet and secret!
+    public boolean isStopGenerateExtendedEntity() { // closet
         return isProperty("isStopGenerateExtendedEntity", false);
     }
 
     // ===================================================================================
     //                                                              Delete Old Table Class
     //                                                              ======================
-    public boolean isDeleteOldTableClass() { // It's closet and internal!
+    public boolean isDeleteOldTableClass() { // closet
         // The default value is true since 0.8.8.1.
         return isProperty("isDeleteOldTableClass", true);
     }
@@ -465,7 +465,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                          Skip Generate If Same File
     //                                                          ==========================
-    public boolean isSkipGenerateIfSameFile() { // It's closet and internal!
+    public boolean isSkipGenerateIfSameFile() { // closet
         // The default value is true since 0.7.8.
         return isProperty("isSkipGenerateIfSameFile", true);
     }
@@ -473,21 +473,21 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                              ToLower in Generator Underscore Method
     //                                              ======================================
-    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() { // It's closet and internal!
+    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() { // closet
         return isProperty("isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
 
     // ===================================================================================
     //                                                                      Flat Expansion
     //                                                                      ==============
-    public boolean isMakeFlatExpansion() { // It's closet until review!
+    public boolean isMakeFlatExpansion() { // closet, closed function permanently
         return isProperty("isMakeFlatExpansion", false);
     }
 
     // ===================================================================================
     //                                                                               S2Dao
     //                                                                               =====
-    public boolean isMakeDaoInterface() { // It's closet! CSharp Only
+    public boolean isMakeDaoInterface() { // closet, CSharp only
         if (isTargetLanguageCSharp()) {
             return true; // It is not implemented at CSharp yet
         }
@@ -510,7 +510,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                          Compatible
     //                                                                          ==========
-    public boolean isCompatibleAutoMappingOldStyle() { // It's closet!
+    public boolean isCompatibleAutoMappingOldStyle() { // closet
         return isProperty("isCompatibleAutoMappingOldStyle", false);
     }
 }

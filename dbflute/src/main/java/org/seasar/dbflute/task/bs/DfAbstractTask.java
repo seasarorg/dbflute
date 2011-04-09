@@ -158,7 +158,6 @@ public abstract class DfAbstractTask extends Task {
         final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
         final StringBuilder sb = new StringBuilder();
         final String ln = ln();
-        sb.append(ln);
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
         sb.append(ln).append("[Task End]: ").append(getPerformanceView(after - before));
         if (abort) {
@@ -195,7 +194,7 @@ public abstract class DfAbstractTask extends Task {
             sb.append(finalInformation);
         }
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
-        _log.info(sb.toString());
+        DfDBFluteTaskUtil.logFinalInfo(sb.toString());
     }
 
     private String buildAdditionalSchemaDisp() {
@@ -286,7 +285,7 @@ public abstract class DfAbstractTask extends Task {
         }
     }
 
-    abstract protected void doExecute();
+    protected abstract void doExecute();
 
     /**
      * Get performance view.

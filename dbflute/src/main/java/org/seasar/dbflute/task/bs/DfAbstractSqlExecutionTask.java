@@ -51,7 +51,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         final List<File> sqlFileList = getTargetSqlFileList();
-        fireMan.execute(getSqlFileRunner(runInfo), sqlFileList);
+        fireMan.fire(getSqlFileRunner(runInfo), sqlFileList);
         showTargetSqlFileInformation(sqlFileList);
     }
 
