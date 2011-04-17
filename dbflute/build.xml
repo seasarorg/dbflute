@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.8.2"/>
-	<property name="build.version" value="${version}-RC1"/>
+	<property name="build.version" value="${version}-RC2"/>
 	<property name="pre.version" value="0.9.8.1"/>
 	<property name="runtime.version" value="0.9.8.2"/>
 	<property name="runtime.build.version" value="${runtime.version}-RC1"/>
@@ -62,6 +62,7 @@
 	<!-- Other Examples -->
 	<property name="multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-seasar-example"/>
 	<property name="multipledb.spring.example.dir" value="${workspace.base}/dbflute-multipledb-spring-example"/>
+	<property name="sqlap.example.dir" value="${workspace.base}/dbflute-sqlap-example"/>
 	<property name="bhvap.seasar.example.dir" value="${workspace.base}/dbflute-bhvap-seasar-example"/>
 	<property name="bhvap.spring.example.dir" value="${workspace.base}/dbflute-bhvap-spring-example"/>
 	<property name="bhvap.guice.example.dir" value="${workspace.base}/dbflute-bhvap-guice-example"/>
@@ -330,22 +331,6 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-multipledb" depends="prepare-reflection" description="==> reflect to multipledb example">
-	  	<copy todir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
-	  	<copy todir="${multipledb.spring.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
-		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.sh" token="-${pre.version}" value="-${version}"/>
-		<replace file="${multipledb.seasar.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${multipledb.seasar.example.dir}/dbflute_memberdb/_project.sh" token="-${pre.version}" value="-${version}"/>
-		<replace file="${multipledb.spring.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${multipledb.spring.example.dir}/dbflute_librarydb/_project.sh" token="-${pre.version}" value="-${version}"/>
-		<replace file="${multipledb.spring.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${multipledb.spring.example.dir}/dbflute_memberdb/_project.sh" token="-${pre.version}" value="-${version}"/>
-		<delete dir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${pre.version}"/>
-		<delete dir="${multipledb.spring.example.dir}/mydbflute/dbflute-${pre.version}"/>
-		<delete dir="${extraction.dir}"/>
-	</target>
-
 	<target name="reflect-to-flex" depends="prepare-reflection" description="==> reflect to flex example">
 	  	<copy todir="${flex.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${flex.example.dir}/lib/${runtime.pre.jar}"/>
@@ -422,6 +407,30 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
+	<target name="reflect-to-multipledb" depends="prepare-reflection" description="==> reflect to multipledb example">
+	  	<copy todir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+	  	<copy todir="${multipledb.spring.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_memberdb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_librarydb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_memberdb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${multipledb.spring.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
+	<target name="reflect-to-sqlap" depends="prepare-reflection" description="==> reflect to sqlap example">
+		<delete file="${sqlap.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${sqlap.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${sqlap.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${sqlap.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
 	<target name="reflect-to-bhvap" depends="prepare-reflection" description="==> reflect to bhvap all examples">
 		<delete file="${bhvap.seasar.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${bhvap.seasar.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
@@ -470,6 +479,7 @@
 	  	<antcall target="reflect-to-flex" />
 	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-sastruts" />
+	  	<antcall target="reflect-to-sqlap" />
 	  	<antcall target="reflect-to-bhvap" />
 	  	<antcall target="reflect-to-tricky" />
 	  	<antcall target="reflect-to-javatest" />

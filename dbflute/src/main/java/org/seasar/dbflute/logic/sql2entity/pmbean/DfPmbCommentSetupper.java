@@ -82,7 +82,7 @@ public class DfPmbCommentSetupper {
     }
 
     protected String derivePmbFileBasePath(DfPmbMetaData pmbMetaData) {
-        final String outputDirectory = pmbMetaData.getOutsideSqlFile().getSql2EntityOutputDirectory();
+        final String outputDirectory = pmbMetaData.getSql2EntityOutputDirectory();
         final String pmbPackage = getOutsideSqlProperties().getExtendedParameterBeanPackage();
         final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
         packagePathHandler.setFileSeparatorSlash(true);

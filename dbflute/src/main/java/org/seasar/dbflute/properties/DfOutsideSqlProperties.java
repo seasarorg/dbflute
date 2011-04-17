@@ -7,7 +7,10 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlLocation;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -18,6 +21,12 @@ import org.seasar.dbflute.util.Srl;
  * @since 0.7.5 (2008/06/25 Wednesday)
  */
 public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfOutsideSqlProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -256,20 +265,28 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         for (Entry<String, Map<String, String>> entry : entrySet) {
             final String applicationDir = entry.getKey();
             final Map<String, String> elementMap = entry.getValue();
-            String sqlDirectory = elementMap.get("sqlDirectory");
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(sqlDirectory)) {
-                // 'src/main/resources' is also contained by resolving later 
-                sqlDirectory = defaultSqlDirectory;
+
+            final String sqlDirectory;
+            {
+                String plainDir = elementMap.get("sqlDirectory");
+                if (Srl.is_Null_or_TrimmedEmpty(plainDir)) {
+                    // 'src/main/resources' is also contained by resolving later 
+                    plainDir = defaultSqlDirectory;
+                }
+                sqlDirectory = doGetSqlDirectory(applicationDir + "/" + plainDir);
             }
-            sqlDirectory = doGetSqlDirectory(applicationDir + "/" + sqlDirectory);
-            String sql2EntityOutputDirectory = elementMap.get("sql2EntityOutputDirectory");
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(sql2EntityOutputDirectory)) {
-                sql2EntityOutputDirectory = defaultSqlDirectory;
+
+            final String sql2EntityOutputDirectory;
+            {
+                String plainDir = elementMap.get("sql2EntityOutputDirectory");
+                if (Srl.is_Null_or_TrimmedEmpty(plainDir)) {
+                    plainDir = defaultSqlDirectory;
+                }
+                sql2EntityOutputDirectory = applicationDir + "/" + plainDir;
             }
-            sql2EntityOutputDirectory = applicationDir + "/" + sql2EntityOutputDirectory;
+
             _outsideSqlLocationList.add(createOutsideSqlLocation(sqlDirectory, sql2EntityOutputDirectory, true));
         }
-
         return _outsideSqlLocationList;
     }
 
@@ -358,6 +375,25 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         final String defaultDir = getBasicProperties().getGenerateOutputDirectory();
         final String value = (String) getOutsideSqlDefinitionMap().get("sql2EntityOutputDirectory");
         return value != null && value.trim().length() > 0 ? value : defaultDir;
+    }
+
+    public void switchSql2EntityOutputDirectory(String outputDirectory) {
+        final DfGenerator generator = getGeneratorInstance();
+        final String outputPath = generator.getOutputPath();
+        if (outputDirectory == null) {
+            final String mainOutDir = getSql2EntityOutputDirectory();
+            if (!outputPath.equals(mainOutDir)) { // if different
+                _log.info("...Setting up sql2EntityOutputDirectory: " + mainOutDir);
+                generator.setOutputPath(mainOutDir); // back to library project
+            }
+        } else if (!outputPath.equals(outputDirectory)) { // if different
+            _log.info("...Setting up sql2EntityOutputDirectory: " + outputDirectory);
+            generator.setOutputPath(outputDirectory);
+        }
+    }
+
+    protected DfGenerator getGeneratorInstance() {
+        return DfGenerator.getInstance();
     }
 
     // ===================================================================================

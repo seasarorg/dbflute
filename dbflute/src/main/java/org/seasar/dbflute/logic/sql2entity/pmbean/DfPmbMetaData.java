@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
@@ -36,18 +34,13 @@ import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
 public class DfPmbMetaData {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfPmbMetaData.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -823,17 +816,31 @@ public class DfPmbMetaData {
     // ===================================================================================
     //                                                                     OutputDirectory
     //                                                                     ===============
-    public void switchSql2EntityOutputDirectory() {
-        final String sql2EntityOutputDirectory = _outsideSqlFile.getSql2EntityOutputDirectory();
-        final DfGenerator generator = getGeneratorInstance();
-        final String outputPath = generator.getOutputPath();
-        if (!outputPath.equals(sql2EntityOutputDirectory)) { // if different
-            _log.info("...Setting up sql2EntityOutputDirectory: " + sql2EntityOutputDirectory);
-            generator.setOutputPath(outputPath);
+    public String getSql2EntityOutputDirectory() {
+        final String sql2EntityOutputDirectory = doGetPlainSql2EntityOutputDirectory();
+        if (sql2EntityOutputDirectory != null) {
+            return sql2EntityOutputDirectory;
+        } else {
+            return getOutsideSqlProperties().getSql2EntityOutputDirectory();
         }
     }
 
-    protected DfGenerator getGeneratorInstance() {
+    public void switchSql2EntityOutputDirectory() {
+        final String sql2EntityOutputDirectory = doGetPlainSql2EntityOutputDirectory();
+        getOutsideSqlProperties().switchSql2EntityOutputDirectory(sql2EntityOutputDirectory);
+    }
+
+    protected String doGetPlainSql2EntityOutputDirectory() {
+        final String sql2EntityOutputDirectory;
+        if (_outsideSqlFile != null) {
+            sql2EntityOutputDirectory = _outsideSqlFile.getSql2EntityOutputDirectory();
+        } else {
+            sql2EntityOutputDirectory = null;
+        }
+        return sql2EntityOutputDirectory;
+    }
+
+    protected static DfGenerator getGeneratorInstance() {
         return DfGenerator.getInstance();
     }
 
@@ -846,6 +853,10 @@ public class DfPmbMetaData {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return getProperties().getOutsideSqlProperties();
     }
 
     protected DfClassificationProperties getClassificationProperties() {

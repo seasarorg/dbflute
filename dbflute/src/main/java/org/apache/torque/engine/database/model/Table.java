@@ -71,7 +71,6 @@ import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
@@ -1883,16 +1882,7 @@ public class Table {
     }
 
     public void switchSql2EntityOutputDirectory() {
-        final DfGenerator generator = getGeneratorInstance();
-        final String outputPath = generator.getOutputPath();
-        if (!outputPath.equals(_sql2EntityOutputDirectory)) { // if different
-            _log.info("...Setting up sql2EntityOutputDirectory: " + _sql2EntityOutputDirectory);
-            generator.setOutputPath(outputPath);
-        }
-    }
-
-    protected DfGenerator getGeneratorInstance() {
-        return DfGenerator.getInstance();
+        getProperties().getOutsideSqlProperties().switchSql2EntityOutputDirectory(_sql2EntityOutputDirectory);
     }
 
     // ===================================================================================

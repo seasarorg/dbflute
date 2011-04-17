@@ -6,7 +6,7 @@
 # 
 # Specification:
 # map:{
-#     ; projectName = [Eclipse Project]
+#     ; projectName = [Eclipse Project1] / [Eclipse Project2] / ...
 #     ; requestUrl = [ResourceSynchronizer's URL]
 # }
 #

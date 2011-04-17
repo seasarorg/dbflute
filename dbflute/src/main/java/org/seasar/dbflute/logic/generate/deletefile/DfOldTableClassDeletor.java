@@ -34,9 +34,9 @@ public class DfOldTableClassDeletor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfGenerator _generator;
-    protected DfPackagePathHandler _packagePathHandler;
-    protected List<String> _packagePathList = new ArrayList<String>();
+    protected final DfGenerator _generator;
+    protected final DfPackagePathHandler _packagePathHandler;
+    protected final List<String> _packagePathList = new ArrayList<String>();
     protected String _classPrefix;
     protected String _classSuffix;
     protected String _classExtension;

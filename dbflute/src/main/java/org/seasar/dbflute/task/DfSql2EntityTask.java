@@ -333,7 +333,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final Database database = _database;
         database.setSql2EntitySchemaData(_schemaData);
         database.setPmbMetaDataMap(_sql2entityMeta.getPmbMetaDataMap());
-        database.setSkipDeleteOldClass(DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile() != null);
+        database.setSkipDeleteOldClass(isSkipDeleteOldClass());
 
         final Map<String, DfCustomizeEntityInfo> entityInfoMap = _sql2entityMeta.getEntityInfoMap();
         final Set<String> entityNameSet = entityInfoMap.keySet();
@@ -344,7 +344,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             final Table tbl = new Table();
             tbl.setSql2EntityCustomize(true);
-            tbl.setSql2EntityOutputDirectory(outsideSqlFile.getSql2EntityOutputDirectory());
+            if (outsideSqlFile != null) {
+                tbl.setSql2EntityOutputDirectory(outsideSqlFile.getSql2EntityOutputDirectory());
+            }
             tbl.setName(entityInfo.getTableDbName());
             if (!entityInfo.needsJavaNameConvert()) {
                 tbl.suppressJavaNameConvert(); // basically here (except STRUCT type)
@@ -404,6 +406,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         final VelocityContext context = createVelocityContext(appData);
         return context;
+    }
+
+    protected boolean isSkipDeleteOldClass() {
+        return DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile() != null;
     }
 
     protected StringKeyMap<String> getPrimaryKeyMap(DfCustomizeEntityInfo entityInfo) {

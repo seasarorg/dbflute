@@ -5,6 +5,7 @@ ant -f build.xml reflect-to-guice
 ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
 ant -f build.xml reflect-to-bhvap
+ant -f build.xml reflect-to-sqlap
 
 cd ../dbflute-basic-example/dbflute_exampledb
 rm ./log/*.log
