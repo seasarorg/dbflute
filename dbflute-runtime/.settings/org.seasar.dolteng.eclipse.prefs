@@ -1,6 +1,0 @@
-#Mon Oct 22 17:27:41 JST 2007
-DaoType=S2Dao
-DefaultResourcePath=/dbflute-basic-example/src/main/resources
-DefaultRootPackage=org.seasar.dbflute.example.basic
-DefaultSrcPath=/dbflute-basic-example/src/main/java
-eclipse.preferences.version=1
