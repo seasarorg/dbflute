@@ -111,7 +111,10 @@ $database.initializeClassificationDeployment()
 ## -----------------------------------------------------------------------------------------------------
 ##                                                                                Parse customize entity
 ##                                                                                ----------------------
+##
 ## Setup output directory.
+## (but it may be switched per one file)
+##
 $database.enableSql2EntityOutputDirectory()
 
 ## for Sql2Entity
@@ -120,15 +123,6 @@ $database.enableSql2EntityOutputDirectory()
 #set ($glPackageBaseCustomizeEntity = "${database.Sql2EntityBaseEntityPackage}" )
 #set ($glPackageCustomizeDBMeta = "${database.Sql2EntityDBMetaPackage}")
 #set ($glPackageExtendedCustomizeEntity = "${database.Sql2EntityExtendedEntityPackage}" )
-
-#set ($path = $database.getPackageAsPath(${glPackageBaseCustomizeEntity}))
-$database.makeDirectory($path)
-
-#set ($path = $database.getPackageAsPath(${glPackageCustomizeDBMeta}))
-$database.makeDirectory($path)
-
-#set ($path = $database.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
-$database.makeDirectory($path)
 
 ##
 ## Delete old customize classes.
@@ -157,6 +151,14 @@ $database.info("public void parseCustomizeEntity() {")
 
   #set ($isExistDao = false)
   #set ($isExistConditionBean = false)
+
+  $table.switchSql2EntityOutputDirectory()
+  #set ($path = $database.getPackageAsPath(${glPackageBaseCustomizeEntity}))
+  $database.makeDirectory($path)
+  #set ($path = $database.getPackageAsPath(${glPackageCustomizeDBMeta}))
+  $database.makeDirectory($path)
+  #set ($path = $database.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
+  $database.makeDirectory($path)
 
   #if ($table.isSql2EntityTypeSafeCursor())
     #set ($path = $database.getPackageAsPath(${myBaseCursorPackageName}))
@@ -206,27 +208,31 @@ $database.info("public void parseParameterBean() {")
 #set ($glPackageBaseParameterBean = "${database.sql2EntityBaseParameterBeanPackage}" )
 #set ($glPackageExtendedParameterBean = "${database.sql2EntityExtendedParameterBeanPackage}" )
 
+#foreach ($pmbMetaData in $database.pmbMetaDataList)
+  #set ($pmbClassName = "$pmbMetaData.className")
+  #set ($myBaseParameterBeanClassName = "$pmbMetaData.baseClassName")
+  #set ($myExtendedParameterBeanClassName = "$pmbMetaData.extendedClassName")
+
+  $pmbMetaData.switchSql2EntityOutputDirectory()
   #set ($path = $database.getPackageAsPath(${glPackageBaseParameterBean}))
   $database.makeDirectory($path)
   #set ($path = $database.getPackageAsPath(${glPackageExtendedParameterBean}))
   $database.makeDirectory($path)
 
-  #foreach ($pmbMetaData in $database.pmbMetaDataList)
-    #set ($pmbClassName = "$pmbMetaData.className")
-    #set ($myBaseParameterBeanClassName = "$pmbMetaData.baseClassName")
-    #set ($myExtendedParameterBeanClassName = "$pmbMetaData.extendedClassName")
+  $database.info("    parse('${myExtendedParameterBeanClassName}');")
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/bsbhv/pmbean/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
 
-    $database.info("    parse('${myExtendedParameterBeanClassName}');")
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/bsbhv/pmbean/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
-
-    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.outputPath},$path).exists())
-      $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
-    #end
+  #set ( $path = "${database.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
   #end
+ #end
 $database.info("}")
 #end
+
+## because it might be switched
+$database.backToSql2EntityOutputDirectory()
 
 ## ===================================================================================
 ##                                                                          Simple Dto
