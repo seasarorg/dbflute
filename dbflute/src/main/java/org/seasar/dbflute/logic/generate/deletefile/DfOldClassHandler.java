@@ -490,8 +490,9 @@ public class DfOldClassHandler {
             if (oldStylePackagePath != null) { // e.g. cursor
                 deletor.addPackagePath(oldStylePackagePath);
             }
+            final List<String> deletedList = deletor.deleteOldTableClass();
             if (deletedListMap != null) {
-                deletedListMap.put(outputDirectory, deletor.deleteOldTableClass());
+                deletedListMap.put(outputDirectory, deletedList);
             }
         }
         if (deletedListMap != null) {
