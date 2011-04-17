@@ -71,22 +71,22 @@ public class DfPmbCommentSetupper {
         if (getBasicProperties().isFriendsS2JDBC()) {
             return;
         }
-        final String basePath = derivePmbFileBasePath();
         final String fileExt = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
                 .getClassFileExtension();
         for (DfPmbMetaData pmbMetaData : _pmbMetaDataList) {
+            final String basePath = derivePmbFileBasePath(pmbMetaData);
             final String classFilePath = basePath + "/" + pmbMetaData.getExtendedClassName() + "." + fileExt;
             final File pmbeanFile = new File(classFilePath);
             reflectExtendedClassDescription(pmbMetaData, pmbeanFile);
         }
     }
 
-    protected String derivePmbFileBasePath() {
-        final String outputDir = getOutsideSqlProperties().getSql2EntityOutputDirectory();
+    protected String derivePmbFileBasePath(DfPmbMetaData pmbMetaData) {
+        final String outputDirectory = pmbMetaData.getOutsideSqlFile().getSql2EntityOutputDirectory();
         final String pmbPackage = getOutsideSqlProperties().getExtendedParameterBeanPackage();
         final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
         packagePathHandler.setFileSeparatorSlash(true);
-        return outputDir + "/" + packagePathHandler.getPackageAsPath(pmbPackage);
+        return outputDirectory + "/" + packagePathHandler.getPackageAsPath(pmbPackage);
     }
 
     protected void reflectExtendedClassDescription(DfPmbMetaData pmbMetaData, File pmbeanFile) {

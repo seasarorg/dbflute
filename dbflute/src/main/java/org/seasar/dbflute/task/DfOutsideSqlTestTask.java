@@ -26,6 +26,7 @@ import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -59,11 +60,11 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     @Override
     protected List<File> getTargetSqlFileList() {
-        final List<File> sqlFileList = collectSqlFileList();
+        final DfOutsideSqlPack outsideSqlPack = collectSqlFileList();
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
         if (specifiedSqlFile != null) {
             final List<File> filteredList = new ArrayList<File>();
-            for (File sqlFile : sqlFileList) {
+            for (File sqlFile : outsideSqlPack.getPhysicalFileList()) {
                 final String fileName = sqlFile.getName();
                 if (specifiedSqlFile.equals(fileName)) {
                     filteredList.add(sqlFile);
@@ -71,7 +72,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             }
             return filteredList;
         } else {
-            return sqlFileList;
+            return outsideSqlPack.getPhysicalFileList();
         }
     }
 
@@ -184,11 +185,6 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         }
 
         checker.check(sqlFile.getName(), sql);
-    }
-
-    @Override
-    protected String getSqlDirectory() {
-        return getOutsideSqlProperties().getSqlDirectory();
     }
 
     @Override

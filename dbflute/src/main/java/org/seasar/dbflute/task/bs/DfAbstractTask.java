@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.task.bs;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
@@ -34,7 +33,8 @@ import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
-import org.seasar.dbflute.logic.sql2entity.analyzer.DfSqlFileCollector;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
@@ -398,12 +398,11 @@ public abstract class DfAbstractTask extends Task {
     //                                                                 ===================
     /**
      * Collect SQL files the list.
-     * @return The list of SQL files. (NotNull)
+     * @return The pack object for outside-SQL files. (NotNull)
      */
-    protected List<File> collectSqlFileList() {
-        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final DfSqlFileCollector sqlFileCollector = new DfSqlFileCollector(sqlDirectory, getBasicProperties());
-        return sqlFileCollector.collectSqlFileList();
+    protected DfOutsideSqlPack collectSqlFileList() {
+        final DfOutsideSqlCollector sqlFileCollector = new DfOutsideSqlCollector();
+        return sqlFileCollector.collectOutsideSql();
     }
 
     // ===================================================================================

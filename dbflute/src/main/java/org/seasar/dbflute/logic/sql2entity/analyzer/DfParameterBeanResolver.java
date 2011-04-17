@@ -46,7 +46,6 @@ import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
 import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
@@ -78,10 +77,10 @@ public class DfParameterBeanResolver {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSql2EntityMeta _sql2entityMeta;
-    protected final File _sqlFile;
+    protected final DfOutsideSqlFile _outsideSqlFile;
     protected final AppData _schemaData;
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
-    protected final DfSqlFileNameResolver _sqlFileNameResolver = new DfSqlFileNameResolver();
+    protected final DfOutsideSqlNameResolver _sqlFileNameResolver = new DfOutsideSqlNameResolver();
     protected final DfPropertyTypePackageResolver _propertyTypePackageResolver = new DfPropertyTypePackageResolver();
     protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
 
@@ -91,9 +90,9 @@ public class DfParameterBeanResolver {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfParameterBeanResolver(DfSql2EntityMeta sql2entityMeta, File sqlFile, AppData schemaData) {
+    public DfParameterBeanResolver(DfSql2EntityMeta sql2entityMeta, DfOutsideSqlFile outsideSqlFile, AppData schemaData) {
         _sql2entityMeta = sql2entityMeta;
-        _sqlFile = sqlFile;
+        _outsideSqlFile = outsideSqlFile;
         _schemaData = schemaData;
     }
 
@@ -113,6 +112,7 @@ public class DfParameterBeanResolver {
         final DfPmbMetaData pmbMetaData = new DfPmbMetaData();
         processClassHeader(sql, parameterBeanName, pmbMetaData);
         processParameterProperty(sql, parameterBeanName, pmbMetaData);
+        pmbMetaData.setOutsideSqlFile(_outsideSqlFile);
         pmbMetaData.adjustPropertyMetaFinally(_schemaData);
 
         filterAlternateBooleanMethod(pmbMetaData);
@@ -156,7 +156,7 @@ public class DfParameterBeanResolver {
         {
             String className = (idx >= 0) ? parameterBeanName.substring(0, idx) : parameterBeanName;
             className = className.trim();
-            className = resolvePmbNameIfNeeds(className, _sqlFile);
+            className = resolvePmbNameIfNeeds(className, _outsideSqlFile);
             pmbMetaData.setClassName(className);
         }
         if (idx >= 0) {
@@ -220,7 +220,7 @@ public class DfParameterBeanResolver {
             final int nameIndex = propertyDef.lastIndexOf(nameDelimiter);
             if (nameIndex <= 0) {
                 String msg = "The parameter bean element should be [typeName propertyName].";
-                msg = msg + " But: element=" + element + " srcFile=" + _sqlFile;
+                msg = msg + " But: element=" + element + " srcFile=" + _outsideSqlFile;
                 throw new IllegalStateException(msg);
             }
             // ParameterBean has the "import" clause of language-embedded utility
@@ -237,9 +237,7 @@ public class DfParameterBeanResolver {
                 propertyNameOptionMap.put(propertyName, optionDef);
             }
         }
-        pmbMetaData.setSqlFile(_sqlFile);
-        final Map<String, Map<String, String>> bqpMap = _bqpSetupper.extractBasicBqpMap(DfCollectionUtil
-                .newArrayList(_sqlFile));
+        final Map<String, Map<String, String>> bqpMap = _bqpSetupper.extractBasicBqpMap(createOutsideSqlPackAsOne());
         if (!bqpMap.isEmpty()) {
             final Map<String, String> bqpElementMap = bqpMap.values().iterator().next();
             pmbMetaData.setBqpElementMap(bqpElementMap);
@@ -248,6 +246,12 @@ public class DfParameterBeanResolver {
 
     protected String resolvePackageNameExceptUtil(String typeName) {
         return _propertyTypePackageResolver.resolvePackageNameExceptUtil(typeName);
+    }
+
+    protected DfOutsideSqlPack createOutsideSqlPackAsOne() {
+        final DfOutsideSqlPack pack = new DfOutsideSqlPack();
+        pack.add(_outsideSqlFile);
+        return pack;
     }
 
     // -----------------------------------------------------
@@ -533,7 +537,7 @@ public class DfParameterBeanResolver {
         br.addItem("ParameterBean");
         br.addElement(pmbName);
         br.addItem("SQL Files");
-        br.addElement(metaData.getSqlFile());
+        br.addElement(metaData.getOutsideSqlFile());
         br.addElement(currentSqlFile);
         final String msg = br.buildExceptionMessage();
         throw new DfParameterBeanDuplicateException(msg);
@@ -550,8 +554,8 @@ public class DfParameterBeanResolver {
         return _outsideSqlMarkAnalyzer.getParameterBeanPropertyTypeList(sql);
     }
 
-    protected String resolvePmbNameIfNeeds(String className, File file) {
-        return _sqlFileNameResolver.resolvePmbNameIfNeeds(className, file.getName());
+    protected String resolvePmbNameIfNeeds(String className, DfOutsideSqlFile file) {
+        return _sqlFileNameResolver.resolvePmbNameIfNeeds(className, file.getPhysicalFile().getName());
     }
 
     // ===================================================================================

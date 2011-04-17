@@ -1,19 +1,14 @@
 package org.seasar.dbflute.logic.jdbc.connection;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -96,31 +91,6 @@ public class DfCurrentSchemaConnector {
                 }
             }
         }
-    }
-
-    protected List<File> collectSqlFile(String sqlDirectory) {
-        return createSqlFileGetter().getSqlFileList(sqlDirectory);
-    }
-
-    protected DfSqlFileGetter createSqlFileGetter() {
-        final DfLanguageDependencyInfo dependencyInfo = _basicProperties.getLanguageDependencyInfo();
-        return new DfSqlFileGetter() {
-            @Override
-            protected boolean acceptSqlFile(File file) {
-                if (!dependencyInfo.isCompileTargetFile(file)) {
-                    return false;
-                }
-                return super.acceptSqlFile(file);
-            }
-        };
-    }
-
-    protected boolean containsSrcMainJava(String sqlDirectory) {
-        return DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory);
-    }
-
-    protected String replaceSrcMainJavaToSrcMainResources(String sqlDirectory) {
-        return DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
     }
 
     // ===================================================================================

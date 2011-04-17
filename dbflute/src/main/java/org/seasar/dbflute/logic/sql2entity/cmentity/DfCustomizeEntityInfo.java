@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 
 /**
@@ -48,6 +49,9 @@ public class DfCustomizeEntityInfo {
 
     // additional information (procedure only)
     protected boolean _procedureHandling;
+
+    // SQL file defined at
+    protected DfOutsideSqlFile _outsideSqlFile;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -206,5 +210,13 @@ public class DfCustomizeEntityInfo {
 
     public void setProcedureHandling(boolean procedureHandling) {
         this._procedureHandling = procedureHandling;
+    }
+
+    public DfOutsideSqlFile getOutsideSqlFile() {
+        return _outsideSqlFile;
+    }
+
+    public void setOutsideSqlFile(DfOutsideSqlFile outsideSqlFile) {
+        this._outsideSqlFile = outsideSqlFile;
     }
 }

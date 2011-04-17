@@ -15,19 +15,22 @@
  */
 package org.seasar.dbflute.logic.sql2entity.pmbean;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -39,6 +42,12 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class DfPmbMetaData {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfPmbMetaData.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -53,7 +62,7 @@ public class DfPmbMetaData {
     protected Map<String, String> _propertyNameOptionMap;
     protected Set<String> _autoDetectedPropertyNameSet;
     protected Set<String> _alternateBooleanMethodNameSet;
-    protected File _sqlFile;
+    protected DfOutsideSqlFile _outsideSqlFile;
     protected Map<String, String> _bqpElementMap;
     protected DfCustomizeEntityInfo _customizeEntityInfo;
 
@@ -812,6 +821,23 @@ public class DfPmbMetaData {
     }
 
     // ===================================================================================
+    //                                                                     OutputDirectory
+    //                                                                     ===============
+    public void switchSql2EntityOutputDirectory() {
+        final String sql2EntityOutputDirectory = _outsideSqlFile.getSql2EntityOutputDirectory();
+        final DfGenerator generator = getGeneratorInstance();
+        final String outputPath = generator.getOutputPath();
+        if (!outputPath.equals(sql2EntityOutputDirectory)) { // if different
+            _log.info("...Setting up sql2EntityOutputDirectory: " + sql2EntityOutputDirectory);
+            generator.setOutputPath(outputPath);
+        }
+    }
+
+    protected DfGenerator getGeneratorInstance() {
+        return DfGenerator.getInstance();
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
@@ -905,12 +931,12 @@ public class DfPmbMetaData {
         this._alternateBooleanMethodNameSet = alternateBooleanMethodNameSet;
     }
 
-    public File getSqlFile() {
-        return _sqlFile;
+    public DfOutsideSqlFile getOutsideSqlFile() {
+        return _outsideSqlFile;
     }
 
-    public void setSqlFile(File sqlFile) {
-        this._sqlFile = sqlFile;
+    public void setOutsideSqlFile(DfOutsideSqlFile outsideSqlFile) {
+        this._outsideSqlFile = outsideSqlFile;
     }
 
     public Map<String, String> getBqpElementMap() {

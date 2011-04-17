@@ -52,12 +52,20 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
         return new LanguageMetaDataCSharp();
     }
 
+    public String getDefaultMainProgramDirectory() {
+        return "source";
+    }
+
+    public String getDefaultMainResourceDirectory() {
+        return "source";
+    }
+
     public String getDefaultGenerateOutputDirectory() {
         return "../source";
     }
 
     public String getDefaultResourceOutputDirectory() {
-        return "../source/${topNamespace}/Resources";
+        return "../source/${topNamespace}/Resources"; // basically unused
     }
 
     public String getIntegerConvertExpression(String value) {

@@ -88,7 +88,8 @@ import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
-import org.seasar.dbflute.logic.sql2entity.analyzer.DfSqlFileCollector;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbGenerationHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
@@ -2100,7 +2101,7 @@ public class Database {
     //                                                                 ===================
     protected Map<String, Map<String, Map<String, String>>> _tableBqpMap;
 
-    public boolean hasTableBqpMap() {
+    public boolean hasTableBqpMap() { // basically for SchemaHTML
         return !getTableBqpMap().isEmpty();
     }
 
@@ -2110,7 +2111,7 @@ public class Database {
         }
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         try {
-            _tableBqpMap = setupper.extractTableBqpMap(collectSqlFileList());
+            _tableBqpMap = setupper.extractTableBqpMap(collectOutsideSql());
         } catch (RuntimeException e) {
             _log.warn("Failed to extract the map of table behavior query path!", e);
             _tableBqpMap = new HashMap<String, Map<String, Map<String, String>>>();
@@ -2118,11 +2119,10 @@ public class Database {
         return _tableBqpMap;
     }
 
-    protected List<File> collectSqlFileList() {
-        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final DfSqlFileCollector sqlFileCollector = new DfSqlFileCollector(sqlDirectory, getBasicProperties());
-        sqlFileCollector.suppressDirectoryCheck();
-        return sqlFileCollector.collectSqlFileList();
+    protected DfOutsideSqlPack collectOutsideSql() {
+        final DfOutsideSqlCollector outsideSqlCollector = new DfOutsideSqlCollector();
+        outsideSqlCollector.suppressDirectoryCheck();
+        return outsideSqlCollector.collectOutsideSql();
     }
 
     // ===================================================================================

@@ -79,8 +79,6 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
 
     protected abstract DfSqlFileRunnerExecute getSqlFileRunner(DfRunnerInformation runInfo);
 
-    protected abstract String getSqlDirectory();
-
     protected abstract boolean isAutoCommit();
 
     protected abstract boolean isErrorContinue();

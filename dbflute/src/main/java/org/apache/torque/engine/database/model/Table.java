@@ -71,6 +71,7 @@ import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
@@ -153,9 +154,10 @@ public class Table {
     // -----------------------------------------------------
     //                                 Sql2Entity Definition
     //                                 ---------------------
-    private boolean _sql2entityCustomize;
-    private boolean _sql2entityCustomizeHasNested;
-    private boolean _sql2entityTypeSafeCursor;
+    private boolean _sql2EntityCustomize;
+    private boolean _sql2EntityCustomizeHasNested;
+    private boolean _sql2EntityTypeSafeCursor;
+    private String _sql2EntityOutputDirectory;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -1787,27 +1789,35 @@ public class Table {
     //                                                               Sql2Entity Definition
     //                                                               =====================
     public boolean isSql2EntityCustomize() {
-        return _sql2entityCustomize;
+        return _sql2EntityCustomize;
     }
 
-    public void setSql2EntityCustomize(boolean sql2entityCustomize) {
-        _sql2entityCustomize = sql2entityCustomize;
+    public void setSql2EntityCustomize(boolean sql2EntityCustomize) {
+        _sql2EntityCustomize = sql2EntityCustomize;
     }
 
     public boolean isSql2EntityCustomizeHasNested() {
-        return _sql2entityCustomizeHasNested;
+        return _sql2EntityCustomizeHasNested;
     }
 
-    public void setSql2EntityCustomizeHasNested(boolean sql2entityCustomizeHasNested) {
-        _sql2entityCustomizeHasNested = sql2entityCustomizeHasNested;
+    public void setSql2EntityCustomizeHasNested(boolean sql2EntityCustomizeHasNested) {
+        _sql2EntityCustomizeHasNested = sql2EntityCustomizeHasNested;
     }
 
     public boolean isSql2EntityTypeSafeCursor() {
-        return _sql2entityTypeSafeCursor;
+        return _sql2EntityTypeSafeCursor;
     }
 
-    public void setSql2EntityTypeSafeCursor(boolean sql2entityTypeSafeCursor) {
-        this._sql2entityTypeSafeCursor = sql2entityTypeSafeCursor;
+    public void setSql2EntityTypeSafeCursor(boolean sql2EntityTypeSafeCursor) {
+        this._sql2EntityTypeSafeCursor = sql2EntityTypeSafeCursor;
+    }
+
+    public String getSql2EntityOutputDirectory() {
+        return _sql2EntityOutputDirectory;
+    }
+
+    public void setSql2EntityOutputDirectory(String sql2EntityOutputDirectory) {
+        this._sql2EntityOutputDirectory = sql2EntityOutputDirectory;
     }
 
     public boolean isLoadableCustomizeEntity() {
@@ -1870,6 +1880,19 @@ public class Table {
             ++index;
         }
         return settingList;
+    }
+
+    public void switchSql2EntityOutputDirectory() {
+        final DfGenerator generator = getGeneratorInstance();
+        final String outputPath = generator.getOutputPath();
+        if (!outputPath.equals(_sql2EntityOutputDirectory)) { // if different
+            _log.info("...Setting up sql2EntityOutputDirectory: " + _sql2EntityOutputDirectory);
+            generator.setOutputPath(outputPath);
+        }
+    }
+
+    protected DfGenerator getGeneratorInstance() {
+        return DfGenerator.getInstance();
     }
 
     // ===================================================================================

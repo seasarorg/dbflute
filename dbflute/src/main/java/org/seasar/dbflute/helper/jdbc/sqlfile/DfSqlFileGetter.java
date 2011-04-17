@@ -37,29 +37,32 @@ public class DfSqlFileGetter {
     //                                                                                ====
     public List<File> getSqlFileList(String sqlDirectory) {
         final List<File> fileList = new ArrayList<File>();
-        {
-            final File dir = new File(sqlDirectory);
-            if (!dir.exists()) {
-                String msg = "The sqlDirectory does not exist: " + dir;
-                throw new IllegalStateException(msg);
-            }
-            if (!dir.isDirectory()) {
-                String msg = "The sqlDirectory should be directory. but file...: " + dir;
-                throw new IllegalStateException(msg);
-            }
-            registerFile(fileList, dir);
-        }
+        final File fileDir = toFileDir(sqlDirectory);
+        registerFile(fileList, fileDir);
         return fileList;
     }
 
-    protected void registerFile(List<File> fileList, File dir) {
+    protected File toFileDir(String sqlDirectory) {
+        final File dir = new File(sqlDirectory);
+        if (!dir.exists()) {
+            String msg = "The sqlDirectory does not exist: " + dir;
+            throw new IllegalStateException(msg);
+        }
+        if (!dir.isDirectory()) {
+            String msg = "The sqlDirectory should be directory. but file...: " + dir;
+            throw new IllegalStateException(msg);
+        }
+        return dir;
+    }
+
+    protected void registerFile(List<File> fileList, File fileDir) {
         final FileFilter sqlFileFileter;
         if (_sqlFileFileter != null) {
             sqlFileFileter = _sqlFileFileter;
         } else {
             sqlFileFileter = createDefaultSqlFileFileFilter();
         }
-        final File[] sqlFiles = dir.listFiles(sqlFileFileter);
+        final File[] sqlFiles = fileDir.listFiles(sqlFileFileter);
         for (final File sqlFile : sqlFiles) {
             fileList.add(sqlFile);
         }
@@ -69,7 +72,7 @@ public class DfSqlFileGetter {
         } else {
             directoryOnlyFilter = createDefaultDirectoryOnlyFileFilter();
         }
-        final File[] directories = dir.listFiles(directoryOnlyFilter);
+        final File[] directories = fileDir.listFiles(directoryOnlyFilter);
         for (final File subdir : directories) {
             registerFile(fileList, subdir);
         }

@@ -53,6 +53,14 @@ public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
         return new LanguageMetaDataPhp();
     }
 
+    public String getDefaultMainProgramDirectory() {
+        return PATH_MAVEN_SRC_MAIN_PHP;
+    }
+
+    public String getDefaultMainResourceDirectory() {
+        return PATH_MAVEN_SRC_MAIN_PHP;
+    }
+
     public String getDefaultGenerateOutputDirectory() {
         return "../" + PATH_MAVEN_SRC_MAIN_PHP;
     }

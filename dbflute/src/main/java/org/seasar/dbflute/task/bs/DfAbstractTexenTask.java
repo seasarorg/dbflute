@@ -54,7 +54,9 @@ import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
-import org.seasar.dbflute.logic.sql2entity.analyzer.DfSqlFileCollector;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -602,13 +604,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                 SQL File Collecting
     //                                                                 ===================
     /**
-     * Collect SQL files the list.
-     * @return The list of SQL files. (NotNull)
+     * Collect outside-SQL containing its file info as pack.
+     * @return The pack object for outside-SQL files. (NotNull)
      */
-    protected List<File> collectSqlFileList() {
-        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final DfSqlFileCollector sqlFileCollector = new DfSqlFileCollector(sqlDirectory, getBasicProperties());
-        return sqlFileCollector.collectSqlFileList();
+    protected DfOutsideSqlPack collectOutsideSql() {
+        final DfOutsideSqlCollector sqlFileCollector = new DfOutsideSqlCollector();
+        return sqlFileCollector.collectOutsideSql();
     }
 
     // ===================================================================================
@@ -695,12 +696,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // ===================================================================================
     //                                                                SQL File Information
     //                                                                ====================
-    protected void showTargetSqlFileInformation(List<File> sqlFileList) {
+    protected void showTargetSqlFileInformation(DfOutsideSqlPack outsideSqlPack) {
         _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Target SQL files: " + sqlFileList.size());
+        _log.info("Target SQL files: " + outsideSqlPack.size());
         _log.info(" ");
-        for (File sqlFile : sqlFileList) {
-            _log.info("  " + sqlFile.getName());
+        for (DfOutsideSqlFile sqlFile : outsideSqlPack.getOutsideSqlFileList()) {
+            _log.info("  " + sqlFile.getPhysicalFile().getName());
         }
         _log.info("- - - - - - - - - -/");
         _log.info(" ");

@@ -60,11 +60,12 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSql2EntityMeta _sql2entityMeta;
+    protected final DfOutsideSqlPack _outsideSqlPack;
     protected final DBDef _currentDBDef;
     protected final AppData _schemaData;
 
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
-    protected final DfSqlFileNameResolver _sqlFileNameResolver = new DfSqlFileNameResolver();
+    protected final DfOutsideSqlNameResolver _sqlFileNameResolver = new DfOutsideSqlNameResolver();
     protected final DfPropertyTypePackageResolver _propertyTypePackageResolver = new DfPropertyTypePackageResolver();
     protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
 
@@ -72,9 +73,10 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     //                                                                         Constructor
     //                                                                         ===========
     public DfOutsideSqlAnalyzer(DfRunnerInformation runInfo, DataSource dataSource, DfSql2EntityMeta sqlFileMeta,
-            AppData schemaData) {
+            DfOutsideSqlPack outsideSqlPack, AppData schemaData) {
         super(runInfo, dataSource);
         _sql2entityMeta = sqlFileMeta;
+        _outsideSqlPack = outsideSqlPack;
         _currentDBDef = currentDBDef();
         _schemaData = schemaData;
     }
@@ -153,6 +155,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                         customizeEntityInfo.setScalarHandling(true);
                     }
                     customizeEntityInfo.setPrimaryKeyList(getPrimaryKeyColumnNameList(sql));
+                    customizeEntityInfo.setOutsideSqlFile(getCurrentOutsideSqlFile());
                     _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
                 }
             }
@@ -218,7 +221,15 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     }
 
     protected DfParameterBeanResolver createParameterBeanResolver() {
-        return new DfParameterBeanResolver(_sql2entityMeta, _sqlFile, _schemaData);
+        final DfOutsideSqlFile outsideSqlFile = _outsideSqlPack.getOutsideSqlFile(_sqlFile);
+        return new DfParameterBeanResolver(_sql2entityMeta, outsideSqlFile, _schemaData);
+    }
+
+    // ===================================================================================
+    //                                                                     OutsideSql Info
+    //                                                                     ===============
+    protected DfOutsideSqlFile getCurrentOutsideSqlFile() {
+        return _outsideSqlPack.getOutsideSqlFile(_sqlFile);
     }
 
     // ===================================================================================
@@ -318,7 +329,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         br.addItem("ParameterBean");
         br.addElement(pmbName);
         br.addItem("SQL Files");
-        br.addElement(metaData.getSqlFile());
+        br.addElement(metaData.getOutsideSqlFile());
         br.addElement(currentSqlFile);
         final String msg = br.buildExceptionMessage();
         throw new DfParameterBeanDuplicateException(msg);

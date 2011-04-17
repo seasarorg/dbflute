@@ -52,6 +52,10 @@ public interface DfLanguageDependencyInfo {
      */
     public LanguageMetaData createLanguageMetaData();
 
+    public String getDefaultMainProgramDirectory();
+
+    public String getDefaultMainResourceDirectory();
+
     /**
      * @return The default of generate output directory. (NotNull)
      */

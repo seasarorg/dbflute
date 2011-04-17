@@ -55,6 +55,14 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
         return new LanguageMetaDataJava();
     }
 
+    public String getDefaultMainProgramDirectory() {
+        return PATH_MAVEN_SRC_MAIN_JAVA;
+    }
+
+    public String getDefaultMainResourceDirectory() {
+        return PATH_MAVEN_SRC_MAIN_RESOURCES;
+    }
+
     public String getDefaultGenerateOutputDirectory() {
         return "../" + PATH_MAVEN_SRC_MAIN_JAVA;
     }

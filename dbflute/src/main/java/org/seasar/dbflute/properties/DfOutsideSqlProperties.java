@@ -1,12 +1,17 @@
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlLocation;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -222,20 +227,73 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                        SqlDirectory
-    //                                                                        ============
-    public String getSqlDirectory() {
-        String sqlDirectory = (String) getOutsideSqlDefinitionMap().get("sqlDirectory");
-        if (sqlDirectory == null || sqlDirectory.trim().length() == 0) {
-            sqlDirectory = getDefaultSqlDirectory();
+    //                                                                         SqlLocation
+    //                                                                         ===========
+    protected List<DfOutsideSqlLocation> _outsideSqlLocationList;
+
+    public List<DfOutsideSqlLocation> getSqlLocationList() {
+        if (_outsideSqlLocationList != null) {
+            return _outsideSqlLocationList;
         }
-        sqlDirectory = removeEndSeparatorIfNeeds(sqlDirectory);
+        _outsideSqlLocationList = new ArrayList<DfOutsideSqlLocation>();
+        final String mainDir = getMainSqlDirectory();
+        final String mainOutput = getSql2EntityOutputDirectory();
+        _outsideSqlLocationList.add(createOutsideSqlLocation(mainDir, mainOutput, false));
+        final Object obj = getOutsideSqlDefinitionMap().get("applicationOutsideSqlMap");
+        if (obj == null) {
+            return _outsideSqlLocationList;
+        }
+        if (!(obj instanceof Map<?, ?>)) {
+            String msg = "The property 'applicationOutsideSqlMap' should be Map: " + obj.getClass();
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        @SuppressWarnings("unchecked")
+        final Map<String, Map<String, String>> sqlApMap = (Map<String, Map<String, String>>) obj;
+        final Set<Entry<String, Map<String, String>>> entrySet = sqlApMap.entrySet();
+
+        final String defaultSqlDirectory = getBasicProperties().getLanguageDependencyInfo()
+                .getDefaultMainProgramDirectory();
+        for (Entry<String, Map<String, String>> entry : entrySet) {
+            final String applicationDir = entry.getKey();
+            final Map<String, String> elementMap = entry.getValue();
+            String sqlDirectory = elementMap.get("sqlDirectory");
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(sqlDirectory)) {
+                // 'src/main/resources' is also contained by resolving later 
+                sqlDirectory = defaultSqlDirectory;
+            }
+            sqlDirectory = doGetSqlDirectory(applicationDir + "/" + sqlDirectory);
+            String sql2EntityOutputDirectory = elementMap.get("sql2EntityOutputDirectory");
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(sql2EntityOutputDirectory)) {
+                sql2EntityOutputDirectory = defaultSqlDirectory;
+            }
+            sql2EntityOutputDirectory = applicationDir + "/" + sql2EntityOutputDirectory;
+            _outsideSqlLocationList.add(createOutsideSqlLocation(sqlDirectory, sql2EntityOutputDirectory, true));
+        }
+
+        return _outsideSqlLocationList;
+    }
+
+    protected String getMainSqlDirectory() { // for main
+        final String plainDir = (String) getOutsideSqlDefinitionMap().get("sqlDirectory");
+        return doGetSqlDirectory(plainDir);
+    }
+
+    protected String doGetSqlDirectory(String plainDir) {
+        if (plainDir == null || plainDir.trim().length() == 0) {
+            plainDir = getDefaultSqlDirectory();
+        }
+        plainDir = removeEndSeparatorIfNeeds(plainDir);
         String sqlPackage = getSqlPackage();
         if (sqlPackage != null && sqlPackage.trim().length() > 0) {
             String sqlPackageDirectory = resolveSqlPackageFileSeparator(sqlPackage);
-            sqlDirectory = sqlDirectory + "/" + removeStartSeparatorIfNeeds(sqlPackageDirectory);
+            plainDir = plainDir + "/" + removeStartSeparatorIfNeeds(sqlPackageDirectory);
         }
-        return sqlDirectory;
+        return plainDir;
+    }
+
+    protected DfOutsideSqlLocation createOutsideSqlLocation(String sqlDirectory, String sql2EntityOutputDirectory,
+            boolean sqlAp) {
+        return new DfOutsideSqlLocation(sqlDirectory, sql2EntityOutputDirectory, sqlAp);
     }
 
     // -----------------------------------------------------
@@ -293,6 +351,15 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return DfStringUtil.replace(sqlPackage, ".", "/");
     }
 
+    // -----------------------------------------------------
+    //                                       OutputDirectory
+    //                                       ---------------
+    public String getSql2EntityOutputDirectory() { // for main
+        final String defaultDir = getBasicProperties().getGenerateOutputDirectory();
+        final String value = (String) getOutsideSqlDefinitionMap().get("sql2EntityOutputDirectory");
+        return value != null && value.trim().length() > 0 ? value : defaultDir;
+    }
+
     // ===================================================================================
     //                                                                          SqlPackage
     //                                                                          ==========
@@ -316,15 +383,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     protected String resolvePackageBaseMarkIfNeeds(String sqlPackage) {
         String packageBase = getBasicProperties().getPackageBase();
         return DfStringUtil.replace(sqlPackage, "$$PACKAGE_BASE$$", packageBase);
-    }
-
-    // ===================================================================================
-    //                                                                     OutputDirectory
-    //                                                                     ===============
-    public String getSql2EntityOutputDirectory() {
-        final String defaultDir = getBasicProperties().getGenerateOutputDirectory();
-        final String value = (String) getOutsideSqlDefinitionMap().get("sql2EntityOutputDirectory");
-        return value != null && value.trim().length() > 0 ? value : defaultDir;
     }
 
     // ===================================================================================

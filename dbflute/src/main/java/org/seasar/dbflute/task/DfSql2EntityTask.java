@@ -15,9 +15,7 @@
  */
 package org.seasar.dbflute.task;
 
-import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,6 +50,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlAnalyzer;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMeta;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
@@ -119,10 +119,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setRollbackOnly(true); // this task does not commit
         runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
 
-        final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        final List<File> sqlFileList = getTargetSqlFileList();
-        fireMan.fire(runner, sqlFileList);
+        final DfOutsideSqlPack outsideSqlPack = getTargetSqlFileList();
+        final DfSqlFileRunner runner = createSqlFileRunner(runInfo, outsideSqlPack);
+        fireMan.fire(runner, outsideSqlPack.getPhysicalFileList());
 
         setupProcedure();
 
@@ -130,9 +130,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         setupBehaviorQueryPath();
         setupExtendedClassDescription();
 
-        showTargetSqlFileInformation(sqlFileList);
+        showTargetSqlFileInformation(outsideSqlPack);
         showSkippedFileInformation();
-        handleNotFoundResult(sqlFileList);
+        handleNotFoundResult(outsideSqlPack);
         handleException();
         refreshResources();
     }
@@ -206,15 +206,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                   Executing Element
     //                                                                   =================
-    protected List<File> getTargetSqlFileList() {
-        final List<File> sqlFileList = collectSqlFileList();
+    protected DfOutsideSqlPack getTargetSqlFileList() {
+        final DfOutsideSqlPack sqlFileList = collectOutsideSql();
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
         if (specifiedSqlFile != null) {
-            final List<File> filteredList = new ArrayList<File>();
-            for (File sqlFile : sqlFileList) {
-                final String fileName = sqlFile.getName();
+            final DfOutsideSqlPack filteredList = new DfOutsideSqlPack();
+            for (DfOutsideSqlFile outsideSqlFile : sqlFileList.getOutsideSqlFileList()) {
+                final String fileName = outsideSqlFile.getPhysicalFile().getName();
                 if (specifiedSqlFile.equals(fileName)) {
-                    filteredList.add(sqlFile);
+                    filteredList.add(outsideSqlFile);
                 }
             }
             return filteredList;
@@ -228,22 +228,22 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      * @param runInfo Run information. (NotNull)
      * @return SQL file runner. (NotNull)
      */
-    protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
-        return new DfOutsideSqlAnalyzer(runInfo, getDataSource(), _sql2entityMeta, _schemaData);
+    protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo, DfOutsideSqlPack outsideSqlPack) {
+        return new DfOutsideSqlAnalyzer(runInfo, getDataSource(), _sql2entityMeta, outsideSqlPack, _schemaData);
     }
 
-    protected void handleNotFoundResult(List<File> sqlFileList) {
+    protected void handleNotFoundResult(DfOutsideSqlPack outsideSqlPack) {
         final Map<String, DfCustomizeEntityInfo> entityInfoMap = _sql2entityMeta.getEntityInfoMap();
         final Map<String, DfPmbMetaData> pmbMetaDataMap = _sql2entityMeta.getPmbMetaDataMap();
         if (entityInfoMap.isEmpty() && pmbMetaDataMap.isEmpty()) {
             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
             _log.warn("SQL for sql2entity was not found!");
             _log.warn("");
-            _log.warn("SQL Files: " + sqlFileList.size());
+            _log.warn("SQL Files: " + outsideSqlPack.size());
             int index = 0;
-            for (File file : sqlFileList) {
+            for (DfOutsideSqlFile file : outsideSqlPack.getOutsideSqlFileList()) {
                 index++;
-                _log.warn("  " + index + " -- " + file);
+                _log.warn("  " + index + " -- " + file.getPhysicalFile());
             }
             _log.warn("* * * * * * * * * */");
             _log.warn(" ");
@@ -308,7 +308,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                 Behavior Query Path
     //                                                                 ===================
     protected void setupBehaviorQueryPath() {
-        final List<File> sqlFileList = collectSqlFileList();
+        final DfOutsideSqlPack sqlFileList = collectOutsideSql();
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         setupper.setupBehaviorQueryPath(sqlFileList);
     }
@@ -340,9 +340,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         for (String entityName : entityNameSet) {
             final DfCustomizeEntityInfo entityInfo = entityInfoMap.get(entityName);
             final Map<String, DfColumnMetaInfo> metaMap = entityInfo.getColumnMap();
+            final DfOutsideSqlFile outsideSqlFile = entityInfo.getOutsideSqlFile();
 
             final Table tbl = new Table();
             tbl.setSql2EntityCustomize(true);
+            tbl.setSql2EntityOutputDirectory(outsideSqlFile.getSql2EntityOutputDirectory());
             tbl.setName(entityInfo.getTableDbName());
             if (!entityInfo.needsJavaNameConvert()) {
                 tbl.suppressJavaNameConvert(); // basically here (except STRUCT type)

@@ -54,7 +54,6 @@ package org.apache.torque.task;
  * <http://www.apache.org/>.
  */
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -62,6 +61,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -218,8 +218,8 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     //                                                                 Behavior Query Path
     //                                                                 ===================
     protected void setupBehaviorQueryPath() {
-        final List<File> sqlFileList = collectSqlFileList();
+        final DfOutsideSqlPack outsideSqlPack = collectOutsideSql();
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
-        setupper.setupBehaviorQueryPath(sqlFileList);
+        setupper.setupBehaviorQueryPath(outsideSqlPack);
     }
 }

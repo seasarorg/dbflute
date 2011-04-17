@@ -31,8 +31,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +43,8 @@ import org.seasar.dbflute.exception.DfBehaviorNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -82,7 +84,7 @@ public class DfBehaviorQueryPathSetupper {
     /**
      * @param sqlFileList The list of SQL file. (NotNull)
      */
-    public void setupBehaviorQueryPath(List<File> sqlFileList) {
+    public void setupBehaviorQueryPath(DfOutsideSqlPack sqlFileList) {
         if (getOutsideSqlProperties().isSuppressBehaviorQueryPath()) {
             _log.info("*Behavior Query Path is suppressed!");
             return;
@@ -99,11 +101,11 @@ public class DfBehaviorQueryPathSetupper {
     //                                                                             =======
     /**
      * Extract the basic map of behavior query path
-     * @param sqlFileList
+     * @param outsideSqlPack The pack object for outside-SQL file. (NotNull)
      * @return The basic map of behavior query path. The key is slash-path. (NotNull, EmptyAllowd: means not found)
      */
-    public Map<String, Map<String, String>> extractBasicBqpMap(List<File> sqlFileList) {
-        return doExtractBehaviorQueryPathMap(sqlFileList);
+    public Map<String, Map<String, String>> extractBasicBqpMap(DfOutsideSqlPack outsideSqlPack) {
+        return doExtractBehaviorQueryPathMap(outsideSqlPack);
     }
 
     /**
@@ -121,15 +123,15 @@ public class DfBehaviorQueryPathSetupper {
      *     } 
      * }
      * </pre>
-     * @param sqlFileList The list of SQL file. (NotNull)
+     * @param outsideSqlPack The pack object for outside-SQL file. (NotNull)
      * @return The case insensitive map of behavior query path per table. The key is table name. (NotNull, EmptyAllowd: means not found)
      */
-    public Map<String, Map<String, Map<String, String>>> extractTableBqpMap(List<File> sqlFileList) {
+    public Map<String, Map<String, Map<String, String>>> extractTableBqpMap(DfOutsideSqlPack outsideSqlPack) {
         final Map<String, Map<String, Map<String, String>>> resultMap = StringKeyMap.createAsFlexibleOrdered();
-        if (sqlFileList.isEmpty()) {
+        if (outsideSqlPack.isEmpty()) {
             return resultMap;
         }
-        final Map<String, Map<String, String>> bqpMap = doExtractBehaviorQueryPathMap(sqlFileList);
+        final Map<String, Map<String, String>> bqpMap = doExtractBehaviorQueryPathMap(outsideSqlPack);
         final Map<File, Map<String, Map<String, String>>> resourceMap = createReflectResourceMap(bqpMap);
         final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = resourceMap.entrySet();
         for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
@@ -168,10 +170,10 @@ public class DfBehaviorQueryPathSetupper {
     //                                                                        Main Process
     //                                                                        ============
     /**
-     * @param sqlFileList The list of SQL file. (NotNull)
+     * @param outsideSqlPack The pack object for outside-SQL file. (NotNull)
      * @return The map of behavior query path. (NotNull)
      */
-    protected Map<String, Map<String, String>> doExtractBehaviorQueryPathMap(List<File> sqlFileList) {
+    protected Map<String, Map<String, String>> doExtractBehaviorQueryPathMap(DfOutsideSqlPack outsideSqlPack) {
         final String exbhvName;
         {
             String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
@@ -181,22 +183,22 @@ public class DfBehaviorQueryPathSetupper {
             exbhvName = exbhvPackage;
         }
         final Map<String, Map<String, String>> behaviorQueryPathMap = new LinkedHashMap<String, Map<String, String>>();
-        gatherBehaviorQueryPathInfo(behaviorQueryPathMap, sqlFileList, exbhvName);
+        gatherBehaviorQueryPathInfo(behaviorQueryPathMap, outsideSqlPack, exbhvName);
         return behaviorQueryPathMap;
     }
 
     /**
      * @param behaviorQueryPathMap The empty map of behavior query path. (NotNull)
-     * @param sqlFileList The list of SQL file. (NotNull)
+     * @param outsideSqlPack The pack object for outside-SQL file. (NotNull)
      * @param exbhvName The name of extended behavior. (NotNull)
      */
     protected void gatherBehaviorQueryPathInfo(Map<String, Map<String, String>> behaviorQueryPathMap,
-            List<File> sqlFileList, String exbhvName) {
+            DfOutsideSqlPack outsideSqlPack, String exbhvName) {
         final String exbhvMark = "/" + exbhvName + "/";
         final String exbhvSuffix = "Bhv";
         final Pattern behaviorQueryPathPattern = Pattern.compile(".+" + exbhvMark + ".+" + exbhvSuffix + "_.+.sql$");
-        for (File sqlFile : sqlFileList) {
-            final String path = getSlashPath(sqlFile);
+        for (DfOutsideSqlFile sqlFile : outsideSqlPack.getOutsideSqlFileList()) {
+            final String path = getSlashPath(sqlFile.getPhysicalFile());
             final Matcher matcher = behaviorQueryPathPattern.matcher(path);
             if (!matcher.matches()) {
                 continue;
@@ -228,9 +230,9 @@ public class DfBehaviorQueryPathSetupper {
         }
     }
 
-    protected void setupInfoInSqlFile(File sqlFile, Map<String, String> elementMap) {
+    protected void setupInfoInSqlFile(DfOutsideSqlFile outsideSqlFile, Map<String, String> elementMap) {
         final DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
-        final BufferedReader reader = new BufferedReader(newInputStreamReader(sqlFile));
+        final BufferedReader reader = new BufferedReader(newInputStreamReader(outsideSqlFile));
         final StringBuilder sb = new StringBuilder();
         try {
             while (true) {
@@ -241,7 +243,7 @@ public class DfBehaviorQueryPathSetupper {
                 sb.append(line).append(ln());
             }
         } catch (IOException e) {
-            String msg = "Failed to read the SQL: " + sqlFile;
+            String msg = "Failed to read the SQL: " + outsideSqlFile;
             throw new IllegalStateException(msg, e);
         }
         final String sql = sb.toString();
@@ -255,10 +257,10 @@ public class DfBehaviorQueryPathSetupper {
         elementMap.put(KEY_SQL, sql);
     }
 
-    protected InputStreamReader newInputStreamReader(File sqlFile) {
+    protected InputStreamReader newInputStreamReader(DfOutsideSqlFile sqlFile) {
         final String encoding = getProperties().getOutsideSqlProperties().getSqlFileEncoding();
         try {
-            return new InputStreamReader(new FileInputStream(sqlFile), encoding);
+            return new InputStreamReader(new FileInputStream(sqlFile.getPhysicalFile()), encoding);
         } catch (FileNotFoundException e) {
             throw new IllegalStateException("The file does not exist: " + sqlFile, e);
         } catch (UnsupportedEncodingException e) {
