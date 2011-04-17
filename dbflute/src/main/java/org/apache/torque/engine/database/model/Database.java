@@ -734,6 +734,7 @@ public class Database {
         }
         if (getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
             final DfOldClassHandler handler = createOldClassHandler();
+            handler.setCustomizeTableList(getTableList());
             handler.setPmbMetaDataMap(_pmbMetaDataMap);
             handler.deleteOldCustomizeClass();
         }

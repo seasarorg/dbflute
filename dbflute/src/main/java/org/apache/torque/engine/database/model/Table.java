@@ -1811,14 +1811,6 @@ public class Table {
         this._sql2EntityTypeSafeCursor = sql2EntityTypeSafeCursor;
     }
 
-    public String getSql2EntityOutputDirectory() {
-        return _sql2EntityOutputDirectory;
-    }
-
-    public void setSql2EntityOutputDirectory(String sql2EntityOutputDirectory) {
-        this._sql2EntityOutputDirectory = sql2EntityOutputDirectory;
-    }
-
     public boolean isLoadableCustomizeEntity() {
         final Table domain = getLoadableCustomizeDomain();
         return domain != null && domain.hasReferrerAsMany();
@@ -1879,6 +1871,21 @@ public class Table {
             ++index;
         }
         return settingList;
+    }
+
+    /**
+     * @return The output directory for Sql2Entity. (NotNull)
+     */
+    public String getSql2EntityOutputDirectory() {
+        if (_sql2EntityOutputDirectory != null) {
+            return _sql2EntityOutputDirectory;
+        } else {
+            return getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory();
+        }
+    }
+
+    public void setSql2EntityOutputDirectory(String sql2EntityOutputDirectory) {
+        this._sql2EntityOutputDirectory = sql2EntityOutputDirectory;
     }
 
     public void switchSql2EntityOutputDirectory() {

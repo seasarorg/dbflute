@@ -68,6 +68,7 @@ public class DfBehaviorQueryPathSetupper {
     public static final String KEY_ENTITY_NAME = "entityName";
     public static final String KEY_BEHAVIOR_NAME = "behaviorName";
     public static final String KEY_BEHAVIOR_QUERY_PATH = "behaviorQueryPath";
+    public static final String KEY_SQL_AP = "sqlAp";
     public static final String KEY_TITLE = "title";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_SQL = "sql";
@@ -197,8 +198,8 @@ public class DfBehaviorQueryPathSetupper {
         final String exbhvMark = "/" + exbhvName + "/";
         final String exbhvSuffix = "Bhv";
         final Pattern behaviorQueryPathPattern = Pattern.compile(".+" + exbhvMark + ".+" + exbhvSuffix + "_.+.sql$");
-        for (DfOutsideSqlFile sqlFile : outsideSqlPack.getOutsideSqlFileList()) {
-            final String path = getSlashPath(sqlFile.getPhysicalFile());
+        for (DfOutsideSqlFile outsideSqlFile : outsideSqlPack.getOutsideSqlFileList()) {
+            final String path = getSlashPath(outsideSqlFile.getPhysicalFile());
             final Matcher matcher = behaviorQueryPathPattern.matcher(path);
             if (!matcher.matches()) {
                 continue;
@@ -223,10 +224,13 @@ public class DfBehaviorQueryPathSetupper {
             behaviorQueryElement.put(KEY_ENTITY_NAME, entityName);
             behaviorQueryElement.put(KEY_BEHAVIOR_NAME, behaviorName);
             behaviorQueryElement.put(KEY_BEHAVIOR_QUERY_PATH, behaviorQueryPath);
+            if (outsideSqlFile.isSqlAp()) {
+                behaviorQueryElement.put(KEY_SQL_AP, "true");
+            }
             behaviorQueryPathMap.put(path, behaviorQueryElement);
 
             // setup informations in the SQL file
-            setupInfoInSqlFile(sqlFile, behaviorQueryElement);
+            setupInfoInSqlFile(outsideSqlFile, behaviorQueryElement);
         }
     }
 
@@ -272,7 +276,7 @@ public class DfBehaviorQueryPathSetupper {
      * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
      */
     protected void reflectBehaviorQueryPath(Map<String, Map<String, String>> behaviorQueryPathMap) {
-        Map<File, Map<String, Map<String, String>>> reflectResourceMap = createReflectResourceMap(behaviorQueryPathMap);
+        final Map<File, Map<String, Map<String, String>>> reflectResourceMap = createReflectResourceMap(behaviorQueryPathMap);
         if (reflectResourceMap.isEmpty()) {
             return;
         }
@@ -313,9 +317,12 @@ public class DfBehaviorQueryPathSetupper {
         final Set<Entry<String, Map<String, String>>> entrySet = behaviorQueryPathMap.entrySet();
         for (Entry<String, Map<String, String>> entry : entrySet) {
             final Map<String, String> behaviorQueryElementMap = entry.getValue();
-            final String behaviorName = behaviorQueryElementMap.get(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_NAME); // on SQL file
-            final String behaviorQueryPath = behaviorQueryElementMap
-                    .get(DfBehaviorQueryPathSetupper.KEY_BEHAVIOR_QUERY_PATH);
+            final String behaviorName = behaviorQueryElementMap.get(KEY_BEHAVIOR_NAME); // on SQL file
+            final String behaviorQueryPath = behaviorQueryElementMap.get(KEY_BEHAVIOR_QUERY_PATH);
+            final String sqlApExp = behaviorQueryElementMap.get(KEY_SQL_AP);
+            if (sqlApExp != null && "true".equalsIgnoreCase(sqlApExp)) {
+                continue; // out of target for ApplicationOutsideSql
+            }
 
             // relation point between SQL file and BsBhv
             File bsbhvFile = bsbhvFileMap.get(behaviorName);

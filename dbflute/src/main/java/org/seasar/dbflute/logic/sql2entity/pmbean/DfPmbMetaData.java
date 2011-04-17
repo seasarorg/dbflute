@@ -816,6 +816,9 @@ public class DfPmbMetaData {
     // ===================================================================================
     //                                                                     OutputDirectory
     //                                                                     ===============
+    /**
+     * @return The output directory for Sql2Entity. (NotNull)
+     */
     public String getSql2EntityOutputDirectory() {
         final String sql2EntityOutputDirectory = doGetPlainSql2EntityOutputDirectory();
         if (sql2EntityOutputDirectory != null) {

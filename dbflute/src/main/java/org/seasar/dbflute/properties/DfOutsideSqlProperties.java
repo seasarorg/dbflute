@@ -383,11 +383,11 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (outputDirectory == null) {
             final String mainOutDir = getSql2EntityOutputDirectory();
             if (!outputPath.equals(mainOutDir)) { // if different
-                _log.info("...Setting up sql2EntityOutputDirectory: " + mainOutDir);
+                _log.info("...Switching sql2EntityOutputDirectory: " + mainOutDir);
                 generator.setOutputPath(mainOutDir); // back to library project
             }
         } else if (!outputPath.equals(outputDirectory)) { // if different
-            _log.info("...Setting up sql2EntityOutputDirectory: " + outputDirectory);
+            _log.info("...Switching sql2EntityOutputDirectory: " + outputDirectory);
             generator.setOutputPath(outputDirectory);
         }
     }

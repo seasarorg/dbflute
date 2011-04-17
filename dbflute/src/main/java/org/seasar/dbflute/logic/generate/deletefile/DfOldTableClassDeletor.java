@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 
 /**
@@ -34,7 +33,7 @@ public class DfOldTableClassDeletor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfGenerator _generator;
+    protected final String _outputDirectory;
     protected final DfPackagePathHandler _packagePathHandler;
     protected final List<String> _packagePathList = new ArrayList<String>();
     protected String _classPrefix;
@@ -45,8 +44,8 @@ public class DfOldTableClassDeletor {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOldTableClassDeletor(DfGenerator generator, DfPackagePathHandler packagePathHandler) {
-        _generator = generator;
+    public DfOldTableClassDeletor(String outputDirectory, DfPackagePathHandler packagePathHandler) {
+        _outputDirectory = outputDirectory;
         _packagePathHandler = packagePathHandler;
     }
 
@@ -78,7 +77,7 @@ public class DfOldTableClassDeletor {
      */
     protected List<File> findPackageFileList(String packagePath, final String classPrefix, final String classSuffix) {
         final String packageAsPath = _packagePathHandler.getPackageAsPath(packagePath);
-        final String dirPath = getGeneratorInstance().getOutputPath() + "/" + packageAsPath;
+        final String dirPath = _outputDirectory + "/" + packageAsPath;
         final File dir = new File(dirPath);
         if (!dir.exists() || !dir.isDirectory()) {
             return new ArrayList<File>();
@@ -106,13 +105,6 @@ public class DfOldTableClassDeletor {
             return new ArrayList<File>();
         }
         return Arrays.asList(listFiles);
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    public DfGenerator getGeneratorInstance() {
-        return DfGenerator.getInstance();
     }
 
     // ===================================================================================
