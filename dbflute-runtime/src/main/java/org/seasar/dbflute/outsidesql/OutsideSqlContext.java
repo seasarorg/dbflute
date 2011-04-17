@@ -255,8 +255,12 @@ public class OutsideSqlContext {
         final String pureName = Srl.substringLastRear(standardPath, "/");
         if (pureName.contains("Bhv_")) { // retry for ApplicationBehavior
             final String dir = Srl.substringLastFront(standardPath, "/");
-            final String filteredName = Srl.replace(standardPath, "Bhv_", "BhvAp_");
-            readSql = doReadPlainOutsideSql(sqlFileEncoding, dbmsSuffix, dir + "/" + filteredName);
+            final String filtered = Srl.replace(pureName, "Bhv_", "BhvAp_");
+            final String bhvApPath = dir + "/" + filtered;
+            readSql = doReadPlainOutsideSql(sqlFileEncoding, dbmsSuffix, bhvApPath);
+        }
+        if (readSql != null) {
+            return readSql;
         }
         throwOutsideSqlNotFoundException(standardPath);
         return null; // unreachable
@@ -270,7 +274,7 @@ public class OutsideSqlContext {
             sb.append(" {").append(sqlFileEncoding).append(", ").append(dbmsSuffix).append("}");
             _log.debug(sb.toString());
         }
-        String sql;
+        final String sql;
         if (isExistResource(dbmsPath)) { // at first
             if (_internalDebug && _log.isDebugEnabled()) {
                 _log.debug("Found the outside-SQL for the DBMS: " + dbmsPath);
