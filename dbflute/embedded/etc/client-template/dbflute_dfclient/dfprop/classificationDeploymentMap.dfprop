@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# classificationDeploymentMap: (NotRequired - Default 'map:{}')
+# classificationDeploymentMap: (NotRequired - Default map:{})
 # 
 # The relation between column and classification.
 # 

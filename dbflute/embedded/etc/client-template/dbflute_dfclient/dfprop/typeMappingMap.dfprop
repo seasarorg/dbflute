@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# typeMappingMap: (NotRequired - Default 'map:{}')
+# typeMappingMap: (NotRequired - Default map:{})
 #
 # If you want to change mappings from default mappings,
 # you can specify your original mappings.

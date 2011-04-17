@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# additionalUniqueKeyMap: (NotRequired - Default 'map:{}')
+# additionalUniqueKeyMap: (NotRequired - Default map:{})
 #
 # If unique key does not exist in your database,
 # you can set up here as virtual unique key for DBFlute.

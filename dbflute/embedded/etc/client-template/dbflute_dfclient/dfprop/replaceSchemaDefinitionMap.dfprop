@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# replaceSchemaDefinitionMap: (Default map:{})
+# replaceSchemaDefinitionMap: (NotRequired - Default map:{})
 #
 # The various settings about replace-schema.
 # 

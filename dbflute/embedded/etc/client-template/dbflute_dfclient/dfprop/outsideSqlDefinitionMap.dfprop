@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# outsideSqlDefinitionMap: (NotRequired - Default 'map:{}')
+# outsideSqlDefinitionMap: (NotRequired - Default map:{})
 #
 # The various settings about outsideSql. 
 # 

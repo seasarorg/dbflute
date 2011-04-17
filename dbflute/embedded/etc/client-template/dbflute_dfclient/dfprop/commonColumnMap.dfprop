@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# commonColumnMap: (Default 'map:{}')
+# commonColumnMap: (Default map:{})
 # 
 # The definition of common column(contains auto set-up).
 # For example, the date you registered the record,

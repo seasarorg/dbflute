@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# additionalForeignKeyMap: (NotRequired - Default 'map:{}')
+# additionalForeignKeyMap: (NotRequired - Default map:{})
 #
 # If foreign key does not exist in your database,
 # you can set up here as virtual foreign key for DBFlute.

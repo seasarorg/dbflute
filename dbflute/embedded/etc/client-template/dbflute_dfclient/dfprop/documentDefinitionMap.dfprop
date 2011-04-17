@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# documentDefinitionMap: (NotRequired - Default 'map:{}')
+# documentDefinitionMap: (NotRequired - Default map:{})
 #
 # o documentOutputDirectory (NotRequired - Default './output/doc')
 # o aliasDelimiterInDbComment (NotRequired - Default '')

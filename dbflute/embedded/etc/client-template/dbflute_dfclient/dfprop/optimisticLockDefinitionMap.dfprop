@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# optimisticLockDefinitionMap: (Required)
+# optimisticLockDefinitionMap: (NotRequired - Default map:{})
 #
 # The definition for optimistic lock of DBFlute.
 # 

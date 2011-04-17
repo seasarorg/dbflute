@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# refreshDefinitionMap: (Default 'map:{}')
+# refreshDefinitionMap: (NotRequired - Default map:{})
 #
 # If you use ResourceSynchronizer and specify this property,
 # You don't need to refresh(F5) your eclipse project.
