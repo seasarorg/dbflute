@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 
 /**
@@ -29,6 +31,12 @@ import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
  * @since 0.7.0 (2008/05/07 Wednesday)
  */
 public class DfOldTableClassDeletor {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfOldClassHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -63,7 +71,12 @@ public class DfOldTableClassDeletor {
                     continue;
                 }
                 deletedClassNameList.add(nameWithoutExt);
-                file.delete();
+                if (file.exists()) {
+                    file.delete();
+                } else {
+                    String msg = "Not found the old file: " + file;
+                    _log.warn(msg); // basically framework error
+                }
             }
         }
         return deletedClassNameList;

@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
@@ -29,7 +28,7 @@ public class DfOldClassHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(Database.class);
+    private static final Log _log = LogFactory.getLog(DfOldClassHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -406,10 +405,10 @@ public class DfOldClassHandler {
                     public String setup(Table table) {
                         return table.getBaseEntityClassName();
                     }
-                }, null);
+                }, null, false);
     }
 
-    public void deleteOldCustomizeClass_for_DBMeta() {
+    public void deleteOldCustomizeClass_for_DBMeta() { // has no extended class
         if (_cmentityLocationMap == null) {
             return;
         }
@@ -422,7 +421,7 @@ public class DfOldClassHandler {
             public String setup(Table table) {
                 return table.getDBMetaClassName();
             }
-        }, null);
+        }, null, true);
     }
 
     protected Map<String, List<String>> _deletedOldCustomizeBaseCursorListMap;
@@ -442,7 +441,7 @@ public class DfOldClassHandler {
                     public String setup(Table table) {
                         return table.getBaseEntityClassName() + classSuffix;
                     }
-                }, oldStylePackagePath);
+                }, oldStylePackagePath, false);
     }
 
     protected Map<String, List<String>> _deletedOldCustomizeBaseCursorHandlerListMap;
@@ -462,15 +461,19 @@ public class DfOldClassHandler {
                     public String setup(Table table) {
                         return table.getBaseEntityClassName() + classSuffix;
                     }
-                }, oldStylePackagePath);
+                }, oldStylePackagePath, false);
     }
 
     protected void doDeleteOldCustomizeClass_for_BaseEntity(String packagePath, String classSuffix,
-            Map<String, List<String>> deletedListMap, final NotDeleteTCNSetupper setupper, String oldStylePackagePath) {
+            Map<String, List<String>> deletedListMap, final NotDeleteTCNSetupper setupper, String oldStylePackagePath,
+            boolean removeBasePrefix) {
         if (_cmentityLocationMap == null) {
             return;
         }
-        final String classPrefix = getProjectPrefix() + getBasePrefix();
+        if (deletedListMap == null) { // means it does not have its extended class
+            deletedListMap = new LinkedHashMap<String, List<String>>(); // only for logging
+        }
+        final String classPrefix = getProjectPrefix() + (removeBasePrefix ? "" : getBasePrefix());
         final Set<Entry<String, Map<String, Table>>> entrySet = _cmentityLocationMap.entrySet();
         for (Entry<String, Map<String, Table>> entry : entrySet) {
             final String outputDirectory = entry.getKey();
@@ -491,13 +494,9 @@ public class DfOldClassHandler {
                 deletor.addPackagePath(oldStylePackagePath);
             }
             final List<String> deletedList = deletor.deleteOldTableClass();
-            if (deletedListMap != null) {
-                deletedListMap.put(outputDirectory, deletedList);
-            }
+            deletedListMap.put(outputDirectory, deletedList);
         }
-        if (deletedListMap != null) {
-            showDeleteOldTableFile(deletedListMap);
-        }
+        showDeleteOldTableFile(deletedListMap);
     }
 
     protected Map<String, List<String>> _deletedOldCustomizeBaseParameterBeanListMap;
