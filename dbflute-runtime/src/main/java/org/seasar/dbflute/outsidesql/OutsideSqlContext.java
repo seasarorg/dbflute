@@ -247,6 +247,22 @@ public class OutsideSqlContext {
      */
     protected String readPlainOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
         final String standardPath = _outsideSqlPath;
+        String readSql = doReadPlainOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath);
+        if (readSql != null) {
+            return readSql;
+        }
+        // means not found
+        final String pureName = Srl.substringLastRear(standardPath, "/");
+        if (pureName.contains("Bhv_")) { // retry for ApplicationBehavior
+            final String dir = Srl.substringLastFront(standardPath, "/");
+            final String filteredName = Srl.replace(standardPath, "Bhv_", "BhvAp_");
+            readSql = doReadPlainOutsideSql(sqlFileEncoding, dbmsSuffix, dir + "/" + filteredName);
+        }
+        throwOutsideSqlNotFoundException(standardPath);
+        return null; // unreachable
+    }
+
+    protected String doReadPlainOutsideSql(String sqlFileEncoding, String dbmsSuffix, String standardPath) {
         final String dbmsPath = buildDbmsPath(standardPath, dbmsSuffix);
         if (_internalDebug && _log.isDebugEnabled()) {
             final StringBuilder sb = new StringBuilder();
@@ -267,8 +283,7 @@ public class OutsideSqlContext {
             } else if (isExistResource(standardPath)) { // main
                 sql = readText(standardPath, sqlFileEncoding);
             } else {
-                throwOutsideSqlNotFoundException(standardPath);
-                return null; // unreachable
+                return null; // means not found
             }
         }
         return removeInitialUnicodeBomIfNeeds(sqlFileEncoding, sql);
