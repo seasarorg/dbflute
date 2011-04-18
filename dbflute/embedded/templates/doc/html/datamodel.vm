@@ -159,6 +159,10 @@
 	dl.bqplist dd.subinfo {
 		padding-left: 2em;
 	}
+	dl.bqplist dd.subinfo span.sqlap {
+		font-style: italic;
+		color: #002266;
+	}
 	dl.bqplist dd.subinfo span.file {
 		font-style: italic;
 	}
@@ -326,6 +330,9 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 	</dd>
 #end
 	<dd class="subinfo">
+#if ($table.isBehaviorQueryPathSqlAp($behaviorQueryPath))
+        <span class="sqlap">(${table.getBehaviorQueryPathSqlApProjectName($behaviorQueryPath)})</span>
+#end
 		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
 #if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
 		<span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>

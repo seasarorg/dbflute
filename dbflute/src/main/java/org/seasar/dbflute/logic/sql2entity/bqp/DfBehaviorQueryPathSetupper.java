@@ -62,7 +62,8 @@ public class DfBehaviorQueryPathSetupper {
     public static final String KEY_ENTITY_NAME = "entityName";
     public static final String KEY_BEHAVIOR_NAME = "behaviorName";
     public static final String KEY_BEHAVIOR_QUERY_PATH = "behaviorQueryPath";
-    public static final String KEY_SQL_AP = "sqlAp";
+    public static final String KEY_SQLAP = "sqlAp";
+    public static final String KEY_SQLAP_PROJECT_NAME = "sqlApProjectName";
     public static final String KEY_TITLE = "title";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_SQL = "sql";
@@ -127,7 +128,7 @@ public class DfBehaviorQueryPathSetupper {
             return resultMap;
         }
         final Map<String, Map<String, String>> bqpMap = doExtractBehaviorQueryPathMap(outsideSqlPack);
-        final Map<File, Map<String, Map<String, String>>> resourceMap = createReflectResourceMap(bqpMap);
+        final Map<File, Map<String, Map<String, String>>> resourceMap = createTableResourceMap(bqpMap);
         final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = resourceMap.entrySet();
         for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
             final File bsbhvFile = entry.getKey();
@@ -170,7 +171,8 @@ public class DfBehaviorQueryPathSetupper {
             behaviorQueryElement.put(KEY_BEHAVIOR_NAME, bqpOutsideSqlFile.getBehaviorName());
             behaviorQueryElement.put(KEY_BEHAVIOR_QUERY_PATH, bqpOutsideSqlFile.getBehaviorQueryPath());
             if (outsideSqlFile.isSqlAp()) {
-                behaviorQueryElement.put(KEY_SQL_AP, "true");
+                behaviorQueryElement.put(KEY_SQLAP, "true");
+                behaviorQueryElement.put(KEY_SQLAP_PROJECT_NAME, outsideSqlFile.getProjectName());
             }
             behaviorQueryPathMap.put(path, behaviorQueryElement);
 
@@ -230,11 +232,31 @@ public class DfBehaviorQueryPathSetupper {
 
     /**
      * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
+     * @return The map of table resource. (NotNull)
+     * @throws DfBehaviorNotFoundException When the behavior is not found.
+     */
+    protected Map<File, Map<String, Map<String, String>>> createTableResourceMap(
+            Map<String, Map<String, String>> behaviorQueryPathMap) {
+        return doCreateBhvFileResourceMap(behaviorQueryPathMap, false);
+    }
+
+    /**
+     * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
      * @return The map of reflect resource. (NotNull)
      * @throws DfBehaviorNotFoundException When the behavior is not found.
      */
     protected Map<File, Map<String, Map<String, String>>> createReflectResourceMap(
             Map<String, Map<String, String>> behaviorQueryPathMap) {
+        return doCreateBhvFileResourceMap(behaviorQueryPathMap, true);
+    }
+
+    /**
+     * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
+     * @return The map of base behavior resource. (NotNull)
+     * @throws DfBehaviorNotFoundException When the behavior is not found.
+     */
+    protected Map<File, Map<String, Map<String, String>>> doCreateBhvFileResourceMap(
+            Map<String, Map<String, String>> behaviorQueryPathMap, boolean reflectOnly) {
         if (behaviorQueryPathMap.isEmpty()) {
             return new HashMap<File, Map<String, Map<String, String>>>();
         }
@@ -264,9 +286,9 @@ public class DfBehaviorQueryPathSetupper {
             final Map<String, String> behaviorQueryElementMap = entry.getValue();
             final String behaviorName = behaviorQueryElementMap.get(KEY_BEHAVIOR_NAME); // on SQL file
             final String behaviorQueryPath = behaviorQueryElementMap.get(KEY_BEHAVIOR_QUERY_PATH);
-            final String sqlApExp = behaviorQueryElementMap.get(KEY_SQL_AP);
-            if (sqlApExp != null && "true".equalsIgnoreCase(sqlApExp)) {
-                continue; // out of target for ApplicationOutsideSql
+            final String sqlApExp = behaviorQueryElementMap.get(KEY_SQLAP);
+            if (reflectOnly && sqlApExp != null && "true".equalsIgnoreCase(sqlApExp)) {
+                continue; // out of target for ApplicationOutsideSql if reflect-only
             }
 
             // relation point between SQL file and BsBhv

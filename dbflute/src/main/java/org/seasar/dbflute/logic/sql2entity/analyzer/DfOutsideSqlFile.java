@@ -70,6 +70,10 @@ public class DfOutsideSqlFile {
         return _physicalFile;
     }
 
+    public String getProjectName() {
+        return _outsideSqlLocation.getProjectName();
+    }
+
     public String getSqlDirectory() {
         return _outsideSqlLocation.getSqlDirectory();
     }

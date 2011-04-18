@@ -245,9 +245,10 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             return _outsideSqlLocationList;
         }
         _outsideSqlLocationList = new ArrayList<DfOutsideSqlLocation>();
+        final String mainProjectName = "main"; // basically unused
         final String mainDir = getMainSqlDirectory();
         final String mainOutput = getSql2EntityOutputDirectory();
-        _outsideSqlLocationList.add(createOutsideSqlLocation(mainDir, mainOutput, false));
+        _outsideSqlLocationList.add(createOutsideSqlLocation(mainProjectName, mainDir, mainOutput, false));
         final Object obj = getOutsideSqlDefinitionMap().get("applicationOutsideSqlMap");
         if (obj == null) {
             return _outsideSqlLocationList;
@@ -265,6 +266,17 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         for (Entry<String, Map<String, String>> entry : entrySet) {
             final String applicationDir = entry.getKey();
             final Map<String, String> elementMap = entry.getValue();
+
+            // basically for display
+            final String projectName;
+            {
+                final String lastName = Srl.substringLastRear(applicationDir, "/");
+                if (Srl.is_Null_or_TrimmedEmpty(lastName) || Srl.equalsPlain(lastName, ".", "..")) {
+                    projectName = applicationDir;
+                } else {
+                    projectName = lastName;
+                }
+            }
 
             final String sqlDirectory;
             {
@@ -285,7 +297,8 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
                 sql2EntityOutputDirectory = applicationDir + "/" + plainDir;
             }
 
-            _outsideSqlLocationList.add(createOutsideSqlLocation(sqlDirectory, sql2EntityOutputDirectory, true));
+            _outsideSqlLocationList.add(createOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory,
+                    true));
         }
         return _outsideSqlLocationList;
     }
@@ -308,9 +321,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return plainDir;
     }
 
-    protected DfOutsideSqlLocation createOutsideSqlLocation(String sqlDirectory, String sql2EntityOutputDirectory,
-            boolean sqlAp) {
-        return new DfOutsideSqlLocation(sqlDirectory, sql2EntityOutputDirectory, sqlAp);
+    protected DfOutsideSqlLocation createOutsideSqlLocation(String projectName, String sqlDirectory,
+            String sql2EntityOutputDirectory, boolean sqlAp) {
+        return new DfOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory, sqlAp);
     }
 
     // -----------------------------------------------------

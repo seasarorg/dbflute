@@ -24,6 +24,7 @@ public class DfOutsideSqlLocation {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final String _projectName;
     protected final String _sqlDirectory;
     protected final String _sql2EntityOutputDirectory;
     protected final boolean _sqlAp;
@@ -31,7 +32,8 @@ public class DfOutsideSqlLocation {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOutsideSqlLocation(String sqlDirectory, String sql2EntityOutputDirectory, boolean sqlAp) {
+    public DfOutsideSqlLocation(String projectName, String sqlDirectory, String sql2EntityOutputDirectory, boolean sqlAp) {
+        _projectName = projectName;
         _sqlDirectory = sqlDirectory;
         _sql2EntityOutputDirectory = sql2EntityOutputDirectory;
         _sqlAp = sqlAp;
@@ -40,6 +42,10 @@ public class DfOutsideSqlLocation {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getProjectName() {
+        return _projectName;
+    }
+
     public String getSqlDirectory() {
         return _sqlDirectory;
     }

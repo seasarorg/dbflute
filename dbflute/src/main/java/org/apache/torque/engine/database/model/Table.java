@@ -75,6 +75,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
+import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -2829,7 +2830,7 @@ public class Table {
 
     public String getBehaviorQueryPathPath(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
-        final String path = elementMap.get("path");
+        final String path = elementMap.get(DfBehaviorQueryPathSetupper.KEY_PATH);
         return Srl.is_NotNull_and_NotTrimmedEmpty(path) ? path : "";
     }
 
@@ -2904,6 +2905,18 @@ public class Table {
         } else {
             return "&nbsp;";
         }
+    }
+
+    public boolean isBehaviorQueryPathSqlAp(String behaviorQueryPath) {
+        final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
+        final String sqlAp = elementMap.get(DfBehaviorQueryPathSetupper.KEY_SQLAP);
+        return Srl.is_NotNull_and_NotTrimmedEmpty(sqlAp) ? "true".equals(sqlAp) : false;
+    }
+
+    public String getBehaviorQueryPathSqlApProjectName(String behaviorQueryPath) {
+        final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
+        final String sqlApProjectName = elementMap.get(DfBehaviorQueryPathSetupper.KEY_SQLAP_PROJECT_NAME);
+        return Srl.is_NotNull_and_NotTrimmedEmpty(sqlApProjectName) ? sqlApProjectName : "";
     }
 
     // This method is not necessary because sql2entity cannot use this.
