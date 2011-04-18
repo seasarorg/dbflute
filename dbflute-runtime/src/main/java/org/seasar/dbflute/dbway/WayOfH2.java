@@ -57,6 +57,7 @@ public class WayOfH2 implements DBWay {
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return "23001".equals(sqlState);
+        // changed to latter after about 1.3.154
+        return "23001".equals(sqlState) || "23505".equals(sqlState);
     }
 }
