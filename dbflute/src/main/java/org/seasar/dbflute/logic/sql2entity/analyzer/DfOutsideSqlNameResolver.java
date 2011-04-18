@@ -18,7 +18,9 @@ package org.seasar.dbflute.logic.sql2entity.analyzer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfIllegalAutoNamingClassNameException;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -69,10 +71,20 @@ public class DfOutsideSqlNameResolver {
             throw new IllegalStateException(msg);
         }
         final int beginIndex;
-        if (fileName.contains("Bhv_")) {
-            beginIndex = fileName.indexOf("Bhv_") + "Bhv_".length();
-        } else {
-            beginIndex = 0;
+        {
+            // search both types 'fooBhv_', 'fooBhvAp_'
+            final String bhvSuffix = "Bhv_";
+            if (fileName.contains(bhvSuffix)) {
+                beginIndex = fileName.indexOf(bhvSuffix) + bhvSuffix.length();
+            } else {
+                final String additionalSuffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
+                final String bhvApSuffix = additionalSuffix + "_";
+                if (fileName.contains(bhvApSuffix)) {
+                    beginIndex = fileName.indexOf(bhvApSuffix) + bhvApSuffix.length();
+                } else {
+                    beginIndex = 0;
+                }
+            }
         }
         String tmp = fileName.substring(beginIndex);
         int endIndex = tmp.indexOf("_");
@@ -148,5 +160,16 @@ public class DfOutsideSqlNameResolver {
 
     protected String ln() {
         return "\n";
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
     }
 }

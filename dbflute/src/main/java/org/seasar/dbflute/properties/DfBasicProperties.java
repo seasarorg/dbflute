@@ -519,7 +519,24 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getApplicationBehaviorAdditionalSuffix() { // It's closet!
+        // but does not work well because other tools handle fixed 'AP'
         return getProperty("applicationBehaviorAdditionalSuffix", "Ap", getApplicationBehaviorMap());
+    }
+
+    public String getBhvApResolvedProjectPrefix() {
+        if (isApplicationBehaviorProject()) {
+            return getLibraryProjectPrefix();
+        } else {
+            return getProjectPrefix();
+        }
+    }
+
+    public String getBhvApResolvedBehaviorSuffix() {
+        if (isApplicationBehaviorProject()) {
+            return "Bhv" + getApplicationBehaviorAdditionalSuffix();
+        } else {
+            return "Bhv";
+        }
     }
 
     // ===================================================================================
