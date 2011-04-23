@@ -17,7 +17,6 @@ import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler;
-import org.seasar.dbflute.logic.doc.dataxls.DfTemplateDataTableInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
@@ -51,17 +50,14 @@ public class DfLoadDataMigration {
     public void outputData(Database database) {
         final List<List<Table>> orderedList = analyzeOrder(database);
         final DfDataXlsTemplateHandler handler = new DfDataXlsTemplateHandler(_dataSource);
+        handler.setupContainsCommonColumn();
         handler.setupOverLimitTruncated();
         int sectionNo = 1;
         for (List<Table> tableList : orderedList) {
-            final Map<String, DfTemplateDataTableInfo> tableInfoMap = new LinkedHashMap<String, DfTemplateDataTableInfo>();
+            final Map<String, Table> tableInfoMap = new LinkedHashMap<String, Table>();
             _log.info("[Section " + sectionNo + "]");
             for (Table table : tableList) {
-                final DfTemplateDataTableInfo tableInfo = new DfTemplateDataTableInfo();
-                tableInfo.setTableDbName(table.getName());
-                tableInfo.setTableSqlName(table.getTableSqlNameDirectUse());
-                tableInfo.setColumnList(table.getColumnList());
-                tableInfoMap.put(table.getName(), tableInfo);
+                tableInfoMap.put(table.getName(), table);
             }
             final String directoryPath = getCurrentTypeDataDirectoryPath();
             final String number = (sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo));

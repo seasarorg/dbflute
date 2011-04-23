@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
@@ -38,6 +39,7 @@ public class DfDataXlsTemplateHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected final DataSource _dataSource;
+    protected boolean _containsCommonColumn;
     protected boolean _overLimitTruncated;
 
     // ===================================================================================
@@ -52,19 +54,19 @@ public class DfDataXlsTemplateHandler {
     //                                                                          ==========
     /**
      * Output data excel templates. (using dataSource)
-     * @param tableInfoMap The map of table info. (NotNull)
+     * @param tableInfoMap The map of table. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of xls. (NotNull)
      * @return The result of dump. (NotNull)
      */
-    public DfDataXlsTemplateResult outputData(Map<String, DfTemplateDataTableInfo> tableInfoMap, int limit, File xlsFile) {
+    public DfDataXlsTemplateResult outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile) {
         filterUnsupportedTable(tableInfoMap);
         final DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(_dataSource);
         final Map<String, List<Map<String, String>>> templateDataMap = extractor.extractData(tableInfoMap, limit);
         return transferToXls(tableInfoMap, templateDataMap, xlsFile);
     }
 
-    protected void filterUnsupportedTable(Map<String, DfTemplateDataTableInfo> tableInfoMap) {
+    protected void filterUnsupportedTable(Map<String, Table> tableInfoMap) {
         // additional tables are unsupported here
         // because it's not an important function
         final Map<String, Object> additionalTableMap = getAdditionalTableProperties().getAdditionalTableMap();
@@ -78,11 +80,12 @@ public class DfDataXlsTemplateHandler {
 
     /**
      * Transfer data to excel. (state-less)
+     * @param tableMap The map of table. (NotNull)
      * @param templateDataMap The map of template data. (NotNull)
      * @param xlsFile The file of xls. (NotNull)
      * @return The result of dump. (NotNull)
      */
-    protected DfDataXlsTemplateResult transferToXls(Map<String, DfTemplateDataTableInfo> tableInfoMap,
+    protected DfDataXlsTemplateResult transferToXls(Map<String, Table> tableMap,
             Map<String, List<Map<String, String>>> templateDataMap, File xlsFile) {
         final Map<String, List<Column>> overTableColumnMap = new LinkedHashMap<String, List<Column>>();
         final Map<String, List<Map<String, String>>> overTemplateDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
@@ -92,8 +95,8 @@ public class DfDataXlsTemplateHandler {
         final int xlsLimit = XLS_LIMIT;
         _log.info("...Transferring " + templateDataMap.size() + " tables to xls files");
         for (String tableDbName : tableDbNameSet) {
-            final DfTemplateDataTableInfo tableInfo = tableInfoMap.get(tableDbName);
-            final List<Column> columnList = tableInfo.getColumnList();
+            final Table table = tableMap.get(tableDbName);
+            final List<Column> columnList = table.getColumnList();
             final int dotIndex = tableDbName.indexOf(".");
             final DfDataTable dataTable;
             if (dotIndex >= 0) {
@@ -104,6 +107,9 @@ public class DfDataXlsTemplateHandler {
             }
             int columnIndex = 0;
             for (Column column : columnList) {
+                if (isExceptCommonColumn(column)) {
+                    continue;
+                }
                 dataTable.addColumn(column.getName(), DfDtsColumnTypes.STRING);
                 ++columnIndex;
             }
@@ -127,6 +133,9 @@ public class DfDataXlsTemplateHandler {
                 final Set<String> columnNameSet = recordMap.keySet();
                 final DfDataRow dataRow = dataTable.addRow();
                 for (String columnName : columnNameSet) {
+                    if (!dataTable.hasColumn(columnName)) {
+                        continue; // basically excepted common columns
+                    }
                     final String value = recordMap.get(columnName);
                     dataRow.addValue(columnName, value);
                 }
@@ -149,6 +158,10 @@ public class DfDataXlsTemplateHandler {
         return templateDataResult;
     }
 
+    protected boolean isExceptCommonColumn(Column column) {
+        return !_containsCommonColumn && column.isCommonColumn();
+    }
+
     protected DfXlsWriter createXlsWriter(File xlsFile) {
         // The xls file should have all string cell type for replace-schema. 
         return new DfXlsWriter(xlsFile).stringCellType();
@@ -157,6 +170,10 @@ public class DfDataXlsTemplateHandler {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    public void setupContainsCommonColumn() { // option
+        _containsCommonColumn = true;
+    }
+
     public void setupOverLimitTruncated() { // option
         _overLimitTruncated = true;
     }

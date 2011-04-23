@@ -947,6 +947,16 @@ public class Table {
         return fkList;
     }
 
+    public ForeignKey getSelfReferenceForeignKey() { // returns first found
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        for (ForeignKey fk : foreignKeyList) {
+            if (fk.isSelfReference()) {
+                return fk;
+            }
+        }
+        return null;
+    }
+
     /**
      * A utility function to create a new foreign key
      * from attrib and add it to this table.
@@ -1098,6 +1108,16 @@ public class Table {
      */
     public boolean hasRelation() {
         return (hasForeignKey() || hasReferrer());
+    }
+
+    public boolean hasSelfReference() {
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        for (ForeignKey fk : foreignKeyList) {
+            if (fk.isSelfReference()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

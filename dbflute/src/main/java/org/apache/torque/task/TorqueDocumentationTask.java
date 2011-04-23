@@ -79,7 +79,6 @@ import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateResult;
-import org.seasar.dbflute.logic.doc.dataxls.DfTemplateDataTableInfo;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -147,7 +146,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* Data Xls Template *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        final Map<String, DfTemplateDataTableInfo> tableInfoMap = new LinkedHashMap<String, DfTemplateDataTableInfo>();
+        final Map<String, Table> tableInfoMap = new LinkedHashMap<String, Table>();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
         final Map<String, String> commonColumnMap = getCommonColumnMap();
         final Database database = _schemaData.getDatabase();
@@ -161,22 +160,21 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                 }
                 columnNameList.add(column);
             }
-            final DfTemplateDataTableInfo tableInfo = new DfTemplateDataTableInfo();
-            tableInfo.setTableDbName(table.getName());
-            tableInfo.setTableSqlName(table.getTableSqlNameDirectUse());
-            tableInfo.setColumnList(columnNameList);
-            tableInfoMap.put(table.getName(), tableInfo);
+            tableInfoMap.put(table.getName(), table);
         }
         _log.info("...Outputting data xls template: tables=" + tableInfoMap.size());
         outputDataXlsTemplate(tableInfoMap);
         _log.info("");
     }
 
-    protected void outputDataXlsTemplate(Map<String, DfTemplateDataTableInfo> tableInfoMap) {
-        final DfDataXlsTemplateHandler xlsHandler = new DfDataXlsTemplateHandler(getDataSource());
+    protected void outputDataXlsTemplate(Map<String, Table> tableMap) {
+        final DfDataXlsTemplateHandler handler = new DfDataXlsTemplateHandler(getDataSource());
+        if (isDataXlsTemplateContainsCommonColumn()) {
+            handler.setupContainsCommonColumn();
+        }
         final Integer limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
-        final DfDataXlsTemplateResult outputResult = xlsHandler.outputData(tableInfoMap, limit, xlsFile);
+        final DfDataXlsTemplateResult outputResult = handler.outputData(tableMap, limit, xlsFile);
         outputDataCsvTemplate(outputResult);
     }
 

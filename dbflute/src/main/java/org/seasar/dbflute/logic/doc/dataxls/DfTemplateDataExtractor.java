@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.ForeignKey;
+import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
@@ -47,28 +49,31 @@ public class DfTemplateDataExtractor {
     //                                                                             =======
     /**
      * Extract data for template.
-     * @param tableInfoMap The map of table info. (NotNull)
+     * @param tableMap The map of table. (NotNull)
      * @param limit The limit of records. (If it's minus value, extracts all records.)
      */
-    public Map<String, List<Map<String, String>>> extractData(Map<String, DfTemplateDataTableInfo> tableInfoMap,
-            int limit) {
+    public Map<String, List<Map<String, String>>> extractData(Map<String, Table> tableMap, int limit) {
         final Map<String, List<Map<String, String>>> templateDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
-        for (Entry<String, DfTemplateDataTableInfo> entry : tableInfoMap.entrySet()) {
+        for (Entry<String, Table> entry : tableMap.entrySet()) {
             final String tableDbName = entry.getKey();
-            final DfTemplateDataTableInfo tableInfo = entry.getValue();
-            final List<Map<String, Object>> objectList = selectObjectList(tableInfo, limit);
+            final Table table = entry.getValue();
+            final List<Map<String, Object>> objectList = selectObjectList(table, limit);
             final List<Map<String, String>> resultList = createResultList(objectList);
             templateDataMap.put(tableDbName, resultList);
         }
         return templateDataMap;
     }
 
-    protected List<Map<String, Object>> selectObjectList(DfTemplateDataTableInfo tableInfo, int limit) {
-        final String tableSqlName = tableInfo.getTableSqlName();
-        final List<Column> columnList = tableInfo.getColumnList();
-        final String selectClause = buildSelectClause(columnList);
-        final String fromClause = buildFromClause(tableSqlName);
-        final String sql = selectClause + " " + fromClause;
+    protected List<Map<String, Object>> selectObjectList(Table table, int limit) {
+        final String tableSqlName = table.getTableSqlNameDirectUse();
+        final List<Column> columnList = table.getColumnList();
+        final String sql;
+        {
+            final String selectClause = buildSelectClause(columnList);
+            final String fromClause = buildFromClause(tableSqlName);
+            final String orderByClause = buildOrderByClause(table);
+            sql = selectClause + fromClause + orderByClause;
+        }
         final Map<String, ValueType> columnValueTypeMap = new LinkedHashMap<String, ValueType>();
         for (Column column : columnList) {
             final String columnName = column.getName();
@@ -134,7 +139,20 @@ public class DfTemplateDataExtractor {
     }
 
     protected String buildFromClause(String tableName) {
-        return "from " + tableName;
+        return " from " + tableName;
+    }
+
+    protected String buildOrderByClause(Table table) {
+        final ForeignKey selfReferenceFK = table.getSelfReferenceForeignKey();
+        final String orderBy;
+        if (selfReferenceFK != null && selfReferenceFK.isSimpleKeyFK()) {
+            final Column firstColumn = table.getColumn(selfReferenceFK.getFirstLocalColumnName());
+            final String firstName = firstColumn.getColumnSqlNameDirectUse();
+            orderBy = " order by " + firstName + " is not null asc, " + firstName + " asc";
+        } else {
+            orderBy = "";
+        }
+        return orderBy;
     }
 
     protected List<Map<String, String>> createResultList(List<Map<String, Object>> objectList) {
