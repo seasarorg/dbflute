@@ -16,8 +16,10 @@ import javax.sql.DataSource;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
 import org.seasar.dbflute.s2dao.valuetype.basic.TimeType;
 import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
@@ -72,7 +74,8 @@ public class DfTemplateDataExtractor {
             final String selectClause = buildSelectClause(columnList);
             final String fromClause = buildFromClause(tableSqlName);
             final String orderByClause = buildOrderByClause(table);
-            sql = selectClause + fromClause + orderByClause;
+            final String sqlSuffix = buildSqlSuffix(table, limit);
+            sql = selectClause + fromClause + orderByClause + sqlSuffix;
         }
         final Map<String, ValueType> columnValueTypeMap = new LinkedHashMap<String, ValueType>();
         for (Column column : columnList) {
@@ -155,6 +158,17 @@ public class DfTemplateDataExtractor {
         return orderBy;
     }
 
+    protected String buildSqlSuffix(Table table, int limit) {
+        if (limit < 1) {
+            return "";
+        }
+        final DfBasicProperties prop = getBasicProperties();
+        if (prop.isDatabaseMySQL() || prop.isDatabasePostgreSQL() || prop.isDatabaseH2()) {
+            return " limit " + limit;
+        }
+        return "";
+    }
+
     protected List<Map<String, String>> createResultList(List<Map<String, Object>> objectList) {
         final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
         for (Map<String, Object> recordMap : objectList) {
@@ -186,5 +200,13 @@ public class DfTemplateDataExtractor {
     protected String formatDate(Date date, String pattern) {
         final String prefix = (DfTypeUtil.isDateBC(date) ? "BC" : "");
         return prefix + DfTypeUtil.toString(date, pattern);
+    }
+
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
     }
 }
