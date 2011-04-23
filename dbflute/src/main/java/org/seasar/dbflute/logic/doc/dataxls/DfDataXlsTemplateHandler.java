@@ -30,6 +30,8 @@ public class DfDataXlsTemplateHandler {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfLoadDataMigration.class);
 
+    public static final int XLS_LIMIT = 65000; // about
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -55,8 +57,8 @@ public class DfDataXlsTemplateHandler {
      */
     public DfDataXlsTemplateResult outputData(Map<String, DfTemplateDataTableInfo> tableInfoMap, int limit, File xlsFile) {
         final DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(_dataSource);
-        final Map<String, List<Map<String, String>>> dumpDataMap = extractor.extractData(tableInfoMap, limit);
-        return transferToXls(tableInfoMap, dumpDataMap, xlsFile);
+        final Map<String, List<Map<String, String>>> templateDataMap = extractor.extractData(tableInfoMap, limit);
+        return transferToXls(tableInfoMap, templateDataMap, xlsFile);
     }
 
     /**
@@ -73,7 +75,7 @@ public class DfDataXlsTemplateHandler {
 
         final Set<String> tableDbNameSet = templateDataMap.keySet();
         final DfDataSet dataSet = new DfDataSet();
-        final int xlsLimit = 65000; // about
+        final int xlsLimit = XLS_LIMIT;
         _log.info("...Transferring " + templateDataMap.size() + " tables to xls files");
         for (String tableDbName : tableDbNameSet) {
             final DfTemplateDataTableInfo tableInfo = tableInfoMap.get(tableDbName);
@@ -91,15 +93,20 @@ public class DfDataXlsTemplateHandler {
                 dataTable.addColumn(column.getName(), DfDtsColumnTypes.STRING);
                 ++columnIndex;
             }
-            List<Map<String, String>> recordList = templateDataMap.get(tableDbName);
-            _log.info("  " + tableDbName + " (" + recordList.size() + ")");
-            if (recordList.size() > xlsLimit) {
-                if (_overLimitTruncated) {
-                    recordList = recordList.subList(0, xlsLimit);
+            final List<Map<String, String>> recordList;
+            {
+                List<Map<String, String>> extractedList = templateDataMap.get(tableDbName);
+                _log.info("  " + tableDbName + " (" + extractedList.size() + ")");
+                if (extractedList.size() > xlsLimit) {
+                    if (_overLimitTruncated) {
+                        recordList = extractedList.subList(0, xlsLimit);
+                    } else {
+                        overTableColumnMap.put(tableDbName, columnList);
+                        overTemplateDataMap.put(tableDbName, extractedList);
+                        continue;
+                    }
                 } else {
-                    overTableColumnMap.put(tableDbName, columnList);
-                    overTemplateDataMap.put(tableDbName, recordList);
-                    continue;
+                    recordList = extractedList;
                 }
             }
             for (Map<String, String> recordMap : recordList) {

@@ -57,6 +57,9 @@ public class DfLoadDataMigration {
             final Map<String, DfTemplateDataTableInfo> tableInfoMap = new LinkedHashMap<String, DfTemplateDataTableInfo>();
             _log.info("[Section " + sectionNo + "]");
             for (Table table : tableList) {
+                if (table.isAdditionalSchema()) {
+                    continue; // because tables on main schema only are target
+                }
                 final DfTemplateDataTableInfo tableInfo = new DfTemplateDataTableInfo();
                 tableInfo.setTableDbName(table.getName());
                 tableInfo.setTableSqlName(table.getTableSqlNameDirectUse());
@@ -67,10 +70,10 @@ public class DfLoadDataMigration {
             final String number = (sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo));
             final File baseDir = new File(directoryPath);
             if (!baseDir.exists()) {
-                baseDir.mkdir();
+                baseDir.mkdirs();
             }
-            final File xlsFile = new File(directoryPath + "/migration-section-" + number + ".xls");
-            handler.outputData(tableInfoMap, -1, xlsFile);
+            final File xlsFile = new File(directoryPath + "/migration-data-section" + number + ".xls");
+            handler.outputData(tableInfoMap, DfDataXlsTemplateHandler.XLS_LIMIT, xlsFile);
             ++sectionNo;
         }
     }
