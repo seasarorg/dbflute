@@ -148,16 +148,11 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final Map<String, DfTemplateDataTableInfo> tableInfoMap = new LinkedHashMap<String, DfTemplateDataTableInfo>();
-        final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
-        final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
         final Map<String, String> commonColumnMap = getCommonColumnMap();
         final Database database = _schemaData.getDatabase();
         final List<Table> tableList = database.getTableList();
         for (Table table : tableList) {
-            if (additionalTableMap.containsKey(table.getName())) {
-                continue;
-            }
             final Column[] columns = table.getColumns();
             final List<Column> columnNameList = new ArrayList<Column>();
             for (Column column : columns) {
@@ -235,8 +230,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     // ===================================================================================
-    //                                                                  Related Properties
-    //                                                                  ==================
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
     }
@@ -269,6 +264,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     public boolean isGenerateProcedureParameterBean() {
         return getProperties().getOutsideSqlProperties().isGenerateProcedureParameterBean();
+    }
+
+    protected DfAdditionalTableProperties getAdditionalTableProperties() {
+        return getProperties().getAdditionalTableProperties();
     }
 
     // ===================================================================================

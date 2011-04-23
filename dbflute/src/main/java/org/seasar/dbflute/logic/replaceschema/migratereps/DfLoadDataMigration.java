@@ -57,9 +57,6 @@ public class DfLoadDataMigration {
             final Map<String, DfTemplateDataTableInfo> tableInfoMap = new LinkedHashMap<String, DfTemplateDataTableInfo>();
             _log.info("[Section " + sectionNo + "]");
             for (Table table : tableList) {
-                if (table.isAdditionalSchema()) {
-                    continue; // because tables on main schema only are target
-                }
                 final DfTemplateDataTableInfo tableInfo = new DfTemplateDataTableInfo();
                 tableInfo.setTableDbName(table.getName());
                 tableInfo.setTableSqlName(table.getTableSqlNameDirectUse());
@@ -109,7 +106,9 @@ public class DfLoadDataMigration {
         final List<Table> unregisteredTableList = new ArrayList<Table>();
         final List<Table> elementList = new ArrayList<Table>();
         for (Table table : tableList) {
-            if (table.isTypeView()) {
+            if (table.isTypeView() || table.isAdditionalSchema()) {
+                // view object - view is not an object which has own data
+                // additional schema - tables on main schema only are target
                 continue;
             }
             final List<ForeignKey> foreignKeyList = table.getForeignKeyList();

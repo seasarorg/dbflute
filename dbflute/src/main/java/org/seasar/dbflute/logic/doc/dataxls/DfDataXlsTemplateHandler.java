@@ -11,12 +11,14 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
 import org.seasar.dbflute.logic.replaceschema.migratereps.DfLoadDataMigration;
+import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 
 /**
  * @author jflute
@@ -35,7 +37,7 @@ public class DfDataXlsTemplateHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource _dataSource;
+    protected final DataSource _dataSource;
     protected boolean _overLimitTruncated;
 
     // ===================================================================================
@@ -56,9 +58,22 @@ public class DfDataXlsTemplateHandler {
      * @return The result of dump. (NotNull)
      */
     public DfDataXlsTemplateResult outputData(Map<String, DfTemplateDataTableInfo> tableInfoMap, int limit, File xlsFile) {
+        filterUnsupportedTable(tableInfoMap);
         final DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(_dataSource);
         final Map<String, List<Map<String, String>>> templateDataMap = extractor.extractData(tableInfoMap, limit);
         return transferToXls(tableInfoMap, templateDataMap, xlsFile);
+    }
+
+    protected void filterUnsupportedTable(Map<String, DfTemplateDataTableInfo> tableInfoMap) {
+        // additional tables are unsupported here
+        // because it's not an important function
+        final Map<String, Object> additionalTableMap = getAdditionalTableProperties().getAdditionalTableMap();
+        final Set<String> keySet = additionalTableMap.keySet();
+        for (String key : keySet) {
+            if (tableInfoMap.containsKey(key)) {
+                tableInfoMap.remove(key);
+            }
+        }
     }
 
     /**
@@ -69,7 +84,6 @@ public class DfDataXlsTemplateHandler {
      */
     protected DfDataXlsTemplateResult transferToXls(Map<String, DfTemplateDataTableInfo> tableInfoMap,
             Map<String, List<Map<String, String>>> templateDataMap, File xlsFile) {
-
         final Map<String, List<Column>> overTableColumnMap = new LinkedHashMap<String, List<Column>>();
         final Map<String, List<Map<String, String>>> overTemplateDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
 
@@ -140,7 +154,21 @@ public class DfDataXlsTemplateHandler {
         return new DfXlsWriter(xlsFile).stringCellType();
     }
 
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
     public void setupOverLimitTruncated() { // option
         _overLimitTruncated = true;
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfAdditionalTableProperties getAdditionalTableProperties() {
+        return getProperties().getAdditionalTableProperties();
     }
 }
