@@ -75,6 +75,8 @@
     classname="org.seasar.dbflute.task.replaceschema.DfLoadDataTask"/>
   <taskdef name="df-take-finally" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.replaceschema.DfTakeFinallyTask"/>
+  <taskdef name="df-migrate-reps" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.replaceschema.migrate.DfMigrateRepsTask"/>
 
   <!--
     for Ant-Contrib
@@ -233,6 +235,20 @@
         beforeTimestamp="${now.date}"
         environmentType="${dfenv}">
     </df-take-finally>
+  </target>
+
+  <target name="migrate-reps" description="==> replace-schema">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Migrate from DB to Replace-Schema !           |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+
+    <df-migrate-reps
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}">
+    </df-migrate-reps>
   </target>
 
   <target name="outside-sql-test" description="==> outside-sql-test">

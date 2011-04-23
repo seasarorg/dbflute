@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -86,7 +86,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     @Override
     protected void doExecute() {
         _log.info("");
-        _log.info("{Replace Schema Properties}");
+        _log.info("{ReplaceSchema Properties}");
         _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
         _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
         initializeSchema();
@@ -514,8 +514,8 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfReplaceSchemaProperties getMyProperties() {
         return DfBuildProperties.getInstance().getReplaceSchemaProperties();
     }

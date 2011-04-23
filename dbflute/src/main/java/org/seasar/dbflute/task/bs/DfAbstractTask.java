@@ -37,6 +37,7 @@ import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -381,18 +382,6 @@ public abstract class DfAbstractTask extends Task {
         }
     }
 
-    protected DfBuildProperties getProperties() {
-        return DfBuildProperties.getInstance();
-    }
-
-    protected DfBasicProperties getBasicProperties() {
-        return getProperties().getBasicProperties();
-    }
-
-    protected DfDatabaseProperties getDatabaseProperties() {
-        return getProperties().getDatabaseProperties();
-    }
-
     // ===================================================================================
     //                                                                 SQL File Collecting
     //                                                                 ===================
@@ -403,6 +392,29 @@ public abstract class DfAbstractTask extends Task {
     protected DfOutsideSqlPack collectSqlFileList() {
         final DfOutsideSqlCollector sqlFileCollector = new DfOutsideSqlCollector();
         return sqlFileCollector.collectOutsideSql();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    public String getTargetDatabase() {
+        return getBasicProperties().getDatabaseType();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

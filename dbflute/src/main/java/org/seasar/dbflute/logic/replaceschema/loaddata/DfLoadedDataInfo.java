@@ -26,6 +26,17 @@ import java.util.Map;
 public class DfLoadedDataInfo {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String COMMON_ENV_TYPE = "common";
+    public static final String TSV_FILE_TYPE = "tsv";
+    public static final String CSV_FILE_TYPE = "csv";
+    public static final String XLS_FILE_TYPE = "xls";
+    public static final String FIRSTXLS_FILE_TYPE = "firstxls";
+    public static final String TSV_DELIMITER = "\t";
+    public static final String CSV_DELIMITER = ",";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final List<DfLoadedFile> _loadedFileList = new ArrayList<DfLoadedFile>();

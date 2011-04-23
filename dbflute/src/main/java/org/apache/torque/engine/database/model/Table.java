@@ -328,6 +328,10 @@ public class Table {
         return _type != null && _type.equalsIgnoreCase("table");
     }
 
+    public boolean isTypeView() {
+        return _type != null && _type.equalsIgnoreCase("view");
+    }
+
     // -----------------------------------------------------
     //                                          Table Schema
     //                                          ------------

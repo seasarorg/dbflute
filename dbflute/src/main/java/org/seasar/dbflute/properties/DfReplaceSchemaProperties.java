@@ -96,6 +96,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return dir + "/data/" + envType + "/" + typeName;
     }
 
+    public String getCurrentTypeDataDirectoryPath(String typeName) {
+        final String playSqlDirectory = getReplaceSchemaPlaySqlDirectory();
+        final String dataLoadingType = getDataLoadingType();
+        return playSqlDirectory + "/data/" + dataLoadingType + "/" + typeName;
+    }
+
     // ===================================================================================
     //                                                                   Data Loading Type
     //                                                                   =================

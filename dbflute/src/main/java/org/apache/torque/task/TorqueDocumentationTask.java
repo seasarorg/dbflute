@@ -78,7 +78,8 @@ import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler.TemplateDataResult;
+import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateResult;
+import org.seasar.dbflute.logic.doc.dataxls.DfTemplateDataTableInfo;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -146,7 +147,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* Data Xls Template *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        final Map<String, List<Column>> tableColumnMap = new LinkedHashMap<String, List<Column>>();
+        final Map<String, DfTemplateDataTableInfo> tableInfoMap = new LinkedHashMap<String, DfTemplateDataTableInfo>();
         final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
@@ -165,22 +166,26 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                 }
                 columnNameList.add(column);
             }
-            tableColumnMap.put(table.getTableSqlNameDirectUse(), columnNameList);
+            final DfTemplateDataTableInfo tableInfo = new DfTemplateDataTableInfo();
+            tableInfo.setTableDbName(table.getName());
+            tableInfo.setTableSqlName(table.getTableSqlNameDirectUse());
+            tableInfo.setColumnList(columnNameList);
+            tableInfoMap.put(table.getName(), tableInfo);
         }
-        _log.info("...Outputting data xls template: tables=" + tableColumnMap.size());
-        outputDataXlsTemplate(tableColumnMap);
+        _log.info("...Outputting data xls template: tables=" + tableInfoMap.size());
+        outputDataXlsTemplate(tableInfoMap);
         _log.info("");
     }
 
-    protected void outputDataXlsTemplate(Map<String, List<Column>> tableColumnMap) {
+    protected void outputDataXlsTemplate(Map<String, DfTemplateDataTableInfo> tableInfoMap) {
         final DfDataXlsTemplateHandler xlsHandler = new DfDataXlsTemplateHandler(getDataSource());
         final Integer limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
-        final TemplateDataResult outputResult = xlsHandler.outputData(tableColumnMap, limit, xlsFile);
+        final DfDataXlsTemplateResult outputResult = xlsHandler.outputData(tableInfoMap, limit, xlsFile);
         outputDataCsvTemplate(outputResult);
     }
 
-    protected void outputDataCsvTemplate(TemplateDataResult outputResult) {
+    protected void outputDataCsvTemplate(DfDataXlsTemplateResult outputResult) {
         final Map<String, List<Column>> overTableColumnMap = outputResult.getOverTableColumnMap();
         if (overTableColumnMap.isEmpty()) {
             return;

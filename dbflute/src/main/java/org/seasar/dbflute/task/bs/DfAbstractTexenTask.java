@@ -770,6 +770,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return getProperties().getBasicProperties();
     }
 
+    public String getTargetDatabase() {
+        return getBasicProperties().getDatabaseType();
+    }
+
     protected DfDatabaseProperties getDatabaseProperties() {
         return getProperties().getDatabaseProperties();
     }
@@ -795,10 +799,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getTargetDatabase() {
-        return getBasicProperties().getDatabaseType();
-    }
-
     public void setEnvironmentType(String environmentType) {
         DfEnvironmentType.getInstance().setEnvironmentType(environmentType);
     }

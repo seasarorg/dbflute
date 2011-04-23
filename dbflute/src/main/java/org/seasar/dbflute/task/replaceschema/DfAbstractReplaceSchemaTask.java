@@ -41,8 +41,8 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
     protected DfReplaceSchemaFinalInfo _replaceSchemaFinalInfo;
 
     // ===================================================================================
-    //                                                                 DataSource Override
-    //                                                                 ===================
+    //                                                                          DataSource
+    //                                                                          ==========
     @Override
     protected boolean isUseDataSource() {
         return true;

@@ -33,12 +33,13 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfLoadDataTask.class);
     protected static final String LOG_PATH = "./log/load-data.log";
-    protected static final String COMMON_ENV_TYPE = "common";
-    protected static final String TSV_FILE_TYPE = "tsv";
-    protected static final String CSV_FILE_TYPE = "csv";
-    protected static final String XLS_FILE_TYPE = "xls";
-    protected static final String TSV_DELIMITER = "\t";
-    protected static final String CSV_DELIMITER = ",";
+    protected static final String COMMON_ENV_TYPE = DfLoadedDataInfo.COMMON_ENV_TYPE;
+    public static final String TSV_FILE_TYPE = DfLoadedDataInfo.TSV_FILE_TYPE;
+    public static final String CSV_FILE_TYPE = DfLoadedDataInfo.CSV_FILE_TYPE;
+    public static final String XLS_FILE_TYPE = DfLoadedDataInfo.XLS_FILE_TYPE;
+    public static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
+    protected static final String TSV_DELIMITER = DfLoadedDataInfo.TSV_DELIMITER;
+    protected static final String CSV_DELIMITER = DfLoadedDataInfo.CSV_DELIMITER;
 
     // ===================================================================================
     //                                                                           Attribute
@@ -63,19 +64,24 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         try {
-            // common (tsv -> csv -> xls)
+            // applicationPlaySql is used only for xls,
+            // which is the fixed specification
+
+            // common (firstxls -> tsv -> csv -> xls)
+            writeDbFromXlsAsCommonDataFirst();
+            writeDbFromXlsAsCommonDataAppFirst();
             writeDbFromDelimiterFileAsCommonData(TSV_FILE_TYPE, TSV_DELIMITER);
             writeDbFromDelimiterFileAsCommonData(CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsCommonData();
-            // additionalPlaySql is used only for xls
-            // this is the fixed specification
-            writeDbFromXlsAsCommonDataAdditional();
+            writeDbFromXlsAsCommonDataApp();
 
-            // specified environment (tsv -> csv -> xls)
+            // specified environment (firstxls -> tsv -> csv -> xls)
+            writeDbFromXlsAsLoadingTypeDataFirst();
+            writeDbFromXlsAsLoadingTypeDataAppFirst();
             writeDbFromDelimiterFileAsLoadingTypeData(TSV_FILE_TYPE, TSV_DELIMITER);
             writeDbFromDelimiterFileAsLoadingTypeData(CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsLoadingTypeData();
-            writeDbFromXlsAsLoadingTypeDataAdditional();
+            writeDbFromXlsAsLoadingTypeDataApp();
             _success = true; // means no exception
         } finally {
             try {
@@ -120,7 +126,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
         final String envType = getDataLoadingType();
         final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, fileType);
-        writeDbFromDelimiterFile(envType, path, fileType, delimter);
+        writeDbFromDelimiterFile(getDataLoadingType(), path, fileType, delimter);
     }
 
     protected void writeDbFromDelimiterFile(String envType, String directoryPath, String fileType, String delimiter) {
@@ -183,36 +189,82 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     // --------------------------------------------
     //                                     Xls Data
     //                                     --------
-    protected void writeDbFromXlsAsCommonData() {
-        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
-        final String path = doGetCommonDataDirectoryPath(dir, XLS_FILE_TYPE);
-        writeDbFromXls(COMMON_ENV_TYPE, path);
+    protected void writeDbFromXlsAsCommonDataFirst() {
+        writeDbFromXls(new XlsWritingResource().commonType().firstXls());
     }
 
-    protected void writeDbFromXlsAsCommonDataAdditional() {
-        final String dir = getMyProperties().getApplicationPlaySqlDirectory();
-        if (Srl.is_Null_or_TrimmedEmpty(dir)) {
-            return;
-        }
-        final String path = doGetCommonDataDirectoryPath(dir, XLS_FILE_TYPE);
-        writeDbFromXls(COMMON_ENV_TYPE, path);
+    protected void writeDbFromXlsAsCommonDataAppFirst() {
+        writeDbFromXls(new XlsWritingResource().application().commonType().firstXls());
+    }
+
+    protected void writeDbFromXlsAsCommonData() {
+        writeDbFromXls(new XlsWritingResource().commonType());
+    }
+
+    protected void writeDbFromXlsAsCommonDataApp() {
+        writeDbFromXls(new XlsWritingResource().application().commonType());
+    }
+
+    protected void writeDbFromXlsAsLoadingTypeDataFirst() {
+        writeDbFromXls(new XlsWritingResource().firstXls());
+    }
+
+    protected void writeDbFromXlsAsLoadingTypeDataAppFirst() {
+        writeDbFromXls(new XlsWritingResource().application().firstXls());
     }
 
     protected void writeDbFromXlsAsLoadingTypeData() {
-        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
-        final String envType = getDataLoadingType();
-        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, XLS_FILE_TYPE);
-        writeDbFromXls(envType, path);
+        writeDbFromXls(new XlsWritingResource());
     }
 
-    protected void writeDbFromXlsAsLoadingTypeDataAdditional() {
-        final String dir = getMyProperties().getApplicationPlaySqlDirectory();
+    protected void writeDbFromXlsAsLoadingTypeDataApp() {
+        writeDbFromXls(new XlsWritingResource().application());
+    }
+
+    protected static class XlsWritingResource {
+        protected boolean _application;
+        protected boolean _commonType;
+        protected boolean _firstXls;
+
+        public boolean isApplication() {
+            return _application;
+        }
+
+        public XlsWritingResource application() {
+            _application = true;
+            return this;
+        }
+
+        public boolean isCommonType() {
+            return _commonType;
+        }
+
+        public XlsWritingResource commonType() {
+            _commonType = true;
+            return this;
+        }
+
+        public boolean isFirstXls() {
+            return _firstXls;
+        }
+
+        public XlsWritingResource firstXls() {
+            _firstXls = true;
+            return this;
+        }
+    }
+
+    protected void writeDbFromXls(XlsWritingResource res) {
+        final String repPlaySqlDir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String appPlaySqlDir = getMyProperties().getApplicationPlaySqlDirectory();
+        final String dir = res.isApplication() ? appPlaySqlDir : repPlaySqlDir;
         if (Srl.is_Null_or_TrimmedEmpty(dir)) {
             return;
         }
-        final String envType = getDataLoadingType();
-        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, XLS_FILE_TYPE);
-        writeDbFromXls(envType, path);
+        final String envType = res.isCommonType() ? COMMON_ENV_TYPE : getDataLoadingType();
+        final String typeName = res.isFirstXls() ? FIRSTXLS_FILE_TYPE : XLS_FILE_TYPE;
+        final String dataDirectory = doGetLoadingTypeDataDirectoryPath(dir, envType, typeName);
+        writeDbFromXls(envType, dataDirectory);
     }
 
     protected void writeDbFromXls(String envType, String dataDirectory) {
@@ -316,6 +368,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             return;
         }
         detailMessageSb.append("(").append(envType).append(")").append(ln());
+        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(FIRSTXLS_FILE_TYPE), 10);
         doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(TSV_FILE_TYPE), 3);
         doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(CSV_FILE_TYPE), 3);
         doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);

@@ -45,7 +45,7 @@ public class DfXlsReaderTest extends PlainTestCase {
         final DfDataSet dataSet = reader.read();
 
         // ## Assert ##
-        log("[DataSet]:" + getLineSeparator() + dataSet);
+        log("[DataSet]:" + ln() + dataSet);
         final int tableSize = dataSet.getTableSize();
         assertTrue(tableSize > 0);
         boolean existsNull = false;

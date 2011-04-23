@@ -20,7 +20,6 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -43,7 +42,7 @@ public class DfDataXlsTemplateHandlerTest extends PlainTestCase {
         if (xlsFile.exists()) {
             xlsFile.delete();
         }
-        final Map<String, List<Column>> tableColumnMap = new LinkedHashMap<String, List<Column>>();
+        final Map<String, DfTemplateDataTableInfo> tableColumnMap = new LinkedHashMap<String, DfTemplateDataTableInfo>();
         {
             final List<Column> columnList = new ArrayList<Column>();
             {
@@ -70,7 +69,12 @@ public class DfDataXlsTemplateHandlerTest extends PlainTestCase {
                 column.setJdbcType(TypeMap.VARCHAR);
                 columnList.add(column);
             }
-            tableColumnMap.put("TEST_TABLE", columnList);
+            final DfTemplateDataTableInfo tableInfo = new DfTemplateDataTableInfo();
+            final String tableDbName = "TEST_TABLE";
+            tableInfo.setTableDbName(tableDbName);
+            tableInfo.setTableSqlName("next." + tableDbName);
+            tableInfo.setColumnList(columnList);
+            tableColumnMap.put(tableDbName, tableInfo);
         }
         final Map<String, List<Map<String, String>>> dumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
         {
@@ -93,7 +97,7 @@ public class DfDataXlsTemplateHandlerTest extends PlainTestCase {
         assertTrue(xlsFile.exists());
         final DfXlsReader xlsReader = new DfXlsReader(xlsFile);
         final DfDataSet dataSet = xlsReader.read();
-        log("[DataSet]:" + getLineSeparator() + dataSet);
+        log("[DataSet]:" + ln() + dataSet);
         final int tableSize = dataSet.getTableSize();
         assertTrue(tableSize > 0);
         boolean existsJapaneseColumn = false;
