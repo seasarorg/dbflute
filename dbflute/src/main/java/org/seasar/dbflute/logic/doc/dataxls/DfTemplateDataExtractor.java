@@ -26,6 +26,7 @@ import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -83,7 +84,13 @@ public class DfTemplateDataExtractor {
 
             // create value type for the column
             final ValueType valueType;
-            if (column.isJavaNativeDateObject()) {
+            if (column.isJavaNativeStringObject()) {
+                if (column.isDbTypeStringClob()) {
+                    valueType = new StringClobType();
+                } else {
+                    valueType = new StringType();
+                }
+            } else if (column.isJavaNativeDateObject()) {
                 // date types should be treated correctly
                 if (column.isJdbcTypeTime()) {
                     valueType = new TimeType();
