@@ -173,7 +173,7 @@ public class DfDataXlsTemplateHandler {
     protected void writeXlsData(DfDataSet dataSet, File xlsFile) {
         final DfXlsWriter writer = createXlsWriter(xlsFile);
         try {
-            _log.info("...Writing data to xls file: " + xlsFile.getName());
+            _log.info("...Writing xls data: " + xlsFile.getName());
             writer.write(dataSet); // flush
         } catch (RuntimeException e) {
             String msg = "Failed to write the xls file: " + xlsFile;
@@ -195,11 +195,14 @@ public class DfDataXlsTemplateHandler {
         if (delimiterDir == null) { // no output delimiter data
             return;
         }
+        final String ext;
         final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateLf();
         if (_delimiterDataTypeCsv) {
             option.delimitateByComma();
+            ext = "csv";
         } else {
             option.delimitateByTab(); // as default
+            ext = "tsv";
         }
         final String tableDbName = table.getName();
         _log.info("...Outputting delimiter data (over xls limit): " + tableDbName);
@@ -207,7 +210,7 @@ public class DfDataXlsTemplateHandler {
             delimiterDir.mkdirs();
         }
         final FileToken fileToken = new FileTokenImpl();
-        final String delimiterFilePath = delimiterDir.getPath() + "/" + tableDbName + ".csv";
+        final String delimiterFilePath = delimiterDir.getPath() + "/" + tableDbName + "." + ext;
         final List<Column> columnList = table.getColumnList();
         final List<String> columnNameList = new ArrayList<String>();
         for (Column column : columnList) {
