@@ -280,9 +280,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return xlsFile;
     }
 
-    public File getDataCsvTemplateDir() {
+    public File getDataDelimiterTemplateDir() { // for large data
         final String outputDirectory = getDocumentOutputDirectory();
-        final File xlsFile = new File(outputDirectory + "/csvdata");
+        final File xlsFile = new File(outputDirectory + "/largedata");
         return xlsFile;
     }
 

@@ -162,8 +162,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (isDataXlsTemplateContainsCommonColumn()) {
             handler.setContainsCommonColumn(true);
         }
-        handler.setDelimiterDataOutputDir(getDataCsvTemplateDir());
-        handler.setDelimiterDataTypeCsv(true);
+        handler.setDelimiterDataOutputDir(getDataDelimiterTemplateDir());
+        // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
+        //handler.setDelimiterDataTypeCsv(true);
         final int limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
         handler.outputData(tableMap, limit, xlsFile);
@@ -180,8 +181,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().isDataXlsTemplateRecordLimitValid();
     }
 
-    protected File getDataCsvTemplateDir() {
-        return getDocumentProperties().getDataCsvTemplateDir();
+    protected File getDataDelimiterTemplateDir() {
+        return getDocumentProperties().getDataDelimiterTemplateDir();
     }
 
     protected int getDataXlsTemplateRecordLimit() {

@@ -116,7 +116,7 @@ public class DfDataXlsTemplateHandler {
             }
         }
         if (dataSet.getTableSize() > 0) {
-            flushXlsData(dataSet, xlsFile);
+            writeXlsData(dataSet, xlsFile);
         }
     }
 
@@ -170,9 +170,10 @@ public class DfDataXlsTemplateHandler {
         return !_containsCommonColumn && column.isCommonColumn();
     }
 
-    protected void flushXlsData(DfDataSet dataSet, File xlsFile) {
+    protected void writeXlsData(DfDataSet dataSet, File xlsFile) {
         final DfXlsWriter writer = createXlsWriter(xlsFile);
         try {
+            _log.info("...Writing data to xls file: " + xlsFile.getName());
             writer.write(dataSet); // flush
         } catch (RuntimeException e) {
             String msg = "Failed to write the xls file: " + xlsFile;
