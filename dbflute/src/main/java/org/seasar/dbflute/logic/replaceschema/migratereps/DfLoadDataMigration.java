@@ -50,8 +50,7 @@ public class DfLoadDataMigration {
     public void outputData(Database database) {
         final List<List<Table>> orderedList = analyzeOrder(database);
         final DfDataXlsTemplateHandler handler = new DfDataXlsTemplateHandler(_dataSource);
-        handler.setupContainsCommonColumn();
-        handler.setupOverLimitTruncated();
+        handler.setContainsCommonColumn(true); // fixed
         int sectionNo = 1;
         for (List<Table> tableList : orderedList) {
             final Map<String, Table> tableInfoMap = new LinkedHashMap<String, Table>();

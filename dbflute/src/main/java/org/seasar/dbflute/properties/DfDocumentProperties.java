@@ -256,10 +256,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return limit != null;
     }
 
-    public Integer getDataXlsTemplateRecordLimit() {
+    public int getDataXlsTemplateRecordLimit() {
         String limit = (String) getDocumentDefinitionMap().get("dataXlsTemplateRecordLimit");
         if (limit == null || limit.trim().length() == 0 || limit.trim().equalsIgnoreCase("null")) {
-            return null;
+            return -1;
         }
         try {
             return Integer.valueOf(limit);

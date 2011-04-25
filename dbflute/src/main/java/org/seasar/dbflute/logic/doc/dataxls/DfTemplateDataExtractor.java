@@ -1,10 +1,11 @@
 package org.seasar.dbflute.logic.doc.dataxls;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFacCursorCallback;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFacStringConverter;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -38,7 +41,9 @@ public class DfTemplateDataExtractor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource _dataSource;
+    protected final DataSource _dataSource;
+    protected int _extractingLimit = -1;
+    protected int _largeBorder = -1;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -53,32 +58,101 @@ public class DfTemplateDataExtractor {
     /**
      * Extract data for template.
      * @param tableMap The map of table. (NotNull)
-     * @param limit The limit of records. (If it's minus value, extracts all records.)
      */
-    public Map<String, List<Map<String, String>>> extractData(Map<String, Table> tableMap, int limit) {
-        final Map<String, List<Map<String, String>>> templateDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
+    public Map<String, DfTemplateDataResult> extractData(Map<String, Table> tableMap) {
+        final Map<String, DfTemplateDataResult> templateDataMap = new LinkedHashMap<String, DfTemplateDataResult>();
         for (Entry<String, Table> entry : tableMap.entrySet()) {
             final String tableDbName = entry.getKey();
             final Table table = entry.getValue();
-            final List<Map<String, Object>> objectList = selectObjectList(table, limit);
-            final List<Map<String, String>> resultList = createResultList(objectList);
-            templateDataMap.put(tableDbName, resultList);
+            final DfTemplateDataResult result = selectData(table);
+            templateDataMap.put(tableDbName, result);
         }
         return templateDataMap;
     }
 
-    protected List<Map<String, Object>> selectObjectList(Table table, int limit) {
+    protected DfTemplateDataResult selectData(Table table) {
         final String tableSqlName = table.getTableSqlNameDirectUse();
-        final List<Column> columnList = table.getColumnList();
+
+        boolean large = false;
+        if (_largeBorder >= 0) {
+            if (_extractingLimit < 0 || _largeBorder < _extractingLimit) {
+                final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+                final int countAll = facade.selectCountAll(tableSqlName);
+                if (countAll > _largeBorder) { // it's large
+                    large = true;
+                }
+            }
+        }
+
+        final String sql = buildExtractingSql(table);
+        if (large) {
+            return processLargeData(table, sql);
+        } else { // main
+            return processNormalData(table, sql);
+        }
+    }
+
+    protected String buildExtractingSql(Table table) {
         final String sql;
         {
+            final List<Column> columnList = table.getColumnList();
             final String selectClause = buildSelectClause(columnList);
+            final String tableSqlName = table.getTableSqlNameDirectUse();
             final String fromClause = buildFromClause(tableSqlName);
             final String orderByClause = buildOrderByClause(table);
-            final String sqlSuffix = buildSqlSuffix(table, limit);
+            final String sqlSuffix = buildSqlSuffix(table);
             sql = selectClause + fromClause + orderByClause + sqlSuffix;
         }
-        final Map<String, ValueType> columnValueTypeMap = new LinkedHashMap<String, ValueType>();
+        return sql;
+    }
+
+    // ===================================================================================
+    //                                                                         Normal Data
+    //                                                                         ===========
+    protected DfTemplateDataResult processNormalData(Table table, String sql) {
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
+        final DfJFacStringConverter converter = createStringConverter();
+        final Integer limit = _extractingLimit;
+        final List<Map<String, String>> resultList = facade.selectStringList(sql, valueTypeMap, converter, limit);
+        return new DfTemplateDataResult(resultList);
+    }
+
+    // ===================================================================================
+    //                                                                          Large Data
+    //                                                                          ==========
+    protected DfTemplateDataResult processLargeData(Table table, final String sql) {
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
+        final DfJFacStringConverter converter = createStringConverter();
+        final DfJFacCursorCallback callback = facade.selectCursor(sql, valueTypeMap, converter);
+        return new DfTemplateDataResult(callback);
+    }
+
+    public class DfTemplateDataResultSetWrapper {
+        protected ResultSet _rs;
+        protected Map<String, ValueType> _columnValueTypeMap;
+
+        public DfTemplateDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
+            _rs = rs;
+            _columnValueTypeMap = columnValueTypeMap;
+        }
+
+        public boolean next() throws SQLException {
+            return _rs.next();
+        }
+
+        public String getString(String columnName) throws SQLException {
+            final ValueType valueType = _columnValueTypeMap.get(columnName);
+            return convertToStringValue(valueType.getValue(_rs, columnName));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       JDBC Handling
+    //                                                                       =============
+    protected Map<String, ValueType> createColumnValueTypeMap(List<Column> columnList) {
+        final Map<String, ValueType> valueTypeMap = new LinkedHashMap<String, ValueType>();
         for (Column column : columnList) {
             final String columnName = column.getName();
 
@@ -114,10 +188,9 @@ public class DfTemplateDataExtractor {
                 valueType = new StringType();
             }
 
-            columnValueTypeMap.put(columnName, valueType);
+            valueTypeMap.put(columnName, valueType);
         }
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        return facade.selectList(sql, columnValueTypeMap, limit);
+        return valueTypeMap;
     }
 
     protected static class NullBytesType extends BytesType {
@@ -137,6 +210,30 @@ public class DfTemplateDataExtractor {
         };
     }
 
+    protected void close(Connection conn, Statement st, ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException ignored) {
+            }
+        }
+        if (st != null) {
+            try {
+                st.close();
+            } catch (SQLException ignored) {
+            }
+        }
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          SQL Clause
+    //                                                                          ==========
     protected String buildSelectClause(List<Column> columnList) {
         final StringBuilder sb = new StringBuilder();
         for (Column column : columnList) {
@@ -165,43 +262,47 @@ public class DfTemplateDataExtractor {
         return orderBy;
     }
 
-    protected String buildSqlSuffix(Table table, int limit) {
-        if (limit < 1) {
+    protected String buildSqlSuffix(Table table) {
+        if (_extractingLimit < 1) {
             return "";
         }
         final DfBasicProperties prop = getBasicProperties();
         if (prop.isDatabaseMySQL() || prop.isDatabasePostgreSQL() || prop.isDatabaseH2()) {
-            return " limit " + limit;
+            return " limit " + _extractingLimit;
         }
         return "";
     }
 
-    protected List<Map<String, String>> createResultList(List<Map<String, Object>> objectList) {
-        final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-        for (Map<String, Object> recordMap : objectList) {
-            final Map<String, String> stringMap = new LinkedHashMap<String, String>();
-            for (Entry<String, Object> entry : recordMap.entrySet()) {
-                final String columnName = entry.getKey();
-                final Object objValue = entry.getValue();
-                final String strValue;
-                if (objValue instanceof String) {
-                    strValue = (String) objValue;
-                } else if (objValue instanceof Timestamp) {
-                    final Timestamp timestamp = (Timestamp) objValue;
-                    strValue = formatDate(timestamp, "yyyy-MM-dd HH:mm:ss.SSS");
-                } else if (objValue instanceof Time) {
-                    strValue = DfTypeUtil.toString((Time) objValue, "HH:mm:ss");
-                } else if (objValue instanceof Date) {
-                    final Date date = (Date) objValue;
-                    strValue = formatDate(date, "yyyy-MM-dd HH:mm:ss");
-                } else {
-                    strValue = objValue != null ? objValue.toString() : null;
-                }
-                stringMap.put(columnName, strValue);
+    // ===================================================================================
+    //                                                                          Conversion
+    //                                                                          ==========
+    protected DfJFacStringConverter createStringConverter() {
+        return new DfJFacStringConverter() {
+            public String convert(Object value) {
+                return convertToStringValue(value);
             }
-            resultList.add(stringMap);
+        };
+    }
+
+    protected String convertToStringValue(Object value) {
+        if (value == null) {
+            return null;
         }
-        return resultList;
+        final String str;
+        if (value instanceof String) {
+            str = (String) value;
+        } else if (value instanceof Timestamp) {
+            final Timestamp timestamp = (Timestamp) value;
+            str = formatDate(timestamp, "yyyy-MM-dd HH:mm:ss.SSS");
+        } else if (value instanceof Time) {
+            str = DfTypeUtil.toString((Time) value, "HH:mm:ss");
+        } else if (value instanceof Date) {
+            final Date date = (Date) value;
+            str = formatDate(date, "yyyy-MM-dd HH:mm:ss");
+        } else {
+            str = value.toString();
+        }
+        return str;
     }
 
     protected String formatDate(Date date, String pattern) {
@@ -209,11 +310,39 @@ public class DfTemplateDataExtractor {
         return prefix + DfTypeUtil.toString(date, pattern);
     }
 
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public int getExtractingLimit() {
+        return _extractingLimit;
+    }
+
+    /**
+     * @param extractingLimit The limit for extracting. (MinusAllowed: means no limit)
+     */
+    public void setExtractingLimit(int extractingLimit) {
+        this._extractingLimit = extractingLimit;
+    }
+
+    public int getLargeBorder() {
+        return _largeBorder;
+    }
+
+    /**
+     * @param largeBorder The border count for large data. (MinusAllowed: means no border)
+     */
+    public void setLargeBorder(int largeBorder) {
+        this._largeBorder = largeBorder;
     }
 }

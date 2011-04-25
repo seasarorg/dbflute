@@ -55,14 +55,10 @@ package org.apache.torque.task;
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,13 +68,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.helper.token.file.FileMakingCallback;
-import org.seasar.dbflute.helper.token.file.FileMakingOption;
-import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
-import org.seasar.dbflute.helper.token.file.FileToken;
-import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateResult;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -170,61 +160,13 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected void outputDataXlsTemplate(Map<String, Table> tableMap) {
         final DfDataXlsTemplateHandler handler = new DfDataXlsTemplateHandler(getDataSource());
         if (isDataXlsTemplateContainsCommonColumn()) {
-            handler.setupContainsCommonColumn();
+            handler.setContainsCommonColumn(true);
         }
-        final Integer limit = getDataXlsTemplateRecordLimit();
+        handler.setDelimiterDataOutputDir(getDataCsvTemplateDir());
+        handler.setDelimiterDataTypeCsv(true);
+        final int limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
-        final DfDataXlsTemplateResult outputResult = handler.outputData(tableMap, limit, xlsFile);
-        outputDataCsvTemplate(outputResult);
-    }
-
-    protected void outputDataCsvTemplate(DfDataXlsTemplateResult outputResult) {
-        final Map<String, List<Column>> overTableColumnMap = outputResult.getOverTableColumnMap();
-        if (overTableColumnMap.isEmpty()) {
-            return;
-        }
-        _log.info("...Outputting data csv template(over 65000): tables=" + overTableColumnMap.size());
-        final Map<String, List<Map<String, String>>> overDumpDataMap = outputResult.getOverTemplateDataMap();
-        final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
-        final File csvDir = getDataCsvTemplateDir();
-        if (!csvDir.exists()) {
-            csvDir.mkdirs();
-        }
-        final FileToken fileToken = new FileTokenImpl();
-        final Set<String> tableNameSet = overTableColumnMap.keySet();
-        for (final String tableName : tableNameSet) {
-            final String csvFilePath = csvDir.getPath() + "/" + tableName + ".csv";
-            final List<Column> columnList = overTableColumnMap.get(tableName);
-            final List<String> columnNameList = new ArrayList<String>();
-            for (Column column : columnList) {
-                columnNameList.add(column.getName());
-            }
-            final List<Map<String, String>> recordList = overDumpDataMap.get(tableName);
-            _log.info("    " + tableName + "(" + recordList.size() + ")");
-            try {
-                option.headerInfo(columnNameList);
-                final Iterator<Map<String, String>> recordListIterator = recordList.iterator();
-                fileToken.make(csvFilePath, new FileMakingCallback() {
-                    public FileMakingRowResource getRowResource() {
-                        if (!recordListIterator.hasNext()) {
-                            return null;
-                        }
-                        final Map<String, String> recordMap = recordListIterator.next();
-                        final FileMakingRowResource resource = new FileMakingRowResource();
-                        final LinkedHashMap<String, String> nameValueMap = new LinkedHashMap<String, String>();
-                        nameValueMap.putAll(recordMap);
-                        resource.setNameValueMap(nameValueMap);
-                        return resource;
-                    }
-                }, option);
-            } catch (FileNotFoundException e) {
-                String msg = "Failed to output CSV file: table=" + tableName + " csv=" + csvFilePath;
-                throw new IllegalStateException(msg, e);
-            } catch (IOException e) {
-                String msg = "Failed to output CSV file: table=" + tableName + " csv=" + csvFilePath;
-                throw new IllegalStateException(msg, e);
-            }
-        }
+        handler.outputData(tableMap, limit, xlsFile);
     }
 
     // ===================================================================================
@@ -238,7 +180,11 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().isDataXlsTemplateRecordLimitValid();
     }
 
-    protected Integer getDataXlsTemplateRecordLimit() {
+    protected File getDataCsvTemplateDir() {
+        return getDocumentProperties().getDataCsvTemplateDir();
+    }
+
+    protected int getDataXlsTemplateRecordLimit() {
         return getDocumentProperties().getDataXlsTemplateRecordLimit();
     }
 
@@ -248,10 +194,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected File getDataXlsTemplateFile() {
         return getDocumentProperties().getDataXlsTemplateFile();
-    }
-
-    protected File getDataCsvTemplateDir() {
-        return getDocumentProperties().getDataCsvTemplateDir();
     }
 
     protected Map<String, String> getCommonColumnMap() {
