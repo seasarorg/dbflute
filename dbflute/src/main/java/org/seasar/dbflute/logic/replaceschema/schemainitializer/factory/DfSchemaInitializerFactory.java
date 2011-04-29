@@ -18,9 +18,9 @@ import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitiali
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerPostgreSQL;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerSQLServer;
-import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * @author jflute
@@ -31,7 +31,7 @@ public class DfSchemaInitializerFactory {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected DfBasicProperties _basicProperties;
+    protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected DfDatabaseProperties _databaseProperties;
     protected DfReplaceSchemaProperties _replaceSchemaProperties;
     protected InitializeType _initializeType;
@@ -44,11 +44,11 @@ public class DfSchemaInitializerFactory {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSchemaInitializerFactory(DataSource dataSource, DfBasicProperties basicProperties,
+    public DfSchemaInitializerFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties,
             InitializeType initializeType) {
         _dataSource = dataSource;
-        _basicProperties = basicProperties;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;
         _replaceSchemaProperties = replaceSchemaProperties;
         _initializeType = initializeType;
@@ -59,19 +59,19 @@ public class DfSchemaInitializerFactory {
     //                                                                              ======
     public DfSchemaInitializer createSchemaInitializer() {
         final DfSchemaInitializer initializer;
-        if (_basicProperties.isDatabaseMySQL()) {
+        if (_databaseTypeFacadeProp.isDatabaseMySQL()) {
             initializer = createSchemaInitializerMySQL();
-        } else if (_basicProperties.isDatabasePostgreSQL()) {
+        } else if (_databaseTypeFacadeProp.isDatabasePostgreSQL()) {
             initializer = createSchemaInitializerPostgreSQL();
-        } else if (_basicProperties.isDatabaseOracle()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseOracle()) {
             initializer = createSchemaInitializerOracle();
-        } else if (_basicProperties.isDatabaseDB2()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseDB2()) {
             initializer = createSchemaInitializerDB2();
-        } else if (_basicProperties.isDatabaseSQLServer()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseSQLServer()) {
             initializer = createSchemaInitializerSqlServer();
-        } else if (_basicProperties.isDatabaseH2()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseH2()) {
             initializer = createSchemaInitializerH2();
-        } else if (_basicProperties.isDatabaseFirebird()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseFirebird()) {
             initializer = createSchemaInitializerFirebird();
         } else {
             initializer = createSchemaInitializerJdbc();
