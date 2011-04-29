@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.logic.replaceschema.allmain.DfCreateSchemaMain;
-import org.seasar.dbflute.logic.replaceschema.allmain.DfCreateSchemaMain.CreatingDataSourceHandler;
+import org.seasar.dbflute.logic.replaceschema.allmain.DfCreateSchemaMain.CreatingDataSourcePlayer;
 
 public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
@@ -54,7 +54,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfCreateSchemaMain main = new DfCreateSchemaMain(new CreatingDataSourceHandler() {
+        final DfCreateSchemaMain main = DfCreateSchemaMain.createAsCore(new CreatingDataSourcePlayer() {
             public DataSource callbackGetDataSource() {
                 return getDataSource();
             }
@@ -77,6 +77,5 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     public void setValidTaskEndInformation(String validTaskEndInformation) {
         this._validTaskEndInformation = validTaskEndInformation != null
                 && validTaskEndInformation.trim().equalsIgnoreCase("true");
-        ;
     }
 }

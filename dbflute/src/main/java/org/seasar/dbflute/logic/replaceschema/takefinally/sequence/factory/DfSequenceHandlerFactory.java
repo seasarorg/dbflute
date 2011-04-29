@@ -10,8 +10,8 @@ import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHan
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerH2;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerOracle;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerPostgreSQL;
-import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * @author jflute
@@ -19,25 +19,25 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 public class DfSequenceHandlerFactory {
 
     protected DataSource _dataSource;
-    protected DfBasicProperties _basicProperties;
+    protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected DfDatabaseProperties _databaseProperties;
 
-    public DfSequenceHandlerFactory(DataSource dataSource, DfBasicProperties basicProperties,
+    public DfSequenceHandlerFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties) {
         _dataSource = dataSource;
-        _basicProperties = basicProperties;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;
     }
 
     public DfSequenceHandler createSequenceHandler() {
         final List<UnifiedSchema> targetSchemaList = createTargetSchemaList();
-        if (_basicProperties.isDatabasePostgreSQL()) {
+        if (_databaseTypeFacadeProp.isDatabasePostgreSQL()) {
             return new DfSequenceHandlerPostgreSQL(_dataSource, targetSchemaList);
-        } else if (_basicProperties.isDatabaseOracle()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseOracle()) {
             return new DfSequenceHandlerOracle(_dataSource, targetSchemaList);
-        } else if (_basicProperties.isDatabaseDB2()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseDB2()) {
             return new DfSequenceHandlerDB2(_dataSource, targetSchemaList);
-        } else if (_basicProperties.isDatabaseH2()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseH2()) {
             return new DfSequenceHandlerH2(_dataSource, targetSchemaList);
         }
         return null;

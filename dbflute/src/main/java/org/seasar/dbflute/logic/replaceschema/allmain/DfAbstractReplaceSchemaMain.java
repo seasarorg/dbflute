@@ -1,17 +1,15 @@
 package org.seasar.dbflute.logic.replaceschema.allmain;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
+import org.seasar.dbflute.helper.token.line.LineToken;
+import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
@@ -21,50 +19,6 @@ import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
 public class DfAbstractReplaceSchemaMain {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    protected static final String CREATE_SCHEMA_LOG_PATH = "./log/create-schema.log";
-    protected static final String LOAD_DATA_LOG_PATH = "./log/load-data.log";
-
-    // ===================================================================================
-    //                                                                         Result Dump
-    //                                                                         ===========
-    protected void dumpProcessResult(File dumpFile, String resultMessage, boolean failure, String detailMessage) {
-        if (dumpFile.exists()) {
-            boolean deleted = dumpFile.delete();
-            if (!deleted) {
-                return; // skip to dump!
-            }
-        }
-        if (resultMessage == null || resultMessage.trim().length() == 0) {
-            return; // nothing to dump!
-        }
-        BufferedWriter bw = null;
-        try {
-            final StringBuilder contentsSb = new StringBuilder();
-            contentsSb.append(resultMessage).append(ln()).append(failure);
-            if (detailMessage != null && detailMessage.trim().length() > 0) {
-                contentsSb.append(ln()).append(detailMessage);
-            }
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dumpFile), "UTF-8"));
-            bw.write(contentsSb.toString());
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
 
     // ===================================================================================
     //                                                                      Various Common
@@ -89,35 +43,46 @@ public class DfAbstractReplaceSchemaMain {
         return false;
     }
 
+    protected List<String> extractDetailMessageList(DfSqlFileFireResult fireResult) {
+        final List<String> detailMessageList = new ArrayList<String>();
+        final String detailMessage = fireResult.getDetailMessage();
+        if (detailMessage != null && detailMessage.trim().length() > 0) {
+            final LineToken lineToken = new LineTokenImpl();
+            final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+            lineTokenizingOption.setDelimiter(ln());
+            final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
+            for (String tokenizedElement : tokenizedList) {
+                detailMessageList.add(tokenizedElement);
+            }
+        }
+        return detailMessageList;
+    }
+
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
-    protected DfBuildProperties getProperties() {
+    protected static DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
-    protected DfReplaceSchemaProperties getReplaceSchemaProperties() {
+    protected static DfReplaceSchemaProperties getReplaceSchemaProperties() {
         return DfBuildProperties.getInstance().getReplaceSchemaProperties();
     }
 
-    protected DfBasicProperties getBasicProperties() {
+    protected static DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
 
-    protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
+    protected static DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
         return getBasicProperties().getDatabaseTypeFacadeProp();
     }
 
-    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
+    protected static DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
         return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
-    protected DfDatabaseProperties getDatabaseProperties() {
+    protected static DfDatabaseProperties getDatabaseProperties() {
         return getProperties().getDatabaseProperties();
-    }
-
-    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
-        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

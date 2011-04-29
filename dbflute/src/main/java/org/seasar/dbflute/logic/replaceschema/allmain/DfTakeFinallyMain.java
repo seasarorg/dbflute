@@ -1,4 +1,4 @@
-package org.seasar.dbflute.task.replaceschema;
+package org.seasar.dbflute.logic.replaceschema.allmain;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
-import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
@@ -29,40 +29,67 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.replaceschema.dataassert.DfDataAssertHandler;
 import org.seasar.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
-import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.factory.DfSequenceHandlerFactory;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
-public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
+public class DfTakeFinallyMain extends DfAbstractReplaceSchemaMain {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfTakeFinallyTask.class);
+    private static final Log _log = LogFactory.getLog(DfTakeFinallyMain.class);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                        Basic Resource
+    //                                        --------------
+    protected final DataSource _dataSource;
+    protected final UnifiedSchema _mainSchema;
+    protected final boolean _utility; // unused but for future
+
     protected Timestamp _beforeTimestamp; // is set through its property
     protected DfSqlFileFireResult _takeFinallyFireResult;
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected DfTakeFinallyMain(DataSource dataSource, UnifiedSchema mainSchema, boolean utility) {
+        _dataSource = dataSource;
+        _mainSchema = mainSchema;
+        _utility = utility;
+    }
+
+    public static DfTakeFinallyMain createAsCore(DataSource dataSource) {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        return new DfTakeFinallyMain(dataSource, mainSchema, false);
+    }
+
+    public static DfTakeFinallyMain createAsUtility(DataSource dataSource) {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        return new DfTakeFinallyMain(dataSource, mainSchema, true);
+    }
+
+    // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    @Override
-    protected void doExecute() {
+    public DfTakeFinallyFinalInfo execute() {
         final DfRunnerInformation runInfo = createRunnerInformation();
 
         beforeTakeFinally();
+        DfSqlFileFireResult fireResult = null;
+        DfTakeFinallyAssertionFailureException assertionEx = null;
         try {
-            _takeFinallyFireResult = takeFinally(runInfo);
+            fireResult = takeFinally(runInfo);
         } catch (DfTakeFinallyAssertionFailureException e) {
             _takeFinallyFireResult = new DfSqlFileFireResult();
             _takeFinallyFireResult.setExistsError(true);
@@ -71,54 +98,40 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             sb.append(" >> ").append(DfTypeUtil.toClassTitle(e));
             sb.append(ln()).append(" (Look at the exception message: console or dbflute.log)");
             _takeFinallyFireResult.setDetailMessage(sb.toString());
-            throw e;
+            assertionEx = e;
         }
+        final DfTakeFinallyFinalInfo finalInfo = createFinalInfo(fireResult, assertionEx);
         incrementSequenceToDataMax();
-        handleSchemaFailure();
+        return finalInfo;
     }
 
-    @Override
-    protected long getTaskBeforeTimeMillis() {
-        if (_beforeTimestamp != null) {
-            return _beforeTimestamp.getTime();
-        } else {
-            return super.getTaskBeforeTimeMillis();
-        }
-    }
-
-    // --------------------------------------------
-    //                                Create Schema
-    //                                -------------
     protected DfRunnerInformation createRunnerInformation() {
         final DfRunnerInformation runInfo = new DfRunnerInformation();
-        runInfo.setDriver(_driver);
-        runInfo.setUrl(_url);
-        runInfo.setUser(_userId);
-        runInfo.setPassword(_password);
+        final DfDatabaseProperties prop = getDatabaseProperties();
+        runInfo.setDriver(prop.getDatabaseDriver());
+        runInfo.setUrl(prop.getDatabaseUrl());
+        runInfo.setUser(prop.getDatabaseUser());
+        runInfo.setPassword(prop.getDatabasePassword());
         runInfo.setEncoding(getReplaceSchemaSqlFileEncoding());
         runInfo.setAutoCommit(true);
-        runInfo.setErrorContinue(getMyProperties().isErrorContinue());
+        runInfo.setErrorContinue(getReplaceSchemaProperties().isErrorContinue());
         runInfo.setRollbackOnly(false);
         return runInfo;
     }
 
     protected String getReplaceSchemaSqlFileEncoding() {
-        return getMyProperties().getSqlFileEncoding();
+        return getReplaceSchemaProperties().getSqlFileEncoding();
     }
 
     public boolean isLoggingInsertSql() {
-        return getMyProperties().isLoggingInsertSql();
-    }
-
-    protected DfReplaceSchemaProperties getMyProperties() {
-        return DfBuildProperties.getInstance().getReplaceSchemaProperties();
+        return getReplaceSchemaProperties().isLoggingInsertSql();
     }
 
     // --------------------------------------------
     //                          Before Take Finally
     //                          -------------------
     protected void beforeTakeFinally() {
-        String processCommand = getMyProperties().getBeforeTakeFinally();
+        String processCommand = getReplaceSchemaProperties().getBeforeTakeFinally();
         if (processCommand == null) {
             return;
         }
@@ -141,8 +154,8 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {
-        final DfReplaceSchemaProperties prop = getMyProperties();
-        final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+        final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
+        final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, _dataSource) {
             @Override
             protected String filterSql(String sql) {
                 sql = super.filterSql(sql);
@@ -177,7 +190,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         };
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException {
-                final String dataLoadingType = getMyProperties().getDataLoadingType();
+                final String dataLoadingType = getReplaceSchemaProperties().getDataLoadingType();
                 final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(dataLoadingType);
                 final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
                 if (dataAssertHandler == null) {
@@ -198,13 +211,13 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected List<File> getTakeFinallyNextSqlFileList() {
-        final String path = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String path = getReplaceSchemaProperties().getReplaceSchemaPlaySqlDirectory();
         return doGetTakeFinallySqlFileList(path);
     }
 
     protected List<File> getTakeFinallyNextSqlFileListAdditional() {
         final List<File> fileList = new ArrayList<File>();
-        final String path = getMyProperties().getApplicationPlaySqlDirectory();
+        final String path = getReplaceSchemaProperties().getApplicationPlaySqlDirectory();
         if (Srl.is_Null_or_TrimmedEmpty(path)) {
             return DfCollectionUtil.emptyList();
         }
@@ -244,18 +257,18 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected String getTakeFinallySqlFileNameWithoutExt() {
-        return getMyProperties().getTakeFinallySqlFileNameWithoutExt();
+        return getReplaceSchemaProperties().getTakeFinallySqlFileNameWithoutExt();
     }
 
     protected String getTakeFinallySqlFileExt() {
-        return getMyProperties().getTakeFinallySqlFileExt();
+        return getReplaceSchemaProperties().getTakeFinallySqlFileExt();
     }
 
     // --------------------------------------------
     //                           Increment Sequence
     //                           ------------------
     protected void incrementSequenceToDataMax() {
-        if (!getMyProperties().isIncrementSequenceToDataMax()) {
+        if (!getReplaceSchemaProperties().isIncrementSequenceToDataMax()) {
             return;
         }
         _log.info("");
@@ -266,30 +279,15 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         _log.info("* * * * * * * * * * **");
         final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
         final Map<String, String> tableSequenceMap = sequenceProp.getTableSequenceMap();
-        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(getDataSource(), getBasicProperties(),
+        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(_dataSource, getDatabaseTypeFacadeProp(),
                 getDatabaseProperties());
         final DfSequenceHandler sequenceHandler = factory.createSequenceHandler();
         if (sequenceHandler == null) {
-            String databaseType = getBasicProperties().getTargetDatabase();
+            String databaseType = getDatabaseTypeFacadeProp().getTargetDatabase();
             String msg = "Unsupported isIncrementSequenceToDataMax at " + databaseType;
             throw new UnsupportedOperationException(msg);
         }
         sequenceHandler.incrementSequenceToDataMax(tableSequenceMap);
-    }
-
-    // --------------------------------------------
-    //                               Schema Failure
-    //                               --------------
-    protected void handleSchemaFailure() { // means continued errors
-        final DfReplaceSchemaFinalInfo finalInfo = getReplaceSchemaFinalInfo();
-        if (finalInfo.isCreateSchemaFailure()) {
-            String msg = "Failed to create schema (Look at the final info)";
-            throw new DfCreateSchemaFailureException(msg);
-        }
-        if (finalInfo.isTakeFinallyFailure()) {
-            String msg = "Failed to take finally (Look at the final info)";
-            throw new DfTakeFinallyFailureException(msg);
-        }
     }
 
     // --------------------------------------------
@@ -368,19 +366,16 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
-    @Override
-    protected DfTakeFinallyFinalInfo getTakeFinallyFinalInfo() {
-        return extractTakeFinallyFinalInfo(_takeFinallyFireResult);
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setBeforeTimestamp(String beforeTimestamp) {
-        try {
-            _beforeTimestamp = Timestamp.valueOf(beforeTimestamp);
-        } catch (RuntimeException ignored) {
-            _log.warn("Wrong beforeTimestampExpression: " + beforeTimestamp, ignored);
+    protected DfTakeFinallyFinalInfo createFinalInfo(DfSqlFileFireResult fireResult,
+            DfTakeFinallyAssertionFailureException assertionEx) {
+        final DfTakeFinallyFinalInfo finalInfo = new DfTakeFinallyFinalInfo();
+        finalInfo.setResultMessage(fireResult.getResultMessage());
+        final List<String> detailMessageList = extractDetailMessageList(fireResult);
+        for (String detailMessage : detailMessageList) {
+            finalInfo.addDetailMessage(detailMessage);
         }
+        finalInfo.setFailure(fireResult.existsError());
+        finalInfo.setAssertionEx(assertionEx);
+        return finalInfo;
     }
 }

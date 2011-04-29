@@ -26,6 +26,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory.InitializeType;
@@ -46,8 +47,14 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final CreatingDataSourceHandler _dataSourceHandler;
+    // -----------------------------------------------------
+    //                                        Basic Resource
+    //                                        --------------
+    protected final CreatingDataSourcePlayer _dataSourcePlayer;
 
+    // -----------------------------------------------------
+    //                                           Change User
+    //                                           -----------
     protected boolean _lazyConnection;
     protected String _currentUser;
     protected StringSet _goodByeUserSet = StringSet.createAsCaseInsensitive();
@@ -55,31 +62,39 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
     protected StringKeyMap<Connection> _changeUserConnectionMap = StringKeyMap.createAsCaseInsensitive();
 
     // ===================================================================================
-    //                                                                             Execute
-    //                                                                             =======
-    public DfCreateSchemaMain(CreatingDataSourceHandler dataSourceHandler, boolean lazyConnection) {
-        _dataSourceHandler = dataSourceHandler;
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected DfCreateSchemaMain(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
+        _dataSourcePlayer = dataSourcePlayer;
         _lazyConnection = lazyConnection;
     }
 
-    public static interface CreatingDataSourceHandler {
+    public static DfCreateSchemaMain createAsCore(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
+        return new DfCreateSchemaMain(dataSourcePlayer, lazyConnection);
+    }
+
+    public static DfCreateSchemaMain createAsUtility(CreatingDataSourcePlayer dataSourcePlayer) {
+        return new DfCreateSchemaMain(dataSourcePlayer, false);
+    }
+
+    public static interface CreatingDataSourcePlayer {
         DataSource callbackGetDataSource();
 
         void callbackSetupDataSource() throws SQLException;
     }
 
     protected DataSource getDataSource() {
-        return _dataSourceHandler.callbackGetDataSource();
+        return _dataSourcePlayer.callbackGetDataSource();
     }
 
     protected void setupDataSource() throws SQLException {
-        _dataSourceHandler.callbackSetupDataSource();
+        _dataSourcePlayer.callbackSetupDataSource();
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public void execute() {
+    public DfCreateSchemaFinalInfo execute() {
         _log.info("");
         _log.info("{ReplaceSchema Properties}");
         _log.info("errorContinue     = " + getReplaceSchemaProperties().isErrorContinue());
@@ -87,7 +102,8 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
         initializeSchema();
 
         final DfRunnerInformation runInfo = createRunnerInformation();
-        createSchema(runInfo);
+        final DfSqlFileFireResult fireResult = createSchema(runInfo);
+        return createFinalInfo(fireResult);
     }
 
     // ===================================================================================
@@ -100,7 +116,7 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
     }
 
     protected void initializeSchemaAdditionalDrop() {
-        List<Map<String, Object>> additionalDropMapList = getReplaceSchemaProperties().getAdditionalDropMapList();
+        final List<Map<String, Object>> additionalDropMapList = getReplaceSchemaProperties().getAdditionalDropMapList();
         if (additionalDropMapList.isEmpty()) {
             return;
         }
@@ -197,7 +213,7 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
         return getReplaceSchemaProperties().getSqlFileEncoding();
     }
 
-    protected void createSchema(DfRunnerInformation runInfo) {
+    protected DfSqlFileFireResult createSchema(DfRunnerInformation runInfo) {
         _log.info("");
         _log.info("* * * * * * * * *");
         _log.info("*               *");
@@ -207,13 +223,9 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Create Schema");
         final DfSqlFileFireResult result = fireMan.fire(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
-        try {
-            dumpResult(result);
-        } catch (Throwable ignored) {
-            _log.warn("*Failed to dump create-schema result: " + result, ignored);
-        }
         _log.info(""); // for space line
         destroyChangeUserConnection();
+        return result;
     }
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
@@ -494,14 +506,17 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
     }
 
     // ===================================================================================
-    //                                                                         Result Dump
-    //                                                                         ===========
-    protected void dumpResult(DfSqlFileFireResult result) {
-        final String resultMessage = result.getResultMessage();
-        final boolean failure = result.existsError();
-        final String detailMessage = result.getDetailMessage();
-        final File dumpFile = new File(CREATE_SCHEMA_LOG_PATH);
-        dumpProcessResult(dumpFile, resultMessage, failure, detailMessage);
+    //                                                                          Final Info
+    //                                                                          ==========
+    protected DfCreateSchemaFinalInfo createFinalInfo(DfSqlFileFireResult fireResult) {
+        final DfCreateSchemaFinalInfo finalInfo = new DfCreateSchemaFinalInfo();
+        finalInfo.setResultMessage(fireResult.getResultMessage());
+        final List<String> detailMessageList = extractDetailMessageList(fireResult);
+        for (String detailMessage : detailMessageList) {
+            finalInfo.addDetailMessage(detailMessage);
+        }
+        finalInfo.setFailure(fireResult.existsError());
+        return finalInfo;
     }
 
     // ===================================================================================

@@ -67,14 +67,8 @@
     classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
   <taskdef name="df-outside-sql-test" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
-
-  <!-- ReplaceSchema -->
   <taskdef name="df-create-schema" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.replaceschema.DfCreateSchemaTask"/>
-  <taskdef name="df-load-data" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.replaceschema.DfLoadDataTask"/>
-  <taskdef name="df-take-finally" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.replaceschema.DfTakeFinallyTask"/>
+    classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
   <taskdef name="df-migrate-reps" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.replaceschema.migrate.DfMigrateRepsTask"/>
 
