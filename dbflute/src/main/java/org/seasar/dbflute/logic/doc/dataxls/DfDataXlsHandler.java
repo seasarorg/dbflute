@@ -104,7 +104,6 @@ public class DfDataXlsHandler {
             int limit, File xlsFile) {
         final Set<String> tableDbNameSet = templateDataMap.keySet();
         final DfDataSet dataSet = new DfDataSet();
-        _log.info("...Transferring " + templateDataMap.size() + " tables to xls files");
         for (String tableDbName : tableDbNameSet) {
             final Table table = tableMap.get(tableDbName);
             final DfTemplateDataResult templateDataResult = templateDataMap.get(tableDbName);
@@ -173,7 +172,6 @@ public class DfDataXlsHandler {
     protected void writeXlsData(DfDataSet dataSet, File xlsFile) {
         final DfXlsWriter writer = createXlsWriter(xlsFile);
         try {
-            _log.info("...Writing xls data: " + xlsFile.getName());
             writer.write(dataSet); // flush
         } catch (RuntimeException e) {
             String msg = "Failed to write the xls file: " + xlsFile;
