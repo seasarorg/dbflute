@@ -44,8 +44,8 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlAnalyzer;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
@@ -325,7 +325,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final Set<String> entityNameSet = entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
             final DfCustomizeEntityInfo entityInfo = entityInfoMap.get(entityName);
-            final Map<String, DfColumnMetaInfo> metaMap = entityInfo.getColumnMap();
+            final Map<String, DfColumnMeta> metaMap = entityInfo.getColumnMap();
             final DfOutsideSqlFile outsideSqlFile = entityInfo.getOutsideSqlFile();
 
             final Table tbl = new Table();
@@ -417,7 +417,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return pkMap;
     }
 
-    protected boolean hasAllCommonColumn(Map<String, DfColumnMetaInfo> columnJdbcTypeMap) {
+    protected boolean hasAllCommonColumn(Map<String, DfColumnMeta> columnJdbcTypeMap) {
         final Map<String, String> commonColumnMap = getCommonColumnMap();
         if (commonColumnMap.isEmpty()) {
             return false;
@@ -465,7 +465,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return null;
     }
 
-    protected void setupTorqueType(Map<String, DfColumnMetaInfo> metaMap, String columnName, Column column,
+    protected void setupTorqueType(Map<String, DfColumnMeta> metaMap, String columnName, Column column,
             boolean allCommonColumn) {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // If the select columns have common columns, 
@@ -478,13 +478,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 return;
             }
         }
-        final DfColumnMetaInfo columnMetaInfo = metaMap.get(columnName);
+        final DfColumnMeta columnMetaInfo = metaMap.get(columnName);
         final String columnTorqueType = getColumnTorqueType(columnMetaInfo);
         column.setJdbcType(columnTorqueType);
     }
 
-    protected void setupDbType(Map<String, DfColumnMetaInfo> metaMap, String columnName, Column column) {
-        final DfColumnMetaInfo columnMetaInfo = metaMap.get(columnName);
+    protected void setupDbType(Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
+        final DfColumnMeta columnMetaInfo = metaMap.get(columnName);
         final String dbTypeName;
         final String plainName = columnMetaInfo.getDbTypeName();
         if (Srl.contains(plainName, ".")) { // basically for ARRAY and STRUCT type
@@ -510,7 +510,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return prop.getCommonColumnMap();
     }
 
-    protected String getColumnTorqueType(DfColumnMetaInfo columnMetaInfo) {
+    protected String getColumnTorqueType(DfColumnMeta columnMetaInfo) {
         if (columnMetaInfo.isProcedureParameter() && !_columnHandler.hasMappingJdbcType(columnMetaInfo)) {
             // unknown type of procedure parameter should be treated as Object
             return TypeMap.OTHER;
@@ -519,16 +519,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected void setupColumnSizeContainsDigit(Map<String, DfColumnMetaInfo> metaMap, String columnName,
+    protected void setupColumnSizeContainsDigit(Map<String, DfColumnMeta> metaMap, String columnName,
             final Column column) {
-        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
+        final DfColumnMeta metaInfo = metaMap.get(columnName);
         final int columnSize = metaInfo.getColumnSize();
         final int decimalDigits = metaInfo.getDecimalDigits();
         column.setupColumnSize(columnSize, decimalDigits);
     }
 
-    protected void setupColumnComment(Map<String, DfColumnMetaInfo> metaMap, String columnName, Column column) {
-        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
+    protected void setupColumnComment(Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
+        final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
         final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
         if (relatedTable == null) {
@@ -543,7 +543,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         column.setPlainComment(plainComment);
     }
 
-    protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMetaInfo> metaMap, String columnName,
+    protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMeta> metaMap, String columnName,
             Column column, String pkRelatedTableName, StringBuilder logSb) {
         final Table relatedTable = setupSql2EntityRelatedTable(entityName, metaMap, columnName, column,
                 pkRelatedTableName);
@@ -553,9 +553,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         buildCustomizeEntityColumnInfo(logSb, columnName, column, relatedTable, relatedColumn, forcedJavaNative);
     }
 
-    protected Table setupSql2EntityRelatedTable(String entityName, Map<String, DfColumnMetaInfo> metaMap,
+    protected Table setupSql2EntityRelatedTable(String entityName, Map<String, DfColumnMeta> metaMap,
             String columnName, Column column, String pkRelatedTableName) {
-        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
+        final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
         Table relatedTable = getRelatedTable(sql2EntityRelatedTableName); // first attack
         if (relatedTable == null) {
@@ -608,12 +608,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected Column setupSql2EntityRelatedColumn(Table relatedTable, Map<String, DfColumnMetaInfo> metaMap,
+    protected Column setupSql2EntityRelatedColumn(Table relatedTable, Map<String, DfColumnMeta> metaMap,
             String columnName, Column column) {
         if (relatedTable == null) {
             return null;
         }
-        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
+        final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
         final Column relatedColumn = relatedTable.getColumn(sql2EntityRelatedColumnName);
         if (relatedColumn == null) {
@@ -631,9 +631,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return relatedTable;
     }
 
-    protected String setupSql2EntityForcedJavaNative(final Map<String, DfColumnMetaInfo> metaMap, String columnName,
+    protected String setupSql2EntityForcedJavaNative(final Map<String, DfColumnMeta> metaMap, String columnName,
             final Column column) {
-        final DfColumnMetaInfo metaInfo = metaMap.get(columnName);
+        final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityForcedJavaNative = metaInfo.getSql2EntityForcedJavaNative();
         column.setSql2EntityForcedJavaNative(sql2EntityForcedJavaNative);
         return sql2EntityForcedJavaNative;
@@ -846,10 +846,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     logSb.append(" with customize-entity");
                 }
                 logSb.append(")").append(ln());
-                final Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap = pmbMetaData
+                final Map<String, DfProcedureColumnMeta> propertyNameColumnInfoMap = pmbMetaData
                         .getPropertyNameColumnInfoMap();
-                for (Entry<String, DfProcedureColumnMetaInfo> columnEntry : propertyNameColumnInfoMap.entrySet()) {
-                    final DfProcedureColumnMetaInfo columnInfo = columnEntry.getValue();
+                for (Entry<String, DfProcedureColumnMeta> columnEntry : propertyNameColumnInfoMap.entrySet()) {
+                    final DfProcedureColumnMeta columnInfo = columnEntry.getValue();
                     logSb.append("  ").append(columnInfo.getColumnNameDisp());
                     logSb.append(ln());
                 }

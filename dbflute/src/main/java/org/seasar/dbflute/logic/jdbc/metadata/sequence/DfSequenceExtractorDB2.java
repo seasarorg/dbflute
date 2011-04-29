@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -51,9 +51,9 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
     // ===================================================================================
     //                                                                        Sequence Map
     //                                                                        ============
-    protected Map<String, DfSequenceMetaInfo> doGetSequenceMap() {
+    protected Map<String, DfSequenceMeta> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
-        final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, DfSequenceMeta> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildMetaSelectSql();
         if (sql == null) {
@@ -70,7 +70,7 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
         final StringBuilder logSb = new StringBuilder();
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
-            final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
+            final DfSequenceMeta info = new DfSequenceMeta();
             String sequenceSchema = recordMap.get("SEQSCHEMA");
 
             // trim because DB2 returns "char(8)-owner"

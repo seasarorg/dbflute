@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 
 public class DfCustomizeEntityMetaExtractor {
 
@@ -40,12 +40,12 @@ public class DfCustomizeEntityMetaExtractor {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public Map<String, DfColumnMetaInfo> extractColumnMetaInfoMap(ResultSet rs, String sql,
+    public Map<String, DfColumnMeta> extractColumnMetaInfoMap(ResultSet rs, String sql,
             DfForcedJavaNativeProvider forcedJavaNativeProvider) throws SQLException {
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, DfColumnMeta> columnMetaInfoMap = StringKeyMap.createAsFlexibleOrdered();
         final ResultSetMetaData md = rs.getMetaData();
         for (int i = 1; i <= md.getColumnCount(); i++) {
-            final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
+            final DfColumnMeta metaInfo = new DfColumnMeta();
 
             String sql2EntityRelatedTableName = null;
             try {

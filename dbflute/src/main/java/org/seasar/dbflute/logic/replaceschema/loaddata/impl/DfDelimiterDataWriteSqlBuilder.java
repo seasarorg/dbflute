@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDelimiterDataRegistrationFailureException;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
@@ -26,7 +26,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableDbName;
-    protected Map<String, DfColumnMetaInfo> _columnMap;
+    protected Map<String, DfColumnMeta> _columnMap;
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
@@ -248,11 +248,11 @@ public class DfDelimiterDataWriteSqlBuilder {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, DfColumnMetaInfo> getColumnMap() {
+    public Map<String, DfColumnMeta> getColumnMap() {
         return _columnMap;
     }
 
-    public void setColumnMap(Map<String, DfColumnMetaInfo> columnMap) {
+    public void setColumnMap(Map<String, DfColumnMeta> columnMap) {
         this._columnMap = columnMap;
     }
 

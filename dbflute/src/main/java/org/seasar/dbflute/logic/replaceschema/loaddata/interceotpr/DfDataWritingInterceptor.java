@@ -17,14 +17,14 @@ package org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr;
 
 import java.util.Map;
 
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 
 /**
  * @author jflute
  */
 public interface DfDataWritingInterceptor {
 
-    void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap);
+    void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap);
 
-    void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap);
+    void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap);
 }

@@ -29,8 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -54,7 +54,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException
      */
-    public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, DfTableMetaInfo tableInfo) throws SQLException {
+    public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
         return getPrimaryKey(metaData, unifiedSchema, tableName);
@@ -68,9 +68,9 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException
      */
-    public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
+    public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
-        DfPrimaryKeyMetaInfo info = doGetPrimaryKey(metaData, unifiedSchema, tableName, false);
+        DfPrimaryKeyMeta info = doGetPrimaryKey(metaData, unifiedSchema, tableName, false);
         if (canRetryCaseInsensitive()) {
             if (!info.hasPrimaryKey()) { // retry by lower case
                 info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toLowerCase(), true);
@@ -82,9 +82,9 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return info;
     }
 
-    protected DfPrimaryKeyMetaInfo doGetPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+    protected DfPrimaryKeyMeta doGetPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, boolean retry) throws SQLException {
-        final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
+        final DfPrimaryKeyMeta info = new DfPrimaryKeyMeta();
         if (isPrimaryKeyExtractingUnsupported()) {
             if (isDatabaseMsAccess()) {
                 return processMSAccess(metaData, unifiedSchema, tableName, info);
@@ -131,7 +131,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected void assertPrimaryKeyNotExcepted(DfPrimaryKeyMetaInfo info, UnifiedSchema unifiedSchema, String tableName) {
+    protected void assertPrimaryKeyNotExcepted(DfPrimaryKeyMeta info, UnifiedSchema unifiedSchema, String tableName) {
         final List<String> primaryKeyList = info.getPrimaryKeyList();
         for (String primaryKey : primaryKeyList) {
             if (isColumnExcept(unifiedSchema, tableName, primaryKey)) {
@@ -151,8 +151,8 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information of primary key. (NotNull)
      * @throws SQLException
      */
-    protected DfPrimaryKeyMetaInfo processMSAccess(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, DfPrimaryKeyMetaInfo info) throws SQLException {
+    protected DfPrimaryKeyMeta processMSAccess(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, DfPrimaryKeyMeta info) throws SQLException {
         // it can get from unique key from JDBC of MS Access
         final List<String> emptyList = DfCollectionUtil.emptyList();
         final Map<String, Map<Integer, String>> uqMap = getUniqueKeyMap(metaData, unifiedSchema, tableName, emptyList);
@@ -178,14 +178,14 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException
      */
-    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
+    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
             throws SQLException { // Non Primary Key Only
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
         if (tableInfo.isTableTypeView()) {
             return newLinkedHashMap();
         }
-        final DfPrimaryKeyMetaInfo pkInfo = getPrimaryKey(metaData, tableInfo);
+        final DfPrimaryKeyMeta pkInfo = getPrimaryKey(metaData, tableInfo);
         return getUniqueKeyMap(metaData, unifiedSchema, tableName, pkInfo.getPrimaryKeyList());
     }
 

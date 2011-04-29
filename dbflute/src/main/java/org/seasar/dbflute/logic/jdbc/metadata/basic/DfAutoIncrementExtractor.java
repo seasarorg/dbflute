@@ -23,8 +23,8 @@ import java.sql.Statement;
 
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 
 /**
  * The handler of auto increment. 
@@ -39,8 +39,8 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param primaryKeyColumnInfo The meta information of primary-key column.
      * @return Determination.
      */
-    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo,
-            DfColumnMetaInfo primaryKeyColumnInfo) throws SQLException {
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo,
+            DfColumnMeta primaryKeyColumnInfo) throws SQLException {
         if (analyzeByDatabaseDependencyMeta(tableInfo, primaryKeyColumnInfo)) {
             return true;
         }
@@ -48,7 +48,7 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
         return isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnName);
     }
 
-    protected boolean analyzeByDatabaseDependencyMeta(DfTableMetaInfo tableInfo, DfColumnMetaInfo primaryKeyColumnInfo) {
+    protected boolean analyzeByDatabaseDependencyMeta(DfTableMeta tableInfo, DfColumnMeta primaryKeyColumnInfo) {
         if (isDatabaseSybase()) {
             return primaryKeyColumnInfo.isSybaseAutoIncrement();
         } else {
@@ -63,12 +63,12 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param primaryKeyColumnName The name of primary-key column.
      * @return Determination.
      */
-    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName)
             throws SQLException {
         return analyzeByResultSetMeta(conn, tableInfo, primaryKeyColumnName);
     }
 
-    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
+    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName)
             throws SQLException {
         final String tableSqlName = tableInfo.buildTableSqlName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableSqlName);

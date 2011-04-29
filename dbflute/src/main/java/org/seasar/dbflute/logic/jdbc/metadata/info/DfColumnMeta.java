@@ -23,7 +23,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfColumnMetaInfo {
+public class DfColumnMeta {
 
     // ===================================================================================
     //                                                                           Attribute

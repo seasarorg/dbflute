@@ -35,9 +35,9 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 
 /**
  * @author jflute
@@ -60,9 +60,9 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
-    public Map<String, DfProcedureSynonymMetaInfo> extractProcedureSynonymMap() {
+    public Map<String, DfProcedureSynonymMeta> extractProcedureSynonymMap() {
         _log.info("...Extracting procedure synonym");
-        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, DfProcedureSynonymMeta> procedureSynonymMap = StringKeyMap.createAsFlexibleOrdered();
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement st = null;
@@ -70,15 +70,15 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final Map<String, DfProcedureMetaInfo> procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
-            final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>();
+            final Map<String, DfProcedureMeta> procedureMap = new LinkedHashMap<String, DfProcedureMeta>();
+            final List<DfProcedureMeta> procedureList = new ArrayList<DfProcedureMeta>();
             final DfProcedureExtractor procedureHandler = new DfProcedureExtractor();
             procedureHandler.suppressLogging();
             for (UnifiedSchema unifiedSchema : _targetSchemaList) {
                 // get new procedure list because different instances is needed at this process
                 procedureList.addAll(procedureHandler.getPlainProcedureList(_dataSource, metaData, unifiedSchema));
             }
-            for (DfProcedureMetaInfo metaInfo : procedureList) {
+            for (DfProcedureMeta metaInfo : procedureList) {
                 final String procedureKeyName = metaInfo.getProcedureFullQualifiedName();
                 procedureMap.put(procedureKeyName, metaInfo);
             }
@@ -92,7 +92,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 final String tableName = rs.getString("TABLE_NAME");
                 final String dbLinkName = rs.getString("DB_LINK");
 
-                final DfSynonymMetaInfo synonymMetaInfo = new DfSynonymMetaInfo();
+                final DfSynonymMeta synonymMetaInfo = new DfSynonymMeta();
 
                 // Basic
                 synonymMetaInfo.setSynonymOwner(synonymOwner);
@@ -115,7 +115,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 }
 
                 final String procedureKey = tableOwner.buildSchemaQualifiedName(tableName);
-                final DfProcedureMetaInfo procedureMetaInfo = procedureMap.get(procedureKey);
+                final DfProcedureMeta procedureMetaInfo = procedureMap.get(procedureKey);
                 if (procedureMetaInfo == null) {
                     // Synonym for Package Procedure has several problems.
                     // So it is not supported here.
@@ -130,7 +130,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                     //}
                 }
                 procedureMetaInfo.setProcedureSynonym(true);
-                final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = new DfProcedureSynonymMetaInfo();
+                final DfProcedureSynonymMeta procedureSynonymMetaInfo = new DfProcedureSynonymMeta();
                 procedureSynonymMetaInfo.setProcedureMetaInfo(procedureMetaInfo);
                 procedureSynonymMetaInfo.setSynonymMetaInfo(synonymMetaInfo);
                 final String synonymKey = buildSynonymMapKey(synonymOwner, synonymName);
@@ -180,7 +180,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         return synonymOwner.buildSchemaQualifiedName(synonymName);
     }
 
-    protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
+    protected void judgeSynonymSelectable(DfSynonymMeta info) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String synonymSqlName = info.buildSynonymSqlName();
         final String sql = "select * from " + synonymSqlName + " where 0 = 1";

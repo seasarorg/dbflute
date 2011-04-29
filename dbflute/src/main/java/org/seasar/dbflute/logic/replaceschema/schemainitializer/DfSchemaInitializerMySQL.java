@@ -18,8 +18,8 @@ package org.seasar.dbflute.logic.replaceschema.schemainitializer;
 import java.sql.Connection;
 import java.util.List;
 
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 
 /**
  * @author jflute
@@ -30,9 +30,9 @@ public class DfSchemaInitializerMySQL extends DfSchemaInitializerJdbc {
     //                                                                    Drop Foreign Key
     //                                                                    ================
     @Override
-    protected void dropForeignKey(Connection connection, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropForeignKey(Connection connection, List<DfTableMeta> tableMetaInfoList) {
         final DfDropForeignKeyByJdbcCallback callback = new DfDropForeignKeyByJdbcCallback() {
-            public String buildDropForeignKeySql(DfForeignKeyMetaInfo metaInfo) {
+            public String buildDropForeignKeySql(DfForeignKeyMeta metaInfo) {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
                 final String localTableName = filterTableName(metaInfo.getLocalTableName());
                 final StringBuilder sb = new StringBuilder();

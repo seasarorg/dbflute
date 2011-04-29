@@ -27,7 +27,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * @author jflute
  * @since 0.7.0 (2008/04/18 Friday)
  */
-public class DfTableMetaInfo {
+public class DfTableMeta {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -101,8 +101,8 @@ public class DfTableMetaInfo {
     //                                                                      ==============
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof DfTableMetaInfo) {
-            return buildTableFullQualifiedName().equals(((DfTableMetaInfo) obj).buildTableFullQualifiedName());
+        if (obj != null && obj instanceof DfTableMeta) {
+            return buildTableFullQualifiedName().equals(((DfTableMeta) obj).buildTableFullQualifiedName());
         }
         return false;
     }

@@ -30,7 +30,7 @@ public class DfTypeStructInfo {
     //                                                                           =========
     protected final UnifiedSchema _owner; // required at first
     protected final String _typeName; // required at first
-    protected final StringKeyMap<DfColumnMetaInfo> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered(); // required at first
+    protected final StringKeyMap<DfColumnMeta> _attributeInfoMap = StringKeyMap.createAsFlexibleOrdered(); // required at first
     protected String _entityType; // is set after analyzing
 
     // ===================================================================================
@@ -53,7 +53,7 @@ public class DfTypeStructInfo {
     }
 
     public boolean hasNestedStructEntityRef() {
-        for (DfColumnMetaInfo columnInfo : _attributeInfoMap.values()) {
+        for (DfColumnMeta columnInfo : _attributeInfoMap.values()) {
             if (columnInfo.hasTypeArrayInfo()) { // array in struct
                 final DfTypeArrayInfo arrayInfo = columnInfo.getTypeArrayInfo();
                 DfTypeArrayInfo nestedArrayInfo = arrayInfo;
@@ -105,7 +105,7 @@ public class DfTypeStructInfo {
 
     protected String doToStringAttributeOnly(boolean escape) {
         final StringBuilder sb = new StringBuilder();
-        for (DfColumnMetaInfo info : _attributeInfoMap.values()) {
+        for (DfColumnMeta info : _attributeInfoMap.values()) {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
@@ -146,11 +146,11 @@ public class DfTypeStructInfo {
         return _owner.isAdditionalSchema() ? getTypeName() : getTypePureName();
     }
 
-    public StringKeyMap<DfColumnMetaInfo> getAttributeInfoMap() {
+    public StringKeyMap<DfColumnMeta> getAttributeInfoMap() {
         return _attributeInfoMap;
     }
 
-    public void putAttributeInfo(DfColumnMetaInfo attributeInfo) {
+    public void putAttributeInfo(DfColumnMeta attributeInfo) {
         _attributeInfoMap.put(attributeInfo.getColumnName(), attributeInfo);
     }
 

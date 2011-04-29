@@ -27,7 +27,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle.ProcedureArgumentInfo;
@@ -246,14 +246,14 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
             StringKeyMap<DfTypeStructInfo> structInfoMap, StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
             DfTypeStructInfo structInfo) {
-        for (DfColumnMetaInfo columnInfo : structInfo.getAttributeInfoMap().values()) {
+        for (DfColumnMeta columnInfo : structInfo.getAttributeInfoMap().values()) {
             doResolveStructAttributeInfo(unifiedSchema, structInfoMap, flatArrayInfoMap, structInfo, columnInfo);
         }
     }
 
     protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
             StringKeyMap<DfTypeStructInfo> structInfoMap, StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
-            DfTypeStructInfo structInfo, DfColumnMetaInfo columnInfo) {
+            DfTypeStructInfo structInfo, DfColumnMeta columnInfo) {
         final String attrTypeName = columnInfo.getDbTypeName();
         final DfTypeArrayInfo arrayInfo = doResolveStructAttributeArray(structInfoMap, flatArrayInfoMap, attrTypeName);
         if (arrayInfo != null) { // array attribute

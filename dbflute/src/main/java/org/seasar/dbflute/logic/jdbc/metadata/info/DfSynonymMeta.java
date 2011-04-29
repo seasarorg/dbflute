@@ -27,7 +27,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 /**
  * @author jflute
  */
-public class DfSynonymMetaInfo {
+public class DfSynonymMeta {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,13 +36,13 @@ public class DfSynonymMetaInfo {
     protected String _synonymName;
     protected UnifiedSchema _tableOwner;
     protected String _tableName;
-    protected DfPrimaryKeyMetaInfo _primaryKey;
+    protected DfPrimaryKeyMeta _primaryKey;
     protected boolean _autoIncrement;
     protected Map<String, Map<Integer, String>> _uniqueKeyMap;
-    protected Map<String, DfForeignKeyMetaInfo> _foreignKeyMap;
+    protected Map<String, DfForeignKeyMeta> _foreignKeyMap;
     protected Map<String, Map<Integer, String>> _indexMap;
     protected String _dbLinkName;
-    protected List<DfColumnMetaInfo> _columnMetaInfoList4DBLink;
+    protected List<DfColumnMeta> _columnMetaInfoList4DBLink;
     protected boolean _selectable;
     protected boolean _procedureSynonym;
     protected boolean _sequenceSynonym;
@@ -143,11 +143,11 @@ public class DfSynonymMetaInfo {
         this._tableName = tableName;
     }
 
-    public DfPrimaryKeyMetaInfo getPrimaryKey() {
+    public DfPrimaryKeyMeta getPrimaryKey() {
         return _primaryKey;
     }
 
-    public void setPrimaryKey(DfPrimaryKeyMetaInfo primaryKey) {
+    public void setPrimaryKey(DfPrimaryKeyMeta primaryKey) {
         this._primaryKey = primaryKey;
     }
 
@@ -167,11 +167,11 @@ public class DfSynonymMetaInfo {
         this._uniqueKeyMap = uniqueKeyMap;
     }
 
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMap() {
-        return _foreignKeyMap != null ? _foreignKeyMap : new HashMap<String, DfForeignKeyMetaInfo>();
+    public Map<String, DfForeignKeyMeta> getForeignKeyMap() {
+        return _foreignKeyMap != null ? _foreignKeyMap : new HashMap<String, DfForeignKeyMeta>();
     }
 
-    public void setForeignKeyMap(Map<String, DfForeignKeyMetaInfo> foreignKeyMap) {
+    public void setForeignKeyMap(Map<String, DfForeignKeyMeta> foreignKeyMap) {
         this._foreignKeyMap = foreignKeyMap;
     }
 
@@ -191,11 +191,11 @@ public class DfSynonymMetaInfo {
         this._dbLinkName = dbLinkName;
     }
 
-    public List<DfColumnMetaInfo> getColumnMetaInfoList4DBLink() {
-        return _columnMetaInfoList4DBLink != null ? _columnMetaInfoList4DBLink : new ArrayList<DfColumnMetaInfo>();
+    public List<DfColumnMeta> getColumnMetaInfoList4DBLink() {
+        return _columnMetaInfoList4DBLink != null ? _columnMetaInfoList4DBLink : new ArrayList<DfColumnMeta>();
     }
 
-    public void setColumnMetaInfoList4DBLink(List<DfColumnMetaInfo> columnMetaInfoList4DBLink) {
+    public void setColumnMetaInfoList4DBLink(List<DfColumnMeta> columnMetaInfoList4DBLink) {
         this._columnMetaInfoList4DBLink = columnMetaInfoList4DBLink;
     }
 

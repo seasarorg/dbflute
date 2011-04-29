@@ -20,7 +20,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.dbway.WayOfSybase;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 
 /**
  * @author jflute
@@ -33,8 +33,8 @@ public class DfDataWritingInterceptorSybase extends DfDataWritingInterceptorSQLS
 
     @Override
     protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName,
-            Map<String, DfColumnMetaInfo> columnMap) {
-        for (DfColumnMetaInfo info : columnMap.values()) {
+            Map<String, DfColumnMeta> columnMap) {
+        for (DfColumnMeta info : columnMap.values()) {
             if (info.isSybaseAutoIncrement()) {
                 return true;
             }

@@ -51,7 +51,7 @@ import org.seasar.dbflute.helper.dataset.states.DfDtsSqlContext;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
@@ -134,7 +134,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
 
         // set up columnMetaInfo
-        final Map<String, DfColumnMetaInfo> columnInfoMap = getColumnInfoMap(tableDbName);
+        final Map<String, DfColumnMeta> columnInfoMap = getColumnInfoMap(tableDbName);
         if (columnInfoMap.isEmpty()) {
             throwTableNotFoundException(file, tableDbName);
         }
@@ -237,20 +237,20 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return br.buildExceptionMessage();
     }
 
-    protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+    protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
-    protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+    protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMetaInfo> columnInfoMap, List<String> columnNameList, Connection conn,
+            Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn,
             PreparedStatement ps) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
@@ -372,7 +372,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final DfDataTable table = dataSet.getTable(i);
             final String tableName = table.getTableDbName();
 
-            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnInfoMap(tableName);
+            final Map<String, DfColumnMeta> metaInfoMap = getColumnInfoMap(tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DfDataColumn dataColumn = table.getColumn(j);
                 if (!metaInfoMap.containsKey(dataColumn.getColumnDbName())) {
@@ -392,7 +392,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableDbName();
 
-            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnInfoMap(tableName);
+            final Map<String, DfColumnMeta> metaInfoMap = getColumnInfoMap(tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 

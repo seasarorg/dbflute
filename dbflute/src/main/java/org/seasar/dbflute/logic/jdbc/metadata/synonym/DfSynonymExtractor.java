@@ -17,7 +17,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.synonym;
 
 import java.util.Map;
 
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 
 /**
  * @author jflute
@@ -25,5 +25,5 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
  */
 public interface DfSynonymExtractor {
 
-    Map<String, DfSynonymMetaInfo> extractSynonymMap();
+    Map<String, DfSynonymMeta> extractSynonymMap();
 }

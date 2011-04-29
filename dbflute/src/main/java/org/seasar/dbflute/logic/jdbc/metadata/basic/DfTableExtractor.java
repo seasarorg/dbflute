@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -54,15 +54,15 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
-    public List<DfTableMetaInfo> getTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
+    public List<DfTableMeta> getTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
         return doGetTableList(metaData, unifiedSchema);
     }
 
-    protected List<DfTableMetaInfo> doGetTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
+    protected List<DfTableMeta> doGetTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
         final String[] objectTypes = getRealObjectTypeTargetArray(unifiedSchema);
-        final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
+        final List<DfTableMeta> tableList = new ArrayList<DfTableMeta>();
         ResultSet rs = null;
         try {
             _log.info("...Getting tables:");
@@ -104,7 +104,7 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
                     continue;
                 }
 
-                final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
+                final DfTableMeta tableMetaInfo = new DfTableMeta();
                 tableMetaInfo.setTableName(tableName);
                 tableMetaInfo.setTableType(tableType);
                 tableMetaInfo.setUnifiedSchema(tableUnifiedSchema);
@@ -160,11 +160,11 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    public Map<String, DfTableMetaInfo> getTableMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
+    public Map<String, DfTableMeta> getTableMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
-        final List<DfTableMetaInfo> tableList = getTableList(metaData, unifiedSchema);
-        final Map<String, DfTableMetaInfo> map = DfCollectionUtil.newLinkedHashMap();
-        for (DfTableMetaInfo tableInfo : tableList) {
+        final List<DfTableMeta> tableList = getTableList(metaData, unifiedSchema);
+        final Map<String, DfTableMeta> map = DfCollectionUtil.newLinkedHashMap();
+        for (DfTableMeta tableInfo : tableList) {
             map.put(tableInfo.getTableName(), tableInfo);
         }
         return map;

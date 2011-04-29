@@ -24,10 +24,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -44,7 +44,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                       Drop Sequence
     //                                                                       =============
     @Override
-    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropSequence(Connection conn, List<DfTableMeta> tableMetaInfoList) {
         final String catalog = _unifiedSchema.existsPureCatalog() ? _unifiedSchema.getPureCatalog() : null;
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
@@ -74,15 +74,15 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+    protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
         final String expression = "(" + buildProcedureArgExpression(metaInfo) + ")";
         return super.buildProcedureSqlName(metaInfo) + expression;
     }
 
-    protected String buildProcedureArgExpression(DfProcedureMetaInfo metaInfo) {
-        final List<DfProcedureColumnMetaInfo> metaInfoList = metaInfo.getProcedureColumnList();
+    protected String buildProcedureArgExpression(DfProcedureMeta metaInfo) {
+        final List<DfProcedureColumnMeta> metaInfoList = metaInfo.getProcedureColumnList();
         final StringBuilder sb = new StringBuilder();
-        for (DfProcedureColumnMetaInfo columnMetaInfo : metaInfoList) {
+        for (DfProcedureColumnMeta columnMetaInfo : metaInfoList) {
             final String dbTypeName = columnMetaInfo.getDbTypeName();
             final String columnName = columnMetaInfo.getColumnName();
             final DfProcedureColumnType columnType = columnMetaInfo.getProcedureColumnType();

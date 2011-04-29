@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractorOracle;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -21,7 +21,7 @@ public class DfSynonymExtractorFactory {
     protected DataSource _dataSource;
     protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected DfDatabaseProperties _databaseProperties;
-    protected Map<String, DfTableMetaInfo> _generatedTableMap;
+    protected Map<String, DfTableMeta> _generatedTableMap;
 
     /**
      * @param dataSource The data source. (NotNull)
@@ -30,7 +30,7 @@ public class DfSynonymExtractorFactory {
      * @param generatedTableMap The map of generated tables for checking reference tables. (NotNull)
      */
     public DfSynonymExtractorFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
-            DfDatabaseProperties databaseProperties, Map<String, DfTableMetaInfo> generatedTableMap) {
+            DfDatabaseProperties databaseProperties, Map<String, DfTableMeta> generatedTableMap) {
         _dataSource = dataSource;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;

@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -41,7 +41,7 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
     //                                                                       Drop Sequence
     //                                                                       =============
     @Override
-    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropSequence(Connection conn, List<DfTableMeta> tableMetaInfoList) {
         final String catalog = _unifiedSchema.existsPureCatalog() ? _unifiedSchema.getPureCatalog() : null;
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();

@@ -17,7 +17,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
 import java.util.Map;
 
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 
 /**
  * @author jflute
@@ -25,5 +25,5 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
  */
 public interface DfSequenceExtractor {
 
-    Map<String, DfSequenceMetaInfo> getSequenceMap();
+    Map<String, DfSequenceMeta> getSequenceMap();
 }

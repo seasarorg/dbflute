@@ -26,8 +26,8 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
@@ -69,7 +69,7 @@ public class DfPmbMetaData {
     // only when for procedure
     protected String _procedureName;
     protected Map<String, String> _propertyNameColumnNameMap;
-    protected Map<String, DfProcedureColumnMetaInfo> _propertyNameColumnInfoMap;
+    protected Map<String, DfProcedureColumnMeta> _propertyNameColumnInfoMap;
     protected boolean _procedureCalledBySelect;
     protected boolean _procedureRefCustomizeEntity;
 
@@ -526,7 +526,7 @@ public class DfPmbMetaData {
     //                                               -------
     public String getPropertyRefColumnInfo(String propertyName, AppData schemaData) {
         if (isRelatedToProcedure()) {
-            final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(propertyName);
+            final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
             return metaInfo != null ? ": {" + metaInfo.getColumnDefinitionLineDisp() + "}" : "";
         }
         final StringBuilder sb = new StringBuilder();
@@ -591,12 +591,12 @@ public class DfPmbMetaData {
     //                                                                           Procedure
     //                                                                           =========
     public boolean hasProcedureOverload() {
-        final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap();
+        final Map<String, DfProcedureColumnMeta> columnInfoMap = getPropertyNameColumnInfoMap();
         if (columnInfoMap == null) {
             return false;
         }
-        final Collection<DfProcedureColumnMetaInfo> values = columnInfoMap.values();
-        for (DfProcedureColumnMetaInfo columnInfo : values) {
+        final Collection<DfProcedureColumnMeta> values = columnInfoMap.values();
+        for (DfProcedureColumnMeta columnInfo : values) {
             if (columnInfo.getOverloadNo() != null) {
                 return true;
             }
@@ -639,7 +639,7 @@ public class DfPmbMetaData {
     //                                ----------------------
     public boolean needsStringClobHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -648,7 +648,7 @@ public class DfPmbMetaData {
 
     public boolean needsBytesOidHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -657,7 +657,7 @@ public class DfPmbMetaData {
 
     public boolean needsFixedLengthStringHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -666,7 +666,7 @@ public class DfPmbMetaData {
 
     public boolean needsObjectBindingBigDecimalHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         if (metaInfo == null) {
             return false;
         }
@@ -679,7 +679,7 @@ public class DfPmbMetaData {
                 || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
             return false;
         }
-        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         return metaInfo != null && metaInfo.hasTypeArrayInfo();
     }
 
@@ -689,7 +689,7 @@ public class DfPmbMetaData {
                 || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
             return false;
         }
-        final DfProcedureColumnMetaInfo metaInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         return metaInfo != null && metaInfo.hasTypeStructInfo();
     }
 
@@ -698,7 +698,7 @@ public class DfPmbMetaData {
     //                                           -----------
     public String getProcedureParameterOracleArrayTypeName(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta columnInfo = getProcedureColumnInfo(propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayInfo()) {
             return columnInfo.getTypeArrayInfo().getTypeSqlName();
         }
@@ -707,7 +707,7 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleArrayElementTypeName(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta columnInfo = getProcedureColumnInfo(propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayInfo()) {
             return columnInfo.getTypeArrayInfo().getElementType();
         }
@@ -716,7 +716,7 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleArrayElementJavaNative(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta columnInfo = getProcedureColumnInfo(propertyName);
         if (columnInfo != null && columnInfo.hasTypeArrayElementJavaNative()) {
             return columnInfo.getTypeArrayInfo().getElementJavaNative();
         }
@@ -731,7 +731,7 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleStructTypeName(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta columnInfo = getProcedureColumnInfo(propertyName);
         if (columnInfo != null && columnInfo.hasTypeStructInfo()) {
             return columnInfo.getTypeStructInfo().getTypeSqlName();
         }
@@ -740,7 +740,7 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleStructEntityType(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMetaInfo columnInfo = getProcedureColumnInfo(propertyName);
+        final DfProcedureColumnMeta columnInfo = getProcedureColumnInfo(propertyName);
         if (columnInfo != null && columnInfo.hasTypeStructEntityType()) {
             return columnInfo.getTypeStructInfo().getEntityType();
         }
@@ -756,9 +756,9 @@ public class DfPmbMetaData {
     // -----------------------------------------------------
     //                                           Column Info
     //                                           -----------
-    protected DfProcedureColumnMetaInfo getProcedureColumnInfo(String propertyName) {
+    protected DfProcedureColumnMeta getProcedureColumnInfo(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final Map<String, DfProcedureColumnMetaInfo> columnInfoMap = getPropertyNameColumnInfoMap();
+        final Map<String, DfProcedureColumnMeta> columnInfoMap = getPropertyNameColumnInfoMap();
         if (columnInfoMap != null) {
             return columnInfoMap.get(propertyName);
         }
@@ -996,11 +996,11 @@ public class DfPmbMetaData {
         this._propertyNameColumnNameMap = propertyNameColumnNameMap;
     }
 
-    public Map<String, DfProcedureColumnMetaInfo> getPropertyNameColumnInfoMap() {
+    public Map<String, DfProcedureColumnMeta> getPropertyNameColumnInfoMap() {
         return _propertyNameColumnInfoMap;
     }
 
-    public void setPropertyNameColumnInfoMap(Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap) {
+    public void setPropertyNameColumnInfoMap(Map<String, DfProcedureColumnMeta> propertyNameColumnInfoMap) {
         this._propertyNameColumnInfoMap = propertyNameColumnInfoMap;
     }
 

@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author jflute
  */
-public class DfPrimaryKeyMetaInfo {
+public class DfPrimaryKeyMeta {
 
     // ===================================================================================
     //                                                                           Attribute

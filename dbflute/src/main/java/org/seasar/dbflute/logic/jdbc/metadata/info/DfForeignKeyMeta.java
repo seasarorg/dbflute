@@ -15,80 +15,73 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
-import java.math.BigDecimal;
+import java.util.Map;
+
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
-public class DfSequenceMetaInfo {
+public class DfForeignKeyMeta {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String sequenceCatalog; // nullable
-    protected String sequenceSchema;
-    protected String sequenceName;
-    protected BigDecimal minimumValue;
-    protected BigDecimal maximumValue;
-    protected Integer incrementSize;
+    protected String _foreignKeyName;
+
+    protected String _localTableName;
+
+    protected String _foreignTableName;
+
+    protected Map<String, String> _columnNameMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return (sequenceCatalog != null ? sequenceCatalog + "." : "") + sequenceSchema + "." + sequenceName + ":{"
-                + minimumValue + " to " + maximumValue + ", increment " + incrementSize + "}";
+        return _foreignKeyName + "-{" + _localTableName + ":" + _foreignTableName + "--" + _columnNameMap + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getSequenceCatalog() {
-        return sequenceCatalog;
+    public String getForeignKeyName() {
+        return _foreignKeyName;
     }
 
-    public void setSequenceCatalog(String sequenceCatalog) {
-        this.sequenceCatalog = sequenceCatalog;
+    public void setForeignKeyName(String foreignKeyName) {
+        this._foreignKeyName = foreignKeyName;
     }
 
-    public String getSequenceSchema() {
-        return sequenceSchema;
+    public String getLocalTableName() {
+        return _localTableName;
     }
 
-    public void setSequenceSchema(String sequenceSchema) {
-        this.sequenceSchema = sequenceSchema;
+    public void setLocalTableName(String localtableName) {
+        this._localTableName = localtableName;
     }
 
-    public String getSequenceName() {
-        return sequenceName;
+    public String getForeignTableName() {
+        return _foreignTableName;
     }
 
-    public void setSequenceName(String sequenceName) {
-        this.sequenceName = sequenceName;
+    public void setForeignTableName(String foreignTableName) {
+        this._foreignTableName = foreignTableName;
     }
 
-    public BigDecimal getMinimumValue() {
-        return minimumValue;
+    public Map<String, String> getColumnNameMap() {
+        return _columnNameMap;
     }
 
-    public void setMinimumValue(BigDecimal minimumValue) {
-        this.minimumValue = minimumValue;
+    public void setColumnNameMap(Map<String, String> columnNameMap) {
+        if (columnNameMap == null) {
+            throw new IllegalArgumentException("The argument 'columnNameMap' should not be null!");
+        }
+        this._columnNameMap = columnNameMap;
     }
 
-    public BigDecimal getMaximumValue() {
-        return maximumValue;
-    }
-
-    public void setMaximumValue(BigDecimal maximumValue) {
-        this.maximumValue = maximumValue;
-    }
-
-    public Integer getIncrementSize() {
-        return incrementSize;
-    }
-
-    public void setIncrementSize(Integer incrementSize) {
-        this.incrementSize = incrementSize;
+    public void putColumnNameMap(String localColumnName, String foreignColumnName) {
+        this._columnNameMap.put(localColumnName, foreignColumnName);
     }
 }

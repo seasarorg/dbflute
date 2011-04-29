@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -77,7 +77,7 @@ public class DfStructExtractorOracle {
                 info = new DfTypeStructInfo(unifiedSchema, typeName);
                 structInfoMap.put(typeName, info);
             }
-            final DfColumnMetaInfo attributeInfo = new DfColumnMetaInfo();
+            final DfColumnMeta attributeInfo = new DfColumnMeta();
             final String attrName = map.get("ATTR_NAME");
             if (Srl.is_Null_or_TrimmedEmpty(attrName)) {
                 continue;

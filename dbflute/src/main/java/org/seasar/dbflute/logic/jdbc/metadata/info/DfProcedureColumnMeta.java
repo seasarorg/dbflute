@@ -8,7 +8,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
-public class DfProcedureColumnMetaInfo {
+public class DfProcedureColumnMeta {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -24,7 +24,7 @@ public class DfProcedureColumnMetaInfo {
 
     // if the informations can be extracted
     // (if these attributes are null, it's not always true that these are other types)
-    protected Map<String, DfColumnMetaInfo> _resultSetColumnInfoMap; // when ResultSet type
+    protected Map<String, DfColumnMeta> _resultSetColumnInfoMap; // when ResultSet type
     protected DfTypeArrayInfo _typeArrayInfo; // when ARRAY type 
     protected DfTypeStructInfo _typeStructInfo; // when STRUCT type
 
@@ -348,11 +348,11 @@ public class DfProcedureColumnMetaInfo {
         this._columnComment = columnComment;
     }
 
-    public Map<String, DfColumnMetaInfo> getResultSetColumnInfoMap() {
+    public Map<String, DfColumnMeta> getResultSetColumnInfoMap() {
         return _resultSetColumnInfoMap;
     }
 
-    public void setResultSetColumnInfoMap(Map<String, DfColumnMetaInfo> resultSetColumnInfoMap) {
+    public void setResultSetColumnInfoMap(Map<String, DfColumnMeta> resultSetColumnInfoMap) {
         this._resultSetColumnInfoMap = resultSetColumnInfoMap;
     }
 

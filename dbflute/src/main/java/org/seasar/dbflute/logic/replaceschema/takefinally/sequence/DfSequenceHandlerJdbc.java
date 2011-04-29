@@ -34,8 +34,8 @@ import org.seasar.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -56,7 +56,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     protected DataSource _dataSource;
     protected List<UnifiedSchema> _unifiedSchemaList;
     protected final DfUniqueKeyExtractor _uniqueKeyHandler = new DfUniqueKeyExtractor();
-    protected Map<String, DfTableMetaInfo> _tableMap;
+    protected Map<String, DfTableMeta> _tableMap;
 
     protected void initializeTableInfo(Connection conn) throws SQLException {
         if (_tableMap != null) {
@@ -89,8 +89,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         _log.info("...Incrementing sequences to max value of table data");
         String tableName = null;
         String sequenceName = null;
-        DfTableMetaInfo tableInfo = null;
-        DfPrimaryKeyMetaInfo pkInfo = null;
+        DfTableMeta tableInfo = null;
+        DfPrimaryKeyMeta pkInfo = null;
         String tableSqlName = null;
         Integer actualValue = null;
         Connection conn = null;
@@ -171,8 +171,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
     }
 
-    protected DfTableMetaInfo findTableInfo(Connection conn, String tableName) throws SQLException {
-        final DfTableMetaInfo table = _tableMap.get(tableName);
+    protected DfTableMeta findTableInfo(Connection conn, String tableName) throws SQLException {
+        final DfTableMeta table = _tableMap.get(tableName);
         if (table == null) {
             String msg = "Failed to find the table in generated target tables:";
             msg = msg + " table=" + tableName + " target=" + _tableMap.keySet();
@@ -181,7 +181,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         return table;
     }
 
-    protected DfPrimaryKeyMetaInfo findPrimaryKeyInfo(Connection conn, DfTableMetaInfo tableInfo) throws SQLException {
+    protected DfPrimaryKeyMeta findPrimaryKeyInfo(Connection conn, DfTableMeta tableInfo) throws SQLException {
         final DatabaseMetaData metaData = conn.getMetaData();
         return _uniqueKeyHandler.getPrimaryKey(metaData, tableInfo);
     }
@@ -226,7 +226,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
     }
 
-    protected Integer selectDataMax(Statement statement, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
+    protected Integer selectDataMax(Statement statement, DfTableMeta tableInfo, String primaryKeyColumnName)
             throws SQLException {
         final String tableSqlName = tableInfo.buildTableSqlName();
         final String sql = "select max(" + primaryKeyColumnName + ") as MAX_VALUE from " + tableSqlName;
@@ -264,7 +264,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     protected abstract Integer selectNextVal(Statement statement, String sequenceName) throws SQLException;
 
     protected void throwIncrementSequenceToDataMaxFailureException(String tableName, String sequenceName,
-            DfTableMetaInfo tableInfo, DfPrimaryKeyMetaInfo pkInfo, String tableSqlName, Integer actualValue,
+            DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo, String tableSqlName, Integer actualValue,
             SQLException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();

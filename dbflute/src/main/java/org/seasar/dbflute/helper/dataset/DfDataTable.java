@@ -17,8 +17,8 @@ import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
@@ -138,7 +138,7 @@ public class DfDataTable {
     }
 
     public void setupMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
-        final Map<String, DfColumnMetaInfo> metaMap = extractColumnMetaMap(metaData, unifiedSchema);
+        final Map<String, DfColumnMeta> metaMap = extractColumnMetaMap(metaData, unifiedSchema);
         final Set<String> primaryKeySet = getPrimaryKeySet(metaData, unifiedSchema);
         for (int i = 0; i < getColumnSize(); ++i) {
             final DfDataColumn column = getColumn(i);
@@ -147,7 +147,7 @@ public class DfDataTable {
             } else {
                 column.setPrimaryKey(false);
             }
-            final DfColumnMetaInfo metaInfo = metaMap.get(column.getColumnDbName());
+            final DfColumnMeta metaInfo = metaMap.get(column.getColumnDbName());
             if (metaInfo != null) {
                 column.setWritable(true);
                 final int jdbcDefValue = metaInfo.getJdbcDefValue();
@@ -162,12 +162,12 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
+    protected Map<String, DfColumnMeta> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
-        final List<DfColumnMetaInfo> metaList = new DfColumnExtractor().getColumnList(metaData, unifiedSchema,
+        final List<DfColumnMeta> metaList = new DfColumnExtractor().getColumnList(metaData, unifiedSchema,
                 _tableDbName);
-        final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
-        for (DfColumnMetaInfo metaInfo : metaList) {
+        final Map<String, DfColumnMeta> metaMap = new HashMap<String, DfColumnMeta>();
+        for (DfColumnMeta metaInfo : metaList) {
             metaMap.put(metaInfo.getColumnName(), metaInfo);
         }
         return metaMap;
@@ -175,7 +175,7 @@ public class DfDataTable {
 
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) {
         try {
-            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyExtractor().getPrimaryKey(metaData, unifiedSchema,
+            final DfPrimaryKeyMeta pkInfo = new DfUniqueKeyExtractor().getPrimaryKey(metaData, unifiedSchema,
                     _tableDbName);
             final List<String> list = pkInfo.getPrimaryKeyList();
             return new HashSet<String>(list);

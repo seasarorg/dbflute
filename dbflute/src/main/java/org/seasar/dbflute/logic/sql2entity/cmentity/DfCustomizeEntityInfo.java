@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
@@ -34,7 +34,7 @@ public class DfCustomizeEntityInfo {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _tableDbName;
-    protected final Map<String, DfColumnMetaInfo> _columnMap;
+    protected final Map<String, DfColumnMeta> _columnMap;
     protected final DfTypeStructInfo _typeStructInfo;
 
     // additional information (outsideSql only)
@@ -56,11 +56,11 @@ public class DfCustomizeEntityInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMetaInfo> columnMap) {
+    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMap) {
         this(tableDbName, columnMap, null);
     }
 
-    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMetaInfo> columnMap,
+    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMap,
             DfTypeStructInfo typeStructInfo) {
         _tableDbName = tableDbName;
         _columnMap = columnMap;
@@ -132,7 +132,7 @@ public class DfCustomizeEntityInfo {
         return _tableDbName;
     }
 
-    public Map<String, DfColumnMetaInfo> getColumnMap() {
+    public Map<String, DfColumnMeta> getColumnMap() {
         return _columnMap;
     }
 

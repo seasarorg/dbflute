@@ -41,7 +41,7 @@ import org.seasar.dbflute.exception.DfDelimiterDataTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -68,7 +68,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     protected Map<String, String> _defaultValueMap;
 
     /** The cache map of meta info. The key is table name. */
-    protected final Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
+    protected final Map<String, Map<String, DfColumnMeta>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -92,7 +92,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         if (tableDbName.indexOf("-") >= 0) {
             tableDbName = tableDbName.substring(tableDbName.indexOf("-") + "-".length());
         }
-        final Map<String, DfColumnMetaInfo> columnInfoMap = getColumnInfoMap(tableDbName);
+        final Map<String, DfColumnMeta> columnInfoMap = getColumnInfoMap(tableDbName);
         if (columnInfoMap.isEmpty()) {
             throwTableNotFoundException(_fileName, tableDbName);
         }
@@ -362,13 +362,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         return br.buildExceptionMessage();
     }
 
-    protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+    protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
         }
     }
 
-    protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+    protected void finallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
         }

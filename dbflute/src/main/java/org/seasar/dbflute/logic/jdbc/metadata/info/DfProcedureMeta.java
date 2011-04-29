@@ -12,7 +12,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfProcedureMetaInfo {
+public class DfProcedureMeta {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -29,8 +29,8 @@ public class DfProcedureMetaInfo {
     protected boolean _procedureSynonym;
     protected boolean _packageProcedure;
 
-    protected final List<DfProcedureColumnMetaInfo> _procedureColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
-    protected final List<DfProcedureNotParamResultMetaInfo> _notParamResultList = new ArrayList<DfProcedureNotParamResultMetaInfo>();
+    protected final List<DfProcedureColumnMeta> _procedureColumnList = new ArrayList<DfProcedureColumnMeta>();
+    protected final List<DfProcedureNotParamResultMeta> _notParamResultList = new ArrayList<DfProcedureNotParamResultMeta>();
 
     // ===================================================================================
     //                                                                          Expression
@@ -98,7 +98,7 @@ public class DfProcedureMetaInfo {
     //                                                                    ================
     public int getBindParameterCount() {
         int count = 0;
-        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+        for (DfProcedureColumnMeta columnInfo : _procedureColumnList) {
             if (columnInfo.isBindParameter()) {
                 ++count;
             }
@@ -108,7 +108,7 @@ public class DfProcedureMetaInfo {
 
     public int getInputParameterCount() {
         int count = 0;
-        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+        for (DfProcedureColumnMeta columnInfo : _procedureColumnList) {
             if (columnInfo.isInputParameter()) {
                 ++count;
             }
@@ -132,7 +132,7 @@ public class DfProcedureMetaInfo {
     //                                              Overload
     //                                              --------
     public boolean hasOverloadParameter() {
-        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+        for (DfProcedureColumnMeta columnInfo : _procedureColumnList) {
             if (columnInfo.getOverloadNo() != null) {
                 return true;
             }
@@ -147,7 +147,7 @@ public class DfProcedureMetaInfo {
         if (!getBasicProperties().isDatabaseSQLServer()) {
             return false;
         }
-        for (DfProcedureColumnMetaInfo columnInfo : _procedureColumnList) {
+        for (DfProcedureColumnMeta columnInfo : _procedureColumnList) {
             if (columnInfo.isSQLServerTableReturnValue()) {
                 return true;
             }
@@ -270,19 +270,19 @@ public class DfProcedureMetaInfo {
         this._procedureSynonym = procedureSynonym;
     }
 
-    public List<DfProcedureColumnMetaInfo> getProcedureColumnList() {
+    public List<DfProcedureColumnMeta> getProcedureColumnList() {
         return _procedureColumnList;
     }
 
-    public void addProcedureColumn(DfProcedureColumnMetaInfo procedureColumn) {
+    public void addProcedureColumn(DfProcedureColumnMeta procedureColumn) {
         _procedureColumnList.add(procedureColumn);
     }
 
-    public List<DfProcedureNotParamResultMetaInfo> getNotParamResultList() {
+    public List<DfProcedureNotParamResultMeta> getNotParamResultList() {
         return _notParamResultList;
     }
 
-    public void addNotParamResult(DfProcedureNotParamResultMetaInfo notParamResult) {
+    public void addNotParamResult(DfProcedureNotParamResultMeta notParamResult) {
         this._notParamResultList.add(notParamResult);
     }
 }

@@ -14,7 +14,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.junit.Test;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 public class DfXlsDataHandlerImplTest extends PlainTestCase {
@@ -45,12 +45,12 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
         // ## Arrange ##
         final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl(null) {
             @Override
-            protected Class<?> getBindType(String tableName, DfColumnMetaInfo columnMetaInfo) {
+            protected Class<?> getBindType(String tableName, DfColumnMeta columnMetaInfo) {
                 return BigDecimal.class;
             }
         };
-        Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsCaseInsensitive();
-        DfColumnMetaInfo info = new DfColumnMetaInfo();
+        Map<String, DfColumnMeta> columnMetaInfoMap = StringKeyMap.createAsCaseInsensitive();
+        DfColumnMeta info = new DfColumnMeta();
         info.setColumnName("foo");
         info.setColumnSize(3);
         info.setJdbcDefValue(Types.NUMERIC);

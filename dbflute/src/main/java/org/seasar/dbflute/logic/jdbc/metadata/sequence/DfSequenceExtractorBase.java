@@ -22,7 +22,7 @@ import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 
 /**
  * @author jflute
@@ -47,11 +47,11 @@ public abstract class DfSequenceExtractorBase extends DfAbstractMetaDataExtracto
     // ===================================================================================
     //                                                                        Sequence Map
     //                                                                        ============
-    public Map<String, DfSequenceMetaInfo> getSequenceMap() {
+    public Map<String, DfSequenceMeta> getSequenceMap() {
         return doGetSequenceMap();
     }
 
-    protected abstract Map<String, DfSequenceMetaInfo> doGetSequenceMap();
+    protected abstract Map<String, DfSequenceMeta> doGetSequenceMap();
 
     protected String buildSequenceMapKey(String catalog, String schema, String name) {
         return (catalog != null ? catalog + "." : "") + (schema != null ? schema + "." : "") + name;

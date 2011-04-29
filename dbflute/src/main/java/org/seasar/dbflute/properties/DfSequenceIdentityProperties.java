@@ -17,7 +17,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
@@ -229,15 +229,15 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                            Sequence (Meta Info) Map
     //                                                            ========================
-    protected Map<String, DfSequenceMetaInfo> _sequenceMap;
+    protected Map<String, DfSequenceMeta> _sequenceMap;
 
-    protected Map<String, DfSequenceMetaInfo> getSequenceMap(DataSource dataSource) {
+    protected Map<String, DfSequenceMeta> getSequenceMap(DataSource dataSource) {
         if (_sequenceMap != null) {
             return _sequenceMap;
         }
         final DfSequenceExtractorFactory factory = createSequenceExtractorFactory(dataSource);
         final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
-        Map<String, DfSequenceMetaInfo> sequenceMap = null;
+        Map<String, DfSequenceMeta> sequenceMap = null;
         if (sequenceExtractor != null) {
             try {
                 sequenceMap = sequenceExtractor.getSequenceMap();
@@ -258,9 +258,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return new DfSequenceExtractorFactory(dataSource, facadeProp, getDatabaseProperties());
     }
 
-    protected DfSequenceMetaInfo getSequenceElement(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMetaInfo> sequenceMap) {
-        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
+    protected DfSequenceMeta getSequenceElement(UnifiedSchema unifiedSchema, String sequenceName,
+            Map<String, DfSequenceMeta> sequenceMap) {
+        DfSequenceMeta info = sequenceMap.get(sequenceName);
         if (info != null) {
             return info;
         }
@@ -292,13 +292,13 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     public BigDecimal getSequenceMinimumValueBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
-        final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
+        final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMinimumValue(unifiedSchema, sequenceName, sequenceMap);
     }
 
     protected BigDecimal getSequenceMinimumValue(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
+            Map<String, DfSequenceMeta> sequenceMap) {
+        final DfSequenceMeta info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal minimumValue = info.getMinimumValue();
             if (minimumValue != null) {
@@ -325,13 +325,13 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     public BigDecimal getSequenceMaximumValueBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
-        final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
+        final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMaximumValue(unifiedSchema, sequenceName, sequenceMap);
     }
 
     protected BigDecimal getSequenceMaximumValue(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
+            Map<String, DfSequenceMeta> sequenceMap) {
+        final DfSequenceMeta info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal maximumValue = info.getMaximumValue();
             if (maximumValue != null) {
@@ -358,13 +358,13 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     public Integer getSequenceIncrementSizeBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
-        final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
+        final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceIncrementSize(unifiedSchema, sequenceName, sequenceMap);
     }
 
     protected Integer getSequenceIncrementSize(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
+            Map<String, DfSequenceMeta> sequenceMap) {
+        final DfSequenceMeta info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
             if (incrementSize != null) {
@@ -406,7 +406,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
         final String cacheSizeProp = cacheValue.substring(0, endMarkIndex).trim();
         final String sequenceName = getSequenceName(tableName);
-        final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
+        final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         final Integer incrementSize = getSequenceIncrementSize(unifiedSchema, sequenceName, sequenceMap);
         if (cacheSizeProp != null && cacheSizeProp.trim().length() > 0) { // cacheSize is specified
             final Integer cacheSize = castCacheSize(cacheSizeProp, tableName, sequenceProp, sequenceName);

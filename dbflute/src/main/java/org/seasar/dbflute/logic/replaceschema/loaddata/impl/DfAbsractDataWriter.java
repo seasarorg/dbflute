@@ -43,7 +43,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
@@ -83,7 +83,7 @@ public abstract class DfAbsractDataWriter {
     protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
 
     /** The cache map of meta info. The key is table name. (ordered for display) */
-    protected final Map<String, Map<String, DfColumnMetaInfo>> _columnInfoCacheMap = StringKeyMap
+    protected final Map<String, Map<String, DfColumnMeta>> _columnInfoCacheMap = StringKeyMap
             .createAsFlexibleOrdered();
 
     /** The cache map of bind type. The key is table name. (ordered for display) */
@@ -125,7 +125,7 @@ public abstract class DfAbsractDataWriter {
     //                                            Null Value
     //                                            ----------
     protected boolean processNull(String tableName, String columnName, Object value, PreparedStatement ps,
-            int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (!isNullValue(value)) {
             return false;
         }
@@ -140,7 +140,7 @@ public abstract class DfAbsractDataWriter {
             ps.setNull(bindCount, cachedType); // basically no exception
             return true;
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             // use mapped type at first
             final String mappedJdbcType = _columnHandler.getColumnJdbcType(columnInfo);
@@ -210,11 +210,11 @@ public abstract class DfAbsractDataWriter {
     //                                     NotNull NotString
     //                                     -----------------
     protected boolean processNotNullNotString(String tableName, String columnName, Object obj, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (!isNotNullNotString(obj)) {
             return false;
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             final Class<?> columnType = getBindType(tableName, columnInfo);
             if (columnType != null) {
@@ -234,7 +234,7 @@ public abstract class DfAbsractDataWriter {
     //                                        NotNull String
     //                                        --------------
     protected void processNotNullString(File dataFile, String tableName, String columnName, String value,
-            Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap)
+            Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
             throws SQLException {
         if (value == null) {
             String msg = "This method is only for NotNull and StringExpression:";
@@ -290,13 +290,13 @@ public abstract class DfAbsractDataWriter {
 
     public static interface StringProcessor {
         boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException;
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException;
     }
 
     protected class DateStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             return processDate(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
@@ -309,7 +309,7 @@ public abstract class DfAbsractDataWriter {
     protected class BooleanStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             return processBoolean(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
@@ -322,7 +322,7 @@ public abstract class DfAbsractDataWriter {
     protected class NumberStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             return processNumber(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
@@ -335,7 +335,7 @@ public abstract class DfAbsractDataWriter {
     protected class UUIDStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             return processUUID(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
@@ -348,7 +348,7 @@ public abstract class DfAbsractDataWriter {
     protected class ArrayStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             return processArray(tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
 
@@ -361,7 +361,7 @@ public abstract class DfAbsractDataWriter {
     protected class XmlStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             return processXml(tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
 
@@ -374,7 +374,7 @@ public abstract class DfAbsractDataWriter {
     protected class BinaryFileStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             return processBinary(dataFile, tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
 
@@ -387,7 +387,7 @@ public abstract class DfAbsractDataWriter {
     protected class RealStringProcessor implements StringProcessor {
 
         public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
             ps.setString(bindCount, value);
             return true;
         }
@@ -406,11 +406,11 @@ public abstract class DfAbsractDataWriter {
     //                                                  Date
     //                                                  ----
     protected boolean processDate(String tableName, String columnName, String value, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             final Class<?> columnType = getBindType(tableName, columnInfo);
             if (columnType != null) {
@@ -442,11 +442,11 @@ public abstract class DfAbsractDataWriter {
     //                                               Boolean
     //                                               -------
     protected boolean processBoolean(String tableName, String columnName, String value, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             final Class<?> columnType = getBindType(tableName, columnInfo);
             if (columnType != null) {
@@ -471,11 +471,11 @@ public abstract class DfAbsractDataWriter {
     //                                                Number
     //                                                ------
     protected boolean processNumber(String tableName, String columnName, String value, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             final Class<?> columnType = getBindType(tableName, columnInfo);
             if (columnType != null) {
@@ -536,11 +536,11 @@ public abstract class DfAbsractDataWriter {
     //                                                  UUID
     //                                                  ----
     protected boolean processUUID(String tableName, String columnName, String value, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             final Class<?> columnType = getBindType(tableName, columnInfo);
             if (columnType != null) {
@@ -567,11 +567,11 @@ public abstract class DfAbsractDataWriter {
     //                                                 ARRAY
     //                                                 -----
     protected boolean processArray(String tableName, String columnName, String value, PreparedStatement ps,
-            int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             if (getBasicProperties().isDatabasePostgreSQL()) {
                 //rsMeta#getColumnTypeName() returns value starts with "_" if
@@ -603,11 +603,11 @@ public abstract class DfAbsractDataWriter {
     //                                                   XML
     //                                                   ---
     protected boolean processXml(String tableName, String columnName, String value, PreparedStatement ps,
-            int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             if (getBasicProperties().isDatabasePostgreSQL()) {
                 final String dbTypeName = columnInfo.getDbTypeName();
@@ -635,11 +635,11 @@ public abstract class DfAbsractDataWriter {
     //                                                Binary
     //                                                ------
     protected boolean processBinary(File dataFile, String tableName, String columnName, String value,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMetaInfo> columnInfoMap) throws SQLException {
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMetaInfo columnInfo = columnInfoMap.get(columnName);
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
             final Class<?> columnType = getBindType(tableName, columnInfo);
             if (columnType != null) {
@@ -788,7 +788,7 @@ public abstract class DfAbsractDataWriter {
      * @param columnInfoMap The info map of column. (NotNull)
      * @return The type of column. (NullAllowed: However Basically NotNull)
      */
-    protected Class<?> getBindType(String tableName, DfColumnMetaInfo columnInfoMap) {
+    protected Class<?> getBindType(String tableName, DfColumnMeta columnInfoMap) {
         Map<String, Class<?>> cacheMap = _bindTypeCacheMap.get(tableName);
         if (cacheMap == null) {
             cacheMap = StringKeyMap.createAsFlexibleOrdered();
@@ -846,17 +846,17 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
-    protected Map<String, DfColumnMetaInfo> getColumnInfoMap(String tableName) {
+    protected Map<String, DfColumnMeta> getColumnInfoMap(String tableName) {
         if (_columnInfoCacheMap.containsKey(tableName)) {
             return _columnInfoCacheMap.get(tableName);
         }
-        final Map<String, DfColumnMetaInfo> columnInfoMap = StringKeyMap.createAsFlexible();
+        final Map<String, DfColumnMeta> columnInfoMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableName);
-            for (DfColumnMetaInfo columnInfo : columnList) {
+            final List<DfColumnMeta> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableName);
+            for (DfColumnMeta columnInfo : columnList) {
                 columnInfoMap.put(columnInfo.getColumnName(), columnInfo);
             }
             _columnInfoCacheMap.put(tableName, columnInfoMap);

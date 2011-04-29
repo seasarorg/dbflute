@@ -26,8 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -44,7 +44,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Map<String, DfTableMetaInfo> _generatedTableMap;
+    protected Map<String, DfTableMeta> _generatedTableMap;
 
     // ===================================================================================
     //                                                                         Foreign Key
@@ -56,7 +56,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMap(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
+    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
             throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
@@ -71,9 +71,9 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName) throws SQLException {
-        Map<String, DfForeignKeyMetaInfo> map = doGetForeignKeyMap(metaData, unifiedSchema, tableName, false);
+        Map<String, DfForeignKeyMeta> map = doGetForeignKeyMap(metaData, unifiedSchema, tableName, false);
         if (canRetryCaseInsensitive()) {
             if (map.isEmpty()) { // retry by lower case
                 map = doGetForeignKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), true);
@@ -85,9 +85,9 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return map;
     }
 
-    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMap(DatabaseMetaData metaData,
+    protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(DatabaseMetaData metaData,
             UnifiedSchema unifiedSchema, String tableName, boolean retry) throws SQLException {
-        final Map<String, DfForeignKeyMetaInfo> fkMap = newLinkedHashMap();
+        final Map<String, DfForeignKeyMeta> fkMap = newLinkedHashMap();
         if (isForeignKeyExtractingUnsupported()) {
             return fkMap;
         }
@@ -140,9 +140,9 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 final UnifiedSchema foreignSchema = createAsDynamicSchema(foreignCatalogName, foreignSchemaName);
                 assertPKColumnNotExcepted(foreignSchema, foreignTableName, foreignColumnName);
 
-                DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
+                DfForeignKeyMeta metaInfo = fkMap.get(fkName);
                 if (metaInfo == null) { // basically here
-                    metaInfo = new DfForeignKeyMetaInfo();
+                    metaInfo = new DfForeignKeyMeta();
                     fkMap.put(fkName, metaInfo);
                 } else {
                     // /- - - - - - - - - - - -
@@ -222,9 +222,9 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     protected boolean judgeSameNameForeignKey(String localName, String firstName, String secondName) {
-        final DfTableMetaInfo localInfo = getTableInfo(localName);
-        final DfTableMetaInfo firstInfo = getTableInfo(firstName);
-        final DfTableMetaInfo secondInfo = getTableInfo(secondName);
+        final DfTableMeta localInfo = getTableInfo(localName);
+        final DfTableMeta firstInfo = getTableInfo(firstName);
+        final DfTableMeta secondInfo = getTableInfo(secondName);
         if (localInfo != null && firstInfo != null && secondInfo != null) {
             final String localType = localInfo.getTableType();
             if (localType.equals(firstInfo.getTableType())) {
@@ -255,14 +255,14 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         _log.info(sb.toString());
     }
 
-    protected Map<String, DfForeignKeyMetaInfo> filterSameStructureForeignKey(Map<String, DfForeignKeyMetaInfo> fkMap) {
-        final Map<String, DfForeignKeyMetaInfo> filteredFKMap = newLinkedHashMap();
+    protected Map<String, DfForeignKeyMeta> filterSameStructureForeignKey(Map<String, DfForeignKeyMeta> fkMap) {
+        final Map<String, DfForeignKeyMeta> filteredFKMap = newLinkedHashMap();
         final Map<Map<String, Object>, Object> checkMap = newLinkedHashMap();
         final Object dummyObj = new Object();
-        final Set<Entry<String, DfForeignKeyMetaInfo>> entrySet = fkMap.entrySet();
-        for (Entry<String, DfForeignKeyMetaInfo> entry : entrySet) {
+        final Set<Entry<String, DfForeignKeyMeta>> entrySet = fkMap.entrySet();
+        for (Entry<String, DfForeignKeyMeta> entry : entrySet) {
             final String foreinKeyName = entry.getKey();
-            final DfForeignKeyMetaInfo metaInfo = entry.getValue();
+            final DfForeignKeyMeta metaInfo = entry.getValue();
             final Map<String, Object> checkKey = newLinkedHashMap();
             checkKey.put(metaInfo.getForeignTableName(), dummyObj);
             checkKey.put("columnNameMap:" + metaInfo.getColumnNameMap(), dummyObj);
@@ -281,7 +281,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public void exceptForeignTableNotGenerated(Map<String, DfTableMetaInfo> generatedTableMap) {
+    public void exceptForeignTableNotGenerated(Map<String, DfTableMeta> generatedTableMap) {
         _generatedTableMap = generatedTableMap;
     }
 
@@ -290,7 +290,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             // means no check of generation
             return true;
         }
-        final DfTableMetaInfo info = _generatedTableMap.get(foreignTableName);
+        final DfTableMeta info = _generatedTableMap.get(foreignTableName);
         if (info == null) {
             return false;
         }
@@ -300,7 +300,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return true;
     }
 
-    protected DfTableMetaInfo getTableInfo(String tableName) {
+    protected DfTableMeta getTableInfo(String tableName) {
         if (_generatedTableMap == null) {
             return null;
         }

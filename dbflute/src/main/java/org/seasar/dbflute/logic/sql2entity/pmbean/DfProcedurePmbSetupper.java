@@ -31,14 +31,14 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfProcedureExecutionMetaExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -89,16 +89,16 @@ public class DfProcedurePmbSetupper {
         }
         _log.info(" ");
         _log.info("...Setting up procedures for generating parameter-beans");
-        final List<DfProcedureMetaInfo> procedureList = getAvailableProcedureList();
+        final List<DfProcedureMeta> procedureList = getAvailableProcedureList();
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
-        for (DfProcedureMetaInfo procedure : procedureList) {
+        for (DfProcedureMeta procedure : procedureList) {
             final Map<String, String> propertyNameTypeMap = DfCollectionUtil.newLinkedHashMap();
             final Map<String, String> propertyNameOptionMap = DfCollectionUtil.newLinkedHashMap();
             final Map<String, String> propertyNameColumnNameMap = DfCollectionUtil.newLinkedHashMap();
-            final Map<String, DfProcedureColumnMetaInfo> propertyNameColumnInfoMap = DfCollectionUtil
+            final Map<String, DfProcedureColumnMeta> propertyNameColumnInfoMap = DfCollectionUtil
                     .newLinkedHashMap();
-            final List<DfProcedureColumnMetaInfo> procedureColumnList = procedure.getProcedureColumnList();
-            final List<DfProcedureNotParamResultMetaInfo> notParamResultList = procedure.getNotParamResultList();
+            final List<DfProcedureColumnMeta> procedureColumnList = procedure.getProcedureColumnList();
+            final List<DfProcedureNotParamResultMeta> notParamResultList = procedure.getNotParamResultList();
 
             final String pmbName = convertProcedureNameToPmbName(procedure.getProcedureName());
             {
@@ -114,7 +114,7 @@ public class DfProcedurePmbSetupper {
 
             // Procedure Parameter handling
             int index = 0;
-            for (DfProcedureColumnMetaInfo column : procedureColumnList) {
+            for (DfProcedureColumnMeta column : procedureColumnList) {
                 if (!column.isBindParameter()) {
                     continue;
                 }
@@ -152,7 +152,7 @@ public class DfProcedurePmbSetupper {
             }
 
             // NotParamResult handling
-            for (DfProcedureNotParamResultMetaInfo result : notParamResultList) {
+            for (DfProcedureNotParamResultMeta result : notParamResultList) {
                 final String propertyName = result.getPropertyName();
                 final String propertyType;
                 if (result.hasResultSetColumnInfo()) {
@@ -189,9 +189,9 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                      Procedure List
     //                                                                      ==============
-    protected List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
+    protected List<DfProcedureMeta> getAvailableProcedureList() throws SQLException {
         _procedureHandler.includeProcedureSynonym(_dataSource);
-        final List<DfProcedureMetaInfo> procedureList = _procedureHandler.getAvailableProcedureList(_dataSource);
+        final List<DfProcedureMeta> procedureList = _procedureHandler.getAvailableProcedureList(_dataSource);
         if (getOutsideSqlProperties().isGenerateProcedureCustomizeEntity()) {
             final DfProcedureExecutionMetaExtractor executionMetaHandler = new DfProcedureExecutionMetaExtractor();
             executionMetaHandler.extractExecutionMetaData(_dataSource, procedureList);
@@ -203,7 +203,7 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                       Property Type
     //                                                                       =============
-    protected ProcedurePropertyInfo processProcedureProperty(String pmbName, DfProcedureColumnMetaInfo column,
+    protected ProcedurePropertyInfo processProcedureProperty(String pmbName, DfProcedureColumnMeta column,
             String propertyName) {
         final ProcedurePropertyInfo propertyInfo = new ProcedurePropertyInfo();
         propertyInfo.setColumnInfo(column);
@@ -234,7 +234,7 @@ public class DfProcedurePmbSetupper {
         return propertyInfo;
     }
 
-    protected String doProcessSpecialType(String pmbName, DfProcedureColumnMetaInfo column,
+    protected String doProcessSpecialType(String pmbName, DfProcedureColumnMeta column,
             ProcedurePropertyInfo propertyInfo) {
         if (getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
             final String wallOfOracleType = doProcessGreatWallOfOracleType(pmbName, column, propertyInfo);
@@ -252,7 +252,7 @@ public class DfProcedurePmbSetupper {
         return propertyType;
     }
 
-    protected String doProcessGreatWallOfOracleType(String pmbName, DfProcedureColumnMetaInfo column,
+    protected String doProcessGreatWallOfOracleType(String pmbName, DfProcedureColumnMeta column,
             ProcedurePropertyInfo propertyInfo) {
         final String propertyType;
         if (column.isOracleTreatedAsArray() && column.hasTypeArrayInfo()) {
@@ -272,7 +272,7 @@ public class DfProcedurePmbSetupper {
     // -----------------------------------------------------
     //                                    ResultSet Property
     //                                    ------------------
-    protected boolean isResultSetProperty(DfProcedureColumnMetaInfo column) {
+    protected boolean isResultSetProperty(DfProcedureColumnMeta column) {
         if (column.hasResultSetColumnInfo()) {
             return true;
         }
@@ -327,15 +327,15 @@ public class DfProcedurePmbSetupper {
     protected void registerEntityInfoIfNeeds(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
         final String typeName = getStructEntityNameResouce(structInfo);
         if (!_entityInfoMap.containsKey(typeName)) { // because of independent objects and so called several times
-            final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
+            final StringKeyMap<DfColumnMeta> attrMap = structInfo.getAttributeInfoMap();
             _entityInfoMap.put(typeName, createEntityInfo(typeName, attrMap, structInfo));
             setupStructAttribute(structInfo, propertyInfo);
         }
     }
 
     protected void setupStructAttribute(DfTypeStructInfo structInfo, ProcedurePropertyInfo propertyInfo) {
-        final StringKeyMap<DfColumnMetaInfo> attrMap = structInfo.getAttributeInfoMap();
-        for (DfColumnMetaInfo attrInfo : attrMap.values()) { // nested array or struct handling
+        final StringKeyMap<DfColumnMeta> attrMap = structInfo.getAttributeInfoMap();
+        for (DfColumnMeta attrInfo : attrMap.values()) { // nested array or struct handling
             if (attrInfo.hasTypeArrayInfo()) { // array in struct
                 final DfTypeArrayInfo typeArrayInfo = attrInfo.getTypeArrayInfo();
                 if (typeArrayInfo.hasElementStructInfo()) { // struct in array in struct
@@ -388,16 +388,16 @@ public class DfProcedurePmbSetupper {
     // -----------------------------------------------------
     //                                           Entity Info
     //                                           -----------
-    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMetaInfo> columnMap) {
+    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap) {
         return doCreateEntityInfo(entityName, columnMap, null);
     }
 
-    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMetaInfo> columnMap,
+    protected DfCustomizeEntityInfo createEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap,
             DfTypeStructInfo structInfo) {
         return doCreateEntityInfo(entityName, columnMap, structInfo);
     }
 
-    protected DfCustomizeEntityInfo doCreateEntityInfo(String entityName, Map<String, DfColumnMetaInfo> columnMap,
+    protected DfCustomizeEntityInfo doCreateEntityInfo(String entityName, Map<String, DfColumnMeta> columnMap,
             DfTypeStructInfo structInfo) {
         final DfCustomizeEntityInfo entityInfo;
         if (structInfo != null) {
@@ -431,15 +431,15 @@ public class DfProcedurePmbSetupper {
     }
 
     protected static class ProcedurePropertyInfo {
-        protected DfProcedureColumnMetaInfo _columnInfo;
+        protected DfProcedureColumnMeta _columnInfo;
         protected String _propertyType;
         protected boolean _refCustomizeEntity;
 
-        public DfProcedureColumnMetaInfo getColumnInfo() {
+        public DfProcedureColumnMeta getColumnInfo() {
             return _columnInfo;
         }
 
-        public void setColumnInfo(DfProcedureColumnMetaInfo columnInfo) {
+        public void setColumnInfo(DfProcedureColumnMeta columnInfo) {
             _columnInfo = columnInfo;
         }
 

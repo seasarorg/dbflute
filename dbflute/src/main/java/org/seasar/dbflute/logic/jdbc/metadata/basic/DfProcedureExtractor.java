@@ -37,12 +37,12 @@ import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureListGettingFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorOracle;
@@ -82,8 +82,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The list of available procedure meta informations. (NotNull)
      * @throws SQLException
      */
-    public List<DfProcedureMetaInfo> getAvailableProcedureList(DataSource dataSource) throws SQLException {
-        return new ArrayList<DfProcedureMetaInfo>(getAvailableProcedureMap(dataSource).values());
+    public List<DfProcedureMeta> getAvailableProcedureList(DataSource dataSource) throws SQLException {
+        return new ArrayList<DfProcedureMeta>(getAvailableProcedureMap(dataSource).values());
     }
 
     /**
@@ -93,7 +93,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The map of available procedure meta informations. The key is full-qualified name. (NotNull)
      * @throws SQLException
      */
-    public Map<String, DfProcedureMetaInfo> getAvailableProcedureMap(DataSource dataSource) throws SQLException {
+    public Map<String, DfProcedureMeta> getAvailableProcedureMap(DataSource dataSource) throws SQLException {
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         final UnifiedSchema mainSchema = databaseProperties.getDatabaseSchema();
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
@@ -103,7 +103,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
 
         // main schema
-        final List<DfProcedureMetaInfo> procedureList = getPlainProcedureList(dataSource, metaData, mainSchema);
+        final List<DfProcedureMeta> procedureList = getPlainProcedureList(dataSource, metaData, mainSchema);
 
         // additional schema
         setupAdditionalSchemaProcedure(dataSource, metaData, procedureList);
@@ -112,11 +112,11 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         setupProcedureSynonym(procedureList);
 
         // filter by property
-        final List<DfProcedureMetaInfo> filteredList = filterByProperty(procedureList);
+        final List<DfProcedureMeta> filteredList = filterByProperty(procedureList);
 
         // create available procedure map
-        final Map<String, DfProcedureMetaInfo> procedureHandlingMap = newLinkedHashMap();
-        for (DfProcedureMetaInfo metaInfo : filteredList) {
+        final Map<String, DfProcedureMeta> procedureHandlingMap = newLinkedHashMap();
+        for (DfProcedureMeta metaInfo : filteredList) {
             // handle duplicate
             if (handleDuplicateProcedure(metaInfo, procedureHandlingMap, mainSchema)) {
                 continue;
@@ -125,12 +125,12 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
 
         // arrange order (additional schema after main schema)
-        final Map<String, DfProcedureMetaInfo> procedureOrderedMap = newLinkedHashMap();
-        final Map<String, DfProcedureMetaInfo> additionalSchemaProcedureMap = newLinkedHashMap();
-        final Set<Entry<String, DfProcedureMetaInfo>> entrySet = procedureHandlingMap.entrySet();
-        for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
+        final Map<String, DfProcedureMeta> procedureOrderedMap = newLinkedHashMap();
+        final Map<String, DfProcedureMeta> additionalSchemaProcedureMap = newLinkedHashMap();
+        final Set<Entry<String, DfProcedureMeta>> entrySet = procedureHandlingMap.entrySet();
+        for (Entry<String, DfProcedureMeta> entry : entrySet) {
             final String key = entry.getKey();
-            final DfProcedureMetaInfo metaInfo = entry.getValue();
+            final DfProcedureMeta metaInfo = entry.getValue();
             if (metaInfo.getProcedureSchema().isAdditionalSchema()) {
                 additionalSchemaProcedureMap.put(key, metaInfo);
             } else {
@@ -145,7 +145,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                     Additional Schema
     //                                     -----------------
     protected void setupAdditionalSchemaProcedure(DataSource dataSource, DatabaseMetaData metaData,
-            List<DfProcedureMetaInfo> procedureList) throws SQLException {
+            List<DfProcedureMeta> procedureList) throws SQLException {
         if (_suppressAdditionalSchema) {
             return;
         }
@@ -156,7 +156,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             if (schemaInfo.isSuppressProcedure()) {
                 continue;
             }
-            final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(dataSource, metaData,
+            final List<DfProcedureMeta> additionalProcedureList = getPlainProcedureList(dataSource, metaData,
                     additionalSchema);
             procedureList.addAll(additionalProcedureList);
         }
@@ -165,7 +165,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                     Procedure Synonym
     //                                     -----------------
-    protected void setupProcedureSynonym(List<DfProcedureMetaInfo> procedureList) {
+    protected void setupProcedureSynonym(List<DfProcedureMeta> procedureList) {
         if (_procedureSynonymDataSource == null) {
             return;
         }
@@ -178,7 +178,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         if (extractor == null) {
             return; // unsupported at the database
         }
-        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = extractor.extractProcedureSynonymMap();
+        final Map<String, DfProcedureSynonymMeta> procedureSynonymMap = extractor.extractProcedureSynonymMap();
         if (handlingType.equals(ProcedureSynonymHandlingType.INCLUDE)) {
             // only add procedure synonyms to the procedure list
         } else if (handlingType.equals(ProcedureSynonymHandlingType.SWITCH)) {
@@ -189,17 +189,17 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             throw new IllegalStateException(msg);
         }
         log("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
-        final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
-        final List<DfProcedureMetaInfo> procedureSynonymList = new ArrayList<DfProcedureMetaInfo>();
-        for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
-            final DfProcedureSynonymMetaInfo metaInfo = entry.getValue();
+        final Set<Entry<String, DfProcedureSynonymMeta>> entrySet = procedureSynonymMap.entrySet();
+        final List<DfProcedureMeta> procedureSynonymList = new ArrayList<DfProcedureMeta>();
+        for (Entry<String, DfProcedureSynonymMeta> entry : entrySet) {
+            final DfProcedureSynonymMeta metaInfo = entry.getValue();
             if (!isSynonymAllowedSchema(metaInfo)) {
                 continue;
             }
 
             // merge synonym to procedure (create copied instance)
             final String beforeName = metaInfo.getProcedureMetaInfo().buildProcedureLoggingName();
-            final DfProcedureMetaInfo mergedProcedure = metaInfo.createMergedProcedure();
+            final DfProcedureMeta mergedProcedure = metaInfo.createMergedProcedure();
             final String afterName = mergedProcedure.buildProcedureLoggingName();
             log("  " + beforeName + " to " + afterName);
 
@@ -208,8 +208,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         procedureList.addAll(procedureSynonymList);
     }
 
-    protected boolean isSynonymAllowedSchema(DfProcedureSynonymMetaInfo procedureSynonymMetaInfo) {
-        final DfSynonymMetaInfo synonymMetaInfo = procedureSynonymMetaInfo.getSynonymMetaInfo();
+    protected boolean isSynonymAllowedSchema(DfProcedureSynonymMeta procedureSynonymMetaInfo) {
+        final DfSynonymMeta synonymMetaInfo = procedureSynonymMetaInfo.getSynonymMetaInfo();
         final UnifiedSchema synonymOwner = synonymMetaInfo.getSynonymOwner();
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         final DfAdditionalSchemaInfo additionalSchemaInfo = databaseProperties.getAdditionalSchemaInfo(synonymOwner);
@@ -236,15 +236,15 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                    Filter by Property
     //                                    ------------------
-    protected List<DfProcedureMetaInfo> filterByProperty(List<DfProcedureMetaInfo> procedureList) {
+    protected List<DfProcedureMeta> filterByProperty(List<DfProcedureMeta> procedureList) {
         if (_suppressFilterByProperty) {
             return procedureList;
         }
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
-        final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
+        final List<DfProcedureMeta> resultList = new ArrayList<DfProcedureMeta>();
         log("...Filtering procedures by the property: before=" + procedureList.size());
         int passedCount = 0;
-        for (DfProcedureMetaInfo metaInfo : procedureList) {
+        for (DfProcedureMeta metaInfo : procedureList) {
             final String procedureLoggingName = metaInfo.buildProcedureLoggingName();
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
@@ -285,10 +285,10 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param mainSchema The unified schema for main. (NotNull)
      * @return Does it skip to register the second procedure?
      */
-    protected boolean handleDuplicateProcedure(DfProcedureMetaInfo second,
-            Map<String, DfProcedureMetaInfo> procedureHandlingMap, UnifiedSchema mainSchema) {
+    protected boolean handleDuplicateProcedure(DfProcedureMeta second,
+            Map<String, DfProcedureMeta> procedureHandlingMap, UnifiedSchema mainSchema) {
         final String procedureKeyName = second.buildProcedureKeyName();
-        final DfProcedureMetaInfo first = procedureHandlingMap.get(procedureKeyName);
+        final DfProcedureMeta first = procedureHandlingMap.get(procedureKeyName);
         if (first == null) {
             return false; // not duplicate
         }
@@ -310,7 +310,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         return true;
     }
 
-    protected void showDuplicateProcedure(DfProcedureMetaInfo first, DfProcedureMetaInfo second, boolean electFirst,
+    protected void showDuplicateProcedure(DfProcedureMeta first, DfProcedureMeta second, boolean electFirst,
             String reason) {
         final String firstName = first.buildProcedureLoggingName();
         final String secondName = second.buildProcedureLoggingName();
@@ -336,15 +336,15 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @return The list of procedure meta information. (NotNull)
      */
-    public List<DfProcedureMetaInfo> getPlainProcedureList(DataSource dataSource, DatabaseMetaData metaData,
+    public List<DfProcedureMeta> getPlainProcedureList(DataSource dataSource, DatabaseMetaData metaData,
             UnifiedSchema unifiedSchema) throws SQLException {
-        final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
+        final List<DfProcedureMeta> metaInfoList = new ArrayList<DfProcedureMeta>();
         String procedureName = null;
         ResultSet columnResultSet = null;
         try {
             final ResultSet procedureRs = doGetProcedures(metaData, unifiedSchema);
             setupProcedureMetaInfo(metaInfoList, procedureRs, unifiedSchema);
-            for (DfProcedureMetaInfo metaInfo : metaInfoList) {
+            for (DfProcedureMeta metaInfo : metaInfoList) {
                 procedureName = metaInfo.getProcedureName();
                 final ResultSet columnRs = doGetProcedureColumns(metaData, metaInfo);
                 setupProcedureColumnMetaInfo(metaInfo, columnRs);
@@ -368,14 +368,14 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     protected void resolveAssitInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
-            List<DfProcedureMetaInfo> metaInfoList) {
+            List<DfProcedureMeta> metaInfoList) {
         if (isDatabaseOracle()) {
             doResolveAssistInfoOracle(dataSource, unifiedSchema, metaInfoList);
         }
     }
 
     protected void doResolveAssistInfoOracle(DataSource dataSource, UnifiedSchema unifiedSchema,
-            List<DfProcedureMetaInfo> metaInfoList) {
+            List<DfProcedureMeta> metaInfoList) {
         final DfProcedureSupplementExtractorOracle extractor = new DfProcedureSupplementExtractorOracle(dataSource);
         if (_suppressLogging || unifiedSchema.isAdditionalSchema()) {
             // contains additional schema because it has no change
@@ -386,11 +386,11 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap();
         final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
         final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
-        for (DfProcedureMetaInfo metaInfo : metaInfoList) {
+        for (DfProcedureMeta metaInfo : metaInfoList) {
             final String catalog = metaInfo.getProcedureCatalog();
             final String procedureName = metaInfo.getProcedureName();
-            final List<DfProcedureColumnMetaInfo> columnList = metaInfo.getProcedureColumnList();
-            for (DfProcedureColumnMetaInfo columnInfo : columnList) {
+            final List<DfProcedureColumnMeta> columnList = metaInfo.getProcedureColumnList();
+            for (DfProcedureColumnMeta columnInfo : columnList) {
                 final String columnName = columnInfo.getColumnName();
                 final String key = extractor.generateParameterInfoMapKey(catalog, procedureName, columnName);
 
@@ -436,7 +436,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         return metaData.getProcedures(catalogName, schemaName, null);
     }
 
-    protected void setupProcedureMetaInfo(List<DfProcedureMetaInfo> procedureMetaInfoList, ResultSet procedureRs,
+    protected void setupProcedureMetaInfo(List<DfProcedureMeta> procedureMetaInfoList, ResultSet procedureRs,
             UnifiedSchema unifiedSchema) throws SQLException {
         while (procedureRs.next()) {
             // /- - - - - - - - - - - - - - - - - - - - - - - -
@@ -476,7 +476,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             final Integer procedureType = Integer.valueOf(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
 
-            final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();
+            final DfProcedureMeta metaInfo = new DfProcedureMeta();
             metaInfo.setProcedureCatalog(procedureCatalog);
             metaInfo.setProcedureSchema(createAsDynamicSchema(procedureCatalog, procedureSchema));
             metaInfo.setProcedureName(procedureName);
@@ -498,7 +498,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMetaInfo metaInfo)
+    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta metaInfo)
             throws SQLException {
         final String catalogName = metaInfo.getProcedureCatalog();
         final String schemaName = metaInfo.getProcedureSchema().getPureSchema();
@@ -519,7 +519,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         return metaData.getProcedureColumns(catalogArgName, schemaName, procedureArgName, null);
     }
 
-    protected void setupProcedureColumnMetaInfo(DfProcedureMetaInfo procedureMetaInfo, ResultSet columnRs)
+    protected void setupProcedureColumnMetaInfo(DfProcedureMeta procedureMetaInfo, ResultSet columnRs)
             throws SQLException {
         final Set<String> uniqueSet = new HashSet<String>();
         while (columnRs.next()) {
@@ -596,7 +596,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             }
             final String columnComment = columnRs.getString("REMARKS");
 
-            final DfProcedureColumnMetaInfo procedureColumnMetaInfo = new DfProcedureColumnMetaInfo();
+            final DfProcedureColumnMeta procedureColumnMetaInfo = new DfProcedureColumnMeta();
             procedureColumnMetaInfo.setColumnName(columnName);
             if (procedureColumnType == DatabaseMetaData.procedureColumnUnknown) {
                 procedureColumnMetaInfo.setProcedureColumnType(DfProcedureColumnType.procedureColumnUnknown);
@@ -633,29 +633,29 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected String buildProcedureFullQualifiedName(DfProcedureMetaInfo metaInfo) {
+    protected String buildProcedureFullQualifiedName(DfProcedureMeta metaInfo) {
         return metaInfo.getProcedureSchema().buildFullQualifiedName(metaInfo.getProcedureName());
     }
 
-    protected String buildProcedureSchemaQualifiedName(DfProcedureMetaInfo metaInfo) {
+    protected String buildProcedureSchemaQualifiedName(DfProcedureMeta metaInfo) {
         return metaInfo.getProcedureSchema().buildSchemaQualifiedName(metaInfo.getProcedureName());
     }
 
-    protected void adjustProcedureColumnList(DfProcedureMetaInfo procedureMetaInfo) {
+    protected void adjustProcedureColumnList(DfProcedureMeta procedureMetaInfo) {
         adjustPostgreSQLResultSetParameter(procedureMetaInfo);
     }
 
-    protected void adjustPostgreSQLResultSetParameter(DfProcedureMetaInfo procedureMetaInfo) {
+    protected void adjustPostgreSQLResultSetParameter(DfProcedureMeta procedureMetaInfo) {
         if (!isDatabasePostgreSQL()) {
             return;
         }
-        final List<DfProcedureColumnMetaInfo> columnMetaInfoList = procedureMetaInfo.getProcedureColumnList();
+        final List<DfProcedureColumnMeta> columnMetaInfoList = procedureMetaInfo.getProcedureColumnList();
         boolean existsResultSetParameter = false;
         boolean existsResultSetReturn = false;
         int resultSetReturnIndex = 0;
         String resultSetReturnName = null;
         int index = 0;
-        for (DfProcedureColumnMetaInfo columnMetaInfo : columnMetaInfoList) {
+        for (DfProcedureColumnMeta columnMetaInfo : columnMetaInfoList) {
             final DfProcedureColumnType procedureColumnType = columnMetaInfo.getProcedureColumnType();
             final String dbTypeName = columnMetaInfo.getDbTypeName();
             if (procedureColumnType.equals(DfProcedureColumnType.procedureColumnOut)) {

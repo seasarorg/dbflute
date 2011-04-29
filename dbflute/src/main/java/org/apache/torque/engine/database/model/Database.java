@@ -86,7 +86,7 @@ import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
@@ -2129,9 +2129,9 @@ public class Database {
     // ===================================================================================
     //                                                                  Procedure Document
     //                                                                  ==================
-    protected List<DfProcedureMetaInfo> _procedureMetaInfoList;
+    protected List<DfProcedureMeta> _procedureMetaInfoList;
 
-    public List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
+    public List<DfProcedureMeta> getAvailableProcedureList() throws SQLException {
         if (_procedureMetaInfoList != null) {
             return _procedureMetaInfoList;
         }

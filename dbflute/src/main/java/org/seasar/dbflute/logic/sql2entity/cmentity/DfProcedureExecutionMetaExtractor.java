@@ -35,11 +35,11 @@ import org.seasar.dbflute.exception.DfProcedureExecutionMetaGettingFailureExcept
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
@@ -77,10 +77,10 @@ public class DfProcedureExecutionMetaExtractor {
     // ===================================================================================
     //                                                                             Process
     //                                                                             =======
-    public void extractExecutionMetaData(DataSource dataSource, List<DfProcedureMetaInfo> procedureList)
+    public void extractExecutionMetaData(DataSource dataSource, List<DfProcedureMeta> procedureList)
             throws SQLException {
         final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
-        for (DfProcedureMetaInfo procedure : procedureList) {
+        for (DfProcedureMeta procedure : procedureList) {
             final String procedureFullQualifiedName = procedure.getProcedureFullQualifiedName();
             final String procedureSchemaQualifiedName = procedure.getProcedureSchemaQualifiedName();
             final String procedureName = procedure.getProcedureName();
@@ -92,8 +92,8 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
-        final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnList();
+    protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMeta procedure) throws SQLException {
+        final List<DfProcedureColumnMeta> columnList = procedure.getProcedureColumnList();
         if (!needsToCall(columnList)) {
             final String name = procedure.buildProcedureLoggingName();
             _log.info("*not needed to call: " + name + " params=" + buildParameterTypeView(columnList));
@@ -110,7 +110,7 @@ public class DfProcedureExecutionMetaExtractor {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             cs = conn.prepareCall(sql);
-            final List<DfProcedureColumnMetaInfo> boundColumnList = DfCollectionUtil.newArrayList();
+            final List<DfProcedureColumnMeta> boundColumnList = DfCollectionUtil.newArrayList();
             setupBindParameter(conn, cs, columnList, testValueList, boundColumnList);
             ResultSet rs = null;
 
@@ -140,8 +140,8 @@ public class DfProcedureExecutionMetaExtractor {
                     if (rs == null) {
                         break;
                     }
-                    final Map<String, DfColumnMetaInfo> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
-                    final DfProcedureNotParamResultMetaInfo notParamResult = new DfProcedureNotParamResultMetaInfo();
+                    final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
+                    final DfProcedureNotParamResultMeta notParamResult = new DfProcedureNotParamResultMeta();
                     final String propertyName;
                     if (procedure.isCalledBySelect() && closetIndex == 0) {
                         // for example, table valued function
@@ -159,7 +159,7 @@ public class DfProcedureExecutionMetaExtractor {
                 } while (cs.getMoreResults());
             }
             int index = 0;
-            for (DfProcedureColumnMetaInfo column : boundColumnList) {
+            for (DfProcedureColumnMeta column : boundColumnList) {
                 final DfProcedureColumnType columnType = column.getProcedureColumnType();
                 if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
                     ++index;
@@ -176,7 +176,7 @@ public class DfProcedureExecutionMetaExtractor {
                 }
                 if (obj instanceof ResultSet) {
                     rs = (ResultSet) obj;
-                    final Map<String, DfColumnMetaInfo> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
+                    final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
                     column.setResultSetColumnInfoMap(columnMetaInfoMap);
                 }
                 ++index;
@@ -187,7 +187,7 @@ public class DfProcedureExecutionMetaExtractor {
             br.addItem("SQL");
             br.addElement(sql);
             br.addItem("Parameter");
-            for (DfProcedureColumnMetaInfo column : columnList) {
+            for (DfProcedureColumnMeta column : columnList) {
                 br.addElement(column.getColumnDisplayName());
             }
             br.addItem("Test Value");
@@ -230,8 +230,8 @@ public class DfProcedureExecutionMetaExtractor {
         return sb.toString();
     }
 
-    protected boolean existsReturnValue(List<DfProcedureColumnMetaInfo> columnList) {
-        for (DfProcedureColumnMetaInfo column : columnList) {
+    protected boolean existsReturnValue(List<DfProcedureColumnMeta> columnList) {
+        for (DfProcedureColumnMeta column : columnList) {
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
                 return true;
@@ -240,12 +240,12 @@ public class DfProcedureExecutionMetaExtractor {
         return false;
     }
 
-    protected boolean needsToCall(List<DfProcedureColumnMetaInfo> columnList) {
+    protected boolean needsToCall(List<DfProcedureColumnMeta> columnList) {
         if (!isOracle() && !isPostgreSQL()) {
             return true; // because of for getting notParamResult
         }
         // Here Oracle or PostgreSQL (that don't support notParamResult)
-        for (DfProcedureColumnMetaInfo column : columnList) {
+        for (DfProcedureColumnMeta column : columnList) {
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
             if (DfProcedureColumnType.procedureColumnOut.equals(columnType)
                     || DfProcedureColumnType.procedureColumnInOut.equals(columnType)
@@ -256,10 +256,10 @@ public class DfProcedureExecutionMetaExtractor {
         return false;
     }
 
-    protected String buildParameterTypeView(List<DfProcedureColumnMetaInfo> columnList) {
+    protected String buildParameterTypeView(List<DfProcedureColumnMeta> columnList) {
         final StringBuilder sb = new StringBuilder();
         final String prefix = "procedureColumn";
-        for (DfProcedureColumnMetaInfo column : columnList) {
+        for (DfProcedureColumnMeta column : columnList) {
             String name = column.getProcedureColumnType().name();
             if (name.startsWith(prefix)) {
                 name = name.substring(prefix.length());
@@ -273,13 +273,13 @@ public class DfProcedureExecutionMetaExtractor {
         return sb.toString();
     }
 
-    protected void setupTestValueList(List<DfProcedureColumnMetaInfo> columnList, List<Object> testValueList) {
-        for (DfProcedureColumnMetaInfo column : columnList) {
+    protected void setupTestValueList(List<DfProcedureColumnMeta> columnList, List<Object> testValueList) {
+        for (DfProcedureColumnMeta column : columnList) {
             doSetupTestValueList(column, testValueList);
         }
     }
 
-    protected void doSetupTestValueList(DfProcedureColumnMetaInfo column, List<Object> testValueList) {
+    protected void doSetupTestValueList(DfProcedureColumnMeta column, List<Object> testValueList) {
         if (!column.isInputParameter()) {
             return;
         }
@@ -324,13 +324,13 @@ public class DfProcedureExecutionMetaExtractor {
         testValueList.add(testValue);
     }
 
-    protected String findJdbcType(DfProcedureColumnMetaInfo column) {
+    protected String findJdbcType(DfProcedureColumnMeta column) {
         final int jdbcDefType = column.getJdbcDefType();
         final String dbTypeName = column.getDbTypeName();
         return _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
     }
 
-    protected String findNativeType(String jdbcType, DfProcedureColumnMetaInfo column) {
+    protected String findNativeType(String jdbcType, DfProcedureColumnMeta column) {
         final Integer columnSize = column.getColumnSize();
         final Integer decimalDigits = column.getDecimalDigits();
         return TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
@@ -356,7 +356,7 @@ public class DfProcedureExecutionMetaExtractor {
         return getTypeMappingProperties().isJavaNativeBinaryObject(javaNative);
     }
 
-    public String createSql(DfProcedureMetaInfo procedure, boolean existsReturn, boolean escape) {
+    public String createSql(DfProcedureMeta procedure, boolean existsReturn, boolean escape) {
         final boolean calledBySelect = procedure.isCalledBySelect();
         if (calledBySelect) {
             existsReturn = false;
@@ -397,12 +397,12 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void setupBindParameter(Connection conn, CallableStatement cs,
-            List<DfProcedureColumnMetaInfo> columnList, List<Object> testValueList,
-            List<DfProcedureColumnMetaInfo> boundColumnList) throws SQLException {
+            List<DfProcedureColumnMeta> columnList, List<Object> testValueList,
+            List<DfProcedureColumnMeta> boundColumnList) throws SQLException {
         boundColumnList.clear();
         int index = 0;
         int testValueIndex = 0;
-        for (DfProcedureColumnMetaInfo column : columnList) {
+        for (DfProcedureColumnMeta column : columnList) {
             if (!column.isBindParameter()) {
                 continue; // must be no increment
             }
@@ -430,7 +430,7 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void registerOutParameter(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType,
-            DfProcedureColumnMetaInfo column) throws SQLException {
+            DfProcedureColumnMeta column) throws SQLException {
         final ValueType valueType;
         {
             final ValueType forcedType = getForcedValueType(column);
@@ -464,7 +464,7 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected String buildOutParameterExceptionMessage(int paramIndex, int jdbcDefType,
-            DfProcedureColumnMetaInfo column, ValueType valueType) {
+            DfProcedureColumnMeta column, ValueType valueType) {
         String msg = "Failed to register OUT parameter(" + paramIndex + "|" + jdbcDefType + "):";
         msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
         msg = msg + " :: " + valueType.getClass().getName();
@@ -472,7 +472,7 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void bindObject(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType, Object value,
-            DfProcedureColumnMetaInfo column) throws SQLException {
+            DfProcedureColumnMeta column) throws SQLException {
         final ValueType valueType;
         {
             final ValueType forcedType = getForcedValueType(column);
@@ -500,14 +500,14 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected String buildBindingExceptionMessage(int paramIndex, int jdbcDefType, Object value,
-            DfProcedureColumnMetaInfo column, ValueType valueType) {
+            DfProcedureColumnMeta column, ValueType valueType) {
         String msg = "Failed to bind parameter(" + paramIndex + "|" + jdbcDefType + "):";
         msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
         msg = msg + " :: " + value + ", " + valueType.getClass().getName();
         return msg;
     }
 
-    protected ValueType getForcedValueType(DfProcedureColumnMetaInfo column) {
+    protected ValueType getForcedValueType(DfProcedureColumnMeta column) {
         final ValueType valueType;
         if (column.isOracleNCharOrNVarchar()) { // just in case
             valueType = _stringType;
@@ -532,7 +532,7 @@ public class DfProcedureExecutionMetaExtractor {
     // ===================================================================================
     //                                                                    Column Meta Info
     //                                                                    ================
-    protected Map<String, DfColumnMetaInfo> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {
+    protected Map<String, DfColumnMeta> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {
         return _extractor.extractColumnMetaInfoMap(rs, sql, null);
     }
 

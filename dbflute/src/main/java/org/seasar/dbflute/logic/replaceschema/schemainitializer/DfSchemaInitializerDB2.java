@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 
 /**
  * The schema initializer for DB2.
@@ -42,7 +42,7 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
     //                                                                    Drop Foreign Key
     //                                                                    ================
     @Override
-    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {
+    protected boolean isSkipDropForeignKey(DfTableMeta tableMetaInfo) {
         return tableMetaInfo.isTableTypeAlias();
     }
 
@@ -50,7 +50,7 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
     //                                                                          Drop Table
     //                                                                          ==========
     @Override
-    protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
+    protected void setupDropTable(StringBuilder sb, DfTableMeta metaInfo) {
         if (metaInfo.isTableTypeAlias()) {
             final String tableName = filterTableName(metaInfo.getTableName());
             sb.append("drop alias ").append(tableName);
@@ -63,7 +63,7 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
     //                                                                       Drop Sequence
     //                                                                       =============
     @Override
-    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropSequence(Connection conn, List<DfTableMeta> tableMetaInfoList) {
         if (!_unifiedSchema.hasSchema()) {
             return;
         }

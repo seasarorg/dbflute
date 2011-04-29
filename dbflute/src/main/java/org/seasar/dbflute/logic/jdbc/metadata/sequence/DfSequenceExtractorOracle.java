@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 
 /**
  * @author jflute
@@ -50,9 +50,9 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
     // ===================================================================================
     //                                                                        Sequence Map
     //                                                                        ============
-    protected Map<String, DfSequenceMetaInfo> doGetSequenceMap() {
+    protected Map<String, DfSequenceMeta> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
-        final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, DfSequenceMeta> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final StringBuilder logSb = new StringBuilder();
         setupPureSequence(resultMap, logSb);
         setupSequenceSynonym(resultMap, logSb);
@@ -60,7 +60,7 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
         return resultMap;
     }
 
-    protected void setupPureSequence(Map<String, DfSequenceMetaInfo> resultMap, StringBuilder logSb) {
+    protected void setupPureSequence(Map<String, DfSequenceMeta> resultMap, StringBuilder logSb) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildMetaSelectSql();
         if (sql == null) {
@@ -76,7 +76,7 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
-            final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
+            final DfSequenceMeta info = new DfSequenceMeta();
             final String sequenceSchema = recordMap.get("SEQUENCE_OWNER");
             info.setSequenceSchema(sequenceSchema);
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
@@ -110,7 +110,7 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
         return "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + schemaCondition + ")";
     }
 
-    protected void setupSequenceSynonym(Map<String, DfSequenceMetaInfo> resultMap, StringBuilder logSb) {
+    protected void setupSequenceSynonym(Map<String, DfSequenceMeta> resultMap, StringBuilder logSb) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SYNONYM_OWNER");
@@ -127,7 +127,7 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
         _log.info(sql);
         final List<Map<String, String>> synonymList = facade.selectStringList(sql, columnList);
         for (Map<String, String> recordMap : synonymList) {
-            final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
+            final DfSequenceMeta info = new DfSequenceMeta();
             final String sequenceSchema = recordMap.get("SYNONYM_OWNER");
             info.setSequenceSchema(sequenceSchema);
             final String sequenceName = recordMap.get("SYNONYM_NAME");

@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.dbway.WayOfSQLServer;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
@@ -61,7 +61,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    public void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+    public void processBeforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         final String tableSqlName = quoteTableNameIfNeeds(tableDbName);
         if (hasIdentityColumn(_dataSource, tableSqlName, columnInfoMap)) {
             turnOnIdentityInsert(_dataSource, tableSqlName);
@@ -69,7 +69,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
         }
     }
 
-    public void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMetaInfo> columnInfoMap) {
+    public void processFinallyHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         final String tableSqlName = quoteTableNameIfNeeds(tableDbName);
         if (_identityTableSet.contains(tableSqlName)) {
             turnOffIdentityInsert(_dataSource, tableSqlName);
@@ -85,7 +85,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     //                                                                            Identity
     //                                                                            ========
     protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName,
-            Map<String, DfColumnMetaInfo> columnInfoMap) {
+            Map<String, DfColumnMeta> columnInfoMap) {
         final String sql = "select ident_current ('" + tableSqlName + "') as IDENT_CURRENT";
         final Connection conn = getConnection(dataSource);
         Statement stmt = null;

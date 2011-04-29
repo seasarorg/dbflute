@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -44,7 +44,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                    Drop Foreign Key
     //                                                                    ================
     @Override
-    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {
+    protected boolean isSkipDropForeignKey(DfTableMeta tableMetaInfo) {
         return tableMetaInfo.isTableTypeSynonym();
     }
 
@@ -52,7 +52,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                          Drop Table
     //                                                                          ==========
     @Override
-    protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
+    protected void setupDropTable(StringBuilder sb, DfTableMeta metaInfo) {
         if (metaInfo.isTableTypeSynonym()) {
             final String tableName = filterTableName(metaInfo.getTableName());
             sb.append("drop synonym ").append(tableName);
@@ -65,7 +65,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                       Drop Sequence
     //                                                                       =============
     @Override
-    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropSequence(Connection conn, List<DfTableMeta> tableMetaInfoList) {
         doDropSequence(conn);
     }
 
@@ -78,7 +78,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                        Drop DB Link
     //                                                                        ============
     @Override
-    protected void dropDBLink(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropDBLink(Connection conn, List<DfTableMeta> tableMetaInfoList) {
         doDropDBLink(conn);
     }
 
@@ -95,7 +95,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                    Drop Type Object
     //                                                                    ================
     @Override
-    protected void dropTypeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropTypeObject(Connection conn, List<DfTableMeta> tableMetaInfoList) {
         // TYPE objects have dependences themselves
         final int retryLimit = 10;
         int retryCount = 0;

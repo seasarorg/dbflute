@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 
 /**
  * @author jflute
@@ -50,9 +50,9 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
     // ===================================================================================
     //                                                                        Sequence Map
     //                                                                        ============
-    protected Map<String, DfSequenceMetaInfo> doGetSequenceMap() {
+    protected Map<String, DfSequenceMeta> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
-        final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        final Map<String, DfSequenceMeta> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildMetaSelectSql();
         _log.info(sql);
@@ -67,7 +67,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
         final StringBuilder logSb = new StringBuilder();
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
-            final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
+            final DfSequenceMeta info = new DfSequenceMeta();
             final String sequenceCatalog = recordMap.get("sequence_catalog");
             info.setSequenceCatalog(sequenceCatalog);
             final String sequenceSchema = recordMap.get("sequence_schema");

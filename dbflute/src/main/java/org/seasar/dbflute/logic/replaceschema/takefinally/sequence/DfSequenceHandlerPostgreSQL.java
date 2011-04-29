@@ -33,9 +33,9 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 
 /**
  * @author jflute
@@ -67,8 +67,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     protected void handleSerialTypeSequence(Map<String, String> tableSequenceMap) {
         final StringSet doneSequenceSet = StringSet.createAsFlexibleOrdered();
         doneSequenceSet.addAll(tableSequenceMap.values());
-        DfTableMetaInfo tableInfo = null;
-        DfPrimaryKeyMetaInfo pkInfo = null;
+        DfTableMeta tableInfo = null;
+        DfPrimaryKeyMeta pkInfo = null;
         String sequenceName = null;
         String tableSqlName = null;
         Integer actualValue = null;
@@ -82,8 +82,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
             final DfColumnExtractor columnHandler = new DfColumnExtractor();
             final DfAutoIncrementExtractor autoIncrementHandler = new DfAutoIncrementExtractor();
             _log.info("...Incrementing serial type sequence");
-            final Set<Entry<String, DfTableMetaInfo>> entrySet = _tableMap.entrySet();
-            for (Entry<String, DfTableMetaInfo> entry : entrySet) {
+            final Set<Entry<String, DfTableMeta>> entrySet = _tableMap.entrySet();
+            for (Entry<String, DfTableMeta> entry : entrySet) {
                 // clear elements that are also used exception message
                 tableInfo = null;
                 pkInfo = null;
@@ -102,8 +102,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnName)) {
                     continue;
                 }
-                final Map<String, DfColumnMetaInfo> columnMap = columnHandler.getColumnMap(metaData, tableInfo);
-                final DfColumnMetaInfo columnInfo = columnMap.get(primaryKeyColumnName);
+                final Map<String, DfColumnMeta> columnMap = columnHandler.getColumnMap(metaData, tableInfo);
+                final DfColumnMeta columnInfo = columnMap.get(primaryKeyColumnName);
                 if (columnInfo == null) {
                     continue;
                 }
@@ -161,8 +161,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         }
     }
 
-    protected void throwSerialTypeSequenceHandlingFailureException(DfTableMetaInfo tableInfo,
-            DfPrimaryKeyMetaInfo pkInfo, String sequenceName, String tableSqlName, Integer actualValue,
+    protected void throwSerialTypeSequenceHandlingFailureException(DfTableMeta tableInfo,
+            DfPrimaryKeyMeta pkInfo, String sequenceName, String tableSqlName, Integer actualValue,
             String sequenceSqlName, SQLException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();

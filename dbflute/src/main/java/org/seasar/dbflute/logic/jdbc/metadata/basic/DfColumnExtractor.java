@@ -28,8 +28,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -57,7 +57,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param tableInfo The meta information of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
+    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, DfTableMeta tableInfo)
             throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
@@ -71,9 +71,9 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
+    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
-        List<DfColumnMetaInfo> ls = doGetColumnList(metaData, unifiedSchema, tableName, false);
+        List<DfColumnMeta> ls = doGetColumnList(metaData, unifiedSchema, tableName, false);
         if (canRetryCaseInsensitive()) {
             if (ls.isEmpty()) { // retry by lower case
                 ls = doGetColumnList(metaData, unifiedSchema, tableName.toLowerCase(), true);
@@ -85,9 +85,9 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         return ls;
     }
 
-    protected List<DfColumnMetaInfo> doGetColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+    protected List<DfColumnMeta> doGetColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, boolean retry) throws SQLException {
-        final List<DfColumnMetaInfo> columnList = DfCollectionUtil.newArrayList();
+        final List<DfColumnMeta> columnList = DfCollectionUtil.newArrayList();
 
         // Column names for duplicate check
         final StringSet columnNameSet = StringSet.createAsFlexible();
@@ -133,7 +133,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                 final String columnComment = rs.getString(12);
                 final String defaultValue = rs.getString(13);
 
-                final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
+                final DfColumnMeta columnMetaInfo = new DfColumnMeta();
                 columnMetaInfo.setColumnName(columnName);
                 columnMetaInfo.setJdbcDefValue(jdbcTypeCode);
                 columnMetaInfo.setDbTypeName(dbTypeName);
@@ -182,11 +182,11 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    public Map<String, DfColumnMetaInfo> getColumnMap(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
+    public Map<String, DfColumnMeta> getColumnMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
             throws SQLException {
-        final List<DfColumnMetaInfo> columnList = getColumnList(metaData, tableInfo);
-        final Map<String, DfColumnMetaInfo> map = new LinkedHashMap<String, DfColumnMetaInfo>();
-        for (DfColumnMetaInfo columnInfo : columnList) {
+        final List<DfColumnMeta> columnList = getColumnList(metaData, tableInfo);
+        final Map<String, DfColumnMeta> map = new LinkedHashMap<String, DfColumnMeta>();
+        for (DfColumnMeta columnInfo : columnList) {
             map.put(columnInfo.getColumnName(), columnInfo);
         }
         return map;
@@ -201,7 +201,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param columnMetaInfo The meta information of column. (NotNull)
      * @return The JDBC type of the column. (NotNull)
      */
-    public String getColumnJdbcType(DfColumnMetaInfo columnMetaInfo) {
+    public String getColumnJdbcType(DfColumnMeta columnMetaInfo) {
         return getColumnJdbcType(columnMetaInfo.getJdbcDefValue(), columnMetaInfo.getDbTypeName());
     }
 
@@ -220,7 +220,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param columnMetaInfo The meta information of column. (NotNull)
      * @return The JDBC type of the column. (NotNull)
      */
-    public boolean hasMappingJdbcType(DfColumnMetaInfo columnMetaInfo) {
+    public boolean hasMappingJdbcType(DfColumnMeta columnMetaInfo) {
         return hasMappingJdbcType(columnMetaInfo.getJdbcDefValue(), columnMetaInfo.getDbTypeName());
     }
 

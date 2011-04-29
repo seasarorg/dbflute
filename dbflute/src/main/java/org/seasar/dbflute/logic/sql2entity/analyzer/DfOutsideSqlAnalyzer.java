@@ -34,7 +34,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
@@ -132,7 +132,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
                 final Map<String, String> columnForcedJavaNativeMap = createColumnForcedJavaNativeMap(sql);
                 final DfCustomizeEntityMetaExtractor customizeEntityMetaExtractor = new DfCustomizeEntityMetaExtractor();
-                final Map<String, DfColumnMetaInfo> columnMetaInfoMap = customizeEntityMetaExtractor
+                final Map<String, DfColumnMeta> columnMetaInfoMap = customizeEntityMetaExtractor
                         .extractColumnMetaInfoMap(rs, sql, new DfForcedJavaNativeProvider() {
                             public String provide(String columnName) {
                                 return columnForcedJavaNativeMap.get(columnName);

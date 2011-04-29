@@ -5,10 +5,10 @@ import java.util.Map;
 /**
  * @author jflute
  */
-public class DfProcedureNotParamResultMetaInfo {
+public class DfProcedureNotParamResultMeta {
 
     protected String _propertyName;
-    protected Map<String, DfColumnMetaInfo> _resultSetColumnInfoMap;
+    protected Map<String, DfColumnMeta> _resultSetColumnInfoMap;
 
     public boolean hasResultSetColumnInfo() {
         return _resultSetColumnInfoMap != null && !_resultSetColumnInfoMap.isEmpty();
@@ -22,11 +22,11 @@ public class DfProcedureNotParamResultMetaInfo {
         this._propertyName = propertyName;
     }
 
-    public Map<String, DfColumnMetaInfo> getResultSetColumnInfoMap() {
+    public Map<String, DfColumnMeta> getResultSetColumnInfoMap() {
         return _resultSetColumnInfoMap;
     }
 
-    public void setResultSetColumnInfoMap(Map<String, DfColumnMetaInfo> resultSetColumnInfoMap) {
+    public void setResultSetColumnInfoMap(Map<String, DfColumnMeta> resultSetColumnInfoMap) {
         this._resultSetColumnInfoMap = resultSetColumnInfoMap;
     }
 }
