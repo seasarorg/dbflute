@@ -134,8 +134,6 @@ public class DfSchemaInitializerFactory {
             initializer.setDataSource(_dataSource);
             initializer.setUnifiedSchema(_databaseProperties.getDatabaseSchema());
             initializer.setDropObjectTypeList(_replaceSchemaProperties.getObjectTypeTargetList());
-            initializer.setDropGenerateTableOnly(_replaceSchemaProperties.isDropGenerateTableOnly());
-            initializer.setDropGenerateProcedureOnly(_replaceSchemaProperties.isDropGenerateProcedureOnly());
             return;
         }
 
@@ -149,9 +147,6 @@ public class DfSchemaInitializerFactory {
             final UnifiedSchema unifiedSchema = getAdditionalDropSchema(_additionalDropMap);
             initializer.setUnifiedSchema(unifiedSchema);
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
-            initializer.setDropTableTargetList(getAdditionalDropTableTargetList(_additionalDropMap));
-            initializer.setDropTableExceptList(getAdditionalDropTableExceptList(_additionalDropMap));
-            initializer.setDropGenerateTableOnly(false);
             return;
         }
 
@@ -203,18 +198,6 @@ public class DfSchemaInitializerFactory {
 
     protected List<String> getAdditionalDropObjectTypeList(Map<String, Object> map) {
         return _replaceSchemaProperties.getAdditionalDropObjectTypeList(map);
-    }
-
-    protected List<String> getAdditionalDropTableTargetList(Map<String, Object> map) {
-        return _replaceSchemaProperties.getAdditionalDropTableTargetList(map);
-    }
-
-    protected List<String> getAdditionalDropTableExceptList(Map<String, Object> map) {
-        return _replaceSchemaProperties.getAdditionalDropTableExceptList(map);
-    }
-
-    protected boolean isAdditionalDropAllTable(Map<String, Object> map) {
-        return _replaceSchemaProperties.isAdditionalDropAllTable(map);
     }
 
     public Map<String, Object> getAdditionalDropMap() {

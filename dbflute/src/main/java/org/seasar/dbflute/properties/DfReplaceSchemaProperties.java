@@ -235,17 +235,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                  Drop Generate Only
-    //                                                                  ==================
-    public boolean isDropGenerateTableOnly() {
-        return isProperty("isDropGenerateTableOnly", false, getReplaceSchemaDefinitionMap());
-    }
-
-    public boolean isDropGenerateProcedureOnly() {
-        return isProperty("isDropGenerateProcedureOnly", false, getReplaceSchemaDefinitionMap());
-    }
-
-    // ===================================================================================
     //                                                                     Additional User
     //                                                                     ===============
     protected Map<String, Map<String, String>> _additionalUesrMap;
@@ -397,26 +386,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             }
         }
         return castToList(obj, "additionalDropMapList.objectTypeTargetList");
-    }
-
-    public List<String> getAdditionalDropTableTargetList(Map<String, Object> additionalDropMap) {
-        Object obj = additionalDropMap.get("tableTargetList");
-        if (obj == null) {
-            return new ArrayList<String>();
-        }
-        return castToList(obj, "additionalDropMapList.tableTargetList");
-    }
-
-    public List<String> getAdditionalDropTableExceptList(Map<String, Object> additionalDropMap) {
-        final Object obj = additionalDropMap.get("tableExceptList");
-        if (obj == null) {
-            return new ArrayList<String>();
-        }
-        return castToList(obj, "additionalDropMapList.tableExceptList");
-    }
-
-    public boolean isAdditionalDropAllTable(Map<String, Object> additionalDropMap) {
-        return isProperty("isDropAllTable", false, additionalDropMap);
     }
 
     public Connection createAdditionalDropConnection(Map<String, Object> additionalDropMap) {

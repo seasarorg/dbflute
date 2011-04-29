@@ -10,8 +10,6 @@
 # o isIncrementSequenceToDataMax: (NotRequired - Default false)
 # o isSuppressBatchUpdate: (NotRequired - Default false)
 # o objectTypeTargetList: (NotRequired - Default databaseInfoMap's)
-# o isDropGenerateTableOnly: (NotRequired - Default false)
-# o isDropGenerateProcedureOnly: (NotRequired - Default false)
 # o filterVariablesMap: (NotRequired - Default map:{})
 # o additionalUserMap: (NotRequired - Default map:{})
 # o additionalDropMapList: (NotRequired - Default list:{})
@@ -83,22 +81,6 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDropGenerateTableOnly: (NotRequired - Default false)
-    #  Does it drop only generating target tables that are specified
-    #  in table-target or table-except setting?
-    #
-    #; isDropGenerateTableOnly = false
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDropGenerateProcedureOnly: (NotRequired - Default false)
-    #  Does it drop only generating target procedures that are specified
-    #  in table-target or table-except setting?
-    #
-    #; isDropGenerateProcedureOnly = false
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o filterVariablesMap: (NotRequired - Default map:{})
     #  You can specify the filter variables for DDL.
     # 
@@ -135,9 +117,6 @@ map:{
     #   o password: (NotRequired - Default same as main schema)
     #   o propertiesMap: (NotRequired - Default map:{})
     #   o objectTypeTargetList: (NotRequired - Default list{TABLE;VIEW})
-    #   o tableExceptList: (NotRequired - Default list{})
-    #   o tableTargetList: (NotRequired - Default list{})
-    #   o isDropAllTable: (NotRequired - Default false)
     #
     #; additionalDropMapList = list:{
     #    ; map:{
@@ -147,9 +126,6 @@ map:{
     #        ; password = NEXTEXAMPLEDB
     #        ; propertiesMap = map:{}
     #        ; objectTypeTargetList = list:{TABLE;VIEW}
-    #        ; tableExceptList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
-    #        ; tableTargetList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
-    #        ; isDropAllTable = false
     #    }
     #}
     # - - - - - - - - - -/
