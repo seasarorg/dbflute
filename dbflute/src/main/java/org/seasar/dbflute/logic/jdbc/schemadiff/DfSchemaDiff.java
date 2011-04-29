@@ -13,7 +13,6 @@ import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -186,11 +185,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     public static DfSchemaDiff createAsFlexible(String previousXml, String nextXml) {
-        final XmlReadingTableFilter tableFilter = null; // no need to filter when reading here
-        final String databaseType = getDatabaseType();
-        final DfSchemaXmlReader previousReader = DfSchemaXmlReader
-                .createAsPlain(previousXml, databaseType, tableFilter);
-        final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsPlain(nextXml, databaseType, tableFilter);
+        // no need to filter when reading here
+        final DfSchemaXmlReader previousReader = DfSchemaXmlReader.createAsFlexibleToManage(previousXml);
+        final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsFlexibleToManage(nextXml);
         return new DfSchemaDiff(previousReader, nextReader);
     }
 
@@ -237,8 +234,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
         br.addNotice("Failed to load schema XML.");
         br.addItem("SchemaXML");
         br.addElement(reader.getSchemaXml());
-        br.addItem("DatabaseType");
-        br.addElement(getDatabaseType());
         br.addItem("Exception");
         br.addElement(e.getClass().getName());
         br.addElement(e.getMessage());

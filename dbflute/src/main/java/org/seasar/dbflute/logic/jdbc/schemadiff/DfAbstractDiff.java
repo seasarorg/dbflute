@@ -136,10 +136,6 @@ public abstract class DfAbstractDiff {
         return DfBuildProperties.getInstance().getBasicProperties().getDatabaseTypeFacadeProp();
     }
 
-    protected static String getDatabaseType() {
-        return getDatabaseTypeFacadeProp().getTargetDatabase();
-    }
-
     protected boolean isDatabaseMySQL() {
         return getDatabaseTypeFacadeProp().isDatabaseMySQL();
     }
