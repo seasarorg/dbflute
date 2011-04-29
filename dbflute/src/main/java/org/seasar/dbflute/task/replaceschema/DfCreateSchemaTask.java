@@ -6,8 +6,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.logic.replaceschema.allmain.DfCreateSchemaMain;
-import org.seasar.dbflute.logic.replaceschema.allmain.DfCreateSchemaMain.CreatingDataSourcePlayer;
+import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaMain;
+import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaMain.CreatingDataSourcePlayer;
 
 public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 

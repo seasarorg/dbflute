@@ -1,6 +1,6 @@
 package org.seasar.dbflute.task.replaceschema;
 
-import org.seasar.dbflute.logic.replaceschema.allmain.DfLoadDataMain;
+import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataMain;
 
 public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
 

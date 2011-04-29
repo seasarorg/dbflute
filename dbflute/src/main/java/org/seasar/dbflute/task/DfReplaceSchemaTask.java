@@ -10,15 +10,15 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
-import org.seasar.dbflute.logic.replaceschema.allmain.DfCreateSchemaMain;
-import org.seasar.dbflute.logic.replaceschema.allmain.DfCreateSchemaMain.CreatingDataSourcePlayer;
-import org.seasar.dbflute.logic.replaceschema.allmain.DfLoadDataMain;
-import org.seasar.dbflute.logic.replaceschema.allmain.DfTakeFinallyMain;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaMain;
+import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataMain;
+import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyMain;
+import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaMain.CreatingDataSourcePlayer;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 public class DfReplaceSchemaTask extends DfAbstractTask {

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.replaceschema.allmain;
+package org.seasar.dbflute.logic.replaceschema.process;
 
 import java.util.ArrayList;
 import java.util.List;
