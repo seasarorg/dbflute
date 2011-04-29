@@ -176,13 +176,13 @@ public class DfSchemaDiff extends DfAbstractDiff {
             return;
         } catch (IOException e) {
             _loadingFailure = true;
-            handleException(e);
+            handleReadingException(e, reader);
         }
         try {
             _previousDb = reader.getSchemaData().getDatabase();
         } catch (RuntimeException e) {
             _loadingFailure = true;
-            handleException(e);
+            handleReadingException(e, reader);
         }
         _previousTableCount = _previousDb.getTableList().size();
     }
@@ -200,23 +200,23 @@ public class DfSchemaDiff extends DfAbstractDiff {
         try {
             reader.read();
         } catch (IOException e) {
-            handleException(e);
+            handleReadingException(e, reader);
         }
         try {
             _nextDb = reader.getSchemaData().getDatabase();
         } catch (RuntimeException e) {
-            handleException(e);
+            handleReadingException(e, reader);
         }
         _diffDate = new Date(DfSystemUtil.currentTimeMillis());
         final int nextTableCount = _nextDb.getTableList().size();
         _tableCountDiff = createNextPreviousDiff(nextTableCount, _previousTableCount);
     }
 
-    protected void handleException(Exception e) {
+    protected void handleReadingException(Exception e, DfSchemaXmlReader reader) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to load schema XML.");
         br.addItem("SchemaXML");
-        br.addElement(getSchemaXmlFilePath());
+        br.addElement(reader.getSchemaXml());
         br.addItem("DatabaseType");
         br.addElement(getDatabaseType());
         br.addItem("Exception");
@@ -956,11 +956,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                       =============
     protected DfSchemaXmlReader createSchemaXmlReader() {
         // no need to filter when reading here
-        return new DfSchemaXmlReader(getSchemaXmlFilePath(), getDatabaseType(), null);
-    }
-
-    protected String getSchemaXmlFilePath() {
-        return getBasicProperties().getProejctSchemaXMLFilePath();
+        return DfSchemaXmlReader.createAsMain(getDatabaseType(), null);
     }
 
     protected String getDatabaseType() {

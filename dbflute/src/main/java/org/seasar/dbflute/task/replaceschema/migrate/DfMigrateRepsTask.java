@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.replaceschema.migratereps.DfLoadDataMigration;
@@ -60,13 +59,7 @@ public class DfMigrateRepsTask extends DfAbstractTask {
     }
 
     protected DfSchemaXmlReader createSchemaFileReader() {
-        final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
-        final String targetDatabase = getTargetDatabase();
-        final XmlReadingTableFilter tableFilter = new XmlReadingTableFilter() {
-            public boolean isExcept(UnifiedSchema unifiedSchema, String tableName) {
-                return false; // all tables are dumped
-            }
-        };
-        return new DfSchemaXmlReader(filePath, targetDatabase, tableFilter);
+        final XmlReadingTableFilter tableFilter = null; // all tables are dumped
+        return DfSchemaXmlReader.createAsMain(getTargetDatabase(), tableFilter);
     }
 }

@@ -193,10 +193,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected DfSchemaXmlReader createSchemaFileReader() {
-        final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
-        final String targetDatabase = getTargetDatabase();
         final XmlReadingTableFilter tableFilter = createXmlReadingTableFilter();
-        return new DfSchemaXmlReader(filePath, targetDatabase, tableFilter);
+        return DfSchemaXmlReader.createAsMain(getTargetDatabase(), tableFilter);
     }
 
     protected XmlReadingTableFilter createXmlReadingTableFilter() { // same as Generate task's one

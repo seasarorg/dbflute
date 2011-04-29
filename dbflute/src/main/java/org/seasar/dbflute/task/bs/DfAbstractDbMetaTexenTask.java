@@ -57,10 +57,8 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     }
 
     protected DfSchemaXmlReader createSchemaFileReader() {
-        final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
-        final String targetDatabase = getTargetDatabase();
         final XmlReadingTableFilter tableFilter = createXmlReadingTableFilter();
-        return new DfSchemaXmlReader(filePath, targetDatabase, tableFilter);
+        return DfSchemaXmlReader.createAsMain(getTargetDatabase(), tableFilter);
     }
 
     protected abstract XmlReadingTableFilter createXmlReadingTableFilter();
