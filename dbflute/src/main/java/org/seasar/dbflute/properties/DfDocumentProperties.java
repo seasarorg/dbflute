@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -249,40 +251,73 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                   Data Xls Tempalte
+    //                                                                   Data Xls Template
     //                                                                   =================
+    protected Map<String, String> _dataXlsTemplateMap;
+
+    protected Map<String, String> getDataXlsTemplateMap() {
+        if (_dataXlsTemplateMap != null) {
+            return _dataXlsTemplateMap;
+        }
+        final String key = "dataXlsTemplateMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, String> map = (Map<String, String>) getDocumentDefinitionMap().get(key);
+        if (map != null) {
+            _dataXlsTemplateMap = map;
+        } else {
+            _dataXlsTemplateMap = DfCollectionUtil.emptyMap();
+        }
+        return _dataXlsTemplateMap;
+    }
+
     public boolean isDataXlsTemplateRecordLimitValid() {
         final Integer limit = getDataXlsTemplateRecordLimit();
         return limit != null;
     }
 
-    public int getDataXlsTemplateRecordLimit() {
-        String limit = (String) getDocumentDefinitionMap().get("dataXlsTemplateRecordLimit");
-        if (limit == null || limit.trim().length() == 0 || limit.trim().equalsIgnoreCase("null")) {
-            return -1;
+    public Integer getDataXlsTemplateRecordLimit() {
+        final Map<String, String> dataXlsTemplateMap = getDataXlsTemplateMap();
+        String limitExp = null;
+        if (!dataXlsTemplateMap.isEmpty()) {
+            final String newKey = "recordLimit";
+            limitExp = dataXlsTemplateMap.get(newKey);
+        }
+        if (Srl.is_Null_or_TrimmedEmpty(limitExp) || limitExp.trim().equalsIgnoreCase("null")) {
+            final String oldKey = "dataXlsTemplateRecordLimit";
+            limitExp = (String) getDocumentDefinitionMap().get(oldKey);
+            if (Srl.is_Null_or_TrimmedEmpty(limitExp) || limitExp.trim().equalsIgnoreCase("null")) {
+                return null;
+            }
         }
         try {
-            return Integer.valueOf(limit);
+            return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
             String msg = "The property 'dataXlsTemplateRecordLimit' of " + KEY_documentDefinitionMap;
-            msg = msg + " should be number but: value=" + limit;
+            msg = msg + " should be number but: value=" + limitExp;
             throw new IllegalStateException(msg, e);
         }
     }
 
     public boolean isDataXlsTemplateContainsCommonColumn() {
-        return isProperty("isDataXlsTemplateContainsCommonColumn", false, getDocumentDefinitionMap());
+        final String newKey = "isContainsCommonColumn";
+        final String oldKey = "isDataXlsTemplateContainsCommonColumn";
+        final boolean defaultValue = isProperty(oldKey, false, getDocumentDefinitionMap());
+        return isProperty(newKey, defaultValue, getDataXlsTemplateMap());
     }
 
-    public File getDataXlsTemplateFile() {
+    public boolean isDataXlsTemplateLoadDataMigration() {
+        final String key = "isLoadDataMigration";
+        return isProperty(key, false, getDataXlsTemplateMap());
+    }
+
+    public String getDataXlsTemplateDir() {
         final String outputDirectory = getDocumentOutputDirectory();
-        final File xlsFile = new File(outputDirectory + "/data-xls-template.xls");
-        return xlsFile;
+        return outputDirectory + "/data";
     }
 
     public File getDataDelimiterTemplateDir() { // for large data
-        final String outputDirectory = getDocumentOutputDirectory();
-        final File xlsFile = new File(outputDirectory + "/largedata");
+        final String templateDir = getDataXlsTemplateDir();
+        final File xlsFile = new File(templateDir + "/largedata");
         return xlsFile;
     }
 

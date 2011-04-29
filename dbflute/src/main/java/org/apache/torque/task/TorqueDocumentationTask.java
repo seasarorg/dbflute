@@ -55,22 +55,15 @@ package org.apache.torque.task;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
-import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler;
+import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsGenerator;
+import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsHandler;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
-import org.seasar.dbflute.properties.DfAdditionalTableProperties;
-import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
@@ -136,38 +129,23 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* Data Xls Template *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        final Map<String, Table> tableInfoMap = new LinkedHashMap<String, Table>();
-        final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
-        final Map<String, String> commonColumnMap = getCommonColumnMap();
         final Database database = _schemaData.getDatabase();
-        final List<Table> tableList = database.getTableList();
-        for (Table table : tableList) {
-            final Column[] columns = table.getColumns();
-            final List<Column> columnNameList = new ArrayList<Column>();
-            for (Column column : columns) {
-                if (!containsCommonColumn && commonColumnMap.containsKey(column.getName())) {
-                    continue;
-                }
-                columnNameList.add(column);
-            }
-            tableInfoMap.put(table.getName(), table);
-        }
-        _log.info("...Outputting data xls template: tables=" + tableInfoMap.size());
-        outputDataXlsTemplate(tableInfoMap);
+        _log.info("...Outputting data xls template: tables=" + database.getTableList().size());
+        outputDataXlsTemplate(database);
         _log.info("");
     }
 
-    protected void outputDataXlsTemplate(Map<String, Table> tableMap) {
-        final DfDataXlsTemplateHandler handler = new DfDataXlsTemplateHandler(getDataSource());
-        if (isDataXlsTemplateContainsCommonColumn()) {
-            handler.setContainsCommonColumn(true);
-        }
+    protected void outputDataXlsTemplate(Database database) {
+        final DfDataXlsHandler handler = new DfDataXlsHandler(getDataSource());
+        handler.setContainsCommonColumn(isDataXlsTemplateContainsCommonColumn());
         handler.setDelimiterDataOutputDir(getDataDelimiterTemplateDir());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
+        final String templateDir = getDataXlsTemplateDir();
+        final String fileTitle = "data-xls";
         final int limit = getDataXlsTemplateRecordLimit();
-        final File xlsFile = getDataXlsTemplateFile();
-        handler.outputData(tableMap, limit, xlsFile);
+        final DfDataXlsGenerator generator = new DfDataXlsGenerator(handler, templateDir, fileTitle, limit);
+        generator.outputData(database);
     }
 
     // ===================================================================================
@@ -193,22 +171,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().isDataXlsTemplateContainsCommonColumn();
     }
 
-    protected File getDataXlsTemplateFile() {
-        return getDocumentProperties().getDataXlsTemplateFile();
-    }
-
-    protected Map<String, String> getCommonColumnMap() {
-        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
-        final Map<String, String> commonColumnMap = commonColumnProperties.getCommonColumnMap();
-        return commonColumnMap;
-    }
-
-    public boolean isGenerateProcedureParameterBean() {
-        return getProperties().getOutsideSqlProperties().isGenerateProcedureParameterBean();
-    }
-
-    protected DfAdditionalTableProperties getAdditionalTableProperties() {
-        return getProperties().getAdditionalTableProperties();
+    protected String getDataXlsTemplateDir() {
+        return getDocumentProperties().getDataXlsTemplateDir();
     }
 
     // ===================================================================================

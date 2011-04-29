@@ -36,7 +36,7 @@ import org.seasar.dbflute.properties.DfAdditionalTableProperties;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfDataXlsTemplateHandler {
+public class DfDataXlsHandler {
 
     // ===================================================================================
     //                                                                          Definition
@@ -59,7 +59,7 @@ public class DfDataXlsTemplateHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataXlsTemplateHandler(DataSource dataSource) {
+    public DfDataXlsHandler(DataSource dataSource) {
         _dataSource = dataSource;
     }
 

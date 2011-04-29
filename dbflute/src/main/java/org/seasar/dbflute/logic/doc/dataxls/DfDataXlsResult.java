@@ -8,7 +8,7 @@ import org.apache.torque.engine.database.model.Column;
 /**
  * @author jflute
  */
-public class DfDataXlsTemplateResult {
+public class DfDataXlsResult {
 
     protected Map<String, List<Column>> _overTableColumnMap;
     protected Map<String, List<Map<String, String>>> _overTemplateDataMap;
